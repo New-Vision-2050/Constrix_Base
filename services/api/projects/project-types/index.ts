@@ -19,7 +19,7 @@ export const ProjectTypesApi = {
       `project-types/${id}/children`,
     ),
   getProjectTypeSchemas: (id: number | string) =>
-    baseApi.get<GetProjectTypeSchemasResponse>(`project-types/${id}/children`),
+    baseApi.get<GetProjectTypeSchemasResponse>(`project-types/${id}/schemas`),
   createSecondLevelProjectType: (args: CreateSecondLevelProjectTypeArgs) =>
     baseApi.post<CreateSecondLevelProjectTypeResponse>(
       `project-types/second-level`,

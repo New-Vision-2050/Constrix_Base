@@ -10,12 +10,11 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Button,
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import CircularProgress from "@mui/material/CircularProgress";
-import { useQueryClient } from "@tanstack/react-query";
+import SaveButton from "@/components/shared/buttons/save";
+import CancelButton from "@/components/shared/buttons/cancel";
 import { toast } from "sonner";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import IconPicker from "@/components/shared/icon-picker";
@@ -40,8 +39,6 @@ export default function AddSubProjectTypeDialog({
   onSuccess,
   parentId,
 }: AddSubProjectTypeDialogProps) {
-  const queryClient = useQueryClient();
-
   const {
     register,
     handleSubmit,
@@ -64,7 +61,6 @@ export default function AddSubProjectTypeDialog({
         is_active: true,
       });
 
-      queryClient.invalidateQueries({ queryKey: ["project-types"] });
       toast.success("تم اضافة التصنيف الفرعي بنجاح");
       reset();
       onClose();
@@ -123,20 +119,8 @@ export default function AddSubProjectTypeDialog({
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose} disabled={isSubmitting}>
-            الغاء
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            {isSubmitting && (
-              <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
-            )}
-            حفظ
-          </Button>
+          <CancelButton onClick={handleClose} disabled={isSubmitting} />
+          <SaveButton type="submit" disabled={isSubmitting} loading={isSubmitting} />
         </DialogActions>
       </form>
     </Dialog>

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +10,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Button,
   Select,
   MenuItem,
   FormControl,
@@ -23,8 +22,10 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import CircularProgress from "@mui/material/CircularProgress";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import LinearProgress from "@mui/material/LinearProgress";
+import SaveButton from "@/components/shared/buttons/save";
+import CancelButton from "@/components/shared/buttons/cancel";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import IconPicker from "@/components/shared/icon-picker";
@@ -53,17 +54,16 @@ export default function AddProjectTypeDialog({
   onSuccess,
   parentId,
 }: AddProjectTypeDialogProps) {
-  const queryClient = useQueryClient();
-  const { data: rootsData } = useQuery({
-    queryKey: ["project-types", "roots"],
+  const { data: secondLevelData } = useQuery({
+    queryKey: ["project-types", "children", parentId],
     queryFn: async () => {
-      const response = await ProjectTypesApi.getRoots();
+      const response = await ProjectTypesApi.getDirectChildren(parentId);
       return response.data.payload ?? [];
     },
     enabled: open,
   });
 
-  const roots: PRJ_ProjectType[] = rootsData ?? [];
+  const secondLevelItems: PRJ_ProjectType[] = secondLevelData ?? [];
 
   const form = useForm<AddProjectTypeFormData>({
     resolver: zodResolver(addProjectTypeSchema),
@@ -88,11 +88,34 @@ export default function AddProjectTypeDialog({
   const referenceProjectTypeId = watch("reference_project_type_id");
   const isCheckboxesEnabled = !!referenceProjectTypeId;
 
+  const { data: referenceSchemasData, isLoading: isSchemasLoading } = useQuery({
+    queryKey: ["project-types", "schemas", referenceProjectTypeId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getProjectTypeSchemas(
+        referenceProjectTypeId!,
+      );
+      return response.data.payload ?? [];
+    },
+    enabled: !!referenceProjectTypeId,
+    gcTime: 0,
+    staleTime: 0,
+  });
+
+  const referenceSchemas = useMemo(() => referenceSchemasData ?? [], [referenceSchemasData]);
+
+  const visibleTabs = useMemo(
+    () =>
+      referenceSchemas.length === 0
+        ? CURRENT_TABS
+        : CURRENT_TABS.filter((tab) =>
+            referenceSchemas.some((schema) => schema.id === tab.schema_id),
+          ),
+    [referenceSchemas],
+  );
+
   const handleReferenceChange = (value: string | null) => {
     setValue("reference_project_type_id", value);
-    if (!value) {
-      setValue("selected_tab_values", null);
-    }
+    setValue("selected_tab_values", null);
   };
 
   const handleFormSubmit = async (data: AddProjectTypeFormData) => {
@@ -121,7 +144,6 @@ export default function AddProjectTypeDialog({
         is_active: true,
       });
 
-      queryClient.invalidateQueries({ queryKey: ["project-types"] });
       toast.success("تم اضافة نوع المشروع بنجاح");
       reset();
       onClose();
@@ -218,9 +240,9 @@ export default function AddProjectTypeDialog({
               <MenuItem value="">
                 <em>مرجعية المشروع</em>
               </MenuItem>
-              {roots.map((root) => (
-                <MenuItem key={root.id} value={root.id.toString()}>
-                  {root.name}
+              {secondLevelItems.map((item) => (
+                <MenuItem key={item.id} value={item.id.toString()}>
+                  {item.name}
                 </MenuItem>
               ))}
             </Select>
@@ -237,40 +259,32 @@ export default function AddProjectTypeDialog({
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 تحديد عناصر المشروع
               </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, pt: 1 }}>
-                {CURRENT_TABS.map((tab) => (
-                  <FormControlLabel
-                    key={tab.value}
-                    disabled={isSubmitting}
-                    control={
-                      <Checkbox
-                        checked={(selectedTabValues ?? []).includes(tab.value)}
-                        onChange={() => toggleTabValue(tab.value)}
-                        disabled={isSubmitting}
-                      />
-                    }
-                    label={tab.name}
-                  />
-                ))}
-              </Box>
+              {isSchemasLoading ? (
+                <LinearProgress sx={{ mt: 1 }} />
+              ) : (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, pt: 1 }}>
+                  {visibleTabs.map((tab) => (
+                    <FormControlLabel
+                      key={tab.value}
+                      disabled={isSubmitting}
+                      control={
+                        <Checkbox
+                          checked={(selectedTabValues ?? []).includes(tab.value)}
+                          onChange={() => toggleTabValue(tab.value)}
+                          disabled={isSubmitting}
+                        />
+                      }
+                      label={tab.name}
+                    />
+                  ))}
+                </Box>
+              )}
             </Box>
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose} disabled={isSubmitting}>
-            الغاء
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            {isSubmitting && (
-              <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
-            )}
-            حفظ
-          </Button>
+          <CancelButton onClick={handleClose} disabled={isSubmitting} />
+          <SaveButton type="submit" disabled={isSubmitting} loading={isSubmitting} />
         </DialogActions>
       </form>
     </Dialog>
