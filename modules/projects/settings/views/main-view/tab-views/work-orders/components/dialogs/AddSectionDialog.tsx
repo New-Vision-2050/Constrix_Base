@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { Dispatch, SetStateAction } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslations } from "next-intl";
 
 export default function AddSectionDialog({
   open,
@@ -17,6 +18,9 @@ export default function AddSectionDialog({
   open: boolean;
   setOpenModal: Dispatch<SetStateAction<boolean>>;
 }) {
+  const t = useTranslations("section");
+  const tForm = useTranslations("section.form");
+  
   const handleClose = () => {
     setOpenModal(false);
   };
@@ -39,7 +43,7 @@ export default function AddSectionDialog({
       <DialogContent className="max-w-6xl w-full bg-sidebar">
         <DialogHeader>
           <DialogTitle className="text-start">
-            إضافة قسم
+            {t("addSection")}
           </DialogTitle>
         </DialogHeader>
         <IconButton
@@ -56,8 +60,8 @@ export default function AddSectionDialog({
 
         <div className="flex flex-col gap-4">
           <TextField
-            label="كود القسم"
-            placeholder="كود القسم"
+            label={tForm("sectionCode")}
+            placeholder={tForm("sectionCodePlaceholder")}
             // error={!!errors.name}
             // helperText={errors.name?.message}
             // disabled={isSubmitting}
@@ -65,8 +69,8 @@ export default function AddSectionDialog({
             size="medium"
           />
           <TextField
-            label="وصف القسم"
-            placeholder="وصف القسم"
+            label={tForm("sectionDescription")}
+            placeholder={tForm("sectionDescriptionPlaceholder")}
             // error={!!errors.name}
             // helperText={errors.name?.message}
             // disabled={isSubmitting}
@@ -81,7 +85,7 @@ export default function AddSectionDialog({
             // disabled={isSubmitting || isFetching}
             className="w-full"
           >
-            حفظ
+            {tForm("save")}
           </Button>
         </div>
       </DialogContent>

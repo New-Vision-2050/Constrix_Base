@@ -9,6 +9,7 @@ import {
 import { RowActionsProps } from "../types";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
+import { useTranslations } from "next-intl";
 
 export function RowActions({
   row,
@@ -17,11 +18,13 @@ export function RowActions({
   canEdit,
   canShow,
 }: RowActionsProps) {
+  const tTable = useTranslations("section.table");
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="sm" className="bg-slate-400 hover:bg-slate-400">
-          action
+          {tTable("action")}
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -31,7 +34,7 @@ export function RowActions({
           onClick={() => onShow(row.id)}
         >
           <VisibilityIcon className="mr-2 h-4 w-4" color="primary" />
-          show
+          {tTable("show")}
         </DropdownMenuItem>
 
         <DropdownMenuItem
@@ -39,7 +42,7 @@ export function RowActions({
           onClick={() => onEdit(row.id)}
         >
           <BorderColorIcon className="mr-2 h-4 w-4" color="primary"/>
-          edit
+          {tTable("editSection")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

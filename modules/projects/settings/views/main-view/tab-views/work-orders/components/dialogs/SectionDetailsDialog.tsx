@@ -10,12 +10,15 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { DetailsDialogProps } from "../../types";
+import { useTranslations } from "next-intl";
 
 const SectionDetailsDialog = ({
   open,
   setOpenModal,
   rowId,
 }: DetailsDialogProps) => {
+  const t = useTranslations("section");
+  const tDetails = useTranslations("section.details");
   const handleClose = () => setOpenModal(false);
 
   // Mock section data
@@ -79,7 +82,7 @@ const SectionDetailsDialog = ({
           mb: 2,
         }}
       >
-        عرض تفاصيل القسم
+        {tDetails("title")}
       </DialogTitle>
 
       <DialogContent>
@@ -88,12 +91,12 @@ const SectionDetailsDialog = ({
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>كود القسم:</strong> {section.sectionCode}
+                  <strong>{tDetails("sectionCode")}:</strong> {section.sectionCode}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>وصف القسم:</strong> {section.sectionDescription}
+                  <strong>{tDetails("sectionDescription")}:</strong> {section.sectionDescription}
                 </Typography>
               </Grid>
             </Grid>
@@ -101,7 +104,7 @@ const SectionDetailsDialog = ({
         )}
         {!section && (
           <Typography textAlign="center" color="error">
-            لم يتم العثور على بيانات القسم
+            {tDetails("notFound")}
           </Typography>
         )}
       </DialogContent>

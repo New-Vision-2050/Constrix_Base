@@ -89,8 +89,8 @@ export default function EditSectionDialog({
   onSuccess,
   sectionId,
 }: SectionDialogProps) {
-  const t = useTranslations("sections");
-  const tForm = useTranslations("sections.form");
+  const t = useTranslations("section");
+  const tForm = useTranslations("section.form");
   const isEditMode = !!sectionId;
 
   // Mock fetch section data when editing (replace with actual API call)
@@ -206,7 +206,7 @@ export default function EditSectionDialog({
         },
       }}
     >
-      <DialogContent className="max-w-6xl w-full bg-sidebar">
+      <DialogContent className="w-full bg-sidebar">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold">
             {t("editSection")}
@@ -227,7 +227,7 @@ export default function EditSectionDialog({
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
             {/* Section Code and Description - 2 Column Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <FormField
                 control={control}
                 name="sectionCode"

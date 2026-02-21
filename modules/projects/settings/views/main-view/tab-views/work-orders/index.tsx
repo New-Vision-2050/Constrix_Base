@@ -15,10 +15,12 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import {useTranslations} from "next-intl";
 
-export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTIONS" | "HIDE";
+export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "HIDE";
 
 export default function WorkOrdersIndex() {
+  const t = useTranslations("section");
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
   return (
@@ -27,7 +29,7 @@ export default function WorkOrdersIndex() {
         <div>
           <Accordion defaultExpanded className="mb-2">
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="h6">Electricity settings</Typography>
+              <Typography variant="h6">{t("electricitySettings")}</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Card
@@ -40,7 +42,7 @@ export default function WorkOrdersIndex() {
                 }}
               >
                 <CardContent>
-                  <Typography>Work order type</Typography>
+                  <Typography>{t("workOrderType")}</Typography>
                 </CardContent>
                 <CardActions>
                   <IconButton
@@ -61,12 +63,12 @@ export default function WorkOrdersIndex() {
                 }}
               >
                 <CardContent>
-                  <Typography>القسم</Typography>
+                  <Typography>{t("section")}</Typography>
                 </CardContent>
                 <CardActions>
                   <IconButton
                     className="cursor-pointer"
-                    onClick={() => setActiveCard("SECTIONS")}
+                    onClick={() => setActiveCard("SECTION")}
                   >
                     <KeyboardArrowRightIcon />
                   </IconButton>
@@ -80,7 +82,7 @@ export default function WorkOrdersIndex() {
       {activeCard === "WORK_ORDER_TYPES" && (
         <WorkOrderTypeView setActiveCard={setActiveCard} />
       )}
-      {activeCard === "SECTIONS" && (
+      {activeCard === "SECTION" && (
         <SectionView setActiveCard={setActiveCard} />
       )}
     </Paper>

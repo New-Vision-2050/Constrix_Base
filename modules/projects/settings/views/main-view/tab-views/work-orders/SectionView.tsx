@@ -17,8 +17,8 @@ export default function SectionView({
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
 }) {
-  const t = useTranslations("sections");
-  const tTable = useTranslations("sections.table");
+  const t = useTranslations("section");
+  const tTable = useTranslations("section.table");
 
   const [displayedRowId, setDisplayedRowId] = useState<string | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
