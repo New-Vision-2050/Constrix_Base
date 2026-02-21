@@ -17,8 +17,9 @@ import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectTypeSchema } from "@/types/api/projects/project-type-schema";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import AddSubProjectTypeDialog from "../../../components/dialogs/add-sub-project-type";
-import { CURRENT_TABS } from "../../../constants/current-tabs";
+import { useProjectSettingsTabs } from "../../../constants/current-tabs";
 import DetailsView from "../tab-views/details";
 import ProjectTermsView from "../tab-views/project-terms";
 import AttachmentsView from "../tab-views/attachments";
@@ -78,6 +79,9 @@ const TabWithCheckbox = ({
 );
 
 export default function SchemaLevelTabs({ parentId }: SchemaLevelTabsProps) {
+  const t = useTranslations("Projects.Settings.projectTypes");
+  const allTabs = useProjectSettingsTabs();
+
   const [selectedSchema, setSelectedSchema] =
     useState<PRJ_ProjectTypeSchema | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -102,10 +106,10 @@ export default function SchemaLevelTabs({ parentId }: SchemaLevelTabsProps) {
   const schemas = useMemo(() => data ?? [], [data]);
   const filteredTabs = useMemo(
     () =>
-      CURRENT_TABS.filter((tab) =>
+      allTabs.filter((tab) =>
         schemas.some((schema) => schema.id === tab.schema_id),
       ),
-    [schemas],
+    [schemas, allTabs],
   );
 
   useEffect(() => {
@@ -153,7 +157,7 @@ export default function SchemaLevelTabs({ parentId }: SchemaLevelTabsProps) {
                 >
                   <AddIcon fontSize="small" sx={{ mr: 1 }} />
                   <Typography variant="subtitle1" fontWeight={500}>
-                    اضافة
+                    {t("add")}
                   </Typography>
                 </MenuItem>
               </MenuList>

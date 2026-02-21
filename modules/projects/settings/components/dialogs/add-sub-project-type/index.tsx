@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,13 +18,7 @@ import CancelButton from "@/components/shared/buttons/cancel";
 import { toast } from "sonner";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import IconPicker from "@/components/shared/icon-picker";
-
-const schema = z.object({
-  name: z.string().min(1, "اسم التصنيف مطلوب"),
-  icon_id: z.string().min(1, "اختيار الأيقونة مطلوب"),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useTranslations } from "next-intl";
 
 interface AddSubProjectTypeDialogProps {
   open: boolean;
@@ -39,6 +33,19 @@ export default function AddSubProjectTypeDialog({
   onSuccess,
   parentId,
 }: AddSubProjectTypeDialogProps) {
+  const t = useTranslations("Projects.Settings.projectTypes.addSubProjectType");
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, t("nameRequired")),
+        icon_id: z.string().min(1, t("iconRequired")),
+      }),
+    [t],
+  );
+
+  type FormData = z.infer<typeof schema>;
+
   const {
     register,
     handleSubmit,
@@ -61,13 +68,13 @@ export default function AddSubProjectTypeDialog({
         is_active: true,
       });
 
-      toast.success("تم اضافة التصنيف الفرعي بنجاح");
+      toast.success(t("successMessage"));
       reset();
       onClose();
       onSuccess?.();
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err?.response?.data?.message ?? "فشل في اضافة التصنيف الفرعي");
+      toast.error(err?.response?.data?.message ?? t("errorMessage"));
     }
   };
 
@@ -89,7 +96,7 @@ export default function AddSubProjectTypeDialog({
           pr: 6,
         }}
       >
-        اضافة تصنيف فرعي
+        {t("title")}
         <IconButton
           aria-label="close"
           onClick={handleClose}
@@ -103,7 +110,7 @@ export default function AddSubProjectTypeDialog({
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             {...register("name")}
-            label="اسم التصنيف"
+            label={t("nameLabel")}
             error={!!errors.name}
             helperText={errors.name?.message}
             disabled={isSubmitting}
