@@ -1,67 +1,45 @@
-import DetailsView from "../views/main-view/tab-views/details";
-import ProjectTermsView from "../views/main-view/tab-views/project-terms";
-import AttachmentsView from "../views/main-view/tab-views/attachments";
-import ContractorsView from "../views/main-view/tab-views/contractors";
-import TeamView from "../views/main-view/tab-views/team";
-import WorkOrdersView from "../views/main-view/tab-views/work-orders";
-import FinancialView from "../views/main-view/tab-views/financial";
-import ContractManagementView from "../views/main-view/tab-views/contract-management";
+import { useTranslations } from "next-intl";
+
+export const SCHEMA_IDS = {
+  detailsView: 1,
+  projectTerms: 2,
+  attachments: 3,
+  contractors: 4,
+  team: 5,
+  workOrders: 6,
+  financial: 7,
+  contractManagement: 8,
+} as const;
 
 export interface ProjectSettingsTab {
   name: string;
   value: string;
-  /** Backend schema ID for ProjectTypesApi - used when creating project types */
   schema_id?: number;
-  component?: React.ReactNode;
 }
 
-export const CURRENT_TABS: ProjectSettingsTab[] = [
-  {
-    name: "بيانات المشروع",
-    value: "project-details",
-    schema_id: 1,
-    component: <DetailsView />,
-  },
-  {
-    name: "بنود المشروع",
-    value: "project-terms",
-    schema_id: 2,
-    component: <ProjectTermsView />,
-  },
-  {
-    name: "المرفقات",
-    value: "attachments",
-    schema_id: 3,
-    component: <AttachmentsView />,
-  },
-  {
-    name: "المقاولين",
-    value: "contractors",
-    schema_id: 4,
-    component: <ContractorsView />,
-  },
-  {
-    name: "الكادر",
-    value: "team",
-    schema_id: 5,
-    component: <TeamView />,
-  },
-  {
-    name: "اوامر العمل",
-    value: "work-orders",
-    schema_id: 6,
-    component: <WorkOrdersView />,
-  },
-  {
-    name: "المالية",
-    value: "financial",
-    schema_id: 7,
-    component: <FinancialView />,
-  },
-  {
-    name: "ادارة العقد",
-    value: "contract-management",
-    schema_id: 8,
-    component: <ContractManagementView />,
-  },
-];
+/** Static value → schema_id map for non-rendering logic (e.g. form submit) */
+export const TAB_SCHEMA_ID_MAP: Record<string, number> = {
+  "project-details": SCHEMA_IDS.detailsView,
+  "project-terms": SCHEMA_IDS.projectTerms,
+  attachments: SCHEMA_IDS.attachments,
+  contractors: SCHEMA_IDS.contractors,
+  team: SCHEMA_IDS.team,
+  "work-orders": SCHEMA_IDS.workOrders,
+  financial: SCHEMA_IDS.financial,
+  "contract-management": SCHEMA_IDS.contractManagement,
+};
+
+/** Hook that returns translated tabs for rendering */
+export function useProjectSettingsTabs(): ProjectSettingsTab[] {
+  const t = useTranslations("Projects.Settings.projectTypes.tabs");
+  return [
+    { name: t("projectDetails"), value: "project-details", schema_id: SCHEMA_IDS.detailsView },
+    { name: t("projectTerms"), value: "project-terms", schema_id: SCHEMA_IDS.projectTerms },
+    { name: t("attachments"), value: "attachments", schema_id: SCHEMA_IDS.attachments },
+    { name: t("contractors"), value: "contractors", schema_id: SCHEMA_IDS.contractors },
+    { name: t("team"), value: "team", schema_id: SCHEMA_IDS.team },
+    { name: t("workOrders"), value: "work-orders", schema_id: SCHEMA_IDS.workOrders },
+    { name: t("financial"), value: "financial", schema_id: SCHEMA_IDS.financial },
+    { name: t("contractManagement"), value: "contract-management", schema_id: SCHEMA_IDS.contractManagement },
+  ];
+}

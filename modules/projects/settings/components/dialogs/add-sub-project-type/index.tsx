@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,22 +10,15 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Button,
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import CircularProgress from "@mui/material/CircularProgress";
-import { useQueryClient } from "@tanstack/react-query";
+import SaveButton from "@/components/shared/buttons/save";
+import CancelButton from "@/components/shared/buttons/cancel";
 import { toast } from "sonner";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import IconPicker from "@/components/shared/icon-picker";
-
-const schema = z.object({
-  name: z.string().min(1, "اسم التصنيف مطلوب"),
-  icon_id: z.string().min(1, "اختيار الأيقونة مطلوب"),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useTranslations } from "next-intl";
 
 interface AddSubProjectTypeDialogProps {
   open: boolean;
@@ -40,7 +33,18 @@ export default function AddSubProjectTypeDialog({
   onSuccess,
   parentId,
 }: AddSubProjectTypeDialogProps) {
-  const queryClient = useQueryClient();
+  const t = useTranslations("Projects.Settings.projectTypes.addSubProjectType");
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, t("nameRequired")),
+        icon_id: z.string().min(1, t("iconRequired")),
+      }),
+    [t],
+  );
+
+  type FormData = z.infer<typeof schema>;
 
   const {
     register,
@@ -64,14 +68,13 @@ export default function AddSubProjectTypeDialog({
         is_active: true,
       });
 
-      queryClient.invalidateQueries({ queryKey: ["project-types"] });
-      toast.success("تم اضافة التصنيف الفرعي بنجاح");
+      toast.success(t("successMessage"));
       reset();
       onClose();
       onSuccess?.();
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err?.response?.data?.message ?? "فشل في اضافة التصنيف الفرعي");
+      toast.error(err?.response?.data?.message ?? t("errorMessage"));
     }
   };
 
@@ -93,7 +96,7 @@ export default function AddSubProjectTypeDialog({
           pr: 6,
         }}
       >
-        اضافة تصنيف فرعي
+        {t("title")}
         <IconButton
           aria-label="close"
           onClick={handleClose}
@@ -107,7 +110,7 @@ export default function AddSubProjectTypeDialog({
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             {...register("name")}
-            label="اسم التصنيف"
+            label={t("nameLabel")}
             error={!!errors.name}
             helperText={errors.name?.message}
             disabled={isSubmitting}
@@ -123,20 +126,8 @@ export default function AddSubProjectTypeDialog({
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose} disabled={isSubmitting}>
-            الغاء
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            {isSubmitting && (
-              <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
-            )}
-            حفظ
-          </Button>
+          <CancelButton onClick={handleClose} disabled={isSubmitting} />
+          <SaveButton type="submit" disabled={isSubmitting} loading={isSubmitting} />
         </DialogActions>
       </form>
     </Dialog>
