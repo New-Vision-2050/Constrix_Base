@@ -1,7 +1,6 @@
 import HorizontalSwitch from "@/modules/projects/settings/components/horizontal-switch";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
-import { useEffect, useState } from "react";
 import { UpdateDataSettingsArgs } from "@/services/api/projects/project-types/types/args";
 
 const items = [

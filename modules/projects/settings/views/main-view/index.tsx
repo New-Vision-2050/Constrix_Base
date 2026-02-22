@@ -2,7 +2,7 @@
 
 import { Checkbox, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { useState, useCallback } from "react";
-import { CURRENT_TABS } from "../../constants/current-tabs";
+import { useProjectSettingsTabs } from "../../constants/current-tabs";
 import RootLevelTabs from "./levels/root-level-tabs";
 import SecondLevelTabs from "./levels/second-level-tabs";
 import SchemaLevelTabs from "./levels/schema-level-tabs";
@@ -34,6 +34,7 @@ const TabWithCheckbox = ({
 };
 
 function ProjectsSettingsMainView() {
+  const CURRENT_TABS = useProjectSettingsTabs();
   const [selectedTab, setSelectedTab] = useState<string>(CURRENT_TABS[0].value);
   const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(
     null,

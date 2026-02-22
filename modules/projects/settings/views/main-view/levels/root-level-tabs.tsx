@@ -5,19 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 import LinearProgress from "@mui/material/LinearProgress";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import SecondLevelTabs from "./second-level-tabs";
 
-interface RootLevelTabsProps {
-  selectedRootId: number | null;
-  onSelectRoot: (root: PRJ_ProjectType) => void;
-  children: React.ReactNode;
-}
+export default function RootLevelTabs() {
+  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(null);
 
-export default function RootLevelTabs({
-  selectedRootId,
-  onSelectRoot,
-  children,
-}: RootLevelTabsProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["project-types", "roots"],
     queryFn: async () => {
@@ -29,24 +22,22 @@ export default function RootLevelTabs({
   const roots = data ?? [];
 
   useEffect(() => {
-    if (roots.length > 0 && !selectedRootId) {
-      onSelectRoot(roots[0]);
+    if (roots.length > 0 && !selectedRoot) {
+      setSelectedRoot(roots[0]);
     }
-  }, [roots, selectedRootId, onSelectRoot]);
-
-  const showContent = !isLoading;
+  }, [roots, selectedRoot]);
 
   return (
     <div className="space-y-4">
       {isLoading && <LinearProgress />}
-      {showContent && (
+      {!isLoading && (
         <>
           <Paper>
             <Tabs
-              value={selectedRootId ?? false}
+              value={selectedRoot?.id ?? false}
               onChange={(_, value: number) => {
                 const root = roots.find((r) => r.id === value);
-                if (root) onSelectRoot(root);
+                if (root) setSelectedRoot(root);
               }}
             >
               {roots.map((root) => (
@@ -54,7 +45,9 @@ export default function RootLevelTabs({
               ))}
             </Tabs>
           </Paper>
-          {children}
+          {selectedRoot && (
+            <SecondLevelTabs key={selectedRoot.id} parentId={selectedRoot.id} />
+          )}
         </>
       )}
     </div>

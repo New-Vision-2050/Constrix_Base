@@ -37,7 +37,11 @@ const mockProjectItems: PRJ_ProjectTerm[] = [
   },
 ];
 
-function ProjectTermsView() {
+interface ProjectTermsViewProps {
+  projectTypeId: number | null;
+}
+
+function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showInactive, setShowInactive] = useState(false);
   

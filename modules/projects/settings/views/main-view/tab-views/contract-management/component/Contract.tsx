@@ -1,20 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Box, Typography } from "@mui/material";
 import HorizontalSwitch from "@/modules/projects/settings/components/horizontal-switch";
 
-const attachmentItems = [
-    {
-        label: "     إظهار جميع بيانات الخاصة بادارات العقد",
-        value: "file-name",
-    },
+interface ContractProps {
+    projectTypeId: number | null;
+}
 
-
-];
-
-function Contract() {
-    const [activeAttachments, setActiveAttachments] = useState<string[]>([]);
+function Contract({ projectTypeId }: ContractProps) {
+    if (!projectTypeId) {
+        return <div className="w-full">الرجاء اختيار نوع مشروع</div>;
+    }
 
     return (
         <div className="w-full">
@@ -23,25 +20,18 @@ function Contract() {
                 <Typography variant="h5" fontWeight="bold">
                     ادارات العقد
                 </Typography>
-
             </Box>
 
             {/* Attachment Items List */}
             <div className="space-y-2">
-                {attachmentItems.map((item) => (
-                    <HorizontalSwitch
-                        key={item.value}
-                        checked={activeAttachments.includes(item.value)}
-                        onChange={(checked) => {
-                            if (checked) {
-                                setActiveAttachments([...activeAttachments, item.value]);
-                            } else {
-                                setActiveAttachments(activeAttachments.filter((i) => i !== item.value));
-                            }
-                        }}
-                        label={item.label}
-                    />
-                ))}
+                <HorizontalSwitch
+                    checked={false}
+                    onChange={(checked) => {
+                        // TODO: Implement API integration
+                        console.log("Contract management setting changed:", checked);
+                    }}
+                    label="إظهار جميع بيانات الخاصة بادارات العقد"
+                />
             </div>
         </div>
     );
