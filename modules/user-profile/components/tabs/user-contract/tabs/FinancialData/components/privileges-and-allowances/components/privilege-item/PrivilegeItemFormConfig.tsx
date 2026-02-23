@@ -20,7 +20,7 @@ export const PrivilegeItemFormConfig = ({
   // declare and define helper variables
   const isEdit = privilegeData ? true : false;
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
-  const { handleRefreshPrivilegesList } = useFinancialDataCxt();
+  const { handleRefreshPrivilegesList, privileges } = useFinancialDataCxt();
 
   const privilegeItemFormConfig: FormConfig = {
     formId: `privilege-form-${privilegeData?.id}`,
@@ -31,6 +31,40 @@ export const PrivilegeItemFormConfig = ({
     sections: [
       {
         fields: [
+          {
+            type: "select",
+            name: "medical_insurance_id",
+            label: "رقم البوليصة التامين الطبي",
+            placeholder: "اختر رقم البوليصة",
+            condition: (values) => {
+              // Show this field only when privilege is MedicalInsurance
+              const selectedPrivilege = privileges?.find(p => p.id === values.privilege_id);
+              const isMedicalInsurance = selectedPrivilege?.type === "MedicalInsurance" ||
+                  selectedPrivilege?.name?.includes("تأمين طبي") ||
+                  privilegeData?.privilege?.type === "MedicalInsurance" ||
+                  privilegeData?.privilege?.name?.includes("تأمين طبي") ||
+                  privilegeData?.type === "MedicalInsurance" ||
+                  privilegeData?.name?.includes("تأمين طبي");
+              return isMedicalInsurance;
+            },
+            dynamicOptions: {
+              url: `${baseURL}/medical-insurances`,
+              valueField: "id",
+              labelField: "policy_number",
+              searchParam: "policy_number",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "اختر رقم البوليصة",
+              },
+            ],
+          },
           {
             type: "select",
             name: "type_privilege_id",
@@ -147,6 +181,7 @@ export const PrivilegeItemFormConfig = ({
               },
             ],
           },
+
           {
             name: "description",
             label: "وصف",
@@ -157,13 +192,7 @@ export const PrivilegeItemFormConfig = ({
         columns: 2,
       },
     ],
-    initialValues: {
-      type_privilege_id: privilegeData?.type_privilege_id,
-      type_allowance_code: privilegeData?.type_allowance_code,
-      charge_amount: privilegeData?.charge_amount,
-      period_id: privilegeData?.period_id,
-      description: privilegeData?.description,
-    },
+    initialValues: privilegeData,
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
