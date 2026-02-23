@@ -26,6 +26,7 @@ import TabsGroup from "@/components/shared/TabsGroup";
 import { Tab } from "@/types/Tab";
 import { Users, Building2 } from "lucide-react";
 import ClientCompaniesTable from "./client-companies-table";
+import BrokerCompaniesTable from "./broker-companies-table";
 import { ModelsTypes } from "./users-sub-entity-form/constants/ModelsTypes";
 
 type PropsT = {
@@ -58,8 +59,9 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
   const entityPermissions = createPermissions(`DYNAMIC.${slug}`);
   const registrationFormSlug = subEntity?.registration_form?.slug;
 
-  // Check if we're viewing clients
+  // Check if we're viewing clients or brokers
   const isClientView = registrationFormSlug === ModelsTypes.CLIENT;
+  const isBrokerView = registrationFormSlug === ModelsTypes.BROKER;
 
   // Check if data is loaded
   const isDataLoaded = sharedSettings !== undefined && userData !== undefined;
@@ -159,6 +161,22 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
     },
   ];
 
+  // Define tabs for broker view
+  const brokerTabs: Tab[] = [
+    {
+      label: "فرد",
+      icon: <Users size={18} />,
+      value: "individual",
+      component: IndividualUsersTable,
+    },
+    {
+      label: "جهة",
+      icon: <Building2 size={18} />,
+      value: "company",
+      component: <BrokerCompaniesTable sub_entity_id={sub_entity_id} registration_form_id={registration_form_id} />,
+    },
+  ];
+
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow
@@ -171,6 +189,13 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
       {isClientView ? (
         <TabsGroup
           tabs={clientTabs}
+          defaultValue="individual"
+          variant="primary"
+          tabsListClassNames="justify-start gap-10"
+        />
+      ) : isBrokerView ? (
+        <TabsGroup
+          tabs={brokerTabs}
           defaultValue="individual"
           variant="primary"
           tabsListClassNames="justify-start gap-10"
