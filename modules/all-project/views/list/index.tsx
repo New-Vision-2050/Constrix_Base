@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -14,8 +14,11 @@ import {
   Select,
 } from "@mui/material";
 import { LayoutGrid, List, EditIcon, Trash2, MoreVertical } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useQueryClient } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
+import DeleteButton from "@/components/shared/delete-button";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
@@ -36,10 +39,12 @@ function ProjectCard({
   project,
   onEdit,
   onDelete,
+  t,
 }: {
   project: ProjectRow;
   onEdit: () => void;
   onDelete: () => void;
+  t: (key: string) => string;
 }) {
   const statusCfg =
     project.status !== undefined ? STATUS_MAP[project.status] : undefined;
@@ -97,11 +102,11 @@ function ProjectCard({
         >
           <MenuItem onClick={onEdit}>
             <EditIcon className="w-4 h-4 ml-2" />
-            تعديل
+            {t("labels.edit")}
           </MenuItem>
           <MenuItem onClick={onDelete}>
             <Trash2 className="w-4 h-4 ml-2" />
-            حذف
+            {t("labels.delete")}
           </MenuItem>
         </CustomMenu>
       </Box>
@@ -166,12 +171,29 @@ function ProjectCard({
 const PROJECTS_QUERY_KEY = "all-projects-list";
 
 export default function AllProjectsList() {
+  const t = useTranslations();
+  const queryClient = useQueryClient();
+
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [addProjectOpen, setAddProjectOpen] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<number | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterProjectTypeId, setFilterProjectTypeId] = useState<string>("");
 
   const formConfig = useMemo(() => getAddProjectFormConfig(), []);
+
+  const handleEdit = useCallback((projectId: number) => setEditingProjectId(projectId), []);
+  const handleDelete = useCallback((projectId: number) => {
+    setDeletingProjectId(projectId);
+    setDeleteDialogOpen(true);
+  }, []);
+  const handleAddOrEditSuccess = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+    setAddProjectOpen(false);
+    setEditingProjectId(null);
+  }, [queryClient]);
 
   // ── Table params ─────────────────────────────────────────────────────────
   const params = ProjectsTableLayout.useTableParams({
@@ -220,9 +242,9 @@ export default function AllProjectsList() {
       ...getProjectsColumns(),
       {
         key: "actions",
-        name: "اجراءات",
+        name: t("project.tableActions"),
         sortable: false,
-        render: () => (
+        render: (row: ProjectRow) => (
           <CustomMenu
             renderAnchor={({ onClick }) => (
               <Button
@@ -233,23 +255,23 @@ export default function AllProjectsList() {
                 onClick={onClick}
                 sx={{ bgcolor: "#3f3f5a", color: "#fff", minWidth: 80 }}
               >
-                اجراء
+                {t("project.tableActions")}
               </Button>
             )}
           >
-            <MenuItem onClick={() => {}}>
+            <MenuItem onClick={() => handleEdit(row.id)}>
               <EditIcon className="w-4 h-4 ml-2" />
-              تعديل
+              {t("labels.edit")}
             </MenuItem>
-            <MenuItem onClick={() => {}}>
+            <MenuItem onClick={() => handleDelete(row.id)}>
               <Trash2 className="w-4 h-4 ml-2" />
-              حذف
+              {t("labels.delete")}
             </MenuItem>
           </CustomMenu>
         ),
       },
     ],
-    []
+    [t, handleEdit, handleDelete]
   );
 
   // ── Table state ──────────────────────────────────────────────────────────
@@ -294,7 +316,7 @@ export default function AllProjectsList() {
       color="primary"
       onClick={() => setAddProjectOpen(true)}
     >
-      اضافة مشروع
+      {t("project.addProject")}
     </Button>
   );
 
@@ -315,7 +337,7 @@ export default function AllProjectsList() {
           fontWeight="bold"
           sx={{ mb: 2, textAlign: "right" }}
         >
-          فلتر البحث
+          {t("project.filterSearch")}
         </Typography>
         <Box
           sx={{
@@ -324,29 +346,28 @@ export default function AllProjectsList() {
             gap: 2,
           }}
         >
-          {/* اسم المشروع is handled by the table's built-in search */}
           <FormControl size="small" fullWidth>
-            <InputLabel>تصنيف المشروع</InputLabel>
+            <InputLabel>{t("project.projectClassification")}</InputLabel>
             <Select
               value={filterProjectTypeId}
-              label="تصنيف المشروع"
+              label={t("project.projectClassification")}
               onChange={(e) => setFilterProjectTypeId(e.target.value)}
             >
-              <MenuItem value="">الكل</MenuItem>
+              <MenuItem value="">{t("project.all")}</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" fullWidth>
-            <InputLabel>حالة المشروع</InputLabel>
+            <InputLabel>{t("project.projectStatus")}</InputLabel>
             <Select
               value={filterStatus}
-              label="حالة المشروع"
+              label={t("project.projectStatus")}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <MenuItem value="">الكل</MenuItem>
-              <MenuItem value="1">جاري</MenuItem>
-              <MenuItem value="0">قيد التنفيذ</MenuItem>
-              <MenuItem value="-1">متوقف</MenuItem>
-              <MenuItem value="2">مكتمل</MenuItem>
+              <MenuItem value="">{t("project.all")}</MenuItem>
+              <MenuItem value="1">{t("project.statusOngoing")}</MenuItem>
+              <MenuItem value="0">{t("project.statusInProgress")}</MenuItem>
+              <MenuItem value="-1">{t("project.statusStopped")}</MenuItem>
+              <MenuItem value="2">{t("project.statusCompleted")}</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -404,8 +425,9 @@ export default function AllProjectsList() {
                 <ProjectCard
                   key={project.id}
                   project={project}
-                  onEdit={() => {}}
-                  onDelete={() => {}}
+                  onEdit={() => handleEdit(project.id)}
+                  onDelete={() => handleDelete(project.id)}
+                  t={t}
                 />
               ))}
             </Box>
@@ -416,9 +438,34 @@ export default function AllProjectsList() {
       {/* ── Add Project Sheet ─────────────────────────────────────────────── */}
       <SheetFormBuilder
         config={formConfig}
-        isOpen={addProjectOpen}
-        onOpenChange={setAddProjectOpen}
-        onSuccess={() => setAddProjectOpen(false)}
+        isOpen={addProjectOpen || !!editingProjectId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setAddProjectOpen(false);
+            setEditingProjectId(null);
+          }
+        }}
+        recordId={editingProjectId ?? undefined}
+        onSuccess={handleAddOrEditSuccess}
+      />
+
+      {/* ── Delete Confirmation Dialog ─────────────────────────────────────── */}
+      <DeleteButton
+        message={t("project.deleteConfirm")}
+        onDelete={async () => {
+          if (!deletingProjectId) return;
+          await apiClient.delete(`${baseURL}/projects/${deletingProjectId}`);
+          queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+          setDeleteDialogOpen(false);
+          setDeletingProjectId(null);
+        }}
+        open={deleteDialogOpen}
+        setOpen={setDeleteDialogOpen}
+        translations={{
+          deleteSuccess: t("labels.deleteSuccess"),
+          deleteError: t("labels.deleteError"),
+          deleteCancelled: t("labels.deleteCancelled"),
+        }}
       />
     </Box>
   );

@@ -7,6 +7,25 @@ export function getAddProjectFormConfig(): FormConfig {
     formId: "add-project-form",
     title: "اضافة مشروع",
     apiUrl: `${baseURL}/projects`,
+    editApiUrl: `${baseURL}/projects/:id`,
+    editApiMethod: "PUT",
+    editDataPath: "payload",
+    editDataTransformer: (data: Record<string, unknown>) => {
+      const clientId = data.client_id ?? (data.client as { id?: number })?.id;
+      const ownerType = clientId ? "entity" : "individual";
+      return {
+        ...data,
+        project_type_id: (data.project_type as { id?: number })?.id ?? data.project_type_id,
+        sub_project_type_id: (data.sub_project_type as { id?: number })?.id ?? data.sub_project_type_id,
+        sub_sub_project_type_id: (data.sub_sub_project_type as { id?: number })?.id ?? data.sub_sub_project_type_id,
+        cost_center_branch_id: (data.cost_center_branch as { id?: number })?.id ?? data.cost_center_branch_id,
+        management_id: (data.management as { id?: number })?.id ?? data.management_id,
+        responsible_employee_id: (data.responsible_employee as { id?: number })?.id ?? data.responsible_employee_id,
+        owner_type: ownerType,
+        client_id_entity: ownerType === "entity" ? clientId : undefined,
+        client_id_individual: ownerType === "individual" ? clientId : undefined,
+      };
+    },
     laravelValidation: { enabled: true, errorsPath: "errors" },
     sections: [
       {
