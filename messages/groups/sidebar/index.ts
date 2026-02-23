@@ -28,7 +28,7 @@ export const sidebarMessages = new MessagesGroup({
   CRM: _m("CRM", "علاقات العملاء"),
   clients: _m("Clients", "العملاء"),
   brokers: _m("Brokers", "الوسطاء"),
-  CRMSettings: _m("CRM Settings", "اعدادات علاقات العملاء"),
+  CRMSettings: _m("Settings", "اعدادات"),
   ecommerce: _m("E-commerce", "المتجر"),
   "docs-library": _m("Docs Library", "مستندات والبيانات"),
   "docs-library-docs": _m("Docs", "المستندات"),
