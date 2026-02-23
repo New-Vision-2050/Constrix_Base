@@ -117,8 +117,8 @@ export function SidebarContentWrapper({
           ...project,
           ...restMenuProps,
           sub_entities: [
-            ...(project.sub_entities || []),
             ...transformedMenuSubEntities,
+            ...(project.sub_entities || []),
           ],
         };
       });
@@ -152,6 +152,23 @@ export function SidebarContentWrapper({
     };
 
     const data: Project[] = [
+      {
+        name: t("Sidebar.CRM"),
+        slug: SUPER_ENTITY_SLUG.CRM,
+        icon: LayoutDashboardIcon,
+        urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
+        isActive: pageName === ROUTER.CRM.clients,
+        show: !isCentralCompany,
+        sub_entities: [
+          {
+            name: t("Sidebar.CRMSettings"),
+            url: ROUTER.CRM.settings,
+            icon: Settings,
+            isActive: pageName === ROUTER.CRM.settings,
+            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
+          },
+        ],
+      },
       {
         name: t("Sidebar.Companies"),
         urls: [ROUTER.COMPANIES],
@@ -251,23 +268,6 @@ export function SidebarContentWrapper({
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
             show: isCentralCompany && can(Object.values(PERMISSIONS.subEntity)),
-          },
-        ],
-      },
-      {
-        name: t("Sidebar.CRM"),
-        slug: SUPER_ENTITY_SLUG.CRM,
-        icon: LayoutDashboardIcon,
-        urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
-        isActive: pageName === ROUTER.CRM.clients,
-        show: !isCentralCompany,
-        sub_entities: [
-          {
-            name: t("Sidebar.CRMSettings"),
-            url: ROUTER.CRM.settings,
-            icon: Settings,
-            isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
           },
         ],
       },
