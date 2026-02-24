@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Paper, Tab, Tabs } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { ProjectTypesApi } from "@/services/api/projects/project-types";
+import { PRJ_ProjectType } from "@/types/api/projects/project-type";
+import LinearProgress from "@mui/material/LinearProgress";
+import MainItemsCard from "../components/main-items-card";
 
 interface Term {
   id: number;
@@ -11,6 +16,7 @@ interface Term {
 export default function TermsTab() {
   const [terms, setTerms] = useState<Term[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(null);
 
   useEffect(() => {
     fetchTerms();
@@ -31,6 +37,22 @@ export default function TermsTab() {
     }
   };
 
+  const { data, isLoading: isLoadingRoots } = useQuery({
+    queryKey: ["project-types", "roots"],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getRoots();
+      return response.data.payload ?? [];
+    },
+  });
+
+  const roots = data ?? [];
+
+  useEffect(() => {
+    if (roots.length > 0 && !selectedRoot) {
+      setSelectedRoot(roots[0]);
+    }
+  }, [roots, selectedRoot]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center p-8">
@@ -40,29 +62,28 @@ export default function TermsTab() {
   }
 
   return (
-    <div className="p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {terms.map((term) => (
-          <Card key={term.id} className="bg-[#29285E] border-[#29285E] hover:bg-[#3a3a7a] transition-colors">
-            <CardHeader>
-              <CardTitle className="text-white text-lg font-semibold">
-                {term.label}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-gray-300">
-                Term ID: {term.id}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="p-6 space-y-6">
+    
+      <div className="space-y-4">
+        {isLoadingRoots && <LinearProgress />}
+        {!isLoadingRoots && (
+          <Paper>
+            <Tabs
+              value={selectedRoot?.id ?? false}
+              onChange={(_, value: number) => {
+                const root = roots.find((r) => r.id === value);
+                if (root) setSelectedRoot(root);
+              }}
+            >
+              {roots.map((root) => (
+                <Tab key={root.id} label={root.name} value={root.id} />
+              ))}
+            </Tabs>
+          </Paper>
+        )}
+        
+        <MainItemsCard />
       </div>
-      
-      {terms.length === 0 && (
-        <div className="text-center text-white p-8">
-          No terms found
-        </div>
-      )}
     </div>
   );
 }
