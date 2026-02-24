@@ -1,6 +1,7 @@
 // import ElectricitySettings from "./electricity-settings";
 import WorkOrderTypeView from "./WorkOrderTypeView";
 import SectionView from "./SectionView";
+import ActionsView from "./ActionsView";
 import React, { useState } from "react";
 import {
   Accordion,
@@ -17,7 +18,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import {useTranslations} from "next-intl";
 
-export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "HIDE";
+export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "ACTIONS" | "HIDE";
 
 export default function WorkOrdersIndex() {
   const t = useTranslations("projectSettings.section");
@@ -74,6 +75,27 @@ export default function WorkOrdersIndex() {
                   </IconButton>
                 </CardActions>
               </Card>
+              <Card
+                sx={{
+                  minWidth: 275,
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  "&:hover": { backgroundColor: "#2d2d5a" },
+                }}
+              >
+                <CardContent>
+                  <Typography>{t("actions")}</Typography>
+                </CardContent>
+                <CardActions>
+                  <IconButton
+                    className="cursor-pointer"
+                    onClick={() => setActiveCard("ACTIONS")}
+                  >
+                    <KeyboardArrowRightIcon />
+                  </IconButton>
+                </CardActions>
+              </Card>
             </AccordionDetails>
           </Accordion>
         </div>
@@ -84,6 +106,9 @@ export default function WorkOrdersIndex() {
       )}
       {activeCard === "SECTION" && (
         <SectionView setActiveCard={setActiveCard} />
+      )}
+      {activeCard === "ACTIONS" && (
+        <ActionsView setActiveCard={setActiveCard} />
       )}
     </Paper>
   );

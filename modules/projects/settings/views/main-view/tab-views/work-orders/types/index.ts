@@ -17,13 +17,23 @@ export interface Section {
   sectionDescription: string;
 }
 
+export interface Action {
+  id: string;
+  code: number;
+  description: string;
+}
+
 export interface RowActionsProps {
-  row: WorkOrderType | Section;
+  row: WorkOrderType | Section | Action;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;
   canEdit: boolean;
   canShow: boolean;
   t?: (key: string) => string;
+  /** Translation namespace for table labels (e.g. "projectSettings.section.table" or "projectSettings.actions.table") */
+  translationNamespace?: string;
+  /** Key for edit menu item (e.g. "editSection" or "editAction") */
+  editLabelKey?: string;
 }
 
 export type ActionType = "display" | "edit";
