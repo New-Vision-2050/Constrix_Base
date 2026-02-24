@@ -1,5 +1,6 @@
 import HorizontalSwitch from "@/modules/projects/settings/components/horizontal-switch";
 import { useState } from "react";
+import { SettingsTabItemProps } from "../../types";
 
 const items = [
   {
@@ -44,7 +45,7 @@ const items = [
   },
 ];
 
-function DetailsView() {
+function DetailsView(_props: SettingsTabItemProps) {
   const [activeList, setActiveList] = useState<string[]>([]);
 
   return (

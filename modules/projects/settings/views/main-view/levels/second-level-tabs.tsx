@@ -82,7 +82,7 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
             </div>
           </Paper>
           {selectedItem && (
-            <SchemaLevelTabs key={selectedItem.id} parentId={selectedItem.id} />
+            <SchemaLevelTabs key={selectedItem.id} firstLevelId={parentId} parentId={selectedItem.id} />
           )}
         </>
       )}

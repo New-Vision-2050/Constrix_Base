@@ -3,6 +3,8 @@ import WorkOrderTypeView from "./WorkOrderTypeView";
 import SectionView from "./SectionView";
 import ActionsView from "./ActionsView";
 import ReportsFormsView from "./ReportsFormsView";
+import React, { useState } from "react";
+import { SettingsTabItemProps } from "../../types";
 import {
   Accordion,
   AccordionSummary,
@@ -22,7 +24,7 @@ import TasksSettingsView from "./TasksSettingsView";
 
 export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "ACTIONS" | "REPORT_FORMS" | "ADD_TASKS" | "TASKS_SETTINGS" | "HIDE";
 
-export default function WorkOrdersIndex() {
+export default function WorkOrdersIndex(_props: SettingsTabItemProps) {
   const t = useTranslations("projectSettings.section");
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
