@@ -17,8 +17,8 @@ export default function WorkOrderTypePage({
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
 }) {
-  const t = useTranslations("work-orders");
-  const tTable = useTranslations("work-orders.table");
+  const t = useTranslations("projectSettings.workOrders");
+  const tTable = useTranslations("projectSettings.workOrders.table");
 
   const [displayedRowId, setDisplayedRowId] = useState<string | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -196,10 +196,6 @@ export default function WorkOrderTypePage({
           setEditingRowId(null);
         }}
         workOrderId={editingRowId || undefined}
-        onSuccess={() => {
-          setEditDialogOpen(false);
-          setEditingRowId(null);
-        }}
       />
     </Box>
   );

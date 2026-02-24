@@ -8,20 +8,14 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormControl,
-  FormMessage,
-} from "@/modules/table/components/ui/form";
-import { Loader2 } from "lucide-react";
-import FormLabel from "@/components/shared/FormLabel";
+  TextField,
+  Button,
+  Box,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+
 import { toast } from "sonner";
 import { z } from "zod";
 import { IconButton } from "@mui/material";
@@ -36,7 +30,6 @@ export interface SectionFormData {
 export interface SectionDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
   sectionId?: string;
 }
 
@@ -86,11 +79,10 @@ const getDefaultSectionFormValues = (): SectionFormData => ({
 export default function EditSectionDialog({
   open,
   onClose,
-  onSuccess,
   sectionId,
 }: SectionDialogProps) {
-  const t = useTranslations("section");
-  const tForm = useTranslations("section.form");
+  const t = useTranslations("projectSettings.section");
+  const tForm = useTranslations("projectSettings.section.form");
   const isEditMode = !!sectionId;
 
   // Mock fetch section data when editing (replace with actual API call)
@@ -122,6 +114,7 @@ export default function EditSectionDialog({
     handleSubmit,
     reset,
     setValue,
+    register,
     formState: { errors, isSubmitting },
   } = form;
 
@@ -195,23 +188,22 @@ export default function EditSectionDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={handleClose}
-      maxWidth={"sm"}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         sx: {
           color: "white",
           borderRadius: "8px",
           border: "1px solid rgba(255, 255, 255, 0.08)",
-          p: 8,
+          bgcolor: "background.paper",
         },
       }}
     >
-      <DialogContent className="w-full bg-sidebar">
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold">
-            {t("editSection")}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent sx={{ p: 4 }}>
+        <DialogTitle sx={{ p: 0, mb: 3, textAlign: "center", fontSize: "1.125rem", fontWeight: 600 }}>
+          {t("editSection")}
+        </DialogTitle>
         <IconButton
           onClick={handleClose}
           sx={{
@@ -224,69 +216,92 @@ export default function EditSectionDialog({
           <CloseIcon />
         </IconButton>
 
-        <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
-            {/* Section Code and Description - 2 Column Grid */}
-            <div className="flex flex-col gap-4">
-              <FormField
-                control={control}
-                name="sectionCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {tForm("sectionCode")}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        variant="secondary"
-                        disabled={isSubmitting || isFetching}
-                        className="mt-1 bg-sidebar border-gray-700"
-                        placeholder={tForm("sectionCodePlaceholder")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="sectionDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {tForm("sectionDescription")}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        variant="secondary"
-                        disabled={isSubmitting || isFetching}
-                        className="mt-1 bg-sidebar border-gray-700"
-                        placeholder={tForm("sectionDescriptionPlaceholder")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
+          {/* Section Code and Description */}
+          <TextField
+            label={tForm("sectionCode")}
+            required
+            fullWidth
+            disabled={isSubmitting || isFetching}
+            placeholder={tForm("sectionCodePlaceholder")}
+            error={!!errors.sectionCode}
+            helperText={errors.sectionCode?.message}
+            {...register("sectionCode")}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "rgba(255, 255, 255, 0.23)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "rgba(255, 255, 255, 0.23)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "rgba(255, 255, 255, 0.7)",
+                "&.Mui-focused": {
+                  color: "primary.main",
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: "white",
+              },
+            }}
+          />
+          
+          <TextField
+            label={tForm("sectionDescription")}
+            required
+            fullWidth
+            disabled={isSubmitting || isFetching}
+            placeholder={tForm("sectionDescriptionPlaceholder")}
+            error={!!errors.sectionDescription}
+            helperText={errors.sectionDescription?.message}
+            {...register("sectionDescription")}
+            multiline
+            rows={3}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "rgba(255, 255, 255, 0.23)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "rgba(255, 255, 255, 0.23)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "rgba(255, 255, 255, 0.7)",
+                "&.Mui-focused": {
+                  color: "primary.main",
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: "white",
+              },
+            }}
+          />
 
-            {/* Submit Button */}
-            <div className="mt-6">
-              <Button
-                type="submit"
-                disabled={isSubmitting || isFetching}
-                className="w-full"
-              >
-                {(isSubmitting || isFetching) && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {tForm("save")}
-              </Button>
-            </div>
-          </form>
-        </Form>
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={isSubmitting || isFetching}
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+            startIcon={isSubmitting || isFetching ? <CircularProgress size={20} color="inherit" /> : null}
+          >
+            {tForm("save")}
+          </Button>
+        </Box>
       </DialogContent>
     </Dialog>
   );

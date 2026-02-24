@@ -67,9 +67,7 @@ const WorkOrderDetailsDialog = ({
       maxWidth={"lg"}
       PaperProps={{
         sx: {
-          color: "white",
           borderRadius: "8px",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
           p: 8,
         },
       }}
@@ -80,7 +78,6 @@ const WorkOrderDetailsDialog = ({
           position: "absolute",
           right: 16,
           top: 16,
-          color: "rgba(255,255,255,0.5)",
         }}
       >
         <CloseIcon />
@@ -122,11 +119,7 @@ const WorkOrderDetailsDialog = ({
             <Typography textAlign="center" sx={{ mb: 2 }}>
               اجراءات امر العمل
             </Typography>
-            <Box
-              sx={{
-                color: "white",
-              }}
-            >
+            <Box >
               <TasksTypeTable
                 table={
                   <TasksTypeTable.Table

@@ -20,7 +20,7 @@ import {useTranslations} from "next-intl";
 export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "HIDE";
 
 export default function WorkOrdersIndex() {
-  const t = useTranslations("section");
+  const t = useTranslations("projectSettings.section");
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
   return (

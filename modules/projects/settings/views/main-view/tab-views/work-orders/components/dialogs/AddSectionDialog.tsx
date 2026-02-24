@@ -1,93 +1,95 @@
-import { DialogHeader } from "@/components/ui/dialog";
+"use client";
+
+import React from "react";
+import { useTranslations } from "next-intl";
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogTitle,
-  IconButton,
   TextField,
+  Button,
+  Box,
 } from "@mui/material";
-import { Dispatch, SetStateAction } from "react";
+import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useTranslations } from "next-intl";
+
+export interface AddSectionDialogProps {
+  open: boolean;
+  setOpenModal: (open: boolean) => void;
+}
 
 export default function AddSectionDialog({
   open,
   setOpenModal,
-}: {
-  open: boolean;
-  setOpenModal: Dispatch<SetStateAction<boolean>>;
-}) {
-  const t = useTranslations("section");
-  const tForm = useTranslations("section.form");
-  
+}: AddSectionDialogProps) {
+  const t = useTranslations("projectSettings.section");
+  const tForm = useTranslations("projectSettings.section.form");
+
   const handleClose = () => {
     setOpenModal(false);
   };
+
   return (
     <Dialog
       open={open}
-      maxWidth={"sm"}
       onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         sx: {
-          color: "white",
           borderRadius: "8px",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          position: "absolute",
+          position: "fixed",
           top: 0,
           right: 0,
         },
       }}
     >
-      <DialogContent className="max-w-6xl w-full bg-sidebar">
-        <DialogHeader>
-          <DialogTitle className="text-start">
-            {t("addSection")}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent sx={{ p: 4 }}>
+        <DialogTitle sx={{ p: 0, mb: 3, textAlign: "center", fontSize: "1.125rem", fontWeight: 600 }}>
+          {t("addSection")}
+        </DialogTitle>
         <IconButton
           onClick={handleClose}
           sx={{
             position: "absolute",
             right: 16,
             top: 16,
-            color: "rgba(255,255,255,0.5)",
           }}
         >
           <CloseIcon />
         </IconButton>
 
-        <div className="flex flex-col gap-4">
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          {/* Section Code */}
           <TextField
             label={tForm("sectionCode")}
-            placeholder={tForm("sectionCodePlaceholder")}
-            // error={!!errors.name}
-            // helperText={errors.name?.message}
-            // disabled={isSubmitting}
+            required
             fullWidth
-            size="medium"
+            placeholder={tForm("sectionCodePlaceholder")}
+
           />
+          
+          {/* Section Description */}
           <TextField
             label={tForm("sectionDescription")}
-            placeholder={tForm("sectionDescriptionPlaceholder")}
-            // error={!!errors.name}
-            // helperText={errors.name?.message}
-            // disabled={isSubmitting}
+            required
             fullWidth
-            size="medium"
-          />
-        </div>
+            placeholder={tForm("sectionDescriptionPlaceholder")}
+            multiline
+            rows={3}
 
-        <div className="mt-6">
+          />
+
+          {/* Submit Button */}
           <Button
             type="submit"
-            // disabled={isSubmitting || isFetching}
-            className="w-full"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
           >
             {tForm("save")}
           </Button>
-        </div>
+        </Box>
       </DialogContent>
     </Dialog>
   );

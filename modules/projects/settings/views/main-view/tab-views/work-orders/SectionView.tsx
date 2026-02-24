@@ -17,8 +17,8 @@ export default function SectionView({
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
 }) {
-  const t = useTranslations("section");
-  const tTable = useTranslations("section.table");
+  const t = useTranslations("projectSettings.section");
+  const tTable = useTranslations("projectSettings.section.table");
 
   const [displayedRowId, setDisplayedRowId] = useState<string | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -125,11 +125,11 @@ export default function SectionView({
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <IconButton
             onClick={() => setActiveCard("HIDE")}
-            sx={{ color: "white" }}
+        
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h6" color="white">
+          <Typography variant="h6">
             {t("title")}
           </Typography>
         </Box>
@@ -139,9 +139,6 @@ export default function SectionView({
       </Box>
 
       <Box
-        sx={{
-          color: "white",
-        }}
       >
         <SectionTable
           table={
@@ -166,10 +163,6 @@ export default function SectionView({
           setEditingRowId(null);
         }}
         sectionId={editingRowId || undefined}
-        onSuccess={() => {
-          setEditDialogOpen(false);
-          setEditingRowId(null);
-        }}
       />
     </Box>
   );

@@ -5,7 +5,6 @@ import {
   DialogContent,
   IconButton,
   Typography,
-  Grid,
   Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,8 +16,7 @@ const SectionDetailsDialog = ({
   setOpenModal,
   rowId,
 }: DetailsDialogProps) => {
-  const t = useTranslations("section");
-  const tDetails = useTranslations("section.details");
+  const tDetails = useTranslations("projectSettings.section.details");
   const handleClose = () => setOpenModal(false);
 
   // Mock section data
@@ -46,18 +44,16 @@ const SectionDetailsDialog = ({
   ];
 
   // Find the section by ID
-  const section = mockSections.find(s => s.id === rowId);
+  const section = mockSections.find((s) => s.id === rowId);
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth={"sm"}
+      maxWidth={"lg"}
       PaperProps={{
         sx: {
-          color: "white",
           borderRadius: "8px",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
           p: 8,
         },
       }}
@@ -68,7 +64,6 @@ const SectionDetailsDialog = ({
           position: "absolute",
           right: 16,
           top: 16,
-          color: "rgba(255,255,255,0.5)",
         }}
       >
         <CloseIcon />
@@ -87,19 +82,15 @@ const SectionDetailsDialog = ({
 
       <DialogContent>
         {section && (
-          <Box>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>{tDetails("sectionCode")}:</strong> {section.sectionCode}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>{tDetails("sectionDescription")}:</strong> {section.sectionDescription}
-                </Typography>
-              </Grid>
-            </Grid>
+          <Box className="flex justify-between gap-4">
+            <Typography variant="body1">
+              <strong>{tDetails("sectionCode")}:</strong> {section.sectionCode}
+            </Typography>
+
+            <Typography variant="body1">
+              <strong>{tDetails("sectionDescription")}:</strong>{" "}
+              {section.sectionDescription}
+            </Typography>
           </Box>
         )}
         {!section && (

@@ -1,14 +1,15 @@
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Button,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { RowActionsProps } from "../types";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { useTranslations } from "next-intl";
 
 export function RowActions({
@@ -18,33 +19,62 @@ export function RowActions({
   canEdit,
   canShow,
 }: RowActionsProps) {
-  const tTable = useTranslations("section.table");
-  
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" className="bg-slate-400 hover:bg-slate-400">
-          {tTable("action")}
-          <ChevronDown className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          disabled={!canShow}
-          onClick={() => onShow(row.id)}
-        >
-          <VisibilityIcon className="mr-2 h-4 w-4" color="primary" />
-          {tTable("show")}
-        </DropdownMenuItem>
+  const tTable = useTranslations("projectSettings.section.table");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-        <DropdownMenuItem
-          disabled={!canEdit}
-          onClick={() => onEdit(row.id)}
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <Button
+        size="small"
+        variant="contained"
+        color="inherit"
+        onClick={handleClick}
+        endIcon={<KeyboardArrowDownIcon />}
+        sx={{ bgcolor: "grey.400" }}
+      >
+        {tTable("action")}
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <MenuItem
+          disabled={!canShow}
+          onClick={() => {
+            onShow(row.id);
+            handleClose();
+          }}
         >
-          <BorderColorIcon className="mr-2 h-4 w-4" color="primary"/>
-          {tTable("editSection")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <ListItemIcon>
+            <VisibilityIcon fontSize="small" color="primary" />
+          </ListItemIcon>
+          <ListItemText>{tTable("show")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!canEdit}
+          onClick={() => {
+            onEdit(row.id);
+            handleClose();
+          }}
+        >
+          <ListItemIcon>
+            <BorderColorIcon fontSize="small" color="primary" />
+          </ListItemIcon>
+          <ListItemText>{tTable("editSection")}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
   );
 }
