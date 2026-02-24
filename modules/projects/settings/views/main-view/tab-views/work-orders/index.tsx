@@ -2,6 +2,7 @@
 import WorkOrderTypeView from "./WorkOrderTypeView";
 import SectionView from "./SectionView";
 import React, { useState } from "react";
+import { SettingsTabItemProps } from "../../types";
 import {
   Accordion,
   AccordionSummary,
@@ -19,7 +20,7 @@ import {useTranslations} from "next-intl";
 
 export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "HIDE";
 
-export default function WorkOrdersIndex() {
+export default function WorkOrdersIndex(_props: SettingsTabItemProps) {
   const t = useTranslations("projectSettings.section");
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
