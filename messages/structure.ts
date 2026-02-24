@@ -58,6 +58,8 @@ import { storesMessages } from "./groups/stores";
 import { imageUploadCropMessages } from "./groups/image-upload-crop";
 import { workPanelMessages } from "./groups/work-panel";
 import { iconsMessages } from "./groups/icons";
+import { projectMessages } from "./groups/projects";
+import { projectSettingsMessages } from "./groups/projects/settings";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -121,4 +123,6 @@ export const messagesStructure = new MessagesGroup({
   ImageUploadCrop: imageUploadCropMessages,
   WorkPanel: workPanelMessages,
   icons: iconsMessages,
+  Projects: projectMessages,
+  projectSettings: projectSettingsMessages,
 });
