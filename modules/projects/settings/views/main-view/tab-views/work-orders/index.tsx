@@ -1,10 +1,8 @@
-// import ElectricitySettings from "./electricity-settings";
+import React, { useState } from "react";
 import WorkOrderTypeView from "./WorkOrderTypeView";
 import SectionView from "./SectionView";
 import ActionsView from "./ActionsView";
 import ReportsFormsView from "./ReportsFormsView";
-import AddTasksView from "./AddTasksView";
-import React, { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -19,8 +17,10 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import {useTranslations} from "next-intl";
+import TasksView from "./TasksView";
+import TasksSettingsView from "./TasksSettingsView";
 
-export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "ACTIONS" | "REPORT_FORMS" | "ADD_TASKS" | "HIDE";
+export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "ACTIONS" | "REPORT_FORMS" | "ADD_TASKS" | "TASKS_SETTINGS" | "HIDE";
 
 export default function WorkOrdersIndex() {
   const t = useTranslations("projectSettings.section");
@@ -158,7 +158,10 @@ export default function WorkOrdersIndex() {
         <ReportsFormsView setActiveCard={setActiveCard} />
       )}
       {activeCard === "ADD_TASKS" && (
-        <AddTasksView setActiveCard={setActiveCard} />
+        <TasksView setActiveCard={setActiveCard} />
+      )}
+      {activeCard === "TASKS_SETTINGS" && (
+        <TasksSettingsView setActiveCard={setActiveCard} />
       )}
     </Paper>
   );

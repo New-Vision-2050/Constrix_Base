@@ -70,6 +70,7 @@ export const WorkOrdersMessages = new MessagesGroup({
     inactive: _m("Inactive", "غير نشط"),
     actions: _m("Actions", "الإجراءات"),
     action: _m("Action", "الإجراء"),
+    show: _m("Show", "عرض"),
     editWorkOrder: _m("Edit Work Order", "تعديل أمر العمل"),
     delete: _m("Delete", "حذف"),
     deleteSuccess: _m("Work order deleted successfully", "تم حذف أمر العمل بنجاح"),

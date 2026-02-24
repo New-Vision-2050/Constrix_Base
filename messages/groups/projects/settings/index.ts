@@ -5,6 +5,7 @@ import { WorkOrdersMessages } from "./work-order/work-order-type";
 import { ActionsMessages } from "./work-order/actions";
 import { ReportFormsMessages } from "./work-order/report-forms";
 import { AddTasksMessages } from "./work-order/add-tasks";
+import { TasksSettingsMessages } from "./work-order/tasks-settings";
 
 export const projectSettingsMessages = new MessagesGroup({
   projectTypes: projectTypesMessages,
@@ -13,4 +14,5 @@ export const projectSettingsMessages = new MessagesGroup({
   actions: ActionsMessages,
   reportForms: ReportFormsMessages,
   addTasks: AddTasksMessages,
+  tasksSettings: TasksSettingsMessages,
 });

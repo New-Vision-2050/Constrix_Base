@@ -37,8 +37,14 @@ export interface Task {
   tasksName: string;
 }
 
+export interface TaskSetting {
+  id: string;
+  workOrderType: string;
+  tasks: string;
+}
+
 export interface RowActionsProps {
-  row: WorkOrderType | Section | Action | ReportForm | Task;
+  row: WorkOrderType | Section | Action | ReportForm | Task | TaskSetting;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;
   canEdit: boolean;

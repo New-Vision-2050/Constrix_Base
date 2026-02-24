@@ -5,20 +5,20 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { RowActions } from "./components/RowActions";
-import EditTasksDialog from "./components/dialogs/EditTasksDialog";
-import TasksDetailsDialog from "./components/dialogs/TasksDetailsDialog";
-import { Task } from "./types";
-import AddTasksDialog from "./components/dialogs/AddTasksDialog";
+import EditTasksSettingsDialog from "./components/dialogs/EditTasksSettingsDialog";
+import TasksSettingsDetailsDialog from "./components/dialogs/TasksSettingsDetailsDialog";
+import { TaskSetting } from "./types";
+import AddTasksSettingsDialog from "./components/dialogs/AddTasksSettingsDialog";
 
-const AddTasksTable = HeadlessTableLayout<Task>("psat");
+const TasksSettingsTable = HeadlessTableLayout<TaskSetting>("psts");
 
-export default function AddTasksView({
+export default function TasksSettingsView({
   setActiveCard,
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
 }) {
-  const t = useTranslations("projectSettings.addTasks");
-  const tTable = useTranslations("projectSettings.addTasks.table");
+  const t = useTranslations("projectSettings.tasksSettings");
+  const tTable = useTranslations("projectSettings.tasksSettings.table");
 
   const [displayedRowId, setDisplayedRowId] = useState<string | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -39,64 +39,71 @@ export default function AddTasksView({
     setOpenAddDialog(true);
   };
 
-  const handleSettings = () => {
-    // No logic for now
-  };
-
-  const params = AddTasksTable.useTableParams({
+  const params = TasksSettingsTable.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
 
-  const tasks = [
-    { id: "task1", tasksNumber: 1, tasksName: "مهمة أولى" },
-    { id: "task2", tasksNumber: 2, tasksName: "مهمة ثانية" },
-    { id: "task3", tasksNumber: 3, tasksName: "مهمة ثالثة" },
-    { id: "task4", tasksNumber: 4, tasksName: "مهمة رابعة" },
+  const tasksSettings = [
+    {
+      id: "ts1",
+      workOrderType: "نوع أمر العمل 1",
+      tasks: "مهمة أولى، مهمة ثانية",
+    },
+    {
+      id: "ts2",
+      workOrderType: "نوع أمر العمل 2",
+      tasks: "مهمة ثانية، مهمة ثالثة",
+    },
+    {
+      id: "ts3",
+      workOrderType: "نوع أمر العمل 3",
+      tasks: "مهمة أولى، مهمة رابعة",
+    },
   ];
 
   const columns = [
     {
-      key: "tasksNumber",
-      name: tTable("tasksNumber"),
+      key: "workOrderType",
+      name: tTable("workOrderType"),
       sortable: false,
-      render: (row: Task) => (
-        <span className="p-2 text-sm">{row.tasksNumber}</span>
+      render: (row: TaskSetting) => (
+        <span className="p-2 text-sm">{row.workOrderType}</span>
       ),
     },
     {
-      key: "tasksName",
-      name: tTable("tasksName"),
+      key: "tasks",
+      name: tTable("tasks"),
       sortable: false,
-      render: (row: Task) => (
-        <span className="p-2 text-sm">{row.tasksName}</span>
+      render: (row: TaskSetting) => (
+        <span className="p-2 text-sm">{row.tasks}</span>
       ),
     },
     {
       key: "actions",
       name: tTable("actions"),
       sortable: false,
-      render: (row: Task) => (
+      render: (row: TaskSetting) => (
         <RowActions
           row={row}
           onShow={handleDisplay}
           onEdit={handleEdit}
           canShow={true}
           canEdit={true}
-          translationNamespace="projectSettings.addTasks.table"
-          editLabelKey="editTask"
+          translationNamespace="projectSettings.tasksSettings.table"
+          editLabelKey="editTasksSettings"
         />
       ),
     },
   ];
 
-  const tableState = AddTasksTable.useTableState({
-    data: tasks,
+  const tableState = TasksSettingsTable.useTableState({
+    data: tasksSettings,
     columns,
     totalPages: 1,
     totalItems: 10,
     params,
-    getRowId: (task) => task.id,
+    getRowId: (taskSetting) => taskSetting.id,
     loading: false,
     searchable: false,
     filtered: params.search !== "",
@@ -123,30 +130,20 @@ export default function AddTasksView({
             {t("title")}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ px: 6 }}
-            onClick={handleAdd}
-          >
-            {tTable("addTask")}
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ px: 6 }}
-            onClick={handleSettings}
-          >
-            {t("settings")}
-          </Button>
-        </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ px: 6 }}
+          onClick={handleAdd}
+        >
+          {tTable("addTasksSettings")}
+        </Button>
       </Box>
 
       <Box sx={{ color: "white" }}>
-        <AddTasksTable
+        <TasksSettingsTable
           table={
-            <AddTasksTable.Table
+            <TasksSettingsTable.Table
               state={tableState}
               loadingOptions={{ rows: 5 }}
             />
@@ -154,19 +151,22 @@ export default function AddTasksView({
         />
       </Box>
 
-      <AddTasksDialog open={openAddDialog} setOpenModal={setOpenAddDialog} />
-      <TasksDetailsDialog
+      <AddTasksSettingsDialog
+        open={openAddDialog}
+        setOpenModal={setOpenAddDialog}
+      />
+      <TasksSettingsDetailsDialog
         open={openModal}
         setOpenModal={setOpenModal}
         rowId={displayedRowId}
       />
-      <EditTasksDialog
+      <EditTasksSettingsDialog
         open={editDialogOpen || Boolean(editingRowId)}
         onClose={() => {
           setEditDialogOpen(false);
           setEditingRowId(null);
         }}
-        taskId={editingRowId || undefined}
+        taskSettingId={editingRowId || undefined}
       />
     </Box>
   );
