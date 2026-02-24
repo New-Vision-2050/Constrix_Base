@@ -59,5 +59,24 @@ export const workPanelMessages = new MessagesGroup({
   ),
   loading: _m("Loading...", "جاري التحميل..."),
   noBranches: _m("No branches found", "لم يتم العثور على فروع"),
+
+  // Project Data
+  projectData: _m("Project Data", "بيانات المشروع"),
+  referenceNumber: _m("Reference Number", "الرقم المرجعي"),
+  projectName: _m("Project Name", "اسم المشروع"),
+  details: _m("Details", "المفصل"),
+  responsibleEngineer: _m("Responsible Engineer", "المهندس المسؤول"),
+  contractNumber: _m("Contract Number", "رقم العقد"),
+  contractType: _m("Contract Type", "نوع العقد"),
+  costCenter: _m("Cost Center", "مركز التكلفة"),
+  projectValue: _m("Project Value", "قيمة المشروع"),
+  startDate: _m("Start Date", "تاريخ البدء"),
+  completionPercentage: _m("Completion Percentage", "نسبة الانجاز"),
+  save: _m("Save", "حفظ"),
+  cancel: _m("Cancel", "إلغاء"),
+  saving: _m("Saving...", "جاري الحفظ..."),
+  errorLoading: _m("Error loading data", "حدث خطأ في تحميل البيانات"),
+  pleaseSelectBranch: _m("Please select branch", "يرجى اختيار فرع"),
+  selectBranchToViewProjectData: _m("Select branch to view project data", "اختر فرعاً لعرض بيانات المشروع"),
 });
 

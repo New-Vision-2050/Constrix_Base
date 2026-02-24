@@ -195,6 +195,7 @@ export default function SchemaLevelTabs({ firstLevelId, parentId }: SchemaLevelT
                   firstLevelId,
                   secondLevelId: parentId,
                   thirdLevelId: selectedSchema.id,
+                  projectTypeId: selectedSchema.id,
                 })}
               </Paper>
             </div>
