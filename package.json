@@ -21,6 +21,7 @@
     "@mui/material-nextjs": "^7.3.5",
     "@mui/stylis-plugin-rtl": "^7.3.5",
     "@mui/x-charts-pro": "^8.27.0",
+    "@mui/x-data-grid": "^8.27.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
