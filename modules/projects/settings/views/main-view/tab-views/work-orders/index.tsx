@@ -3,6 +3,7 @@ import WorkOrderTypeView from "./WorkOrderTypeView";
 import SectionView from "./SectionView";
 import ActionsView from "./ActionsView";
 import ReportsFormsView from "./ReportsFormsView";
+import AddTasksView from "./AddTasksView";
 import React, { useState } from "react";
 import {
   Accordion,
@@ -19,7 +20,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import {useTranslations} from "next-intl";
 
-export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "ACTIONS" | "REPORT_FORMS" | "HIDE";
+export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "ACTIONS" | "REPORT_FORMS" | "ADD_TASKS" | "HIDE";
 
 export default function WorkOrdersIndex() {
   const t = useTranslations("projectSettings.section");
@@ -118,6 +119,27 @@ export default function WorkOrdersIndex() {
                   </IconButton>
                 </CardActions>
               </Card>
+              <Card
+                sx={{
+                  minWidth: 275,
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  "&:hover": { backgroundColor: "#2d2d5a" },
+                }}
+              >
+                <CardContent>
+                  <Typography>{t("addTasks")}</Typography>
+                </CardContent>
+                <CardActions>
+                  <IconButton
+                    className="cursor-pointer"
+                    onClick={() => setActiveCard("ADD_TASKS")}
+                  >
+                    <KeyboardArrowRightIcon />
+                  </IconButton>
+                </CardActions>
+              </Card>
             </AccordionDetails>
           </Accordion>
         </div>
@@ -134,6 +156,9 @@ export default function WorkOrdersIndex() {
       )}
       {activeCard === "REPORT_FORMS" && (
         <ReportsFormsView setActiveCard={setActiveCard} />
+      )}
+      {activeCard === "ADD_TASKS" && (
+        <AddTasksView setActiveCard={setActiveCard} />
       )}
     </Paper>
   );

@@ -31,8 +31,14 @@ export interface ReportForm {
   notes: string;
 }
 
+export interface Task {
+  id: string;
+  tasksNumber: number;
+  tasksName: string;
+}
+
 export interface RowActionsProps {
-  row: WorkOrderType | Section | Action | ReportForm;
+  row: WorkOrderType | Section | Action | ReportForm | Task;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;
   canEdit: boolean;

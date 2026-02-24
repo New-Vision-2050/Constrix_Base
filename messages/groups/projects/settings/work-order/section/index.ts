@@ -9,6 +9,7 @@ export const SectionMessages = new MessagesGroup({
   section: _m("Section", "القسم"),
   actions: _m("Actions", "الإجراءات"),
   reportForms: _m("Report Forms", "نماذج التقارير"),
+  addTasks: _m("Add Tasks", "إضافة مهام"),
   form: new MessagesGroup({
     sectionCode: _m("Section Code", "كود القسم"),
     sectionCodePlaceholder: _m("Enter section code", "أدخل كود القسم"),
