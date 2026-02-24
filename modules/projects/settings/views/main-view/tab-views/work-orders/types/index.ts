@@ -23,8 +23,16 @@ export interface Action {
   description: string;
 }
 
+export interface ReportForm {
+  id: string;
+  referenceNumber: string;
+  formName: string;
+  workOrderType: string;
+  notes: string;
+}
+
 export interface RowActionsProps {
-  row: WorkOrderType | Section | Action;
+  row: WorkOrderType | Section | Action | ReportForm;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;
   canEdit: boolean;

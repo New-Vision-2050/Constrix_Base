@@ -8,6 +8,7 @@ export const SectionMessages = new MessagesGroup({
   workOrderType: _m("Work Order Type", "نوع أمر العمل"),
   section: _m("Section", "القسم"),
   actions: _m("Actions", "الإجراءات"),
+  reportForms: _m("Report Forms", "نماذج التقارير"),
   form: new MessagesGroup({
     sectionCode: _m("Section Code", "كود القسم"),
     sectionCodePlaceholder: _m("Enter section code", "أدخل كود القسم"),
