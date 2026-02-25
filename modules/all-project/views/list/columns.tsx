@@ -6,17 +6,18 @@ export interface ProjectRow {
   id: number;
   ref_number?: string;
   name: string;
-  client?: { id: number; name: string };
-  responsible_employee?: { id: number; name: string };
-  management?: { id: number; name: string };
-  cost_center_branch?: { id: number; name: string };
-  project_type?: { id: number; name: string };
-  sub_project_type?: { id: number; name: string };
+  client_name: string;
+  manager_name: string;
+  management_name: string;
+  branch_name: string;
+  project_type_name: string;
+  sub_project_type?: string;
+  sub_sub_project_type_name: string;
   contract_number?: string;
   start_date?: string;
   end_date?: string;
   specializations?: string;
-  project_manager?: { id: number; name: string };
+  project_owner_name: string;
   completion_percentage?: number;
   delay_percentage?: number;
   status?: number;
@@ -85,43 +86,51 @@ export const getProjectsColumns = () => [
     key: "client",
     name: "اسم العميل",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.client?.name ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.project_owner_name ?? "—"}</span>,
   },
   {
-    key: "responsible_employee",
-    name: "المهندس المسؤول",
+    key: "project_type_name",
+    name: "نوع المشروع",
+    sortable: false,
+    render: (row: ProjectRow) => <span>{row.project_type_name ?? "—"}</span>,
+  },
+  {
+    key: "sub_project_type",
+    name: "تصنيف المشروع",
+    sortable: false,
+    render: (row: ProjectRow) => <span>{row.sub_project_type ?? "—"}</span>,
+  },
+  {
+    key: "sub_sub_project_type_name",
+    name: "التصنيف الفرعي",
     sortable: false,
     render: (row: ProjectRow) => (
-      <span>{row.responsible_employee?.name ?? "—"}</span>
+      <span>{row.sub_sub_project_type_name ?? "—"}</span>
     ),
+  },
+  {
+    key: "branch_name",
+    name: "الفرع التابع",
+    sortable: false,
+    render: (row: ProjectRow) => <span>{row.branch_name ?? "—"}</span>,
   },
   {
     key: "management",
     name: "الادارة",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.management?.name ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.management_name ?? "—"}</span>,
   },
   {
-    key: "cost_center_branch",
-    name: "الفرع التابع له",
+    key: "responsible_employee",
+    name: "المهندس المسؤول",
     sortable: false,
-    render: (row: ProjectRow) => (
-      <span>{row.cost_center_branch?.name ?? "—"}</span>
-    ),
+    render: (row: ProjectRow) => <span>{row.manager_name ?? "—"}</span>,
   },
   {
-    key: "project_type",
-    name: "تصنيف المشروع",
+    key: "project_manager",
+    name: "مدير المشروع",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.project_type?.name ?? "—"}</span>,
-  },
-  {
-    key: "sub_project_type",
-    name: "نوع المشروع",
-    sortable: false,
-    render: (row: ProjectRow) => (
-      <span>{row.sub_project_type?.name ?? "—"}</span>
-    ),
+    render: (row: ProjectRow) => <span>{row.project_owner_name ?? "—"}</span>,
   },
   {
     key: "contract_number",
@@ -142,34 +151,18 @@ export const getProjectsColumns = () => [
     render: (row: ProjectRow) => <span>{row.end_date ?? "—"}</span>,
   },
   {
-    key: "specializations",
-    name: "تخصصات المشروع",
-    sortable: false,
-    render: (row: ProjectRow) => <span>{row.specializations ?? "—"}</span>,
-  },
-  {
-    key: "project_manager",
-    name: "مدير المشروع",
-    sortable: false,
-    render: (row: ProjectRow) => (
-      <span>{row.project_manager?.name ?? "—"}</span>
-    ),
-  },
-  {
-    key: "completion_percentage",
-    name: "نسبة الانجاز",
+    key: "forward_time",
+    name: "التقدم الزمني",
     sortable: false,
     render: (row: ProjectRow) => (
       <ProgressBar value={row.completion_percentage} color="#16a34a" />
     ),
   },
   {
-    key: "delay_percentage",
-    name: "نسبة التأخير",
+    key: "completion_percentage",
+    name: "الانجاز",
     sortable: false,
-    render: (row: ProjectRow) => (
-      <ProgressBar value={row.delay_percentage} color="#d97706" />
-    ),
+    render: (row: ProjectRow) => <ProgressBar value={20} color="#d97706" />,
   },
   {
     key: "status",

@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from "react";
 import {
   Box,
   Button,
-  Chip,
   LinearProgress,
   MenuItem,
   Typography,
@@ -13,160 +12,20 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
-import { LayoutGrid, List, EditIcon, Trash2, MoreVertical } from "lucide-react";
+import { LayoutGrid, List, EditIcon, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
-import { SheetFormBuilder } from "@/modules/form-builder";
 import { useQuery } from "@tanstack/react-query";
-import { apiClient, baseURL } from "@/config/axios-config";
-import { getAddProjectFormConfig } from "./form-config";
-import { ProjectRow, getProjectsColumns, STATUS_MAP } from "./columns";
+import { AllProjectsApi } from "@/services/api/all-projects";
+import { ProjectRow, getProjectsColumns } from "./columns";
+import { ProjectCard } from "./components/ProjectCard";
+import { ProjectFormDrawer } from "./components/ProjectFormDrawer";
 
-// ============================================================================
-// Table instance
-// ============================================================================
-
-const ProjectsTableLayout = HeadlessTableLayout<ProjectRow>("all-projects-list");
-
-// ============================================================================
-// Cards view
-// ============================================================================
-
-function ProjectCard({
-  project,
-  onEdit,
-  onDelete,
-  t,
-}: {
-  project: ProjectRow;
-  onEdit: () => void;
-  onDelete: () => void;
-  t: (key: string) => string;
-}) {
-  const statusCfg =
-    project.status !== undefined ? STATUS_MAP[project.status] : undefined;
-
-  const fields = [
-    { label: "الرقم المرجعي", value: project.ref_number ?? project.id },
-    { label: "اسم العميل", value: project.client?.name ?? "—" },
-    { label: "المهندس المسؤول", value: project.responsible_employee?.name ?? "—" },
-    { label: "الادارة", value: project.management?.name ?? "—" },
-    { label: "بداية المشروع", value: project.start_date ?? "—" },
-    { label: "نهاية المشروع", value: project.end_date ?? "—" },
-  ];
-
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2.5,
-        borderRadius: 2,
-        border: "1px solid rgba(255,255,255,0.08)",
-        bgcolor: "background.paper",
-      }}
-    >
-      {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          mb: 2,
-        }}
-      >
-        <Typography variant="subtitle1" fontWeight="bold">
-          {project.name}
-        </Typography>
-        <CustomMenu
-          renderAnchor={({ onClick }) => (
-            <Box
-              component="button"
-              onClick={onClick}
-              sx={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "text.secondary",
-                p: 0.5,
-                borderRadius: 1,
-                display: "flex",
-                "&:hover": { bgcolor: "action.hover" },
-              }}
-            >
-              <MoreVertical size={18} />
-            </Box>
-          )}
-        >
-          <MenuItem onClick={onEdit}>
-            <EditIcon className="w-4 h-4 ml-2" />
-            {t("labels.edit")}
-          </MenuItem>
-          <MenuItem onClick={onDelete}>
-            <Trash2 className="w-4 h-4 ml-2" />
-            {t("labels.delete")}
-          </MenuItem>
-        </CustomMenu>
-      </Box>
-
-      {/* Fields grid */}
-      <Box
-        sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}
-      >
-        {fields.map(({ label, value }) => (
-          <Box key={label}>
-            <Typography variant="caption" color="text.secondary" display="block">
-              {label}
-            </Typography>
-            <Typography variant="body2" fontWeight="medium">
-              {String(value)}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
-
-      {/* Status + progress */}
-      {statusCfg && (
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Chip
-            label={statusCfg.label}
-            size="small"
-            sx={{
-              backgroundColor: statusCfg.bg,
-              color: "#fff",
-              fontWeight: "bold",
-              fontSize: "0.7rem",
-            }}
-          />
-          <Box sx={{ flex: 1 }}>
-            <LinearProgress
-              variant="determinate"
-              value={Math.min(project.completion_percentage ?? 0, 100)}
-              sx={{
-                height: 5,
-                borderRadius: 3,
-                bgcolor: "rgba(255,255,255,0.1)",
-                "& .MuiLinearProgress-bar": {
-                  bgcolor: statusCfg.bg,
-                  borderRadius: 3,
-                },
-              }}
-            />
-          </Box>
-          <Typography variant="caption">
-            {project.completion_percentage ?? 0}%
-          </Typography>
-        </Box>
-      )}
-    </Paper>
-  );
-}
-
-// ============================================================================
-// Main component
-// ============================================================================
+const ProjectsTableLayout =
+  HeadlessTableLayout<ProjectRow>("all-projects-list");
 
 const PROJECTS_QUERY_KEY = "all-projects-list";
 
@@ -175,33 +34,40 @@ export default function AllProjectsList() {
   const queryClient = useQueryClient();
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [addProjectOpen, setAddProjectOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
-  const [deletingProjectId, setDeletingProjectId] = useState<number | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<number | null>(
+    null,
+  );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterProjectTypeId, setFilterProjectTypeId] = useState<string>("");
 
-  const formConfig = useMemo(() => getAddProjectFormConfig(), []);
-
-  const handleEdit = useCallback((projectId: number) => setEditingProjectId(projectId), []);
-  const handleDelete = useCallback((projectId: number) => {
-    setDeletingProjectId(projectId);
-    setDeleteDialogOpen(true);
-  }, []);
-  const handleAddOrEditSuccess = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
-    setAddProjectOpen(false);
-    setEditingProjectId(null);
-  }, [queryClient]);
-
-  // ── Table params ─────────────────────────────────────────────────────────
   const params = ProjectsTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
 
-  // ── Fetch projects ───────────────────────────────────────────────────────
+  const handleEdit = useCallback((projectId: number) => {
+    setEditingProjectId(projectId);
+    setDrawerOpen(true);
+  }, []);
+
+  const handleDelete = useCallback((projectId: number) => {
+    setDeletingProjectId(projectId);
+    setDeleteDialogOpen(true);
+  }, []);
+
+  const handleAddNew = useCallback(() => {
+    setEditingProjectId(null);
+    setDrawerOpen(true);
+  }, []);
+
+  const handleCloseDrawer = useCallback(() => {
+    setDrawerOpen(false);
+    setEditingProjectId(null);
+  }, []);
+
   const { data: queryData, isLoading } = useQuery({
     queryKey: [
       PROJECTS_QUERY_KEY,
@@ -212,14 +78,14 @@ export default function AllProjectsList() {
       filterProjectTypeId,
     ],
     queryFn: async () => {
-      const response = await apiClient.get(`${baseURL}/projects`, {
-        params: {
-          page: params.page,
-          per_page: params.limit,
-          ...(params.search ? { name: params.search } : {}),
-          ...(filterStatus !== "" ? { status: filterStatus } : {}),
-          ...(filterProjectTypeId ? { project_type_id: filterProjectTypeId } : {}),
-        },
+      const response = await AllProjectsApi.list({
+        page: params.page,
+        per_page: params.limit,
+        ...(params.search ? { name: params.search } : {}),
+        ...(filterStatus !== "" ? { status: filterStatus } : {}),
+        ...(filterProjectTypeId
+          ? { project_type_id: filterProjectTypeId }
+          : {}),
       });
 
       const payload = response.data.payload ?? [];
@@ -267,11 +133,15 @@ export default function AllProjectsList() {
               <Trash2 className="w-4 h-4 ml-2" />
               {t("labels.delete")}
             </MenuItem>
+            <MenuItem onClick={() => handleDelete(row.id)}>
+              <Trash2 className="w-4 h-4 ml-2" />
+              {t("labels.show")}
+            </MenuItem>
           </CustomMenu>
         ),
       },
     ],
-    [t, handleEdit, handleDelete]
+    [t, handleEdit, handleDelete],
   );
 
   // ── Table state ──────────────────────────────────────────────────────────
@@ -311,18 +181,13 @@ export default function AllProjectsList() {
   );
 
   const addButton = (
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={() => setAddProjectOpen(true)}
-    >
+    <Button variant="contained" color="primary" onClick={handleAddNew}>
       {t("project.addProject")}
     </Button>
   );
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* ── Search filter section ─────────────────────────────────────── */}
       <Paper
         elevation={0}
         sx={{
@@ -332,11 +197,7 @@ export default function AllProjectsList() {
           border: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <Typography
-          variant="subtitle1"
-          fontWeight="bold"
-          sx={{ mb: 2, textAlign: "right" }}
-        >
+        <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
           {t("project.filterSearch")}
         </Typography>
         <Box
@@ -372,8 +233,6 @@ export default function AllProjectsList() {
           </FormControl>
         </Box>
       </Paper>
-
-      {/* ── Table view ───────────────────────────────────────────────────── */}
       {viewMode === "table" ? (
         <ProjectsTableLayout
           filters={
@@ -435,18 +294,11 @@ export default function AllProjectsList() {
         </Box>
       )}
 
-      {/* ── Add Project Sheet ─────────────────────────────────────────────── */}
-      <SheetFormBuilder
-        config={formConfig}
-        isOpen={addProjectOpen || !!editingProjectId}
-        onOpenChange={(open) => {
-          if (!open) {
-            setAddProjectOpen(false);
-            setEditingProjectId(null);
-          }
-        }}
-        recordId={editingProjectId ?? undefined}
-        onSuccess={handleAddOrEditSuccess}
+      <ProjectFormDrawer
+        open={drawerOpen}
+        onClose={handleCloseDrawer}
+        editingProjectId={editingProjectId}
+        queryKey={PROJECTS_QUERY_KEY}
       />
 
       {/* ── Delete Confirmation Dialog ─────────────────────────────────────── */}
@@ -454,7 +306,7 @@ export default function AllProjectsList() {
         message={t("project.deleteConfirm")}
         onDelete={async () => {
           if (!deletingProjectId) return;
-          await apiClient.delete(`${baseURL}/projects/${deletingProjectId}`);
+          await AllProjectsApi.delete(deletingProjectId);
           queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
           setDeleteDialogOpen(false);
           setDeletingProjectId(null);
