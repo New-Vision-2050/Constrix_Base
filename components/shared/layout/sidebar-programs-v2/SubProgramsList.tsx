@@ -6,7 +6,7 @@ import React, { memo } from "react";
 import Link from "@i18n/link";
 import { Project } from "@/types/sidebar-menu";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   List,
   ListItemButton,
@@ -37,6 +37,8 @@ export const SubProgramsList = memo(function SubProgramsList({
   const { open } = useSidebar();
   const t = useTranslations();
   const { palette } = useTheme();
+  const locale = useLocale();
+  const isRtl = locale === "ar";
 
   const visibleSubEntities =
     activeProject?.sub_entities?.filter((item) => item.show) ?? [];
@@ -96,6 +98,7 @@ export const SubProgramsList = memo(function SubProgramsList({
                     mx: 0.5,
                     transition: "all 0.2s ease-in-out",
                     overflow: "hidden",
+                    flexDirection: isRtl ? "row-reverse" : "row",
                     "&.Mui-selected": {
                       backgroundColor: alpha(palette.primary.main, 0.1),
                       color: "primary.main",
@@ -106,19 +109,20 @@ export const SubProgramsList = memo(function SubProgramsList({
                       "&::before": {
                         content: '""',
                         position: "absolute",
-                        left: 0,
+                        [isRtl ? "right" : "left"]: 0,
                         top: 0,
                         bottom: 0,
                         width: 4,
                         backgroundColor: "primary.main",
-                        borderRadius: "0 4px 4px 0",
+                        borderRadius: isRtl ? "4px 0 0 4px" : "0 4px 4px 0",
                       },
                     },
                     "&:hover": {
                       backgroundColor: "action.hover",
-                      transform: "translateX(4px)",
+                      transform: `translateX(${isRtl ? "-4px" : "4px"})`,
                     },
                     pl: isActive ? 3 : 2,
+                    pr: isActive ? 3 : 2,
                   }}
                 >
                   {/* Icon */}
@@ -174,6 +178,7 @@ export const SubProgramsList = memo(function SubProgramsList({
                       sx: {
                         color: isActive ? "primary.main" : "text.primary",
                         transition: "color 0.2s ease-in-out",
+                        textAlign: isRtl ? "right" : "left",
                       },
                     }}
                   />

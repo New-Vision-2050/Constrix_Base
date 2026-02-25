@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Box, Typography, Button, TextField, MenuItem, Switch, Paper, Select, FormControl, InputLabel } from "@mui/material";
 import { Add} from "@mui/icons-material";
 import HeadlessTableLayout from "@/components/headless/table";
-import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
+import { PRJ_ProjectTerm } from "@/types/api/projects/project-term";
 import { AddProjectTermDialog } from "./AddProjectTermDialog";
 import { DeleteProjectTermDialog } from "./DeleteProjectTermDialog";
 import { EditProjectTermDialog } from "./EditProjectTermDialog";
@@ -12,7 +12,7 @@ import { ViewProjectTermDialog } from "./ViewProjectTermDialog";
 import { ItemActionsDialog } from "./ItemActionsDialog";
 
 // Mock data for demonstration
-const mockProjectItems: PRJ_ProjectTerm[] = [
+const initialMockProjectItems: PRJ_ProjectTerm[] = [
   {
     id: 1,
     reference_number: "1520202",
@@ -48,6 +48,39 @@ interface ProjectTermsViewProps {
 function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showInactive, setShowInactive] = useState(false);
+  const [rows, setRows] = useState<PRJ_ProjectTerm[]>(initialMockProjectItems);
+
+  // Toggle status function
+  const toggleStatus = async (id: number) => {
+    const row = rows.find((r) => r.id === id);
+    if (!row) return;
+
+    const newStatus = row.status === "1" ? "0" : "1";
+
+    // Update local state immediately for better UX
+    setRows((prev) =>
+        prev.map((r) =>
+            r.id === id ? { ...r, status: newStatus, updated_at: new Date().toISOString() } : r
+        )
+    );
+
+    // TODO: Add API call to update status
+    try {
+      // await updateProjectTermStatus({
+      //   id: id.toString(),
+      //   status: newStatus,
+      // });
+      console.log(`Status updated for item ${id}: ${newStatus}`);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      // Revert on error
+      setRows((prev) =>
+          prev.map((r) =>
+              r.id === id ? { ...r, status: row.status } : r
+          )
+      );
+    }
+  };
 
   // Dialog states
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -156,9 +189,10 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       name: "تفعيل البند",
       sortable: false,
       render: (row: PRJ_ProjectTerm) => (
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" ml="5px" alignItems="center" justifyContent="flex-end" gap={1}>
             <Switch
                 checked={row.status === "1"}
+                onChange={() => toggleStatus(row.id)}
                 size="small"
                 color="primary"
             />
@@ -190,7 +224,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   ];
 
   // Filter data based on search and filters
-  const filteredData = mockProjectItems.filter((item) => {
+  const filteredData = rows.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.reference_number.toLowerCase().includes(searchTerm.toLowerCase());
@@ -203,7 +237,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   const handleAdd = (data: Partial<PRJ_ProjectTerm>) => {
     const newItem: PRJ_ProjectTerm = {
       ...data,
-      id: Math.max(...mockProjectItems.map(item => item.id)) + 1,
+      id: Math.max(...rows.map(item => item.id)) + 1,
       parent_id: null,
       project_type_id: null,
       created_at: new Date().toISOString(),
@@ -215,15 +249,12 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       services: data.services || [],
       status: data.status || "1",
     };
-    mockProjectItems.push(newItem);
+    setRows(prev => [...prev, newItem]);
   };
 
   const handleDelete = () => {
     if (selectedItem) {
-      const index = mockProjectItems.findIndex(item => item.id === selectedItem.id);
-      if (index > -1) {
-        mockProjectItems.splice(index, 1);
-      }
+      setRows(prev => prev.filter(item => item.id !== selectedItem.id));
     }
     setDeleteDialogOpen(false);
     setSelectedItem(null);
@@ -232,14 +263,13 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
 
   const handleUpdate = (data: Partial<PRJ_ProjectTerm>) => {
     if (selectedItem) {
-      const index = mockProjectItems.findIndex(item => item.id === selectedItem.id);
-      if (index > -1) {
-        mockProjectItems[index] = {
-          ...mockProjectItems[index],
-          ...data,
-          updated_at: new Date().toISOString(),
-        } as PRJ_ProjectTerm;
-      }
+      setRows(prev => 
+        prev.map(item => 
+          item.id === selectedItem.id 
+            ? { ...item, ...data, updated_at: new Date().toISOString() }
+            : item
+        )
+      );
     }
     setEditDialogOpen(false);
     setSelectedItem(null);
@@ -265,16 +295,43 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
 
   // Handlers for ItemActionsDialog
   const handleItemUpdate = (data: Partial<PRJ_ProjectTerm>) => {
+    if (selectedItem) {
+      setRows(prev => 
+        prev.map(item => 
+          item.id === selectedItem.id 
+            ? { ...item, ...data, updated_at: new Date().toISOString() }
+            : item
+        )
+      );
+    }
     console.log("Updating item:", selectedItem?.id, data);
     // TODO: Add API call to update item
   };
 
   const handleItemDelete = () => {
+    if (selectedItem) {
+      setRows(prev => prev.filter(item => item.id !== selectedItem.id));
+    }
     console.log("Deleting item:", selectedItem?.id);
     // TODO: Add API call to delete item
   };
 
   const handleItemCreate = (data: Partial<PRJ_ProjectTerm>) => {
+    const newItem: PRJ_ProjectTerm = {
+      ...data,
+      id: Math.max(...rows.map(item => item.id)) + 1,
+      parent_id: null,
+      project_type_id: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      reference_number: data.reference_number || "",
+      name: data.name || "",
+      description: data.description || "",
+      sub_items_count: data.sub_items_count || 0,
+      services: data.services || [],
+      status: data.status || "1",
+    };
+    setRows(prev => [...prev, newItem]);
     console.log("Creating new item:", data);
     // TODO: Add API call to create item
   };
@@ -320,7 +377,18 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
         </Box>
 
         {/* Action Button Above Table */}
-        <Box className="flex justify-end mb-4">
+        <Box className="flex justify-between items-center mb-4">
+          <Box className="flex items-center gap-2">
+            <Typography variant="body2">
+              إظهار البنود غير النشطة
+            </Typography>
+            <Switch
+              checked={showInactive}
+              onChange={(e) => setShowInactive(e.target.checked)}
+              size="small"
+              color="primary"
+            />
+          </Box>
           <Button
               variant="contained"
               startIcon={<Add />}

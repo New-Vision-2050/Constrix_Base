@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -21,8 +21,22 @@ import {
   InputLabel,
 } from "@mui/material";
 import { Add, Edit, Delete, Visibility } from "@mui/icons-material";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import HeadlessTableLayout from "@/components/headless/table";
 import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
+
+const projectTermSchema = z.object({
+  reference_number: z.string().optional(),
+  name: z.string().min(1, "اسم البند مطلوب"),
+  description: z.string().optional(),
+  sub_items_count: z.number().min(0, "عدد البنود الفرعية يجب أن يكون 0 أو أكثر"),
+  services: z.array(z.string()).optional(),
+  status: z.enum(["0", "1"]),
+});
+
+type ProjectTermFormData = z.infer<typeof projectTermSchema>;
 
 interface ItemActionsDialogProps {
   open: boolean;
@@ -87,6 +101,46 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     initialSortDirection: "asc",
   });
 
+  // Create form instance
+  const createForm = useForm<ProjectTermFormData>({
+    resolver: zodResolver(projectTermSchema),
+    defaultValues: {
+      reference_number: "",
+      name: "",
+      description: "",
+      sub_items_count: 0,
+      services: [],
+      status: "1",
+    },
+  });
+
+  // Update form instance
+  const updateForm = useForm<ProjectTermFormData>({
+    resolver: zodResolver(projectTermSchema),
+    defaultValues: {
+      reference_number: "",
+      name: "",
+      description: "",
+      sub_items_count: 0,
+      services: [],
+      status: "1",
+    },
+  });
+
+  // Update form when item changes
+  useEffect(() => {
+    if (item) {
+      updateForm.reset({
+        reference_number: item.reference_number,
+        name: item.name,
+        description: item.description,
+        sub_items_count: item.sub_items_count,
+        services: item.services,
+        status: item.status,
+      });
+    }
+  }, [item, updateForm]);
+
   // Define table columns (same as main component)
   const columns = [
     {
@@ -149,7 +203,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       name: "تفعيل البند",
       sortable: false,
       render: (row: PRJ_ProjectTerm) => (
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" ml="5px" alignItems="center" justifyContent="flex-end" gap={1}>
             <Switch
                 checked={row.status === "1"}
                 size="small"
@@ -198,59 +252,19 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     getRowId: (item) => item.id.toString(),
     loading: false,
   });
-  
-  // Update form state
-  const [updateFormData, setUpdateFormData] = useState({
-    reference_number: "",
-    name: "",
-    description: "",
-    sub_items_count: 0,
-    services: [] as string[],
-    status: "1" as "0" | "1",
-  });
-
-  // Create form state
-  const [createFormData, setCreateFormData] = useState({
-    reference_number: "",
-    name: "",
-    description: "",
-    sub_items_count: 0,
-    services: [] as string[],
-    status: "1" as "0" | "1",
-  });
-
-  React.useEffect(() => {
-    if (item) {
-      setUpdateFormData({
-        reference_number: item.reference_number,
-        name: item.name,
-        description: item.description,
-        sub_items_count: item.sub_items_count,
-        services: item.services,
-        status: item.status,
-      });
-    }
-  }, [item]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
-  const handleUpdate = () => {
-    onUpdate(updateFormData);
+  const handleUpdate = (data: ProjectTermFormData) => {
+    onUpdate({ ...data, id: item?.id });
     onClose();
   };
 
-  const handleCreate = () => {
-    onCreate(createFormData);
-    setCreateFormData({
-      reference_number: "",
-      name: "",
-      description: "",
-      sub_items_count: 0,
-      services: [],
-      status: "1",
-    });
+  const handleCreate = (data: ProjectTermFormData) => {
+    onCreate(data);
+    createForm.reset();
     onClose();
   };
 
@@ -260,9 +274,9 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth PaperProps={{ dir: "rtl" }}>
       <DialogTitle>
-        <Typography variant="h6">
+        <Typography variant="h6" component="div">
           إجراءات البند: {item?.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -274,6 +288,8 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tab icon={<Visibility />} label="عرض الجدول" />
           <Tab icon={<Add />} label="إضافة جديد" />
+          <Tab icon={<Edit />} label="تعديل البند" />
+          <Tab icon={<Delete />} label="حذف البند" />
         </Tabs>
 
         {/* Table View Tab */}
@@ -294,42 +310,82 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
             إضافة بند جديد
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField
-              label="الرقم المرجعي"
-              value={createFormData.reference_number}
-              onChange={(e) => setCreateFormData({ ...createFormData, reference_number: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="اسم البند"
-              value={createFormData.name}
-              onChange={(e) => setCreateFormData({ ...createFormData, name: e.target.value })}
-              fullWidth
-              required
-            />
-            <TextField
-              label="وصف البند"
-              value={createFormData.description}
-              onChange={(e) => setCreateFormData({ ...createFormData, description: e.target.value })}
-              fullWidth
-              multiline
-              rows={3}
-            />
-            <TextField
-              label="عدد البنود الفرعية"
-              type="number"
-              value={createFormData.sub_items_count}
-              onChange={(e) => setCreateFormData({ ...createFormData, sub_items_count: parseInt(e.target.value) || 0 })}
-              fullWidth
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={createFormData.status === "1"}
-                  onChange={(e) => setCreateFormData({ ...createFormData, status: e.target.checked ? "1" : "0" })}
+            <Controller
+              name="reference_number"
+              control={createForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="الرقم المرجعي"
+                  fullWidth
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
                 />
-              }
-              label="تفعيل البند"
+              )}
+            />
+            <Controller
+              name="name"
+              control={createForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="اسم البند"
+                  fullWidth
+                  required
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={createForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="وصف البند"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
+                />
+              )}
+            />
+            <Controller
+              name="sub_items_count"
+              control={createForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="عدد البنود الفرعية"
+                  type="number"
+                  fullWidth
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
+                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                />
+              )}
+            />
+            <Controller
+              name="status"
+              control={createForm.control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value === "1"}
+                      onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
+                    />
+                  }
+                  label="تفعيل البند"
+                  sx={{ textAlign: "right", alignSelf: "flex-start" }}
+                />
+              )}
             />
           </Box>
         </TabPanel>
@@ -340,42 +396,82 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
             تعديل البند الحالي
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField
-              label="الرقم المرجعي"
-              value={updateFormData.reference_number}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, reference_number: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="اسم البند"
-              value={updateFormData.name}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, name: e.target.value })}
-              fullWidth
-              required
-            />
-            <TextField
-              label="وصف البند"
-              value={updateFormData.description}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, description: e.target.value })}
-              fullWidth
-              multiline
-              rows={3}
-            />
-            <TextField
-              label="عدد البنود الفرعية"
-              type="number"
-              value={updateFormData.sub_items_count}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, sub_items_count: parseInt(e.target.value) || 0 })}
-              fullWidth
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={updateFormData.status === "1"}
-                  onChange={(e) => setUpdateFormData({ ...updateFormData, status: e.target.checked ? "1" : "0" })}
+            <Controller
+              name="reference_number"
+              control={updateForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="الرقم المرجعي"
+                  fullWidth
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
                 />
-              }
-              label="تفعيل البند"
+              )}
+            />
+            <Controller
+              name="name"
+              control={updateForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="اسم البند"
+                  fullWidth
+                  required
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={updateForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="وصف البند"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
+                />
+              )}
+            />
+            <Controller
+              name="sub_items_count"
+              control={updateForm.control}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="عدد البنود الفرعية"
+                  type="number"
+                  fullWidth
+                  error={!!error}
+                  helperText={error?.message}
+                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
+                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                />
+              )}
+            />
+            <Controller
+              name="status"
+              control={updateForm.control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value === "1"}
+                      onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
+                    />
+                  }
+                  label="تفعيل البند"
+                  sx={{ textAlign: "right", alignSelf: "flex-start" }}
+                />
+              )}
             />
           </Box>
         </TabPanel>
@@ -405,12 +501,12 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       <DialogActions>
         <Button onClick={onClose}>إلغاء</Button>
         {activeTab === 1 && (
-          <Button onClick={handleCreate} variant="contained" color="primary">
+          <Button onClick={createForm.handleSubmit(handleCreate)} variant="contained" color="primary">
             إضافة
           </Button>
         )}
         {activeTab === 2 && (
-          <Button onClick={handleUpdate} variant="contained" color="primary">
+          <Button onClick={updateForm.handleSubmit(handleUpdate)} variant="contained" color="primary">
             تحديث
           </Button>
         )}

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import { BarChart } from "@mui/x-charts/BarChart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
 
 export function ZoomBarChart() {
@@ -30,20 +30,21 @@ export function ZoomBarChart() {
     fetchData();
   }, [getAllChartsData]);
 
-  const xLabels = data.map(d => d.month);
-
   return (
     <Box className="mt-6">
       <Typography variant="h6" className="text-right mb-2">
         انتهاء التأشيرات شهرياً
       </Typography>
-      <BarChart
-        xAxis={[{ scaleType: 'band', data: xLabels }]}
-        series={[
-          { data: data.map(d => d.count), label: 'Visa Expiration Count', color: '#8884d8' }
-        ]}
-
-      />
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="count" fill="#8884d8" name="عدد انتهاء التأشيرات" />
+        </BarChart>
+      </ResponsiveContainer>
     </Box>
   );
 }

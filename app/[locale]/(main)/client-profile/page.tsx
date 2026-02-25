@@ -17,10 +17,16 @@ export default async function ClientProfilePage() {
 
 export async function fetchMeData(): Promise<ClientProfileData | null> {
   try {
-    const response = await baseApi.get(`${baseURL}/users/me`);
+    // Check if we're in server environment and have proper headers
+    const response = await baseApi.get(`${baseURL}/users/me`, {
+      headers: {
+        'Cache-Control': 'no-cache',
+      }
+    });
     return response.data.payload;
   } catch (error) {
     console.error("Error fetching user data:", error);
+    // Return null instead of throwing to prevent layout crashes
     return null;
   }
 }

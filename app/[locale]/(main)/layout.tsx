@@ -11,8 +11,17 @@ async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const meData = await fetchMeData();
-  const userTypes = meData?.user_types ?? [];
+  let meData = null;
+  let userTypes: any[] = [];
+  
+  try {
+    meData = await fetchMeData();
+    userTypes = meData?.user_types ?? [];
+  } catch (error) {
+    console.error("Error in layout fetching user data:", error);
+    // Continue without user data
+  }
+  
   const companyCookie = cookieStore.get("company-data")?.value;
   const company = companyCookie ? JSON.parse(companyCookie) : null;
 

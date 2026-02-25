@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Box, Typography, Avatar, Stack, IconButton } from "@mui/material";
-import { BarChart } from "@mui/x-charts/BarChart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { ZoomIn } from "lucide-react";
 
 // ─── Circular Ring Badge ────────────────────────────────────────────────
@@ -97,9 +97,11 @@ function WavyLineChart() {
 }
 
 // ─── Mini Bar Chart Data ────────────────────────────────────────────────
-const barChartLabels = ["الاصايل", "الهاجدية", "الانوار"];
-const barSeries1 = [700, 450, 600]; // red/orange bars
-const barSeries2 = [500, 350, 500]; // yellow bars
+const barChartData = [
+  { name: "الاصايل", series1: 700, series2: 500 },
+  { name: "الهاجدية", series1: 450, series2: 350 },
+  { name: "الانوار", series1: 600, series2: 500 },
+];
 
 // ─── Main Stats Bar ─────────────────────────────────────────────────────
 export default function ProjectStatsBar() {
@@ -276,34 +278,25 @@ export default function ProjectStatsBar() {
           </Typography>
         </Box>
         <Box sx={{ height: 120, width: "100%" }}>
-          <BarChart
-            xAxis={[
-              {
-                scaleType: "band",
-                data: barChartLabels,
-                tickLabelStyle: { fontSize: 9, fill: "#888" },
-              },
-            ]}
-            yAxis={[
-              {
-                tickLabelStyle: { fontSize: 9, fill: "#888" },
-              },
-            ]}
-            series={[
-              { data: barSeries1, color: "#E65100" },
-              { data: barSeries2, color: "#FDD835" },
-            ]}
-            width={210}
-            height={120}
-            margin={{ top: 5, right: 5, bottom: 20, left: 30 }}
-            slots={{
-              legend: () => null,
-            }}
-            sx={{
-              "& .MuiChartsAxis-line": { stroke: "#333" },
-              "& .MuiChartsAxis-tick": { stroke: "#333" },
-            }}
-          />
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+              data={barChartData} 
+              margin={{ top: 5, right: 5, bottom: 20, left: 30 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fontSize: 9, fill: "#888" }}
+                stroke="#333"
+              />
+              <YAxis 
+                tick={{ fontSize: 9, fill: "#888" }}
+                stroke="#333"
+              />
+              <Bar dataKey="series1" fill="#E65100" />
+              <Bar dataKey="series2" fill="#FDD835" />
+            </BarChart>
+          </ResponsiveContainer>
         </Box>
       </Box>
     </Box>
