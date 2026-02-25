@@ -9,30 +9,26 @@ import {
   TextField,
   Button,
   Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-// Types
-export interface SectionFormData {
-  sectionCode: string;
-  sectionDescription: string;
-}
-
-export interface SectionDialogProps {
+export interface EditTasksDialogProps {
   open: boolean;
   onClose: () => void;
-  sectionId?: string;
+  taskId?: string;
 }
 
-
-export default function EditSectionDialog({
+export default function EditTasksDialog({
   open,
   onClose,
-}: SectionDialogProps) {
-  const t = useTranslations("projectSettings.section");
-  const tForm = useTranslations("projectSettings.section.form");
+}: EditTasksDialogProps) {
+  const t = useTranslations("projectSettings.addTasks");
+  const tForm = useTranslations("projectSettings.addTasks.form");
 
   const handleClose = () => {
     onClose();
@@ -62,7 +58,7 @@ export default function EditSectionDialog({
             fontWeight: 600,
           }}
         >
-          {t("editSection")}
+          {t("editTask")}
         </DialogTitle>
         <IconButton
           onClick={handleClose}
@@ -80,30 +76,27 @@ export default function EditSectionDialog({
           component="form"
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          {/* Section Code and Description */}
           <TextField
-            label={tForm("sectionCode")}
+            label={tForm("serialNumber")}
             required
             fullWidth
-            placeholder={tForm("sectionCodePlaceholder")}
+            placeholder={tForm("serialNumberPlaceholder")}
           />
 
-          <TextField
-            label={tForm("sectionDescription")}
-            required
-            fullWidth
-            placeholder={tForm("sectionDescriptionPlaceholder")}
-            multiline
-            rows={3}
-          />
+          <FormControl fullWidth>
+            <InputLabel>{tForm("tasksName")}</InputLabel>
+            <Select label={tForm("tasksName")}>
+              <MenuItem value="">
+                {tForm("tasksNameSelectPlaceholder")}
+              </MenuItem>
+              <MenuItem value="task1">مهمة أولى</MenuItem>
+              <MenuItem value="task2">مهمة ثانية</MenuItem>
+              <MenuItem value="task3">مهمة ثالثة</MenuItem>
+              <MenuItem value="task4">مهمة رابعة</MenuItem>
+            </Select>
+          </FormControl>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mt: 2 }}
-          >
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
             {tForm("save")}
           </Button>
         </Box>

@@ -7,6 +7,10 @@ export const SectionMessages = new MessagesGroup({
   electricitySettings: _m("Electricity Settings", "إعدادات الكهرباء"),
   workOrderType: _m("Work Order Type", "نوع أمر العمل"),
   section: _m("Section", "القسم"),
+  actions: _m("Actions", "الإجراءات"),
+  reportForms: _m("Report Forms", "نماذج التقارير"),
+  addTasks: _m("Add Tasks", "إضافة مهام"),
+  tasksSettings: _m("Tasks Settings", "إعدادات المهام"),
   form: new MessagesGroup({
     sectionCode: _m("Section Code", "كود القسم"),
     sectionCodePlaceholder: _m("Enter section code", "أدخل كود القسم"),

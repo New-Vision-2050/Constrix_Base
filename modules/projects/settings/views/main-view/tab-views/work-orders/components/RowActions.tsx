@@ -18,8 +18,10 @@ export function RowActions({
   onEdit,
   canEdit,
   canShow,
+  translationNamespace = "projectSettings.section.table",
+  editLabelKey = "editSection",
 }: RowActionsProps) {
-  const tTable = useTranslations("projectSettings.section.table");
+  const tTable = useTranslations(translationNamespace);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -72,7 +74,7 @@ export function RowActions({
           <ListItemIcon>
             <BorderColorIcon fontSize="small" color="primary" />
           </ListItemIcon>
-          <ListItemText>{tTable("editSection")}</ListItemText>
+          <ListItemText>{tTable(editLabelKey)}</ListItemText>
         </MenuItem>
       </Menu>
     </>
