@@ -14,7 +14,8 @@ export const pricesOffersMessages = new MessagesGroup({
     referenceNumber: _m("Reference Number", "الرقم المرجعي"),
     offerName: _m("Offer Name", "اسم العرض"),
     clientName: _m("Client Name", "اسم العميل"),
-    department: _m("Department", "الادارة التابع لها"),
+    department: _m("Department", "الفرع التابع له"),
+    management: _m("Management", "الادارة التابعة لها"),
     financialResponsible: _m("Financial Responsible", "المسؤول المالي"),
     offerStatus: _m("Offer Status", "حالة العرض"),
     mediator: _m("Mediator", "الوسيط"),
@@ -25,7 +26,7 @@ export const pricesOffersMessages = new MessagesGroup({
     createOffer: _m("Create Offer Price", "إنشاء عرض سعر"),
     sort: _m("Sort", "ترتیب"),
     accepted: _m("Accepted", "مقبول"),
-    pending: _m("Pending", "قيد النتظار"),
+    pending: _m("Pending", "قيد الإنتظار"),
     rejected: _m("Rejected", "مرفوض"),
   }),
 });

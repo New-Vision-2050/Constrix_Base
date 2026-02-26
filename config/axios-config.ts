@@ -35,8 +35,9 @@ apiClient.interceptors.request.use(
     config.headers["Accept-Language"] = lang || "ar";
     config.headers["Lang"] = lang || "ar";
 
-    // Add current domain to headers
-    if (typeof window !== "undefined") {
+    // Add current domain to headers (skip when config.skipXDomain is true - e.g. client-requests)
+    const skipXDomain = (config as { skipXDomain?: boolean }).skipXDomain;
+    if (typeof window !== "undefined" && !skipXDomain) {
       config.headers["X-Domain"] = currentHost;
     }
 

@@ -1,14 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import StatisticsCardHeader from "../organizational-structure/components/StatisticsCard/StatisticsCardHeader";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import TopicIcon from "@mui/icons-material/Topic";
-import EventBusyIcon from "@mui/icons-material/EventBusy";
-import TrendingUpSharpIcon from "@mui/icons-material/TrendingUpSharp";
-import PaidIcon from "@mui/icons-material/Paid";
 import {
   Typography,
   Box,
@@ -23,38 +17,18 @@ import { FileText } from "lucide-react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
-import { PriceOffer } from "./types";
 import OfferStatusChip from "./OfferStatusChip";
-import { getClientRequests } from "@/services/api/client-requests";
+import PricesOffersWidgets from "./PricesOffersWidgets";
+import { ClientRequestsApi } from "@/services/api/client-requests";
 import type { ClientRequest } from "@/services/api/client-requests/types/response";
 
-// Map API response to table row format
-function mapClientRequestToPriceOffer(item: ClientRequest): PriceOffer {
-  const raw = item as Record<string, unknown>;
-  return {
-    id: String(item.id),
-    referenceNumber: (raw.reference_number ?? raw.referenceNumber ?? item.id) as string,
-    offerName: (raw.offer_name ?? raw.offerName ?? raw.name ?? "—") as string,
-    clientName: (raw.client_name ?? raw.clientName ?? "—") as string,
-    department: (raw.department ?? raw.branch_name ?? "—") as string,
-    financialResponsible: (raw.financial_responsible ?? raw.financialResponsible ?? "—") as string,
-    offerStatus: (raw.status_client_request ?? raw.offerStatus ?? "pending") as PriceOffer["offerStatus"],
-    mediator: (raw.mediator ?? raw.broker_name ?? "—") as string,
-    hasAttachment: Boolean(
-      raw.has_attachment ?? raw.hasAttachment ?? (Array.isArray(raw.attachments) && raw.attachments.length > 0)
-    ),
-  };
-}
-
-
-const PricesOffersTable = HeadlessTableLayout<PriceOffer>("prices-offers");
+const PricesOffersTable = HeadlessTableLayout<ClientRequest>("prices-offers");
 
 export default function PricesOffersIndex() {
   const t = useTranslations("pricesOffers.searchFilter");
   const tTable = useTranslations("pricesOffers.table");
   const [referenceNumber, setReferenceNumber] = useState("");
   const [offerNumber, setOfferNumber] = useState("");
-  const [offerStatus, setOfferStatus] = useState("pending");
   const [endDate, setEndDate] = useState("");
   const [responsiblePerson, setResponsiblePerson] = useState("");
 
@@ -63,33 +37,22 @@ export default function PricesOffersIndex() {
     initialLimit: 15,
   });
 
-  const { data: apiData, isLoading } = useQuery({
-    queryKey: [
-      "client-requests",
-      params.page,
-      params.limit,
-      params.search,
-      offerStatus,
-      referenceNumber,
-      offerNumber,
-    ],
-    queryFn: () =>
-      getClientRequests({
+  const { data, isLoading } = useQuery({
+    queryKey: ["client-requests", params.page, params.limit],
+    queryFn: async () => {
+      const response = await ClientRequestsApi.list({
         page: params.page,
         per_page: params.limit,
-        status_client_request: offerStatus
-          ? (offerStatus as "accepted" | "pending" | "rejected" | "draft")
-          : "pending",
-        content: params.search || undefined,
-      }),
+        status_client_request: "accepted",
+      });
+      return response.data;
+    },
   });
 
-  const data = useMemo(
-    () => (apiData?.payload ?? []).map(mapClientRequestToPriceOffer),
-    [apiData]
-  );
-  const totalPages = apiData?.pagination?.last_page ?? 1;
-  const totalItems = apiData?.pagination?.result_count ?? 0;
+  const clientRequests = data?.payload || [];
+
+  const totalPages = data?.pagination?.last_page ?? 1;
+  const totalItems = data?.pagination?.result_count ?? 0;
 
   const columns = useMemo(
     () => [
@@ -97,50 +60,71 @@ export default function PricesOffersIndex() {
         key: "referenceNumber",
         name: tTable("referenceNumber"),
         sortable: false,
-        render: (row: PriceOffer) => <span className="p-2 text-sm">{row.referenceNumber}</span>,
+        render: (row: ClientRequest) => (
+          <span className="p-2 text-sm">{row.client_request_type_id}</span>
+        ),
       },
       {
         key: "offerName",
         name: tTable("offerName"),
         sortable: false,
-        render: (row: PriceOffer) => <span className="p-2 text-sm">{row.offerName}</span>,
+        render: (row: ClientRequest) => (
+          <span className="p-2 text-sm">{row.content}</span>
+        ),
       },
       {
         key: "clientName",
         name: tTable("clientName"),
         sortable: false,
-        render: (row: PriceOffer) => <span className="p-2 text-sm">{row.clientName}</span>,
+        render: (row: ClientRequest) => (
+          <span className="p-2 text-sm">{row.client?.name ?? "—"}</span>
+        ),
       },
       {
-        key: "department",
-        name: tTable("department"),
+        key: "management",
+        name: tTable("management"),
         sortable: false,
-        render: (row: PriceOffer) => <span className="p-2 text-sm">{row.department}</span>,
+        render: (row: ClientRequest) => (
+          <span className="p-2 text-sm">{row.management?.name ?? "—"}</span>
+        ),
       },
       {
         key: "financialResponsible",
         name: tTable("financialResponsible"),
         sortable: false,
-        render: (row: PriceOffer) => <span className="p-2 text-sm">{row.financialResponsible}</span>,
+        render: (row: ClientRequest) => (
+          // TODO: Add financial responsible name
+          <span className="p-2 text-sm">
+            {row.client_request_receiver_from?.name ?? "—"}
+          </span>
+        ),
       },
       {
         key: "offerStatus",
         name: tTable("offerStatus"),
         sortable: false,
-        render: (row: PriceOffer) => <OfferStatusChip status={row.offerStatus} />,
+        render: (row: ClientRequest) => (
+          <OfferStatusChip
+            status={row.client_price_offer_status ?? row.status_client_request}
+          />
+        ),
       },
       {
         key: "mediator",
         name: tTable("mediator"),
         sortable: false,
-        render: (row: PriceOffer) => <span className="p-2 text-sm">{row.mediator}</span>,
+        render: (row: ClientRequest) => (
+          // TODO: Add mediator name
+          <span className="p-2 text-sm">{row.management?.name ?? "—"}</span>
+        ),
       },
       {
         key: "attachments",
         name: tTable("attachments"),
         sortable: false,
-        render: (row: PriceOffer) =>
-          row.hasAttachment ? (
+        render: (row: ClientRequest) =>
+          row.term_setting_id !== null ||
+          (row.attachments && row.attachments.length > 0) ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <FileText className="w-5 h-5 text-red-500" />
               <span className="text-sm">{tTable("report")}</span>
@@ -173,58 +157,28 @@ export default function PricesOffersIndex() {
         ),
       },
     ],
-    [tTable]
+    [tTable],
   );
 
   const state = PricesOffersTable.useTableState({
-    data,
+    data: clientRequests,
     columns,
     totalPages,
     totalItems,
     params,
     selectable: true,
-    getRowId: (row: PriceOffer) => row.id,
+    getRowId: (row: ClientRequest) => row.id,
     loading: isLoading,
     searchable: true,
-    filtered: params.search !== "" || !!offerStatus || !!referenceNumber || !!offerNumber,
+    filtered: params.search !== "" || !!referenceNumber || !!offerNumber,
     onExport: async () => {
       // TODO: implement export
     },
   });
 
-  useEffect(() => {
-    console.log(data);
-  },[data])
-
   return (
     <div>
-      <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2 mb-4">
-        <StatisticsCardHeader
-          title="إجمالي الأسعار"
-          number={125}
-          icon={<PaidIcon color="success" />}
-        />
-        <StatisticsCardHeader
-          title="محول لعقد"
-          number={25}
-          icon={<CheckCircleIcon color="primary" />}
-        />
-        <StatisticsCardHeader
-          title="عروض مقبولة"
-          number={35}
-          icon={<TrendingUpSharpIcon color="success" />}
-        />
-        <StatisticsCardHeader
-          title="عروض مرفوضة"
-          number={8}
-          icon={<EventBusyIcon color="error" />}
-        />
-        <StatisticsCardHeader
-          title="إجمالي المسودة"
-          number={5}
-          icon={<TopicIcon color="warning" />}
-        />
-      </div>
+      <PricesOffersWidgets />
 
       <Box className="p-4 rounded-lg mb-4 bg-sidebar">
         <Typography variant="h6" sx={{ mb: 2 }}>
@@ -258,11 +212,7 @@ export default function PricesOffersIndex() {
           />
           <FormControl size="small" fullWidth>
             <InputLabel>{t("offerStatus")}</InputLabel>
-            <Select
-              value={offerStatus}
-              label={t("offerStatus")}
-              onChange={(e) => setOfferStatus(e.target.value)}
-            >
+            <Select value={t("offerStatus")} label={t("offerStatus")}>
               <MenuItem value="">{t("all")}</MenuItem>
               <MenuItem value="draft">مسودة</MenuItem>
               <MenuItem value="pending">قيد الانتظار</MenuItem>
