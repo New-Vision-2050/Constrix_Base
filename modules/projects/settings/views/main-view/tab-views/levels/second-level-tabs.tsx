@@ -8,7 +8,7 @@ import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useEffect, useState } from "react";
 import DialogTrigger from "@/components/headless/dialog-trigger";
-import AddProjectTypeDialog from "../../../components/dialogs/add-project-type";
+import AddProjectTypeDialog from "../../../../components/dialogs/add-project-type";
 import { APP_ICONS } from "@/constants/icons";
 import SchemaLevelTabs from "./schema-level-tabs";
 
@@ -17,7 +17,9 @@ interface SecondLevelTabsProps {
 }
 
 export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
-  const [selectedItem, setSelectedItem] = useState<PRJ_ProjectType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PRJ_ProjectType | null>(
+    null,
+  );
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["project-types", "children", parentId],
@@ -58,7 +60,13 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
                       key={item.id}
                       value={item.id}
                       label={
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.75,
+                          }}
+                        >
                           {IconComponent && <IconComponent size={16} />}
                           {item.name}
                         </Box>
@@ -82,7 +90,11 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
             </div>
           </Paper>
           {selectedItem && (
-            <SchemaLevelTabs key={selectedItem.id} parentId={selectedItem.id} />
+            <SchemaLevelTabs
+              key={selectedItem.id}
+              firstLevelId={parentId}
+              parentId={selectedItem.id}
+            />
           )}
         </>
       )}

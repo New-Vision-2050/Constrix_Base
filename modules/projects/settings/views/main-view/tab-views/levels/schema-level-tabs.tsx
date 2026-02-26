@@ -18,41 +18,43 @@ import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectTypeSchema } from "@/types/api/projects/project-type-schema";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import AddSubProjectTypeDialog from "../../../components/dialogs/add-sub-project-type";
-import { useProjectSettingsTabs } from "../../../constants/current-tabs";
-import DetailsView from "../tab-views/details";
-import ProjectTermsView from "../tab-views/project-terms";
-import AttachmentsView from "../tab-views/attachments";
-import ContractorsView from "../tab-views/contractors";
-import TeamView from "../tab-views/team";
-import WorkOrdersView from "../tab-views/work-orders";
-import FinancialView from "../tab-views/financial";
-import ContractManagementView from "../tab-views/contract-management";
+import AddSubProjectTypeDialog from "../../../../components/dialogs/add-sub-project-type";
+import { useProjectSettingsTabs } from "../../../../constants/current-tabs";
+import DetailsView from "../details";
+import ProjectTermsView from "../project-terms";
+import AttachmentsView from "../attachments";
+import ContractorsView from "../contractors";
+import TeamView from "../team";
+import WorkOrdersView from "../work-orders";
+import FinancialView from "../financial";
+import ContractManagementView from "../contract-management";
+import { SettingsTabItemProps } from "../../types";
 
-function renderTabContent(tab: string) {
+function renderTabContent(tab: string, props: SettingsTabItemProps) {
   switch (tab) {
     case "project-details":
-      return <DetailsView />;
+      return <DetailsView {...props} />;
     case "project-terms":
-      return <ProjectTermsView />;
+      return <ProjectTermsView {...props} />;
     case "attachments":
-      return <AttachmentsView />;
+      return <AttachmentsView {...props} />;
     case "contractors":
-      return <ContractorsView />;
+      return <ContractorsView {...props} />;
     case "team":
-      return <TeamView />;
+      return <TeamView {...props} />;
     case "work-orders":
       return <WorkOrdersView />;
     case "financial":
-      return <FinancialView />;
+      return <FinancialView {...props} />;
     case "contract-management":
-      return <ContractManagementView />;
+      return <ContractManagementView {...props} />;
     default:
       return null;
   }
 }
 
 interface SchemaLevelTabsProps {
+  firstLevelId: number;
   parentId: number;
 }
 
@@ -78,7 +80,10 @@ const TabWithCheckbox = ({
   />
 );
 
-export default function SchemaLevelTabs({ parentId }: SchemaLevelTabsProps) {
+export default function SchemaLevelTabs({
+  firstLevelId,
+  parentId,
+}: SchemaLevelTabsProps) {
   const t = useTranslations("Projects.Settings.projectTypes");
   const allTabs = useProjectSettingsTabs();
 
@@ -113,10 +118,14 @@ export default function SchemaLevelTabs({ parentId }: SchemaLevelTabsProps) {
   );
 
   useEffect(() => {
-    if (schemas.length > 0 && !selectedSchema) {
-      setSelectedSchema(schemas[0]);
+    const items = thirdLevelQuery.data ?? [];
+    if (items.length === 0) return;
+    const isValid =
+      selectedSchema && items.some((item) => item.id === selectedSchema.id);
+    if (!isValid) {
+      setSelectedSchema(items[0]);
     }
-  }, [schemas, selectedSchema]);
+  }, [thirdLevelQuery.data, selectedSchema]);
 
   useEffect(() => {
     if (isLoading || filteredTabs.length === 0) return;
@@ -185,7 +194,13 @@ export default function SchemaLevelTabs({ parentId }: SchemaLevelTabsProps) {
                   ))}
                 </Tabs>
               </Paper>
-              <Paper className="p-4">{renderTabContent(selectedTab)}</Paper>
+              <Paper className="p-4">
+                {renderTabContent(selectedTab, {
+                  firstLevelId,
+                  secondLevelId: parentId,
+                  thirdLevelId: selectedSchema.id,
+                })}
+              </Paper>
             </div>
           )}
         </Grid>
