@@ -10,32 +10,23 @@ import {
   Button,
   Box,
 } from "@mui/material";
-
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-// Types
-export interface SectionFormData {
-  sectionCode: string;
-  sectionDescription: string;
-}
-
-export interface SectionDialogProps {
+export interface AddTasksDialogProps {
   open: boolean;
-  onClose: () => void;
-  sectionId?: string;
+  setOpenModal: (open: boolean) => void;
 }
 
-
-export default function EditSectionDialog({
+export default function AddTasksDialog({
   open,
-  onClose,
-}: SectionDialogProps) {
-  const t = useTranslations("projectSettings.section");
-  const tForm = useTranslations("projectSettings.section.form");
+  setOpenModal,
+}: AddTasksDialogProps) {
+  const t = useTranslations("projectSettings.addTasks");
+  const tForm = useTranslations("projectSettings.addTasks.form");
 
   const handleClose = () => {
-    onClose();
+    setOpenModal(false);
   };
 
   return (
@@ -46,9 +37,10 @@ export default function EditSectionDialog({
       fullWidth
       PaperProps={{
         sx: {
-          color: "white",
           borderRadius: "8px",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
+          position: "fixed",
+          top: 0,
+          right: 0,
         },
       }}
     >
@@ -62,7 +54,7 @@ export default function EditSectionDialog({
             fontWeight: 600,
           }}
         >
-          {t("editSection")}
+          {t("addTask")}
         </DialogTitle>
         <IconButton
           onClick={handleClose}
@@ -70,40 +62,27 @@ export default function EditSectionDialog({
             position: "absolute",
             right: 16,
             top: 16,
-            color: "rgba(255,255,255,0.5)",
           }}
         >
           <CloseIcon />
         </IconButton>
 
-        <Box
-          component="form"
-          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-        >
-          {/* Section Code and Description */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <TextField
-            label={tForm("sectionCode")}
+            label={tForm("serialNumber")}
             required
             fullWidth
-            placeholder={tForm("sectionCodePlaceholder")}
+            placeholder={tForm("serialNumberPlaceholder")}
           />
 
           <TextField
-            label={tForm("sectionDescription")}
+            label={tForm("tasksName")}
             required
             fullWidth
-            placeholder={tForm("sectionDescriptionPlaceholder")}
-            multiline
-            rows={3}
+            placeholder={tForm("tasksNamePlaceholder")}
           />
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mt: 2 }}
-          >
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
             {tForm("save")}
           </Button>
         </Box>

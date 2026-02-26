@@ -123,7 +123,8 @@ export default function WorkOrderTypePage({
           onEdit={handleEdit}
           canShow={true}
           canEdit={true}
-          // t={tTable}  const tTable = useTranslations("Work order type");
+          translationNamespace="projectSettings.workOrders.table"
+          editLabelKey="editWorkOrder"
         />
       ),
     },

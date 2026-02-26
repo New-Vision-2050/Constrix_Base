@@ -10,29 +10,26 @@ import {
   Button,
   Box,
 } from "@mui/material";
-
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-// Types
-export interface SectionFormData {
-  sectionCode: string;
-  sectionDescription: string;
+export interface ActionFormData {
+  actionCode: string;
+  actionDescription: string;
 }
 
-export interface SectionDialogProps {
+export interface EditActionsDialogProps {
   open: boolean;
   onClose: () => void;
-  sectionId?: string;
+  actionId?: string;
 }
 
-
-export default function EditSectionDialog({
+export default function EditActionsDialog({
   open,
   onClose,
-}: SectionDialogProps) {
-  const t = useTranslations("projectSettings.section");
-  const tForm = useTranslations("projectSettings.section.form");
+}: EditActionsDialogProps) {
+  const t = useTranslations("projectSettings.actions");
+  const tForm = useTranslations("projectSettings.actions.form");
 
   const handleClose = () => {
     onClose();
@@ -62,7 +59,7 @@ export default function EditSectionDialog({
             fontWeight: 600,
           }}
         >
-          {t("editSection")}
+          {t("editAction")}
         </DialogTitle>
         <IconButton
           onClick={handleClose}
@@ -80,24 +77,22 @@ export default function EditSectionDialog({
           component="form"
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          {/* Section Code and Description */}
           <TextField
-            label={tForm("sectionCode")}
+            label={tForm("actionCode")}
             required
             fullWidth
-            placeholder={tForm("sectionCodePlaceholder")}
+            placeholder={tForm("actionCodePlaceholder")}
           />
 
           <TextField
-            label={tForm("sectionDescription")}
+            label={tForm("actionDescription")}
             required
             fullWidth
-            placeholder={tForm("sectionDescriptionPlaceholder")}
+            placeholder={tForm("actionDescriptionPlaceholder")}
             multiline
             rows={3}
           />
 
-          {/* Submit Button */}
           <Button
             type="submit"
             variant="contained"
