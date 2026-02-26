@@ -26,6 +26,7 @@ export const ROUTER = {
   HR_SETTINGS: "/hr-settings",
   Organizational_Structure: "/organizational-structure",
   WORK_PANEL: "/work-panel",
+  WORK_PANEL_SETTINGS: "/work-panel-settings",
   ROLES: "/roles",
   PERMISSIONS: "/permissions",
   AttendanceDeparture: "/attendance-departure",
@@ -42,6 +43,7 @@ export const ROUTER = {
   DOCS_LIBRARY: "/docs-library",
   ACTIVITIES_LOGS: "/activities-logs",
   TERMS_CONDITIONS: "/stores/terms",
+  PROJECTS_SETTINGS: "/projects/settings",
   CMS: {
     CATEGORIES: "/content-management-system/categories",
     ICONS: "/content-management-system/icons",
