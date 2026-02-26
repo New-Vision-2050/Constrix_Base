@@ -10,6 +10,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import { useLocale } from "next-intl";
 
 interface DeleteProjectTermDialogProps {
   open: boolean;
@@ -19,8 +20,11 @@ interface DeleteProjectTermDialogProps {
 }
 
 export function DeleteProjectTermDialog({ open, onClose, onConfirm, itemName }: DeleteProjectTermDialogProps) {
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+  
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth dir={isRtl ? "rtl" : "ltr"}>
       <DialogTitle>تأكيد الحذف</DialogTitle>
       <DialogContent>
         <Box sx={{ py: 2 }}>
@@ -33,10 +37,12 @@ export function DeleteProjectTermDialog({ open, onClose, onConfirm, itemName }: 
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>إلغاء</Button>
-        <Button onClick={onConfirm} variant="contained" color="error">
-          حذف
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button onClick={onClose}>إلغاء</Button>
+          <Button onClick={onConfirm} variant="contained" >
+            حذف
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );

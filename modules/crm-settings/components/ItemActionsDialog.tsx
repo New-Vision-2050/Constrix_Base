@@ -19,21 +19,25 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Chip,
+  Checkbox,
+  FormGroup,
 } from "@mui/material";
 import { Add, Edit, Delete, Visibility } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
-import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
-
+import { TermSetting } from "@/services/api/projects/project-terms/types/response";
+import { ProjectTermsApi } from "@/services/api/projects/project-terms";
 const projectTermSchema = z.object({
-  reference_number: z.string().optional(),
   name: z.string().min(1, "اسم البند مطلوب"),
   description: z.string().optional(),
-  sub_items_count: z.number().min(0, "عدد البنود الفرعية يجب أن يكون 0 أو أكثر"),
-  services: z.array(z.string()).optional(),
-  status: z.enum(["0", "1"]),
+  parent_id: z.number().nullable().optional(),
+  project_type_id: z.number().optional(),
+  term_services_ids: z.array(z.number()).optional(),
+  is_active: z.number().min(0).max(1).default(1),
 });
 
 type ProjectTermFormData = z.infer<typeof projectTermSchema>;
@@ -41,39 +45,36 @@ type ProjectTermFormData = z.infer<typeof projectTermSchema>;
 interface ItemActionsDialogProps {
   open: boolean;
   onClose: () => void;
-  item: PRJ_ProjectTerm | null;
-  onUpdate: (data: Partial<PRJ_ProjectTerm>) => void;
+  item: TermSetting | null;
+  onUpdate: (data: any) => void;
   onDelete: () => void;
-  onCreate: (data: Partial<PRJ_ProjectTerm>) => void;
-  tableData: PRJ_ProjectTerm[];
-  onAction: (action: string, item: PRJ_ProjectTerm) => void;
+  onCreate: (data: any) => void;
+  tableData: TermSetting[];
+  onAction: (action: string, item: TermSetting) => void;
 }
-
 // Mock data for the table (same as main component)
-const mockTableData: PRJ_ProjectTerm[] = [
+const mockTableData: TermSetting[] = [
   {
     id: 1,
-    reference_number: "1520202",
     name: "تصاميم شبكه الجهد",
     description: "وصف تصاميم شبكه الجهد المتوسط",
-    sub_items_count: 5,
-    services: ["خدمة 1", "خدمة 2"],
-    status: "1",
     parent_id: null,
     project_type_id: null,
+    is_active: 1,
+    children_count: 5,
+    term_services_count: 2,
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
   },
   {
     id: 2,
-    reference_number: "1520203",
     name: "تصاميم محطة المحولات",
     description: "وصف تصاميم محطة المحولات الرئيسية",
-    sub_items_count: 3,
-    services: ["خدمة 3"],
-    status: "1",
     parent_id: null,
     project_type_id: null,
+    is_active: 1,
+    children_count: 3,
+    term_services_count: 1,
     created_at: "2024-01-02T00:00:00Z",
     updated_at: "2024-01-02T00:00:00Z",
   },
@@ -89,9 +90,53 @@ function TabPanel({ children, value, index }: { children: React.ReactNode; value
 
 export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onCreate, tableData, onAction }: ItemActionsDialogProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const queryClient = useQueryClient();
+  
+  // Mutation for creating child terms
+  const createChildMutation = useMutation({
+    mutationFn: (data: any) => ProjectTermsApi.createTermSetting(data),
+    onSuccess: () => {
+      createForm.reset();
+      // Switch to table tab and refresh data
+      setActiveTab(0);
+      queryClient.invalidateQueries({ queryKey: ["term-children", item?.id] });
+    },
+  });
+  
+  // Fetch children data when dialog opens and item is available
+  const { data: childrenData, isLoading: isLoadingChildren, error: childrenError } = useQuery({
+    queryKey: ["term-children", item?.id],
+    queryFn: async () => {
+      if (!item?.id) return { payload: [] };
+      try {
+        const response = await ProjectTermsApi.getTermChildren(item.id);
+        console.log("Children API response:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching children:", error);
+        return { payload: [] };
+      }
+    },
+    enabled: !!item?.id && open,
+    retry: 1,
+  });
+  
+  const children = Array.isArray(childrenData?.payload) ? childrenData.payload : 
+                Array.isArray(childrenData?.children) ? childrenData.children :
+                Array.isArray(childrenData) ? childrenData : [];
+  
+  console.log("Children data extracted:", children);
+  console.log("Children data length:", children.length);
+  
+  // Toggle status function for table switches
+  const toggleStatus = (id: number) => {
+    // This would need to be implemented to work with the query cache
+    // For now, this is just a local UI update
+    console.log("Toggle status for child:", id);
+  };
   
   // Create table instance
-  const DialogTable = HeadlessTableLayout<PRJ_ProjectTerm>();
+  const DialogTable = HeadlessTableLayout<TermSetting>();
 
   // Use table params for pagination and sorting
   const tableParams = DialogTable.useTableParams({
@@ -101,18 +146,36 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     initialSortDirection: "asc",
   });
 
+  // Fetch services for the form
+  const { data: servicesData } = useQuery({
+    queryKey: ["term-services"],
+    queryFn: async () => {
+      const response = await ProjectTermsApi.getTermServices();
+      return response.data;
+    },
+  });
+
+  const services = servicesData?.payload || [];
+
   // Create form instance
   const createForm = useForm<ProjectTermFormData>({
     resolver: zodResolver(projectTermSchema),
     defaultValues: {
-      reference_number: "",
       name: "",
       description: "",
-      sub_items_count: 0,
-      services: [],
-      status: "1",
+      parent_id: item?.id || null,
+      project_type_id: undefined,
+      term_services_ids: [],
+      is_active: 1,
     },
   });
+
+  // Update form when item changes (to set parent_id)
+  useEffect(() => {
+    if (item?.id) {
+      createForm.setValue("parent_id", item.id);
+    }
+  }, [item, createForm]);
 
   // Update form instance
   const updateForm = useForm<ProjectTermFormData>({
@@ -131,12 +194,9 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
   useEffect(() => {
     if (item) {
       updateForm.reset({
-        reference_number: item.reference_number,
         name: item.name,
         description: item.description,
-        sub_items_count: item.sub_items_count,
-        services: item.services,
-        status: item.status,
+        status: item.is_active === 1 ? "1" : "0",
       });
     }
   }, [item, updateForm]);
@@ -144,12 +204,12 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
   // Define table columns (same as main component)
   const columns = [
     {
-      key: "reference_number",
-      name: "الرقم المرجعي",
+      key: "id",
+      name: "الرقم",
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Typography variant="body2" fontWeight="medium">
-            {row.reference_number}
+            {row.id}
           </Typography>
       ),
     },
@@ -157,7 +217,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       key: "name",
       name: "اسم البند",
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Typography variant="body2" fontWeight="medium">
             {row.name}
           </Typography>
@@ -167,51 +227,41 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       key: "description",
       name: "وصف البند",
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Typography variant="body2" color="text.secondary">
             {row.description}
           </Typography>
       ),
     },
     {
-      key: "services",
-      name: "خدمات البند",
-      sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <TextField
-              select
-              size="small"
-              value=""
-              sx={{ minWidth: 150 }}
-              SelectProps={{
-                displayEmpty: true,
-              }}
-          >
-            <MenuItem value="" disabled>
-              اختر الخدمة
-            </MenuItem>
-            {row.services.map((service, index) => (
-                <MenuItem key={index} value={service}>
-                  {service}
-                </MenuItem>
-            ))}
-          </TextField>
+
+      key: "term_services_count",
+      name: "عدد الخدمات",
+      sortable: true,
+      render: (row: TermSetting) => (
+          <Typography variant="body2">
+            {row.term_services_count}
+          </Typography>
       ),
     },
     {
       key: "status",
       name: "تفعيل البند",
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Box display="flex" ml="5px" alignItems="center" justifyContent="flex-end" gap={1}>
-            <Switch
-                checked={row.status === "1"}
-                size="small"
-                color="primary"
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={row.is_active === 1}
+                  onChange={() => toggleStatus(row.id)}
+                  size="small"
+                  color="primary"
+                />
+              }
+              label={row.is_active === 1 ? "نشط" : "غير نشط"}
+              labelPlacement="start"
             />
-            <Typography variant="body2">
-              {row.status === "1" ? "نشط" : "غير نشط"}
-            </Typography>
           </Box>
       ),
     },
@@ -219,7 +269,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       key: "actions",
       name: "إجراءات",
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>الإجراءات</InputLabel>
             <Select
@@ -237,20 +287,20 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
   ];
 
   // Calculate pagination
-  const totalPages = Math.ceil(tableData.length / tableParams.limit);
+  const totalPages = Math.ceil(children.length / tableParams.limit);
   const startIndex = (tableParams.page - 1) * tableParams.limit;
   const endIndex = startIndex + tableParams.limit;
-  const paginatedData = tableData.slice(startIndex, endIndex);
+  const paginatedData = children.slice(startIndex, endIndex);
 
   // Table state
   const tableState = DialogTable.useTableState({
     data: paginatedData,
     columns,
     totalPages,
-    totalItems: tableData.length,
+    totalItems: children.length,
     params: tableParams,
     getRowId: (item) => item.id.toString(),
-    loading: false,
+    loading: isLoadingChildren,
   });
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -263,9 +313,10 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
   };
 
   const handleCreate = (data: ProjectTermFormData) => {
-    onCreate(data);
-    createForm.reset();
-    onClose();
+    createChildMutation.mutate({
+      ...data,
+      parent_id: item?.id,
+    });
   };
 
   const handleDelete = () => {
@@ -280,7 +331,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
           إجراءات البند: {item?.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          الرقم المرجعي: {item?.reference_number}
+          معرف البند: {item?.id}
         </Typography>
       </DialogTitle>
       
@@ -288,42 +339,45 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tab icon={<Visibility />} label="عرض الجدول" />
           <Tab icon={<Add />} label="إضافة جديد" />
-          <Tab icon={<Edit />} label="تعديل البند" />
-          <Tab icon={<Delete />} label="حذف البند" />
+
         </Tabs>
 
         {/* Table View Tab */}
         <TabPanel value={activeTab} index={0}>
           <Typography variant="h6" gutterBottom>
-            عرض جميع البنود
+            البنود الفرعية لـ: {item?.name}
           </Typography>
-          <Paper>
-            <DialogTable.TopActions state={tableState} />
-            <DialogTable.Table state={tableState} />
-            <DialogTable.Pagination state={tableState} />
-          </Paper>
+          {isLoadingChildren ? (
+            <Box display="flex" justifyContent="center" alignItems="center" p={4}>
+              <Typography>جاري تحميل البنود الفرعية...</Typography>
+            </Box>
+          ) : childrenError ? (
+            <Box display="flex" justifyContent="center" alignItems="center" p={4}>
+              <Typography color="error">
+                حدث خطأ في تحميل البنود الفرعية. يرجى المحاولة مرة أخرى.
+              </Typography>
+            </Box>
+          ) : children.length === 0 ? (
+            <Box display="flex" justifyContent="center" alignItems="center" p={4}>
+              <Typography color="text.secondary">
+                لا توجد بنود فرعية لهذا البند.
+              </Typography>
+            </Box>
+          ) : (
+            <Paper>
+              <DialogTable.TopActions state={tableState} />
+              <DialogTable.Table state={tableState} />
+              <DialogTable.Pagination state={tableState} />
+            </Paper>
+          )}
         </TabPanel>
 
         {/* Create Tab */}
         <TabPanel value={activeTab} index={1}>
           <Typography variant="h6" gutterBottom>
-            إضافة بند جديد
+            إضافة بند فرعي لـ: {item?.name}
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Controller
-              name="reference_number"
-              control={createForm.control}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  label="الرقم المرجعي"
-                  fullWidth
-                  error={!!error}
-                  helperText={error?.message}
-                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
-                />
-              )}
-            />
             <Controller
               name="name"
               control={createForm.control}
@@ -356,37 +410,102 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
               )}
             />
             <Controller
-              name="sub_items_count"
+              name="term_services_ids"
               control={createForm.control}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  label="عدد البنود الفرعية"
-                  type="number"
-                  fullWidth
-                  error={!!error}
-                  helperText={error?.message}
-                  inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
-                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                />
+              render={({ field }) => (
+                <FormControl component="fieldset" fullWidth>
+                  <Typography variant="subtitle1" gutterBottom sx={{ color: '#ffffff', fontWeight: 'bold' }}>
+                    الخدمات
+                  </Typography>
+                  <FormGroup sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 1 }}>
+                    {services.map((service) => (
+                      <FormControlLabel
+                        key={service.id}
+                        control={
+                          <Checkbox
+                            checked={field.value.includes(service.id)}
+                            onChange={(e) => {
+                              const selectedServices = field.value;
+                              if (e.target.checked) {
+                                field.onChange([...selectedServices, service.id]);
+                              } else {
+                                field.onChange(selectedServices.filter((id: number) => id !== service.id));
+                              }
+                            }}
+                            sx={{
+                              color: '#ffffff',
+                              '&.Mui-checked': {
+                                color: '#F42588',
+                              },
+                              '& .MuiSvgIcon-root': {
+                                borderColor: '#ffffff',
+                              },
+                            }}
+                          />
+                        }
+                        label={service.name}
+                        sx={{ 
+                          color: '#ffffff',
+                          '& .MuiFormControlLabel-label': {
+                            color: '#ffffff',
+                          }
+                        }}
+                      />
+                    ))}
+                  </FormGroup>
+                </FormControl>
               )}
             />
             <Controller
-              name="status"
+              name="is_active"
               control={createForm.control}
               render={({ field }) => (
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={field.value === "1"}
-                      onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
-                    />
-                  }
-                  label="تفعيل البند"
-                  sx={{ textAlign: "right", alignSelf: "flex-start" }}
-                />
+                <Box 
+                  display="flex" 
+                  alignItems="center" 
+                  justifyContent="flex-start" 
+                  gap={2}
+                  sx={{ width: '100%', mt: 1 }}
+                >
+                  <Typography variant="body2" sx={{ minWidth: '80px' }}>
+                    الحالة:
+                  </Typography>
+                  <Switch
+                    checked={field.value === 1}
+                    onChange={(e) => {
+                      console.log('Switch changed:', e.target.checked, 'Current value:', field.value);
+                      field.onChange(e.target.checked ? 1 : 0);
+                    }}
+                    size="small"
+                    color="primary"
+                  />
+                  <Typography variant="body2">
+                    {field.value === 1 ? "نشط" : "غير نشط"}
+                  </Typography>
+                </Box>
               )}
             />
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={createForm.handleSubmit(handleCreate)}
+                disabled={createChildMutation.isPending}
+                fullWidth
+              >
+                {createChildMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  createForm.reset();
+                  setActiveTab(0);
+                }}
+                fullWidth
+              >
+                إلغاء
+              </Button>
+            </Box>
           </Box>
         </TabPanel>
 
@@ -461,16 +580,35 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
               name="status"
               control={updateForm.control}
               render={({ field }) => (
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={field.value === "1"}
-                      onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
-                    />
-                  }
-                  label="تفعيل البند"
-                  sx={{ textAlign: "right", alignSelf: "flex-start" }}
-                />
+                <Box 
+                  display="flex" 
+                  alignItems="center" 
+                  justifyContent="flex-start" 
+                  gap={2}
+                  sx={{ width: '100%', mt: 1 }}
+                >
+                  <Typography variant="body2" sx={{ minWidth: '80px' }}>
+                    الحالة:
+                  </Typography>
+                  <Switch
+                    checked={field.value === "1"}
+                    onChange={(e) => {
+                      console.log('Switch changed:', e.target.checked, 'Current value:', field.value);
+                      field.onChange(e.target.checked ? "1" : "0");
+                    }}
+                    size="small"
+                    color="primary"
+                  />
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      fontWeight: field.value === "1" ? 'bold' : 'normal',
+                      color: field.value === "1" ? 'primary.main' : 'text.secondary'
+                    }}
+                  >
+                    {field.value === "1" ? "نشط" : "غير نشط"}
+                  </Typography>
+                </Box>
               )}
             />
           </Box>
@@ -499,12 +637,14 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose}>إلغاء</Button>
-        {activeTab === 1 && (
-          <Button onClick={createForm.handleSubmit(handleCreate)} variant="contained" color="primary">
-            إضافة
-          </Button>
-        )}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button onClick={onClose}>إلغاء</Button>
+          {activeTab === 1 && (
+            <Button onClick={createForm.handleSubmit(handleCreate)} variant="contained" color="primary">
+              إضافة
+            </Button>
+          )}
+        </Box>
         {activeTab === 2 && (
           <Button onClick={updateForm.handleSubmit(handleUpdate)} variant="contained" color="primary">
             تحديث

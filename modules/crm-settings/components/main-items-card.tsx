@@ -1,82 +1,79 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, TextField, MenuItem, Switch, Paper, Select, FormControl, InputLabel } from "@mui/material";
 import { Add} from "@mui/icons-material";
 import HeadlessTableLayout from "@/components/headless/table";
-import { PRJ_ProjectTerm } from "@/types/api/projects/project-term";
+import { TermSetting } from "@/services/api/projects/project-terms/types/response";
 import { AddProjectTermDialog } from "./AddProjectTermDialog";
 import { DeleteProjectTermDialog } from "./DeleteProjectTermDialog";
 import { EditProjectTermDialog } from "./EditProjectTermDialog";
 import { ViewProjectTermDialog } from "./ViewProjectTermDialog";
 import { ItemActionsDialog } from "./ItemActionsDialog";
+import { ProjectTermsApi } from "@/services/api/projects/project-terms";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// Mock data for demonstration
-const initialMockProjectItems: PRJ_ProjectTerm[] = [
-  {
-    id: 1,
-    reference_number: "1520202",
-    name: "تصاميم شبكه الجهد",
-    description: "وصف تصاميم شبكه الجهد المتوسط",
-    sub_items_count: 5,
-    services: [],
-    status: "1",
-    parent_id: null,
-    project_type_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: 2,
-    reference_number: "200202020",
-    name: "تصاميم شبكه الجهد",
-    description: "وصف تصاميم شبكه الجهد المتوسط",
-    sub_items_count: 8,
-    services: [],
-    status: "1",
-    parent_id: null,
-    project_type_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-];
-
-interface ProjectTermsViewProps {
-  projectTypeId: number | null;
+interface MainItemsCardProps {
+  terms?: TermSetting[];
 }
 
-function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
+function MainItemsCard({ terms = [] }: MainItemsCardProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [showInactive, setShowInactive] = useState(false);
-  const [rows, setRows] = useState<PRJ_ProjectTerm[]>(initialMockProjectItems);
+  const [rows, setRows] = useState<TermSetting[]>([]);
+  const queryClient = useQueryClient();
+
+  // Update rows when terms prop changes
+  useEffect(() => {
+    setRows(terms || []);
+  }, [terms]);
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => 
+      ProjectTermsApi.updateTermSetting(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["term-settings"] });
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => ProjectTermsApi.deleteTermSetting(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["term-settings"] });
+    },
+  });
 
   // Toggle status function
   const toggleStatus = async (id: number) => {
     const row = rows.find((r) => r.id === id);
     if (!row) return;
 
-    const newStatus = row.status === "1" ? "0" : "1";
+    const currentStatus = row.is_active;
+    const newStatus = currentStatus === 1 ? 0 : 1;
+
+    console.log(`Toggling status for item ${id}: ${currentStatus} -> ${newStatus}`);
 
     // Update local state immediately for better UX
     setRows((prev) =>
         prev.map((r) =>
-            r.id === id ? { ...r, status: newStatus, updated_at: new Date().toISOString() } : r
+            r.id === id ? { ...r, is_active: newStatus, updated_at: new Date().toISOString() } : r
         )
     );
 
-    // TODO: Add API call to update status
+    // API call to update status
     try {
-      // await updateProjectTermStatus({
-      //   id: id.toString(),
-      //   status: newStatus,
-      // });
+      await updateMutation.mutateAsync({
+        id,
+        data: { is_active: newStatus }
+      });
       console.log(`Status updated for item ${id}: ${newStatus}`);
     } catch (error) {
       console.error("Error updating status:", error);
       // Revert on error
       setRows((prev) =>
           prev.map((r) =>
-              r.id === id ? { ...r, status: row.status } : r
+              r.id === id ? { ...r, is_active: currentStatus } : r
           )
       );
     }
@@ -88,11 +85,11 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [itemActionsDialogOpen, setItemActionsDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<PRJ_ProjectTerm | null>(null);
+  const [selectedItem, setSelectedItem] = useState<TermSetting | null>(null);
   const [itemToDelete, setItemToDelete] = useState<string>("");
 
   // Create table instance
-  const ProjectItemsTable = HeadlessTableLayout<PRJ_ProjectTerm>();
+  const ProjectItemsTable = HeadlessTableLayout<TermSetting>();
 
   // Use table params for pagination and sorting
   const tableParams = ProjectItemsTable.useTableParams({
@@ -105,12 +102,12 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   // Define table columns
   const columns = [
     {
-      key: "reference_number",
-      name: "الرقم المرجعي",
+      key: "id",
+      name: "الرقم",
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Typography variant="body2" fontWeight="medium">
-            {row.reference_number}
+            {row.id}
           </Typography>
       ),
     },
@@ -118,7 +115,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       key: "name",
       name: "اسم البند",
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Typography 
             variant="body2" 
             fontWeight="medium"
@@ -143,61 +140,46 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       key: "description",
       name: "وصف البند",
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Typography variant="body2" color="text.secondary">
             {row.description}
           </Typography>
       ),
     },
     {
-      key: "sub_items_count",
+      key: "children_count",
       name: "عدد البنود الفرعية",
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Typography variant="body2">
-            {row.sub_items_count}
+            {row.children_count}
           </Typography>
       ),
     },
     {
-      key: "services",
-      name: "خدمات البند",
-      sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <TextField
-              select
-              size="small"
-              value=""
-              sx={{ minWidth: 150 }}
-              SelectProps={{
-                displayEmpty: true,
-              }}
-          >
-            <MenuItem value="" disabled>
-              اختر الخدمة
-            </MenuItem>
-            {row.services.map((service, index) => (
-                <MenuItem key={index} value={service}>
-                  {service}
-                </MenuItem>
-            ))}
-          </TextField>
+      key: "term_services_count",
+      name: "عدد الخدمات",
+      sortable: true,
+      render: (row: TermSetting) => (
+          <Typography variant="body2">
+            {row.term_services_count}
+          </Typography>
       ),
     },
     {
-      key: "status",
+      key: "is_active",
       name: "تفعيل البند",
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <Box display="flex" ml="5px" alignItems="center" justifyContent="flex-end" gap={1}>
             <Switch
-                checked={row.status === "1"}
+                checked={row.is_active === 1}
                 onChange={() => toggleStatus(row.id)}
                 size="small"
                 color="primary"
             />
             <Typography variant="body2">
-              {row.status === "1" ? "نشط" : "غير نشط"}
+              {row.is_active === 1 ? "نشط" : "غير نشط"}
             </Typography>
           </Box>
       ),
@@ -206,7 +188,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       key: "actions",
       name: "إجراءات",
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
+      render: (row: TermSetting) => (
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>الإجراءات</InputLabel>
             <Select
@@ -223,59 +205,47 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
     },
   ];
 
-  // Filter data based on search and filters
+  // Filter data based on search only (no status filtering)
   const filteredData = rows.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.reference_number.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = showInactive || item.status === "1";
+        item.id.toString().includes(searchTerm.toLowerCase());
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch;
   });
 
   // Handler functions
-  const handleAdd = (data: Partial<PRJ_ProjectTerm>) => {
-    const newItem: PRJ_ProjectTerm = {
-      ...data,
-      id: Math.max(...rows.map(item => item.id)) + 1,
-      parent_id: null,
-      project_type_id: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      reference_number: data.reference_number || "",
-      name: data.name || "",
-      description: data.description || "",
-      sub_items_count: data.sub_items_count || 0,
-      services: data.services || [],
-      status: data.status || "1",
-    };
-    setRows(prev => [...prev, newItem]);
+  const handleAdd = (data: any) => {
+    // The API call is handled in the dialog component
+    // Just refresh the data
+    queryClient.invalidateQueries({ queryKey: ["term-settings"] });
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedItem) {
-      setRows(prev => prev.filter(item => item.id !== selectedItem.id));
+      try {
+        await deleteMutation.mutateAsync(selectedItem.id);
+      } catch (error) {
+        console.error("Error deleting item:", error);
+      }
     }
     setDeleteDialogOpen(false);
     setSelectedItem(null);
     setItemToDelete("");
   };
 
-  const handleUpdate = (data: Partial<PRJ_ProjectTerm>) => {
+  const handleUpdate = (data: any) => {
     if (selectedItem) {
-      setRows(prev => 
-        prev.map(item => 
-          item.id === selectedItem.id 
-            ? { ...item, ...data, updated_at: new Date().toISOString() }
-            : item
-        )
-      );
+      updateMutation.mutate({
+        id: selectedItem.id,
+        data
+      });
     }
     setEditDialogOpen(false);
     setSelectedItem(null);
   };
 
-  const handleAction = (action: string, item: PRJ_ProjectTerm) => {
+  const handleAction = (action: string, item: TermSetting) => {
     switch (action) {
       case "edit":
         setSelectedItem(item);
@@ -294,50 +264,33 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   };
 
   // Handlers for ItemActionsDialog
-  const handleItemUpdate = (data: Partial<PRJ_ProjectTerm>) => {
+  const handleItemUpdate = (data: any) => {
     if (selectedItem) {
-      setRows(prev => 
-        prev.map(item => 
-          item.id === selectedItem.id 
-            ? { ...item, ...data, updated_at: new Date().toISOString() }
-            : item
-        )
-      );
+      updateMutation.mutate({
+        id: selectedItem.id,
+        data
+      });
     }
-    console.log("Updating item:", selectedItem?.id, data);
-    // TODO: Add API call to update item
   };
 
-  const handleItemDelete = () => {
+  const handleItemDelete = async () => {
     if (selectedItem) {
-      setRows(prev => prev.filter(item => item.id !== selectedItem.id));
+      try {
+        await deleteMutation.mutateAsync(selectedItem.id);
+      } catch (error) {
+        console.error("Error deleting item:", error);
+      }
     }
-    console.log("Deleting item:", selectedItem?.id);
-    // TODO: Add API call to delete item
   };
 
-  const handleItemCreate = (data: Partial<PRJ_ProjectTerm>) => {
-    const newItem: PRJ_ProjectTerm = {
-      ...data,
-      id: Math.max(...rows.map(item => item.id)) + 1,
-      parent_id: null,
-      project_type_id: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      reference_number: data.reference_number || "",
-      name: data.name || "",
-      description: data.description || "",
-      sub_items_count: data.sub_items_count || 0,
-      services: data.services || [],
-      status: data.status || "1",
-    };
-    setRows(prev => [...prev, newItem]);
-    console.log("Creating new item:", data);
-    // TODO: Add API call to create item
+  const handleItemCreate = (data: any) => {
+    // The API call is handled in the dialog component
+    // Just refresh the data
+    queryClient.invalidateQueries({ queryKey: ["term-settings"] });
   };
 
   // Handler for dialog table actions
-  const handleDialogAction = (action: string, item: PRJ_ProjectTerm) => {
+  const handleDialogAction = (action: string, item: TermSetting) => {
     if (action === "open") {
       setSelectedItem(item);
       setItemActionsDialogOpen(true);
@@ -348,7 +301,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
 
   // Calculate totals
   const totalItems = filteredData.length;
-  const activeItems = filteredData.filter(item => item.status === "1").length;
+  const activeItems = filteredData.filter(item => item.is_active === 1).length;
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredData.length / tableParams.limit);
@@ -378,16 +331,8 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
 
         {/* Action Button Above Table */}
         <Box className="flex justify-between items-center mb-4">
-          <Box className="flex items-center gap-2">
-            <Typography variant="body2">
-              إظهار البنود غير النشطة
-            </Typography>
-            <Switch
-              checked={showInactive}
-              onChange={(e) => setShowInactive(e.target.checked)}
-              size="small"
-              color="primary"
-            />
+          <Box>
+            {/* Removed show inactive switch */}
           </Box>
           <Button
               variant="contained"
@@ -444,4 +389,4 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   );
 }
 
-export default ProjectTermsView;
+export default MainItemsCard;

@@ -12,6 +12,7 @@ import {
   Switch,
   FormControlLabel,
 } from "@mui/material";
+import { useLocale } from "next-intl";
 import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
 
 interface EditProjectTermDialogProps {
@@ -22,6 +23,9 @@ interface EditProjectTermDialogProps {
 }
 
 export function EditProjectTermDialog({ open, onClose, onUpdate, item }: EditProjectTermDialogProps) {
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+  
   const [formData, setFormData] = useState({
     reference_number: "",
     name: "",
@@ -50,7 +54,7 @@ export function EditProjectTermDialog({ open, onClose, onUpdate, item }: EditPro
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth dir={isRtl ? "rtl" : "ltr"}>
       <DialogTitle>تعديل البند الرئيسي</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
@@ -94,10 +98,12 @@ export function EditProjectTermDialog({ open, onClose, onUpdate, item }: EditPro
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>إلغاء</Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
-          تحديث
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button onClick={onClose}>إلغاء</Button>
+          <Button onClick={handleSubmit} variant="contained" color="primary">
+            تحديث
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );

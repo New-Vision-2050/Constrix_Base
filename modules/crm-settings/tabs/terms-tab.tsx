@@ -5,37 +5,21 @@ import { Paper, Tab, Tabs } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
+import { ProjectTermsApi } from "@/services/api/projects/project-terms";
+import { TermSetting } from "@/services/api/projects/project-terms/types/response";
 import LinearProgress from "@mui/material/LinearProgress";
 import MainItemsCard from "../components/main-items-card";
 
-interface Term {
-  id: number;
-  label: string;
-}
-
 export default function TermsTab() {
-  const [terms, setTerms] = useState<Term[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(null);
 
-  useEffect(() => {
-    fetchTerms();
-  }, []);
-
-  const fetchTerms = async () => {
-    try {
-      const response = await fetch("/api/crm/terms");
-      const data = await response.json();
-      
-      if (data.status === 200) {
-        setTerms(data.payload);
-      }
-    } catch (error) {
-      console.error("Error fetching terms:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: termsData, isLoading: loadingTerms } = useQuery({
+    queryKey: ["term-settings"],
+    queryFn: async () => {
+      const response = await ProjectTermsApi.getTermSettings({ page: 1, per_page: 15 });
+      return response.data;
+    },
+  });
 
   const { data, isLoading: isLoadingRoots } = useQuery({
     queryKey: ["project-types", "roots"],
@@ -46,6 +30,7 @@ export default function TermsTab() {
   });
 
   const roots = data ?? [];
+  const terms = termsData?.payload ?? [];
 
   useEffect(() => {
     if (roots.length > 0 && !selectedRoot) {
@@ -53,10 +38,10 @@ export default function TermsTab() {
     }
   }, [roots, selectedRoot]);
 
-  if (loading) {
+  if (loadingTerms) {
     return (
       <div className="flex justify-center items-center p-8">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">Loading terms...</div>
       </div>
     );
   }
@@ -82,7 +67,7 @@ export default function TermsTab() {
           </Paper>
         )}
         
-        <MainItemsCard />
+        <MainItemsCard terms={terms || []} />
       </div>
     </div>
   );

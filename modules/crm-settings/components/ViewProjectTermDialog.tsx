@@ -79,7 +79,7 @@ export function ViewProjectTermDialog({ open, onClose, item, onSave, readOnly = 
   if (!item) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth dir="rtl">
       <DialogTitle>{readOnly ? "تفاصيل البند الرئيسي" : "تعديل البند الرئيسي"}</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
