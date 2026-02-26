@@ -18,17 +18,17 @@ import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectTypeSchema } from "@/types/api/projects/project-type-schema";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import AddSubProjectTypeDialog from "../../../components/dialogs/add-sub-project-type";
-import { useProjectSettingsTabs } from "../../../constants/current-tabs";
-import DetailsView from "../tab-views/details";
-import ProjectTermsView from "../tab-views/project-terms";
-import AttachmentsView from "../tab-views/attachments";
-import ContractorsView from "../tab-views/contractors";
-import TeamView from "../tab-views/team";
-import WorkOrdersView from "../tab-views/work-orders";
-import FinancialView from "../tab-views/financial";
-import ContractManagementView from "../tab-views/contract-management";
-import { SettingsTabItemProps } from "../types";
+import AddSubProjectTypeDialog from "../../../../components/dialogs/add-sub-project-type";
+import { useProjectSettingsTabs } from "../../../../constants/current-tabs";
+import DetailsView from "../details";
+import ProjectTermsView from "../project-terms";
+import AttachmentsView from "../attachments";
+import ContractorsView from "../contractors";
+import TeamView from "../team";
+import WorkOrdersView from "../work-orders";
+import FinancialView from "../financial";
+import ContractManagementView from "../contract-management";
+import { SettingsTabItemProps } from "../../types";
 
 function renderTabContent(tab: string, props: SettingsTabItemProps) {
   switch (tab) {
@@ -43,7 +43,7 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
     case "team":
       return <TeamView {...props} />;
     case "work-orders":
-      return <WorkOrdersView {...props} />;
+      return <WorkOrdersView />;
     case "financial":
       return <FinancialView {...props} />;
     case "contract-management":
@@ -80,7 +80,10 @@ const TabWithCheckbox = ({
   />
 );
 
-export default function SchemaLevelTabs({ firstLevelId, parentId }: SchemaLevelTabsProps) {
+export default function SchemaLevelTabs({
+  firstLevelId,
+  parentId,
+}: SchemaLevelTabsProps) {
   const t = useTranslations("Projects.Settings.projectTypes");
   const allTabs = useProjectSettingsTabs();
 
@@ -117,7 +120,8 @@ export default function SchemaLevelTabs({ firstLevelId, parentId }: SchemaLevelT
   useEffect(() => {
     const items = thirdLevelQuery.data ?? [];
     if (items.length === 0) return;
-    const isValid = selectedSchema && items.some((item) => item.id === selectedSchema.id);
+    const isValid =
+      selectedSchema && items.some((item) => item.id === selectedSchema.id);
     if (!isValid) {
       setSelectedSchema(items[0]);
     }
