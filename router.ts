@@ -45,7 +45,6 @@ export const ROUTER = {
   ACTIVITIES_LOGS: "/activities-logs",
   TERMS_CONDITIONS: "/stores/terms",
   PROJECTS_SETTINGS: "/projects/settings",
-  ALL_PROJECTS: "/all-projects",
   CMS: {
     CATEGORIES: "/content-management-system/categories",
     ICONS: "/content-management-system/icons",

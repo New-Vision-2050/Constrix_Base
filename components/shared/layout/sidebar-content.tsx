@@ -166,9 +166,9 @@ export function SidebarContentWrapper({
     const data: Project[] = [
       {
         name: "لوحه العمل",
-        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, ROUTER.ALL_PROJECTS],
+        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, "/projects"],
         icon: LayoutDashboardIcon,
-        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith(ROUTER.ALL_PROJECTS),
+        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith("/projects"),
         slug: "work-panel",
         show: !isCentralCompany,
         sub_entities: [
