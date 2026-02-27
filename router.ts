@@ -13,6 +13,7 @@ export const ROUTER = {
   pagesSettings: "/stores/pages-setting",
   Coupons: "/stores/coupons",
   PaymentMethods: "/stores/payment-methods",
+  All_PROJECTS: "/all-projects",
   USERS: "/users",
   SETTINGS: "/settings",
   DASHBOARD: "/dashboard",
