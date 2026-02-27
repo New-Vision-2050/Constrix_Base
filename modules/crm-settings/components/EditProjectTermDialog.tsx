@@ -1,276 +1,104 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import * as z from "zod";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
-  DialogContent,
-  DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/modules/table/components/ui/textarea";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormControl,
-} from "@/modules/table/components/ui/form";
-import FormLabel from "@/components/shared/FormLabel";
-import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { ProjectTermsApi } from "@/services/api/projects/project-terms";
-import { Checkbox } from "@/components/ui/checkbox";
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Box,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
+import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
 
 interface EditProjectTermDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
-  termSettingId: number | null;
-  projectTypeId: number | null;
+  onUpdate: (data: Partial<PRJ_ProjectTerm>) => void;
+  item: PRJ_ProjectTerm | null;
 }
 
-const createTermSettingSchema = (t: any) => z.object({
-  name: z.string().min(1, t('validation.nameRequired')),
-  description: z.string().optional(),
-  term_services_ids: z.array(z.number()).min(1, t('validation.servicesRequired')),
-});
-
-type TermSettingFormData = {
-  name: string;
-  description?: string;
-  term_services_ids: number[];
-};
-
-export function EditProjectTermDialog({ open, onClose, onSuccess, termSettingId, projectTypeId }: EditProjectTermDialogProps) {
-  const t = useTranslations('CRMSettingsModule.terms');
-  
-  const form = useForm<TermSettingFormData>({
-    resolver: zodResolver(createTermSettingSchema(t)),
-    defaultValues: {
-      name: "",
-      description: "",
-      term_services_ids: [],
-    },
+export function EditProjectTermDialog({ open, onClose, onUpdate, item }: EditProjectTermDialogProps) {
+  const [formData, setFormData] = useState({
+    reference_number: "",
+    name: "",
+    description: "",
+    sub_items_count: 0,
+    services: [] as string[],
+    status: "1" as "0" | "1",
   });
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = form;
-
-  // Fetch term setting data
-  const { data: termSettingData, isLoading: isFetchingTerm } = useQuery({
-    queryKey: ["term-setting", termSettingId],
-    queryFn: async () => {
-      const response = await ProjectTermsApi.getTermSetting(termSettingId!);
-      return response.data;
-    },
-    enabled: open && !!termSettingId,
-  });
-
-  // Fetch term services
-  const { data: termServicesData, isLoading: isLoadingServices } = useQuery({
-    queryKey: ["term-services"],
-    queryFn: async () => {
-      const response = await ProjectTermsApi.getTermServices({
-        page: 1,
-        per_page: 100,
-      });
-      return response.data;
-    },
-    enabled: open,
-  });
-
-  const termServices = termServicesData?.payload || [];
 
   useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      const firstError = Object.values(errors)[0];
-      if (firstError?.message) {
-        toast.error(firstError.message as string);
-      }
-    }
-  }, [errors]);
-
-  useEffect(() => {
-    if (termSettingData?.payload) {
-      const term = termSettingData.payload;
-      reset({
-        name: term.name || "",
-        description: term.description || "",
-        term_services_ids: term.term_services?.map(s => s.id) || [],
+    if (item) {
+      setFormData({
+        reference_number: item.reference_number,
+        name: item.name,
+        description: item.description,
+        sub_items_count: item.sub_items_count,
+        services: item.services,
+        status: item.status,
       });
     }
-  }, [termSettingData, reset]);
+  }, [item]);
 
-  const onSubmit = async (data: TermSettingFormData) => {
-    if (!termSettingId) return;
-    
-    try {
-      await ProjectTermsApi.updateTermSetting(termSettingId, {
-        name: data.name,
-        description: data.description,
-        project_type_id: projectTypeId,
-        term_services_ids: data.term_services_ids,
-      });
-
-      toast.success(t('success.updated'));
-      onSuccess?.();
-      reset();
-      onClose();
-    } catch (error: any) {
-      console.error("Error updating term setting:", error);
-      
-      if (error.response?.status === 422) {
-        const validationErrors = error.response.data?.errors;
-        if (validationErrors) {
-          const firstErrorKey = Object.keys(validationErrors)[0];
-          const firstErrorMessage = validationErrors[firstErrorKey][0];
-          toast.error(firstErrorMessage || t('validation.validationError'));
-          return;
-        }
-      }
-      
-      toast.error(t('error.updateFailed'));
-    }
-  };
-
-  const handleClose = () => {
-    if (!isSubmitting) {
-      reset();
-      onClose();
-    }
+  const handleSubmit = () => {
+    onUpdate(formData);
+    onClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl w-full bg-sidebar max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold">
-            {t('dialog.editTitle')}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Name Field */}
-            <FormField
-              control={control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs" required>
-                    {t('form.name')}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      variant="secondary"
-                      disabled={isSubmitting || isFetchingTerm}
-                      className="mt-1 bg-sidebar border-gray-700"
-                      placeholder={t('form.namePlaceholder')}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormErrorMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Description Field */}
-            <FormField
-              control={control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs">
-                    {t('form.description')}
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      disabled={isSubmitting || isFetchingTerm}
-                      rows={3}
-                      className="mt-1 resize-none bg-sidebar border-gray-700"
-                      placeholder={t('form.descriptionPlaceholder')}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormErrorMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Term Services Multi-Select */}
-            <FormField
-              control={control}
-              name="term_services_ids"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs" required>
-                    {t('form.services')}
-                  </FormLabel>
-                  <div className="border border-gray-700 rounded-md p-4 bg-sidebar space-y-3">
-                    {isLoadingServices || isFetchingTerm ? (
-                      <div className="flex items-center justify-center py-4">
-                        <Loader2 className="h-6 w-6 animate-spin" />
-                      </div>
-                    ) : (
-                      termServices.map((service) => (
-                        <div key={service.id} className="flex items-center space-x-2 space-x-reverse">
-                          <Checkbox
-                            id={`service-${service.id}`}
-                            checked={field.value?.includes(service.id)}
-                            onCheckedChange={(checked) => {
-                              const currentValues = field.value || [];
-                              if (checked) {
-                                field.onChange([...currentValues, service.id]);
-                              } else {
-                                field.onChange(
-                                  currentValues.filter((id) => id !== service.id)
-                                );
-                              }
-                            }}
-                            disabled={isSubmitting}
-                          />
-                          <label
-                            htmlFor={`service-${service.id}`}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                          >
-                            {service.name}
-                          </label>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <FormErrorMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Submit Button */}
-            <div className="mt-6">
-              <Button
-                type="submit"
-                disabled={isSubmitting || isLoadingServices || isFetchingTerm}
-                className="w-full"
-              >
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {t('form.update')}
-              </Button>
-            </div>
-          </form>
-        </Form>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>تعديل البند الرئيسي</DialogTitle>
+      <DialogContent>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+          <TextField
+            label="الرقم المرجعي"
+            value={formData.reference_number}
+            onChange={(e) => setFormData({ ...formData, reference_number: e.target.value })}
+            fullWidth
+          />
+          <TextField
+            label="اسم البند"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            fullWidth
+            required
+          />
+          <TextField
+            label="وصف البند"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            fullWidth
+            multiline
+            rows={3}
+          />
+          <TextField
+            label="عدد البنود الفرعية"
+            type="number"
+            value={formData.sub_items_count}
+            onChange={(e) => setFormData({ ...formData, sub_items_count: parseInt(e.target.value) || 0 })}
+            fullWidth
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={formData.status === "1"}
+                onChange={(e) => setFormData({ ...formData, status: e.target.checked ? "1" : "0" })}
+              />
+            }
+            label="تفعيل البند"
+          />
+        </Box>
       </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>إلغاء</Button>
+        <Button onClick={handleSubmit} variant="contained" color="primary">
+          تحديث
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
