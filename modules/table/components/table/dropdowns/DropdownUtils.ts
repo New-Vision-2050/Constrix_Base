@@ -84,72 +84,61 @@ export const getFetchUrl = (
 ): string|null => {
     let url = baseUrl;
     const params = new URLSearchParams();
-    let dependenciesCount = 0;
-    if (dynamicConfig.dependsOn && dependencies) {
-        // Case 1: String format (backward compatibility)
-        if (typeof dynamicConfig.dependsOn === 'string') {
-            dependenciesCount++;
-            if (dynamicConfig.filterParam && dependencies[dynamicConfig.dependsOn]) {
-                const dependencyValue = dependencies[dynamicConfig.dependsOn];
-                // Handle both string and string[] values
-                const paramValue = Array.isArray(dependencyValue)
-                    ? dependencyValue.join(',')
-                    : dependencyValue;
+    if (dynamicConfig.dependsOn) {
+        // If dependsOn is provided, we must also have dependencies values.
+        if (!dependencies) return null;
 
-                params.append(
-                    dynamicConfig.filterParam,
-                    paramValue
-                );
+        // Case 1: String format (backward compatibility)
+        if (typeof dynamicConfig.dependsOn === "string") {
+            const field = dynamicConfig.dependsOn;
+            const dependencyValue = dependencies[field];
+            if (!dependencyValue) return null;
+
+            if (dynamicConfig.filterParam) {
+                const paramValue = Array.isArray(dependencyValue)
+                    ? dependencyValue.join(",")
+                    : dependencyValue;
+                params.append(dynamicConfig.filterParam, paramValue);
             }
         }
         // Case 2: Array of dependency configs
         else if (Array.isArray(dynamicConfig.dependsOn)) {
             for (const depConfig of dynamicConfig.dependsOn) {
-                dependenciesCount++;
-                if (dependencies[depConfig.field]) {
-                    const dependencyValue = dependencies[depConfig.field];
-                    const paramValue = Array.isArray(dependencyValue)
-                        ? dependencyValue.join(',')
-                        : dependencyValue;
+                const dependencyValue = dependencies[depConfig.field];
+                if (!dependencyValue) return null;
 
-                    if (depConfig.method === 'replace') {
-                        // Replace placeholders in URL
-                        const placeholder = `{${depConfig.field}}`;
-                        url = url.replace(placeholder, encodeURIComponent(paramValue));
-                    } else if (depConfig.method === 'query') {
-                        // Add as query parameter
-                        const paramName = depConfig.paramName || depConfig.field;
-                        params.append(paramName, paramValue);
-                    }
+                const paramValue = Array.isArray(dependencyValue)
+                    ? dependencyValue.join(",")
+                    : dependencyValue;
+
+                if (depConfig.method === "replace") {
+                    const placeholder = `{${depConfig.field}}`;
+                    url = url.replace(placeholder, encodeURIComponent(paramValue));
+                } else if (depConfig.method === "query") {
+                    const paramName = depConfig.paramName || depConfig.field;
+                    params.append(paramName, paramValue);
                 }
             }
         }
         // Case 3: Object with field names as keys
-        else if (typeof dynamicConfig.dependsOn === 'object') {
+        else if (typeof dynamicConfig.dependsOn === "object") {
             for (const [field, config] of Object.entries(dynamicConfig.dependsOn)) {
-                dependenciesCount++;
-                if (dependencies[field]) {
-                    const dependencyValue = dependencies[field];
-                    const paramValue = Array.isArray(dependencyValue)
-                        ? dependencyValue.join(',')
-                        : dependencyValue;
+                const dependencyValue = dependencies[field];
+                if (!dependencyValue) return null;
 
-                    if (config.method === 'replace') {
-                        // Replace placeholders in URL
-                        const placeholder = `{${field}}`;
-                        url = url.replace(placeholder, encodeURIComponent(paramValue));
-                    } else if (config.method === 'query') {
-                        // Add as query parameter
-                        const paramName = config.paramName || field;
-                        params.append(paramName, paramValue);
-                    }
+                const paramValue = Array.isArray(dependencyValue)
+                    ? dependencyValue.join(",")
+                    : dependencyValue;
+
+                if (config.method === "replace") {
+                    const placeholder = `{${field}}`;
+                    url = url.replace(placeholder, encodeURIComponent(paramValue));
+                } else if (config.method === "query") {
+                    const paramName = config.paramName || field;
+                    params.append(paramName, paramValue);
                 }
             }
         }
-    }
-
-    if (dynamicConfig.dependsOn && (params.size !== dependenciesCount || dependenciesCount == 0)) {
-        return null;
     }
     // Append params to URL
     const queryString = params.toString();
