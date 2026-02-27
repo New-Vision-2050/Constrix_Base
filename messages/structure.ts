@@ -60,7 +60,6 @@ import { workPanelMessages } from "./groups/work-panel";
 import { iconsMessages } from "./groups/icons";
 import { projectMessages } from "./groups/projects";
 import { projectSettingsMessages } from "./groups/projects/settings";
-import { pricesOffersMessages } from "./groups/prices-offers";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -126,5 +125,4 @@ export const messagesStructure = new MessagesGroup({
   icons: iconsMessages,
   Projects: projectMessages,
   projectSettings: projectSettingsMessages,
-  pricesOffers: pricesOffersMessages,
 });
