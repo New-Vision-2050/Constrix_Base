@@ -57,7 +57,9 @@ import { companyProfileLegalDataFormMessages } from "./groups/company-profile/le
 import { storesMessages } from "./groups/stores";
 import { imageUploadCropMessages } from "./groups/image-upload-crop";
 import { workPanelMessages } from "./groups/work-panel";
-import { projectMessages } from "./groups/project";
+import { iconsMessages } from "./groups/icons";
+import { projectMessages } from "./groups/projects";
+import { projectSettingsMessages } from "./groups/projects/settings";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -120,5 +122,7 @@ export const messagesStructure = new MessagesGroup({
   ClientProfile: clientProfileModuleMessages,
   ImageUploadCrop: imageUploadCropMessages,
   WorkPanel: workPanelMessages,
-  project: projectMessages,
+  icons: iconsMessages,
+  Projects: projectMessages,
+  projectSettings: projectSettingsMessages,
 });

@@ -1,0 +1,285 @@
+"use client";
+
+import React, { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+  Checkbox,
+  FormControlLabel,
+  Box,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import LinearProgress from "@mui/material/LinearProgress";
+import SaveButton from "@/components/shared/buttons/save";
+import CancelButton from "@/components/shared/buttons/cancel";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ProjectTypesApi } from "@/services/api/projects/project-types";
+import IconPicker from "@/components/shared/icon-picker";
+import { TAB_SCHEMA_ID_MAP, useProjectSettingsTabs } from "../../../constants/current-tabs";
+import { PRJ_ProjectType } from "@/types/api/projects/project-type";
+import { useTranslations } from "next-intl";
+
+interface AddProjectTypeDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+  parentId: number;
+}
+
+export default function AddProjectTypeDialog({
+  open,
+  onClose,
+  onSuccess,
+  parentId,
+}: AddProjectTypeDialogProps) {
+  const t = useTranslations("Projects.Settings.projectTypes.addProjectType");
+
+  const addProjectTypeSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, t("nameRequired")),
+        icon_id: z.string().min(1, t("iconRequired")),
+        reference_project_type_id: z.string().nullable(),
+        selected_tab_values: z.array(z.string()).nullable(),
+      }),
+    [t],
+  );
+
+  type AddProjectTypeFormData = z.infer<typeof addProjectTypeSchema>;
+
+  const allTabs = useProjectSettingsTabs();
+
+  const { data: secondLevelData } = useQuery({
+    queryKey: ["project-types", "children", parentId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getDirectChildren(parentId);
+      return response.data.payload ?? [];
+    },
+    enabled: open,
+  });
+
+  const secondLevelItems: PRJ_ProjectType[] = secondLevelData ?? [];
+
+  const form = useForm<AddProjectTypeFormData>({
+    resolver: zodResolver(addProjectTypeSchema),
+    defaultValues: {
+      name: "",
+      icon_id: "",
+      reference_project_type_id: null,
+      selected_tab_values: null,
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = form;
+
+  const selectedTabValues = watch("selected_tab_values");
+  const referenceProjectTypeId = watch("reference_project_type_id");
+  const isCheckboxesEnabled = !!referenceProjectTypeId;
+
+  const { data: referenceSchemasData, isLoading: isSchemasLoading } = useQuery({
+    queryKey: ["project-types", "schemas", referenceProjectTypeId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getProjectTypeSchemas(
+        referenceProjectTypeId!,
+      );
+      return response.data.payload ?? [];
+    },
+    enabled: !!referenceProjectTypeId,
+    gcTime: 0,
+    staleTime: 0,
+  });
+
+  const referenceSchemas = useMemo(() => referenceSchemasData ?? [], [referenceSchemasData]);
+
+  const visibleTabs = useMemo(
+    () =>
+      referenceSchemas.length === 0
+        ? allTabs
+        : allTabs.filter((tab) =>
+            referenceSchemas.some((schema) => schema.id === tab.schema_id),
+          ),
+    [referenceSchemas, allTabs],
+  );
+
+  const handleReferenceChange = (value: string | null) => {
+    setValue("reference_project_type_id", value);
+    setValue("selected_tab_values", null);
+  };
+
+  const handleFormSubmit = async (data: AddProjectTypeFormData) => {
+    try {
+      const schemaIds =
+        data.selected_tab_values && data.selected_tab_values.length > 0
+          ? data.selected_tab_values
+              .map((value) => TAB_SCHEMA_ID_MAP[value])
+              .filter((id): id is number => typeof id === "number")
+          : [];
+
+      await ProjectTypesApi.createSecondLevelProjectType({
+        name: data.name,
+        icon: data.icon_id,
+        parent_id: parentId,
+        reference_project_type_id: data.reference_project_type_id
+          ? Number(data.reference_project_type_id)
+          : null,
+        schema_ids: schemaIds,
+        is_active: true,
+      });
+
+      toast.success(t("successMessage"));
+      reset();
+      onClose();
+      onSuccess?.();
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message ?? t("errorMessage"));
+    }
+  };
+
+  const handleClose = () => {
+    if (!isSubmitting) {
+      reset();
+      onClose();
+    }
+  };
+
+  const toggleTabValue = (value: string) => {
+    if (!isCheckboxesEnabled) return;
+    const current = selectedTabValues ?? [];
+    if (current.includes(value)) {
+      const next = current.filter((v) => v !== value);
+      setValue("selected_tab_values", next.length ? next : null);
+    } else {
+      setValue("selected_tab_values", [...current, value]);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <DialogTitle
+        component="div"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pr: 6,
+        }}
+      >
+        {t("title")}
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField
+            {...register("name")}
+            label={t("nameLabel")}
+            placeholder={t("nameLabel")}
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            disabled={isSubmitting}
+            fullWidth
+            size="medium"
+          />
+
+          <IconPicker
+            value={watch("icon_id")}
+            onChange={(id) => setValue("icon_id", id, { shouldValidate: true })}
+            disabled={isSubmitting}
+            error={errors.icon_id?.message}
+          />
+
+          <FormControl
+            fullWidth
+            error={!!errors.reference_project_type_id}
+            disabled={isSubmitting}
+          >
+            <InputLabel id="reference-select-label">{t("referenceLabel")}</InputLabel>
+            <Select
+              labelId="reference-select-label"
+              label={t("referenceLabel")}
+              value={watch("reference_project_type_id") ?? ""}
+              onChange={(e) =>
+                handleReferenceChange(
+                  e.target.value ? String(e.target.value) : null,
+                )
+              }
+            >
+              <MenuItem value="">
+                <em>{t("referenceLabel")}</em>
+              </MenuItem>
+              {secondLevelItems.map((item) => (
+                <MenuItem key={item.id} value={item.id.toString()}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.reference_project_type_id && (
+              <FormHelperText>
+                {errors.reference_project_type_id.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          {isCheckboxesEnabled && (
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {t("projectElementsLabel")}
+              </Typography>
+              {isSchemasLoading ? (
+                <LinearProgress sx={{ mt: 1 }} />
+              ) : (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, pt: 1 }}>
+                  {visibleTabs.map((tab) => (
+                    <FormControlLabel
+                      key={tab.value}
+                      disabled={isSubmitting}
+                      control={
+                        <Checkbox
+                          checked={(selectedTabValues ?? []).includes(tab.value)}
+                          onChange={() => toggleTabValue(tab.value)}
+                          disabled={isSubmitting}
+                        />
+                      }
+                      label={tab.name}
+                    />
+                  ))}
+                </Box>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <CancelButton onClick={handleClose} disabled={isSubmitting} />
+          <SaveButton type="submit" disabled={isSubmitting} loading={isSubmitting} />
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+}

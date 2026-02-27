@@ -54,6 +54,18 @@ export function SidebarContentWrapper({
     { can, isCentralCompany, isSuperAdmin } = p;
   const user = useAuthStore((state) => state.user);
 
+  // Helper to get pathname without locale prefix
+  const getPathnameWithoutLocale = React.useCallback((pathname: string) => {
+    const segments = pathname.split("/").filter(Boolean);
+    // Remove locale (first segment like 'ar', 'en')
+    if (segments.length > 0 && segments[0].length === 2) {
+      return "/" + segments.slice(1).join("/");
+    }
+    return pathname;
+  }, []);
+
+  const fullPath = getPathnameWithoutLocale(path);
+
   const userProfileUrl = React.useMemo(() => {
     const isEmployee = userTypes.some(
       (userType) => userType.role == UsersRole.Employee,
@@ -113,6 +125,26 @@ export function SidebarContentWrapper({
             };
           }) || [];
 
+        // For CRM, append Settings at the end after API sub-entities
+        if (project.slug === SUPER_ENTITY_SLUG.CRM) {
+          const crmSettings = {
+            name: t("Sidebar.CRMSettings"),
+            url: ROUTER.CRM.settings,
+            icon: Settings,
+            isActive: pageName === ROUTER.CRM.settings,
+            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
+          };
+          
+          return {
+            ...project,
+            ...restMenuProps,
+            sub_entities: [
+              ...transformedMenuSubEntities,
+              crmSettings,
+            ],
+          };
+        }
+
         return {
           ...project,
           ...restMenuProps,
@@ -124,7 +156,7 @@ export function SidebarContentWrapper({
       });
       return formatted;
     },
-    [can],
+    [can, t, pageName, isCentralCompany],
   );
 
   const SidebarProjects: Project[] = React.useMemo(() => {
@@ -152,6 +184,30 @@ export function SidebarContentWrapper({
     };
 
     const data: Project[] = [
+      {
+        name: "لوحه العمل",
+        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, "/projects"],
+        icon: LayoutDashboardIcon,
+        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith("/projects"),
+        slug: "work-panel",
+        show: !isCentralCompany,
+        sub_entities: [
+          {
+            name: "الاعدادات",
+            url: ROUTER.WORK_PANEL_SETTINGS,
+            icon: SettingsIcon,
+            isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
+            show: !isCentralCompany,
+          },
+          {
+            name: "المشاريع",
+            url: "/projects",
+            icon: FolderClosed, // Using FolderClosed as it's already imported
+            isActive: fullPath.startsWith("/projects") && !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
+            show: !isCentralCompany,
+          },
+        ],
+      },
       {
         name: t("Sidebar.Companies"),
         urls: [ROUTER.COMPANIES],
@@ -261,15 +317,7 @@ export function SidebarContentWrapper({
         urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
         isActive: pageName === ROUTER.CRM.clients,
         show: !isCentralCompany,
-        sub_entities: [
-          {
-            name: t("Sidebar.CRMSettings"),
-            url: ROUTER.CRM.settings,
-            icon: Settings,
-            isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
-          },
-        ],
+        sub_entities: [],
       },
       {
         name: t("Sidebar.docs-library"),
