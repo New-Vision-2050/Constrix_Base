@@ -186,9 +186,9 @@ export function SidebarContentWrapper({
     const data: Project[] = [
       {
         name: "لوحه العمل",
-        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, "/projects"],
+        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, ROUTER.ALL_PROJECTS],
         icon: LayoutDashboardIcon,
-        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith("/projects"),
+        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith(ROUTER.ALL_PROJECTS),
         slug: "work-panel",
         show: !isCentralCompany,
         sub_entities: [
@@ -201,7 +201,7 @@ export function SidebarContentWrapper({
           },
           {
             name: "المشاريع",
-            url: "/projects",
+            url: ROUTER.ALL_PROJECTS,
             icon: FolderClosed, // Using FolderClosed as it's already imported
             isActive: fullPath.startsWith("/projects") && !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
             show: !isCentralCompany,
