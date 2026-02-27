@@ -150,6 +150,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       const response = await ProjectTermsApi.getTermSettings({
         page: params.page,
         per_page: params.limit,
+        name: params.search || undefined,
       });
       return response.data;
     },
