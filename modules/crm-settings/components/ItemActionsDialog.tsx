@@ -1,425 +1,390 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-  Tabs,
-  Tab,
-  TextField,
-  Switch,
-  FormControlLabel,
-  Paper,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
-import { Add, Edit, Delete, Visibility } from "@mui/icons-material";
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import HeadlessTableLayout from "@/components/headless/table";
-import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
+import { ProjectTermsApi } from "@/services/api/projects/project-terms";
+import { TermSetting } from "@/services/api/projects/project-terms/types/response";
+import { AddProjectTermDialog } from "./AddProjectTermDialog";
+import { EditProjectTermDialog } from "./EditProjectTermDialog";
+import ConfirmDeleteDialog from "@/modules/company-profile/components/official-data/official-docs-section/docs-settings-dialog/AddDocumentType/ConfirmDeleteDialog";
+import { toast } from "sonner";
+import { Plus, Eye } from "lucide-react";
+import { Switch as SwitchUI } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface ItemActionsDialogProps {
   open: boolean;
   onClose: () => void;
-  item: PRJ_ProjectTerm | null;
-  onUpdate: (data: Partial<PRJ_ProjectTerm>) => void;
+  item: TermSetting | null;
+  onUpdate: () => void;
   onDelete: () => void;
-  onCreate: (data: Partial<PRJ_ProjectTerm>) => void;
-  tableData: PRJ_ProjectTerm[];
-  onAction: (action: string, item: PRJ_ProjectTerm) => void;
+  onCreate: () => void;
+  tableData: TermSetting[];
+  onAction: (action: string, item: TermSetting) => void;
 }
 
-// Mock data for the table (same as main component)
-const mockTableData: PRJ_ProjectTerm[] = [
-  {
-    id: 1,
-    reference_number: "1520202",
-    name: "تصاميم شبكه الجهد",
-    description: "وصف تصاميم شبكه الجهد المتوسط",
-    sub_items_count: 5,
-    services: ["خدمة 1", "خدمة 2"],
-    status: "1",
-    parent_id: null,
-    project_type_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: 2,
-    reference_number: "1520203",
-    name: "تصاميم محطة المحولات",
-    description: "وصف تصاميم محطة المحولات الرئيسية",
-    sub_items_count: 3,
-    services: ["خدمة 3"],
-    status: "1",
-    parent_id: null,
-    project_type_id: null,
-    created_at: "2024-01-02T00:00:00Z",
-    updated_at: "2024-01-02T00:00:00Z",
-  },
-];
+const ChildrenTable = HeadlessTableLayout<TermSetting>("children-terms");
 
-function TabPanel({ children, value, index }: { children: React.ReactNode; value: number; index: number }) {
+interface RowActionsProps {
+  row: TermSetting;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+}
+
+interface RowActionsPropsWithT extends RowActionsProps {
+  t: any;
+}
+
+function RowActions({ row, onEdit, onDelete, t }: RowActionsPropsWithT) {
   return (
-    <div hidden={value !== index}>
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-8">
+          {t('table.actions')}
+          <ChevronDown className="h-4 w-4 mr-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onEdit(row.id)}>
+          {t('actions.edit')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDelete(row.id)} className="text-destructive">
+          {t('actions.delete')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
-export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onCreate, tableData, onAction }: ItemActionsDialogProps) {
-  const [activeTab, setActiveTab] = useState(0);
-  
-  // Create table instance
-  const DialogTable = HeadlessTableLayout<PRJ_ProjectTerm>();
+interface ServicesDropdownProps {
+  termSetting: TermSetting;
+  allServices: Array<{ id: number; name: string }>;
+  onUpdate: () => void;
+  t: any;
+}
 
-  // Use table params for pagination and sorting
-  const tableParams = DialogTable.useTableParams({
+function ServicesDropdown({ termSetting, allServices, onUpdate, t }: ServicesDropdownProps) {
+  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(
+    termSetting.services?.map(s => s.id) || []
+  );
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  React.useEffect(() => {
+    setSelectedServiceIds(termSetting.services?.map(s => s.id) || []);
+  }, [termSetting.services]);
+
+  const handleToggleService = async (serviceId: number, checked: boolean) => {
+    const newSelectedIds = checked
+      ? [...selectedServiceIds, serviceId]
+      : selectedServiceIds.filter(id => id !== serviceId);
+
+    setSelectedServiceIds(newSelectedIds);
+    setIsUpdating(true);
+
+    try {
+      await ProjectTermsApi.updateTermServices(termSetting.id, {
+        term_service_ids: newSelectedIds,
+      });
+      toast.success(t('success.servicesUpdated'));
+      onUpdate();
+    } catch (error) {
+      console.error("Error updating services:", error);
+      toast.error(t('error.servicesUpdateFailed'));
+      setSelectedServiceIds(termSetting.services?.map(s => s.id) || []);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+  
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-8" disabled={isUpdating}>
+          {t('actions.selectServices')}
+          <ChevronDown className="h-4 w-4 mr-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56" dir="rtl">
+        {allServices.map((service) => (
+          <DropdownMenuCheckboxItem
+            key={service.id}
+            checked={selectedServiceIds.includes(service.id)}
+            onCheckedChange={(checked) => handleToggleService(service.id, checked)}
+            disabled={isUpdating}
+            className="cursor-pointer flex-row-reverse justify-between [&>span]:data-[state=checked]:bg-pink-500 [&>span]:data-[state=checked]:border-pink-500"
+          >
+            {service.name}
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+
+export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onCreate, tableData, onAction }: ItemActionsDialogProps) {
+  const t = useTranslations('CRMSettingsModule.terms');
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editingTermId, setEditingTermId] = useState<number | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  
+  // Table params
+  const params = ChildrenTable.useTableParams({
     initialPage: 1,
     initialLimit: 10,
-    initialSortBy: "name",
-    initialSortDirection: "asc",
   });
 
-  // Define table columns (same as main component)
+  // Fetch children
+  const { data, isLoading, refetch, error } = useQuery({
+    queryKey: ["term-children", item?.id, params.page, params.limit],
+    queryFn: async () => {
+      if (!item?.id) return null;
+      try {
+        const response = await ProjectTermsApi.getTermChildren(item.id);
+        return response.data;
+      } catch (error: any) {
+        console.error("Error fetching children:", error);
+        console.error("Response:", error.response);
+        throw error;
+      }
+    },
+    enabled: open && !!item?.id,
+    retry: false,
+  });
+
+  const children = useMemo<TermSetting[]>(
+    () => (data?.payload || []),
+    [data]
+  );
+
+  const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
+  const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
+
+  // Fetch term services for dropdown
+  const { data: termServicesData } = useQuery({
+    queryKey: ["term-services"],
+    queryFn: async () => {
+      const response = await ProjectTermsApi.getTermServices({
+        page: 1,
+        per_page: 100,
+      });
+      return response.data;
+    },
+  });
+
+  const allServices = termServicesData?.payload || [];
+
+  // Handlers
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirmId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await ProjectTermsApi.deleteTermSetting(deleteConfirmId);
+      toast.success(t('success.deleted'));
+      setDeleteConfirmId(null);
+      refetch();
+    } catch {
+      toast.error(t('error.deleteFailed'));
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirmId(null);
+  };
+
+  const handleToggleActive = async (id: number, currentStatus: number) => {
+    const newStatus = currentStatus === 1 ? 0 : 1;
+    
+    try {
+      await ProjectTermsApi.updateTermStatus(id, {
+        is_active: newStatus,
+      });
+      toast.success(newStatus === 1 ? t('success.statusActivated') : t('success.statusDeactivated'));
+      refetch();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error(t('error.statusUpdateFailed'));
+    }
+  };
+
+  // Define table columns
   const columns = [
     {
-      key: "reference_number",
-      name: "الرقم المرجعي",
+      key: "id",
+      name: t('table.referenceNumber'),
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
-          <Typography variant="body2" fontWeight="medium">
-            {row.reference_number}
-          </Typography>
+      render: (row: TermSetting) => (
+        <span className="font-medium">{row.id}</span>
       ),
     },
     {
       key: "name",
-      name: "اسم البند",
+      name: t('table.name'),
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
-          <Typography variant="body2" fontWeight="medium">
-            {row.name}
-          </Typography>
+      render: (row: TermSetting) => (
+        <span className="font-medium">{row.name}</span>
       ),
     },
     {
       key: "description",
-      name: "وصف البند",
+      name: t('table.description'),
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
-          <Typography variant="body2" color="text.secondary">
-            {row.description}
-          </Typography>
+      render: (row: TermSetting) => (
+        <span className="text-muted-foreground">{row.description || "-"}</span>
+      ),
+    },
+    {
+      key: "children_count",
+      name: t('table.childrenCount'),
+      sortable: true,
+      render: (row: TermSetting) => (
+        <span className="text-center block">{row.children_count}</span>
       ),
     },
     {
       key: "services",
-      name: "خدمات البند",
+      name: t('table.services'),
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <TextField
-              select
-              size="small"
-              value=""
-              sx={{ minWidth: 150 }}
-              SelectProps={{
-                displayEmpty: true,
-              }}
-          >
-            <MenuItem value="" disabled>
-              اختر الخدمة
-            </MenuItem>
-            {row.services.map((service, index) => (
-                <MenuItem key={index} value={service}>
-                  {service}
-                </MenuItem>
-            ))}
-          </TextField>
+      render: (row: TermSetting) => (
+        <ServicesDropdown 
+          termSetting={row} 
+          allServices={allServices} 
+          onUpdate={refetch}
+          t={t}
+        />
       ),
     },
     {
       key: "status",
-      name: "تفعيل البند",
+      name: t('table.status'),
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Switch
-                checked={row.status === "1"}
-                size="small"
-                color="primary"
-            />
-            <Typography variant="body2">
-              {row.status === "1" ? "نشط" : "غير نشط"}
-            </Typography>
-          </Box>
+      render: (row: TermSetting) => (
+        <div className="flex items-center gap-2">
+          <SwitchUI
+            checked={row.is_active === 1}
+            onCheckedChange={() => handleToggleActive(row.id, row.is_active)}
+          />
+          <span className="text-sm">
+            {row.is_active === 1 ? t('table.active') : t('table.inactive')}
+          </span>
+        </div>
       ),
     },
     {
       key: "actions",
-      name: "إجراءات",
+      name: t('table.actions'),
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>الإجراءات</InputLabel>
-            <Select
-                value=""
-                label="الإجراءات"
-                onChange={(e) => onAction(e.target.value as string, row)}
-            >
-              <MenuItem value="edit">تعديل</MenuItem>
-              <MenuItem value="delete">حذف</MenuItem>
-              <MenuItem value="view">عرض</MenuItem>
-            </Select>
-          </FormControl>
+      render: (row: TermSetting) => (
+        <RowActions
+          row={row}
+          onEdit={setEditingTermId}
+          onDelete={handleDeleteClick}
+          t={t}
+        />
       ),
     },
   ];
 
-  // Calculate pagination
-  const totalPages = Math.ceil(tableData.length / tableParams.limit);
-  const startIndex = (tableParams.page - 1) * tableParams.limit;
-  const endIndex = startIndex + tableParams.limit;
-  const paginatedData = tableData.slice(startIndex, endIndex);
-
   // Table state
-  const tableState = DialogTable.useTableState({
-    data: paginatedData,
+  const tableState = ChildrenTable.useTableState({
+    data: children,
     columns,
     totalPages,
-    totalItems: tableData.length,
-    params: tableParams,
-    getRowId: (item) => item.id.toString(),
-    loading: false,
+    totalItems,
+    params,
+    getRowId: (term) => term.id.toString(),
+    loading: isLoading,
+    searchable: true,
+    filtered: params.search !== "",
   });
   
-  // Update form state
-  const [updateFormData, setUpdateFormData] = useState({
-    reference_number: "",
-    name: "",
-    description: "",
-    sub_items_count: 0,
-    services: [] as string[],
-    status: "1" as "0" | "1",
-  });
-
-  // Create form state
-  const [createFormData, setCreateFormData] = useState({
-    reference_number: "",
-    name: "",
-    description: "",
-    sub_items_count: 0,
-    services: [] as string[],
-    status: "1" as "0" | "1",
-  });
-
-  React.useEffect(() => {
-    if (item) {
-      setUpdateFormData({
-        reference_number: item.reference_number,
-        name: item.name,
-        description: item.description,
-        sub_items_count: item.sub_items_count,
-        services: item.services,
-        status: item.status,
-      });
-    }
-  }, [item]);
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
-  const handleUpdate = () => {
-    onUpdate(updateFormData);
-    onClose();
-  };
-
-  const handleCreate = () => {
-    onCreate(createFormData);
-    setCreateFormData({
-      reference_number: "",
-      name: "",
-      description: "",
-      sub_items_count: 0,
-      services: [],
-      status: "1",
-    });
-    onClose();
-  };
-
-  const handleDelete = () => {
-    onDelete();
-    onClose();
-  };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>
-        <Typography variant="h6">
-          إجراءات البند: {item?.name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          الرقم المرجعي: {item?.reference_number}
-        </Typography>
-      </DialogTitle>
-      
-      <DialogContent>
-        <Tabs value={activeTab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tab icon={<Visibility />} label="عرض الجدول" />
-          <Tab icon={<Add />} label="إضافة جديد" />
-        </Tabs>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-center text-lg font-semibold">
+            {t('dialog.itemActions')}: {item?.name}
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground text-center">
+            {t('table.referenceNumber')}: {item?.id}
+          </p>
+        </DialogHeader>
 
-        {/* Table View Tab */}
-        <TabPanel value={activeTab} index={0}>
-          <Typography variant="h6" gutterBottom>
-            عرض جميع البنود
-          </Typography>
-          <Paper>
-            <DialogTable.TopActions state={tableState} />
-            <DialogTable.Table state={tableState} />
-            <DialogTable.Pagination state={tableState} />
-          </Paper>
-        </TabPanel>
+        <div className="space-y-4" dir="rtl">
+          {/* Add Button Above Table */}
+          <div className="flex justify-end">
+            <Button onClick={() => setAddDialogOpen(true)}>
+              <Plus className="h-4 w-4 ml-2" />
+              {t('actions.add')}
+            </Button>
+          </div>
 
-        {/* Create Tab */}
-        <TabPanel value={activeTab} index={1}>
-          <Typography variant="h6" gutterBottom>
-            إضافة بند جديد
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField
-              label="الرقم المرجعي"
-              value={createFormData.reference_number}
-              onChange={(e) => setCreateFormData({ ...createFormData, reference_number: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="اسم البند"
-              value={createFormData.name}
-              onChange={(e) => setCreateFormData({ ...createFormData, name: e.target.value })}
-              fullWidth
-              required
-            />
-            <TextField
-              label="وصف البند"
-              value={createFormData.description}
-              onChange={(e) => setCreateFormData({ ...createFormData, description: e.target.value })}
-              fullWidth
-              multiline
-              rows={3}
-            />
-            <TextField
-              label="عدد البنود الفرعية"
-              type="number"
-              value={createFormData.sub_items_count}
-              onChange={(e) => setCreateFormData({ ...createFormData, sub_items_count: parseInt(e.target.value) || 0 })}
-              fullWidth
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={createFormData.status === "1"}
-                  onChange={(e) => setCreateFormData({ ...createFormData, status: e.target.checked ? "1" : "0" })}
-                />
-              }
-              label="تفعيل البند"
-            />
-          </Box>
-        </TabPanel>
+          {/* Table */}
+          <ChildrenTable
+            filters={
+              <ChildrenTable.TopActions state={tableState} />
+            }
+            table={
+              <ChildrenTable.Table state={tableState} loadingOptions={{ rows: 5 }} />
+            }
+            pagination={<ChildrenTable.Pagination state={tableState} />}
+          />
+        </div>
 
-        {/* Update Tab */}
-        <TabPanel value={activeTab} index={2}>
-          <Typography variant="h6" gutterBottom>
-            تعديل البند الحالي
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField
-              label="الرقم المرجعي"
-              value={updateFormData.reference_number}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, reference_number: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="اسم البند"
-              value={updateFormData.name}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, name: e.target.value })}
-              fullWidth
-              required
-            />
-            <TextField
-              label="وصف البند"
-              value={updateFormData.description}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, description: e.target.value })}
-              fullWidth
-              multiline
-              rows={3}
-            />
-            <TextField
-              label="عدد البنود الفرعية"
-              type="number"
-              value={updateFormData.sub_items_count}
-              onChange={(e) => setUpdateFormData({ ...updateFormData, sub_items_count: parseInt(e.target.value) || 0 })}
-              fullWidth
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={updateFormData.status === "1"}
-                  onChange={(e) => setUpdateFormData({ ...updateFormData, status: e.target.checked ? "1" : "0" })}
-                />
-              }
-              label="تفعيل البند"
-            />
-          </Box>
-        </TabPanel>
+        {/* Add Child Dialog */}
+        <AddProjectTermDialog
+          open={addDialogOpen}
+          onClose={() => setAddDialogOpen(false)}
+          onSuccess={() => {
+            refetch();
+            setAddDialogOpen(false);
+            onCreate();
+          }}
+          projectTypeId={item?.project_type_id || null}
+          parentId={item?.id || null}
+        />
 
-        {/* Delete Tab */}
-        <TabPanel value={activeTab} index={3}>
-          <Typography variant="h6" gutterBottom color="error">
-            حذف البند
-          </Typography>
-          <Box sx={{ py: 2 }}>
-            <Typography>
-              هل أنت متأكد من حذف البند "{item?.name}"؟
-            </Typography>
-            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              هذا الإجراء لا يمكن التراجع عنه.
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              <strong>الرقم المرجعي:</strong> {item?.reference_number}
-            </Typography>
-            <Typography variant="body2">
-              <strong>الوصف:</strong> {item?.description}
-            </Typography>
-          </Box>
-        </TabPanel>
+        {/* Edit Dialog */}
+        <EditProjectTermDialog
+          open={Boolean(editingTermId)}
+          onClose={() => setEditingTermId(null)}
+          onSuccess={() => {
+            refetch();
+            setEditingTermId(null);
+            onUpdate();
+          }}
+          termSettingId={editingTermId}
+          projectTypeId={item?.project_type_id || null}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDeleteDialog
+          open={Boolean(deleteConfirmId)}
+          onConfirm={confirmDelete}
+          onClose={cancelDelete}
+          title={t('dialog.deleteConfirm')}
+        />
       </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose}>إلغاء</Button>
-        {activeTab === 1 && (
-          <Button onClick={handleCreate} variant="contained" color="primary">
-            إضافة
-          </Button>
-        )}
-        {activeTab === 2 && (
-          <Button onClick={handleUpdate} variant="contained" color="primary">
-            تحديث
-          </Button>
-        )}
-        {activeTab === 3 && (
-          <Button onClick={handleDelete} variant="contained" color="error">
-            حذف
-          </Button>
-        )}
-      </DialogActions>
     </Dialog>
   );
 }
