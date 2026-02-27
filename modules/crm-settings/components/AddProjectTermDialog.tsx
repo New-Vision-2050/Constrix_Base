@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import * as z from "zod";
 import {
   Dialog,
@@ -26,7 +27,6 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ProjectTermsApi } from "@/services/api/projects/project-terms";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
 
 interface AddProjectTermDialogProps {
   open: boolean;
@@ -36,17 +36,23 @@ interface AddProjectTermDialogProps {
   parentId?: number | null;
 }
 
-const termSettingSchema = z.object({
-  name: z.string().min(1, "اسم البند مطلوب"),
+const createTermSettingSchema = (t: any) => z.object({
+  name: z.string().min(1, t('validation.nameRequired')),
   description: z.string().optional(),
-  term_services_ids: z.array(z.number()).min(1, "يجب اختيار خدمة واحدة على الأقل"),
+  term_services_ids: z.array(z.number()).min(1, t('validation.servicesRequired')),
 });
 
-type TermSettingFormData = z.infer<typeof termSettingSchema>;
+type TermSettingFormData = {
+  name: string;
+  description?: string;
+  term_services_ids: number[];
+};
 
 export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, parentId }: AddProjectTermDialogProps) {
+  const t = useTranslations('CRMSettingsModule.terms');
+  
   const form = useForm<TermSettingFormData>({
-    resolver: zodResolver(termSettingSchema),
+    resolver: zodResolver(createTermSettingSchema(t)),
     defaultValues: {
       name: "",
       description: "",
@@ -105,7 +111,7 @@ export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, 
         term_services_ids: data.term_services_ids,
       });
 
-      toast.success("تم إضافة البند بنجاح");
+      toast.success(t('success.created'));
       onSuccess?.();
       reset();
       onClose();
@@ -117,12 +123,12 @@ export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, 
         if (validationErrors) {
           const firstErrorKey = Object.keys(validationErrors)[0];
           const firstErrorMessage = validationErrors[firstErrorKey][0];
-          toast.error(firstErrorMessage || "خطأ في التحقق من البيانات");
+          toast.error(firstErrorMessage || t('validation.validationError'));
           return;
         }
       }
       
-      toast.error("حدث خطأ أثناء إضافة البند");
+      toast.error(t('error.createFailed'));
     }
   };
 
@@ -138,7 +144,7 @@ export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, 
       <DialogContent className="max-w-2xl w-full bg-sidebar max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold">
-            إضافة بند رئيسي
+            {parentId ? t('dialog.addTitle') : t('dialog.addTitle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -151,14 +157,14 @@ export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs" required>
-                    اسم البند
+                    {t('form.name')}
                   </FormLabel>
                   <FormControl>
                     <Input
                       variant="secondary"
                       disabled={isSubmitting}
                       className="mt-1 bg-sidebar border-gray-700"
-                      placeholder="أدخل اسم البند"
+                      placeholder={t('form.namePlaceholder')}
                       {...field}
                     />
                   </FormControl>
@@ -174,14 +180,14 @@ export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs">
-                    وصف البند
+                    {t('form.description')}
                   </FormLabel>
                   <FormControl>
                     <Textarea
                       disabled={isSubmitting}
                       rows={3}
                       className="mt-1 resize-none bg-sidebar border-gray-700"
-                      placeholder="أدخل وصف البند"
+                      placeholder={t('form.descriptionPlaceholder')}
                       {...field}
                     />
                   </FormControl>
@@ -197,7 +203,7 @@ export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs" required>
-                    الخدمات
+                    {t('form.services')}
                   </FormLabel>
                   <div className="border border-gray-700 rounded-md p-4 bg-sidebar space-y-3">
                     {isLoadingServices ? (
@@ -247,7 +253,7 @@ export function AddProjectTermDialog({ open, onClose, onSuccess, projectTypeId, 
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                حفظ
+                {t('form.save')}
               </Button>
             </div>
           </form>

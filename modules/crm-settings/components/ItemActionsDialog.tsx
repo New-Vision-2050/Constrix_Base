@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -46,21 +47,25 @@ interface RowActionsProps {
   onDelete: (id: number) => void;
 }
 
-function RowActions({ row, onEdit, onDelete }: RowActionsProps) {
+interface RowActionsPropsWithT extends RowActionsProps {
+  t: any;
+}
+
+function RowActions({ row, onEdit, onDelete, t }: RowActionsPropsWithT) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="h-8">
-          إجراءات
+          {t('table.actions')}
           <ChevronDown className="h-4 w-4 mr-1" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => onEdit(row.id)}>
-          تعديل
+          {t('actions.edit')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onDelete(row.id)} className="text-destructive">
-          حذف
+          {t('actions.delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -71,9 +76,10 @@ interface ServicesDropdownProps {
   termSetting: TermSetting;
   allServices: Array<{ id: number; name: string }>;
   onUpdate: () => void;
+  t: any;
 }
 
-function ServicesDropdown({ termSetting, allServices, onUpdate }: ServicesDropdownProps) {
+function ServicesDropdown({ termSetting, allServices, onUpdate, t }: ServicesDropdownProps) {
   const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(
     termSetting.services?.map(s => s.id) || []
   );
@@ -95,11 +101,11 @@ function ServicesDropdown({ termSetting, allServices, onUpdate }: ServicesDropdo
       await ProjectTermsApi.updateTermServices(termSetting.id, {
         term_service_ids: newSelectedIds,
       });
-      toast.success("تم تحديث الخدمات بنجاح");
+      toast.success(t('success.servicesUpdated'));
       onUpdate();
     } catch (error) {
       console.error("Error updating services:", error);
-      toast.error("حدث خطأ أثناء تحديث الخدمات");
+      toast.error(t('error.servicesUpdateFailed'));
       setSelectedServiceIds(termSetting.services?.map(s => s.id) || []);
     } finally {
       setIsUpdating(false);
@@ -110,7 +116,7 @@ function ServicesDropdown({ termSetting, allServices, onUpdate }: ServicesDropdo
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="h-8" disabled={isUpdating}>
-          اختر الخدمات
+          {t('actions.selectServices')}
           <ChevronDown className="h-4 w-4 mr-1" />
         </Button>
       </DropdownMenuTrigger>
@@ -133,6 +139,7 @@ function ServicesDropdown({ termSetting, allServices, onUpdate }: ServicesDropdo
 
 
 export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onCreate, tableData, onAction }: ItemActionsDialogProps) {
+  const t = useTranslations('CRMSettingsModule.terms');
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editingTermId, setEditingTermId] = useState<number | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
@@ -192,11 +199,11 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     if (!deleteConfirmId) return;
     try {
       await ProjectTermsApi.deleteTermSetting(deleteConfirmId);
-      toast.success("تم حذف البند بنجاح");
+      toast.success(t('success.deleted'));
       setDeleteConfirmId(null);
       refetch();
     } catch {
-      toast.error("حدث خطأ أثناء حذف البند");
+      toast.error(t('error.deleteFailed'));
     }
   };
 
@@ -211,11 +218,11 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       await ProjectTermsApi.updateTermStatus(id, {
         is_active: newStatus,
       });
-      toast.success(newStatus === 1 ? "تم تفعيل البند بنجاح" : "تم إلغاء تفعيل البند بنجاح");
+      toast.success(newStatus === 1 ? t('success.statusActivated') : t('success.statusDeactivated'));
       refetch();
     } catch (error) {
       console.error("Error updating status:", error);
-      toast.error("حدث خطأ أثناء تحديث حالة البند");
+      toast.error(t('error.statusUpdateFailed'));
     }
   };
 
@@ -223,7 +230,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
   const columns = [
     {
       key: "id",
-      name: "الرقم المرجعي",
+      name: t('table.referenceNumber'),
       sortable: true,
       render: (row: TermSetting) => (
         <span className="font-medium">{row.id}</span>
@@ -231,7 +238,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     },
     {
       key: "name",
-      name: "اسم البند",
+      name: t('table.name'),
       sortable: true,
       render: (row: TermSetting) => (
         <span className="font-medium">{row.name}</span>
@@ -239,7 +246,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     },
     {
       key: "description",
-      name: "وصف البند",
+      name: t('table.description'),
       sortable: true,
       render: (row: TermSetting) => (
         <span className="text-muted-foreground">{row.description || "-"}</span>
@@ -247,7 +254,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     },
     {
       key: "children_count",
-      name: "عدد البنود الفرعية",
+      name: t('table.childrenCount'),
       sortable: true,
       render: (row: TermSetting) => (
         <span className="text-center block">{row.children_count}</span>
@@ -255,19 +262,20 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
     },
     {
       key: "services",
-      name: "خدمات البند",
+      name: t('table.services'),
       sortable: false,
       render: (row: TermSetting) => (
         <ServicesDropdown 
           termSetting={row} 
           allServices={allServices} 
           onUpdate={refetch}
+          t={t}
         />
       ),
     },
     {
       key: "status",
-      name: "تفعيل البند",
+      name: t('table.status'),
       sortable: false,
       render: (row: TermSetting) => (
         <div className="flex items-center gap-2">
@@ -276,20 +284,21 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
             onCheckedChange={() => handleToggleActive(row.id, row.is_active)}
           />
           <span className="text-sm">
-            {row.is_active === 1 ? "نشط" : "غير نشط"}
+            {row.is_active === 1 ? t('table.active') : t('table.inactive')}
           </span>
         </div>
       ),
     },
     {
       key: "actions",
-      name: "إجراءات",
+      name: t('table.actions'),
       sortable: false,
       render: (row: TermSetting) => (
         <RowActions
           row={row}
           onEdit={setEditingTermId}
           onDelete={handleDeleteClick}
+          t={t}
         />
       ),
     },
@@ -314,10 +323,10 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       <DialogContent className="max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold">
-            إجراءات البند: {item?.name}
+            {t('dialog.itemActions')}: {item?.name}
           </DialogTitle>
           <p className="text-sm text-muted-foreground text-center">
-            الرقم المرجعي: {item?.id}
+            {t('table.referenceNumber')}: {item?.id}
           </p>
         </DialogHeader>
 
@@ -326,7 +335,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
           <div className="flex justify-end">
             <Button onClick={() => setAddDialogOpen(true)}>
               <Plus className="h-4 w-4 ml-2" />
-              إضافة جديد
+              {t('actions.add')}
             </Button>
           </div>
 
@@ -373,7 +382,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
           open={Boolean(deleteConfirmId)}
           onConfirm={confirmDelete}
           onClose={cancelDelete}
-          title="هل أنت متأكد من حذف هذا البند؟"
+          title={t('dialog.deleteConfirm')}
         />
       </DialogContent>
     </Dialog>
