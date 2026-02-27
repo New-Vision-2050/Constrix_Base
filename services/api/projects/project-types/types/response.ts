@@ -1,22 +1,27 @@
-import { PRJ_ProjectType } from "@/types/api/projects/project-type";
-import { PRJ_ProjectTypeSchema } from "@/types/api/projects/project-type-schema";
-import { ApiBaseResponse } from "@/types/common/response/base";
+import {PRJ_ProjectType} from "@/types/api/projects/project-type";
+import {PRJ_ProjectTypeSchema} from "@/types/api/projects/project-type-schema";
+import {ApiBaseResponse} from "@/types/common/response/base";
 
 export interface GetRootsProjectTypesResponse extends ApiBaseResponse<
     PRJ_ProjectType[]
-> {}
+> {
+}
 
 export interface GetDirectChildrenProjectTypesResponse extends ApiBaseResponse<
     PRJ_ProjectType[]
-> {}
+> {
+}
 
 export interface GetProjectTypeSchemasResponse extends ApiBaseResponse<
     PRJ_ProjectTypeSchema[]
-> {}
+> {
+}
 
-export interface CreateSecondLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {}
+export interface CreateSecondLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {
+}
 
-export interface CreateThirdLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {}
+export interface CreateThirdLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {
+}
 
 export interface DataSettings {
     id: number;
@@ -34,9 +39,11 @@ export interface DataSettings {
     updated_at: string;
 }
 
-export interface GetDataSettingsResponse extends ApiBaseResponse<DataSettings> {}
+export interface GetDataSettingsResponse extends ApiBaseResponse<DataSettings> {
+}
 
-export interface UpdateDataSettingsResponse extends ApiBaseResponse<DataSettings> {}
+export interface UpdateDataSettingsResponse extends ApiBaseResponse<DataSettings> {
+}
 
 export interface AttachmentContractSettings {
     id: number;
@@ -64,13 +71,17 @@ export interface AttachmentTermsContractSettings {
     updated_at: string;
 }
 
-export interface GetAttachmentContractSettingsResponse extends ApiBaseResponse<AttachmentContractSettings> {}
+export interface GetAttachmentContractSettingsResponse extends ApiBaseResponse<AttachmentContractSettings> {
+}
 
-export interface UpdateAttachmentContractSettingsResponse extends ApiBaseResponse<AttachmentContractSettings> {}
+export interface UpdateAttachmentContractSettingsResponse extends ApiBaseResponse<AttachmentContractSettings> {
+}
 
-export interface GetAttachmentTermsContractSettingsResponse extends ApiBaseResponse<AttachmentTermsContractSettings> {}
+export interface GetAttachmentTermsContractSettingsResponse extends ApiBaseResponse<AttachmentTermsContractSettings> {
+}
 
-export interface UpdateAttachmentTermsContractSettingsResponse extends ApiBaseResponse<AttachmentTermsContractSettings> {}
+export interface UpdateAttachmentTermsContractSettingsResponse extends ApiBaseResponse<AttachmentTermsContractSettings> {
+}
 
 export interface ContractorContractSettings {
     id: number;
@@ -80,9 +91,11 @@ export interface ContractorContractSettings {
     updated_at: string;
 }
 
-export interface GetContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {}
+export interface GetContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {
+}
 
-export interface UpdateContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {}
+export interface UpdateContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {
+}
 
 export interface EmployeeContractSettings {
     id: number;
@@ -92,6 +105,8 @@ export interface EmployeeContractSettings {
     updated_at: string;
 }
 
-export interface GetEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {}
+export interface GetEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {
+}
 
-export interface UpdateEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {}
+export interface UpdateEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {
+}
