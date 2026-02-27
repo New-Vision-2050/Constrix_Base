@@ -8,6 +8,7 @@ import {
   Settings,
   FolderClosed,
   LibraryBig,
+  FileText,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "@i18n/navigation";
@@ -125,8 +126,16 @@ export function SidebarContentWrapper({
             };
           }) || [];
 
-        // For CRM, append Settings at the end after API sub-entities
+        // For CRM, append Price Offers and Settings at the end after API sub-entities
         if (project.slug === SUPER_ENTITY_SLUG.CRM) {
+          const priceOffers = {
+            name: t("Sidebar.PricesOffers"),
+            url: ROUTER.CRM.pricesOffers,
+            icon: FileText,
+            isActive: fullPath === ROUTER.CRM.pricesOffers,
+            show: !isCentralCompany,
+          };
+          
           const crmSettings = {
             name: t("Sidebar.CRMSettings"),
             url: ROUTER.CRM.settings,
@@ -140,6 +149,7 @@ export function SidebarContentWrapper({
             ...restMenuProps,
             sub_entities: [
               ...transformedMenuSubEntities,
+              priceOffers,
               crmSettings,
             ],
           };
