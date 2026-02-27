@@ -1,0 +1,52 @@
+import { MessagesGroup, _m } from "@/messages";
+
+export const ReportFormsMessages = new MessagesGroup({
+  title: _m("Report Forms", "نماذج التقارير"),
+  editReportForm: _m("Edit Report Form", "تعديل نموذج التقرير"),
+  addReportForm: _m("Add Report Form", "إضافة نموذج تقرير"),
+  form: new MessagesGroup({
+    formName: _m("Form Name", "اسم النموذج"),
+    formNamePlaceholder: _m("Enter form name", "أدخل اسم النموذج"),
+    workOrderType: _m("Work Order Type", "نوع أمر العمل"),
+    workOrderTypePlaceholder: _m("Select work order type", "اختر نوع أمر العمل"),
+    theQuestion: _m("The Question", "السؤال"),
+    theQuestionPlaceholder: _m("Enter question", "أدخل السؤال"),
+    value: _m("Value", "القيمة"),
+    valuePlaceholder: _m("Enter value", "أدخل القيمة"),
+    add: _m("Add", "إضافة"),
+    remove: _m("Remove", "حذف"),
+    numberOfAttachments: _m("Number of Attachments", "عدد المرفقات"),
+    numberOfAttachmentsPlaceholder: _m("Enter number of attachments", "أدخل عدد المرفقات"),
+    notes: _m("Notes", "الملاحظات"),
+    notesPlaceholder: _m("Enter notes", "أدخل الملاحظات"),
+    save: _m("Save", "حفظ"),
+  }),
+  table: new MessagesGroup({
+    addReportForm: _m("Add Report Form", "إضافة نموذج تقرير"),
+    referenceNumber: _m("Reference Number", "الرقم المرجعي"),
+    formName: _m("Form Name", "اسم النموذج"),
+    workOrderType: _m("Work Order Type", "نوع أمر العمل"),
+    notes: _m("Notes", "الملاحظات"),
+    actions: _m("Actions", "الإجراءات"),
+    action: _m("Action", "الإجراء"),
+    show: _m("Show", "عرض"),
+    editReportForm: _m("Edit Report Form", "تعديل نموذج التقرير"),
+    delete: _m("Delete", "حذف"),
+    deleteSuccess: _m("Report form deleted successfully", "تم حذف نموذج التقرير بنجاح"),
+    deleteError: _m("Failed to delete report form", "فشل حذف نموذج التقرير"),
+    deleteConfirmMessage: _m(
+      "Are you sure you want to delete this report form?",
+      "هل أنت متأكد من حذف نموذج التقرير؟"
+    ),
+    searchPlaceholder: _m("Search...", "البحث..."),
+    reset: _m("Reset", "إعادة تعيين"),
+  }),
+  details: new MessagesGroup({
+    title: _m("Report Form Details", "تفاصيل نموذج التقرير"),
+    referenceNumber: _m("Reference Number", "الرقم المرجعي"),
+    formName: _m("Form Name", "اسم النموذج"),
+    workOrderType: _m("Work Order Type", "نوع أمر العمل"),
+    notes: _m("Notes", "الملاحظات"),
+    notFound: _m("Report form not found", "لم يتم العثور على نموذج التقرير"),
+  }),
+});
