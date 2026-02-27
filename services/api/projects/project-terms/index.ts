@@ -23,8 +23,12 @@ export const ProjectTermsApi = {
     baseApi.delete<DeleteTermSettingResponse>(`term-settings/${id}`),
   getTermSettings: (args?: GetTermSettingsArgs) =>
     baseApi.get<GetTermSettingsResponse>("term-settings", { params: args }),
+  getTermSetting: (id: number) =>
+    baseApi.get<CreateTermSettingResponse>(`term-settings/${id}`),
   getTermServices: (args?: GetTermServicesArgs) =>
     baseApi.get<GetTermServicesResponse>("term-services", { params: args }),
   getTermChildren: (id: number) =>
     baseApi.get<GetTermSettingsResponse>(`term-settings/${id}/children`),
+  getTermServicesByTermId: (termId: number) =>
+    baseApi.get<GetTermServicesResponse>(`term-settings/${termId}/services`),
 };

@@ -121,21 +121,7 @@ export function AddProjectTermDialog({ open, onClose, onAdd }: AddProjectTermDia
                 />
               )}
             />
-            <Controller
-              name="status"
-              control={control}
-              render={({ field }) => (
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={field.value === "1"}
-                      onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
-                    />
-                  }
-                  label="تفعيل البند"
-                />
-              )}
-            />
+
           </Box>
         </DialogContent>
         <DialogActions>

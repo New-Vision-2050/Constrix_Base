@@ -122,6 +122,12 @@ export function AddProjectTermDialog({ open, onClose, onAdd, parentId, isChild =
   const handleSubmit = async () => {
   try {
     setLoading(true);
+    
+    if (!formData.name.trim()) {
+      console.error("Name is required");
+      return;
+    }
+    
     const response = await ProjectTermsApi.createTermSetting({
       name: formData.name,
       description: formData.description,
@@ -130,7 +136,15 @@ export function AddProjectTermDialog({ open, onClose, onAdd, parentId, isChild =
       term_services_ids: formData.term_services_ids,
     });
     
-    if (response.data.code === "SUCCESS_WITH_LIST_PAYLOAD_OBJECTS") {
+    console.log("Create response:", response);
+    
+    // Check if response exists and has data
+    if (!response || !response.data) {
+      console.error("No response received from API");
+      return;
+    }
+    
+    if (response.data.code === "SUCCESS_WITH_SINGLE_PAYLOAD_OBJECT") {
       onAdd(response.data.payload);
       setFormData({
         name: "",
@@ -141,10 +155,14 @@ export function AddProjectTermDialog({ open, onClose, onAdd, parentId, isChild =
       });
       onClose();
     } else {
-      console.error("Failed to create term setting:", response.data.message);
+      console.error("Failed to create term setting:", response.data.message || "Unknown error");
     }
   } catch (error) {
     console.error("Error creating term setting:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+    }
   } finally {
     setLoading(false);
   }

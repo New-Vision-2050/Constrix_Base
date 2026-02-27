@@ -35,6 +35,7 @@ export interface TermSetting {
   is_active: number;
   children_count: number;
   term_services_count: number;
+  term_services?: TermService[];
   created_at: string;
   updated_at: string;
 }

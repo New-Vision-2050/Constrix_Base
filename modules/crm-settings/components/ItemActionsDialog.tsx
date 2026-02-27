@@ -234,37 +234,46 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
       ),
     },
     {
-
-      key: "term_services_count",
-      name: "عدد الخدمات",
-      sortable: true,
-      render: (row: TermSetting) => (
-          <Typography variant="body2">
-            {row.term_services_count}
-          </Typography>
-      ),
-    },
-    {
-      key: "status",
-      name: "تفعيل البند",
+      key: "term_services",
+      name: "الخدمات",
       sortable: false,
-      render: (row: TermSetting) => (
-          <Box display="flex" ml="5px" alignItems="center" justifyContent="flex-end" gap={1}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={row.is_active === 1}
-                  onChange={() => toggleStatus(row.id)}
-                  size="small"
-                  color="primary"
-                />
-              }
-              label={row.is_active === 1 ? "نشط" : "غير نشط"}
-              labelPlacement="start"
-            />
-          </Box>
-      ),
+      render: (row: TermSetting) => {
+        console.log("Child row data:", row);
+        console.log("Child term services:", row.term_services);
+        return (
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>الخدمات</InputLabel>
+            <Select
+                multiple
+                value={row.term_services?.map((service: any) => service.id) || []}
+                label="الخدمات"
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => {
+                      const service = row.term_services?.find((s: any) => s.id === value);
+                      return (
+                        <Chip
+                          key={value}
+                          label={service?.name}
+                          size="small"
+                          sx={{ fontSize: '0.7rem', height: 20 }}
+                        />
+                      );
+                    })}
+                  </Box>
+                )}
+            >
+              {row.term_services?.map((service: any) => (
+                <MenuItem key={service.id} value={service.id}>
+                  {service.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      },
     },
+
     {
       key: "actions",
       name: "إجراءات",
@@ -470,15 +479,7 @@ export function ItemActionsDialog({ open, onClose, item, onUpdate, onDelete, onC
                   <Typography variant="body2" sx={{ minWidth: '80px' }}>
                     الحالة:
                   </Typography>
-                  <Switch
-                    checked={field.value === 1}
-                    onChange={(e) => {
-                      console.log('Switch changed:', e.target.checked, 'Current value:', field.value);
-                      field.onChange(e.target.checked ? 1 : 0);
-                    }}
-                    size="small"
-                    color="primary"
-                  />
+
                   <Typography variant="body2">
                     {field.value === 1 ? "نشط" : "غير نشط"}
                   </Typography>
