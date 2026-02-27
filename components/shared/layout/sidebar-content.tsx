@@ -125,6 +125,26 @@ export function SidebarContentWrapper({
             };
           }) || [];
 
+        // For CRM, append Settings at the end after API sub-entities
+        if (project.slug === SUPER_ENTITY_SLUG.CRM) {
+          const crmSettings = {
+            name: t("Sidebar.CRMSettings"),
+            url: ROUTER.CRM.settings,
+            icon: Settings,
+            isActive: pageName === ROUTER.CRM.settings,
+            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
+          };
+
+          return {
+            ...project,
+            ...restMenuProps,
+            sub_entities: [
+              ...transformedMenuSubEntities,
+              crmSettings,
+            ],
+          };
+        }
+
         return {
           ...project,
           ...restMenuProps,
@@ -136,8 +156,7 @@ export function SidebarContentWrapper({
       });
       return formatted;
     },
-    [can],
-  );
+      [can, t, pageName, isCentralCompany],  );
 
   const SidebarProjects: Project[] = React.useMemo(() => {
     const settingsRoutesNames = [
