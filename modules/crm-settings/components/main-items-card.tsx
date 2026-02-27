@@ -1,378 +1,412 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, Typography, Button, TextField, MenuItem, Switch, Paper, Select, FormControl, InputLabel } from "@mui/material";
-import { Add} from "@mui/icons-material";
+import React, { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import HeadlessTableLayout from "@/components/headless/table";
-import { PRJ_ProjectTerm } from "@/types/api/projects/project-term/index";
+import { ProjectTermsApi } from "@/services/api/projects/project-terms";
+import { TermSetting } from "@/services/api/projects/project-terms/types/response";
 import { AddProjectTermDialog } from "./AddProjectTermDialog";
-import { DeleteProjectTermDialog } from "./DeleteProjectTermDialog";
 import { EditProjectTermDialog } from "./EditProjectTermDialog";
-import { ViewProjectTermDialog } from "./ViewProjectTermDialog";
 import { ItemActionsDialog } from "./ItemActionsDialog";
+import ConfirmDeleteDialog from "@/modules/company-profile/components/official-data/official-docs-section/docs-settings-dialog/AddDocumentType/ConfirmDeleteDialog";
+import { toast } from "sonner";
+import { Plus } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
-// Mock data for demonstration
-const mockProjectItems: PRJ_ProjectTerm[] = [
-  {
-    id: 1,
-    reference_number: "1520202",
-    name: "تصاميم شبكه الجهد",
-    description: "وصف تصاميم شبكه الجهد المتوسط",
-    sub_items_count: 5,
-    services: [],
-    status: "1",
-    parent_id: null,
-    project_type_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: 2,
-    reference_number: "200202020",
-    name: "تصاميم شبكه الجهد",
-    description: "وصف تصاميم شبكه الجهد المتوسط",
-    sub_items_count: 8,
-    services: [],
-    status: "1",
-    parent_id: null,
-    project_type_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-];
+const TermSettingsTable = HeadlessTableLayout<TermSetting>("term-settings");
 
 interface ProjectTermsViewProps {
   projectTypeId: number | null;
 }
 
-function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showInactive, setShowInactive] = useState(false);
+interface RowActionsProps {
+  row: TermSetting;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+  onView: (id: number) => void;
+  t: any;
+}
 
+function RowActions({ row, onEdit, onDelete, onView, t }: RowActionsProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-8">
+          {t('table.actions')}
+          <ChevronDown className="h-4 w-4 mr-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onView(row.id)}>
+          {t('actions.view')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onEdit(row.id)}>
+          {t('actions.edit')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDelete(row.id)} className="text-destructive">
+          {t('actions.delete')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+interface ServicesDropdownProps {
+  termSetting: TermSetting;
+  allServices: Array<{ id: number; name: string }>;
+  onUpdate: () => void;
+  t: any;
+}
+
+function ServicesDropdown({ termSetting, allServices, onUpdate, t }: ServicesDropdownProps) {
+  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(
+    termSetting.services?.map(s => s.id) || []
+  );
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Update local state when termSetting changes
+  React.useEffect(() => {
+    setSelectedServiceIds(termSetting.services?.map(s => s.id) || []);
+  }, [termSetting.services]);
+
+  const handleToggleService = async (serviceId: number, checked: boolean) => {
+    const newSelectedIds = checked
+      ? [...selectedServiceIds, serviceId]
+      : selectedServiceIds.filter(id => id !== serviceId);
+
+    setSelectedServiceIds(newSelectedIds);
+    setIsUpdating(true);
+
+    try {
+      await ProjectTermsApi.updateTermServices(termSetting.id, {
+        term_service_ids: newSelectedIds,
+      });
+      toast.success(t('success.servicesUpdated'));
+      onUpdate();
+    } catch (error) {
+      console.error("Error updating services:", error);
+      toast.error(t('error.servicesUpdateFailed'));
+      // Revert on error
+      setSelectedServiceIds(termSetting.services?.map(s => s.id) || []);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+  
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-8" disabled={isUpdating}>
+          {t('actions.selectServices')}
+          <ChevronDown className="h-4 w-4 mr-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56" dir="rtl">
+        {allServices.map((service) => (
+          <DropdownMenuCheckboxItem
+            key={service.id}
+            checked={selectedServiceIds.includes(service.id)}
+            onCheckedChange={(checked) => handleToggleService(service.id, checked)}
+            disabled={isUpdating}
+            className="cursor-pointer flex-row-reverse justify-between [&>span]:data-[state=checked]:bg-pink-500 [&>span]:data-[state=checked]:border-pink-500"
+          >
+            {service.name}
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
+  const t = useTranslations('CRMSettingsModule.terms');
   // Dialog states
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [editingTermId, setEditingTermId] = useState<number | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [itemActionsDialogOpen, setItemActionsDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<PRJ_ProjectTerm | null>(null);
-  const [itemToDelete, setItemToDelete] = useState<string>("");
+  const [selectedItem, setSelectedItem] = useState<TermSetting | null>(null);
 
-  // Create table instance
-  const ProjectItemsTable = HeadlessTableLayout<PRJ_ProjectTerm>();
-
-  // Use table params for pagination and sorting
-  const tableParams = ProjectItemsTable.useTableParams({
+  // Table params
+  const params = TermSettingsTable.useTableParams({
     initialPage: 1,
     initialLimit: 10,
-    initialSortBy: "name",
-    initialSortDirection: "asc",
   });
 
-  // Define table columns
+  // Fetch term settings
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["term-settings", projectTypeId, params.page, params.limit, params.search],
+    queryFn: async () => {
+      const response = await ProjectTermsApi.getTermSettings({
+        page: params.page,
+        per_page: params.limit,
+      });
+      return response.data;
+    },
+    enabled: !!projectTypeId,
+  });
+
+  const termSettings = useMemo<TermSetting[]>(
+    () => (data?.payload || []),
+    [data]
+  );
+
+  const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
+  const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
+
+  // Fetch term services for dropdown
+  const { data: termServicesData } = useQuery({
+    queryKey: ["term-services"],
+    queryFn: async () => {
+      const response = await ProjectTermsApi.getTermServices({
+        page: 1,
+        per_page: 100,
+      });
+      return response.data;
+    },
+  });
+
+  const allServices = termServicesData?.payload || [];
+
+  // Handlers
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirmId(id);
+  };
+
+  const handleViewClick = (id: number) => {
+    const item = termSettings.find(t => t.id === id);
+    if (item) {
+      setSelectedItem(item);
+      setItemActionsDialogOpen(true);
+    }
+  };
+
+  const handleNameClick = (row: TermSetting) => {
+    setSelectedItem(row);
+    setItemActionsDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await ProjectTermsApi.deleteTermSetting(deleteConfirmId);
+      toast.success(t('success.deleted'));
+      setDeleteConfirmId(null);
+      refetch();
+    } catch {
+      toast.error(t('error.deleteFailed'));
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirmId(null);
+  };
+
+  const handleToggleActive = async (id: number, currentStatus: number) => {
+    const newStatus = currentStatus === 1 ? 0 : 1;
+    
+    try {
+      await ProjectTermsApi.updateTermStatus(id, {
+        is_active: newStatus,
+      });
+      toast.success(newStatus === 1 ? t('success.statusActivated') : t('success.statusDeactivated'));
+      refetch();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error(t('error.statusUpdateFailed'));
+    }
+  };
+
+  // Define table columns matching Figma design
   const columns = [
     {
-      key: "reference_number",
-      name: "الرقم المرجعي",
+      key: "id",
+      name: t('table.referenceNumber'),
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
-          <Typography variant="body2" fontWeight="medium">
-            {row.reference_number}
-          </Typography>
+      render: (row: TermSetting) => (
+        <span className="font-medium">{row.id}</span>
       ),
     },
     {
       key: "name",
-      name: "اسم البند",
+      name: t('table.name'),
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
-          <Typography 
-            variant="body2" 
-            fontWeight="medium"
-            sx={{ 
-              cursor: "pointer", 
-              color: "#1976d2",
-              "&:hover": { 
-                textDecoration: "underline",
-                color: "#1565c0"
-              }
-            }}
-            onClick={() => {
-              setSelectedItem(row);
-              setItemActionsDialogOpen(true);
-            }}
-          >
-            {row.name}
-          </Typography>
+      render: (row: TermSetting) => (
+        <button
+          onClick={() => handleNameClick(row)}
+          className="text-primary hover:underline font-medium text-right"
+        >
+          {row.name}
+        </button>
       ),
     },
     {
       key: "description",
-      name: "وصف البند",
+      name: t('table.description'),
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
-          <Typography variant="body2" color="text.secondary">
-            {row.description}
-          </Typography>
+      render: (row: TermSetting) => (
+        <span className="text-muted-foreground">{row.description || "-"}</span>
       ),
     },
     {
-      key: "sub_items_count",
-      name: "عدد البنود الفرعية",
+      key: "children_count",
+      name: t('table.childrenCount'),
       sortable: true,
-      render: (row: PRJ_ProjectTerm) => (
-          <Typography variant="body2">
-            {row.sub_items_count}
-          </Typography>
+      render: (row: TermSetting) => (
+        <span className="text-center block">{row.children_count}</span>
       ),
     },
     {
       key: "services",
-      name: "خدمات البند",
+      name: t('table.services'),
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <TextField
-              select
-              size="small"
-              value=""
-              sx={{ minWidth: 150 }}
-              SelectProps={{
-                displayEmpty: true,
-              }}
-          >
-            <MenuItem value="" disabled>
-              اختر الخدمة
-            </MenuItem>
-            {row.services.map((service, index) => (
-                <MenuItem key={index} value={service}>
-                  {service}
-                </MenuItem>
-            ))}
-          </TextField>
+      render: (row: TermSetting) => (
+        <ServicesDropdown 
+          termSetting={row} 
+          allServices={allServices} 
+          onUpdate={refetch}
+          t={t}
+        />
       ),
     },
     {
       key: "status",
-      name: "تفعيل البند",
+      name: t('table.status'),
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Switch
-                checked={row.status === "1"}
-                size="small"
-                color="primary"
-            />
-            <Typography variant="body2">
-              {row.status === "1" ? "نشط" : "غير نشط"}
-            </Typography>
-          </Box>
+      render: (row: TermSetting) => (
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={row.is_active === 1}
+            onCheckedChange={() => handleToggleActive(row.id, row.is_active)}
+          />
+          <span className="text-sm">
+            {row.is_active === 1 ? t('table.active') : t('table.inactive')}
+          </span>
+        </div>
       ),
     },
     {
       key: "actions",
-      name: "إجراءات",
+      name: t('table.actions'),
       sortable: false,
-      render: (row: PRJ_ProjectTerm) => (
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>الإجراءات</InputLabel>
-            <Select
-                value=""
-                label="الإجراءات"
-                onChange={(e) => handleAction(e.target.value as string, row)}
-            >
-              <MenuItem value="edit">تعديل</MenuItem>
-              <MenuItem value="delete">حذف</MenuItem>
-              <MenuItem value="view">عرض</MenuItem>
-            </Select>
-          </FormControl>
+      render: (row: TermSetting) => (
+        <RowActions
+          row={row}
+          onEdit={setEditingTermId}
+          onDelete={handleDeleteClick}
+          onView={handleViewClick}
+          t={t}
+        />
       ),
     },
   ];
 
-  // Filter data based on search and filters
-  const filteredData = mockProjectItems.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.reference_number.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = showInactive || item.status === "1";
-
-    return matchesSearch && matchesStatus;
-  });
-
-  // Handler functions
-  const handleAdd = (data: Partial<PRJ_ProjectTerm>) => {
-    const newItem: PRJ_ProjectTerm = {
-      ...data,
-      id: Math.max(...mockProjectItems.map(item => item.id)) + 1,
-      parent_id: null,
-      project_type_id: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      reference_number: data.reference_number || "",
-      name: data.name || "",
-      description: data.description || "",
-      sub_items_count: data.sub_items_count || 0,
-      services: data.services || [],
-      status: data.status || "1",
-    };
-    mockProjectItems.push(newItem);
-  };
-
-  const handleDelete = () => {
-    if (selectedItem) {
-      const index = mockProjectItems.findIndex(item => item.id === selectedItem.id);
-      if (index > -1) {
-        mockProjectItems.splice(index, 1);
-      }
-    }
-    setDeleteDialogOpen(false);
-    setSelectedItem(null);
-    setItemToDelete("");
-  };
-
-  const handleUpdate = (data: Partial<PRJ_ProjectTerm>) => {
-    if (selectedItem) {
-      const index = mockProjectItems.findIndex(item => item.id === selectedItem.id);
-      if (index > -1) {
-        mockProjectItems[index] = {
-          ...mockProjectItems[index],
-          ...data,
-          updated_at: new Date().toISOString(),
-        } as PRJ_ProjectTerm;
-      }
-    }
-    setEditDialogOpen(false);
-    setSelectedItem(null);
-  };
-
-  const handleAction = (action: string, item: PRJ_ProjectTerm) => {
-    switch (action) {
-      case "edit":
-        setSelectedItem(item);
-        setEditDialogOpen(true);
-        break;
-      case "delete":
-        setSelectedItem(item);
-        setItemToDelete(item.name);
-        setDeleteDialogOpen(true);
-        break;
-      case "view":
-        setSelectedItem(item);
-        setViewDialogOpen(true);
-        break;
-    }
-  };
-
-  // Handlers for ItemActionsDialog
-  const handleItemUpdate = (data: Partial<PRJ_ProjectTerm>) => {
-    console.log("Updating item:", selectedItem?.id, data);
-    // TODO: Add API call to update item
-  };
-
-  const handleItemDelete = () => {
-    console.log("Deleting item:", selectedItem?.id);
-    // TODO: Add API call to delete item
-  };
-
-  const handleItemCreate = (data: Partial<PRJ_ProjectTerm>) => {
-    console.log("Creating new item:", data);
-    // TODO: Add API call to create item
-  };
-
-  // Handler for dialog table actions
-  const handleDialogAction = (action: string, item: PRJ_ProjectTerm) => {
-    if (action === "open") {
-      setSelectedItem(item);
-      setItemActionsDialogOpen(true);
-    } else {
-      handleAction(action, item);
-    }
-  };
-
-  // Calculate totals
-  const totalItems = filteredData.length;
-  const activeItems = filteredData.filter(item => item.status === "1").length;
-
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredData.length / tableParams.limit);
-  const startIndex = (tableParams.page - 1) * tableParams.limit;
-  const endIndex = startIndex + tableParams.limit;
-  const paginatedData = filteredData.slice(startIndex, endIndex);
-
   // Table state
-  const tableState = ProjectItemsTable.useTableState({
-    data: paginatedData,
+  const tableState = TermSettingsTable.useTableState({
+    data: termSettings,
     columns,
     totalPages,
-    totalItems: filteredData.length,
-    params: tableParams,
-    getRowId: (item) => item.id.toString(),
-    loading: false,
+    totalItems,
+    params,
+    getRowId: (term) => term.id.toString(),
+    loading: isLoading,
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
-      <Box className="p-6">
-        {/* Header Section */}
-        <Box className="mb-6">
-          <Typography variant="h5" fontWeight="bold" className="mb-2">
-           بنود الريئيسيه
-          </Typography>
-        </Box>
+    <div className="px-8 space-y-4">
+      <TermSettingsTable
+        filters={
+          <TermSettingsTable.TopActions
+            state={tableState}
+            customActions={
+              <Button onClick={() => setAddDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('actions.addMainTerm')}
+              </Button>
+            }
+          />
+        }
+        table={
+          <TermSettingsTable.Table state={tableState} loadingOptions={{ rows: 5 }} />
+        }
+        pagination={<TermSettingsTable.Pagination state={tableState} />}
+      />
 
-        {/* Action Button Above Table */}
-        <Box className="flex justify-end mb-4">
-          <Button
-              variant="contained"
-              startIcon={<Add />}
-              className="bg-blue-600 hover:bg-blue-700"
-              onClick={() => setAddDialogOpen(true)}
-          >
-            إضافة بند رئيسي
-          </Button>
-        </Box>
+      {/* Add Dialog */}
+      <AddProjectTermDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onSuccess={() => {
+          refetch();
+          setAddDialogOpen(false);
+        }}
+        projectTypeId={projectTypeId}
+      />
 
-        <Paper>
-          <ProjectItemsTable.TopActions state={tableState} />
-          <ProjectItemsTable.Table state={tableState} />
-          <ProjectItemsTable.Pagination state={tableState} />
-        </Paper>
+      {/* Edit Dialog */}
+      <EditProjectTermDialog
+        open={Boolean(editingTermId)}
+        onClose={() => setEditingTermId(null)}
+        onSuccess={() => {
+          refetch();
+          setEditingTermId(null);
+        }}
+        termSettingId={editingTermId}
+        projectTypeId={projectTypeId}
+      />
 
-        {/* Footer Notes */}
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={Boolean(deleteConfirmId)}
+        onConfirm={confirmDelete}
+        onClose={cancelDelete}
+        title={t('dialog.deleteConfirm')}
+      />
 
-        {/* Dialogs */}
-        <AddProjectTermDialog
-            open={addDialogOpen}
-            onClose={() => setAddDialogOpen(false)}
-            onAdd={handleAdd}
-        />
-        <DeleteProjectTermDialog
-            open={deleteDialogOpen}
-            onClose={() => setDeleteDialogOpen(false)}
-            onConfirm={handleDelete}
-            itemName={itemToDelete}
-        />
-        <EditProjectTermDialog
-            open={editDialogOpen}
-            onClose={() => setEditDialogOpen(false)}
-            onUpdate={handleUpdate}
-            item={selectedItem}
-        />
-        <ViewProjectTermDialog
-            open={viewDialogOpen}
-            onClose={() => setViewDialogOpen(false)}
-            item={selectedItem}
-        />
-        <ItemActionsDialog
-            open={itemActionsDialogOpen}
-            onClose={() => setItemActionsDialogOpen(false)}
-            item={selectedItem}
-            onUpdate={handleItemUpdate}
-            onDelete={handleItemDelete}
-            onCreate={handleItemCreate}
-            tableData={filteredData}
-            onAction={handleDialogAction}
-        />
-      </Box>
+      {/* Item Actions Dialog */}
+      <ItemActionsDialog
+        open={itemActionsDialogOpen}
+        onClose={() => {
+          setItemActionsDialogOpen(false);
+          setSelectedItem(null);
+        }}
+        item={selectedItem as any}
+        onUpdate={() => {
+          refetch();
+        }}
+        onDelete={() => {
+          if (selectedItem) {
+            handleDeleteClick(selectedItem.id);
+          }
+          setItemActionsDialogOpen(false);
+        }}
+        onCreate={() => {
+          refetch();
+        }}
+        tableData={termSettings as any}
+        onAction={(action, item) => {
+          if (action === "edit") {
+            setEditingTermId(item.id);
+            setItemActionsDialogOpen(false);
+          } else if (action === "delete") {
+            handleDeleteClick(item.id);
+            setItemActionsDialogOpen(false);
+          }
+        }}
+      />
+    </div>
   );
 }
 
