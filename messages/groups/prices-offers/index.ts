@@ -9,6 +9,9 @@ export const pricesOffersMessages = new MessagesGroup({
     endDate: _m("End Date", "تاريخ الانتهاء"),
     responsiblePerson: _m("Responsible Person", "المسؤول"),
     all: _m("All", "الكل"),
+    chooseFilters: _m("Choose Filters", "اختر الفلاتر"),
+    search: _m("Search", "بحث"),
+    draft: _m("Draft", "مسودة"),
   }),
   table: new MessagesGroup({
     referenceNumber: _m("Reference Number", "الرقم المرجعي"),
@@ -28,5 +31,8 @@ export const pricesOffersMessages = new MessagesGroup({
     accepted: _m("Accepted", "مقبول"),
     pending: _m("Pending", "قيد الإنتظار"),
     rejected: _m("Rejected", "مرفوض"),
+    draft: _m("Draft", "مسودة"),
+    view: _m("View", "عرض"),
+    edit: _m("Edit", "تعديل"),
   }),
 });

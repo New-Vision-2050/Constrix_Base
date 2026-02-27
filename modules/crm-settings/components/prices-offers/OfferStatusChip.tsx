@@ -15,7 +15,7 @@ export default function OfferStatusChip({
     accepted: { label: t("accepted"), color: "success" as const },
     pending: { label: t("pending"), color: "warning" as const },
     rejected: { label: t("rejected"), color: "error" as const },
-    draft: { label: "مسودة", color: "default" as const },
+    draft: { label: t("draft"), color: "default" as const },
   };
   const { label, color } =
     config[status as keyof typeof config] ?? config.draft;

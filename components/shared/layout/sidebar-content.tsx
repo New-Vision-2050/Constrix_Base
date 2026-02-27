@@ -258,8 +258,13 @@ export function SidebarContentWrapper({
         name: t("Sidebar.CRM"),
         slug: SUPER_ENTITY_SLUG.CRM,
         icon: LayoutDashboardIcon,
-        urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
-        isActive: pageName === ROUTER.CRM.clients,
+        urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings, ROUTER.CRM.pricesOffers],
+        isActive: [
+          ROUTER.CRM.clients,
+          ROUTER.CRM.brokers,
+          ROUTER.CRM.settings,
+          ROUTER.CRM.pricesOffers,
+        ].some((route) => path === route || path.endsWith(route)),
         show: !isCentralCompany,
         sub_entities: [
           {
@@ -269,6 +274,14 @@ export function SidebarContentWrapper({
             isActive: pageName === ROUTER.CRM.settings,
             show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
           },
+          {
+            name: t("Sidebar.PricesOffers"),
+            url: ROUTER.CRM.pricesOffers,
+            icon: LayoutDashboardIcon,
+            isActive: path === ROUTER.CRM.pricesOffers,
+            show: !isCentralCompany,
+          },
+          
         ],
       },
       {
@@ -678,7 +691,7 @@ export function SidebarContentWrapper({
       },
     ];
     return data;
-  }, [pageName, isCentralCompany, can, t, userProfileUrl]);
+  }, [pageName, path, isCentralCompany, can, t, userProfileUrl]);
 
   const all = React.useMemo(() => {
     if (isLoading) return [];

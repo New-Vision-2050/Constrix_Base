@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import StatisticsCardHeader from "../organizational-structure/components/StatisticsCard/StatisticsCardHeader";
+import StatisticsCardHeader from "../../../organizational-structure/components/StatisticsCard/StatisticsCardHeader";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import TopicIcon from "@mui/icons-material/Topic";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
