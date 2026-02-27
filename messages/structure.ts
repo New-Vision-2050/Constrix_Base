@@ -124,6 +124,7 @@ export const messagesStructure = new MessagesGroup({
   ImageUploadCrop: imageUploadCropMessages,
   WorkPanel: workPanelMessages,
   icons: iconsMessages,
+  project: projectMessages,
   Projects: projectMessages,
   projectSettings: projectSettingsMessages,
   pricesOffers: pricesOffersMessages,

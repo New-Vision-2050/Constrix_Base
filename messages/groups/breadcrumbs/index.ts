@@ -32,6 +32,8 @@ export const breadcrumbsMessages = new MessagesGroup({
   companies: _m("Companies", "الشركات"),
   "company-profile": _m("Company Profile", "ملف الشركة"),
   "crm-settings": _m("CRM Settings", "إعدادات"),
+  "client-relations": _m("Client Relations", "علاقات العملاء"),
+  "price-offers": _m("Price Offers", "عروض الأسعار"),
   "docs-library": _m("Docs Library", "مكتبة المستندات"),
   "human-resources": _m("Human Resources", "الموارد البشرية"),
   "organizational-structure": _m("Organizational Structure", "هيكل المنظمة"),

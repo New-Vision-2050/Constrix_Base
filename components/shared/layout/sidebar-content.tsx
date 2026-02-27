@@ -8,6 +8,7 @@ import {
   Settings,
   FolderClosed,
   LibraryBig,
+  FileText,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "@i18n/navigation";
@@ -125,8 +126,16 @@ export function SidebarContentWrapper({
             };
           }) || [];
 
-        // For CRM, append Settings at the end after API sub-entities
+        // For CRM, append Price Offers and Settings at the end after API sub-entities
         if (project.slug === SUPER_ENTITY_SLUG.CRM) {
+          const priceOffers = {
+            name: t("Sidebar.PricesOffers"),
+            url: ROUTER.CRM.pricesOffers,
+            icon: FileText,
+            isActive: fullPath === ROUTER.CRM.pricesOffers,
+            show: !isCentralCompany,
+          };
+          
           const crmSettings = {
             name: t("Sidebar.CRMSettings"),
             url: ROUTER.CRM.settings,
@@ -140,6 +149,7 @@ export function SidebarContentWrapper({
             ...restMenuProps,
             sub_entities: [
               ...transformedMenuSubEntities,
+              priceOffers,
               crmSettings,
             ],
           };
@@ -186,9 +196,9 @@ export function SidebarContentWrapper({
     const data: Project[] = [
       {
         name: "لوحه العمل",
-        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, "/projects"],
+        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, ROUTER.ALL_PROJECTS],
         icon: LayoutDashboardIcon,
-        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith("/projects"),
+        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith(ROUTER.ALL_PROJECTS),
         slug: "work-panel",
         show: !isCentralCompany,
         sub_entities: [
@@ -201,7 +211,7 @@ export function SidebarContentWrapper({
           },
           {
             name: "المشاريع",
-            url: "/projects",
+            url: ROUTER.ALL_PROJECTS,
             icon: FolderClosed, // Using FolderClosed as it's already imported
             isActive: fullPath.startsWith("/projects") && !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
             show: !isCentralCompany,
