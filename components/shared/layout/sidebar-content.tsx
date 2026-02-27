@@ -125,26 +125,6 @@ export function SidebarContentWrapper({
             };
           }) || [];
 
-        // For CRM, append Settings at the end after API sub-entities
-        if (project.slug === SUPER_ENTITY_SLUG.CRM) {
-          const crmSettings = {
-            name: t("Sidebar.CRMSettings"),
-            url: ROUTER.CRM.settings,
-            icon: Settings,
-            isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
-          };
-          
-          return {
-            ...project,
-            ...restMenuProps,
-            sub_entities: [
-              ...transformedMenuSubEntities,
-              crmSettings,
-            ],
-          };
-        }
-
         return {
           ...project,
           ...restMenuProps,
@@ -156,7 +136,7 @@ export function SidebarContentWrapper({
       });
       return formatted;
     },
-    [can, t, pageName, isCentralCompany],
+    [can],
   );
 
   const SidebarProjects: Project[] = React.useMemo(() => {
@@ -317,7 +297,15 @@ export function SidebarContentWrapper({
         urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
         isActive: pageName === ROUTER.CRM.clients,
         show: !isCentralCompany,
-        sub_entities: [],
+        sub_entities: [
+          {
+            name: t("Sidebar.CRMSettings"),
+            url: ROUTER.CRM.settings,
+            icon: Settings,
+            isActive: pageName === ROUTER.CRM.settings,
+            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
+          },
+        ],
       },
       {
         name: t("Sidebar.docs-library"),
