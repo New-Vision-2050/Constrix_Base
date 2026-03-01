@@ -5,6 +5,7 @@ import {
 } from "./types/response";
 import { CreateSocialLinkParams, UpdateSocialLinkParams } from "./types/params";
 import { serialize } from "object-to-formdata";
+import { exportRequest } from "@/utils/exportRequest";
 
 /**
  * Communication Settings Social Links API
@@ -18,6 +19,8 @@ export const CommunicationSettingsSocialLinksApi = {
     page?: number;
     per_page?: number;
     type?: string;
+    sort_by?: string;
+    sort_direction?: "asc" | "desc";
     status?: number;
     link?: string;
   }) => baseApi.get<ListSocialLinksResponse>("social-media-links", { params }),
@@ -49,4 +52,9 @@ export const CommunicationSettingsSocialLinksApi = {
    * Delete social link
    */
   delete: (id: string) => baseApi.delete(`social-media-links/${id}`),
+
+  /**
+   * Export social links
+   */
+  export: exportRequest("social-media-links/export"),
 };

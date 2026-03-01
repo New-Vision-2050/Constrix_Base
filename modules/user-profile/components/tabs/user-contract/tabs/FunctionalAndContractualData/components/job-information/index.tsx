@@ -21,7 +21,8 @@ export default function JobInformation() {
           editMode={<JobInformationEditMode />}
           settingsBtn={{
             items: [],
-            disabledEdit: !can([PERMISSIONS.profile.salaryInfo.update]),
+            disabledEdit: !can([PERMISSIONS.profile.employmentInfo.update]),
+            
           }}
         />
       </div>

@@ -2,8 +2,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { NewArrivalsDialog } from "@/modules/stores/components/dialogs/add-page-setting";
 import withPermissions from "@/lib/permissions/client/withPermissions";
@@ -20,7 +19,7 @@ import { PagesSettingApi } from "@/services/api/ecommerce/pages-setting/new-arri
 const NEW_ARRIVALS_QUERY_KEY = "pages-setting-new-arrivals";
 
 // Create typed table instance
-const NewArrivalsTableLayout = HeadlessTableLayout<NewArrivalsRow>();
+const NewArrivalsTableLayout = HeadlessTableLayout<NewArrivalsRow>("spsn");
 
 function NewArrivalsTable() {
   const t = useTranslations("pagesSettings");
@@ -35,9 +34,6 @@ function NewArrivalsTable() {
   const [deletingPageId, setDeletingPageId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
-
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = NewArrivalsTableLayout.useTableParams({
     initialPage: 1,
@@ -46,13 +42,18 @@ function NewArrivalsTable() {
 
   // ✅ STEP 2: Fetch data using useQuery
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [NEW_ARRIVALS_QUERY_KEY, params.page, params.limit, searchQuery],
+    queryKey: [
+      NEW_ARRIVALS_QUERY_KEY,
+      params.page,
+      params.limit,
+      params.search,
+    ],
     queryFn: async () => {
       const response = await PagesSettingApi.list({
         type: "new_arrival",
         page: params.page,
         per_page: params.limit,
-        search: searchQuery,
+        search: params.search,
       });
 
       return {
@@ -114,7 +115,8 @@ function NewArrivalsTable() {
     selectable: true,
     getRowId: (page: NewArrivalsRow) => page.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   const handleAddPage = () => {
@@ -126,39 +128,16 @@ function NewArrivalsTable() {
       <Box>
         <NewArrivalsTableLayout
           filters={
-            <Stack spacing={2}>
-              {/* Filter Controls */}
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={tCommon("search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.banner.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={handleAddPage}
-                      fullWidth
-                    >
-                      {t("actions.addBanner")}
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            <NewArrivalsTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.banner.create]}>
+                  <Button variant="contained" onClick={handleAddPage}>
+                    {t("actions.addBanner")}
+                  </Button>
+                </Can>
+              }
+            />
           }
           table={
             <NewArrivalsTableLayout.Table
@@ -176,7 +155,7 @@ function NewArrivalsTable() {
           open={Boolean(editingPageId)}
           onClose={() => setEditingPageId(null)}
           pageId={
-            editingPageId === "new" ? undefined : editingPageId ?? undefined
+            editingPageId === "new" ? undefined : (editingPageId ?? undefined)
           }
           onSuccess={() => {
             queryClient.invalidateQueries({

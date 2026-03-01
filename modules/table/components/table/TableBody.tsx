@@ -37,7 +37,7 @@ const TableBody: React.FC<TableBodyProps> = ({
             <div className="flex flex-col items-center justify-center py-4">
               <Database className="h-8 w-8 text-muted-foreground/60 mb-2" />
               <span>
-                {t("Main.NoResultsRound")}
+                {t("Main.NoResultsFound")}
                 {searchQuery ? ` ${searchQuery}` : ""}
               </span>
             </div>

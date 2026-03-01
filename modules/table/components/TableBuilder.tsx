@@ -15,12 +15,26 @@ import { useResetTableOnRouteChange } from "@/modules/table/hooks/useResetTableO
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 
+type ExecutionProps = {
+  row: { id: string; [key: string]: unknown };
+  executions?: unknown[];
+  formConfig?: unknown;
+  buttonLabel?: string;
+  tableName?: string;
+  className?: string;
+  showEdit?: boolean;
+  showDelete?: boolean;
+  deleteConfirmMessage?: React.ReactNode;
+  deleteUrl?: string;
+  onDeleteSuccess?: () => void;
+};
+
 // Dynamically import the Execution component
-const Execution = dynamic(
+const Execution = dynamic<React.ComponentType<ExecutionProps>>(
   () => import("@/app/[locale]/(main)/companies/cells/execution"),
   {
     ssr: false,
-  }
+  },
 );
 
 interface TableBuilderProps {
@@ -69,7 +83,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     visibleColumnKeys,
     loading,
     error,
-    isFirstLoad,
     sortState,
     searchQuery,
     searchFields,
@@ -95,7 +108,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     setSelectionEnabled,
     selectRow,
     selectAllRows,
-    clearSelectedRows,
     setVisibleColumns,
   } = useTableData(
     dataUrl,
@@ -106,7 +118,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     config?.defaultSearchQuery || "",
     config?.dataMapper,
     searchConfig,
-    config // Pass the entire config object
+    config, // Pass the entire config object
   );
 
   const enableExport =
@@ -134,15 +146,15 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       // Check if action column should be added based on available actions
       const shouldAddActionColumn = Boolean(
         (config?.executions && config.executions.length > 0) ||
-          config?.executionConfig?.canEdit ||
-          config?.executionConfig?.canDelete
+        config?.executionConfig?.canEdit ||
+        config?.executionConfig?.canDelete,
       );
 
       // Check if there's already an "id" column
       const hasIdKey = config.columns.some((column) => column.key === "id");
 
       // Create a new array with action column if needed
-      let columnsWithActions = [...config.columns];
+      const columnsWithActions = [...config.columns];
 
       if (shouldAddActionColumn && !hasIdKey) {
         columnsWithActions.push({
@@ -160,6 +172,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
               showDelete: Boolean(config?.executionConfig?.canDelete),
               deleteConfirmMessage: config?.deleteConfirmMessage,
               deleteUrl: config?.deleteUrl,
+              onDeleteSuccess: config?.onDeleteSuccess,
             });
           },
         });
@@ -171,7 +184,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         filteredColumns = filteredColumns.filter(
           (col) =>
             config.availableColumnKeys?.includes(col.key) ||
-            (col.key === "id" && shouldAddActionColumn) // Only include action column if it should be added
+            (col.key === "id" && shouldAddActionColumn), // Only include action column if it should be added
         );
       }
 
@@ -194,7 +207,14 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       columnsInitializedRef.current = true;
       configColumnsRef.current = filteredColumns;
     }
-  }, [columns.length, t]); // Add t to dependencies
+  }, [
+    columns.length,
+    t,
+    config,
+    setColumns,
+    setColumnVisibilityKeys,
+    setVisibleColumns,
+  ]); // Add t to dependencies
 
   const enableSorting = config?.enableSorting !== false;
   const enablePagination = config?.enablePagination !== false;
@@ -216,10 +236,10 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   React.useEffect(() => {
     if (error) {
       // Don't show toast for canceled errors
-      const isCanceledError = 
-        error.toLowerCase().includes("canceled") || 
+      const isCanceledError =
+        error.toLowerCase().includes("canceled") ||
         error.toLowerCase().includes("err_canceled");
-      
+
       if (!isCanceledError) {
         toast({
           title: "Error",

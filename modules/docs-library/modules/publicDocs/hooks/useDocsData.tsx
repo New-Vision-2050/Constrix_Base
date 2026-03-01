@@ -9,11 +9,32 @@ export default function useDocsData(
   limit?: number,
   page?: number,
   searchData?: SearchFormData,
-  sort?: string
+  sort?: string,
+  fixedType?: string,
 ) {
   return useQuery({
-    queryKey: ["docs", branchId, parentId, password, limit, page, searchData, sort], // unique to each id
-    queryFn: () => getDocs(branchId, parentId, password, limit, page, searchData, sort),
+    queryKey: [
+      "docs",
+      branchId,
+      parentId,
+      password,
+      limit,
+      page,
+      searchData,
+      sort,
+      fixedType,
+    ], // unique to each id
+    queryFn: () =>
+      getDocs(
+        branchId,
+        parentId,
+        password,
+        limit,
+        page,
+        searchData,
+        sort,
+        fixedType,
+      ),
     refetchOnWindowFocus: false, // don't refetch on tab switch
     // refetchOnReconnect: false,   // don't refetch on network reconnect
     // refetchOnMount: false,       // don't refetch when component remounts

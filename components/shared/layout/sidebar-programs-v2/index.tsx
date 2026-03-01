@@ -43,7 +43,11 @@ export function SidebarProgramsListV2({ projects }: PropsT) {
     // If no match, try to match against sub_entities urls
     if (!matchedProject) {
       matchedProject = projects.find((project) =>
-        project.sub_entities?.some((sub) => sub.url === pathnameWithoutLocale)
+        project.sub_entities?.some((sub) => {
+          if (!sub.url) return false;
+          // Use exact match first, or fall back to prefix match
+          return sub.url === pathnameWithoutLocale || pathnameWithoutLocale.startsWith(sub.url);
+        })
       );
     }
 
@@ -74,7 +78,11 @@ export function SidebarProgramsListV2({ projects }: PropsT) {
     // If no match, try to match against sub_entities urls
     if (!matchedProject) {
       matchedProject = projects.find((project) =>
-        project.sub_entities?.some((sub) => sub.url === pathnameWithoutLocale)
+        project.sub_entities?.some((sub) => {
+          if (!sub.url) return false;
+          // Use exact match first, or fall back to prefix match
+          return sub.url === pathnameWithoutLocale || pathnameWithoutLocale.startsWith(sub.url);
+        })
       );
     }
 

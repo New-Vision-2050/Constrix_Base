@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { DealOfDayDialog } from "@/modules/stores/components/dialogs/add-coupons";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -17,7 +16,7 @@ import { DealDaysApi } from "@/services/api/ecommerce/deal-days";
 
 const DEAL_OF_DAY_QUERY_KEY = "deal-of-day-list";
 
-const DealOfDayTableLayout = HeadlessTableLayout<DealOfDayRow>();
+const DealOfDayTableLayout = HeadlessTableLayout<DealOfDayRow>("sdd");
 
 function DealOfDayView() {
   const t = useTranslations();
@@ -26,7 +25,6 @@ function DealOfDayView() {
   const [editingDealId, setEditingDealId] = useState<string | null>(null);
   const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const params = DealOfDayTableLayout.useTableParams({
     initialPage: 1,
@@ -34,10 +32,10 @@ function DealOfDayView() {
   });
 
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [DEAL_OF_DAY_QUERY_KEY, params.page, params.limit, searchQuery],
+    queryKey: [DEAL_OF_DAY_QUERY_KEY, params.page, params.limit, params.search],
     queryFn: async () => {
       const response = await DealDaysApi.list({
-        search: searchQuery,
+        search: params.search,
         page: params.page,
         per_page: params.limit,
       });
@@ -96,7 +94,8 @@ function DealOfDayView() {
     selectable: true,
     getRowId: (deal: DealOfDayRow) => deal.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
@@ -104,38 +103,19 @@ function DealOfDayView() {
       <Box>
         <DealOfDayTableLayout
           filters={
-            <Stack spacing={2}>
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={t("labels.search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.dealDay.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={() => setEditingDealId("new")}
-                      fullWidth
-                    >
-                      اضافة صفقة اليوم
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            <DealOfDayTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.dealDay.create]}>
+                  <Button
+                    variant="contained"
+                    onClick={() => setEditingDealId("new")}
+                  >
+                    اضافة صفقة اليوم
+                  </Button>
+                </Can>
+              }
+            />
           }
           table={
             <DealOfDayTableLayout.Table

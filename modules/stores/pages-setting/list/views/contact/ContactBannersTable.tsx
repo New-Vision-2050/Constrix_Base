@@ -2,8 +2,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { ContactDialog } from "@/modules/stores/components/dialogs/add-page-setting";
 import withPermissions from "@/lib/permissions/client/withPermissions";
@@ -20,7 +19,7 @@ import { BannersApi } from "@/services/api/ecommerce/pages-setting/contact/banne
 const CONTACT_BANNERS_QUERY_KEY = "pages-setting-contact-banners";
 
 // Create typed table instance
-const ContactBannersTableLayout = HeadlessTableLayout<BannersRow>();
+const ContactBannersTableLayout = HeadlessTableLayout<BannersRow>("spscb");
 
 function ContactBannersTable() {
   const t = useTranslations("pagesSettings");
@@ -35,9 +34,6 @@ function ContactBannersTable() {
   const [deletingPageId, setDeletingPageId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
-
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = ContactBannersTableLayout.useTableParams({
     initialPage: 1,
@@ -50,14 +46,14 @@ function ContactBannersTable() {
       CONTACT_BANNERS_QUERY_KEY,
       params.page,
       params.limit,
-      searchQuery,
+      params.search,
     ],
     queryFn: async () => {
       const response = await BannersApi.list({
         type: "contact_us",
         page: params.page,
         per_page: params.limit,
-        search: searchQuery,
+        search: params.search,
       });
 
       return {
@@ -119,7 +115,8 @@ function ContactBannersTable() {
     selectable: true,
     getRowId: (page: BannersRow) => page.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   const handleAddPage = () => {
@@ -131,39 +128,16 @@ function ContactBannersTable() {
       <Box>
         <ContactBannersTableLayout
           filters={
-            <Stack spacing={2}>
-              {/* Filter Controls */}
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={tCommon("search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.banner.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={handleAddPage}
-                      fullWidth
-                    >
-                      {t("actions.addBanner")}
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            <ContactBannersTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.banner.create]}>
+                  <Button variant="contained" onClick={handleAddPage}>
+                    {t("actions.addBanner")}
+                  </Button>
+                </Can>
+              }
+            />
           }
           table={
             <ContactBannersTableLayout.Table

@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { FeaturedDealDialog } from "@/modules/stores/components/dialogs/add-coupons";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -17,7 +16,7 @@ import { FeatureDealsApi } from "@/services/api/ecommerce/feature-deals";
 
 const FEATURED_DEAL_QUERY_KEY = "featured-deal-list";
 
-const FeaturedDealTableLayout = HeadlessTableLayout<FeaturedDealRow>();
+const FeaturedDealTableLayout = HeadlessTableLayout<FeaturedDealRow>("sfd");
 
 function FeaturedDealView() {
   const t = useTranslations();
@@ -26,7 +25,6 @@ function FeaturedDealView() {
   const [editingDealId, setEditingDealId] = useState<string | null>(null);
   const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const params = FeaturedDealTableLayout.useTableParams({
     initialPage: 1,
@@ -34,10 +32,15 @@ function FeaturedDealView() {
   });
 
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [FEATURED_DEAL_QUERY_KEY, params.page, params.limit, searchQuery],
+    queryKey: [
+      FEATURED_DEAL_QUERY_KEY,
+      params.page,
+      params.limit,
+      params.search,
+    ],
     queryFn: async () => {
       const response = await FeatureDealsApi.list({
-        search: searchQuery,
+        search: params.search,
         page: params.page,
         per_page: params.limit,
       });
@@ -96,7 +99,8 @@ function FeaturedDealView() {
     selectable: true,
     getRowId: (deal: FeaturedDealRow) => deal.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
@@ -104,38 +108,19 @@ function FeaturedDealView() {
       <Box>
         <FeaturedDealTableLayout
           filters={
-            <Stack spacing={2}>
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={t("labels.search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.featureDeal.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={() => setEditingDealId("new")}
-                      fullWidth
-                    >
-                      اضافة صفقة مميزة
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            <FeaturedDealTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.featureDeal.create]}>
+                  <Button
+                    variant="contained"
+                    onClick={() => setEditingDealId("new")}
+                  >
+                    اضافة صفقة مميزة
+                  </Button>
+                </Can>
+              }
+            />
           }
           table={
             <FeaturedDealTableLayout.Table

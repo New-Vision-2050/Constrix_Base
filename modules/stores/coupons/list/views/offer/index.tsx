@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { OfferDialog } from "@/modules/stores/components/dialogs/add-coupons";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -17,7 +16,7 @@ import { FlashDealsApi } from "@/services/api/ecommerce/flash-deals";
 
 const OFFERS_QUERY_KEY = "offers-list";
 
-const OffersTableLayout = HeadlessTableLayout<OfferRow>();
+const OffersTableLayout = HeadlessTableLayout<OfferRow>("soff");
 
 function OfferView() {
   const t = useTranslations();
@@ -26,7 +25,6 @@ function OfferView() {
   const [editingOfferId, setEditingOfferId] = useState<string | null>(null);
   const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const params = OffersTableLayout.useTableParams({
     initialPage: 1,
@@ -34,10 +32,10 @@ function OfferView() {
   });
 
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [OFFERS_QUERY_KEY, params.page, params.limit, searchQuery],
+    queryKey: [OFFERS_QUERY_KEY, params.page, params.limit, params.search],
     queryFn: async () => {
       const response = await FlashDealsApi.list({
-        search: searchQuery,
+        search: params.search,
         page: params.page,
         per_page: params.limit,
       });
@@ -96,7 +94,8 @@ function OfferView() {
     selectable: true,
     getRowId: (offer: OfferRow) => offer.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
@@ -104,38 +103,19 @@ function OfferView() {
       <Box>
         <OffersTableLayout
           filters={
-            <Stack spacing={2}>
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={t("labels.search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.flashDeal.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={() => setEditingOfferId("new")}
-                      fullWidth
-                    >
-                      اضافة عرض
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            <OffersTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.flashDeal.create]}>
+                  <Button
+                    variant="contained"
+                    onClick={() => setEditingOfferId("new")}
+                  >
+                    اضافة عرض
+                  </Button>
+                </Can>
+              }
+            />
           }
           table={
             <OffersTableLayout.Table

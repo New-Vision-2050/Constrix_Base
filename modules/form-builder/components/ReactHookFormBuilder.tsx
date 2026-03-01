@@ -82,10 +82,10 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
 }) => {
   const [isEditMode] = useState(config.isEditMode || false);
   const [isLoadingEditData, setIsLoadingEditData] = useState(
-    initialIsLoadingEditData || false
+    initialIsLoadingEditData || false,
   );
   const [editError, setEditError] = useState<string | null>(
-    initialEditError || null
+    initialEditError || null,
   );
   const t = useTranslations();
 
@@ -139,7 +139,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
             data = data[path];
             if (data === undefined) {
               throw new Error(
-                `Data path '${config.editDataPath}' not found in response`
+                `Data path '${config.editDataPath}' not found in response`,
               );
             }
           }
@@ -163,7 +163,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
         setIsLoadingEditData(false);
       }
     },
-    [config, recordId, form]
+    [config, recordId, form],
   );
 
   // Load edit data when in edit mode
@@ -207,8 +207,8 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
                     config.wizardOptions?.allowStepNavigation
                       ? "cursor-pointer"
                       : index <= currentStep
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed opacity-50"
+                        ? "cursor-pointer"
+                        : "cursor-not-allowed opacity-50"
                   }`}
                   onClick={() => {
                     if (
@@ -224,8 +224,8 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
                       index < currentStep
                         ? "bg-green-500 text-white"
                         : index === currentStep
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-gray-200 text-gray-500"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-gray-200 text-gray-500"
                     }`}
                   >
                     {index + 1}
@@ -323,8 +323,17 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
       <div className="mb-4 text-sm">
         {submitError && (
           <div className="text-destructive border border-destructive/20 p-2 rounded">
-            <span className="font-medium">Error: </span>
-            {submitError}
+            <span className="font-medium">{submitError}</span>
+            {Object.keys(errors).length > 0 && (
+              <ul className="mt-2 list-disc list-inside text-sm">
+                {Object.entries(errors).map(([field, error]) => (
+                  <li key={field}>
+                    <span className="font-medium">{field}:</span>{" "}
+                    {error?.message || String(error)}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
         {submitSuccess && (

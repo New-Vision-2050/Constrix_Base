@@ -20,7 +20,7 @@ type PersonalDataTab = Omit<SystemTab, "icon"> & {
 };
 
 export const PersonalDataSections = (
-  t: (key: string) => string
+  t: (key: string) => string,
 ): PersonalDataTab[] => {
   // declare and define component state and vars
   const shownTabs: string[] = [];

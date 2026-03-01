@@ -70,6 +70,7 @@ export interface TableConfig {
   tableTitle?: string;
   deleteConfirmMessage?: string;
   deleteUrl?: string;
+  onDeleteSuccess?: () => void;
   // Execution configuration
   executions?: (MenuItem | RenderFunctionType)[];
   executionConfig?: ExecutionConfig;

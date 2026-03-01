@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { CouponDialog } from "@/modules/stores/components/dialogs/add-coupons";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -17,7 +16,7 @@ import { CouponsApi } from "@/services/api/ecommerce/coupons";
 
 const COUPONS_QUERY_KEY = "coupons-list";
 
-const CouponsTableLayout = HeadlessTableLayout<CouponRow>();
+const CouponsTableLayout = HeadlessTableLayout<CouponRow>("scpn");
 
 function CouponView() {
   const t = useTranslations();
@@ -26,7 +25,6 @@ function CouponView() {
   const [editingCouponId, setEditingCouponId] = useState<string | null>(null);
   const [deletingCouponId, setDeletingCouponId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const params = CouponsTableLayout.useTableParams({
     initialPage: 1,
@@ -34,10 +32,10 @@ function CouponView() {
   });
 
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [COUPONS_QUERY_KEY, params.page, params.limit, searchQuery],
+    queryKey: [COUPONS_QUERY_KEY, params.page, params.limit, params.search],
     queryFn: async () => {
       const response = await CouponsApi.list({
-        search: searchQuery,
+        search: params.search,
         page: params.page,
         per_page: params.limit,
       });
@@ -96,7 +94,8 @@ function CouponView() {
     selectable: true,
     getRowId: (coupon: CouponRow) => coupon.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
@@ -104,38 +103,19 @@ function CouponView() {
       <Box>
         <CouponsTableLayout
           filters={
-            <Stack spacing={2}>
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={t("labels.search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.coupon.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={() => setEditingCouponId("new")}
-                      fullWidth
-                    >
-                      اضافة قسيمة
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            <CouponsTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.coupon.create]}>
+                  <Button
+                    variant="contained"
+                    onClick={() => setEditingCouponId("new")}
+                  >
+                    اضافة قسيمة
+                  </Button>
+                </Can>
+              }
+            />
           }
           table={
             <CouponsTableLayout.Table
