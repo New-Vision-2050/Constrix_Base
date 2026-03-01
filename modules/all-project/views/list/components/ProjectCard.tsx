@@ -27,7 +27,7 @@ export function ProjectCard({
     project.status !== undefined ? STATUS_MAP[project.status] : undefined;
 
   const fields = [
-    { label: "الرقم المرجعي", value: project.ref_number ?? project.id },
+    { label: "الرقم المرجعي", value: project.serial_number ?? project.id },
     { label: "اسم العميل", value: project.client_name ?? "—" },
     {
       label: "المهندس المسؤول",

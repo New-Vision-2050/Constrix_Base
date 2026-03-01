@@ -4,6 +4,7 @@ import { Box, Chip, LinearProgress, Typography } from "@mui/material";
 // Project row type interface
 export interface ProjectRow {
   id: number;
+  serial_number?: string;
   ref_number?: string;
   name: string;
   client_name: string;
@@ -12,6 +13,7 @@ export interface ProjectRow {
   branch_name: string;
   project_type_name: string;
   sub_project_type?: string;
+  sub_project_type_name?: string;
   sub_sub_project_type_name: string;
   contract_number?: string;
   start_date?: string;
@@ -69,10 +71,10 @@ function ProgressBar({ value, color }: { value?: number; color: string }) {
 
 export const getProjectsColumns = () => [
   {
-    key: "ref_number",
+    key: "serial_number",
     name: "الرقم المرجعي",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.ref_number ?? "--"}</span>,
+    render: (row: ProjectRow) => <span>{row.serial_number ?? "--"}</span>,
   },
   {
     key: "name",
@@ -98,7 +100,7 @@ export const getProjectsColumns = () => [
     key: "sub_project_type",
     name: "تصنيف المشروع",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.sub_project_type ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.sub_project_type_name ?? row.sub_project_type ?? "—"}</span>,
   },
   {
     key: "sub_sub_project_type_name",
