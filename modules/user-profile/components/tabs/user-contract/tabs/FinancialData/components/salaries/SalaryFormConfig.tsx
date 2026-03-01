@@ -4,6 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { SalaryTypes } from "./salary_type_enum";
+import useUserContractData from "../../../FunctionalAndContractualData/hooks/useUserContractData";
 
 // Helper to get period name from period ID
 const getPeriodName = async (periodId: string) => {
@@ -11,7 +12,7 @@ const getPeriodName = async (periodId: string) => {
     const response = await apiClient.get(`${baseURL}/periods`);
     const periods = response.data.payload;
     const periodName = periods?.find(
-      (period: any) => period.id === periodId
+      (period: any) => period.id === periodId,
     )?.name;
     console.log("periodName", periodName);
     return periodName;
@@ -22,15 +23,26 @@ const getPeriodName = async (periodId: string) => {
 };
 
 // Helper function to calculate hourly rate based on payment period and salary
+// Using userContractData for weekly work hours
+// Total hours equations:
+// 1 month = Weekly work hours * 4
+// 1 day = Weekly work hours * 4 / 30
+// 1 year = Weekly work hours * 4 * 12
+// 1 week = Weekly work hours
+//
+// Hourly rate = Salary / Total hours for period
 const calculateHourlyRate = (
   periodId: string | undefined,
   salary: number | string | undefined,
-  periodName?: string
+  weeklyWorkHours: number | undefined,
+  periodName?: string,
 ) => {
-  if (!periodId || !salary) return "";
+  if (!periodId || !salary || !weeklyWorkHours) return "";
 
   const salaryValue = Number(salary);
   if (isNaN(salaryValue) || salaryValue <= 0) return "";
+
+  if (weeklyWorkHours <= 0) return "";
 
   // If periodName is directly provided (from existing formValues), use it
   // Otherwise, try to use the cached name from our map
@@ -45,28 +57,35 @@ const calculateHourlyRate = (
   // Use Arabic period names to determine formula
   const nameLower = nameToUse.toLowerCase();
 
+  let totalHours = 0;
+
   if (nameLower.includes("يومي") || nameLower.includes("daily")) {
-    // Daily period: salary / (9 hours per day)
-    return (salaryValue / 9).toFixed(2);
+    // Daily: Total hours = Weekly work hours * 4 / 30
+    totalHours = (weeklyWorkHours * 4) / 30;
   } else if (nameLower.includes("اسبوع") || nameLower.includes("weekly")) {
-    // Weekly period: salary / (48 hours per week )
-    return (salaryValue / 48).toFixed(2);
+    // Weekly: Total hours = Weekly work hours
+    totalHours = weeklyWorkHours;
   } else if (nameLower.includes("شهري") || nameLower.includes("monthly")) {
-    // Monthly period: salary / 192 hours per month
-    return (salaryValue / 192).toFixed(2);
+    // Monthly: Total hours = Weekly work hours * 4
+    totalHours = weeklyWorkHours * 4;
   } else if (nameLower.includes("سنوي") || nameLower.includes("yearly")) {
-    // Yearly period: salary / (12 months * 192 hours per month)
-    return (salaryValue / (12 * 192)).toFixed(2);
+    // Yearly: Total hours = Weekly work hours * 4 * 12
+    totalHours = weeklyWorkHours * 4 * 12;
   } else {
     // Default case - unknown period type
     return "";
   }
+
+  // Hourly rate = Salary / Total hours
+  return (salaryValue / totalHours).toFixed(2);
 };
 
 export const SalaryFormConfig = () => {
   // declare and define component state and variables
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
+
+  const { data: userContractData } = useUserContractData(userId ?? "");
 
   const salaryFormConfig: FormConfig = {
     formId: "salary-data-form",
@@ -101,23 +120,28 @@ export const SalaryFormConfig = () => {
             onChange: async (
               newValue: any,
               values: Record<string, any>,
-              formId?: string
+              formId?: string,
             ) => {
               const formStore = useFormStore.getState();
-              
+
               // If type changed to constant and salary and period exist, calculate hour rate
-              if (newValue === SalaryTypes.constants && values.salary && values.period_id) {
+              if (
+                newValue === SalaryTypes.constants &&
+                values.salary &&
+                values.period_id
+              ) {
                 try {
                   // Get period name
                   const periodName = await getPeriodName(values.period_id);
-                  
-                  // Calculate hourly rate
+
+                  // Calculate hourly rate using weekly work hours from userContractData
                   const hourlyRate = calculateHourlyRate(
                     values.period_id,
                     values.salary,
-                    periodName
+                    userContractData?.working_hours,
+                    periodName,
                   );
-                  
+
                   // Update hour rate in the form
                   formStore.setValues("salary-data-form", {
                     hour_rate: hourlyRate,
@@ -153,7 +177,7 @@ export const SalaryFormConfig = () => {
             onChange: (
               newValue: any,
               values: Record<string, any>,
-              formId?: string
+              formId?: string,
             ) => {
               // No need to calculate hourly rate for percentage-based salary
               if (!formId) return;
@@ -182,7 +206,7 @@ export const SalaryFormConfig = () => {
             onChange: async (
               newValue: any,
               values: Record<string, any>,
-              formId?: string
+              formId?: string,
             ) => {
               const formStore = useFormStore.getState();
 
@@ -194,7 +218,8 @@ export const SalaryFormConfig = () => {
                 const hourlyRate = calculateHourlyRate(
                   values.period_id,
                   newValue,
-                  periodName
+                  userContractData?.working_hours,
+                  periodName,
                 );
 
                 formStore.setValues("salary-data-form", {
@@ -234,7 +259,7 @@ export const SalaryFormConfig = () => {
             onChange: async (
               newValue: any,
               values: Record<string, any>,
-              formId?: string
+              formId?: string,
             ) => {
               const formStore = useFormStore.getState();
               console.log("values", values);
@@ -245,11 +270,12 @@ export const SalaryFormConfig = () => {
                   // Fetch the selected period's name
                   const periodName = await getPeriodName(newValue);
 
-                  // Calculate with the period name
+                  // Calculate with the period name and weekly work hours
                   const hourlyRate = calculateHourlyRate(
                     newValue,
                     values.salary,
-                    periodName
+                    userContractData?.working_hours,
+                    periodName,
                   );
 
                   formStore.setValues("salary-data-form", {

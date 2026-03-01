@@ -19,6 +19,7 @@ export const UserCertificationFormConfig = ({
 }: PropsT) => {
   // declare and define component state and variables
   const formType = certification ? "Edit" : "Create";
+  const IsEditing = certification ? true : false;
   const t = useTranslations('UserProfile.nestedTabs.certificationsData');
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
@@ -116,14 +117,14 @@ export const UserCertificationFormConfig = ({
       },
     ],
     initialValues: {
-      professional_bodie_id: certification?.professional_bodie_id,
-      accreditation_name: certification?.accreditation_name,
-      accreditation_number: certification?.accreditation_number,
-      accreditation_degree: certification?.accreditation_degree,
-      date_obtain: certification?.date_obtain,
-      date_end: certification?.date_end,
+      professional_bodie_id: IsEditing ? certification?.professional_bodie_id : "",
+      accreditation_name: IsEditing ? certification?.accreditation_name : "",
+      accreditation_number: IsEditing ? certification?.accreditation_number : "",
+      accreditation_degree: IsEditing ? certification?.accreditation_degree : "",
+      date_obtain: IsEditing ? certification?.date_obtain : "",
+      date_end: IsEditing ? certification?.date_end : "",
       // Initialize file field empty if editing existing certification
-      file: certification?.file,
+      file: IsEditing ? certification?.file : undefined,
     },
     submitButtonText: t('submitButtonText'),
     cancelButtonText: t('cancelButtonText'),

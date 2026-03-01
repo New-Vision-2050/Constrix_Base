@@ -165,8 +165,8 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
 
     if (error && !isCanceledError) {
       toast({
-        title: "Error loading options",
-        description: `Failed to load options for ${label}: ${error}`,
+        title: t("Table.ErrorLoadingOptions"),
+        description: `${t("Table.Error")}: ${error}`,
         variant: "destructive",
       });
     }

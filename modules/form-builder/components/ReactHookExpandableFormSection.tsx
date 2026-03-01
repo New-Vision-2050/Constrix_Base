@@ -22,14 +22,19 @@ interface ReactHookExpandableFormSectionProps {
   onBlur: (field: string) => void;
   collapsible?: boolean;
   forceDisabled?: boolean;
-  stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
+  stepResponses?: Record<
+    number,
+    { success: boolean; message?: string; data?: Record<string, any> }
+  >;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
   onToggle?: (isOpen: boolean) => void;
   clearFiledError: (field: string) => void;
 }
 
-const ReactHookExpandableFormSection: React.FC<ReactHookExpandableFormSectionProps> = ({
+const ReactHookExpandableFormSection: React.FC<
+  ReactHookExpandableFormSectionProps
+> = ({
   section,
   form,
   values,

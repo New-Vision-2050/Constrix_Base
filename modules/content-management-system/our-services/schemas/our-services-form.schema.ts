@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DesignTypes } from "../constants/design-types-enum";
 
 /**
  * Creates a Zod schema for our-services form validation
@@ -88,6 +89,21 @@ export const createOurServicesFormSchema = (t: (key: string) => string) =>
                   t("servicesRequired") || "At least one service is required",
               }),
           })
+          .refine(
+            (data) => {
+              // If designType is HEXA, services must have at least 6 items
+              if (data.designType === DesignTypes.HEXA) {
+                return data.services.length >= 6;
+              }
+              return true;
+            },
+            {
+              message:
+                t("servicesHexaMinRequired") ||
+                "HEXA design requires at least 6 services",
+              path: ["services"],
+            }
+          )
       )
       .min(1, {
         message:

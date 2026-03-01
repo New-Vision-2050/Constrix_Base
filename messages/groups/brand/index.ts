@@ -7,7 +7,10 @@ export const brandMessages = new MessagesGroup({
   editBrand: _m("Edit Brand", "تعديل العلامة التجارية"),
   brandName: _m("Brand Name", "اسم العلامة التجارية"),
   brandNameRequired: _m("Brand name is required", "اسم العلامة التجارية مطلوب"),
-  brandNameMinLength: _m("Brand name must be at least 2 characters", "اسم العلامة التجارية يجب أن يكون على الأقل حرفين"),
+  brandNameMinLength: _m(
+    "Brand name must be at least 2 characters",
+    "اسم العلامة التجارية يجب أن يكون على الأقل حرفين"
+  ),
   descriptionRequired: _m("Description is required", "الوصف مطلوب"),
   imageRequired: _m("Brand image is required", "صورة العلامة التجارية مطلوبة"),
   notFound: _m("No brands found", "لم يتم العثور على علامات تجارية"),
@@ -15,20 +18,55 @@ export const brandMessages = new MessagesGroup({
   totalRequests: _m("Total Requests", "مجموع الطلبات"),
   imageLabel: _m("Brand Image", "صورة العلامة التجارية"),
   description: _m("Description", "الوصف"),
-  dragDropImage: _m("Drag and drop image here or", "قم بسحب وإفلات الصورة هنا أو"),
+  dragDropImage: _m(
+    "Drag and drop image here or",
+    "قم بسحب وإفلات الصورة هنا أو"
+  ),
   supportedFormats: _m(".jpg, .png, .webp", ".jpg, .png, .webp"),
+  maxSize: _m("Max size: 3MB", "الحد الأقصى: 3 ميجابايت"),
   attachImage: _m("Attach", "إرفاق"),
   removeImage: _m("Remove Image", "إزالة الصورة"),
   save: _m("Save", "حفظ"),
   success: _m("Success", "نجح"),
-  createSuccess: _m("Brand created successfully!", "تم إنشاء العلامة التجارية بنجاح!"),
-  updateSuccess: _m("Brand updated successfully!", "تم تحديث العلامة التجارية بنجاح!"),
-  createError: _m("Failed to create brand. Please try again.", "فشل إنشاء العلامة التجارية. يرجى المحاولة مرة أخرى."),
-  updateError: _m("Failed to update brand. Please try again.", "فشل تحديث العلامة التجارية. يرجى المحاولة مرة أخرى."),
-  validationError: _m("Validation error. Please check your inputs.", "خطأ في التحقق من البيانات. يرجى التحقق من المدخلات."),
-  activatedSuccessfully: _m("Brand activated successfully", "تم تفعيل العلامة التجارية بنجاح"),
-  deactivatedSuccessfully: _m("Brand deactivated successfully", "تم إلغاء تفعيل العلامة التجارية بنجاح"),
+  createSuccess: _m(
+    "Brand created successfully!",
+    "تم إنشاء العلامة التجارية بنجاح!"
+  ),
+  updateSuccess: _m(
+    "Brand updated successfully!",
+    "تم تحديث العلامة التجارية بنجاح!"
+  ),
+  createError: _m(
+    "Failed to create brand. Please try again.",
+    "فشل إنشاء العلامة التجارية. يرجى المحاولة مرة أخرى."
+  ),
+  updateError: _m(
+    "Failed to update brand. Please try again.",
+    "فشل تحديث العلامة التجارية. يرجى المحاولة مرة أخرى."
+  ),
+  validationError: _m(
+    "Validation error. Please check your inputs.",
+    "خطأ في التحقق من البيانات. يرجى التحقق من المدخلات."
+  ),
+  activatedSuccessfully: _m(
+    "Brand activated successfully",
+    "تم تفعيل العلامة التجارية بنجاح"
+  ),
+  deactivatedSuccessfully: _m(
+    "Brand deactivated successfully",
+    "تم إلغاء تفعيل العلامة التجارية بنجاح"
+  ),
   failedToUpdateStatus: _m("Failed to update status", "فشل تحديث الحالة"),
-  areYouSureReactivate: _m("Are you sure you want to reactivate this brand?", "هل أنت متأكد من إعادة تفعيل هذه العلامة التجارية؟"),
-  areYouSureDeactivate: _m("Are you sure you want to deactivate this brand?", "هل أنت متأكد من إلغاء تفعيل هذه العلامة التجارية؟")
+  areYouSureReactivate: _m(
+    "Are you sure you want to reactivate this brand?",
+    "هل أنت متأكد من إعادة تفعيل هذه العلامة التجارية؟"
+  ),
+  areYouSureDeactivate: _m(
+    "Are you sure you want to deactivate this brand?",
+    "هل أنت متأكد من إلغاء تفعيل هذه العلامة التجارية؟"
+  ),
+  deleteConfirm: _m(
+    "Are you sure you want to delete this brand?",
+    "هل أنت متأكد من حذف هذه العلامة التجارية؟"
+  ),
 });

@@ -53,6 +53,14 @@ import { contentManagementSystemMessages } from "./groups/content-management-sys
 import { editSubEntityMessages } from "./groups/edit-sub-entity";
 import { wysiwygMessages } from "./groups/wysiwyg";
 import { clientProfileModuleMessages } from "./groups/client-profile";
+import { companyProfileLegalDataFormMessages } from "./groups/company-profile/legal-data-form";
+import { storesMessages } from "./groups/stores";
+import { imageUploadCropMessages } from "./groups/image-upload-crop";
+import { workPanelMessages } from "./groups/work-panel";
+import { iconsMessages } from "./groups/icons";
+import { projectMessages } from "./groups/projects";
+import { projectSettingsMessages } from "./groups/projects/settings";
+import { pricesOffersMessages } from "./groups/prices-offers";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -79,6 +87,7 @@ export const messagesStructure = new MessagesGroup({
   UserProfile: userProfileMessages,
   activitiesLogs: activitiesLogsMessages,
   companyProfile: companyProfileMessages,
+  companyProfileLegalDataForm: companyProfileLegalDataFormMessages,
   CompanyStructure: companyStructureMessages,
   PersonalDataForm: personalDataFormMessages,
   ClientsModule: clientsModuleMessages,
@@ -86,7 +95,8 @@ export const messagesStructure = new MessagesGroup({
   CRMSettingsModule: crmsettingsModuleMessages,
   AttendanceDepartureModule: attendanceDepartureModuleMessages,
   "hr-settings": hrSettingsMessages,
-  HRSettingsAttendanceDepartureModule: hrsettingsAttendanceDepartureModuleMessages,
+  HRSettingsAttendanceDepartureModule:
+    hrsettingsAttendanceDepartureModuleMessages,
   HRSettingsVacations: hrsettingsVacationsMessages,
   RoleTypes: roleTypesMessages,
   CreateRole: createRoleMessages,
@@ -108,6 +118,14 @@ export const messagesStructure = new MessagesGroup({
   requests: requestsMessages,
   paymentMethods: paymentMethodsMessages,
   "content-management-system": contentManagementSystemMessages,
+  stores: storesMessages,
   wysiwyg: wysiwygMessages,
   ClientProfile: clientProfileModuleMessages,
+  ImageUploadCrop: imageUploadCropMessages,
+  WorkPanel: workPanelMessages,
+  icons: iconsMessages,
+  project: projectMessages,
+  Projects: projectMessages,
+  projectSettings: projectSettingsMessages,
+  pricesOffers: pricesOffersMessages,
 });

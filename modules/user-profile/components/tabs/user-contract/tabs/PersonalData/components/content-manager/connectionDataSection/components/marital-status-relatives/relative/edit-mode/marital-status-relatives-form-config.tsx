@@ -6,6 +6,7 @@ import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
 import { MaritalStatusList } from "../../marital-status-enum";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 type PropsT = {
   relative?: Relative;
@@ -18,6 +19,24 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
   const formMode = !relative ? "Create" : "Edit";
   const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
+  const [maritalStatusOptions, setMaritalStatusOptions] = useState<Array<{
+    id: string;
+    name: string;
+    type: string;
+  }>>([]);
+
+  const getMaritalStatusType = (id: string): string | undefined => {
+    // First try to find in loaded options
+    const foundType = maritalStatusOptions.find((item) => item.id === id)?.type;
+    if (foundType) return foundType;
+
+    // Fallback to relative's marital_status if in edit mode
+    if (relative?.marital_status?.id === id) {
+      return relative.marital_status.type;
+    }
+
+    return undefined;
+  };
 
   const maritalStatusRelativesFormConfig: FormConfig = {
     formId: `ConnectionInformation-relatives-data-form-${relative?.id ?? ""}`,
@@ -39,6 +58,19 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
               url: `${baseURL}/marital_statuses`,
               valueField: "id",
               labelField: "name",
+              transformResponse: (data: unknown) => {
+                const items = data as Array<{
+                  id: string;
+                  name: string;
+                  type: string;
+                }>;
+                setMaritalStatusOptions(items);
+                return items.map((item) => ({
+                  value: item.id,
+                  label: item.name,
+                  type: item.type,
+                }));
+              },
             },
             placeholder: t("maritalStatus"),
           },
@@ -47,6 +79,11 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: t("name"),
             type: "text",
             placeholder: t("name"),
+            condition: (values) => {
+              const maritalStatusId = values.marital_status_id as string;
+              const type = getMaritalStatusType(maritalStatusId);
+              return type !== "not-married";
+            },
             validation: [
               {
                 type: "custom",
@@ -65,6 +102,11 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: t("relationship"),
             type: "text",
             placeholder: t("relationship"),
+            condition: (values) => {
+              const maritalStatusId = values.marital_status_id as string;
+              const type = getMaritalStatusType(maritalStatusId);
+              return type !== "not-married";
+            },
             validation: [
               {
                 type: "custom",
@@ -83,6 +125,11 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: t("phone"),
             type: "phone",
             placeholder: t("phone"),
+            condition: (values) => {
+              const maritalStatusId = values.marital_status_id as string;
+              const type = getMaritalStatusType(maritalStatusId);
+              return type !== "not-married";
+            },
             validation: [
               {
                 type: "phone",
@@ -94,7 +141,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       },
     ],
     initialValues: {
-      marital_status_id: relative?.marital_status?.id?.toString(),
+      marital_status_id: relative?.marital_status?.id,
       name: relative?.name,
       phone: relative?.phone,
       relationship: relative?.relationship,
@@ -130,7 +177,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
         {
           url: url,
           method: method,
-        }
+        },
       );
     },
   };

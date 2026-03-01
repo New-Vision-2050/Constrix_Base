@@ -78,6 +78,13 @@ export default function AddFounderDialog({
     }
   }, [errors]);
 
+  // Reset form to default values when opening Add dialog
+  useEffect(() => {
+    if (open && !isEditMode) {
+      reset(getDefaultFounderFormValues());
+    }
+  }, [open, isEditMode, reset]);
+
   // Populate form with founder data when editing
   useEffect(() => {
     if (isEditMode && founderData?.payload) {

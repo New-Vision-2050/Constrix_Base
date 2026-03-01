@@ -12,8 +12,11 @@ export default function FinancialDataEntryPoint() {
           handleChangeActiveSection: (section) =>
             handleChangeActiveSection(section),
         })}
+        activeSection={activeSection}
       />
-      <div className="p-4 flex-grow gap-8  min-h-[400px] transition-all duration-300">{activeSection?.content}</div>
+      <div className="p-4 flex-grow gap-8  min-h-[400px] transition-all duration-300">
+        {activeSection?.content}
+      </div>
     </div>
   );
 }

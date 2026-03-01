@@ -209,6 +209,7 @@ export const mapApiResponseToFormData = (data: {
   mobile_video_file?: string | null;
   video_profile_file?: string | null;
   description?: string | null;
+  description_ar?: string | null;
   description_en?: string | null;
   is_companies?: 0 | 1;
   is_approvals?: 0 | 1;
@@ -225,7 +226,7 @@ export const mapApiResponseToFormData = (data: {
     web_video_file: data.web_video_file || null, // URL string from API
     mobile_video_link: data.mobile_video_link || null,
     mobile_video_file: data.mobile_video_file || null, // URL string from API
-    description_ar: data.description || "",
+    description_ar: data.description_ar || "",
     description_en: data.description_en || "",
     is_companies: data.is_companies || 0,
     is_approvals: data.is_approvals || 0,

@@ -10,8 +10,14 @@ export const CommunicationMessagesApi = {
   /**
    * List all messages with pagination and filters
    */
-  list: (params?: { search?: string; page?: number; limit?: number; status?: string }) =>
-    baseApi.get<ListMessagesResponse>("website-contact-messages", { params }),
+  list: (params?: { search?: string; page?: number; limit?: number; status?: string }) => {
+    const { limit, ...restParams } = params || {};
+    const apiParams = {
+      ...restParams,
+      ...(limit && { per_page: limit }),
+    };
+    return baseApi.get<ListMessagesResponse>("website-contact-messages", { params: apiParams });
+  },
 
   /**
    * Get single message details

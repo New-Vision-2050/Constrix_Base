@@ -6,7 +6,7 @@ export const dealOfDayMessages = new MessagesGroup({
   table: new MessagesGroup({
     dealName: _m("Deal Name", "اسم الصفقة"),
     product: _m("Product", "المنتج"),
-    active: _m("Active", "نشط")
+    active: _m("Active", "نشط"),
   }),
   add: _m("Add Deal of the Day", "إضافة صفقة اليوم"),
   edit: _m("Edit Deal of the Day", "تعديل صفقة اليوم"),
@@ -18,10 +18,26 @@ export const dealOfDayMessages = new MessagesGroup({
   percentage: _m("Percentage", "نسبة مئوية"),
   amount: _m("Fixed Amount", "مبلغ ثابت"),
   discountValue: _m("Discount Value", "قيمة الخصم"),
-  createSuccess: _m("Deal of the day created successfully", "تم إضافة صفقة اليوم بنجاح"),
-  createError: _m("Failed to create deal of the day", "فشل في إضافة صفقة اليوم"),
-  updateSuccess: _m("Deal of the day updated successfully", "تم تحديث صفقة اليوم بنجاح"),
-  updateError: _m("Failed to update deal of the day", "فشل في تحديث صفقة اليوم"),
+  createSuccess: _m(
+    "Deal of the day created successfully",
+    "تم إضافة صفقة اليوم بنجاح",
+  ),
+  createError: _m(
+    "Failed to create deal of the day",
+    "فشل في إضافة صفقة اليوم",
+  ),
+  updateSuccess: _m(
+    "Deal of the day updated successfully",
+    "تم تحديث صفقة اليوم بنجاح",
+  ),
+  updateError: _m(
+    "Failed to update deal of the day",
+    "فشل في تحديث صفقة اليوم",
+  ),
   save: _m("Save", "حفظ"),
-  cancel: _m("Cancel", "إلغاء")
+  cancel: _m("Cancel", "إلغاء"),
+  deleteConfirm: _m(
+    "Are you sure you want to delete this deal of the day?",
+    "هل أنت متأكد من حذف صفقة اليوم؟",
+  ),
 });

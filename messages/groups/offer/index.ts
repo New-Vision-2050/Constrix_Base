@@ -8,7 +8,7 @@ export const offerMessages = new MessagesGroup({
     startDate: _m("Start Date", "تاريخ البدء"),
     endDate: _m("End Date", "تاريخ الانتهاء"),
     status: _m("Status", "الحالة"),
-    noImage: _m("No Image", "لا صورة")
+    noImage: _m("No Image", "لا صورة"),
   }),
   add: _m("Add New Offer", "إضافة عرض جديد"),
   edit: _m("Edit Offer", "تعديل عرض"),
@@ -21,5 +21,9 @@ export const offerMessages = new MessagesGroup({
   updateSuccess: _m("Offer updated successfully", "تم تحديث العرض بنجاح"),
   updateError: _m("Failed to update offer", "فشل في تحديث العرض"),
   save: _m("Save", "حفظ"),
-  cancel: _m("Cancel", "إلغاء")
+  cancel: _m("Cancel", "إلغاء"),
+  deleteConfirm: _m(
+    "Are you sure you want to delete this offer?",
+    "هل أنت متأكد من حذف هذا العرض؟",
+  ),
 });

@@ -23,14 +23,32 @@ export async function middleware(req: NextRequest) {
   }
 
   // Extract locale from pathname
-  const localeMatch = pathname.match(/^\/([a-z]{2})\//);
+  const localeMatch = pathname.match(/^\/([a-z]{2})(\/|$)/);
   const locale = localeMatch ? localeMatch[1] : "ar";
 
   // Strip locale from pathname for comparisons
-  const pathnameWithoutLocale = pathname.replace(/^\/[a-z]{2}/, "") || "/";
+  const pathnameWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, "") || "/";
+  const isRootRoute = pathnameWithoutLocale === "/";
 
+  // Handle root route redirects based on authentication
+  if (isRootRoute) {
+    if (nvToken) {
+      // User is logged in, redirect to user-profile
+      return NextResponse.redirect(new URL(`/${locale}/user-profile`, req.url));
+    } else {
+      // User is not logged in, redirect to login
+      return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
+    }
+  }
+
+  // If user is not logged in and trying to access protected route, redirect to login
   if (!nvToken && !isLoginPage) {
-    return NextResponse.redirect(new URL("/ar/login", req.url));
+    return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
+  }
+
+  // If user is logged in and trying to access login page, redirect to user-profile
+  if (nvToken && isLoginPage) {
+    return NextResponse.redirect(new URL(`/${locale}/user-profile`, req.url));
   }
 
   const res = intlMiddleware(req);
