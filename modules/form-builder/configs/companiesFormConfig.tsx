@@ -356,7 +356,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
     resetButtonText: t("AddCompanyForm.ResetButtonText"),
     showSubmitLoader: true,
     resetOnSuccess: true,
-    showCancelButton: false,
+    showCancelButton:true,
     showBackButton: false,
 
     // Enable wizard mode
@@ -378,6 +378,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
         0: `${baseURL}/companies`,
         1: `${baseURL}/company-users`,
       },
+
       // API headers for each step
       stepApiHeaders: {
         0: {

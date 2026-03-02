@@ -682,15 +682,17 @@ export function useSheetForm({
 
   // Handle form cancel
   const handleCancel = useCallback(() => {
+    resetForm();
+if(isStepBased){setCurrentStep(0);
     closeSheet();
-
+}
     // Call onCancel callback if provided
     if (onCancel) {
       onCancel();
     } else if (config.onCancel) {
       config.onCancel();
     }
-  }, [closeSheet, onCancel, config.onCancel]);
+  }, [closeSheet, isStepBased, setCurrentStep, resetForm, onCancel, config.onCancel]);
 
   return {
     isOpen,

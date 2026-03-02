@@ -74,7 +74,7 @@ export default async function RootLayout({
   const direction = locale === "ar" ? "rtl" : "ltr";
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
-      <body className={cn(theSans.variable, "!pointer-events-auto")}>
+      <body className={cn(theSans.variable, "!pointer-events-auto")} suppressHydrationWarning>
         <NextTopLoader />
         <AppRouterCacheProvider>
           <ThemeProvider

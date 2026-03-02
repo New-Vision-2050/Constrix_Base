@@ -16,13 +16,20 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import {useTranslations} from "next-intl";
+import { useTranslations } from "next-intl";
 import TasksView from "./TasksView";
 import TasksSettingsView from "./TasksSettingsView";
 
-export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTION" | "ACTIONS" | "REPORT_FORMS" | "ADD_TASKS" | "TASKS_SETTINGS" | "HIDE";
+export type CARDTYPE =
+  | "WORK_ORDER_TYPES"
+  | "SECTION"
+  | "ACTIONS"
+  | "REPORT_FORMS"
+  | "ADD_TASKS"
+  | "TASKS_SETTINGS"
+  | "HIDE";
 
-export default function WorkOrdersIndex() {
+export default function WorkOrdersView() {
   const t = useTranslations("projectSettings.section");
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
