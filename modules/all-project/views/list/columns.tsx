@@ -20,11 +20,6 @@ export interface ProjectRow {
   end_date?: string;
   specializations?: string;
   project_owner_name?: string;
-  responsible_employee?: {
-    id?: number;
-    name?: string;
-  };
-  responsible_employee_name?: string;
   completion_percentage?: number;
   delay_percentage?: number;
   status?: number;
