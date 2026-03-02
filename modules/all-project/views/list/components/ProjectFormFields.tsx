@@ -213,16 +213,10 @@ export function ProjectFormFields({
       <Controller
         name="manager_id"
         control={control}
-        render={({ field }) => {
+        render={() => {
           const selected = managementsData?.find(
             (m) => String(m.id) === watchManagementId,
           );
-          const managerId = selected?.manager?.id
-            ? String(selected.manager.id)
-            : "";
-          if ((field.value ?? "") !== managerId) {
-            field.onChange(managerId);
-          }
           return (
             <TextField
               label={t("project.managementDirector")}
