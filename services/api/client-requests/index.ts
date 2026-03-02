@@ -61,10 +61,18 @@ export const ClientRequestsApi = {
       content: args.content,
       status_client_request: args.status_client_request,
       service_ids: args.service_ids,
-      term_setting_id: args.term_setting_id,
       branch_id: args.branch_id,
       management_id: args.management_id,
       attachments: args.attachments,
+    });
+    args.term_setting_id?.forEach((entry, i) => {
+      form.append(
+        `term_setting_id[${i}][term_service_id]`,
+        String(entry.term_service_id),
+      );
+      entry.term_ids.forEach((id) => {
+        form.append(`term_setting_id[${i}][term_ids][]`, String(id));
+      });
     });
     return baseApi.post<CreateClientRequestResponse>("client-requests", form, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -80,10 +88,18 @@ export const ClientRequestsApi = {
       content: args.content,
       status_client_request: args.status_client_request,
       service_ids: args.service_ids,
-      term_setting_id: args.term_setting_id,
       branch_id: args.branch_id,
       management_id: args.management_id,
       attachments: args.attachments,
+    });
+    args.term_setting_id?.forEach((entry, i) => {
+      form.append(
+        `term_setting_id[${i}][term_service_id]`,
+        String(entry.term_service_id),
+      );
+      entry.term_ids.forEach((termId) => {
+        form.append(`term_setting_id[${i}][term_ids][]`, String(termId));
+      });
     });
     return baseApi.post<CreateClientRequestResponse>(
       `client-requests/${id}`,

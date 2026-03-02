@@ -43,7 +43,7 @@ export const getClientRequestsColumns = (t: (key: string) => string) => [
     key: "item_name",
     name: t("clientRequests.table.itemName"),
     sortable: false,
-    render: (row: ClientRequestRow) => <span>{row.id || "—"}</span>,
+    render: (row: ClientRequestRow) => <span>{"—"}</span>,
   },
   {
     key: "client_request_receiver_from",
@@ -75,7 +75,7 @@ export const getClientRequestsColumns = (t: (key: string) => string) => [
     key: "branch",
     name: t("clientRequests.table.branch"),
     sortable: false,
-    render: (row: ClientRequestRow) => <span>{row.branch?.name ?? "—"}</span>,
+    render: (row: ClientRequestRow) => <span>{"—"}</span>,
   },
   {
     key: "client_request_type",

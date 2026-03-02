@@ -257,14 +257,20 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
 
   const isMounted = useRef(false);
 
-  // Sync groupSelections -> flat form value, skip initial mount to avoid hydration mismatch
+  // Sync groupSelections -> { term_service_id, term_ids }[] form value
+  // Skip initial mount to avoid hydration mismatch
   useEffect(() => {
     if (!isMounted.current) {
       isMounted.current = true;
       return;
     }
-    const flat = Object.values(groupSelections).flat();
-    termSettingField.onChange(flat);
+    const structured = Object.entries(groupSelections)
+      .filter(([, ids]) => ids.length > 0)
+      .map(([groupId, ids]) => ({
+        term_service_id: Number(groupId),
+        term_ids: ids,
+      }));
+    termSettingField.onChange(structured);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupSelections]);
 
