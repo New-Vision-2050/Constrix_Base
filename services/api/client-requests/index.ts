@@ -67,11 +67,11 @@ export const ClientRequestsApi = {
     });
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
-        `term_setting_id[${i}][term_service_id]`,
+        `term_setting_ids[${i}][term_service_id]`,
         String(entry.term_service_id),
       );
       entry.term_ids.forEach((id) => {
-        form.append(`term_setting_id[${i}][term_ids][]`, String(id));
+        form.append(`term_setting_ids[${i}][term_ids][]`, String(id));
       });
     });
     return baseApi.post<CreateClientRequestResponse>("client-requests", form, {

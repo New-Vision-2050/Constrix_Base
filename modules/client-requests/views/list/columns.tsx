@@ -1,32 +1,34 @@
 import { ClientRequestRow } from "@/services/api/client-requests";
+import { Chip } from "@mui/material";
 import React from "react";
 
 export type { ClientRequestRow };
 
-const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
-  pending: { bg: "#4a5568", color: "#fff" },
-  accepted: { bg: "#2d6a4f", color: "#fff" },
-  rejected: { bg: "#c0392b", color: "#fff" },
-  default: { bg: "#555", color: "#fff" },
+type ChipColor =
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "warning"
+  | "info"
+  | "success";
+
+const STATUS_STYLES: Record<string, { bg: ChipColor }> = {
+  pending: { bg: "warning" },
+  accepted: { bg: "success" },
+  rejected: { bg: "error" },
+  default: { bg: "info" },
 };
 
 function StatusBadge({ status }: { status: string }) {
   const style = STATUS_STYLES[status] ?? STATUS_STYLES.default;
   return (
-    <span
-      style={{
-        padding: "3px 10px",
-        borderRadius: "12px",
-        fontSize: "12px",
-        backgroundColor: style.bg,
-        color: style.color,
-        whiteSpace: "nowrap",
-        display: "inline-block",
-        textTransform: "capitalize",
-      }}
-    >
-      {status}
-    </span>
+    <Chip
+      color={style.bg}
+      label={status}
+      size="medium"
+      sx={{ textTransform: "capitalize", color: "#000", fontWeight: 500 }}
+    />
   );
 }
 

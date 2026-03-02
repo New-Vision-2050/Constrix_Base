@@ -39,6 +39,28 @@ export default function ClientRequestsList() {
   const [filterRequestType, setFilterRequestType] = useState("");
   const [filterEmployee, setFilterEmployee] = useState("");
 
+  // Filter data queries
+  const { data: requestTypesData } = useQuery({
+    queryKey: ["client-request-types"],
+    queryFn: () =>
+      ClientRequestsApi.getRequestTypes().then((r) => r.data.payload ?? []),
+    staleTime: Infinity,
+  });
+
+  const { data: sourcesData } = useQuery({
+    queryKey: ["client-request-sources"],
+    queryFn: () =>
+      ClientRequestsApi.getSources().then((r) => r.data.payload ?? []),
+    staleTime: Infinity,
+  });
+
+  const { data: clientsData } = useQuery({
+    queryKey: ["client-request-clients"],
+    queryFn: () =>
+      ClientRequestsApi.getClients().then((r) => r.data.payload ?? []),
+    staleTime: Infinity,
+  });
+
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = ClientRequestsTableLayout.useTableParams({
     initialPage: 1,
@@ -55,6 +77,7 @@ export default function ClientRequestsList() {
       filterStatus,
       filterRequestType,
       filterEmployee,
+      filterClientName,
     ],
     queryFn: async () => {
       const response = await ClientRequestsApi.list({
@@ -65,6 +88,10 @@ export default function ClientRequestsList() {
         ...(filterRequestType
           ? { client_request_type_id: filterRequestType }
           : {}),
+        ...(filterEmployee
+          ? { client_request_receiver_from_id: filterEmployee }
+          : {}),
+        ...(filterClientName ? { client_id: filterClientName } : {}),
       });
       const payload = response.data.payload ?? [];
       const pagination = response.data.pagination;
@@ -145,11 +172,7 @@ export default function ClientRequestsList() {
             borderRadius: 2,
           }}
         >
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            sx={{ mb: 2, textAlign: "end" }}
-          >
+          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2 }}>
             {t("clientRequests.filter.title")}
           </Typography>
           <Box
@@ -159,7 +182,7 @@ export default function ClientRequestsList() {
               gap: 2,
             }}
           >
-            <FormControl size="small" fullWidth>
+            {/* <FormControl size="small" fullWidth>
               <InputLabel>
                 {t("clientRequests.filter.responsibleEmployee")}
               </InputLabel>
@@ -169,8 +192,13 @@ export default function ClientRequestsList() {
                 onChange={(e) => setFilterEmployee(e.target.value)}
               >
                 <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
+                {sourcesData?.map((source) => (
+                  <MenuItem key={source.id} value={String(source.id)}>
+                    {source.name}
+                  </MenuItem>
+                ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
 
             <FormControl size="small" fullWidth>
               <InputLabel>
@@ -205,6 +233,11 @@ export default function ClientRequestsList() {
                 onChange={(e) => setFilterClientName(e.target.value)}
               >
                 <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
+                {clientsData?.map((client) => (
+                  <MenuItem key={client.id} value={String(client.id)}>
+                    {client.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
 
@@ -216,6 +249,11 @@ export default function ClientRequestsList() {
                 onChange={(e) => setFilterRequestType(e.target.value)}
               >
                 <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
+                {requestTypesData?.map((type) => (
+                  <MenuItem key={type.id} value={String(type.id)}>
+                    {type.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>
