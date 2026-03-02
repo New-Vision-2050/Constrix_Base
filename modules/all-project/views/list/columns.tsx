@@ -139,7 +139,7 @@ export const getProjectsColumns = () => [
     key: "project_manager",
     name: "مدير المشروع",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.project_owner_name ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.manager_name ?? "—"}</span>,
   },
   {
     key: "contract_number",
