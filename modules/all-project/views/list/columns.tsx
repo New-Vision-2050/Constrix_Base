@@ -75,11 +75,6 @@ export const getProjectsColumns = () => [
     name: "الرقم المرجعي",
     sortable: false,
     render: (row: ProjectRow) => {
-      // If serial_number looks like a UUID (has hyphens), use ref_number or id instead
-      const isUuid = row.serial_number && row.serial_number.includes('-');
-      if (isUuid) {
-        return <span>{row.ref_number ?? row.id ?? "--"}</span>;
-      }
       return <span>{row.serial_number ?? row.ref_number ?? row.id ?? "--"}</span>;
     },
   },
