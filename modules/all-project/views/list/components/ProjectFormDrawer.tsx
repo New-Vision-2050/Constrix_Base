@@ -77,20 +77,23 @@ export function ProjectFormDrawer({
   );
 
   // Auto-select management director based on chosen management
+  // Only runs when managementsData is loaded to avoid overwriting with empty string
   useEffect(() => {
-    const managements = (formData?.managementsData ?? []) as
+    const managements = formData?.managementsData as
       | ManagementItem[]
       | undefined;
+    if (!managements || managements.length === 0) return;
     if (!watchManagementId) {
       setValue("manager_id", "");
       return;
     }
-    const selected = managements?.find(
+    const selected = managements.find(
       (m) => String(m.id) === watchManagementId,
     );
+    console.log("selected", selected?.manager?.id);
     const managerId = selected?.manager?.id ? String(selected.manager.id) : "";
     setValue("manager_id", managerId);
-  }, [watchManagementId, formData, setValue]);
+  }, [watchManagementId, formData?.managementsData, setValue]);
 
   // Reset form to defaults when opening for new project
   useEffect(() => {
@@ -145,6 +148,7 @@ export function ProjectFormDrawer({
   }, [editingProjectId, reset]);
 
   const onSubmit = async (data: CreateProjectFormValues) => {
+    console.log("data", data);
     try {
       const apiData: CreateProjectData = {
         project_type_id: Number(data.project_type_id),
@@ -159,7 +163,7 @@ export function ProjectFormDrawer({
         project_owner_id: data.project_owner_id,
         branch_id: Number(data.branch_id),
         management_id: Number(data.management_id),
-        manager_id: data.manager_id ? Number(data.manager_id) : null,
+        manager_id: data.manager_id ? data.manager_id : null,
         status: data.status,
         project_owner_type: data.project_owner_type || undefined,
       };
