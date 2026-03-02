@@ -167,6 +167,7 @@ export default function AddMedicalInsuranceDialog({
                 type="date"
                 value={formData.end_date}
                 onChange={(e) => handleInputChange("end_date", e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
                 className="bg-sidebar border-gray-700"
               />
             </div>
