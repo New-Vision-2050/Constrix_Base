@@ -20,6 +20,11 @@ export interface ProjectRow {
   end_date?: string;
   specializations?: string;
   project_owner_name?: string;
+  responsible_employee?: {
+    id?: number;
+    name?: string;
+  };
+  responsible_employee_name?: string;
   completion_percentage?: number;
   delay_percentage?: number;
   status?: number;
@@ -75,11 +80,6 @@ export const getProjectsColumns = () => [
     name: "الرقم المرجعي",
     sortable: false,
     render: (row: ProjectRow) => {
-      // If serial_number looks like a UUID (has hyphens), use ref_number or id instead
-      const isUuid = row.serial_number && row.serial_number.includes('-');
-      if (isUuid) {
-        return <span>{row.ref_number ?? row.id ?? "--"}</span>;
-      }
       return <span>{row.serial_number ?? row.ref_number ?? row.id ?? "--"}</span>;
     },
   },
@@ -133,7 +133,7 @@ export const getProjectsColumns = () => [
     key: "responsible_employee",
     name: "المهندس المسؤول",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.manager_name ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.responsible_employee_name ?? "—"}</span>,
   },
   {
     key: "project_manager",
