@@ -75,7 +75,7 @@ export const SubProgramsList = memo(function SubProgramsList({
         >
           {visibleSubEntities.map((sub, index) => {
             const subUrl = sub.url || `/${activeProject?.slug}/${sub.slug}`;
-            const isActive = subUrl === activeUrl;
+            const isActive = sub.isActive || subUrl === activeUrl;
 
             return (
               <motion.div

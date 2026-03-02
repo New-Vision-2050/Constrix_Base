@@ -4,9 +4,10 @@ type Props = {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label: string;
+  disabled?: boolean;
 };
 
-function HorizontalSwitch({ checked, onChange, label }: Props) {
+function HorizontalSwitch({ checked, onChange, label, disabled = false }: Props) {
   return (
     <Box
       sx={{
@@ -18,19 +19,23 @@ function HorizontalSwitch({ checked, onChange, label }: Props) {
         borderRadius: 1,
         width: 1,
         "&:hover": {
-          backgroundColor: "divider",
+          backgroundColor: disabled ? "transparent" : "divider",
         },
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? "not-allowed" : "pointer",
       }}
       component={ButtonBase}
-      onClick={() => onChange(!checked)}
+      onClick={() => !disabled && onChange(!checked)}
+      disabled={disabled}
     >
       <Typography variant="body1" fontWeight={500}>
         {label}
       </Typography>
       <Switch
         checked={checked}
-        onChange={(e, checked) => onChange(checked)}
+        onChange={(e, checked) => !disabled && onChange(checked)}
         onClick={(e) => e.stopPropagation()}
+        disabled={disabled}
       />
     </Box>
   );

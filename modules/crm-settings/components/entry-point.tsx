@@ -1,6 +1,7 @@
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { useTranslations } from "next-intl";
 import ClientsSettings from "../tabs/clients-settings";
+import TermsTab from "../tabs/terms-tab";
 import { CRMSettingDataCxtProvider } from "../context/CRMSettingData";
 
 export default function CRMSettingsEntryPoint() {
@@ -15,6 +16,11 @@ export default function CRMSettingsEntryPoint() {
       id: "clientsPermissions",
       title: t("clientsPermissions"),
       content: <>clientsPermissions</>,
+    },
+    {
+      id: "terms",
+      title: t("terms"),
+      content: <TermsTab />,
     },
   ];
 

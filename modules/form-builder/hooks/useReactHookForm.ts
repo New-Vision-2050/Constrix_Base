@@ -91,7 +91,11 @@ const createZodSchema = (config: FormConfig): z.ZodTypeAny => {
 
           switch (rule.type) {
             case "required":
-              fieldSchema = z.string().min(1, errorMessage);
+              if (field.type === "select") {
+                fieldSchema = z.any().refine((val) => val !== null && val !== undefined && val !== "", errorMessage);
+              } else {
+                fieldSchema = z.string().min(1, errorMessage);
+              }
               break;
             case "minLength":
               if (

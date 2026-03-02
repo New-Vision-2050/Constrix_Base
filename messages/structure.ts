@@ -61,6 +61,7 @@ import { iconsMessages } from "./groups/icons";
 import { projectMessages } from "./groups/projects";
 import { projectSettingsMessages } from "./groups/projects/settings";
 import { customerRequestsMessages } from "./groups/customer-requests";
+import { pricesOffersMessages } from "./groups/prices-offers";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -124,7 +125,9 @@ export const messagesStructure = new MessagesGroup({
   ImageUploadCrop: imageUploadCropMessages,
   WorkPanel: workPanelMessages,
   icons: iconsMessages,
+  project: projectMessages,
   Projects: projectMessages,
   projectSettings: projectSettingsMessages,
   customerRequests: customerRequestsMessages,
+  pricesOffers: pricesOffersMessages,
 });

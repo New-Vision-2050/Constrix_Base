@@ -1,6 +1,6 @@
 "use client";
 
-import RootLevelTabs from "./levels/root-level-tabs";
+import RootLevelTabs from "./tab-views/levels/root-level-tabs";
 
 function ProjectsSettingsMainView() {
   return (
