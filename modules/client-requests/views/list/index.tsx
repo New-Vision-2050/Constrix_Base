@@ -17,16 +17,15 @@ import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
 import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
-import { CustomerRequestsApi } from "@/services/api/customer-requests";
-import { CustomerRequestRow, getCustomerRequestsColumns } from "./columns";
-import { RequestFormDrawer } from "./components/RequestFormDrawer";
+import { ClientRequestRow, getClientRequestsColumns } from "./columns";
 import { statisticsConfig } from "./components/statistics-config";
-const CUSTOMER_REQUESTS_QUERY_KEY = "customer-requests-list";
+import { RequestFormDrawer } from "./components/RequestFormDrawer";
+import { ClientRequestsApi } from "@/services/api/client-requests";
+const CLIENT_REQUESTS_QUERY_KEY = "client-requests-list";
 
-const CustomerRequestsTableLayout =
-  HeadlessTableLayout<CustomerRequestRow>("crl");
+const ClientRequestsTableLayout = HeadlessTableLayout<ClientRequestRow>("crl");
 
-export default function CustomerRequestsList() {
+export default function ClientRequestsList() {
   const t = useTranslations();
   const queryClient = useQueryClient();
 
@@ -36,12 +35,12 @@ export default function CustomerRequestsList() {
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState("");
-  const [filterCustomerName, setFilterCustomerName] = useState("");
+  const [filterClientName, setFilterClientName] = useState("");
   const [filterRequestType, setFilterRequestType] = useState("");
   const [filterEmployee, setFilterEmployee] = useState("");
 
   // ✅ STEP 1: useTableParams (BEFORE query)
-  const params = CustomerRequestsTableLayout.useTableParams({
+  const params = ClientRequestsTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
@@ -49,7 +48,7 @@ export default function CustomerRequestsList() {
   // ✅ STEP 2: Fetch data using useQuery
   const { data: queryData, isLoading } = useQuery({
     queryKey: [
-      CUSTOMER_REQUESTS_QUERY_KEY,
+      CLIENT_REQUESTS_QUERY_KEY,
       params.page,
       params.limit,
       params.search,
@@ -58,7 +57,7 @@ export default function CustomerRequestsList() {
       filterEmployee,
     ],
     queryFn: async () => {
-      const response = await CustomerRequestsApi.list({
+      const response = await ClientRequestsApi.list({
         page: params.page,
         per_page: params.limit,
         ...(params.search ? { search: params.search } : {}),
@@ -91,16 +90,16 @@ export default function CustomerRequestsList() {
 
   // Define columns
   const columns = [
-    ...getCustomerRequestsColumns(t),
+    ...getClientRequestsColumns(t),
     {
       key: "actions",
-      name: t("customerRequests.table.actions"),
+      name: t("clientRequests.table.actions"),
       sortable: false,
-      render: (row: CustomerRequestRow) => (
+      render: (row: ClientRequestRow) => (
         <CustomMenu
           renderAnchor={({ onClick }) => (
             <Button onClick={onClick}>
-              {t("customerRequests.table.actions")}
+              {t("clientRequests.table.actions")}
             </Button>
           )}
         >
@@ -119,14 +118,14 @@ export default function CustomerRequestsList() {
   ];
 
   // ✅ STEP 3: useTableState (AFTER query)
-  const state = CustomerRequestsTableLayout.useTableState({
+  const state = ClientRequestsTableLayout.useTableState({
     data,
     columns,
     totalPages,
     totalItems,
     params,
     selectable: true,
-    getRowId: (row: CustomerRequestRow) => String(row.id),
+    getRowId: (row: ClientRequestRow) => String(row.id),
     loading: isLoading,
     searchable: true,
     filtered: params.search !== "",
@@ -151,7 +150,7 @@ export default function CustomerRequestsList() {
             fontWeight="bold"
             sx={{ mb: 2, textAlign: "end" }}
           >
-            {t("customerRequests.filter.title")}
+            {t("clientRequests.filter.title")}
           </Typography>
           <Box
             sx={{
@@ -162,99 +161,95 @@ export default function CustomerRequestsList() {
           >
             <FormControl size="small" fullWidth>
               <InputLabel>
-                {t("customerRequests.filter.responsibleEmployee")}
+                {t("clientRequests.filter.responsibleEmployee")}
               </InputLabel>
               <Select
                 value={filterEmployee}
-                label={t("customerRequests.filter.responsibleEmployee")}
+                label={t("clientRequests.filter.responsibleEmployee")}
                 onChange={(e) => setFilterEmployee(e.target.value)}
               >
-                <MenuItem value="">{t("customerRequests.filter.all")}</MenuItem>
+                <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
               </Select>
             </FormControl>
 
             <FormControl size="small" fullWidth>
               <InputLabel>
-                {t("customerRequests.filter.requestStatus")}
+                {t("clientRequests.filter.requestStatus")}
               </InputLabel>
               <Select
                 value={filterStatus}
-                label={t("customerRequests.filter.requestStatus")}
+                label={t("clientRequests.filter.requestStatus")}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
-                <MenuItem value="">{t("customerRequests.filter.all")}</MenuItem>
+                <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
                 <MenuItem value="pending">
-                  {t("customerRequests.status.pending")}
+                  {t("clientRequests.status.pending")}
                 </MenuItem>
                 <MenuItem value="in_progress">
-                  {t("customerRequests.status.inProgress")}
+                  {t("clientRequests.status.inProgress")}
                 </MenuItem>
                 <MenuItem value="approved">
-                  {t("customerRequests.status.approved")}
+                  {t("clientRequests.status.approved")}
                 </MenuItem>
                 <MenuItem value="rejected">
-                  {t("customerRequests.status.rejected")}
+                  {t("clientRequests.status.rejected")}
                 </MenuItem>
               </Select>
             </FormControl>
 
             <FormControl size="small" fullWidth>
-              <InputLabel>
-                {t("customerRequests.filter.customerName")}
-              </InputLabel>
+              <InputLabel>{t("clientRequests.filter.customerName")}</InputLabel>
               <Select
-                value={filterCustomerName}
-                label={t("customerRequests.filter.customerName")}
-                onChange={(e) => setFilterCustomerName(e.target.value)}
+                value={filterClientName}
+                label={t("clientRequests.filter.customerName")}
+                onChange={(e) => setFilterClientName(e.target.value)}
               >
-                <MenuItem value="">{t("customerRequests.filter.all")}</MenuItem>
+                <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
               </Select>
             </FormControl>
 
             <FormControl size="small" fullWidth>
-              <InputLabel>
-                {t("customerRequests.filter.requestType")}
-              </InputLabel>
+              <InputLabel>{t("clientRequests.filter.requestType")}</InputLabel>
               <Select
                 value={filterRequestType}
-                label={t("customerRequests.filter.requestType")}
+                label={t("clientRequests.filter.requestType")}
                 onChange={(e) => setFilterRequestType(e.target.value)}
               >
-                <MenuItem value="">{t("customerRequests.filter.all")}</MenuItem>
+                <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
               </Select>
             </FormControl>
           </Box>
         </Box>
 
         {/* Table */}
-        <CustomerRequestsTableLayout
+        <ClientRequestsTableLayout
           filters={
-            <CustomerRequestsTableLayout.TopActions
+            <ClientRequestsTableLayout.TopActions
               state={state}
               customActions={
                 <Button variant="contained" onClick={handleAddNew}>
-                  {t("customerRequests.addRequest")}
+                  {t("clientRequests.addRequest")}
                 </Button>
               }
             />
           }
           table={
-            <CustomerRequestsTableLayout.Table
+            <ClientRequestsTableLayout.Table
               state={state}
               loadingOptions={{ rows: 5 }}
             />
           }
-          pagination={<CustomerRequestsTableLayout.Pagination state={state} />}
+          pagination={<ClientRequestsTableLayout.Pagination state={state} />}
         />
 
         {/* Delete Confirmation Dialog */}
         <DeleteButton
-          message={t("customerRequests.deleteConfirm")}
+          message={t("clientRequests.deleteConfirm")}
           onDelete={async () => {
             if (!deletingRequestId) return;
-            await CustomerRequestsApi.delete(deletingRequestId);
+            await ClientRequestsApi.delete(deletingRequestId);
             queryClient.invalidateQueries({
-              queryKey: [CUSTOMER_REQUESTS_QUERY_KEY],
+              queryKey: [CLIENT_REQUESTS_QUERY_KEY],
             });
             setDeleteDialogOpen(false);
             setDeletingRequestId(null);
@@ -272,7 +267,7 @@ export default function CustomerRequestsList() {
         <RequestFormDrawer
           open={drawerOpen}
           onClose={handleCloseDrawer}
-          queryKey={CUSTOMER_REQUESTS_QUERY_KEY}
+          queryKey={CLIENT_REQUESTS_QUERY_KEY}
         />
       </Box>
     </>

@@ -18,14 +18,15 @@ import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CustomerRequestSchema,
-  CustomerRequestFormValues,
+  ClientRequestschema,
+  ClientRequestFormValues,
 } from "../validation/requestForm.schema";
-import {
-  CustomerRequestsApi,
-  CreateCustomerRequestArgs,
-} from "@/services/api/customer-requests";
+
 import { RequestFormFields } from "./RequestFormFields";
+import {
+  ClientRequestsApi,
+  CreateClientRequestArgs,
+} from "@/services/api/client-requests";
 
 interface RequestFormDrawerProps {
   open: boolean;
@@ -51,8 +52,8 @@ export function RequestFormDrawer({
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<CustomerRequestFormValues>({
-    resolver: zodResolver(CustomerRequestSchema),
+  } = useForm<ClientRequestFormValues>({
+    resolver: zodResolver(ClientRequestschema),
     mode: "onSubmit",
     defaultValues: {
       client_type: "individual",
@@ -82,12 +83,9 @@ export function RequestFormDrawer({
     }
   }, [open, reset]);
 
-  const submitToApi = async (
-    data: CustomerRequestFormValues,
-    status: string,
-  ) => {
+  const submitToApi = async (data: ClientRequestFormValues, status: string) => {
     try {
-      const apiData: CreateCustomerRequestArgs = {
+      const apiData: CreateClientRequestArgs = {
         client_request_type_id: Number(data.client_request_type_id),
         client_request_receiver_from_id: Number(
           data.client_request_receiver_from_id,
@@ -105,7 +103,7 @@ export function RequestFormDrawer({
         attachments: data.attachments,
       };
 
-      await CustomerRequestsApi.create(apiData);
+      await ClientRequestsApi.create(apiData);
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       handleClose();
     } catch (error) {
@@ -160,7 +158,7 @@ export function RequestFormDrawer({
         {/* Header */}
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" fontWeight="bold">
-            {t("customerRequests.addRequest")}
+            {t("clientRequests.addRequest")}
           </Typography>
         </Box>
         <Divider />
@@ -193,7 +191,7 @@ export function RequestFormDrawer({
             {isSubmitting ? (
               <CircularProgress size={22} sx={{ color: "#fff" }} />
             ) : (
-              t("customerRequests.form.send")
+              t("clientRequests.form.send")
             )}
           </Button>
           <Button
@@ -202,7 +200,7 @@ export function RequestFormDrawer({
             disabled={isSubmitting}
             onClick={handleSaveAsDraft}
           >
-            {t("customerRequests.form.saveAsDraft")}
+            {t("clientRequests.form.saveAsDraft")}
           </Button>
         </Box>
       </Drawer>
@@ -221,7 +219,7 @@ export function RequestFormDrawer({
       >
         <DialogContent sx={{ textAlign: "center", pt: 4 }}>
           <Typography variant="h6" sx={{ mb: 3 }}>
-            {t("customerRequests.dialog.sendAs")}
+            {t("clientRequests.dialog.sendAs")}
           </Typography>
           <RadioGroup
             row
@@ -235,19 +233,19 @@ export function RequestFormDrawer({
             <FormControlLabel
               value="pending"
               control={<Radio sx={{ color: "#fff" }} />}
-              label={t("customerRequests.dialog.send")}
+              label={t("clientRequests.dialog.send")}
               sx={{ color: "#fff" }}
             />
             <FormControlLabel
               value="accepted"
               control={<Radio sx={{ color: "#fff" }} />}
-              label={t("customerRequests.dialog.sendWithAccept")}
+              label={t("clientRequests.dialog.sendWithAccept")}
               sx={{ color: "#fff" }}
             />
             <FormControlLabel
               value="rejected"
               control={<Radio sx={{ color: "#fff" }} />}
-              label={t("customerRequests.dialog.sendWithReject")}
+              label={t("clientRequests.dialog.sendWithReject")}
               sx={{ color: "#fff" }}
             />
           </RadioGroup>
@@ -264,7 +262,7 @@ export function RequestFormDrawer({
             {isSubmitting ? (
               <CircularProgress size={22} sx={{ color: "#fff" }} />
             ) : (
-              t("customerRequests.dialog.save")
+              t("clientRequests.dialog.save")
             )}
           </Button>
         </DialogActions>

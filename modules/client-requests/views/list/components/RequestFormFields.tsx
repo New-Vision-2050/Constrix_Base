@@ -26,18 +26,20 @@ import {
   useController,
 } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { CustomerRequestFormValues } from "../validation/requestForm.schema";
 import { useQuery } from "@tanstack/react-query";
-import {
-  CustomerRequestsApi,
-  TermSettingGroup,
-  TermSettingChild,
-} from "@/services/api/customer-requests";
+
 import { useState, useCallback, useEffect, useRef } from "react";
+import { ClientRequestFormValues } from "../validation/requestForm.schema";
+
+import {
+  ClientRequestsApi,
+  TermSettingChild,
+  TermSettingGroup,
+} from "@/services/api/client-requests";
 
 interface RequestFormFieldsProps {
-  control: Control<CustomerRequestFormValues>;
-  errors: FieldErrors<CustomerRequestFormValues>;
+  control: Control<ClientRequestFormValues>;
+  errors: FieldErrors<ClientRequestFormValues>;
 }
 
 // Collect only leaf IDs (nodes with no children) in a subtree
@@ -203,7 +205,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
   const { data: requestTypesData } = useQuery({
     queryKey: ["client-request-types"],
     queryFn: async () => {
-      const response = await CustomerRequestsApi.getRequestTypes();
+      const response = await ClientRequestsApi.getRequestTypes();
       return response.data.payload;
     },
   });
@@ -211,7 +213,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
   const { data: sourcesData } = useQuery({
     queryKey: ["client-request-receiver-from"],
     queryFn: async () => {
-      const response = await CustomerRequestsApi.getSources();
+      const response = await ClientRequestsApi.getSources();
       return response.data.payload;
     },
   });
@@ -219,7 +221,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
   const { data: servicesData } = useQuery({
     queryKey: ["client-request-services"],
     queryFn: async () => {
-      const response = await CustomerRequestsApi.getServices();
+      const response = await ClientRequestsApi.getServices();
       return response.data.payload;
     },
   });
@@ -227,7 +229,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
   const { data: clientsData } = useQuery({
     queryKey: ["company-users-clients"],
     queryFn: async () => {
-      const response = await CustomerRequestsApi.getClients();
+      const response = await ClientRequestsApi.getClients();
       return response.data.payload;
     },
   });
@@ -235,7 +237,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
   const { data: termSettingsData } = useQuery({
     queryKey: ["term-service-settings"],
     queryFn: async () => {
-      const response = await CustomerRequestsApi.getTermSettings();
+      const response = await ClientRequestsApi.getTermSettings();
       return response.data.payload;
     },
   });
@@ -287,11 +289,11 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
         control={control}
         render={({ field }) => (
           <FormControl fullWidth error={!!errors.client_request_type_id}>
-            <InputLabel>{t("customerRequests.form.requestType")}</InputLabel>
+            <InputLabel>{t("clientRequests.form.requestType")}</InputLabel>
             <Select
               {...field}
               value={field.value ?? ""}
-              label={t("customerRequests.form.requestType")}
+              label={t("clientRequests.form.requestType")}
             >
               {requestTypesData?.map((item) => (
                 <MenuItem key={item.id} value={String(item.id)}>
@@ -317,11 +319,11 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
             fullWidth
             error={!!errors.client_request_receiver_from_id}
           >
-            <InputLabel>{t("customerRequests.form.source")}</InputLabel>
+            <InputLabel>{t("clientRequests.form.source")}</InputLabel>
             <Select
               {...field}
               value={field.value ?? ""}
-              label={t("customerRequests.form.source")}
+              label={t("clientRequests.form.source")}
             >
               {sourcesData?.map((item) => (
                 <MenuItem key={item.id} value={String(item.id)}>
@@ -345,18 +347,18 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
         render={({ field }) => (
           <FormControl>
             <FormLabel sx={{ mb: 0.5 }}>
-              {t("customerRequests.form.ownerType")} *
+              {t("clientRequests.form.ownerType")} *
             </FormLabel>
             <RadioGroup {...field} value={field.value ?? "individual"} row>
               <FormControlLabel
                 value="individual"
                 control={<Radio />}
-                label={t("customerRequests.form.individual")}
+                label={t("clientRequests.form.individual")}
               />
               <FormControlLabel
                 value="company"
                 control={<Radio />}
-                label={t("customerRequests.form.company")}
+                label={t("clientRequests.form.company")}
               />
             </RadioGroup>
           </FormControl>
@@ -369,11 +371,11 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
         control={control}
         render={({ field }) => (
           <FormControl fullWidth error={!!errors.client_id}>
-            <InputLabel>{t("customerRequests.form.client")}</InputLabel>
+            <InputLabel>{t("clientRequests.form.client")}</InputLabel>
             <Select
               {...field}
               value={field.value ?? ""}
-              label={t("customerRequests.form.client")}
+              label={t("clientRequests.form.client")}
             >
               {clientsData?.map((item) => (
                 <MenuItem key={item.id} value={String(item.id)}>
@@ -396,7 +398,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
           <TextField
             {...field}
             value={field.value ?? ""}
-            label={t("customerRequests.form.subject")}
+            label={t("clientRequests.form.subject")}
             fullWidth
             multiline
             rows={3}
@@ -410,13 +412,13 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
         control={control}
         render={({ field }) => (
           <FormControl fullWidth>
-            <InputLabel>{t("customerRequests.form.serviceName")}</InputLabel>
+            <InputLabel>{t("clientRequests.form.serviceName")}</InputLabel>
             <Select
               value={String(field.value?.[0] ?? "")}
               onChange={(e) =>
                 field.onChange(e.target.value ? [Number(e.target.value)] : [])
               }
-              label={t("customerRequests.form.serviceName")}
+              label={t("clientRequests.form.serviceName")}
             >
               {servicesData?.map((item) => (
                 <MenuItem key={item.id} value={String(item.id)}>
@@ -455,8 +457,8 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
               size="small"
             >
               {field.value && field.value.length > 0
-                ? `${field.value.length} ${t("customerRequests.form.attachments")}`
-                : t("customerRequests.form.attachments")}
+                ? `${field.value.length} ${t("clientRequests.form.attachments")}`
+                : t("clientRequests.form.attachments")}
               <input
                 type="file"
                 hidden

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CustomerRequestSchema = z.object({
+export const ClientRequestschema = z.object({
   client_request_type_id: z.string().min(1, "نوع الطلب مطلوب"),
   client_request_receiver_from_id: z.string().min(1, "جهة الورود مطلوبة"),
   client_type: z.enum(["individual", "company"]),
@@ -14,4 +14,4 @@ export const CustomerRequestSchema = z.object({
   attachments: z.array(z.instanceof(File)).optional(),
 });
 
-export type CustomerRequestFormValues = z.infer<typeof CustomerRequestSchema>;
+export type ClientRequestFormValues = z.infer<typeof ClientRequestschema>;

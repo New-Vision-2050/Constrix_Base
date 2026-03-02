@@ -1,4 +1,4 @@
-export interface CreateCustomerRequestArgs {
+export interface CreateClientRequestArgs {
   client_request_type_id: number;
   client_request_receiver_from_id: number;
   client_type: "individual" | "company";
@@ -12,10 +12,9 @@ export interface CreateCustomerRequestArgs {
   attachments?: File[];
 }
 
-export interface UpdateCustomerRequestArgs
-  extends Partial<CreateCustomerRequestArgs> {}
+export interface UpdateClientRequestArgs extends Partial<CreateClientRequestArgs> {}
 
-export interface CustomerRequestListParams {
+export interface ClientRequestListParams {
   page?: number;
   per_page?: number;
   search?: string;

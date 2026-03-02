@@ -1,6 +1,6 @@
 import { _m, MessagesGroup } from "../../types";
 
-export const customerRequestsMessages = new MessagesGroup({
+export const clientRequestsMessages = new MessagesGroup({
   singular: _m("Customer Request", "طلب عميل"),
   plural: _m("Customer Requests", "طلبات العملاء"),
   addRequest: _m("Add Request", "اضافة طلب"),
@@ -20,6 +20,7 @@ export const customerRequestsMessages = new MessagesGroup({
     requestStatus: _m("Request Status", "حالة الطلب"),
     assignedManagement: _m("Assigned Management", "الادارة المسند اليها"),
     actions: _m("Actions", "الاجراءات"),
+    itemName: _m("Item Name", "اسم البند"),
   }),
   status: new MessagesGroup({
     pending: _m("Pending", "قيد الانتظار"),
