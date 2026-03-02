@@ -1,7 +1,8 @@
 "use client";
 
-import Paper from "@mui/material/Paper";
+import { useMemo, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import Paper from "@mui/material/Paper";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { TermServiceSettingsApi } from "@/services/api/crm-settings/term-service-settings";
@@ -10,10 +11,8 @@ import type {
   TermServiceSettingItem,
 } from "@/services/api/crm-settings/term-service-settings/types/response";
 import { LinearProgress } from "@mui/material";
-import { ServiceItemAccordion } from "./ServiceItemAccordion";
-import { AddServiceDialog } from "./AddServiceDialog";
-import { useMemo, useState } from "react";
-import { useCallback } from "react";
+import { ServiceItemAccordion } from "./components/ServiceItemAccordion";
+import { AddServiceDialog } from "./components/AddServiceDialog";
 
 interface ServicesCardProps {
   projectTypeId: number | null;
@@ -134,15 +133,18 @@ export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
 
   return (
     <div className="space-y-4" data-project-type-id={projectTypeId}>
-      
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">{t("services")}</h2>
-        <Button variant="default" size="lg" className="gap-2 px-8" onClick={() => setAddDialogOpen(true)}>
+        <Button
+          variant="default"
+          size="lg"
+          className="gap-2 px-8"
+          onClick={() => setAddDialogOpen(true)}
+        >
           {t("addService")}
         </Button>
       </div>
 
-      
       <Paper className="w-full space-y-2 bg-card/50 p-4">
         {isLoading && <LinearProgress className="mb-2" />}
         {!isLoading && payload.length === 0 && (
@@ -161,7 +163,7 @@ export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
-          )        )}
+          ))}
       </Paper>
 
       <AddServiceDialog

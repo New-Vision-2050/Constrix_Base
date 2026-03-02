@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -19,13 +19,14 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { TermServiceSettingsApi } from "@/services/api/crm-settings/term-service-settings";
 import type {
   TermServiceSettingChild,
   TermServiceSettingItem,
 } from "@/services/api/crm-settings/term-service-settings/types/response";
 import { ServiceItemAccordion } from "./ServiceItemAccordion";
-import { AddServiceDialogProps, AddServiceFormData } from "./types/indes";
+import { AddServiceDialogProps, AddServiceFormData } from "../types/indes";
 
 function getAllDescendantIds(
   item: TermServiceSettingItem | TermServiceSettingChild,
@@ -58,33 +59,30 @@ function findItemById(
 const createAddServiceSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("validation.nameRequired")),
-    // term_services_ids: z
-    //   .array(z.number())
-    //   .min(1, t("validation.servicesRequired")),
+    term_services_ids: z
+      .array(z.number())
+      .min(1, t("validation.servicesRequired")),
   });
 
-/* Static services structure */
-function getStaticServicesPayload(
-  t: (key: string) => string,
-): TermServiceSettingItem[] {
-  return [
-    {
-      id: 1,
-      name: t("engineeringConstructions"),
-      children: [
-        {
-          id: 2,
-          name: t("buildings"),
-          parent_id: 1,
-          children: [
-            { id: 3, name: t("commercialCenters"), parent_id: 2, children: [] },
-            { id: 4, name: t("parks"), parent_id: 2, children: [] },
-            { id: 5, name: t("gardens"), parent_id: 2, children: [] },
-          ],
-        },
-      ],
-    },
-  ];
+/** Collect only leaf IDs (items without children) from selectedIds */
+function getLeafIdsFromSelected(
+  items: TermServiceSettingItem[],
+  selectedIds: Set<number>,
+): number[] {
+  const result: number[] = [];
+  const collect = (item: TermServiceSettingItem | TermServiceSettingChild) => {
+    if (!selectedIds.has(item.id)) {
+      (item.children || []).forEach(collect);
+      return;
+    }
+    if (!item.children?.length) {
+      result.push(item.id);
+    } else {
+      (item.children || []).forEach(collect);
+    }
+  };
+  items.forEach(collect);
+  return result;
 }
 
 export function AddServiceDialog({
@@ -114,7 +112,15 @@ export function AddServiceDialog({
     setValue,
   } = form;
 
-  const payload = useMemo(() => getStaticServicesPayload(t), [t]);
+  const { data: treeResponse, isLoading: isLoadingTree } = useQuery({
+    queryKey: ["term-settings-tree"],
+    queryFn: () => TermServiceSettingsApi.getTree(),
+    enabled: open,
+  });
+  const payload = useMemo(
+    () => treeResponse?.data?.payload ?? [],
+    [treeResponse?.data?.payload],
+  );
 
   const handleToggle = useCallback(
     (id: number, checked: boolean, parentId?: number) => {
@@ -172,14 +178,20 @@ export function AddServiceDialog({
     [],
   );
 
+  useEffect(() => {
+    setValue("term_services_ids", Array.from(selectedIds), {
+      shouldValidate: true,
+    });
+  }, [selectedIds, setValue]);
   const onSubmit = async (data: AddServiceFormData) => {
-
+    const leafIds = getLeafIdsFromSelected(payload, selectedIds);
+    console.log("leafIds", leafIds);
+    // return;
     try {
-      const response = await TermServiceSettingsApi.create({
+      await TermServiceSettingsApi.create({
         name: data.name,
-        term_setting_ids: [25,24,23],   // Array.from(selectedIds)
+        term_setting_ids: leafIds,
       });
-      console.log("response", response);
       toast.success(t("success.created"));
       onSuccess?.();
       reset();
@@ -291,7 +303,19 @@ export function AddServiceDialog({
                     overflow: "auto",
                   }}
                 >
-                  {payload.length === 0 && (
+                  {isLoadingTree && (
+                    <Box
+                      sx={{
+                        py: 4,
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <CircularProgress size={24} />
+                    </Box>
+                  )}
+                  {!isLoadingTree && payload.length === 0 && (
                     <Box
                       sx={{
                         py: 4,
@@ -303,7 +327,8 @@ export function AddServiceDialog({
                       {t("noServices")}
                     </Box>
                   )}
-                  {payload.map((item) => (
+                  {!isLoadingTree &&
+                    payload.map((item) => (
                       <ServiceItemAccordion
                         key={item.id}
                         item={item}
@@ -326,7 +351,7 @@ export function AddServiceDialog({
             type="submit"
             variant="contained"
             fullWidth
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoadingTree}
             sx={{ mt: 2 }}
           >
             {isSubmitting && (
@@ -339,3 +364,4 @@ export function AddServiceDialog({
     </Dialog>
   );
 }
+
