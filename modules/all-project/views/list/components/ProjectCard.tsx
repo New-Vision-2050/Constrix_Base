@@ -33,7 +33,7 @@ export function ProjectCard({
     { label: "اسم العميل", value: project.project_owner_name ?? "—" },
     {
       label: "المهندس المسؤول",
-      value: project.manager_name ?? "—",
+      value: project.responsible_employee_name ?? "—",
     },
     { label: "الادارة", value: project.management_name ?? "—" },
     { label: "بداية المشروع", value: project.start_date ?? "—" },
