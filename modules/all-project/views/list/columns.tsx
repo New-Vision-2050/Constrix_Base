@@ -3,23 +3,23 @@ import { Box, Chip, LinearProgress, Typography } from "@mui/material";
 
 // Project row type interface
 export interface ProjectRow {
-  id: number;
+  id: number | string;
   serial_number?: string;
   ref_number?: string;
   name: string;
-  client_name: string;
-  manager_name: string;
-  management_name: string;
-  branch_name: string;
-  project_type_name: string;
+  client_name?: string;
+  manager_name?: string;
+  management_name?: string;
+  branch_name?: string;
+  project_type_name?: string;
   sub_project_type?: string;
   sub_project_type_name?: string;
-  sub_sub_project_type_name: string;
+  sub_sub_project_type_name?: string;
   contract_number?: string;
   start_date?: string;
   end_date?: string;
   specializations?: string;
-  project_owner_name: string;
+  project_owner_name?: string;
   completion_percentage?: number;
   delay_percentage?: number;
   status?: number;
@@ -74,7 +74,14 @@ export const getProjectsColumns = () => [
     key: "serial_number",
     name: "الرقم المرجعي",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.serial_number ?? "--"}</span>,
+    render: (row: ProjectRow) => {
+      // If serial_number looks like a UUID (has hyphens), use ref_number or id instead
+      const isUuid = row.serial_number && row.serial_number.includes('-');
+      if (isUuid) {
+        return <span>{row.ref_number ?? row.id ?? "--"}</span>;
+      }
+      return <span>{row.serial_number ?? row.ref_number ?? row.id ?? "--"}</span>;
+    },
   },
   {
     key: "name",

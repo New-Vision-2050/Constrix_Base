@@ -26,12 +26,22 @@ export function ProjectCard({
   const statusCfg =
     project.status !== undefined ? STATUS_MAP[project.status] : undefined;
 
+  // Helper function to get reference number
+  const getReferenceNumber = (project: ProjectRow) => {
+    // If serial_number looks like a UUID (has hyphens), use ref_number or id instead
+    const isUuid = project.serial_number && project.serial_number.includes('-');
+    if (isUuid) {
+      return project.ref_number ?? project.id ?? "--";
+    }
+    return project.serial_number ?? project.ref_number ?? project.id ?? "--";
+  };
+
   const fields = [
-    { label: "الرقم المرجعي", value: project.serial_number ?? project.id },
-    { label: "اسم العميل", value: project.client_name ?? "—" },
+    { label: "الرقم المرجعي", value: getReferenceNumber(project) },
+    { label: "اسم العميل", value: project.project_owner_name ?? "—" },
     {
       label: "المهندس المسؤول",
-      value: project.project_owner_name ?? "—",
+      value: project.manager_name ?? "—",
     },
     { label: "الادارة", value: project.management_name ?? "—" },
     { label: "بداية المشروع", value: project.start_date ?? "—" },
