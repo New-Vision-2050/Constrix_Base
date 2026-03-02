@@ -158,7 +158,7 @@ export function RequestFormDrawer({
         }}
       >
         {/* Header */}
-        <Box sx={{ p: 2, textAlign: "end" }}>
+        <Box sx={{ p: 2 }}>
           <Typography variant="h6" fontWeight="bold">
             {t("customerRequests.addRequest")}
           </Typography>
@@ -185,14 +185,6 @@ export function RequestFormDrawer({
         {/* Footer buttons */}
         <Box sx={{ p: 2, display: "flex", gap: 1.5 }}>
           <Button
-            variant="outlined"
-            fullWidth
-            disabled={isSubmitting}
-            onClick={handleSaveAsDraft}
-          >
-            {t("customerRequests.form.saveAsDraft")}
-          </Button>
-          <Button
             variant="contained"
             fullWidth
             disabled={isSubmitting}
@@ -204,6 +196,14 @@ export function RequestFormDrawer({
               t("customerRequests.form.send")
             )}
           </Button>
+          <Button
+            variant="outlined"
+            fullWidth
+            disabled={isSubmitting}
+            onClick={handleSaveAsDraft}
+          >
+            {t("customerRequests.form.saveAsDraft")}
+          </Button>
         </Box>
       </Drawer>
 
@@ -213,7 +213,6 @@ export function RequestFormDrawer({
         onClose={() => setConfirmDialogOpen(false)}
         PaperProps={{
           sx: {
-            bgcolor: "#1e1e2f",
             color: "#fff",
             minWidth: 350,
             borderRadius: 2,

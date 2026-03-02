@@ -1,3 +1,25 @@
+export interface Pagination {
+  last_page: number;
+  result_count: number;
+  current_page?: number;
+  per_page?: number;
+}
+
+export interface ApiPayload<T> {
+  payload: T;
+  pagination?: Pagination;
+}
+
+export type ListCustomerRequestsResponse = ApiPayload<CustomerRequestRow[]>;
+export type ShowCustomerRequestResponse = ApiPayload<CustomerRequestRow>;
+export type CreateCustomerRequestResponse = ApiPayload<CustomerRequestRow>;
+export type GetRequestTypesResponse = ApiPayload<ClientRequestType[]>;
+export type GetSourcesResponse = ApiPayload<ClientRequestReceiverFrom[]>;
+export type GetServicesResponse = ApiPayload<ClientRequestService[]>;
+export type GetClientsResponse = ApiPayload<Client[]>;
+export type GetTermSettingsResponse = ApiPayload<TermSettingGroup[]>;
+export type GetStatsResponse = ApiPayload<Record<string, number>>;
+
 export interface TermSettingChild {
   id: number;
   name: string;

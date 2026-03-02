@@ -20,8 +20,7 @@ import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 import { CustomerRequestsApi } from "@/services/api/customer-requests";
 import { CustomerRequestRow, getCustomerRequestsColumns } from "./columns";
 import { RequestFormDrawer } from "./components/RequestFormDrawer";
-import { statisticsConfig } from "./component/statistics-config";
-
+import { statisticsConfig } from "./components/statistics-config";
 const CUSTOMER_REQUESTS_QUERY_KEY = "customer-requests-list";
 
 const CustomerRequestsTableLayout =
@@ -71,7 +70,7 @@ export default function CustomerRequestsList() {
       const payload = response.data.payload ?? [];
       const pagination = response.data.pagination;
       return {
-        data: payload as CustomerRequestRow[],
+        data: payload,
         totalPages: pagination?.last_page ?? 1,
         totalItems: pagination?.result_count ?? payload.length,
       };

@@ -1,17 +1,21 @@
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseApi } from "@/config/axios/instances/base";
 import {
   CreateCustomerRequestArgs,
   UpdateCustomerRequestArgs,
   CustomerRequestListParams,
+  ListCustomerRequestsResponse,
+  ShowCustomerRequestResponse,
+  CreateCustomerRequestResponse,
+  GetRequestTypesResponse,
+  GetSourcesResponse,
+  GetServicesResponse,
+  GetClientsResponse,
+  GetTermSettingsResponse,
+  GetStatsResponse,
 } from "./types";
 
-// Re-export types
 export * from "./types";
 
-/**
- * Serialize data object to FormData
- * Handles arrays with [] suffix and File objects
- */
 function toFormData(
   data: Record<string, unknown>,
   options?: { skipNull?: boolean },
@@ -43,9 +47,10 @@ function toFormData(
 
 export const CustomerRequestsApi = {
   list: (params?: CustomerRequestListParams) =>
-    apiClient.get(`${baseURL}/client-requests`, { params }),
+    baseApi.get<ListCustomerRequestsResponse>("client-requests", { params }),
 
-  show: (id: string) => apiClient.get(`${baseURL}/client-requests/${id}`),
+  show: (id: string) =>
+    baseApi.get<ShowCustomerRequestResponse>(`client-requests/${id}`),
 
   create: (args: CreateCustomerRequestArgs) => {
     const form = toFormData({
@@ -61,9 +66,13 @@ export const CustomerRequestsApi = {
       management_id: args.management_id,
       attachments: args.attachments,
     });
-    return apiClient.post(`${baseURL}/client-requests`, form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    return baseApi.post<CreateCustomerRequestResponse>(
+      "client-requests",
+      form,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
   },
 
   update: (id: string, args: UpdateCustomerRequestArgs) => {
@@ -80,31 +89,34 @@ export const CustomerRequestsApi = {
       management_id: args.management_id,
       attachments: args.attachments,
     });
-    return apiClient.post(`${baseURL}/client-requests/${id}`, form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    return baseApi.post<CreateCustomerRequestResponse>(
+      `client-requests/${id}`,
+      form,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
   },
 
-  delete: (id: string) => apiClient.delete(`${baseURL}/client-requests/${id}`),
+  delete: (id: string) => baseApi.delete(`client-requests/${id}`),
 
-  // نوع الطلب
   getRequestTypes: () =>
-    apiClient.get(`${baseURL}/client-requests/client-request-types`),
+    baseApi.get<GetRequestTypesResponse>(
+      "client-requests/client-request-types",
+    ),
 
-  // جهة الورود
   getSources: () =>
-    apiClient.get(`${baseURL}/client-requests/client-request-receiver-from`),
+    baseApi.get<GetSourcesResponse>(
+      "client-requests/client-request-receiver-from",
+    ),
 
-  // اسم الخدمة
   getServices: () =>
-    apiClient.get(`${baseURL}/client-requests/client-request-services`),
+    baseApi.get<GetServicesResponse>("client-requests/client-request-services"),
 
-  // العميل
   getClients: (params?: { search?: string }) =>
-    apiClient.get(`${baseURL}/company-users/clients`, { params }),
+    baseApi.get<GetClientsResponse>("company-users/clients", { params }),
 
-  // Term settings tree
-  getTermSettings: () => apiClient.get(`${baseURL}/term-service-settings/all`),
+  getTermSettings: () =>
+    baseApi.get<GetTermSettingsResponse>("term-service-settings/all"),
 
-  getStats: () => apiClient.get(`${baseURL}/client-requests/statistics`),
+  getStats: () =>
+    baseApi.get<GetStatsResponse>("client-requests/status/widgets"),
 };

@@ -33,27 +33,26 @@ import {
   TermSettingGroup,
   TermSettingChild,
 } from "@/services/api/customer-requests";
-import { useState, useCallback } from "react";
-
-type OptionItem = { id: number | string; name: string };
+import { useState, useCallback, useEffect, useRef } from "react";
 
 interface RequestFormFieldsProps {
   control: Control<CustomerRequestFormValues>;
   errors: FieldErrors<CustomerRequestFormValues>;
 }
 
-// Collect all descendant IDs from a node
-function collectAllIds(node: TermSettingChild): number[] {
-  const ids = [node.id];
-  if (node.children) {
-    node.children.forEach((child) => {
-      ids.push(...collectAllIds(child));
-    });
+// Collect only leaf IDs (nodes with no children) in a subtree
+function collectLeafIds(node: TermSettingChild): number[] {
+  if (!node.children || node.children.length === 0) {
+    return [node.id];
   }
+  const ids: number[] = [];
+  node.children.forEach((child) => {
+    ids.push(...collectLeafIds(child));
+  });
   return ids;
 }
 
-// Tree node for children (level 2+)
+// Tree node for children (level 1: intermediate, level 2: leaf)
 function ChildTreeNode({
   node,
   selectedIds,
@@ -67,13 +66,17 @@ function ChildTreeNode({
 }) {
   const [open, setOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
-  const allIds = collectAllIds(node);
-  const isChecked = allIds.every((id) => selectedIds.includes(id));
-  const isIndeterminate =
-    !isChecked && allIds.some((id) => selectedIds.includes(id));
 
-  const handleToggle = () => {
-    onToggle(allIds, !isChecked);
+  // Use leaf IDs scoped to this node's subtree only
+  const leafIds = collectLeafIds(node);
+  const isChecked =
+    leafIds.length > 0 && leafIds.every((id) => selectedIds.includes(id));
+  const isIndeterminate =
+    !isChecked && leafIds.some((id) => selectedIds.includes(id));
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggle(leafIds, !isChecked);
   };
 
   return (
@@ -81,10 +84,9 @@ function ChildTreeNode({
       <Box sx={{ display: "flex", alignItems: "center", py: 0.5 }}>
         <Checkbox
           size="small"
-          color="error"
           checked={isChecked}
           indeterminate={isIndeterminate}
-          onChange={handleToggle}
+          onClick={handleToggle}
           sx={{ p: 0.5 }}
         />
         <Typography variant="body2" sx={{ flex: 1 }}>
@@ -120,7 +122,7 @@ function ChildTreeNode({
   );
 }
 
-// Main group accordion (top level like "إنشاءات هندسية", "مباني", etc.)
+// Main group accordion (top level like "koko", "begoTest", etc.)
 function TermGroupAccordion({
   group,
   selectedIds,
@@ -130,29 +132,29 @@ function TermGroupAccordion({
   selectedIds: number[];
   onToggle: (ids: number[], add: boolean) => void;
 }) {
-  // Collect all IDs from all children in this group
-  const allGroupIds: number[] = [];
+  // Collect only leaf IDs from THIS group's subtree
+  const groupLeafIds: number[] = [];
   group.children.forEach((child) => {
-    allGroupIds.push(...collectAllIds(child));
+    groupLeafIds.push(...collectLeafIds(child));
   });
 
-  const selectedCount = allGroupIds.filter((id) =>
-    selectedIds.includes(id),
+  // selectedIds here is already scoped to this group only
+  const selectedCount = selectedIds.filter((id) =>
+    groupLeafIds.includes(id),
   ).length;
-  const totalCount = allGroupIds.length;
+  const totalCount = groupLeafIds.length;
   const isAllSelected = totalCount > 0 && selectedCount === totalCount;
   const isIndeterminate = selectedCount > 0 && selectedCount < totalCount;
 
   const handleGroupToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onToggle(allGroupIds, !isAllSelected);
+    onToggle(groupLeafIds, !isAllSelected);
   };
 
   return (
     <Accordion
       disableGutters
       sx={{
-        bgcolor: "#2d2d44",
         color: "#fff",
         "&:before": { display: "none" },
         borderRadius: 1,
@@ -168,7 +170,6 @@ function TermGroupAccordion({
       >
         <Checkbox
           size="small"
-          color="error"
           checked={isAllSelected}
           indeterminate={isIndeterminate}
           onClick={handleGroupToggle}
@@ -181,7 +182,7 @@ function TermGroupAccordion({
           ({selectedCount}/{totalCount})
         </Typography>
       </AccordionSummary>
-      <AccordionDetails sx={{ bgcolor: "#1e1e2f", p: 1 }}>
+      <AccordionDetails sx={{ p: 1 }}>
         {group.children.map((child) => (
           <ChildTreeNode
             key={child.id}
@@ -203,7 +204,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
     queryKey: ["client-request-types"],
     queryFn: async () => {
       const response = await CustomerRequestsApi.getRequestTypes();
-      return response.data.payload as OptionItem[];
+      return response.data.payload;
     },
   });
 
@@ -211,7 +212,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
     queryKey: ["client-request-receiver-from"],
     queryFn: async () => {
       const response = await CustomerRequestsApi.getSources();
-      return response.data.payload as OptionItem[];
+      return response.data.payload;
     },
   });
 
@@ -219,7 +220,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
     queryKey: ["client-request-services"],
     queryFn: async () => {
       const response = await CustomerRequestsApi.getServices();
-      return response.data.payload as OptionItem[];
+      return response.data.payload;
     },
   });
 
@@ -227,7 +228,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
     queryKey: ["company-users-clients"],
     queryFn: async () => {
       const response = await CustomerRequestsApi.getClients();
-      return response.data.payload as OptionItem[];
+      return response.data.payload;
     },
   });
 
@@ -235,7 +236,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
     queryKey: ["term-service-settings"],
     queryFn: async () => {
       const response = await CustomerRequestsApi.getTermSettings();
-      return response.data.payload as TermSettingGroup[];
+      return response.data.payload;
     },
   });
 
@@ -246,18 +247,36 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
     defaultValue: [],
   });
 
+  // Per-group selection map: groupId -> Set of selected leaf IDs
+  // This prevents cross-group contamination when leaf IDs repeat across groups
+  const [groupSelections, setGroupSelections] = useState<
+    Record<number, number[]>
+  >({});
+
+  const isMounted = useRef(false);
+
+  // Sync groupSelections -> flat form value, skip initial mount to avoid hydration mismatch
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
+    const flat = Object.values(groupSelections).flat();
+    termSettingField.onChange(flat);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupSelections]);
+
   const handleTermToggle = useCallback(
-    (ids: number[], add: boolean) => {
-      const current = termSettingField.value ?? [];
-      let next: number[];
-      if (add) {
-        next = [...new Set([...current, ...ids])];
-      } else {
-        next = current.filter((id) => !ids.includes(id));
-      }
-      termSettingField.onChange(next);
+    (groupId: number, ids: number[], add: boolean) => {
+      setGroupSelections((prev) => {
+        const current = prev[groupId] ?? [];
+        const next = add
+          ? [...new Set([...current, ...ids])]
+          : current.filter((id) => !ids.includes(id));
+        return { ...prev, [groupId]: next };
+      });
     },
-    [termSettingField],
+    [],
   );
 
   return (
@@ -393,24 +412,14 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
           <FormControl fullWidth>
             <InputLabel>{t("customerRequests.form.serviceName")}</InputLabel>
             <Select
-              multiple
-              value={field.value ?? []}
-              onChange={(e) => field.onChange(e.target.value as number[])}
-              label={t("customerRequests.form.serviceName")}
-              renderValue={(selected) =>
-                servicesData
-                  ?.filter((s) => (selected as number[]).includes(Number(s.id)))
-                  .map((s) => s.name)
-                  .join(", ") || ""
+              value={String(field.value?.[0] ?? "")}
+              onChange={(e) =>
+                field.onChange(e.target.value ? [Number(e.target.value)] : [])
               }
+              label={t("customerRequests.form.serviceName")}
             >
               {servicesData?.map((item) => (
-                <MenuItem key={item.id} value={Number(item.id)}>
-                  <Checkbox
-                    size="small"
-                    color="error"
-                    checked={(field.value ?? []).includes(Number(item.id))}
-                  />
+                <MenuItem key={item.id} value={String(item.id)}>
                   {item.name}
                 </MenuItem>
               ))}
@@ -426,8 +435,8 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
             <TermGroupAccordion
               key={group.id}
               group={group}
-              selectedIds={termSettingField.value ?? []}
-              onToggle={handleTermToggle}
+              selectedIds={groupSelections[group.id] ?? []}
+              onToggle={(ids, add) => handleTermToggle(group.id, ids, add)}
             />
           ))}
         </Box>
