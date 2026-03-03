@@ -128,6 +128,14 @@ export function SidebarContentWrapper({
 
         // For CRM, append Price Offers and Settings at the end after API sub-entities
         if (project.slug === SUPER_ENTITY_SLUG.CRM) {
+          const clientRequests = {
+            name: t("Sidebar.ClientRequests"),
+            url: ROUTER.CRM.clientRequests,
+            icon: FileText,
+            isActive: fullPath === ROUTER.CRM.clientRequests,
+            show: !isCentralCompany,
+          };
+
           const priceOffers = {
             name: t("Sidebar.PricesOffers"),
             url: ROUTER.CRM.pricesOffers,
@@ -135,7 +143,7 @@ export function SidebarContentWrapper({
             isActive: fullPath === ROUTER.CRM.pricesOffers,
             show: !isCentralCompany,
           };
-          
+
           const crmSettings = {
             name: t("Sidebar.CRMSettings"),
             url: ROUTER.CRM.settings,
@@ -143,12 +151,13 @@ export function SidebarContentWrapper({
             isActive: pageName === ROUTER.CRM.settings,
             show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
           };
-          
+
           return {
             ...project,
             ...restMenuProps,
             sub_entities: [
               ...transformedMenuSubEntities,
+              clientRequests,
               priceOffers,
               crmSettings,
             ],
@@ -196,9 +205,15 @@ export function SidebarContentWrapper({
     const data: Project[] = [
       {
         name: "لوحه العمل",
-        urls: [ROUTER.WORK_PANEL_SETTINGS, ROUTER.PROJECTS_SETTINGS, ROUTER.ALL_PROJECTS],
+        urls: [
+          ROUTER.WORK_PANEL_SETTINGS,
+          ROUTER.PROJECTS_SETTINGS,
+          ROUTER.ALL_PROJECTS,
+        ],
         icon: LayoutDashboardIcon,
-        isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith(ROUTER.ALL_PROJECTS),
+        isActive:
+          fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) ||
+          fullPath.startsWith(ROUTER.ALL_PROJECTS),
         slug: "work-panel",
         show: !isCentralCompany,
         sub_entities: [
@@ -206,14 +221,18 @@ export function SidebarContentWrapper({
             name: "الاعدادات",
             url: ROUTER.WORK_PANEL_SETTINGS,
             icon: SettingsIcon,
-            isActive: fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) || fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
+            isActive:
+              fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) ||
+              fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
             show: !isCentralCompany,
           },
           {
             name: "المشاريع",
             url: ROUTER.ALL_PROJECTS,
             icon: FolderClosed, // Using FolderClosed as it's already imported
-            isActive: fullPath.startsWith("/projects") && !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
+            isActive:
+              fullPath.startsWith("/projects") &&
+              !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
             show: !isCentralCompany,
           },
         ],
@@ -324,12 +343,19 @@ export function SidebarContentWrapper({
         name: t("Sidebar.CRM"),
         slug: SUPER_ENTITY_SLUG.CRM,
         icon: LayoutDashboardIcon,
-        urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings, ROUTER.CRM.pricesOffers],
+        urls: [
+          ROUTER.CRM.clients,
+          ROUTER.CRM.brokers,
+          ROUTER.CRM.settings,
+          ROUTER.CRM.pricesOffers,
+          ROUTER.CRM.clientRequests,
+        ],
         isActive: [
           ROUTER.CRM.clients,
           ROUTER.CRM.brokers,
           ROUTER.CRM.settings,
           ROUTER.CRM.pricesOffers,
+          ROUTER.CRM.clientRequests,
         ].some((route) => path === route || path.endsWith(route)),
         show: !isCentralCompany,
         sub_entities: [],
