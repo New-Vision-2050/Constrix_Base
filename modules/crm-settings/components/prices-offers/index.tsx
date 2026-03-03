@@ -25,12 +25,14 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import OfferStatusChip from "./OfferStatusChip";
+import OfferDetailsDialog from "./OfferDetailsDialog";
 import PricesOffersWidgets from "./PricesOffersWidgets";
 import { ClientRequestsApi } from "@/services/api/client-requests";
-import type { ClientRequest } from "@/services/api/client-requests/types/response";
+import type { ClientRequestRow } from "@/services/api/client-requests/types/response";
 import type { ClientRequestListParams } from "@/services/api/client-requests/types/params";
 
-const PricesOffersTable = HeadlessTableLayout<ClientRequest>("prices-offers");
+const PricesOffersTable =
+  HeadlessTableLayout<ClientRequestRow>("prices-offers");
 
 const FILTER_OPTIONS = [
   { key: "referenceNumber", labelKey: "referenceNumber" },
@@ -46,7 +48,11 @@ export default function PricesOffersIndex() {
   const t = useTranslations("pricesOffers.searchFilter");
   const tTable = useTranslations("pricesOffers.table");
   const [selectedFilters, setSelectedFilters] = useState<FilterKey[]>([
-    "offerStatus","referenceNumber","offerNumber","endDate","responsiblePerson",
+    "offerStatus",
+    "referenceNumber",
+    "offerNumber",
+    "endDate",
+    "responsiblePerson",
   ]);
   const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(
     null,
@@ -56,6 +62,8 @@ export default function PricesOffersIndex() {
   const [endDate, setEndDate] = useState("");
   const [offerStatus, setOfferStatus] = useState<string>("");
   const [responsiblePerson, setResponsiblePerson] = useState("");
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<ClientRequestRow | null>(null);
 
   const params = PricesOffersTable.useTableParams({
     initialPage: 1,
@@ -131,15 +139,15 @@ export default function PricesOffersIndex() {
         key: "referenceNumber",
         name: tTable("referenceNumber"),
         sortable: false,
-        render: (row: ClientRequest) => (
-          <span className="p-2 text-sm">{row.client_request_type_id}</span>
+        render: (row: ClientRequestRow) => (
+          <span className="p-2 text-sm">{row.serial_number}</span>
         ),
       },
       {
         key: "offerName",
         name: tTable("offerName"),
         sortable: false,
-        render: (row: ClientRequest) => (
+        render: (row: ClientRequestRow) => (
           <span className="p-2 text-sm">{row.content}</span>
         ),
       },
@@ -147,7 +155,7 @@ export default function PricesOffersIndex() {
         key: "clientName",
         name: tTable("clientName"),
         sortable: false,
-        render: (row: ClientRequest) => (
+        render: (row: ClientRequestRow) => (
           <span className="p-2 text-sm">{row.client?.name ?? "—"}</span>
         ),
       },
@@ -155,7 +163,7 @@ export default function PricesOffersIndex() {
         key: "management",
         name: tTable("management"),
         sortable: false,
-        render: (row: ClientRequest) => (
+        render: (row: ClientRequestRow) => (
           <span className="p-2 text-sm">{row.management?.name ?? "—"}</span>
         ),
       },
@@ -163,7 +171,7 @@ export default function PricesOffersIndex() {
         key: "financialResponsible",
         name: tTable("financialResponsible"),
         sortable: false,
-        render: (row: ClientRequest) => (
+        render: (row: ClientRequestRow) => (
           // TODO: Add financial responsible name
           <span className="p-2 text-sm">
             {row.client_request_receiver_from?.name ?? "—"}
@@ -174,17 +182,15 @@ export default function PricesOffersIndex() {
         key: "offerStatus",
         name: tTable("offerStatus"),
         sortable: false,
-        render: (row: ClientRequest) => (
-          <OfferStatusChip
-            status={row.client_price_offer_status ?? "-"}
-          />
+        render: (row: ClientRequestRow) => (
+          <OfferStatusChip status={row.client_price_offer_status ?? "-"} />
         ),
       },
       {
         key: "mediator",
         name: tTable("mediator"),
         sortable: false,
-        render: (row: ClientRequest) => (
+        render: (row: ClientRequestRow) => (
           // TODO: Add mediator name
           <span className="p-2 text-sm">{row.management?.name ?? "—"}</span>
         ),
@@ -193,22 +199,21 @@ export default function PricesOffersIndex() {
         key: "attachments",
         name: tTable("attachments"),
         sortable: false,
-        render: (row: ClientRequest) =>
-          row.term_setting_id !== null ||
-          (row.attachments && row.attachments.length > 0) ? (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        render: (row: ClientRequestRow) =>
+          row.attachments && row.attachments?.length > 0 ? (
+            <span className="p-2 text-sm flex items-center gap-2">
               <FileText className="w-5 h-5 text-red-500" />
-              <span className="text-sm">{tTable("report")}</span>
-            </Box>
+              {row.attachments?.length}
+            </span>
           ) : (
-            <span className="text-sm text-muted-foreground">—</span>
+            <span className="p-2 text-sm">—</span>
           ),
       },
       {
         key: "actions",
         name: tTable("actions"),
         sortable: false,
-        render: () => (
+        render: (row: ClientRequestRow) => (
           <CustomMenu
             renderAnchor={({ onClick }) => (
               <Button
@@ -222,7 +227,14 @@ export default function PricesOffersIndex() {
               </Button>
             )}
           >
-            <MenuItem onClick={() => {}}>{tTable("view")}</MenuItem>
+            <MenuItem
+              onClick={() => {
+                setSelectedRow(row);
+                setViewDialogOpen(true);
+              }}
+            >
+              {tTable("view")}
+            </MenuItem>
             <MenuItem onClick={() => {}}>{tTable("edit")}</MenuItem>
           </CustomMenu>
         ),
@@ -238,7 +250,7 @@ export default function PricesOffersIndex() {
     totalItems,
     params,
     selectable: true,
-    getRowId: (row: ClientRequest) => row.id,
+    getRowId: (row: ClientRequestRow) => row.id,
     loading: isLoading,
     searchable: true,
     filtered:
@@ -257,82 +269,84 @@ export default function PricesOffersIndex() {
     <div>
       <PricesOffersWidgets />
 
-      {selectedFilters.length > 0 && <Box className="p-4 rounded-lg mb-4 bg-sidebar">
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          {t("title")}
-        </Typography>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              lg: "repeat(5, 1fr)",
-            },
-            gap: 2,
-          }}
-        >
-          {selectedFilters.includes("referenceNumber") && (
-            <TextField
-              size="small"
-              label={t("referenceNumber")}
-              value={referenceNumber}
-              onChange={(e) => setReferenceNumber(e.target.value)}
-              fullWidth
-            />
-          )}
-          {selectedFilters.includes("offerNumber") && (
-            <TextField
-              size="small"
-              label={t("offerNumber")}
-              value={offerNumber}
-              onChange={(e) => setOfferNumber(e.target.value)}
-              fullWidth
-            />
-          )}
-          {selectedFilters.includes("offerStatus") && (
-            <FormControl size="small" fullWidth>
-              <InputLabel>{t("offerStatus")}</InputLabel>
-              <Select
-                value={offerStatus}
-                label={t("offerStatus")}
-                onChange={(e) => setOfferStatus(e.target.value)}
-              >
-                <MenuItem value="">{t("all")}</MenuItem>
-                <MenuItem value="draft">{t("draft")}</MenuItem>
-                <MenuItem value="pending">{tTable("pending")}</MenuItem>
-                <MenuItem value="accepted">{tTable("accepted")}</MenuItem>
-                <MenuItem value="rejected">{tTable("rejected")}</MenuItem>
-              </Select>
-            </FormControl>
-          )}
-          {selectedFilters.includes("endDate") && (
-            <TextField
-              size="small"
-              label={t("endDate")}
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-          )}
-          {selectedFilters.includes("responsiblePerson") && (
-            <FormControl size="small" fullWidth>
-              <InputLabel>{t("responsiblePerson")}</InputLabel>
-              <Select
-                value={responsiblePerson}
-                label={t("responsiblePerson")}
-                onChange={(e) => setResponsiblePerson(e.target.value)}
-              >
-                <MenuItem value="">{t("all")}</MenuItem>
-                {/* TODO: Populate from API when available */}
-              </Select>
-            </FormControl>
-          )}
+      {selectedFilters.length > 0 && (
+        <Box className="p-4 rounded-lg mb-4 bg-sidebar">
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {t("title")}
+          </Typography>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+                lg: "repeat(5, 1fr)",
+              },
+              gap: 2,
+            }}
+          >
+            {selectedFilters.includes("referenceNumber") && (
+              <TextField
+                size="small"
+                label={t("referenceNumber")}
+                value={referenceNumber}
+                onChange={(e) => setReferenceNumber(e.target.value)}
+                fullWidth
+              />
+            )}
+            {selectedFilters.includes("offerNumber") && (
+              <TextField
+                size="small"
+                label={t("offerNumber")}
+                value={offerNumber}
+                onChange={(e) => setOfferNumber(e.target.value)}
+                fullWidth
+              />
+            )}
+            {selectedFilters.includes("offerStatus") && (
+              <FormControl size="small" fullWidth>
+                <InputLabel>{t("offerStatus")}</InputLabel>
+                <Select
+                  value={offerStatus}
+                  label={t("offerStatus")}
+                  onChange={(e) => setOfferStatus(e.target.value)}
+                >
+                  <MenuItem value="">{t("all")}</MenuItem>
+                  <MenuItem value="draft">{t("draft")}</MenuItem>
+                  <MenuItem value="pending">{tTable("pending")}</MenuItem>
+                  <MenuItem value="accepted">{tTable("accepted")}</MenuItem>
+                  <MenuItem value="rejected">{tTable("rejected")}</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+            {selectedFilters.includes("endDate") && (
+              <TextField
+                size="small"
+                label={t("endDate")}
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+            )}
+            {selectedFilters.includes("responsiblePerson") && (
+              <FormControl size="small" fullWidth>
+                <InputLabel>{t("responsiblePerson")}</InputLabel>
+                <Select
+                  value={responsiblePerson}
+                  label={t("responsiblePerson")}
+                  onChange={(e) => setResponsiblePerson(e.target.value)}
+                >
+                  <MenuItem value="">{t("all")}</MenuItem>
+                  {/* TODO: Populate from API when available */}
+                </Select>
+              </FormControl>
+            )}
+          </Box>
         </Box>
-      </Box>}
+      )}
 
       <Box sx={{ p: 0 }}>
         <PricesOffersTable
@@ -401,6 +415,12 @@ export default function PricesOffersIndex() {
           pagination={<PricesOffersTable.Pagination state={state} />}
         />
       </Box>
+
+      <OfferDetailsDialog
+        open={viewDialogOpen}
+        onClose={() => setViewDialogOpen(false)}
+        row={selectedRow}
+      />
     </div>
   );
 }
