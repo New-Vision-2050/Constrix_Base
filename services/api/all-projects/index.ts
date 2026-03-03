@@ -56,4 +56,7 @@ export const AllProjectsApi = {
 
   getIndividualClients: (params?: { name?: string }) =>
     apiClient.get(`${baseURL}/company-users/clients`, { params }),
+
+  getProjectDetails: (projectId: string) =>
+    apiClient.get(`${baseURL}/projects/${projectId}`),
 };
