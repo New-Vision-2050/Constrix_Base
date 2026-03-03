@@ -1,56 +1,30 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import Paper from "@mui/material/Paper";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { TermServiceSettingsApi } from "@/services/api/crm-settings/term-service-settings";
-import type {
-  TermServiceSettingChild,
-  TermServiceSettingItem,
-} from "@/services/api/crm-settings/term-service-settings/types/response";
 import { LinearProgress } from "@mui/material";
 import { ServiceItemAccordion } from "./components/ServiceItemAccordion";
 import { AddServiceDialog } from "./components/AddServiceDialog";
+import { EditServiceDialog } from "./components/EditServiceDialog";
+import ConfirmDeleteDialog from "./components/CofirmDeleteDialog";
+import type { TermServiceSettingItem } from "@/services/api/crm-settings/term-service-settings/types/response";
 
 interface ServicesCardProps {
   projectTypeId: number | null;
 }
 
-function getAllDescendantIds(
-  item: TermServiceSettingItem | TermServiceSettingChild,
-): number[] {
-  const ids: number[] = [];
-  const collect = (i: TermServiceSettingItem | TermServiceSettingChild) => {
-    ids.push(i.id);
-    (i.children || []).forEach(collect);
-  };
-  collect(item);
-  return ids;
-}
-
-function findItemById(
-  items: (TermServiceSettingItem | TermServiceSettingChild)[],
-  targetId: number,
-  parent: TermServiceSettingItem | TermServiceSettingChild | null = null,
-): {
-  item: TermServiceSettingItem | TermServiceSettingChild;
-  parent: TermServiceSettingItem | TermServiceSettingChild | null;
-} | null {
-  for (const item of items) {
-    if (item.id === targetId) return { item, parent };
-    const found = findItemById(item.children || [], targetId, item);
-    if (found) return found;
-  }
-  return null;
-}
-
 export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
   const t = useTranslations("CRMSettingsModule.servicesSettings");
 
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editItem, setEditItem] = useState<TermServiceSettingItem | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["term-service-settings", "all", projectTypeId],
@@ -63,73 +37,15 @@ export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
 
   const payload = useMemo(() => data ?? [], [data]);
 
-  const handleToggle = useCallback(
-    (id: number, checked: boolean, parentId?: number) => {
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        if (checked) next.add(id);
-        else next.delete(id);
+  const handleEdit = (item: TermServiceSettingItem) => {
+    setEditItem(item);
+    setEditDialogOpen(true);
+  };
 
-        // When a child is checked: add parent(s) if all their descendants are now selected
-        if (checked && parentId != null) {
-          let currentParentId: number | undefined = parentId;
-          while (currentParentId != null) {
-            const found = findItemById(payload, currentParentId);
-            if (!found) break;
-            const { item: parentItem } = found;
-            const descendantIds = getAllDescendantIds(parentItem);
-            const allDescendantsSelected = descendantIds
-              .filter((did) => did !== parentItem.id)
-              .every((did) => next.has(did));
-            if (allDescendantsSelected) {
-              next.add(parentItem.id);
-              const parentOfParent = findItemById(payload, parentItem.id);
-              currentParentId = parentOfParent?.parent?.id;
-            } else {
-              break;
-            }
-          }
-        }
-
-        // When a child is unchecked: remove parent(s) from selection
-        if (!checked && parentId != null) {
-          let currentParentId: number | undefined = parentId;
-          while (currentParentId != null) {
-            next.delete(currentParentId);
-            const found = findItemById(payload, currentParentId);
-            currentParentId = found?.parent?.id;
-          }
-        }
-
-        return next;
-      });
-    },
-    [payload],
-  );
-
-  const handleToggleWithDescendants = useCallback(
-    (ids: number[], checked: boolean) => {
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        ids.forEach((id) => {
-          if (checked) next.add(id);
-          else next.delete(id);
-        });
-        return next;
-      });
-    },
-    [],
-  );
-
-  const handleEdit = useCallback((id: number) => {
-    // TODO: Open edit dialog for service item
-    void id;
-  }, []);
-
-  const handleDelete = useCallback((id: number) => {
-    // TODO: Show delete confirmation and delete service item
-    void id;
-  }, []);
+  const handleDelete = (id: number) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
 
   return (
     <div className="space-y-4" data-project-type-id={projectTypeId}>
@@ -157,9 +73,7 @@ export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
             <ServiceItemAccordion
               key={item.id}
               item={item}
-              selectedIds={selectedIds}
-              onToggle={handleToggle}
-              onToggleWithDescendants={handleToggleWithDescendants}
+              selectable={false}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
@@ -173,7 +87,34 @@ export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
           refetch();
           setAddDialogOpen(false);
         }}
-        projectTypeId={projectTypeId}
+        projectTypeId={projectTypeId ?? undefined}
+      />
+      <EditServiceDialog
+        open={editDialogOpen}
+        item={editItem}
+        projectTypeId={projectTypeId ?? undefined}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setEditItem(null);
+        }}
+        onSuccess={() => {
+          refetch();
+          setEditDialogOpen(false);
+          setEditItem(null);
+        }}
+      />
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        deleteId={deleteId}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setDeleteId(null);
+        }}
+        onSuccess={() => {
+          refetch();
+          setDeleteDialogOpen(false);
+          setDeleteId(null);
+        }}
       />
     </div>
   );

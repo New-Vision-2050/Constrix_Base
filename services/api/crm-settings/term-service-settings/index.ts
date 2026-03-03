@@ -3,7 +3,10 @@ import {
   GetTermServiceSettingsResponse,
   TermSettingsTreeResponse,
 } from "./types/response";
-import { CreateTermServiceSettingParams } from "./types/params";
+import {
+  CreateTermServiceSettingParams,
+  UpdateTermServiceSettingParams,
+} from "./types/params";
 
 export const TermServiceSettingsApi = {
   List: () =>
@@ -12,4 +15,13 @@ export const TermServiceSettingsApi = {
     baseApi.get<TermSettingsTreeResponse>("term-settings/tree"),
   create: (body: CreateTermServiceSettingParams) =>
     baseApi.post<GetTermServiceSettingsResponse>("term-service-settings", body),
+  update: (id: number, body: UpdateTermServiceSettingParams) =>
+    baseApi.put<GetTermServiceSettingsResponse>(
+      `term-service-settings/${id}`,
+      body,
+    ),
+  delete: (id: number) =>
+    baseApi.delete<GetTermServiceSettingsResponse>(
+      `term-service-settings/${id}`,
+    ),
 };

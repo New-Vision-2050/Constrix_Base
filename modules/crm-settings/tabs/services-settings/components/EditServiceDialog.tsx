@@ -26,7 +26,7 @@ import type {
   TermServiceSettingItem,
 } from "@/services/api/crm-settings/term-service-settings/types/response";
 import { ServiceItemAccordion } from "./ServiceItemAccordion";
-import { AddServiceDialogProps, AddServiceFormData } from "../types/indes";
+import { EditServiceDialogProps, EditServiceFormData } from "../types/indes";
 
 function getAllDescendantIds(
   item: TermServiceSettingItem | TermServiceSettingChild,
@@ -56,7 +56,7 @@ function findItemById(
   return null;
 }
 
-const createAddServiceSchema = (t: (key: string) => string) =>
+const createEditServiceSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("validation.nameRequired")),
     term_services_ids: z
@@ -85,19 +85,35 @@ function getLeafIdsFromSelected(
   return result;
 }
 
-export function AddServiceDialog({
+/** Get leaf IDs from a single item (its subtree) */
+function getLeafIdsFromItem(
+  item: TermServiceSettingItem | TermServiceSettingChild,
+): number[] {
+  const result: number[] = [];
+  const collect = (i: TermServiceSettingItem | TermServiceSettingChild) => {
+    if (!i.children?.length) {
+      result.push(i.id);
+    } else {
+      (i.children || []).forEach(collect);
+    }
+  };
+  collect(item);
+  return result;
+}
+
+export function EditServiceDialog({
   open,
   onClose,
   onSuccess,
+  item,
   projectTypeId,
-}: AddServiceDialogProps) {
-  void projectTypeId; // reserved for future API filtering
+}: EditServiceDialogProps) {
   const t = useTranslations("CRMSettingsModule.servicesSettings");
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-  const form = useForm<AddServiceFormData>({
-    resolver: zodResolver(createAddServiceSchema(t)),
+  const form = useForm<EditServiceFormData>({
+    resolver: zodResolver(createEditServiceSchema(t)),
     defaultValues: {
       name: "",
       term_services_ids: [],
@@ -121,6 +137,23 @@ export function AddServiceDialog({
     () => treeResponse?.data?.payload ?? [],
     [treeResponse?.data?.payload],
   );
+
+  useEffect(() => {
+    if (open && item) {
+      reset({
+        name: item.name,
+        term_services_ids: [],
+      });
+      const leafIds = getLeafIdsFromItem(item);
+      setSelectedIds(new Set(leafIds));
+    }
+  }, [open, item, reset]);
+
+  useEffect(() => {
+    setValue("term_services_ids", Array.from(selectedIds), {
+      shouldValidate: true,
+    });
+  }, [selectedIds, setValue]);
 
   const handleToggle = useCallback(
     (id: number, checked: boolean, parentId?: number) => {
@@ -178,26 +211,22 @@ export function AddServiceDialog({
     [],
   );
 
-  useEffect(() => {
-    setValue("term_services_ids", Array.from(selectedIds), {
-      shouldValidate: true,
-    });
-  }, [selectedIds, setValue]);
-  const onSubmit = async (data: AddServiceFormData) => {
+  const onSubmit = async (data: EditServiceFormData) => {
+    if (!item) return;
     const leafIds = getLeafIdsFromSelected(payload, selectedIds);
     try {
-      await TermServiceSettingsApi.create({
+      await TermServiceSettingsApi.update(item.id, {
         name: data.name,
         term_setting_ids: leafIds,
         project_type_id: projectTypeId,
       });
-      toast.success(t("success.created"));
+      toast.success(t("success.updated"));
       onSuccess?.();
       reset();
       setSelectedIds(new Set());
       onClose();
     } catch (error: unknown) {
-      console.error("Error creating service:", error);
+      console.error("Error updating service:", error);
       const err = error as {
         response?: {
           status?: number;
@@ -209,11 +238,11 @@ export function AddServiceDialog({
         if (validationErrors) {
           const firstErrorKey = Object.keys(validationErrors)[0];
           const firstErrorMessage = validationErrors[firstErrorKey]?.[0];
-          toast.error(firstErrorMessage || t("validation.validationError"));
+          toast.error(firstErrorMessage ?? t("validation.validationError"));
           return;
         }
       }
-      toast.error(t("error.createFailed"));
+      toast.error(t("error.updateFailed"));
     }
   };
 
@@ -224,6 +253,8 @@ export function AddServiceDialog({
       onClose();
     }
   };
+
+  if (!item) return null;
 
   return (
     <Dialog
@@ -251,7 +282,7 @@ export function AddServiceDialog({
             fontWeight: 600,
           }}
         >
-          {t("addNewService")}
+          {t("editService")}
         </DialogTitle>
         <IconButton
           onClick={handleClose}
@@ -327,10 +358,10 @@ export function AddServiceDialog({
                     </Box>
                   )}
                   {!isLoadingTree &&
-                    payload.map((item) => (
+                    payload.map((treeItem) => (
                       <ServiceItemAccordion
-                        key={item.id}
-                        item={item}
+                        key={treeItem.id}
+                        item={treeItem}
                         selectedIds={selectedIds}
                         onToggle={handleToggle}
                         onToggleWithDescendants={handleToggleWithDescendants}
@@ -363,4 +394,3 @@ export function AddServiceDialog({
     </Dialog>
   );
 }
-

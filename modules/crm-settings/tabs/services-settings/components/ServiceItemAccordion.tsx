@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import {
   TermServiceSettingChild,
   TermServiceSettingItem,
@@ -14,16 +14,19 @@ import {
   Checkbox,
   FormControlLabel,
   Paper,
+  Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ServiceItemActions } from "./ServiceItemActions";
 
 export interface ServiceItemAccordionProps {
   item: TermServiceSettingItem | TermServiceSettingChild;
-  selectedIds: Set<number>;
-  onToggle: (id: number, checked: boolean, parentId?: number) => void;
-  onToggleWithDescendants: (ids: number[], checked: boolean) => void;
-  onEdit?: (id: number) => void;
+  /** When false, hides checkboxes and selection UI. Default: true */
+  selectable?: boolean;
+  selectedIds?: Set<number>;
+  onToggle?: (id: number, checked: boolean, parentId?: number) => void;
+  onToggleWithDescendants?: (ids: number[], checked: boolean) => void;
+  onEdit?: (item: TermServiceSettingItem) => void;
   onDelete?: (id: number) => void;
   depth?: number;
   inGrid?: boolean;
@@ -40,6 +43,22 @@ function getAllDescendantIds(
   };
   collect(item);
   return ids;
+}
+
+function findItemById(
+  items: (TermServiceSettingItem | TermServiceSettingChild)[],
+  targetId: number,
+  parent: TermServiceSettingItem | TermServiceSettingChild | null = null,
+): {
+  item: TermServiceSettingItem | TermServiceSettingChild;
+  parent: TermServiceSettingItem | TermServiceSettingChild | null;
+} | null {
+  for (const item of items) {
+    if (item.id === targetId) return { item, parent };
+    const found = findItemById(item.children || [], targetId, item);
+    if (found) return found;
+  }
+  return null;
 }
 
 /** Returns IDs of leaf items only (items without children) - used for count display */
@@ -84,9 +103,10 @@ function areAnyDescendantsSelected(
 
 export function ServiceItemAccordion({
   item,
-  selectedIds,
-  onToggle,
-  onToggleWithDescendants,
+  selectable = true,
+  selectedIds: selectedIdsProp,
+  onToggle: onToggleProp,
+  onToggleWithDescendants: onToggleWithDescendantsProp,
   onEdit,
   onDelete,
   depth = 0,
@@ -94,6 +114,87 @@ export function ServiceItemAccordion({
   parentId,
 }: ServiceItemAccordionProps) {
   const [expanded, setExpanded] = useState(false);
+  const [internalSelectedIds, setInternalSelectedIds] = useState<Set<number>>(
+    () => new Set(),
+  );
+
+  const isOwnSelection =
+    selectable &&
+    depth === 0 &&
+    selectedIdsProp === undefined &&
+    onToggleProp === undefined &&
+    onToggleWithDescendantsProp === undefined;
+
+  const selectedIds =
+    isOwnSelection ? internalSelectedIds : (selectedIdsProp ?? new Set());
+
+  const handleToggle = useCallback(
+    (id: number, checked: boolean, parentIdArg?: number) => {
+      const updater = (prev: Set<number>) => {
+        const next = new Set(prev);
+        if (checked) next.add(id);
+        else next.delete(id);
+
+        const subtreeRoot = [item];
+        if (checked && parentIdArg != null) {
+          let currentParentId: number | undefined = parentIdArg;
+          while (currentParentId != null) {
+            const found = findItemById(subtreeRoot, currentParentId);
+            if (!found) break;
+            const { item: parentItem } = found;
+            const descendantIds = getAllDescendantIds(parentItem);
+            const allDescendantsSelected = descendantIds
+              .filter((did) => did !== parentItem.id)
+              .every((did) => next.has(did));
+            if (allDescendantsSelected) {
+              next.add(parentItem.id);
+              const parentOfParent = findItemById(subtreeRoot, parentItem.id);
+              currentParentId = parentOfParent?.parent?.id;
+            } else {
+              break;
+            }
+          }
+        }
+
+        if (!checked && parentIdArg != null) {
+          let currentParentId: number | undefined = parentIdArg;
+          while (currentParentId != null) {
+            next.delete(currentParentId);
+            const found = findItemById(subtreeRoot, currentParentId);
+            currentParentId = found?.parent?.id;
+          }
+        }
+
+        return next;
+      };
+
+      if (isOwnSelection) {
+        setInternalSelectedIds(updater);
+      } else {
+        onToggleProp?.(id, checked, parentIdArg);
+      }
+    },
+    [isOwnSelection, onToggleProp, item],
+  );
+
+  const handleToggleWithDescendants = useCallback(
+    (ids: number[], checked: boolean) => {
+      if (isOwnSelection) {
+        setInternalSelectedIds((prev) => {
+          const next = new Set(prev);
+          ids.forEach((id) => {
+            if (checked) next.add(id);
+            else next.delete(id);
+          });
+          return next;
+        });
+      } else {
+        onToggleWithDescendantsProp?.(ids, checked);
+      }
+    },
+    [isOwnSelection, onToggleWithDescendantsProp],
+  );
+
   const hasChildren = (item.children?.length ?? 0) > 0;
   const descendantIds = useMemo(() => getAllDescendantIds(item), [item]);
   const leafIds = useMemo(() => getLeafDescendantIds(item), [item]);
@@ -109,11 +210,11 @@ export function ServiceItemAccordion({
 
   const handleParentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
-    onToggleWithDescendants(descendantIds, checked);
+    handleToggleWithDescendants(descendantIds, checked);
   };
 
   const handleChildChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onToggle(item.id, e.target.checked, parentId);
+    handleToggle(item.id, e.target.checked, parentId);
   };
 
   const checkboxProps = hasChildren
@@ -137,6 +238,28 @@ export function ServiceItemAccordion({
     },
   };
 
+  const labelContent = selectable ? (
+    <FormControlLabel
+      label={item.name}
+      control={
+        <Checkbox
+          {...checkboxProps}
+          onClick={(e) => e.stopPropagation()}
+          sx={checkboxSx}
+        />
+      }
+      sx={{
+        margin: 0,
+        flex: 1,
+        "& .MuiFormControlLabel-label": { flex: 1 },
+      }}
+    />
+  ) : (
+    <Typography variant="body1" sx={{ flex: 1 }}>
+      {item.name}
+    </Typography>
+  );
+
   const content = (
     <Box
       sx={{
@@ -148,21 +271,7 @@ export function ServiceItemAccordion({
         p: 1.5,
       }}
     >
-      <FormControlLabel
-        label={item.name}
-        control={
-          <Checkbox
-            {...checkboxProps}
-            onClick={(e) => e.stopPropagation()}
-            sx={checkboxSx}
-          />
-        }
-        sx={{
-          margin: 0,
-          flex: 1,
-          "& .MuiFormControlLabel-label": { flex: 1 },
-        }}
-      />
+      {labelContent}
     </Box>
   );
 
@@ -204,26 +313,34 @@ export function ServiceItemAccordion({
           sx={{ flex: 1, ms: 1, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 1 }}
         >
           <Box onClick={(e) => e.stopPropagation()} sx={{ display: "flex", flex: 1, minWidth: 0 }}>
-            <FormControlLabel
-              label={item.name}
-              control={
-                <Checkbox
-                  {...checkboxProps}
-                  onClick={(e) => e.stopPropagation()}
-                  sx={checkboxSx}
-                />
-              }
-              sx={{
-                margin: 0,
-                "& .MuiFormControlLabel-label": { flex: 1 },
-              }}
-            />
+            {selectable ? (
+              <FormControlLabel
+                label={item.name}
+                control={
+                  <Checkbox
+                    {...checkboxProps}
+                    onClick={(e) => e.stopPropagation()}
+                    sx={checkboxSx}
+                  />
+                }
+                sx={{
+                  margin: 0,
+                  "& .MuiFormControlLabel-label": { flex: 1 },
+                }}
+              />
+            ) : (
+              <Typography variant="body1" sx={{ flex: 1 }}>
+                {item.name}
+              </Typography>
+            )}
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <span className="text-sm text-gray-500">({selectedCount}/{leafIds.length})</span>
-            {(onEdit || onDelete) && (
+            {selectable && (
+              <span className="text-sm text-gray-500">({selectedCount}/{leafIds.length})</span>
+            )}
+            {depth === 0 && (onEdit || onDelete) && (
               <ServiceItemActions
-                itemId={item.id}
+                item={item as TermServiceSettingItem}
                 onEdit={onEdit ?? (() => {})}
                 onDelete={onDelete ?? (() => {})}
               />
@@ -248,13 +365,12 @@ export function ServiceItemAccordion({
             <ServiceItemAccordion
               key={child.id}
               item={child}
+              selectable={selectable}
               selectedIds={selectedIds}
               onToggle={(id, checked, parentId) =>
-                onToggle(id, checked, parentId ?? item.id)
+                handleToggle(id, checked, parentId ?? item.id)
               }
-              onToggleWithDescendants={onToggleWithDescendants}
-              onEdit={onEdit}
-              onDelete={onDelete}
+              onToggleWithDescendants={handleToggleWithDescendants}
               depth={depth + 1}
               inGrid={(item.children || []).every((c) => !c.children?.length)}
               parentId={item.id}

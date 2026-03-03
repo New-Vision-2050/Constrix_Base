@@ -22,9 +22,11 @@ export const servicesSettingsMessages = new MessagesGroup({
   }),
   success: new MessagesGroup({
     created: _m("Service created successfully", "تم إضافة الخدمة بنجاح"),
+    updated: _m("Service updated successfully", "تم تحديث الخدمة بنجاح"),
   }),
   error: new MessagesGroup({
     createFailed: _m("Error creating service", "حدث خطأ أثناء إضافة الخدمة"),
+    updateFailed: _m("Error updating service", "حدث خطأ أثناء تحديث الخدمة"),
   }),
   // Service categories
   engineeringConstructions: _m("Engineering constructions", "إنشاءات هندسية"),

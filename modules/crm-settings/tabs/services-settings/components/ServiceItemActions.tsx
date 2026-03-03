@@ -12,15 +12,16 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslations } from "next-intl";
+import type { TermServiceSettingItem } from "@/services/api/crm-settings/term-service-settings/types/response";
 
 export interface ServiceItemActionsProps {
-  itemId: number;
-  onEdit: (id: number) => void;
+  item: TermServiceSettingItem;
+  onEdit: (item: TermServiceSettingItem) => void;
   onDelete: (id: number) => void;
 }
 
 export function ServiceItemActions({
-  itemId,
+  item,
   onEdit,
   onDelete,
 }: ServiceItemActionsProps) {
@@ -38,12 +39,12 @@ export function ServiceItemActions({
   };
 
   const handleEdit = () => {
-    onEdit(itemId);
+    onEdit(item);
     handleClose();
   };
 
   const handleDelete = () => {
-    onDelete(itemId);
+    onDelete(item.id);
     handleClose();
   };
 

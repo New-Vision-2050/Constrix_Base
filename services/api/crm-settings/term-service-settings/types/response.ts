@@ -30,5 +30,6 @@ export interface TermSettingsTreeResponse {
 export interface GetTermServiceSettingsResponse {
   code: string;
   message: string | null;
+  error?: string | null;
   payload: TermServiceSettingItem[];
 }
