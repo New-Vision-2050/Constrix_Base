@@ -44,7 +44,7 @@ export const MainProjectSelector = memo(function MainProjectSelector({
       <label
         className={cn(
           "block mb-2 text-sm font-medium",
-          isDarkMode ? "text-gray-300" : "text-gray-700"
+          isDarkMode ? "text-gray-300" : "text-gray-700",
         )}
       >
         {t("Sidebar.mainPrograms")}
@@ -58,7 +58,7 @@ export const MainProjectSelector = memo(function MainProjectSelector({
               <ChevronDown
                 className={cn(
                   "w-5 h-5 transition-transform",
-                  open ? "rotate-180" : ""
+                  open ? "rotate-180" : "",
                 )}
               />
             }

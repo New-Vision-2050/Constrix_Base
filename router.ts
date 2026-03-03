@@ -40,6 +40,7 @@ export const ROUTER = {
     brokers: "/brokers",
     settings: "/crm-settings",
     pricesOffers: "/client-relations/prices-offers",
+    clientRequests: "/crm-settings/client-requests",
   },
   DOCS_LIBRARY: "/docs-library",
   ACTIVITIES_LOGS: "/activities-logs",
