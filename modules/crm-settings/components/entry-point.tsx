@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import ClientsSettings from "../tabs/clients-settings";
 import TermsTab from "../tabs/terms-tab";
 import { CRMSettingDataCxtProvider } from "../context/CRMSettingData";
+import ServicesSettings from "../tabs/services-settings";
 
 export default function CRMSettingsEntryPoint() {
   const t = useTranslations("CRMSettingsModule.tabs");
@@ -21,6 +22,11 @@ export default function CRMSettingsEntryPoint() {
       id: "terms",
       title: t("terms"),
       content: <TermsTab />,
+    },
+    {
+      id: "servicesSettings",
+      title: t("servicesSettings"),
+      content: <ServicesSettings />,
     },
   ];
 

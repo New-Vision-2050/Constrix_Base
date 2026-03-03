@@ -79,8 +79,16 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
       formWithTableReload.reloadTable();
       onClose();
     } catch (error) {
-      console.log(error);
-      toast.error(t2("deleteError"));
+      console.log("DeleteSpecificRow Error:", error);
+      
+      // Extract error message from backend response
+      const errorMsg = 
+        error?.response?.data?.error || 
+        error?.response?.data?.message || 
+        "فشل الحذف";
+      
+      console.log("Final error message:", errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }

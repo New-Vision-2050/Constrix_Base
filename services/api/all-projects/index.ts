@@ -16,7 +16,7 @@ export interface CreateProjectData {
   responsible_employee_id?: number;
   project_owner_id?: string;
   branch_id: number;
-  manager_id?: number | null;
+  manager_id?: string | null;
   management_id: number;
   status: number;
   project_owner_type?: "company" | "individual";

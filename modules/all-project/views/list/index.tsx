@@ -12,9 +12,10 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
-import { LayoutGrid, List, EditIcon, Trash2 } from "lucide-react";
+import { LayoutGrid, List, EditIcon, Trash2, Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
@@ -23,6 +24,7 @@ import { AllProjectsApi } from "@/services/api/all-projects";
 import { ProjectRow, getProjectsColumns } from "./columns";
 import { ProjectCard } from "./components/ProjectCard";
 import { ProjectFormDrawer } from "./components/ProjectFormDrawer";
+import { ROUTER } from "@/router";
 
 const ProjectsTableLayout =
   HeadlessTableLayout<ProjectRow>("all-projects-list");
@@ -32,6 +34,7 @@ const PROJECTS_QUERY_KEY = "all-projects-list";
 export default function AllProjectsList() {
   const t = useTranslations();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -62,6 +65,10 @@ export default function AllProjectsList() {
     setEditingProjectId(null);
     setDrawerOpen(true);
   }, []);
+
+  const handleView = useCallback((projectId: number) => {
+    router.push(ROUTER.PROJECT_DETAILS(String(projectId)));
+  }, [router]);
 
   const handleCloseDrawer = useCallback(() => {
     setDrawerOpen(false);
@@ -133,15 +140,15 @@ export default function AllProjectsList() {
               <Trash2 className="w-4 h-4 ml-2" />
               {t("labels.delete")}
             </MenuItem>
-            <MenuItem onClick={() => handleDelete(row.id)}>
-              <Trash2 className="w-4 h-4 ml-2" />
+            <MenuItem onClick={() => handleView(row.id)}>
+              <Eye className="w-4 h-4 ml-2" />
               {t("labels.show")}
             </MenuItem>
           </CustomMenu>
         ),
       },
     ],
-    [t, handleEdit, handleDelete],
+    [t, handleEdit, handleDelete, handleView],
   );
 
   // ── Table state ──────────────────────────────────────────────────────────

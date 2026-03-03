@@ -3,21 +3,28 @@ import { Box, Chip, LinearProgress, Typography } from "@mui/material";
 
 // Project row type interface
 export interface ProjectRow {
-  id: number;
+  id: number | string;
+  serial_number?: string;
   ref_number?: string;
   name: string;
-  client_name: string;
-  manager_name: string;
-  management_name: string;
-  branch_name: string;
-  project_type_name: string;
+  client_name?: string;
+  manager_name?: string;
+  management_name?: string;
+  branch_name?: string;
+  project_type_name?: string;
   sub_project_type?: string;
-  sub_sub_project_type_name: string;
+  sub_project_type_name?: string;
+  sub_sub_project_type_name?: string;
   contract_number?: string;
   start_date?: string;
   end_date?: string;
   specializations?: string;
-  project_owner_name: string;
+  project_owner_name?: string;
+  responsible_employee?: {
+    id?: number;
+    name?: string;
+  };
+  responsible_employee_name?: string;
   completion_percentage?: number;
   delay_percentage?: number;
   status?: number;
@@ -69,10 +76,12 @@ function ProgressBar({ value, color }: { value?: number; color: string }) {
 
 export const getProjectsColumns = () => [
   {
-    key: "ref_number",
+    key: "serial_number",
     name: "الرقم المرجعي",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.ref_number ?? "--"}</span>,
+    render: (row: ProjectRow) => {
+      return <span>{row.serial_number ?? row.ref_number ?? row.id ?? "--"}</span>;
+    },
   },
   {
     key: "name",
@@ -98,7 +107,7 @@ export const getProjectsColumns = () => [
     key: "sub_project_type",
     name: "تصنيف المشروع",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.sub_project_type ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.sub_project_type_name ?? row.sub_project_type ?? "—"}</span>,
   },
   {
     key: "sub_sub_project_type_name",
@@ -124,13 +133,13 @@ export const getProjectsColumns = () => [
     key: "responsible_employee",
     name: "المهندس المسؤول",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.manager_name ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.responsible_employee_name ?? "—"}</span>,
   },
   {
     key: "project_manager",
     name: "مدير المشروع",
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.project_owner_name ?? "—"}</span>,
+    render: (row: ProjectRow) => <span>{row.manager_name ?? "—"}</span>,
   },
   {
     key: "contract_number",
