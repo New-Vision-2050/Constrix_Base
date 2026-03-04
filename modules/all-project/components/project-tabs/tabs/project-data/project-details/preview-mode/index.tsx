@@ -1,13 +1,20 @@
+"use client";
+
 import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
 
 export default function ProjectDetailsPreviewMode() {
+  const { projectData, isLoading } = useProject();
+
+  const managerName = projectData?.manager?.name || "غير محدد";
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
           valid={true}
           label="مدير المشروع"
-          value="احمد خالد"
+          value={isLoading ? "..." : managerName}
         />
       </div>
       <div className="p-2">

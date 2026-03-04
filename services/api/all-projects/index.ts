@@ -1,59 +1,55 @@
-import { apiClient, baseURL } from "@/config/axios-config";
-
-export interface ProjectParams {
-  page?: number;
-  per_page?: number;
-  name?: string;
-  status?: string;
-  project_type_id?: string;
-}
-
-export interface CreateProjectData {
-  project_type_id: number;
-  sub_project_type_id: number;
-  sub_sub_project_type_id?: number;
-  name: string;
-  responsible_employee_id?: number;
-  project_owner_id?: string;
-  branch_id: number;
-  manager_id?: string | null;
-  management_id: number;
-  status: number;
-  project_owner_type?: "company" | "individual";
-}
-
-export interface UpdateProjectData extends Partial<CreateProjectData> {}
+import { baseApi } from "@/config/axios/instances/base";
+import { ProjectParams, CreateProjectData, UpdateProjectData, ClientParams } from "./types/params";
+import {
+  ListProjectsResponse,
+  ShowProjectResponse,
+  CreateProjectResponse,
+  UpdateProjectResponse,
+  DeleteProjectResponse,
+  GetProjectTypesResponse,
+  GetBranchesResponse,
+  GetManagementsResponse,
+  GetCompanyUsersResponse,
+  GetClientsResponse,
+} from "./types/response";
 
 export const AllProjectsApi = {
   list: (params?: ProjectParams) =>
-    apiClient.get(`${baseURL}/projects`, { params }),
+    baseApi.get<ListProjectsResponse>("projects", { params }),
 
-  show: (id: number) => apiClient.get(`${baseURL}/projects/${id}`),
+  show: (id: number) =>
+    baseApi.get<ShowProjectResponse>(`projects/${id}`),
 
   create: (data: CreateProjectData) =>
-    apiClient.post(`${baseURL}/projects`, data),
+    baseApi.post<CreateProjectResponse>("projects", data),
 
   update: (id: number, data: UpdateProjectData) =>
-    apiClient.put(`${baseURL}/projects/${id}`, data),
+    baseApi.put<UpdateProjectResponse>(`projects/${id}`, data),
 
-  delete: (id: number) => apiClient.delete(`${baseURL}/projects/${id}`),
+  delete: (id: number) =>
+    baseApi.delete<DeleteProjectResponse>(`projects/${id}`),
 
-  getProjectTypes: () => apiClient.get(`${baseURL}/project-types/roots`),
+  getProjectTypes: () =>
+    baseApi.get<GetProjectTypesResponse>("project-types/roots"),
 
   getSubProjectTypes: (projectTypeId: number) =>
-    apiClient.get(`${baseURL}/project-types/${projectTypeId}/children`),
+    baseApi.get<GetProjectTypesResponse>(`project-types/${projectTypeId}/children`),
 
   getBranches: () =>
-    apiClient.get(`${baseURL}/management_hierarchies/list?type=branch`),
+    baseApi.get<GetBranchesResponse>("management_hierarchies/list?type=branch"),
 
   getManagements: () =>
-    apiClient.get(`${baseURL}/management_hierarchies/list?type=management`),
+    baseApi.get<GetManagementsResponse>("management_hierarchies/list?type=management"),
 
-  getCompanyUsers: () => apiClient.get(`${baseURL}/company-users`),
+  getCompanyUsers: () =>
+    baseApi.get<GetCompanyUsersResponse>("company-users"),
 
-  getEntityClients: (params?: { name?: string }) =>
-    apiClient.get(`${baseURL}/companies/clients`, { params }),
+  getEntityClients: (params?: ClientParams) =>
+    baseApi.get<GetClientsResponse>("companies/clients", { params }),
 
-  getIndividualClients: (params?: { name?: string }) =>
-    apiClient.get(`${baseURL}/company-users/clients`, { params }),
+  getIndividualClients: (params?: ClientParams) =>
+    baseApi.get<GetClientsResponse>("company-users/clients", { params }),
+
+  getProjectDetails: (projectId: string) =>
+    baseApi.get<ShowProjectResponse>(`projects/${projectId}`),
 };
