@@ -18,6 +18,7 @@ import {
   Checkbox,
   ListItemIcon,
   ListItemButton,
+  Tooltip,
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import { FileText } from "lucide-react";
@@ -30,6 +31,7 @@ import PricesOffersWidgets from "./PricesOffersWidgets";
 import { ClientRequestsApi } from "@/services/api/client-requests";
 import type { ClientRequestRow } from "@/services/api/client-requests/types/response";
 import type { ClientRequestListParams } from "@/services/api/client-requests/types/params";
+import Link from "next/link";
 
 const PricesOffersTable =
   HeadlessTableLayout<ClientRequestRow>("prices-offers");
@@ -174,7 +176,7 @@ export default function PricesOffersIndex() {
         render: (row: ClientRequestRow) => (
           // TODO: Add financial responsible name
           <span className="p-2 text-sm">
-            {row.financial_responsible?.name ??  "—"}
+            {row.financial_responsible?.name ?? "—"}
           </span>
         ),
       },
@@ -201,9 +203,21 @@ export default function PricesOffersIndex() {
         sortable: false,
         render: (row: ClientRequestRow) =>
           row.attachments && row.attachments?.length > 0 ? (
-            <span className="p-2 text-sm flex items-center gap-2">
-              <FileText className="w-5 h-5 text-red-500" />
-              {row.attachments?.length}
+            <span className="text-sm flex flex-col items-start gap-1">
+              {row.attachments?.map((attachment) => (
+                <span key={attachment.id} className="flex text-sm gap-2">
+                  <FileText className="w-5 h-5 text-red-500" />
+                  <Tooltip title={attachment.name ?? "—"} key={attachment.id}>
+                    <Link
+                      href={attachment.url ?? "—"}
+                      target="_blank"
+                      className="text-sm"
+                    >
+                      {truncateString(attachment.name ?? "—", 12)}
+                    </Link>
+                  </Tooltip>
+                </span>
+              ))}
             </span>
           ) : (
             <span className="p-2 text-sm">—</span>
@@ -265,6 +279,9 @@ export default function PricesOffersIndex() {
     },
   });
 
+  const truncateString = (str: string, n: number) => {
+    return str?.length > n ? str?.slice(0, n) + "..." : str;
+  };
   return (
     <div>
       <PricesOffersWidgets />
