@@ -46,6 +46,10 @@ const FILTER_OPTIONS = [
 
 type FilterKey = (typeof FILTER_OPTIONS)[number]["key"];
 
+export const truncateFileName = (str: string, n: number) => {
+  return str?.length > n ? str?.slice(0, n) + "..." : str;
+};
+
 export default function PricesOffersIndex() {
   const t = useTranslations("pricesOffers.searchFilter");
   const tTable = useTranslations("pricesOffers.table");
@@ -213,7 +217,7 @@ export default function PricesOffersIndex() {
                       target="_blank"
                       className="text-sm"
                     >
-                      {truncateString(attachment.name ?? "—", 12)}
+                      {truncateFileName(attachment.name ?? "—", 12)}
                     </Link>
                   </Tooltip>
                 </span>
@@ -279,9 +283,7 @@ export default function PricesOffersIndex() {
     },
   });
 
-  const truncateString = (str: string, n: number) => {
-    return str?.length > n ? str?.slice(0, n) + "..." : str;
-  };
+  
   return (
     <div>
       <PricesOffersWidgets />

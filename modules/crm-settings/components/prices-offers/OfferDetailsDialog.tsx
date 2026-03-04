@@ -7,12 +7,15 @@ import {
   IconButton,
   Typography,
   Box,
+  Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { FileText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ClientRequestRow } from "@/services/api/client-requests/types/response";
 import OfferStatusChip from "./OfferStatusChip";
+import Link from "next/link";
+import { truncateFileName } from "./index";
 
 interface OfferDetailsDialogProps {
   open: boolean;
@@ -41,7 +44,7 @@ export default function OfferDetailsDialog({
     { label: t("clientType"), value: row.client_type === "individual" ? t("clientTypeIndividual") : t("clientTypeCompany") },
     { label: t("management"), value: row.management?.name ?? "—" },
     { label: t("department"), value: row.branch?.name ?? "—" },
-    { label: t("financialResponsible"), value: row.client_request_receiver_from?.name ?? "—" },
+    { label: t("financialResponsible"), value: row.financial_responsible?.name ?? "—" },
     { label: t("offerStatus"), value: null, render: row.client_price_offer_status ? <OfferStatusChip status={row.client_price_offer_status} /> : "—" },
     { label: t("mediator"), value: row.management?.name ?? "—" },
     { label: t("requestType"), value: row.client_request_type?.name ?? "—" },
@@ -53,9 +56,15 @@ export default function OfferDetailsDialog({
       label: t("attachments"),
       value: row.attachments?.length ? `${row.attachments.length}` : "—",
       render: row.attachments?.length ? (
-        <span className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-red-500" />
-          {row.attachments.length}
+        <span className="flex flex-col items-start gap-2">
+          {row.attachments?.map((attachment) => (
+            <span key={attachment.id} className="flex items-start text-sm gap-2">
+              <FileText className="w-5 h-5 text-red-500" />
+              <Tooltip title={attachment.name ?? "—"} key={attachment.id}>
+                <Link href={attachment.url ?? "—"} target="_blank" className="text-sm">{truncateFileName(attachment.name ?? "—", 20)}</Link>
+              </Tooltip>
+            </span>
+          ))}
         </span>
       ) : undefined,
     },
@@ -66,7 +75,7 @@ export default function OfferDetailsDialog({
   ];
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <IconButton
         onClick={onClose}
         sx={{
