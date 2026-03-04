@@ -31,7 +31,7 @@ const ProjectsTableLayout =
 
 const PROJECTS_QUERY_KEY = "all-projects-list";
 
-export default function AllProjectsList() {
+export default function ProjectsList() {
   const t = useTranslations();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -66,9 +66,12 @@ export default function AllProjectsList() {
     setDrawerOpen(true);
   }, []);
 
-  const handleView = useCallback((projectId: number) => {
-    router.push(ROUTER.PROJECT_DETAILS(String(projectId)));
-  }, [router]);
+  const handleView = useCallback(
+    (projectId: number) => {
+      router.push(ROUTER.PROJECT_DETAILS(String(projectId)));
+    },
+    [router],
+  );
 
   const handleCloseDrawer = useCallback(() => {
     setDrawerOpen(false);
