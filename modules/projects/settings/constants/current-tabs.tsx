@@ -29,6 +29,11 @@ export const TAB_SCHEMA_ID_MAP: Record<string, number> = {
   "contract-management": SCHEMA_IDS.contractManagement,
 };
 
+/** Reverse map: schema_id → tab value (for pre-filling from API schemas) */
+export const SCHEMA_ID_TO_TAB_VALUE: Record<number, string> = Object.fromEntries(
+  Object.entries(TAB_SCHEMA_ID_MAP).map(([value, id]) => [id, value]),
+);
+
 /** Hook that returns translated tabs for rendering */
 export function useProjectSettingsTabs(): ProjectSettingsTab[] {
   const t = useTranslations("Projects.Settings.projectTypes.tabs");
