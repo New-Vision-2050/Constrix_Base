@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { AllProjectsApi } from "@/services/api/all-projects";
+import { AllProjectsApi } from "@/services/api/projects/all-projects";
 
 export function useProjectFormData(
   watchProjectTypeId?: string,

@@ -49,7 +49,7 @@ export const AllProjectsApi = {
   getManagements: () =>
     apiClient.get(`${baseURL}/management_hierarchies/list?type=management`),
 
-  getCompanyUsers: () => apiClient.get(`${baseURL}/company-users`),
+  getCompanyUsers: () => apiClient.get(`${baseURL}/company-users/employees`),
 
   getEntityClients: (params?: { name?: string }) =>
     apiClient.get(`${baseURL}/companies/clients`, { params }),

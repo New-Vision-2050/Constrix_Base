@@ -20,11 +20,14 @@ import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
 import { useQuery } from "@tanstack/react-query";
-import { AllProjectsApi } from "@/services/api/all-projects";
+import { AllProjectsApi } from "@/services/api/projects/all-projects";
+import { CompanyDashboardProjectTypesApi } from "@/services/api/company-dashboard/project-types";
 import { ProjectRow, getProjectsColumns } from "./columns";
 import { ProjectCard } from "./components/ProjectCard";
 import { ProjectFormDrawer } from "./components/ProjectFormDrawer";
 import { ROUTER } from "@/router";
+import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
+import { statisticsConfig } from "./components/statistics-config";
 
 const ProjectsTableLayout =
   HeadlessTableLayout<ProjectRow>("all-projects-list");
@@ -45,6 +48,13 @@ export default function ProjectsList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterProjectTypeId, setFilterProjectTypeId] = useState<string>("");
+
+  const { data: projectTypesData } = useQuery({
+    queryKey: ["company-dashboard-project-types-filter"],
+    queryFn: () => CompanyDashboardProjectTypesApi.list(),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
   const params = ProjectsTableLayout.useTableParams({
     initialPage: 1,
@@ -198,6 +208,8 @@ export default function ProjectsList() {
 
   return (
     <Box sx={{ p: 3 }}>
+      <StatisticsStoreRow config={statisticsConfig} />
+
       <Paper
         elevation={0}
         sx={{
@@ -225,6 +237,11 @@ export default function ProjectsList() {
               onChange={(e) => setFilterProjectTypeId(e.target.value)}
             >
               <MenuItem value="">{t("project.all")}</MenuItem>
+              {projectTypesData?.data?.payload?.map((type) => (
+                <MenuItem key={type.id} value={String(type.id)}>
+                  {type.name_ar}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <FormControl size="small" fullWidth>
