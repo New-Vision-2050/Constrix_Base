@@ -183,42 +183,23 @@ export default function EditProjectTypeDialog({
               .filter((id): id is number => typeof id === "number")
           : [];
 
-      const referenceId = data.reference_project_type_id
-        ? Number(data.reference_project_type_id)
-        : null;
-
-      const updatedItem: PRJ_ProjectType = {
-        ...projectType,
-        name: data.name,
-        icon: data.icon_id,
-        reference_project_type_id: referenceId,
-        schemas: schemaIds.map((id) => {
-          const tab = allTabs.find((t) => t.schema_id === id);
-          return { id, name: tab?.name ?? "" };
-        }),
-      };
-
       await ProjectTypesApi.updateSecondLevelProjectType(projectType.id, {
+        parent_id: parentId,
         name: data.name,
         icon: data.icon_id,
-        reference_project_type_id: referenceId,
+        reference_project_type_id: data.reference_project_type_id
+          ? Number(data.reference_project_type_id)
+          : null,
         schema_ids: schemaIds,
         is_active: true,
       });
 
-      queryClient.setQueryData<PRJ_ProjectType[]>(
-        ["project-types", "children", parentId],
-        (prev) =>
-          prev
-            ? prev.map((item) =>
-                item.id === projectType.id ? updatedItem : item,
-              )
-            : prev,
-      );
+      queryClient.invalidateQueries({
+        queryKey: ["project-types", "children", parentId],
+      });
       queryClient.invalidateQueries({
         queryKey: ["project-types", "schemas", projectType.id],
       });
-
       toast.success(t("successMessage"));
       reset();
       onClose();

@@ -223,6 +223,7 @@ export default function SchemaLevelTabs({
     setSchemaUpdating(true);
     try {
       await ProjectTypesApi.updateSecondLevelProjectType(parentId, {
+        parent_id: firstLevelId,
         name: parentProjectType.name,
         icon: parentProjectType.icon,
         reference_project_type_id:

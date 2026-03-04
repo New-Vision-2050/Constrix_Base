@@ -17,6 +17,7 @@ export interface CreateSecondLevelProjectTypeByParentArgs {
 }
 
 export interface UpdateSecondLevelProjectTypeArgs {
+    parent_id: number;
     name: string;
     icon: string;
     reference_project_type_id: null | number;

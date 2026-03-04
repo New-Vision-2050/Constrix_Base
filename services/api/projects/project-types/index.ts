@@ -47,6 +47,14 @@ export const ProjectTypesApi = {
             `project-types/second-level`,
             args,
         ),
+    updateSecondLevelProjectType: (
+        projectTypeId: number | string,
+        args: UpdateSecondLevelProjectTypeArgs,
+    ) =>
+        baseApi.put<UpdateSecondLevelProjectTypeResponse>(
+            `project-types/second-level/${projectTypeId}`,
+            args,
+        ),
     createSecondLevelProjectTypeByParent: (
         parentId: number | string,
         args: CreateSecondLevelProjectTypeByParentArgs,
@@ -62,14 +70,6 @@ export const ProjectTypesApi = {
         args: UpdateThirdLevelProjectTypeArgs,
     ) =>
         baseApi.put<UpdateThirdLevelProjectTypeResponse>(
-            `project-types/${id}`,
-            args,
-        ),
-    updateSecondLevelProjectType: (
-        id: number | string,
-        args: UpdateSecondLevelProjectTypeArgs,
-    ) =>
-        baseApi.put<UpdateSecondLevelProjectTypeResponse>(
             `project-types/${id}`,
             args,
         ),

@@ -100,7 +100,7 @@ export default function AddProjectTypeDialog({
   const { data: referenceSchemasData, isLoading: isSchemasLoading } = useQuery({
     queryKey: ["project-types", "schemas", referenceProjectTypeId],
     queryFn: async () => {
-      const response = await ProjectTypesApi.getProjectTypeSchemas(
+      const response = await ProjectTypesApi.getProjectTypeSchemasV2(
         referenceProjectTypeId!,
       );
       return response.data.payload ?? [];
@@ -136,7 +136,8 @@ export default function AddProjectTypeDialog({
               .filter((id): id is number => typeof id === "number")
           : [];
 
-      await ProjectTypesApi.createSecondLevelProjectTypeByParent(parentId, {
+      await ProjectTypesApi.createSecondLevelProjectType({
+        parent_id: parentId,
         name: data.name,
         icon: data.icon_id,
         reference_project_type_id: data.reference_project_type_id
