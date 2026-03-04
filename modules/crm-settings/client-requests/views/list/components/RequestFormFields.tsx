@@ -20,642 +20,790 @@ import {
 } from "@mui/material";
 
 
-
-import { ChevronDown, Paperclip } from "lucide-react";
+import {ChevronDown, Paperclip} from "lucide-react";
 import {
-  Controller,
-  Control,
-  FieldErrors,
-  useController,
+    Controller,
+    Control,
+    FieldErrors,
+    useController,
+    useWatch,
 } from "react-hook-form";
-import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/config/axios-config";
+import {useTranslations} from "next-intl";
+import {useQuery} from "@tanstack/react-query";
+import {apiClient} from "@/config/axios-config";
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import { ClientRequestFormValues } from "../validation/requestForm.schema";
+import {useState, useCallback, useEffect, useRef} from "react";
+import {ClientRequestFormValues} from "../validation/requestForm.schema";
 
 import {
-  ClientRequestsApi,
-  TermSettingChild,
-  TermSettingGroup,
-  ClientRequestReceiverFrom,
+    ClientRequestsApi,
+    TermSettingChild,
+    TermSettingGroup,
+    ClientRequestReceiverFrom,
 } from "@/services/api/client-requests";
 import PhoneField from "@/modules/form-builder/components/fields/PhoneField";
 import {FormField, FormItem} from "@/modules/table/components/ui/form";
 
 interface RequestFormFieldsProps {
-  control: Control<ClientRequestFormValues>;
-  errors: FieldErrors<ClientRequestFormValues>;
+    control: Control<ClientRequestFormValues>;
+    errors: FieldErrors<ClientRequestFormValues>;
+    setValue: (name: string, value: any) => void;
 }
 
 // Collect only leaf IDs (nodes with no children) in a subtree
 function collectLeafIds(node: TermSettingChild): number[] {
-  if (!node.children || node.children.length === 0) {
-    return [node.id];
-  }
-  const ids: number[] = [];
-  node.children.forEach((child) => {
-    ids.push(...collectLeafIds(child));
-  });
-  return ids;
+    if (!node.children || node.children.length === 0) {
+        return [node.id];
+    }
+    const ids: number[] = [];
+    node.children.forEach((child) => {
+        ids.push(...collectLeafIds(child));
+    });
+    return ids;
 }
 
 // Tree node for children (level 1: intermediate, level 2: leaf)
 function ChildTreeNode({
-  node,
-  selectedIds,
-  onToggle,
-  level,
-}: {
-  node: TermSettingChild;
-  selectedIds: number[];
-  onToggle: (ids: number[], add: boolean) => void;
-  level: number;
+                           node,
+                           selectedIds,
+                           onToggle,
+                           level,
+                       }: {
+    node: TermSettingChild;
+    selectedIds: number[];
+    onToggle: (ids: number[], add: boolean) => void;
+    level: number;
 }) {
-  const [open, setOpen] = useState(true);
-  const hasChildren = node.children && node.children.length > 0;
+    const [open, setOpen] = useState(true);
+    const hasChildren = node.children && node.children.length > 0;
 
-  // Use leaf IDs scoped to this node's subtree only
-  const leafIds = collectLeafIds(node);
-  const isChecked =
-    leafIds.length > 0 && leafIds.every((id) => selectedIds.includes(id));
-  const isIndeterminate =
-    !isChecked && leafIds.some((id) => selectedIds.includes(id));
+    // Use leaf IDs scoped to this node's subtree only
+    const leafIds = collectLeafIds(node);
+    const isChecked =
+        leafIds.length > 0 && leafIds.every((id) => selectedIds.includes(id));
+    const isIndeterminate =
+        !isChecked && leafIds.some((id) => selectedIds.includes(id));
 
-  const handleToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onToggle(leafIds, !isChecked);
-  };
+    const handleToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onToggle(leafIds, !isChecked);
+    };
 
-  return (
-    <Box sx={{ pl: level * 2 }}>
-      <Box sx={{ display: "flex", alignItems: "center", py: 0.5 }}>
-        <Checkbox
-          size="small"
-          checked={isChecked}
-          indeterminate={isIndeterminate}
-          onClick={handleToggle}
-          sx={{ p: 0.5 }}
-        />
-        <Typography variant="body2" sx={{ flex: 1 }}>
-          {node.name}
-        </Typography>
-        {hasChildren && (
-          <Button
-            size="small"
-            onClick={() => setOpen((v) => !v)}
-            sx={{ minWidth: 24, p: 0 }}
-          >
-            <ChevronDown
-              size={14}
-              style={{ transform: open ? "rotate(0deg)" : "rotate(-90deg)" }}
-            />
-          </Button>
-        )}
-      </Box>
-      {hasChildren && (
-        <Collapse in={open}>
-          {node.children.map((child) => (
-            <ChildTreeNode
-              key={child.id}
-              node={child}
-              selectedIds={selectedIds}
-              onToggle={onToggle}
-              level={level + 1}
-            />
-          ))}
-        </Collapse>
-      )}
-    </Box>
-  );
+    return (
+        <Box sx={{pl: level * 2}}>
+            <Box sx={{display: "flex", alignItems: "center", py: 0.5}}>
+                <Checkbox
+                    size="small"
+                    checked={isChecked}
+                    indeterminate={isIndeterminate}
+                    onClick={handleToggle}
+                    sx={{p: 0.5}}
+                />
+                <Typography variant="body2" sx={{flex: 1}}>
+                    {node.name}
+                </Typography>
+                {hasChildren && (
+                    <Button
+                        size="small"
+                        onClick={() => setOpen((v) => !v)}
+                        sx={{minWidth: 24, p: 0}}
+                    >
+                        <ChevronDown
+                            size={14}
+                            style={{transform: open ? "rotate(0deg)" : "rotate(-90deg)"}}
+                        />
+                    </Button>
+                )}
+            </Box>
+            {hasChildren && (
+                <Collapse in={open}>
+                    {node.children.map((child) => (
+                        <ChildTreeNode
+                            key={child.id}
+                            node={child}
+                            selectedIds={selectedIds}
+                            onToggle={onToggle}
+                            level={level + 1}
+                        />
+                    ))}
+                </Collapse>
+            )}
+        </Box>
+    );
 }
 
 // Main group accordion (top level like "koko", "begoTest", etc.)
 function TermGroupAccordion({
-  group,
-  selectedIds,
-  onToggle,
-}: {
-  group: TermSettingGroup;
-  selectedIds: number[];
-  onToggle: (ids: number[], add: boolean) => void;
+                                group,
+                                selectedIds,
+                                onToggle,
+                            }: {
+    group: TermSettingGroup;
+    selectedIds: number[];
+    onToggle: (ids: number[], add: boolean) => void;
 }) {
-  // Collect only leaf IDs from THIS group's subtree
-  const groupLeafIds: number[] = [];
-  group.children.forEach((child) => {
-    groupLeafIds.push(...collectLeafIds(child));
-  });
+    // Collect only leaf IDs from THIS group's subtree
+    const groupLeafIds: number[] = [];
+    group.children.forEach((child) => {
+        groupLeafIds.push(...collectLeafIds(child));
+    });
 
-  // selectedIds here is already scoped to this group only
-  const selectedCount = selectedIds.filter((id) =>
-    groupLeafIds.includes(id),
-  ).length;
-  const totalCount = groupLeafIds.length;
-  const isAllSelected = totalCount > 0 && selectedCount === totalCount;
-  const isIndeterminate = selectedCount > 0 && selectedCount < totalCount;
+    // selectedIds here is already scoped to this group only
+    const selectedCount = selectedIds.filter((id) =>
+        groupLeafIds.includes(id),
+    ).length;
+    const totalCount = groupLeafIds.length;
+    const isAllSelected = totalCount > 0 && selectedCount === totalCount;
+    const isIndeterminate = selectedCount > 0 && selectedCount < totalCount;
 
-  const handleGroupToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onToggle(groupLeafIds, !isAllSelected);
-  };
+    const handleGroupToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onToggle(groupLeafIds, !isAllSelected);
+    };
 
-  return (
-    <Accordion
-      disableGutters
-      sx={{
-        color: "#fff",
-        "&:before": { display: "none" },
-        borderRadius: 1,
-        mb: 1,
-      }}
-    >
-      <AccordionSummary
-        expandIcon={<ChevronDown size={18} color="#fff" />}
-        sx={{
-          minHeight: 40,
-          "& .MuiAccordionSummary-content": { alignItems: "center", gap: 1 },
-        }}
-      >
-        <Checkbox
-          size="small"
-          checked={isAllSelected}
-          indeterminate={isIndeterminate}
-          onClick={handleGroupToggle}
-          sx={{ p: 0.5 }}
-        />
-        <Typography variant="body2" sx={{ flex: 1 }}>
-          {group.name}
-        </Typography>
-        <Typography variant="caption" sx={{ opacity: 0.7 }}>
-          ({selectedCount}/{totalCount})
-        </Typography>
-      </AccordionSummary>
-      <AccordionDetails sx={{ p: 1 }}>
-        {group.children.map((child) => (
-          <ChildTreeNode
-            key={child.id}
-            node={child}
-            selectedIds={selectedIds}
-            onToggle={onToggle}
-            level={0}
-          />
-        ))}
-      </AccordionDetails>
-    </Accordion>
-  );
+    return (
+        <Accordion
+            disableGutters
+            sx={{
+                color: "#fff",
+                "&:before": {display: "none"},
+                borderRadius: 1,
+                mb: 1,
+            }}
+        >
+            <AccordionSummary
+                expandIcon={<ChevronDown size={18} color="#fff"/>}
+                sx={{
+                    minHeight: 40,
+                    "& .MuiAccordionSummary-content": {alignItems: "center", gap: 1},
+                }}
+            >
+                <Checkbox
+                    size="small"
+                    checked={isAllSelected}
+                    indeterminate={isIndeterminate}
+                    onClick={handleGroupToggle}
+                    sx={{p: 0.5}}
+                />
+                <Typography variant="body2" sx={{flex: 1}}>
+                    {group.name}
+                </Typography>
+                <Typography variant="caption" sx={{opacity: 0.7}}>
+                    ({selectedCount}/{totalCount})
+                </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{p: 1}}>
+                {group.children.map((child) => (
+                    <ChildTreeNode
+                        key={child.id}
+                        node={child}
+                        selectedIds={selectedIds}
+                        onToggle={onToggle}
+                        level={0}
+                    />
+                ))}
+            </AccordionDetails>
+        </Accordion>
+    );
 }
 
-export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
-  const t = useTranslations();
+export function RequestFormFields({control, errors, setValue}: RequestFormFieldsProps) {
+    const t = useTranslations();
     const [showInput, setShowInput] = useState(false);
     const [inputType, setInputType] = useState("");
-  const { data: requestTypesData } = useQuery({
-    queryKey: ["client-request-types"],
-    queryFn: async () => {
-      const response = await ClientRequestsApi.getRequestTypes();
-      return response.data.payload;
-    },
-  });
+    const [showBrokerType, setShowBrokerType] = useState(false);
+    const isMounted = useRef(false);
 
-  const { data: sourcesData } = useQuery({
-    queryKey: ["client-request-receiver-from"],
-    queryFn: async () => {
-      const response = await ClientRequestsApi.getSources();
-      return response.data.payload;
-    },
-  });
+    // Watch form values for conditional logic - MUST be before useQuery calls
+    const selectedSource = useWatch({
+        control,
+        name: "client_request_receiver_from_id"
+    });
 
-  const { data: servicesData } = useQuery({
-    queryKey: ["client-request-services"],
-    queryFn: async () => {
-      const response = await ClientRequestsApi.getServices();
-      return response.data.payload;
-    },
-  });
+    const brokerType = useWatch({
+        control,
+        name: "broker_type"
+    });
 
-  const { data: clientsData } = useQuery({
-    queryKey: ["company-users-clients"],
-    queryFn: async () => {
-      const response = await ClientRequestsApi.getClients();
-      return response.data.payload;
-    },
-  });
+    const clientType = useWatch({
+        control,
+        name: "client_type"
+    });
 
-  const { data: termSettingsData } = useQuery({
-    queryKey: ["term-service-settings"],
-    queryFn: async () => {
-      const response = await ClientRequestsApi.getTermSettings();
-      return response.data.payload;
-    },
-  });
+    const {data: requestTypesData} = useQuery({
+        queryKey: ["client-request-types"],
+        queryFn: async () => {
+            const response = await ClientRequestsApi.getRequestTypes();
+            return response.data.payload;
+        },
+    });
 
-  const { data: employeesData } = useQuery({
-    queryKey: ["employees"],
-    queryFn: async () => {
-      const response = await apiClient.get("/company-users/employees");
-      return response.data.payload || response.data;
-    },
-  });
+    const {data: sourcesData} = useQuery({
+        queryKey: ["client-request-receiver-from"],
+        queryFn: async () => {
+            const response = await ClientRequestsApi.getSources();
+            return response.data.payload;
+        },
+    });
 
-  const { data: brokersData } = useQuery({
-    queryKey: ["brokers"],
-    queryFn: async () => {
-      const response = await apiClient.get("/company-users/brokers");
-      return response.data.payload || response.data;
-    },
-  });
+    const {data: servicesData} = useQuery({
+        queryKey: ["client-request-services"],
+        queryFn: async () => {
+            const response = await ClientRequestsApi.getServices();
+            return response.data.payload;
+        },
+    });
 
-  // Controller for term_setting_id (multi-select tree)
-  const { field: termSettingField } = useController({
-    name: "term_setting_id",
-    control,
-    defaultValue: [],
-  });
+    const {data: clientsData} = useQuery({
+        queryKey: ["company-users-clients"],
+        queryFn: async () => {
+            const response = await ClientRequestsApi.getClients();
+            return response.data.payload;
+        },
+    });
 
-  // Per-group selection map: groupId -> Set of selected leaf IDs
-  // This prevents cross-group contamination when leaf IDs repeat across groups
-  const [groupSelections, setGroupSelections] = useState<
-    Record<number, number[]>
-  >({});
+    const {data: companyClientsData} = useQuery({
+        queryKey: ["company-clients"],
+        queryFn: async () => {
+            const response = await apiClient.get("/companies/clients");
+            return response.data.payload || response.data;
+        },
+        enabled: clientType === "company", // Only fetch when clientType is "company"
+    });
 
-  const isMounted = useRef(false);
+    const {data: termSettingsData} = useQuery({
+        queryKey: ["term-service-settings"],
+        queryFn: async () => {
+            const response = await ClientRequestsApi.getTermSettings();
+            return response.data.payload;
+        },
+    });
 
-  // Sync groupSelections -> { term_service_id, term_ids }[] form value
-  // Skip initial mount to avoid hydration mismatch
-  useEffect(() => {
-    if (!isMounted.current) {
-      isMounted.current = true;
-      return;
-    }
-    const structured = Object.entries(groupSelections)
-      .filter(([, ids]) => ids.length > 0)
-      .map(([groupId, ids]) => ({
-        term_service_id: Number(groupId),
-        term_ids: ids,
-      }));
-    termSettingField.onChange(structured);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupSelections]);
+    const {data: employeesData} = useQuery({
+        queryKey: ["employees"],
+        queryFn: async () => {
+            const response = await apiClient.get("/company-users/employees");
+            return response.data.payload || response.data;
+        },
+    });
 
-  const handleTermToggle = useCallback(
-    (groupId: number, ids: number[], add: boolean) => {
-      setGroupSelections((prev) => {
-        const current = prev[groupId] ?? [];
-        const next = add
-          ? [...new Set([...current, ...ids])]
-          : current.filter((id) => !ids.includes(id));
-        return { ...prev, [groupId]: next };
-      });
-    },
-    [],
-  );
+    const {data: brokersData} = useQuery({
+        queryKey: ["brokers"],
+        queryFn: async () => {
+            const response = await apiClient.get("/company-users/brokers");
+            return response.data.payload || response.data;
+        },
+    });
 
-  return (
-    <>
-      {/* نوع الطلب - client_request_type_id */}
-      <Controller
-        name="client_request_type_id"
-        control={control}
-        render={({ field }) => (
-          <FormControl fullWidth error={!!errors.client_request_type_id}>
-            <InputLabel>{t("clientRequests.form.requestType")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("clientRequests.form.requestType")}
-            >
-              {requestTypesData?.map((item) => (
-                <MenuItem key={item.id} value={String(item.id)}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.client_request_type_id && (
-              <FormHelperText>
-                {errors.client_request_type_id.message}
-              </FormHelperText>
-            )}
-          </FormControl>
-        )}
-      />
+    const {data: companyBrokersData} = useQuery({
+        queryKey: ["company-brokers"],
+        queryFn: async () => {
+            // TODO: Replace with actual company brokers endpoint when available
+            const response = await apiClient.get("/companies/brokers");
+            return response.data.payload || response.data;
+        },
+        enabled: brokerType === "company", // Only fetch when brokerType is "company"
+    });
 
-      {/* جهة الورود - client_request_receiver_from_id */}
-      <Controller
-        name="client_request_receiver_from_id"
-        control={control}
-        render={({ field }) => (
-          <FormControl
-            fullWidth
-            error={!!errors.client_request_receiver_from_id}
-          >
-            <InputLabel></InputLabel>
-            <Autocomplete
-              options={sourcesData || []}
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) =>
-                option.id === value?.id
-              }
-              value={
-                sourcesData?.find(
-                  (item) => String(item.id) === field.value
-                ) || null
-              }
-              onChange={(_, newValue: ClientRequestReceiverFrom | null) => {
-                field.onChange(newValue ? String(newValue.id) : "");
-                  if (newValue?.name === "رقم واتساب") {
-                      setInputType("phone");
-                      setShowInput(true);
-                  } else if (newValue?.name === "بريد الكتروني") {
-                      setInputType("email");
-                      setShowInput(true);
-                  } else if (newValue?.name === "موظف") {
-                      setInputType("employee");
-                      setShowInput(true);
-                  } else if (newValue?.name === "وسيط") {
-                      setInputType("broker");
-                      setShowInput(true);
-                  } else {
-                      setShowInput(false);
-                      setInputType("");
-                  }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("clientRequests.form.source")}
-                  error={!!errors.client_request_receiver_from_id}
-                  helperText={errors.client_request_receiver_from_id?.message}
-                />
+    // Debug: Log raw brokersData after fetching
+    console.log("Raw brokersData from useQuery:", brokersData);
 
-              )}
-            />
-              {showInput && (
-                  <>
-                      {inputType === "phone" && (
-                          <FormField
-                              control={control}
-                              name="phone"
-                              render={({ field: phoneField, fieldState }) => (
-                                  <FormItem>
-                                      <FormLabel required>{t("clientRequests.form.phone")}</FormLabel>
-                                      <FormControl fullWidth>
-                                          <PhoneField
-                                              field={{
-                                                  name: phoneField.name,
-                                                  label: t("clientRequests.form.phone"),
-                                                  type: "phone",
-                                                  placeholder: t("clientRequests.form.phonePlaceholder"),
-                                                  required: true,
-                                              }}
-                                              value={phoneField.value || ""}
-                                              onChange={phoneField.onChange}
-                                              onBlur={phoneField.onBlur}
-                                              touched={fieldState.isTouched}
-                                              defaultCountry="SA"
-                                              international
-                                          />
-                                      </FormControl>
-                                  </FormItem>
-                              )}
-                          />
-                      )}
+    // Controller for term_setting_id (multi-select tree)
+    const {field: termSettingField} = useController({
+        name: "term_setting_id",
+        control,
+        defaultValue: [],
+    });
 
-                      {inputType === "email" && (
-                          <FormField
-                              control={control}
-                              name="email"
-                              render={({ field: emailField, fieldState }) => (
-                                  <FormItem>
-                                      <FormLabel required>{t("clientRequests.form.email")}</FormLabel>
-                                      <FormControl fullWidth>
-                                          <TextField
-                                              {...emailField}
-                                              type="email"
-                                              placeholder={t("clientRequests.form.emailPlaceholder")}
-                                              error={!!fieldState.error}
-                                              helperText={fieldState.error?.message}
-                                              fullWidth
-                                          />
-                                      </FormControl>
-                                  </FormItem>
-                              )}
-                          />
-                      )}
+    // Per-group selection map: groupId -> Set of selected leaf IDs
+    // This prevents cross-group contamination when leaf IDs repeat across groups
+    const [groupSelections, setGroupSelections] = useState<
+        Record<number, number[]>
+    >({});
 
-                      {inputType === "employee" && (
-                          <FormField
-                              control={control}
-                              name="employee_id"
-                              render={({ field: employeeField, fieldState }) => (
-                                  <FormItem>
-                                      <FormLabel required>{t("clientRequests.form.employee")}</FormLabel>
-                                      <FormControl fullWidth>
-                                          <Autocomplete
-                                              options={employeesData || []}
-                                              getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
-                                              isOptionEqualToValue={(option, value) => option.id === value?.id}
-                                              value={employeesData?.find((emp) => String(emp.id) === employeeField.value) || null}
-                                              onChange={(_, newValue) => {
-                                                  employeeField.onChange(newValue ? String(newValue.id) : "");
-                                              }}
-                                              renderInput={(params) => (
-                                                  <TextField
-                                                      {...params}
-                                                      placeholder={t("clientRequests.form.selectEmployee")}
-                                                      error={!!fieldState.error}
-                                                      helperText={fieldState.error?.message}
-                                                  />
-                                              )}
-                                          />
-                                      </FormControl>
-                                  </FormItem>
-                              )}
-                          />
-                      )}
+    // Get selected source name
+    const getSelectedSourceName = () => {
+        if (!selectedSource || !sourcesData) return null;
+        const source = sourcesData.find(item => String(item.id) === selectedSource);
+        return source?.name || null;
+    };
 
-                      {inputType === "broker" && (
-                          <FormField
-                              control={control}
-                              name="broker_id"
-                              render={({ field: brokerField, fieldState }) => (
-                                  <FormItem>
-                                      <FormLabel required>{t("clientRequests.form.broker")}</FormLabel>
-                                      <FormControl fullWidth>
-                                          <Autocomplete
-                                              options={brokersData || []}
-                                              getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
-                                              isOptionEqualToValue={(option, value) => option.id === value?.id}
-                                              value={brokersData?.find((broker) => String(broker.id) === brokerField.value) || null}
-                                              onChange={(_, newValue) => {
-                                                  brokerField.onChange(newValue ? String(newValue.id) : "");
-                                              }}
-                                              renderInput={(params) => (
-                                                  <TextField
-                                                      {...params}
-                                                      placeholder={t("clientRequests.form.selectBroker")}
-                                                      error={!!fieldState.error}
-                                                      helperText={fieldState.error?.message}
-                                                  />
-                                              )}
-                                          />
-                                      </FormControl>
-                                  </FormItem>
-                              )}
-                          />
-                      )}
-                  </>
-              )}
-            {errors.client_request_receiver_from_id && (
-              <FormHelperText>
-                {errors.client_request_receiver_from_id.message}
-              </FormHelperText>
-            )}
-          </FormControl>
-        )}
-      />
+    // Check if broker field should be shown
+    const shouldShowBrokerField = () => {
+        const sourceName = getSelectedSourceName();
+        return sourceName === "الوسطاء" || sourceName === "وسيط";
+    };
 
-      {/* بيانات العميل - client_type radio */}
-      <Controller
-        name="client_type"
-        control={control}
-        render={({ field }) => (
-          <FormControl>
-            <FormLabel sx={{ mb: 0.5 }}>
-              {inputType === "broker" ? t("clientRequests.form.brokerData") : t("clientRequests.form.ownerType")} *
-            </FormLabel>
-            <RadioGroup {...field} value={field.value ?? "individual"} row>
-              <FormControlLabel
-                value="individual"
-                control={<Radio />}
-                label={t("clientRequests.form.individual")}
-              />
-              <FormControlLabel
-                value="company"
-                control={<Radio />}
-                label={t("clientRequests.form.company")}
-              />
-            </RadioGroup>
-          </FormControl>
-        )}
-      />
+    // Filter brokers based on selection
+    const getFilteredBrokers = () => {
+        // Debug: log the broker data structure
+        console.log("All brokers data:", brokersData);
+        console.log("Company brokers data:", companyBrokersData);
+        console.log("Broker type selected:", brokerType);
 
-      {/* العميل - client_id */}
-        <Controller
-            name="client_id"
-            control={control}
-            render={({ field }) => (
-                <FormControl fullWidth error={!!errors.client_id}>
-                    <Autocomplete
-                        options={clientsData || []}
-                        getOptionLabel={(option) => option.name}
-                        isOptionEqualToValue={(option, value) =>
-                            option.id === value?.id
-                        }
-                        value={
-                            clientsData?.find(
-                                (item) => String(item.id) === field.value
-                            ) || null
-                        }
-                        onChange={(_, newValue) => {
-                            field.onChange(newValue ? String(newValue.id) : "");
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label={t("clientRequests.form.client")}
-                                error={!!errors.client_id}
-                                helperText={errors.client_id?.message}
-                            />
+        // If broker type is not selected yet, return individual brokers
+        if (!brokerType) {
+            return brokersData || [];
+        }
+
+        // Filter based on broker type selection using branches field
+        if (brokerType === "individual") {
+            // For "فرد" selection, return individual brokers
+            console.log("Individual brokers:", brokersData);
+            return brokersData || [];
+        } else if (brokerType === "company") {
+            // For "جهه" selection, return company brokers from the new API
+            console.log("Company brokers from /companies/brokers:", companyBrokersData);
+            return companyBrokersData || [];
+        }
+
+        return brokersData || [];
+    };
+    // Filter clients based on client_type selection using branches field
+    const getFilteredClients = () => {
+        console.log("getFilteredClients called");
+        console.log("clientType:", clientType);
+        console.log("clientsData:", clientsData);
+        console.log("companyClientsData:", companyClientsData);
+
+        // If client type is not selected yet, return individual clients
+        if (!clientType) {
+            return clientsData || [];
+        }
+
+        // Filter based on client type selection using different APIs
+        if (clientType === "individual") {
+            // For "فرد" selection, return individual clients
+            console.log("Individual clients:", clientsData);
+            return clientsData || [];
+        } else if (clientType === "company") {
+            // For "جهه" selection, return company clients from the new API
+            console.log("Company clients from /companies/clients:", companyClientsData);
+            return companyClientsData || [];
+        }
+
+        return clientsData || [];
+    };
+
+    // Reset client_id when clientType changes
+    useEffect(() => {
+        setValue("client_id", "");
+    }, [clientType, setValue]);
+
+    // Sync groupSelections -> { term_service_id, term_ids }[] form value
+    // Skip initial mount to avoid hydration mismatch
+    useEffect(() => {
+        if (!isMounted.current) {
+            isMounted.current = true;
+            return;
+        }
+        const structured = Object.entries(groupSelections)
+            .filter(([, ids]) => ids.length > 0)
+            .map(([groupId, ids]) => ({
+                term_service_id: Number(groupId),
+                term_ids: ids,
+            }));
+        termSettingField.onChange(structured);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [groupSelections]);
+
+    const handleTermToggle = useCallback(
+        (groupId: number, ids: number[], add: boolean) => {
+            setGroupSelections((prev) => {
+                const current = prev[groupId] ?? [];
+                const next = add
+                    ? [...new Set([...current, ...ids])]
+                    : current.filter((id) => !ids.includes(id));
+                return {...prev, [groupId]: next};
+            });
+        },
+        [],
+    );
+
+    return (
+        <>
+            {/* نوع الطلب - client_request_type_id */}
+            <Controller
+                name="client_request_type_id"
+                control={control}
+                render={({field}) => (
+                    <FormControl fullWidth error={!!errors.client_request_type_id}>
+                        <InputLabel>{t("clientRequests.form.requestType")}</InputLabel>
+                        <Select
+                            {...field}
+                            value={field.value ?? ""}
+                            label={t("clientRequests.form.requestType")}
+                        >
+                            {requestTypesData?.map((item) => (
+                                <MenuItem key={item.id} value={String(item.id)}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        {errors.client_request_type_id && (
+                            <FormHelperText>
+                                {errors.client_request_type_id.message}
+                            </FormHelperText>
                         )}
-                    />
-                </FormControl>
-            )}
-        />
-
-      {/* موضوع الطلب - content */}
-      <Controller
-        name="content"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            {...field}
-            value={field.value ?? ""}
-            label={t("clientRequests.form.subject")}
-            fullWidth
-            multiline
-            rows={3}
-          />
-        )}
-      />
-
-      {/* اسم الخدمة - service_ids dropdown */}
-      <Controller
-        name="service_ids"
-        control={control}
-        render={({ field }) => (
-          <FormControl fullWidth>
-            <InputLabel></InputLabel>
-            <Select
-              value={String(field.value?.[0] ?? "")}
-              onChange={(e) =>
-                field.onChange(e.target.value ? [Number(e.target.value)] : [])
-              }
-              label={t("clientRequests.form.serviceName")}
-            >
-              {servicesData?.map((item) => (
-                <MenuItem key={item.id} value={String(item.id)}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-      />
-
-      {/* term_setting_id — tree checkbox accordions matching design */}
-      {termSettingsData && termSettingsData.length > 0 && (
-        <Box>
-          {termSettingsData.map((group) => (
-            <TermGroupAccordion
-              key={group.id}
-              group={group}
-              selectedIds={groupSelections[group.id] ?? []}
-              onToggle={(ids, add) => handleTermToggle(group.id, ids, add)}
+                    </FormControl>
+                )}
             />
-          ))}
-        </Box>
-      )}
 
-      {/* المرفقات - attachments */}
-      <Controller
-        name="attachments"
-        control={control}
-        render={({ field }) => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<Paperclip size={16} />}
-              size="small"
-            >
-              {field.value && field.value.length > 0
-                ? `${field.value.length} ${t("clientRequests.form.attachments")}`
-                : t("clientRequests.form.attachments")}
-              <input
-                type="file"
-                hidden
-                multiple
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files ?? []);
-                  field.onChange(files);
-                }}
-              />
-            </Button>
-          </Box>
-        )}
-      />
-    </>
-  );
+            {/* جهة الورود - client_request_receiver_from_id */}
+            <Controller
+                name="client_request_receiver_from_id"
+                control={control}
+                render={({field}) => (
+                    <FormControl
+                        fullWidth
+                        error={!!errors.client_request_receiver_from_id}
+                    >
+                        <InputLabel></InputLabel>
+                        <Autocomplete
+                            options={sourcesData || []}
+                            getOptionLabel={(option) => option.name}
+                            isOptionEqualToValue={(option, value) =>
+                                option.id === value?.id
+                            }
+                            value={
+                                sourcesData?.find(
+                                    (item) => String(item.id) === field.value
+                                ) || null
+                            }
+                            onChange={(_, newValue: ClientRequestReceiverFrom | null) => {
+                                field.onChange(newValue ? String(newValue.id) : "");
+                                console.log("Selected:", newValue?.name); // Debug log
+                                if (newValue?.name === "رقم واتساب") {
+                                    setInputType("phone");
+                                    setShowInput(true);
+                                } else if (newValue?.name === "بريد الكتروني") {
+                                    setInputType("email");
+                                    setShowInput(true);
+                                } else if (newValue?.name === "موظف") {
+                                    setInputType("employee");
+                                    setShowInput(true);
+                                } else if (newValue?.name === "وسيط" || newValue?.name === "الوسطاء") {
+                                    setInputType("broker");
+                                    setShowInput(true);
+                                    setShowBrokerType(true);
+                                } else {
+                                    setShowInput(false);
+                                    setInputType("");
+                                    setShowBrokerType(false);
+                                }
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t("clientRequests.form.source")}
+                                    error={!!errors.client_request_receiver_from_id}
+                                    helperText={errors.client_request_receiver_from_id?.message}
+                                />
+
+                            )}
+                        />
+                        {showInput && (
+                            <>
+                                {inputType === "phone" && (
+                                    <FormField
+                                        control={control}
+                                        name="phone"
+                                        render={({field: phoneField, fieldState}) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("clientRequests.form.phone")}</FormLabel>
+                                                <FormControl fullWidth>
+                                                    <PhoneField
+                                                        field={{
+                                                            name: phoneField.name,
+                                                            label: t("clientRequests.form.phone"),
+                                                            type: "phone",
+                                                            placeholder: t("clientRequests.form.phonePlaceholder"),
+                                                            required: true,
+                                                        }}
+                                                        value={phoneField.value || ""}
+                                                        onChange={phoneField.onChange}
+                                                        onBlur={phoneField.onBlur}
+                                                        touched={fieldState.isTouched}
+                                                        defaultCountry="SA"
+                                                        international
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                                {inputType === "email" && (
+                                    <FormField
+                                        control={control}
+                                        name="email"
+                                        render={({field: emailField, fieldState}) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("clientRequests.form.email")}</FormLabel>
+                                                <FormControl fullWidth>
+                                                    <TextField
+                                                        {...emailField}
+                                                        type="email"
+                                                        placeholder={t("clientRequests.form.emailPlaceholder")}
+                                                        error={!!fieldState.error}
+                                                        helperText={fieldState.error?.message}
+                                                        fullWidth
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                                {inputType === "employee" && (
+                                    <FormField
+                                        control={control}
+                                        name="employee_id"
+                                        render={({field: employeeField, fieldState}) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("clientRequests.form.employee")}</FormLabel>
+                                                <FormControl fullWidth>
+                                                    <Autocomplete
+                                                        options={employeesData || []}
+                                                        getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
+                                                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                                                        value={employeesData?.find((emp) => String(emp.id) === employeeField.value) || null}
+                                                        onChange={(_, newValue) => {
+                                                            employeeField.onChange(newValue ? String(newValue.id) : "");
+                                                        }}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                placeholder={t("clientRequests.form.selectEmployee")}
+                                                                error={!!fieldState.error}
+                                                                helperText={fieldState.error?.message}
+                                                            />
+                                                        )}
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                                {shouldShowBrokerField() && (
+                                    <>
+                                        {console.log("Broker field is being rendered, brokerType:", brokerType)}
+                                        <FormField
+                                            control={control}
+                                            name="broker_type"
+                                            render={({field: brokerTypeField, fieldState}) => (
+                                                <FormItem>
+                                                    <FormLabel >بيانات الوسيط</FormLabel>
+                                                    <RadioGroup {...brokerTypeField}
+                                                                value={brokerTypeField.value ?? "individual"} row>
+                                                        <FormControlLabel
+                                                            value="individual"
+                                                            control={<Radio/>}
+                                                            label="فرد"
+                                                        />
+                                                        <FormControlLabel
+                                                            value="company"
+                                                            control={<Radio/>}
+                                                            label="جهه"
+                                                        />
+                                                    </RadioGroup>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={control}
+                                            name="broker_id"
+                                            render={({field: brokerField, fieldState}) => (
+                                                <FormItem>
+                                                    <FormControl fullWidth>
+                                                        <Autocomplete
+                                                            key={`${brokerType}-${brokerField.value}`} // Force re-render when brokerType or value changes
+                                                            options={getFilteredBrokers()}
+                                                            getOptionLabel={(option) => option.name}
+                                                            isOptionEqualToValue={(option, value) =>
+                                                                option.id === value?.id
+                                                            }
+                                                            value={
+                                                                getFilteredBrokers().find(
+                                                                    (item) => String(item.id) === brokerField.value
+                                                                ) || null
+                                                            }
+                                                            onChange={(_, newValue) => {
+                                                                brokerField.onChange(newValue ? String(newValue.id) : "");
+                                                            }}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    placeholder="الوسيط"
+                                                                    error={!!fieldState.error}
+                                                                    helperText={fieldState.error?.message}
+                                                                />
+                                                            )}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </>
+                                )}
+                            </>
+                        )}
+
+                        {errors.client_request_receiver_from_id && (
+                            <FormHelperText>
+                                {errors.client_request_receiver_from_id.message}
+                            </FormHelperText>
+                        )}
+                    </FormControl>
+                )}
+            />
+
+
+            {/* بيانات العميل - client_type radio */}
+            <Controller
+                name="client_type"
+                control={control}
+                render={({field}) => (
+                    <FormControl>
+                        <FormLabel sx={{mb: 0.5}}>
+                            {t("clientRequests.form.ownerType")} *
+                        </FormLabel>
+                        <RadioGroup {...field} value={field.value ?? "individual"} row>
+                            <FormControlLabel
+                                value="individual"
+                                control={<Radio/>}
+                                label={t("clientRequests.form.individual")}
+                            />
+                            <FormControlLabel
+                                value="company"
+                                control={<Radio/>}
+                                label={t("clientRequests.form.company")}
+                            />
+                        </RadioGroup>
+                    </FormControl>
+                )}
+            />
+
+            {/* العميل - client_id */}
+            <Controller
+                name="client_id"
+                control={control}
+                render={({field}) => (
+                    <FormControl fullWidth error={!!errors.client_id}>
+                        <Autocomplete
+                            key={`${clientType}-${field.value}`} // Force re-render when clientType or value changes
+                            options={getFilteredClients()}
+                            getOptionLabel={(option) => option.name}
+                            isOptionEqualToValue={(option, value) =>
+                                option.id === value?.id
+                            }
+                            value={
+                                getFilteredClients().find(
+                                    (item) => String(item.id) === field.value
+                                ) || null
+                            }
+                            onChange={(_, newValue) => {
+                                field.onChange(newValue ? String(newValue.id) : "");
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t("clientRequests.form.client")}
+                                    error={!!errors.client_id}
+                                    helperText={errors.client_id?.message}
+                                />
+                            )}
+                        />
+                    </FormControl>
+                )}
+            />
+
+            {/* موضوع الطلب - content */}
+            <Controller
+                name="content"
+                control={control}
+                render={({field}) => (
+                    <TextField
+                        {...field}
+                        value={field.value ?? ""}
+                        label={t("clientRequests.form.subject")}
+                        fullWidth
+                        multiline
+                        rows={3}
+                    />
+                )}
+            />
+
+            {/* اسم الخدمة - service_ids dropdown */}
+            {/*  <Controller
+                name="service_ids"
+                control={control}
+                render={({field}) => (
+                    <FormControl fullWidth>
+                        <InputLabel></InputLabel>
+                        <Select
+                            value={String(field.value?.[0] ?? "")}
+                            onChange={(e) =>
+                                field.onChange(e.target.value ? [Number(e.target.value)] : [])
+                            }
+                            label={t("clientRequests.form.serviceName")}
+                        >
+                            {servicesData?.map((item) => (
+                                <MenuItem key={item.id} value={String(item.id)}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                )}
+            />
+            اسم الخدمة - service_ids dropdown */}
+
+            {/* term_setting_id — tree checkbox accordions matching design */}
+            {termSettingsData && termSettingsData.length > 0 && (
+                <Box>
+                    {termSettingsData.map((group) => (
+                        <TermGroupAccordion
+                            key={group.id}
+                            group={group}
+                            selectedIds={groupSelections[group.id] ?? []}
+                            onToggle={(ids, add) => handleTermToggle(group.id, ids, add)}
+                        />
+                    ))}
+                </Box>
+            )}
+
+            {/* المرفقات - attachments */}
+            <Controller
+                name="attachments"
+                control={control}
+                render={({field}) => (
+                    <Box sx={{display: "flex", alignItems: "center", gap: 1}}>
+                        <Button
+                            variant="outlined"
+                            component="label"
+                            startIcon={<Paperclip size={16}/>}
+                            size="small"
+                        >
+                            {field.value && field.value.length > 0
+                                ? `${field.value.length} ${t("clientRequests.form.attachments")}`
+                                : t("clientRequests.form.attachments")}
+                            <input
+                                type="file"
+                                hidden
+                                multiple
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                                onChange={(e) => {
+                                    const files = Array.from(e.target.files ?? []);
+                                    field.onChange(files);
+                                }}
+                            />
+                        </Button>
+                    </Box>
+                )}
+            />
+        </>
+    );
 }

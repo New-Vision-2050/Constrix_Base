@@ -23,6 +23,7 @@ export const ClientRequestschema = z.object({
   email: z.string().email().optional(),
   employee_id: z.string().optional(),
   broker_id: z.string().optional(),
+  broker_type: z.enum(["individual", "company"]).optional(),
 });
 
 export type ClientRequestFormValues = z.infer<typeof ClientRequestschema>;

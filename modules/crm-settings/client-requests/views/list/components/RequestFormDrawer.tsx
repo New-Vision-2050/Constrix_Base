@@ -51,6 +51,7 @@ export function RequestFormDrawer({
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ClientRequestFormValues>({
     resolver: zodResolver(ClientRequestschema),
@@ -101,6 +102,11 @@ export function RequestFormDrawer({
           ? Number(data.management_id)
           : undefined,
         attachments: data.attachments,
+        phone: data.phone,
+        email: data.email,
+        employee_id: data.employee_id,
+        broker_id: data.broker_id,
+        broker_type: data.broker_type,
       };
 
       await ClientRequestsApi.create(apiData);
@@ -175,7 +181,7 @@ export function RequestFormDrawer({
             p: 2,
           }}
         >
-          <RequestFormFields control={control} errors={errors} />
+          <RequestFormFields control={control} errors={errors} setValue={setValue} />
         </Box>
 
         <Divider />

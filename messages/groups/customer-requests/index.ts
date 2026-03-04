@@ -68,6 +68,7 @@ export const clientRequestsMessages = new MessagesGroup({
     selectEmployee: _m("Select employee", "اختر موظف"),
     broker: _m("Broker", "وسيط"),
     selectBroker: _m("Select broker", "اختر وسيط"),
+    brokerType: _m("Broker Type", "نوع الوسيط"),
     saveAsDraft: _m("Save as Draft", "حفظ كـ مسودة"),
     send: _m("Send", "ارسال"),
     cancel: _m("Cancel", "إلغاء"),
