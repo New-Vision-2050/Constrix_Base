@@ -174,7 +174,7 @@ export default function PricesOffersIndex() {
         render: (row: ClientRequestRow) => (
           // TODO: Add financial responsible name
           <span className="p-2 text-sm">
-            {row.client_request_receiver_from?.name ?? "—"}
+            {row.financial_responsible?.name ??  "—"}
           </span>
         ),
       },

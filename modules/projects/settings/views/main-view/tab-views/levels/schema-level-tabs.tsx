@@ -163,39 +163,12 @@ export default function SchemaLevelTabs({
   const { data, isLoading } = useQuery({
     queryKey: ["project-types", "schemas", parentId],
     queryFn: async () => {
-      const response = await ProjectTypesApi.getProjectTypeSchemasV2(parentId);
+      const response = await ProjectTypesApi.getProjectTypeSchemas(parentId);
       return response.data.payload ?? [];
     },
   });
 
   const schemas = useMemo(() => data ?? [], [data]);
-  const referenceId = parentProjectType.reference_project_type_id;
-
-  const { data: referenceSchemasData } = useQuery({
-    queryKey: ["project-types", "schemas", referenceId],
-    queryFn: async () => {
-      const response = await ProjectTypesApi.getProjectTypeSchemas(
-        referenceId!,
-      );
-      return response.data.payload ?? [];
-    },
-    enabled: !!referenceId,
-  });
-
-  const referenceSchemas = useMemo(
-    () => referenceSchemasData ?? [],
-    [referenceSchemasData],
-  );
-
-  const availableTabs = useMemo(
-    () =>
-      referenceSchemas.length > 0
-        ? allTabs.filter((tab) =>
-            referenceSchemas.some((schema) => schema.id === tab.schema_id),
-          )
-        : allTabs,
-    [referenceSchemas, allTabs],
-  );
 
   const filteredTabs = useMemo(
     () =>
@@ -271,6 +244,13 @@ export default function SchemaLevelTabs({
     }
   }, [data, isLoading, filteredTabs, selectedTab]);
 
+  const effectiveTabValue = useMemo(() => {
+    if (filteredTabs.length === 0) return false;
+    return filteredTabs.some((t) => t.value === selectedTab)
+      ? selectedTab
+      : (filteredTabs[0]?.value ?? false);
+  }, [selectedTab, filteredTabs]);
+
   return (
     <div className="space-y-4">
       <Grid container spacing={2}>
@@ -329,11 +309,11 @@ export default function SchemaLevelTabs({
           />
         </Grid>
         <Grid size={9}>
-          {selectedSchema && !isLoading && selectedTab && data && (
+          {selectedSchema && !isLoading && effectiveTabValue && data && (
             <div className="space-y-4">
               <Paper>
-                <Tabs value={selectedTab}>
-                  {availableTabs.map((tab) => (
+                <Tabs value={effectiveTabValue}>
+                  {filteredTabs.map((tab) => (
                     <TabWithCheckbox
                       key={tab.value}
                       onClick={() => setSelectedTab(tab.value)}
@@ -353,7 +333,7 @@ export default function SchemaLevelTabs({
                 </Tabs>
               </Paper>
               <Paper className="p-4">
-                {renderTabContent(selectedTab, {
+                {renderTabContent(effectiveTabValue, {
                   firstLevelId,
                   secondLevelId: parentId,
                   thirdLevelId: selectedSchema.id,
