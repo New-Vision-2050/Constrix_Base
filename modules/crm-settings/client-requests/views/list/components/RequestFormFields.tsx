@@ -1,23 +1,26 @@
 import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormLabel,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-  Checkbox,
-  Button,
-  Box,
-  Collapse,
-  FormHelperText,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    TextField,
+    Radio,
+    RadioGroup,
+    FormControlLabel,
+    FormLabel,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Typography,
+    Checkbox,
+    Button,
+    Box,
+    Collapse,
+    FormHelperText, Autocomplete,
 } from "@mui/material";
+
+
+
 import { ChevronDown, Paperclip } from "lucide-react";
 import {
   Controller,
@@ -27,6 +30,7 @@ import {
 } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/config/axios-config";
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { ClientRequestFormValues } from "../validation/requestForm.schema";
@@ -35,7 +39,10 @@ import {
   ClientRequestsApi,
   TermSettingChild,
   TermSettingGroup,
+  ClientRequestReceiverFrom,
 } from "@/services/api/client-requests";
+import PhoneField from "@/modules/form-builder/components/fields/PhoneField";
+import {FormField, FormItem} from "@/modules/table/components/ui/form";
 
 interface RequestFormFieldsProps {
   control: Control<ClientRequestFormValues>;
@@ -201,7 +208,8 @@ function TermGroupAccordion({
 
 export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
   const t = useTranslations();
-
+    const [showInput, setShowInput] = useState(false);
+    const [inputType, setInputType] = useState("");
   const { data: requestTypesData } = useQuery({
     queryKey: ["client-request-types"],
     queryFn: async () => {
@@ -239,6 +247,22 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
     queryFn: async () => {
       const response = await ClientRequestsApi.getTermSettings();
       return response.data.payload;
+    },
+  });
+
+  const { data: employeesData } = useQuery({
+    queryKey: ["employees"],
+    queryFn: async () => {
+      const response = await apiClient.get("/company-users/employees");
+      return response.data.payload || response.data;
+    },
+  });
+
+  const { data: brokersData } = useQuery({
+    queryKey: ["brokers"],
+    queryFn: async () => {
+      const response = await apiClient.get("/company-users/brokers");
+      return response.data.payload || response.data;
     },
   });
 
@@ -325,18 +349,163 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
             fullWidth
             error={!!errors.client_request_receiver_from_id}
           >
-            <InputLabel>{t("clientRequests.form.source")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("clientRequests.form.source")}
-            >
-              {sourcesData?.map((item) => (
-                <MenuItem key={item.id} value={String(item.id)}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </Select>
+            <InputLabel></InputLabel>
+            <Autocomplete
+              options={sourcesData || []}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) =>
+                option.id === value?.id
+              }
+              value={
+                sourcesData?.find(
+                  (item) => String(item.id) === field.value
+                ) || null
+              }
+              onChange={(_, newValue: ClientRequestReceiverFrom | null) => {
+                field.onChange(newValue ? String(newValue.id) : "");
+                  if (newValue?.name === "رقم واتساب") {
+                      setInputType("phone");
+                      setShowInput(true);
+                  } else if (newValue?.name === "بريد الكتروني") {
+                      setInputType("email");
+                      setShowInput(true);
+                  } else if (newValue?.name === "موظف") {
+                      setInputType("employee");
+                      setShowInput(true);
+                  } else if (newValue?.name === "وسيط") {
+                      setInputType("broker");
+                      setShowInput(true);
+                  } else {
+                      setShowInput(false);
+                      setInputType("");
+                  }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("clientRequests.form.source")}
+                  error={!!errors.client_request_receiver_from_id}
+                  helperText={errors.client_request_receiver_from_id?.message}
+                />
+
+              )}
+            />
+              {showInput && (
+                  <>
+                      {inputType === "phone" && (
+                          <FormField
+                              control={control}
+                              name="phone"
+                              render={({ field: phoneField, fieldState }) => (
+                                  <FormItem>
+                                      <FormLabel required>{t("clientRequests.form.phone")}</FormLabel>
+                                      <FormControl fullWidth>
+                                          <PhoneField
+                                              field={{
+                                                  name: phoneField.name,
+                                                  label: t("clientRequests.form.phone"),
+                                                  type: "phone",
+                                                  placeholder: t("clientRequests.form.phonePlaceholder"),
+                                                  required: true,
+                                              }}
+                                              value={phoneField.value || ""}
+                                              onChange={phoneField.onChange}
+                                              onBlur={phoneField.onBlur}
+                                              touched={fieldState.isTouched}
+                                              defaultCountry="SA"
+                                              international
+                                          />
+                                      </FormControl>
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+
+                      {inputType === "email" && (
+                          <FormField
+                              control={control}
+                              name="email"
+                              render={({ field: emailField, fieldState }) => (
+                                  <FormItem>
+                                      <FormLabel required>{t("clientRequests.form.email")}</FormLabel>
+                                      <FormControl fullWidth>
+                                          <TextField
+                                              {...emailField}
+                                              type="email"
+                                              placeholder={t("clientRequests.form.emailPlaceholder")}
+                                              error={!!fieldState.error}
+                                              helperText={fieldState.error?.message}
+                                              fullWidth
+                                          />
+                                      </FormControl>
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+
+                      {inputType === "employee" && (
+                          <FormField
+                              control={control}
+                              name="employee_id"
+                              render={({ field: employeeField, fieldState }) => (
+                                  <FormItem>
+                                      <FormLabel required>{t("clientRequests.form.employee")}</FormLabel>
+                                      <FormControl fullWidth>
+                                          <Autocomplete
+                                              options={employeesData || []}
+                                              getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
+                                              isOptionEqualToValue={(option, value) => option.id === value?.id}
+                                              value={employeesData?.find((emp) => String(emp.id) === employeeField.value) || null}
+                                              onChange={(_, newValue) => {
+                                                  employeeField.onChange(newValue ? String(newValue.id) : "");
+                                              }}
+                                              renderInput={(params) => (
+                                                  <TextField
+                                                      {...params}
+                                                      placeholder={t("clientRequests.form.selectEmployee")}
+                                                      error={!!fieldState.error}
+                                                      helperText={fieldState.error?.message}
+                                                  />
+                                              )}
+                                          />
+                                      </FormControl>
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+
+                      {inputType === "broker" && (
+                          <FormField
+                              control={control}
+                              name="broker_id"
+                              render={({ field: brokerField, fieldState }) => (
+                                  <FormItem>
+                                      <FormLabel required>{t("clientRequests.form.broker")}</FormLabel>
+                                      <FormControl fullWidth>
+                                          <Autocomplete
+                                              options={brokersData || []}
+                                              getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
+                                              isOptionEqualToValue={(option, value) => option.id === value?.id}
+                                              value={brokersData?.find((broker) => String(broker.id) === brokerField.value) || null}
+                                              onChange={(_, newValue) => {
+                                                  brokerField.onChange(newValue ? String(newValue.id) : "");
+                                              }}
+                                              renderInput={(params) => (
+                                                  <TextField
+                                                      {...params}
+                                                      placeholder={t("clientRequests.form.selectBroker")}
+                                                      error={!!fieldState.error}
+                                                      helperText={fieldState.error?.message}
+                                                  />
+                                              )}
+                                          />
+                                      </FormControl>
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+                  </>
+              )}
             {errors.client_request_receiver_from_id && (
               <FormHelperText>
                 {errors.client_request_receiver_from_id.message}
@@ -353,7 +522,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
         render={({ field }) => (
           <FormControl>
             <FormLabel sx={{ mb: 0.5 }}>
-              {t("clientRequests.form.ownerType")} *
+              {inputType === "broker" ? t("clientRequests.form.brokerData") : t("clientRequests.form.ownerType")} *
             </FormLabel>
             <RadioGroup {...field} value={field.value ?? "individual"} row>
               <FormControlLabel
@@ -372,29 +541,37 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
       />
 
       {/* العميل - client_id */}
-      <Controller
-        name="client_id"
-        control={control}
-        render={({ field }) => (
-          <FormControl fullWidth error={!!errors.client_id}>
-            <InputLabel>{t("clientRequests.form.client")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("clientRequests.form.client")}
-            >
-              {clientsData?.map((item) => (
-                <MenuItem key={item.id} value={String(item.id)}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.client_id && (
-              <FormHelperText>{errors.client_id.message}</FormHelperText>
+        <Controller
+            name="client_id"
+            control={control}
+            render={({ field }) => (
+                <FormControl fullWidth error={!!errors.client_id}>
+                    <Autocomplete
+                        options={clientsData || []}
+                        getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                        }
+                        value={
+                            clientsData?.find(
+                                (item) => String(item.id) === field.value
+                            ) || null
+                        }
+                        onChange={(_, newValue) => {
+                            field.onChange(newValue ? String(newValue.id) : "");
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label={t("clientRequests.form.client")}
+                                error={!!errors.client_id}
+                                helperText={errors.client_id?.message}
+                            />
+                        )}
+                    />
+                </FormControl>
             )}
-          </FormControl>
-        )}
-      />
+        />
 
       {/* موضوع الطلب - content */}
       <Controller
@@ -418,7 +595,7 @@ export function RequestFormFields({ control, errors }: RequestFormFieldsProps) {
         control={control}
         render={({ field }) => (
           <FormControl fullWidth>
-            <InputLabel>{t("clientRequests.form.serviceName")}</InputLabel>
+            <InputLabel></InputLabel>
             <Select
               value={String(field.value?.[0] ?? "")}
               onChange={(e) =>

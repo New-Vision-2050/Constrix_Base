@@ -19,6 +19,10 @@ export const ClientRequestschema = z.object({
   branch_id: z.string().nullable().optional(),
   management_id: z.string().nullable().optional(),
   attachments: z.array(z.instanceof(File)).optional(),
+  phone: z.string().optional(),
+  email: z.string().email().optional(),
+  employee_id: z.string().optional(),
+  broker_id: z.string().optional(),
 });
 
 export type ClientRequestFormValues = z.infer<typeof ClientRequestschema>;
