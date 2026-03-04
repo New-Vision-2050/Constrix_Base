@@ -21,7 +21,6 @@ import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
 import { useQuery } from "@tanstack/react-query";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
-import { CompanyDashboardProjectTypesApi } from "@/services/api/company-dashboard/project-types";
 import { ProjectRow, getProjectsColumns } from "./columns";
 import { ProjectCard } from "./components/ProjectCard";
 import { ProjectFormDrawer } from "./components/ProjectFormDrawer";
@@ -50,8 +49,8 @@ export default function ProjectsList() {
   const [filterProjectTypeId, setFilterProjectTypeId] = useState<string>("");
 
   const { data: projectTypesData } = useQuery({
-    queryKey: ["company-dashboard-project-types-filter"],
-    queryFn: () => CompanyDashboardProjectTypesApi.list(),
+    queryKey: ["all-projects-types-filter"],
+    queryFn: () => AllProjectsApi.getProjectTypes(),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -237,11 +236,13 @@ export default function ProjectsList() {
               onChange={(e) => setFilterProjectTypeId(e.target.value)}
             >
               <MenuItem value="">{t("project.all")}</MenuItem>
-              {projectTypesData?.data?.payload?.map((type) => (
-                <MenuItem key={type.id} value={String(type.id)}>
-                  {type.name_ar}
-                </MenuItem>
-              ))}
+              {(projectTypesData?.data?.payload ?? []).map(
+                (type: { id: number; name: string }) => (
+                  <MenuItem key={type.id} value={String(type.id)}>
+                    {type.name}
+                  </MenuItem>
+                ),
+              )}
             </Select>
           </FormControl>
           <FormControl size="small" fullWidth>
