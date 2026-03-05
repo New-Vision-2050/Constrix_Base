@@ -212,6 +212,13 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     const [showInput, setShowInput] = useState(false);
     const [inputType, setInputType] = useState("");
     const [showBrokerType, setShowBrokerType] = useState(false);
+    const [clientSearchText, setClientSearchText] = useState("");
+    const [employeeSearchText, setEmployeeSearchText] = useState("");
+    const [brokerSearchText, setBrokerSearchText] = useState("");
+    const [branchSearchText, setBranchSearchText] = useState("");
+    const [managementSearchText, setManagementSearchText] = useState("");
+    const [requestTypeSearchText, setRequestTypeSearchText] = useState("");
+    const [receiverSearchText, setReceiverSearchText] = useState("");
     const isMounted = useRef(false);
 
     // Watch form values for conditional logic - MUST be before useQuery calls
@@ -236,17 +243,17 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     });
 
     const {data: requestTypesData} = useQuery({
-        queryKey: ["client-request-types"],
+        queryKey: ["client-request-types", requestTypeSearchText],
         queryFn: async () => {
-            const response = await ClientRequestsApi.getRequestTypes();
+            const response = await ClientRequestsApi.getRequestTypes(requestTypeSearchText);
             return response.data.payload;
         },
     });
 
     const {data: sourcesData} = useQuery({
-        queryKey: ["client-request-receiver-from"],
+        queryKey: ["client-request-receiver-from", receiverSearchText],
         queryFn: async () => {
-            const response = await ClientRequestsApi.getSources();
+            const response = await ClientRequestsApi.getSources(receiverSearchText);
             return response.data.payload;
         },
     });
@@ -260,17 +267,19 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     });
 
     const {data: clientsData} = useQuery({
-        queryKey: ["company-users-clients"],
+        queryKey: ["company-users-clients", clientSearchText],
         queryFn: async () => {
-            const response = await ClientRequestsApi.getClients();
+            const response = await ClientRequestsApi.getClients({ name: clientSearchText });
             return response.data.payload;
         },
     });
 
     const {data: companyClientsData} = useQuery({
-        queryKey: ["company-clients"],
+        queryKey: ["company-clients", clientSearchText],
         queryFn: async () => {
-            const response = await apiClient.get("/companies/clients");
+            const response = await apiClient.get("/companies/clients", { 
+                params: clientSearchText ? { name: clientSearchText } : undefined 
+            });
             return response.data.payload || response.data;
         },
         enabled: clientType === "company", // Only fetch when clientType is "company"
@@ -285,17 +294,21 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     });
 
     const {data: employeesData} = useQuery({
-        queryKey: ["employees"],
+        queryKey: ["employees", employeeSearchText],
         queryFn: async () => {
-            const response = await apiClient.get("/company-users/employees");
+            const response = await apiClient.get("/company-users/employees", {
+                params: employeeSearchText ? { name: employeeSearchText } : undefined
+            });
             return response.data.payload || response.data;
         },
     });
 
     const {data: brokersData} = useQuery({
-        queryKey: ["brokers"],
+        queryKey: ["brokers", brokerSearchText],
         queryFn: async () => {
-            const response = await apiClient.get("/company-users/brokers");
+            const response = await apiClient.get("/company-users/brokers", {
+                params: brokerSearchText ? { name: brokerSearchText } : undefined
+            });
             return response.data.payload || response.data;
         },
     });
@@ -311,17 +324,17 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     });
 
     const {data: branchesData} = useQuery({
-        queryKey: ["branches"],
+        queryKey: ["branches", branchSearchText],
         queryFn: async () => {
-            const response = await ClientRequestsApi.getBranches();
+            const response = await ClientRequestsApi.getBranches(branchSearchText);
             return response.data.payload || response.data;
         },
     });
 
     const {data: managementsData} = useQuery({
-        queryKey: ["managements", selectedBranchId],
+        queryKey: ["managements", selectedBranchId, managementSearchText],
         queryFn: async () => {
-            const response = await ClientRequestsApi.getManagements(selectedBranchId);
+            const response = await ClientRequestsApi.getManagements(selectedBranchId, managementSearchText);
             return response.data.payload || response.data;
         },
         enabled: !!selectedBranchId, // Only fetch when branch is selected
@@ -455,18 +468,32 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 control={control}
                 render={({field}) => (
                     <FormControl fullWidth error={!!errors.client_request_type_id}>
-                        <InputLabel>{t("clientRequests.form.requestType")}</InputLabel>
-                        <Select
-                            {...field}
-                            value={field.value ?? ""}
-                            label={t("clientRequests.form.requestType")}
-                        >
-                            {requestTypesData?.map((item) => (
-                                <MenuItem key={item.id} value={String(item.id)}>
-                                    {item.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
+                        <Autocomplete
+                            options={requestTypesData || []}
+                            getOptionLabel={(option) => option.name}
+                            isOptionEqualToValue={(option, value) =>
+                                option.id === value?.id
+                            }
+                            value={
+                                requestTypesData?.find(
+                                    (item) => String(item.id) === field.value
+                                ) || null
+                            }
+                            onChange={(_, newValue) => {
+                                field.onChange(newValue ? String(newValue.id) : "");
+                            }}
+                            onInputChange={(_, value) => {
+                                setRequestTypeSearchText(value);
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t("clientRequests.form.requestType")}
+                                    error={!!errors.client_request_type_id}
+                                    helperText={errors.client_request_type_id?.message}
+                                />
+                            )}
+                        />
                         {errors.client_request_type_id && (
                             <FormHelperText>
                                 {errors.client_request_type_id.message}
@@ -518,6 +545,9 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                     setInputType("");
                                     setShowBrokerType(false);
                                 }
+                            }}
+                            onInputChange={(_, value) => {
+                                setReceiverSearchText(value);
                             }}
                             renderInput={(params) => (
                                 <TextField
@@ -598,6 +628,9 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                         onChange={(_, newValue) => {
                                                             employeeField.onChange(newValue ? String(newValue.id) : "");
                                                         }}
+                                                        onInputChange={(_, value) => {
+                                                            setEmployeeSearchText(value);
+                                                        }}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
@@ -659,6 +692,9 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                             }
                                                             onChange={(_, newValue) => {
                                                                 brokerField.onChange(newValue ? String(newValue.id) : "");
+                                                            }}
+                                                            onInputChange={(_, value) => {
+                                                                setBrokerSearchText(value);
                                                             }}
                                                             renderInput={(params) => (
                                                                 <TextField
@@ -734,6 +770,9 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                             onChange={(_, newValue) => {
                                 field.onChange(newValue ? String(newValue.id) : "");
                             }}
+                            onInputChange={(_, value) => {
+                                setClientSearchText(value);
+                            }}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -808,18 +847,32 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 control={control}
                 render={({field}) => (
                     <FormControl fullWidth error={!!errors.branch_id}>
-                        <InputLabel>{t("clientRequests.form.branch")}</InputLabel>
-                        <Select
-                            {...field}
-                            value={field.value ?? ""}
-                            label={t("clientRequests.form.branch")}
-                        >
-                            {branchesData?.map((item) => (
-                                <MenuItem key={item.id} value={String(item.id)}>
-                                    {item.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
+                        <Autocomplete
+                            options={branchesData || []}
+                            getOptionLabel={(option) => option.name}
+                            isOptionEqualToValue={(option, value) =>
+                                option.id === value?.id
+                            }
+                            value={
+                                branchesData?.find(
+                                    (item) => String(item.id) === field.value
+                                ) || null
+                            }
+                            onChange={(_, newValue) => {
+                                field.onChange(newValue ? String(newValue.id) : "");
+                            }}
+                            onInputChange={(_, value) => {
+                                setBranchSearchText(value);
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t("clientRequests.form.branch")}
+                                    error={!!errors.branch_id}
+                                    helperText={errors.branch_id?.message}
+                                />
+                            )}
+                        />
                         {errors.branch_id && (
                             <FormHelperText>
                                 {errors.branch_id.message}
@@ -835,19 +888,33 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 control={control}
                 render={({field}) => (
                     <FormControl fullWidth error={!!errors.management_id}>
-                        <InputLabel>{t("clientRequests.form.management")}</InputLabel>
-                        <Select
-                            {...field}
-                            value={field.value ?? ""}
-                            label={t("clientRequests.form.management")}
+                        <Autocomplete
+                            options={managementsData || []}
+                            getOptionLabel={(option) => option.name}
+                            isOptionEqualToValue={(option, value) =>
+                                option.id === value?.id
+                            }
+                            value={
+                                managementsData?.find(
+                                    (item) => String(item.id) === field.value
+                                ) || null
+                            }
+                            onChange={(_, newValue) => {
+                                field.onChange(newValue ? String(newValue.id) : "");
+                            }}
+                            onInputChange={(_, value) => {
+                                setManagementSearchText(value);
+                            }}
                             disabled={!selectedBranchId}
-                        >
-                            {managementsData?.map((item) => (
-                                <MenuItem key={item.id} value={String(item.id)}>
-                                    {item.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t("clientRequests.form.management")}
+                                    error={!!errors.management_id}
+                                    helperText={errors.management_id?.message}
+                                />
+                            )}
+                        />
                         {errors.management_id && (
                             <FormHelperText>
                                 {errors.management_id.message}
