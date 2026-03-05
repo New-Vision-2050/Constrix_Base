@@ -24,6 +24,7 @@ export const clientRequestsMessages = new MessagesGroup({
   }),
   status: new MessagesGroup({
     pending: _m("Pending", "قيد الانتظار"),
+    accepted: _m("Accepted", "مقبول"),
     inProgress: _m("In Progress", "قيد الانجاز"),
     approved: _m("Approved", "مقبول"),
     rejected: _m("Rejected", "مرفوض"),
