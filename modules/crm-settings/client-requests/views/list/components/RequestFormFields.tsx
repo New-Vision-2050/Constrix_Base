@@ -13,6 +13,8 @@ import {
     Box,
     Collapse,
     Autocomplete,
+    Select,
+    MenuItem, FormControl,
 } from "@mui/material";
 import {useRouter} from "@/i18n/navigation";
 import {ChevronDown, Paperclip} from "lucide-react";
@@ -127,78 +129,61 @@ function ChildTreeNode({
     );
 }
 
-// Main group accordion (top level like "koko", "begoTest", etc.)
-function TermGroupAccordion({
-                                group,
-                                selectedIds,
-                                onToggle,
-                            }: {
-    group: TermSettingGroup;
-    selectedIds: number[];
-    onToggle: (ids: number[], add: boolean) => void;
+// Main group select dropdown
+function TermGroupSelect({
+    termSettingsData,
+    selectedGroupId,
+    onGroupChange,
+    groupSelections,
+    onToggle,
+}: {
+    termSettingsData: TermSettingGroup[];
+    selectedGroupId: number | null;
+    onGroupChange: (groupId: number | null) => void;
+    groupSelections: Record<number, number[]>;
+    onToggle: (groupId: number, ids: number[], add: boolean) => void;
 }) {
-    // Collect only leaf IDs from THIS group's subtree
-    const groupLeafIds: number[] = [];
-    group.children.forEach((child) => {
-        groupLeafIds.push(...collectLeafIds(child));
-    });
-
-    // selectedIds here is already scoped to this group only
-    const selectedCount = selectedIds.filter((id) =>
-        groupLeafIds.includes(id),
-    ).length;
-    const totalCount = groupLeafIds.length;
-    const isAllSelected = totalCount > 0 && selectedCount === totalCount;
-    const isIndeterminate = selectedCount > 0 && selectedCount < totalCount;
-
-    const handleGroupToggle = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        onToggle(groupLeafIds, !isAllSelected);
-    };
+    const selectedGroup = termSettingsData.find(group => group.id === selectedGroupId);
 
     return (
-        <Accordion
-            disableGutters
-            sx={{
-                color: "#fff",
-                "&:before": {display: "none"},
-                borderRadius: 1,
-                mb: 1,
-            }}
-        >
-            <AccordionSummary
-                expandIcon={<ChevronDown size={18} color="#fff"/>}
-                sx={{
-                    minHeight: 40,
-                    "& .MuiAccordionSummary-content": {alignItems: "center", gap: 1},
-                }}
-            >
-                <Checkbox
-                    size="small"
-                    checked={isAllSelected}
-                    indeterminate={isIndeterminate}
-                    onClick={handleGroupToggle}
-                    sx={{p: 0.5}}
-                />
-                <Typography variant="body2" sx={{flex: 1}}>
-                    {group.name}
-                </Typography>
-                <Typography variant="caption" sx={{opacity: 0.7}}>
-                    ({selectedCount}/{totalCount})
-                </Typography>
-            </AccordionSummary>
-            <AccordionDetails sx={{p: 1}}>
-                {group.children.map((child) => (
-                    <ChildTreeNode
-                        key={child.id}
-                        node={child}
-                        selectedIds={selectedIds}
-                        onToggle={onToggle}
-                        level={0}
-                    />
-                ))}
-            </AccordionDetails>
-        </Accordion>
+        <Box sx={{ mb: 2 }}>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+                <FormLabel sx={{ mb: 1 }}>اختر المجموعة </FormLabel>
+                <Select
+                    value={selectedGroupId ?? ""}
+                    onChange={(e) => onGroupChange(e.target.value ? Number(e.target.value) : null)}
+                    displayEmpty
+                >
+                    <MenuItem value="" disabled>
+                        اختر مجموعة...
+                    </MenuItem>
+                    {termSettingsData.map((group) => (
+                        <MenuItem key={group.id} value={group.id}>
+                            {group.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
+            {/* Show tree structure when group is selected */}
+            {selectedGroup && (
+                <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 1,
+                    border: '1px solid rgba(0, 0, 0, 0.12)'
+                }}>
+                    {selectedGroup.children.map((child) => (
+                        <ChildTreeNode
+                            key={child.id}
+                            node={child}
+                            selectedIds={groupSelections[selectedGroup.id] ?? []}
+                            onToggle={(ids, add) => onToggle(selectedGroup.id, ids, add)}
+                            level={0}
+                        />
+                    ))}
+                </Box>
+            )}
+        </Box>
     );
 }
 
@@ -351,6 +336,9 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     const [groupSelections, setGroupSelections] = useState<
         Record<number, number[]>
     >({});
+
+    // Selected group for dropdown
+    const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
 
     // Derive conditional field visibility from form state (NOT local useState)
     const {inputType, showInput, showBrokerType} = useMemo(() => {
@@ -777,18 +765,15 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
             />
             اسم الخدمة - service_ids dropdown */}
 
-            {/* term_setting_id — tree checkbox accordions matching design */}
+            {/* term_setting_id — tree select dropdown matching design */}
             {termSettingsData && termSettingsData.length > 0 && (
-                <Box>
-                    {termSettingsData.map((group) => (
-                        <TermGroupAccordion
-                            key={group.id}
-                            group={group}
-                            selectedIds={groupSelections[group.id] ?? []}
-                            onToggle={(ids, add) => handleTermToggle(group.id, ids, add)}
-                        />
-                    ))}
-                </Box>
+                <TermGroupSelect
+                    termSettingsData={termSettingsData}
+                    selectedGroupId={selectedGroupId}
+                    onGroupChange={setSelectedGroupId}
+                    groupSelections={groupSelections}
+                    onToggle={handleTermToggle}
+                />
             )}
 
             {/* الفرع - branch_id */}
