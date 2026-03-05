@@ -136,8 +136,8 @@ export function ProjectFormDrawer({
           management_id: project.management?.id
             ? String(project.management.id)
             : undefined,
-          manager_id: project.manager_id?.id
-            ? String(project.manager_id.id)
+          manager_id: project.manager_id
+            ? String(project.manager_id)
             : undefined,
           responsible_employee_id: project.responsible_employee?.id
             ? String(project.responsible_employee.id)

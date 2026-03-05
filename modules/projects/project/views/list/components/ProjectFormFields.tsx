@@ -9,6 +9,8 @@ import {
   RadioGroup,
   FormControlLabel,
   FormLabel,
+  Autocomplete,
+  createFilterOptions,
 } from "@mui/material";
 import { Controller, Control, FieldErrors } from "react-hook-form";
 import { useTranslations } from "next-intl";
@@ -42,6 +44,7 @@ interface ProjectFormFieldsProps {
   individualClientsData?: OptionItem[];
   // contractTypesData?: OptionItem[];
   // projectClassificationsData?: OptionItem[];
+  onSearchChange?: (fieldName: string, searchValue: string) => void;
 }
 
 export function ProjectFormFields({
@@ -61,86 +64,114 @@ export function ProjectFormFields({
   individualClientsData,
   // contractTypesData,
   // projectClassificationsData,
+  onSearchChange,
 }: ProjectFormFieldsProps) {
   const t = useTranslations();
+
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option: OptionItem | ManagementItem) => option.name,
+  });
 
   return (
     <>
       <Controller
         name="project_type_id"
         control={control}
-        render={({ field }) => (
-          <FormControl fullWidth error={!!errors.project_type_id}>
-            <InputLabel>{t("project.projectType")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("project.projectType")}
-            >
-              {projectTypesData?.map((type: OptionItem) => (
-                <MenuItem key={type.id} value={String(type.id)}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.project_type_id && (
-              <Typography variant="caption" color="error">
-                {t("project.projectTypeRequired")}
-              </Typography>
-            )}
-          </FormControl>
-        )}
+        render={({ field }) => {
+          const selectedOption = projectTypesData?.find(
+            (type) => String(type.id) === field.value
+          );
+          return (
+            <FormControl fullWidth error={!!errors.project_type_id}>
+              <Autocomplete
+                options={projectTypesData || []}
+                getOptionLabel={(option) => option.name}
+                filterOptions={filterOptions}
+                value={selectedOption || null}
+                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                onInputChange={(_, value) => onSearchChange?.("project_type_id", value)}
+                size="small"
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.projectType")}
+                    error={!!errors.project_type_id}
+                    helperText={errors.project_type_id && t("project.projectTypeRequired")}
+                  />
+                )}
+              />
+            </FormControl>
+          );
+        }}
       />
 
       <Controller
         name="sub_project_type_id"
         control={control}
-        render={({ field }) => (
-          <FormControl
-            fullWidth
-            error={!!errors.sub_project_type_id}
-            disabled={!watchProjectTypeId}
-          >
-            <InputLabel>{t("project.subProjectType")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("project.subProjectType")}
+        render={({ field }) => {
+          const selectedOption = subProjectTypesData?.find(
+            (type) => String(type.id) === field.value
+          );
+          return (
+            <FormControl
+              fullWidth
+              error={!!errors.sub_project_type_id}
+              disabled={!watchProjectTypeId}
             >
-              {subProjectTypesData?.map((type: OptionItem) => (
-                <MenuItem key={type.id} value={String(type.id)}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.sub_project_type_id && (
-              <Typography variant="caption" color="error">
-                {t("project.subProjectTypeRequired")}
-              </Typography>
-            )}
-          </FormControl>
-        )}
+              <Autocomplete
+                options={subProjectTypesData || []}
+                getOptionLabel={(option) => option.name}
+                filterOptions={filterOptions}
+                value={selectedOption || null}
+                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                onInputChange={(_, value) => onSearchChange?.("sub_project_type_id", value)}
+                disabled={!watchProjectTypeId}
+                size="small"
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.subProjectType")}
+                    error={!!errors.sub_project_type_id}
+                    helperText={errors.sub_project_type_id && t("project.subProjectTypeRequired")}
+                    disabled={!watchProjectTypeId}
+                  />
+                )}
+              />
+            </FormControl>
+          );
+        }}
       />
 
       <Controller
         name="sub_sub_project_type_id"
         control={control}
-        render={({ field }) => (
-          <FormControl fullWidth disabled={!watchSubProjectTypeId}>
-            <InputLabel>{t("project.subSubProjectType")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("project.subSubProjectType")}
-            >
-              {subSubProjectTypesData?.map((type: OptionItem) => (
-                <MenuItem key={type.id} value={String(type.id)}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+        render={({ field }) => {
+          const selectedOption = subSubProjectTypesData?.find(
+            (type) => String(type.id) === field.value
+          );
+          return (
+            <FormControl fullWidth disabled={!watchSubProjectTypeId}>
+              <Autocomplete
+                options={subSubProjectTypesData || []}
+                getOptionLabel={(option) => option.name}
+                filterOptions={filterOptions}
+                value={selectedOption || null}
+                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                onInputChange={(_, value) => onSearchChange?.("sub_sub_project_type_id", value)}
+                disabled={!watchSubProjectTypeId}
+                size="small"
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.subSubProjectType")}
+                    disabled={!watchSubProjectTypeId}
+                  />
+                )}
+              />
+            </FormControl>
+          );
+        }}
       />
 
       <Controller
@@ -161,53 +192,63 @@ export function ProjectFormFields({
       <Controller
         name="branch_id"
         control={control}
-        render={({ field }) => (
-          <FormControl fullWidth error={!!errors.branch_id}>
-            <InputLabel>{t("project.branch")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("project.branch")}
-            >
-              {branchesData?.map((branch: OptionItem) => (
-                <MenuItem key={branch.id} value={String(branch.id)}>
-                  {branch.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.branch_id && (
-              <Typography variant="caption" color="error">
-                {t("project.branchRequired")}
-              </Typography>
-            )}
-          </FormControl>
-        )}
+        render={({ field }) => {
+          const selectedOption = branchesData?.find(
+            (branch) => String(branch.id) === field.value
+          );
+          return (
+            <FormControl fullWidth error={!!errors.branch_id}>
+              <Autocomplete
+                options={branchesData || []}
+                getOptionLabel={(option) => option.name}
+                filterOptions={filterOptions}
+                value={selectedOption || null}
+                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                onInputChange={(_, value) => onSearchChange?.("branch_id", value)}
+                size="small"
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.branch")}
+                    error={!!errors.branch_id}
+                    helperText={errors.branch_id && t("project.branchRequired")}
+                  />
+                )}
+              />
+            </FormControl>
+          );
+        }}
       />
 
       <Controller
         name="management_id"
         control={control}
-        render={({ field }) => (
-          <FormControl fullWidth error={!!errors.management_id}>
-            <InputLabel>{t("project.management")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("project.management")}
-            >
-              {managementsData?.map((mgmt: ManagementItem) => (
-                <MenuItem key={mgmt.id} value={String(mgmt.id)}>
-                  {mgmt.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.management_id && (
-              <Typography variant="caption" color="error">
-                {t("project.managementRequired")}
-              </Typography>
-            )}
-          </FormControl>
-        )}
+        render={({ field }) => {
+          const selectedOption = managementsData?.find(
+            (mgmt) => String(mgmt.id) === field.value
+          );
+          return (
+            <FormControl fullWidth error={!!errors.management_id}>
+              <Autocomplete
+                options={managementsData || []}
+                getOptionLabel={(option) => option.name}
+                filterOptions={filterOptions}
+                value={selectedOption || null}
+                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                onInputChange={(_, value) => onSearchChange?.("management_id", value)}
+                size="small"
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.management")}
+                    error={!!errors.management_id}
+                    helperText={errors.management_id && t("project.managementRequired")}
+                  />
+                )}
+              />
+            </FormControl>
+          );
+        }}
       />
 
       <Controller
@@ -231,22 +272,30 @@ export function ProjectFormFields({
       <Controller
         name="manager_id"
         control={control}
-        render={({ field }) => (
-          <FormControl fullWidth>
-            <InputLabel>{t("project.projectManager")}</InputLabel>
-            <Select
-              {...field}
-              value={field.value ?? ""}
-              label={t("project.projectManager")}
-            >
-              {companyUsersData?.map((user: OptionItem) => (
-                <MenuItem key={user.id} value={String(user.id)}>
-                  {user.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+        render={({ field }) => {
+          const selectedOption = companyUsersData?.find(
+            (user) => String(user.id) === field.value
+          );
+          return (
+            <FormControl fullWidth>
+              <Autocomplete
+                options={companyUsersData || []}
+                getOptionLabel={(option) => option.name}
+                filterOptions={filterOptions}
+                value={selectedOption || null}
+                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                onInputChange={(_, value) => onSearchChange?.("manager_id", value)}
+                size="small"
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.projectManager")}
+                  />
+                )}
+              />
+            </FormControl>
+          );
+        }}
       />
 
       <Controller
@@ -280,28 +329,32 @@ export function ProjectFormFields({
         <Controller
           name="project_owner_id"
           control={control}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!errors.project_owner_id}>
-              <InputLabel>{t("project.selectClient")}</InputLabel>
-              <Select
-                {...field}
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(e.target.value)}
-                label={t("project.selectClient")}
-              >
-                {entityClientsData?.map((client: OptionItem) => (
-                  <MenuItem key={client.id} value={client.id}>
-                    {client.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.project_owner_id && (
-                <Typography variant="caption" color="error">
-                  {t("project.clientRequired")}
-                </Typography>
-              )}
-            </FormControl>
-          )}
+          render={({ field }) => {
+            const selectedOption = entityClientsData?.find(
+              (client) => String(client.id) === field.value
+            );
+            return (
+              <FormControl fullWidth error={!!errors.project_owner_id}>
+                <Autocomplete
+                  options={entityClientsData || []}
+                  getOptionLabel={(option) => option.name}
+                  filterOptions={filterOptions}
+                  value={selectedOption || null}
+                  onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                  onInputChange={(_, value) => onSearchChange?.("entity_clients", value)}
+                  size="small"
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={t("project.selectClient")}
+                      error={!!errors.project_owner_id}
+                      helperText={errors.project_owner_id && t("project.clientRequired")}
+                    />
+                  )}
+                />
+              </FormControl>
+            );
+          }}
         />
       )}
 
@@ -309,28 +362,32 @@ export function ProjectFormFields({
         <Controller
           name="project_owner_id"
           control={control}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!errors.project_owner_id}>
-              <InputLabel>{t("project.selectClient")}</InputLabel>
-              <Select
-                {...field}
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(e.target.value)}
-                label={t("project.selectClient")}
-              >
-                {individualClientsData?.map((client: OptionItem) => (
-                  <MenuItem key={client.id} value={client.id}>
-                    {client.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.project_owner_id && (
-                <Typography variant="caption" color="error">
-                  {t("project.clientRequired")}
-                </Typography>
-              )}
-            </FormControl>
-          )}
+          render={({ field }) => {
+            const selectedOption = individualClientsData?.find(
+              (client) => String(client.id) === field.value
+            );
+            return (
+              <FormControl fullWidth error={!!errors.project_owner_id}>
+                <Autocomplete
+                  options={individualClientsData || []}
+                  getOptionLabel={(option) => option.name}
+                  filterOptions={filterOptions}
+                  value={selectedOption || null}
+                  onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+                  onInputChange={(_, value) => onSearchChange?.("individual_clients", value)}
+                  size="small"
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={t("project.selectClient")}
+                      error={!!errors.project_owner_id}
+                      helperText={errors.project_owner_id && t("project.clientRequired")}
+                    />
+                  )}
+                />
+              </FormControl>
+            );
+          }}
         />
       )}
 
