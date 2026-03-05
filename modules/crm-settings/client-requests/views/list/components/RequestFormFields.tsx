@@ -227,6 +227,10 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         router.push("/create-client/client?action=create");
     };
 
+    const handleCreateBroker = () => {
+        router.push("/create-client/broker?action=create");
+    };
+
     // Watch form values for conditional logic - MUST be before useQuery calls
     const selectedSource = useWatch({
         control,
@@ -701,6 +705,40 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                             }}
                                                             onInputChange={(_, value) => {
                                                                 setBrokerSearchText(value);
+                                                            }}
+                                                            noOptionsText={brokerSearchText ? "لا يوجد وسطاء بهذا الاسم" : "لا يوجد وسطاء"}
+                                                            renderOption={(props, option) => {
+                                                                const { key, ...restProps } = props;
+                                                                if (option.isCreateButton) {
+                                                                    return (
+                                                                        <Box component="li" key={key} {...restProps}>
+                                                                            <Button
+                                                                                fullWidth
+                                                                                variant="outlined"
+                                                                                onClick={(e) => {
+                                                                                    e.preventDefault();
+                                                                                    e.stopPropagation();
+                                                                                    handleCreateBroker();
+                                                                                }}
+                                                                                sx={{ justifyContent: 'flex-start' }}
+                                                                            >
+                                                                                إنشاء وسيط جديد
+                                                                            </Button>
+                                                                        </Box>
+                                                                    );
+                                                                }
+                                                                return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                                                            }}
+                                                            filterOptions={(options, params) => {
+                                                                const filtered = options.filter((option) =>
+                                                                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                                                                );
+                                                                
+                                                                if (params.inputValue !== '' && filtered.length === 0) {
+                                                                    return [{ isCreateButton: true, name: 'إنشاء وسيط جديد' }];
+                                                                }
+                                                                
+                                                                return filtered;
                                                             }}
                                                             renderInput={(params) => (
                                                                 <TextField

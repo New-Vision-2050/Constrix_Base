@@ -13,7 +13,7 @@ import UsersSubEntityForm from "./users-sub-entity-form";
 import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
 import { CreateClientCxtProvider, useCreateClientCxt } from "@/modules/clients/context/CreateClientCxt";
 import { BrokersDataCxtProvider } from "@/modules/brokers/context/BrokersDataCxt";
-import { CreateBrokerCxtProvider } from "@/modules/brokers/context/CreateBrokerCxt";
+import { CreateBrokerCxtProvider, useCreateBrokerCxt } from "@/modules/brokers/context/CreateBrokerCxt";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config";
 import useUserData from "@/hooks/use-user-data";
@@ -32,9 +32,10 @@ import { ModelsTypes } from "./users-sub-entity-form/constants/ModelsTypes";
 type PropsT = {
   programName: `SuperEntitySlug`;
   forceOpenCreateForm?: boolean;
+  currentSlug?: string;
 };
 
-const UsersSubEntityTable = ({ programName, forceOpenCreateForm }: PropsT) => {
+const UsersSubEntityTable = ({ programName, forceOpenCreateForm, currentSlug }: PropsT) => {
   const t = useTranslations();
   // current user data
   const { data: userData } = useUserData();
@@ -72,29 +73,33 @@ const UsersSubEntityTable = ({ programName, forceOpenCreateForm }: PropsT) => {
     setToggleRefetch((prev) => ++prev);
   };
 
-  // Component to handle force open form inside provider context
-const ForceOpenFormWrapper = ({ children, forceOpen }: { children: React.ReactNode; forceOpen: boolean }) => {
+  // Component to handle both client and broker form force open
+const FormWrapper = ({ children }: { children: React.ReactNode }) => {
   const { openCreateClientSheet } = useCreateClientCxt();
+  const { openCreateBrokerSheet } = useCreateBrokerCxt();
   const [hasOpened, setHasOpened] = useState(false);
   
   useEffect(() => {
-    if (forceOpen && !hasOpened && openCreateClientSheet) {
-      console.log("Force opening create form inside provider");
-      openCreateClientSheet();
-      setHasOpened(true); // Mark as opened to prevent reopening
+    // Check if we should open broker form (priority for broker pages)
+    if (openCreateBrokerSheet && !hasOpened) {
+      openCreateBrokerSheet();
+      setHasOpened(true);
+      
+      // Dispatch event for CreateBrokerSheet
+      window.dispatchEvent(new CustomEvent('force-open-broker-form'));
     }
-  }, [forceOpen, hasOpened, openCreateClientSheet]);
+    // Check if we should open client form
+    else if (openCreateClientSheet && !hasOpened) {
+      openCreateClientSheet();
+      setHasOpened(true);
+      
+      // Dispatch event for CreateClientSheet
+      window.dispatchEvent(new CustomEvent('force-open-client-form'));
+    }
+  }, [openCreateClientSheet, openCreateBrokerSheet, hasOpened]);
   
   return <>{children}</>;
 };
-
-// Handle force open create form
-  useEffect(() => {
-    if (forceOpenCreateForm) {
-      console.log("Force opening create form");
-      // We'll handle this inside the provider below
-    }
-  }, [forceOpenCreateForm]);
 
   const usersConfig = UsersConfigV2({
     canDelete: can(entityPermissions.delete),
@@ -151,7 +156,7 @@ const ForceOpenFormWrapper = ({ children, forceOpen }: { children: React.ReactNo
                   searchBarActions={
                     <div className="flex items-center gap-3">
                       <Can check={[entityPermissions.create]}>
-                        <ForceOpenFormWrapper forceOpen={forceOpenCreateForm || false}>
+                        <FormWrapper forceOpen={forceOpenCreateForm || false}>
                           <UsersSubEntityForm
                             tableId={TABLE_ID}
                             sub_entity_id={sub_entity_id}
@@ -159,7 +164,7 @@ const ForceOpenFormWrapper = ({ children, forceOpen }: { children: React.ReactNo
                             registrationFormSlug={registrationFormSlug}
                             handleRefreshWidgetsData={handleRefreshWidgetsData}
                           />
-                        </ForceOpenFormWrapper>
+                        </FormWrapper>
                       </Can>
                     </div>
                   }

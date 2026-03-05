@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import {useParams, useSearchParams} from "next/navigation";
 import { CreateClientCxtProvider, useCreateClientCxt } from "@/modules/clients/context/CreateClientCxt";
 import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
 import { useEffect, useState } from "react";
@@ -11,17 +11,19 @@ import { useGetSubEntity } from "@/hooks/useGetSubEntity";
 function CreateClientPageContent() {
   const searchParams = useSearchParams();
   const action = searchParams.get("action");
-  const { subEntity } = useGetSubEntity(SUPER_ENTITY_SLUG.CRM, "client");
+  const { slug } = useParams();
+  const { subEntity } = useGetSubEntity(SUPER_ENTITY_SLUG.CRM, slug);
   const [shouldOpenForm, setShouldOpenForm] = useState(false);
 
   useEffect(() => {
     console.log("Action parameter:", action);
+    console.log("Slug:", slug);
     
     if (action === "create") {
-      console.log("Action 'create' detected. Setting shouldOpenForm to true.");
+      console.log(`Action 'create' detected for ${slug}. Setting shouldOpenForm to true.`);
       setShouldOpenForm(true);
     }
-  }, [action]);
+  }, [action, slug]);
 
   const tableId = `${subEntity?.slug}-users`;
   const sub_entity_id = subEntity?.id;
@@ -32,6 +34,7 @@ function CreateClientPageContent() {
       <UsersSubEntityTable 
         programName={SUPER_ENTITY_SLUG.CRM} 
         forceOpenCreateForm={shouldOpenForm}
+        currentSlug={slug}
       />
     </CreateClientCxtProvider>
   );
