@@ -229,7 +229,7 @@ export function ProjectFormFields({
       />
 
       <Controller
-        name="responsible_employee_id"
+        name="manager_id"
         control={control}
         render={({ field }) => (
           <FormControl fullWidth>
@@ -334,18 +334,25 @@ export function ProjectFormFields({
         />
       )}
 
-      {/* <Controller
+      <Controller
         name="contract_type_id"
+        disabled
         control={control}
         render={({ field }) => (
           <FormControl fullWidth error={!!errors.contract_type_id}>
             <InputLabel>الارتباط التعاقدي</InputLabel>
             <Select {...field} label="الارتباط التعاقدي">
-              {contractTypesData?.map((type: OptionItem) => (
+              {/* {contractTypesData?.map((type: OptionItem) => (
                 <MenuItem key={type.id} value={String(type.id)}>
                   {type.name}
                 </MenuItem>
-              ))}
+              ))} */}
+              <MenuItem key="1" value="1">
+                عقد مقاولة
+              </MenuItem>
+              <MenuItem key="2" value="2">
+                عقد استثمار
+              </MenuItem>
             </Select>
             {errors.contract_type_id && (
               <Typography variant="caption" color="error">
@@ -358,19 +365,24 @@ export function ProjectFormFields({
 
       <Controller
         name="project_classification_id"
+        disabled
         control={control}
         render={({ field }) => (
           <FormControl fullWidth error={!!errors.project_classification_id}>
             <InputLabel>وسم المشروع</InputLabel>
             <Select {...field} label="وسم المشروع">
-              {projectClassificationsData?.map((classification: OptionItem) => (
-                <MenuItem
-                  key={classification.id}
-                  value={String(classification.id)}
-                >
-                  {classification.name}
-                </MenuItem>
-              ))}
+              <MenuItem key="1" value="1">
+                مشروع جديد
+              </MenuItem>
+              <MenuItem key="2" value="2">
+                مشروع قديم
+              </MenuItem>
+              <MenuItem key="3" value="3">
+                مشروع متكامل
+              </MenuItem>
+              <MenuItem key="4" value="4">
+                مشروع متكامل
+              </MenuItem>
             </Select>
             {errors.project_classification_id && (
               <Typography variant="caption" color="error">
@@ -379,7 +391,7 @@ export function ProjectFormFields({
             )}
           </FormControl>
         )}
-      /> */}
+      />
     </>
   );
 }

@@ -15,6 +15,11 @@ export interface CreateClientRequestArgs {
   branch_id?: number;
   management_id?: number;
   attachments?: File[];
+  receiver_phone?: string;
+  receiver_email?: string;
+  receiver_employee_id?: string;
+  receiver_broker_id?: string;
+  receiver_broker_type?: "individual" | "company";
 }
 
 export interface UpdateClientRequestArgs extends Partial<CreateClientRequestArgs> {}

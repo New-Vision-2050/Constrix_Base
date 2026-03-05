@@ -1,3 +1,5 @@
+import { Attachment } from "@/types/admin-request";
+
 export interface Pagination {
   last_page: number;
   result_count: number;
@@ -84,4 +86,6 @@ export interface ClientRequestRow {
   services: ClientRequestService[];
   branch: { id: string; name: string } | null;
   management: { id: string; name: string } | null;
+  financial_responsible: { id: string; name: string } | null;
+  attachments: Attachment[];
 }

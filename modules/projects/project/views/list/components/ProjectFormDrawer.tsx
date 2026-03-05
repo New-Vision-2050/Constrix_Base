@@ -10,7 +10,10 @@ import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
-import { AllProjectsApi, CreateProjectData } from "@/services/api/all-projects";
+import {
+  AllProjectsApi,
+  CreateProjectData,
+} from "@/services/api/projects/all-projects";
 import { useProjectFormData } from "../hooks/useProjectFormData";
 import { ProjectFormFields } from "./ProjectFormFields";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -7,10 +7,35 @@ export interface CreateSecondLevelProjectTypeArgs {
     is_active: boolean;
 }
 
+/** Args for creating second-level project type via {id}/second-level-schemas (parent_id in URL) */
+export interface CreateSecondLevelProjectTypeByParentArgs {
+    name: string;
+    icon: string;
+    reference_project_type_id: null | number;
+    schema_ids: number[];
+    is_active: boolean;
+}
+
+export interface UpdateSecondLevelProjectTypeArgs {
+    parent_id: number;
+    name: string;
+    icon: string;
+    reference_project_type_id: null | number;
+    schema_ids: number[];
+    is_active: boolean;
+}
+
 export interface CreateThirdLevelProjectTypeArgs {
     name: string;
     icon: string;
     parent_id: number;
+    is_have_schema: boolean;
+    is_active: boolean;
+}
+
+export interface UpdateThirdLevelProjectTypeArgs {
+    name: string;
+    icon: string;
     is_have_schema: boolean;
     is_active: boolean;
 }

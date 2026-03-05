@@ -1,24 +1,27 @@
 import { baseApi } from "@/config/axios/instances/base";
-import { ProjectParams, CreateProjectData, UpdateProjectData, ClientParams } from "./types/params";
 import {
+  ClientParams,
+  CreateProjectData,
+  ProjectParams,
+  UpdateProjectData,
+} from "../../all-projects/types/params";
+import {
+  CreateProjectResponse,
+  DeleteProjectResponse,
+  GetBranchesResponse,
+  GetClientsResponse,
+  GetManagementsResponse,
+  GetProjectTypesResponse,
   ListProjectsResponse,
   ShowProjectResponse,
-  CreateProjectResponse,
   UpdateProjectResponse,
-  DeleteProjectResponse,
-  GetProjectTypesResponse,
-  GetBranchesResponse,
-  GetManagementsResponse,
-  GetCompanyUsersResponse,
-  GetClientsResponse,
-} from "./types/response";
+} from "../../all-projects/types/response";
 
 export const AllProjectsApi = {
   list: (params?: ProjectParams) =>
     baseApi.get<ListProjectsResponse>("projects", { params }),
 
-  show: (id: number) =>
-    baseApi.get<ShowProjectResponse>(`projects/${id}`),
+  show: (id: number) => baseApi.get<ShowProjectResponse>(`projects/${id}`),
 
   create: (data: CreateProjectData) =>
     baseApi.post<CreateProjectResponse>("projects", data),
@@ -33,16 +36,19 @@ export const AllProjectsApi = {
     baseApi.get<GetProjectTypesResponse>("project-types/roots"),
 
   getSubProjectTypes: (projectTypeId: number) =>
-    baseApi.get<GetProjectTypesResponse>(`project-types/${projectTypeId}/children`),
+    baseApi.get<GetProjectTypesResponse>(
+      `project-types/${projectTypeId}/children`,
+    ),
 
   getBranches: () =>
     baseApi.get<GetBranchesResponse>("management_hierarchies/list?type=branch"),
 
   getManagements: () =>
-    baseApi.get<GetManagementsResponse>("management_hierarchies/list?type=management"),
+    baseApi.get<GetManagementsResponse>(
+      "management_hierarchies/list?type=management",
+    ),
 
-  getCompanyUsers: () =>
-    baseApi.get<GetCompanyUsersResponse>("company-users"),
+  getCompanyUsers: () => baseApi.get(`company-users/employees`),
 
   getEntityClients: (params?: ClientParams) =>
     baseApi.get<GetClientsResponse>("companies/clients", { params }),

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,20 +22,22 @@ import IconPicker from "@/components/shared/icon-picker";
 import { useTranslations } from "next-intl";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 
-interface AddSubProjectTypeDialogProps {
+interface EditSubProjectTypeDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
   parentId: number;
+  projectType: PRJ_ProjectType | null;
 }
 
-export default function AddSubProjectTypeDialog({
+export default function EditSubProjectTypeDialog({
   open,
   onClose,
   onSuccess,
   parentId,
-}: AddSubProjectTypeDialogProps) {
-  const t = useTranslations("Projects.Settings.projectTypes.addSubProjectType");
+  projectType,
+}: EditSubProjectTypeDialogProps) {
+  const t = useTranslations("Projects.Settings.projectTypes.editSubProjectType");
   const queryClient = useQueryClient();
 
   const schema = useMemo(
@@ -61,24 +63,60 @@ export default function AddSubProjectTypeDialog({
     defaultValues: { name: "", icon_id: "" },
   });
 
-  const handleFormSubmit = async (data: FormData) => {
-    try {
-      const response = await ProjectTypesApi.createThirdLevelProjectType({
-        name: data.name,
-        icon: data.icon_id,
-        parent_id: parentId,
-        is_have_schema: true,
-        is_active: true,
+  useEffect(() => {
+    if (open && projectType) {
+      reset({
+        name: projectType.name,
+        icon_id: projectType.icon,
       });
+    }
+  }, [open, projectType, reset]);
 
-      const newItem = response.data.payload as PRJ_ProjectType | undefined;
-      if (newItem) {
+  const updateCacheWithFormData = (data: FormData) => {
+    if (!projectType) return;
+    const optimisticItem: PRJ_ProjectType = {
+      ...projectType,
+      name: data.name,
+      icon: data.icon_id,
+    };
+    queryClient.setQueryData<PRJ_ProjectType[]>(
+      ["third-level-project-types", parentId],
+      (prev) =>
+        prev
+          ? prev.map((item) =>
+              item.id === projectType.id ? optimisticItem : item,
+            )
+          : prev,
+    );
+  };
+
+  const handleFormSubmit = async (data: FormData) => {
+    if (!projectType) return;
+    try {
+      const response = await ProjectTypesApi.updateThirdLevelProjectType(
+        projectType.id,
+        {
+          name: data.name,
+          icon: data.icon_id,
+          is_have_schema: true,
+          is_active: true,
+        },
+      );
+
+      const updatedItem = response.data.payload as PRJ_ProjectType | undefined;
+      if (updatedItem) {
         queryClient.setQueryData<PRJ_ProjectType[]>(
           ["third-level-project-types", parentId],
-          (prev) => (prev ? [...prev, newItem] : [newItem]),
+          (prev) =>
+            prev
+              ? prev.map((item) =>
+                  item.id === projectType.id ? updatedItem : item,
+                )
+              : prev,
         );
+      } else {
+        updateCacheWithFormData(data);
       }
-      queryClient.invalidateQueries({ queryKey: ["project-types", "schemas", parentId] });
 
       toast.success(t("successMessage"));
       reset();
@@ -87,6 +125,7 @@ export default function AddSubProjectTypeDialog({
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       toast.error(err?.response?.data?.message ?? t("errorMessage"));
+      updateCacheWithFormData(data);
     }
   };
 
@@ -96,6 +135,8 @@ export default function AddSubProjectTypeDialog({
       onClose();
     }
   };
+
+  if (!projectType) return null;
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -142,7 +183,11 @@ export default function AddSubProjectTypeDialog({
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <CancelButton onClick={handleClose} disabled={isSubmitting} />
-          <SaveButton type="submit" disabled={isSubmitting} loading={isSubmitting} />
+          <SaveButton
+            type="submit"
+            disabled={isSubmitting}
+            loading={isSubmitting}
+          />
         </DialogActions>
       </form>
     </Dialog>

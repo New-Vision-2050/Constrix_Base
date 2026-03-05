@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,30 +25,37 @@ import CloseIcon from "@mui/icons-material/Close";
 import LinearProgress from "@mui/material/LinearProgress";
 import SaveButton from "@/components/shared/buttons/save";
 import CancelButton from "@/components/shared/buttons/cancel";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import IconPicker from "@/components/shared/icon-picker";
-import { TAB_SCHEMA_ID_MAP, useProjectSettingsTabs } from "../../../constants/current-tabs";
+import {
+  TAB_SCHEMA_ID_MAP,
+  SCHEMA_ID_TO_TAB_VALUE,
+  useProjectSettingsTabs,
+} from "../../../constants/current-tabs";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 import { useTranslations } from "next-intl";
 
-interface AddProjectTypeDialogProps {
+interface EditProjectTypeDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
   parentId: number;
+  projectType: PRJ_ProjectType | null;
 }
 
-export default function AddProjectTypeDialog({
+export default function EditProjectTypeDialog({
   open,
   onClose,
   onSuccess,
   parentId,
-}: AddProjectTypeDialogProps) {
-  const t = useTranslations("Projects.Settings.projectTypes.addProjectType");
+  projectType,
+}: EditProjectTypeDialogProps) {
+  const t = useTranslations("Projects.Settings.projectTypes.editProjectType");
+  const queryClient = useQueryClient();
 
-  const addProjectTypeSchema = useMemo(
+  const editProjectTypeSchema = useMemo(
     () =>
       z.object({
         name: z.string().min(1, t("nameRequired")),
@@ -59,7 +66,7 @@ export default function AddProjectTypeDialog({
     [t],
   );
 
-  type AddProjectTypeFormData = z.infer<typeof addProjectTypeSchema>;
+  type EditProjectTypeFormData = z.infer<typeof editProjectTypeSchema>;
 
   const allTabs = useProjectSettingsTabs();
 
@@ -74,8 +81,8 @@ export default function AddProjectTypeDialog({
 
   const secondLevelItems: PRJ_ProjectType[] = secondLevelData ?? [];
 
-  const form = useForm<AddProjectTypeFormData>({
-    resolver: zodResolver(addProjectTypeSchema),
+  const form = useForm<EditProjectTypeFormData>({
+    resolver: zodResolver(editProjectTypeSchema),
     defaultValues: {
       name: "",
       icon_id: "",
@@ -100,7 +107,7 @@ export default function AddProjectTypeDialog({
   const { data: referenceSchemasData, isLoading: isSchemasLoading } = useQuery({
     queryKey: ["project-types", "schemas", referenceProjectTypeId],
     queryFn: async () => {
-      const response = await ProjectTypesApi.getProjectTypeSchemasV2(
+      const response = await ProjectTypesApi.getProjectTypeSchemas(
         referenceProjectTypeId!,
       );
       return response.data.payload ?? [];
@@ -110,7 +117,10 @@ export default function AddProjectTypeDialog({
     staleTime: 0,
   });
 
-  const referenceSchemas = useMemo(() => referenceSchemasData ?? [], [referenceSchemasData]);
+  const referenceSchemas = useMemo(
+    () => referenceSchemasData ?? [],
+    [referenceSchemasData],
+  );
 
   const visibleTabs = useMemo(
     () =>
@@ -122,12 +132,49 @@ export default function AddProjectTypeDialog({
     [referenceSchemas, allTabs],
   );
 
+  useEffect(() => {
+    if (open && projectType) {
+      const refId =
+        projectType.reference_project_type_id != null
+          ? String(projectType.reference_project_type_id)
+          : null;
+      const tabValues =
+        projectType.schemas && projectType.schemas.length > 0
+          ? projectType.schemas
+              .map((s) => SCHEMA_ID_TO_TAB_VALUE[s.id])
+              .filter((v): v is string => !!v)
+          : null;
+      reset({
+        name: projectType.name,
+        icon_id: projectType.icon,
+        reference_project_type_id: refId,
+        selected_tab_values: tabValues && tabValues.length > 0 ? tabValues : null,
+      });
+    }
+  }, [open, projectType, reset]);
+
   const handleReferenceChange = (value: string | null) => {
     setValue("reference_project_type_id", value);
     setValue("selected_tab_values", null);
   };
 
-  const handleFormSubmit = async (data: AddProjectTypeFormData) => {
+  const toggleTabValue = (value: string) => {
+    if (!isCheckboxesEnabled) return;
+    const current = selectedTabValues ?? [];
+    if (current.includes(value)) {
+      const next = current.filter((v) => v !== value);
+      setValue("selected_tab_values", next.length ? next : null, {
+        shouldDirty: true,
+      });
+    } else {
+      setValue("selected_tab_values", [...current, value], {
+        shouldDirty: true,
+      });
+    }
+  };
+
+  const handleFormSubmit = async (data: EditProjectTypeFormData) => {
+    if (!projectType) return;
     try {
       const schemaIds =
         data.selected_tab_values && data.selected_tab_values.length > 0
@@ -136,7 +183,7 @@ export default function AddProjectTypeDialog({
               .filter((id): id is number => typeof id === "number")
           : [];
 
-      await ProjectTypesApi.createSecondLevelProjectType({
+      await ProjectTypesApi.updateSecondLevelProjectType(projectType.id, {
         parent_id: parentId,
         name: data.name,
         icon: data.icon_id,
@@ -147,6 +194,12 @@ export default function AddProjectTypeDialog({
         is_active: true,
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["project-types", "children", parentId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["project-types", "schemas", projectType.id],
+      });
       toast.success(t("successMessage"));
       reset();
       onClose();
@@ -164,16 +217,7 @@ export default function AddProjectTypeDialog({
     }
   };
 
-  const toggleTabValue = (value: string) => {
-    if (!isCheckboxesEnabled) return;
-    const current = selectedTabValues ?? [];
-    if (current.includes(value)) {
-      const next = current.filter((v) => v !== value);
-      setValue("selected_tab_values", next.length ? next : null);
-    } else {
-      setValue("selected_tab_values", [...current, value]);
-    }
-  };
+  if (!projectType) return null;
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -195,7 +239,10 @@ export default function AddProjectTypeDialog({
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <form
+        onSubmit={handleSubmit(handleFormSubmit)}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             {...register("name")}
@@ -220,7 +267,9 @@ export default function AddProjectTypeDialog({
             error={!!errors.reference_project_type_id}
             disabled={isSubmitting}
           >
-            <InputLabel id="reference-select-label">{t("referenceLabel")}</InputLabel>
+            <InputLabel id="reference-select-label">
+              {t("referenceLabel")}
+            </InputLabel>
             <Select
               labelId="reference-select-label"
               label={t("referenceLabel")}
@@ -234,11 +283,13 @@ export default function AddProjectTypeDialog({
               <MenuItem value="">
                 <em>{t("referenceLabel")}</em>
               </MenuItem>
-              {secondLevelItems.map((item) => (
-                <MenuItem key={item.id} value={item.id.toString()}>
-                  {item.name}
-                </MenuItem>
-              ))}
+              {secondLevelItems
+                .filter((item) => item.id !== projectType.id)
+                .map((item) => (
+                  <MenuItem key={item.id} value={item.id.toString()}>
+                    {item.name}
+                  </MenuItem>
+                ))}
             </Select>
             {errors.reference_project_type_id && (
               <FormHelperText>
@@ -262,7 +313,9 @@ export default function AddProjectTypeDialog({
                       disabled={isSubmitting}
                       control={
                         <Checkbox
-                          checked={(selectedTabValues ?? []).includes(tab.value)}
+                          checked={(selectedTabValues ?? []).includes(
+                            tab.value,
+                          )}
                           onChange={() => toggleTabValue(tab.value)}
                           disabled={isSubmitting}
                         />
@@ -277,9 +330,14 @@ export default function AddProjectTypeDialog({
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <CancelButton onClick={handleClose} disabled={isSubmitting} />
-          <SaveButton type="submit" disabled={isSubmitting} loading={isSubmitting} />
+          <SaveButton
+            type="submit"
+            disabled={isSubmitting}
+            loading={isSubmitting}
+          />
         </DialogActions>
       </form>
     </Dialog>
   );
 }
+

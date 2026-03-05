@@ -46,8 +46,8 @@ export const ROUTER = {
   ACTIVITIES_LOGS: "/activities-logs",
   TERMS_CONDITIONS: "/stores/terms",
   PROJECTS_SETTINGS: "/projects/settings",
-  ALL_PROJECTS: "/all-projects",
-  PROJECT_DETAILS: (id: string) => `/all-projects/${id}`,
+  ALL_PROJECTS: "/projects",
+  PROJECT_DETAILS: (id: string) => `/projects/${id}`,
   CMS: {
     CATEGORIES: "/content-management-system/categories",
     ICONS: "/content-management-system/icons",
