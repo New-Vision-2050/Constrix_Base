@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AllProjectsApi, ProjectDetails } from "@/services/api/all-projects";
+import { AllProjectsApi, ProjectDetails } from "@/services/api/projects/all-projects";
 
 interface ProjectContextType {
   projectId: string;

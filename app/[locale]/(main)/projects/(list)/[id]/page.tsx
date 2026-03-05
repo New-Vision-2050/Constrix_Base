@@ -1,6 +1,6 @@
 "use client";
 
-import AllProjectDetails from "@/modules/all-project";
+import AllProjectDetails from "@/modules/projects/project";
 import { useParams } from "@i18n/navigation";
 
 export default function projectDetails() {

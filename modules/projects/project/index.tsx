@@ -4,7 +4,7 @@ import React from "react";
 import ProjectStatsBar from "./components/stats-bar";
 import ProjectTabs from "./components/project-tabs";
 import { Box } from "@mui/material";
-import { ProjectProvider } from "./context/ProjectContext";
+import { ProjectProvider } from "@/modules/all-project/context/ProjectContext";
 
 interface AllProjectDetailsProps {
   projectId: string;
