@@ -18,7 +18,7 @@ import {
     Collapse,
     FormHelperText, Autocomplete,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 
 import {ChevronDown, Paperclip} from "lucide-react";
@@ -224,11 +224,11 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     const isMounted = useRef(false);
 
     const handleCreateClient = () => {
-        router.push("/create-client/client?action=create");
+        router.push("/create-client/clients?action=create");
     };
 
     const handleCreateBroker = () => {
-        router.push("/create-client/broker?action=create");
+        router.push("/create-client/brokers?action=create");
     };
 
     // Watch form values for conditional logic - MUST be before useQuery calls
