@@ -74,29 +74,32 @@ const UsersSubEntityTable = ({ programName, forceOpenCreateForm, currentSlug }: 
   };
 
   // Component to handle both client and broker form force open
-const FormWrapper = ({ children }: { children: React.ReactNode }) => {
+const FormWrapper = ({ children, forceOpen, registrationFormSlug }: { children: React.ReactNode; forceOpen?: boolean; registrationFormSlug?: string }) => {
   const { openCreateClientSheet } = useCreateClientCxt();
   const { openCreateBrokerSheet } = useCreateBrokerCxt();
   const [hasOpened, setHasOpened] = useState(false);
   
   useEffect(() => {
-    // Check if we should open broker form (priority for broker pages)
-    if (openCreateBrokerSheet && !hasOpened) {
+    // Only proceed if forceOpen is true and we haven't opened yet
+    if (!forceOpen || hasOpened) return;
+    
+    // Check if we should open broker form based on registrationFormSlug
+    if (registrationFormSlug === ModelsTypes.BROKER) {
+      // Open broker form
       openCreateBrokerSheet();
       setHasOpened(true);
       
       // Dispatch event for CreateBrokerSheet
       window.dispatchEvent(new CustomEvent('force-open-broker-form'));
-    }
-    // Check if we should open client form
-    else if (openCreateClientSheet && !hasOpened) {
+    } else {
+      // Open client form (default behavior)
       openCreateClientSheet();
       setHasOpened(true);
       
       // Dispatch event for CreateClientSheet
       window.dispatchEvent(new CustomEvent('force-open-client-form'));
     }
-  }, [openCreateClientSheet, openCreateBrokerSheet, hasOpened]);
+  }, [forceOpen, hasOpened, registrationFormSlug, openCreateClientSheet, openCreateBrokerSheet]);
   
   return <>{children}</>;
 };
@@ -156,7 +159,7 @@ const FormWrapper = ({ children }: { children: React.ReactNode }) => {
                   searchBarActions={
                     <div className="flex items-center gap-3">
                       <Can check={[entityPermissions.create]}>
-                        <FormWrapper forceOpen={forceOpenCreateForm || false}>
+                        <FormWrapper forceOpen={forceOpenCreateForm} registrationFormSlug={registrationFormSlug}>
                           <UsersSubEntityForm
                             tableId={TABLE_ID}
                             sub_entity_id={sub_entity_id}

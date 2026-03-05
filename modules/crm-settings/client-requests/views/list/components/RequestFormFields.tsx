@@ -708,10 +708,9 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                             }}
                                                             noOptionsText={brokerSearchText ? "لا يوجد وسطاء بهذا الاسم" : "لا يوجد وسطاء"}
                                                             renderOption={(props, option) => {
-                                                                const { key, ...restProps } = props;
                                                                 if (option.isCreateButton) {
                                                                     return (
-                                                                        <Box component="li" key={key} {...restProps}>
+                                                                        <Box component="li" {...props}>
                                                                             <Button
                                                                                 fullWidth
                                                                                 variant="outlined"
@@ -727,7 +726,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                                         </Box>
                                                                     );
                                                                 }
-                                                                return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                                                                return <Box component="li" {...props}>{option.name}</Box>;
                                                             }}
                                                             filterOptions={(options, params) => {
                                                                 const filtered = options.filter((option) =>
