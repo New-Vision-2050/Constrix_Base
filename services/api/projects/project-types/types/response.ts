@@ -20,7 +20,13 @@ export interface GetProjectTypeSchemasResponse extends ApiBaseResponse<
 export interface CreateSecondLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {
 }
 
+export interface UpdateSecondLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {
+}
+
 export interface CreateThirdLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {
+}
+
+export interface UpdateThirdLevelProjectTypeResponse extends ApiBaseResponse<PRJ_ProjectType> {
 }
 
 export interface DataSettings {

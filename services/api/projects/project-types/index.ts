@@ -1,7 +1,10 @@
 import {baseApi} from "@/config/axios/instances/base";
 import {
     CreateSecondLevelProjectTypeArgs,
+    CreateSecondLevelProjectTypeByParentArgs,
     CreateThirdLevelProjectTypeArgs,
+    UpdateSecondLevelProjectTypeArgs,
+    UpdateThirdLevelProjectTypeArgs,
     UpdateDataSettingsArgs,
     UpdateAttachmentContractSettingsArgs,
     UpdateAttachmentTermsContractSettingsArgs,
@@ -11,6 +14,8 @@ import {
 import {
     CreateSecondLevelProjectTypeResponse,
     CreateThirdLevelProjectTypeResponse,
+    UpdateSecondLevelProjectTypeResponse,
+    UpdateThirdLevelProjectTypeResponse,
     GetDirectChildrenProjectTypesResponse,
     GetProjectTypeSchemasResponse,
     GetRootsProjectTypesResponse,
@@ -35,13 +40,39 @@ export const ProjectTypesApi = {
         ),
     getProjectTypeSchemas: (id: number | string) =>
         baseApi.get<GetProjectTypeSchemasResponse>(`project-types/${id}/schemas`),
+    getProjectTypeSchemasV2: (id: number | string) =>
+        baseApi.get<GetProjectTypeSchemasResponse>(`project-types/${id}/second-level-schemas`),
     createSecondLevelProjectType: (args: CreateSecondLevelProjectTypeArgs) =>
         baseApi.post<CreateSecondLevelProjectTypeResponse>(
             `project-types/second-level`,
             args,
         ),
+    updateSecondLevelProjectType: (
+        projectTypeId: number | string,
+        args: UpdateSecondLevelProjectTypeArgs,
+    ) =>
+        baseApi.put<UpdateSecondLevelProjectTypeResponse>(
+            `project-types/second-level/${projectTypeId}`,
+            args,
+        ),
+    createSecondLevelProjectTypeByParent: (
+        parentId: number | string,
+        args: CreateSecondLevelProjectTypeByParentArgs,
+    ) =>
+        baseApi.post<CreateSecondLevelProjectTypeResponse>(
+            `project-types/${parentId}/second-level-schemas`,
+            args,
+        ),
     createThirdLevelProjectType: (args: CreateThirdLevelProjectTypeArgs) =>
         baseApi.post<CreateThirdLevelProjectTypeResponse>(`project-types`, args),
+    updateThirdLevelProjectType: (
+        id: number | string,
+        args: UpdateThirdLevelProjectTypeArgs,
+    ) =>
+        baseApi.put<UpdateThirdLevelProjectTypeResponse>(
+            `project-types/${id}`,
+            args,
+        ),
     getDataSettings: (projectTypeId: number | string) =>
         baseApi.get<GetDataSettingsResponse>(
             `project-types/${projectTypeId}/data-settings`,

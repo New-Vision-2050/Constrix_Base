@@ -5,6 +5,7 @@ import {
   Checkbox,
   CircularProgress,
   Grid,
+  IconButton,
   MenuItem,
   MenuList,
   Paper,
@@ -12,14 +13,22 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import AddIcon from "@mui/icons-material/Add";
+import { Settings } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
-import { PRJ_ProjectTypeSchema } from "@/types/api/projects/project-type-schema";
+import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddSubProjectTypeDialog from "../../../../components/dialogs/add-sub-project-type";
-import { useProjectSettingsTabs } from "../../../../constants/current-tabs";
+import EditSubProjectTypeDialog from "../../../../components/dialogs/edit-sub-project-type";
+import {
+  TAB_SCHEMA_ID_MAP,
+  useProjectSettingsTabs,
+} from "../../../../constants/current-tabs";
 import DetailsView from "../details";
 import ProjectTermsView from "../project-terms";
 import AttachmentsView from "../attachments";
@@ -56,16 +65,59 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
 interface SchemaLevelTabsProps {
   firstLevelId: number;
   parentId: number;
+  parentProjectType: PRJ_ProjectType;
+  onParentUpdate?: () => void;
+}
+
+function EditSubProjectTypeDialogTrigger({
+  item,
+  parentId,
+  onSuccess,
+}: {
+  item: PRJ_ProjectType;
+  parentId: number;
+  onSuccess: () => void;
+}) {
+  return (
+    <DialogTrigger
+      component={EditSubProjectTypeDialog}
+      dialogProps={{
+        parentId,
+        projectType: item,
+        onSuccess,
+      }}
+      render={({ onOpen }) => (
+        <IconButton
+          component="div"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpen();
+          }}
+          color="primary"
+          size="small"
+          sx={{ cursor: "pointer" }}
+        >
+          <Settings sx={{ fontSize: 18 }} className="text-gray-500 cursor-pointer" />
+        </IconButton>
+      )}
+    />
+  );
 }
 
 const TabWithCheckbox = ({
   label,
   value,
+  checked,
   onClick,
+  onCheckboxChange,
+  disabled,
 }: {
   label: string;
   value: string;
+  checked: boolean;
   onClick: () => void;
+  onCheckboxChange: (e: React.MouseEvent) => void;
+  disabled?: boolean;
 }) => (
   <Tab
     value={value}
@@ -73,7 +125,11 @@ const TabWithCheckbox = ({
     onClick={onClick}
     label={
       <div className="flex items-center">
-        <Checkbox onClick={(e) => e.stopPropagation()} />
+        <Checkbox
+          checked={checked}
+          onClick={onCheckboxChange}
+          disabled={disabled}
+        />
         <Typography variant="subtitle2">{label}</Typography>
       </div>
     }
@@ -83,14 +139,18 @@ const TabWithCheckbox = ({
 export default function SchemaLevelTabs({
   firstLevelId,
   parentId,
+  parentProjectType,
+  onParentUpdate,
 }: SchemaLevelTabsProps) {
   const t = useTranslations("Projects.Settings.projectTypes");
   const allTabs = useProjectSettingsTabs();
+  const queryClient = useQueryClient();
 
   const [selectedSchema, setSelectedSchema] =
-    useState<PRJ_ProjectTypeSchema | null>(null);
+    useState<PRJ_ProjectType | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const [schemaUpdating, setSchemaUpdating] = useState(false);
 
   const thirdLevelQuery = useQuery({
     queryKey: ["third-level-project-types", parentId],
@@ -100,7 +160,7 @@ export default function SchemaLevelTabs({
     },
   });
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["project-types", "schemas", parentId],
     queryFn: async () => {
       const response = await ProjectTypesApi.getProjectTypeSchemas(parentId);
@@ -109,6 +169,7 @@ export default function SchemaLevelTabs({
   });
 
   const schemas = useMemo(() => data ?? [], [data]);
+
   const filteredTabs = useMemo(
     () =>
       allTabs.filter((tab) =>
@@ -117,6 +178,49 @@ export default function SchemaLevelTabs({
     [schemas, allTabs],
   );
 
+  const selectedSchemaIds = useMemo(
+    () => new Set(schemas.map((s) => s.id)),
+    [schemas],
+  );
+
+  const handleSchemaToggle = async (tabValue: string) => {
+    const schemaId = TAB_SCHEMA_ID_MAP[tabValue];
+    if (schemaId == null) return;
+    const isCurrentlySelected = selectedSchemaIds.has(schemaId);
+    const newSchemaIds = isCurrentlySelected
+      ? schemas.filter((s) => s.id !== schemaId).map((s) => s.id)
+      : [...schemas.map((s) => s.id), schemaId]
+          .filter((id, i, arr) => arr.indexOf(id) === i)
+          .sort((a, b) => a - b);
+
+    setSchemaUpdating(true);
+    try {
+      await ProjectTypesApi.updateSecondLevelProjectType(parentId, {
+        parent_id: firstLevelId,
+        name: parentProjectType.name,
+        icon: parentProjectType.icon,
+        reference_project_type_id:
+          parentProjectType.reference_project_type_id ?? null,
+        schema_ids: newSchemaIds,
+        is_active: true,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["project-types", "schemas", parentId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["project-types", "children", firstLevelId],
+      });
+      onParentUpdate?.();
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(
+        err?.response?.data?.message ?? "Failed to update project schemas",
+      );
+    } finally {
+      setSchemaUpdating(false);
+    }
+  };
+
   useEffect(() => {
     const items = thirdLevelQuery.data ?? [];
     if (items.length === 0) return;
@@ -124,6 +228,11 @@ export default function SchemaLevelTabs({
       selectedSchema && items.some((item) => item.id === selectedSchema.id);
     if (!isValid) {
       setSelectedSchema(items[0]);
+    } else if (selectedSchema) {
+      const updated = items.find((item) => item.id === selectedSchema.id);
+      if (updated && updated !== selectedSchema) {
+        setSelectedSchema(updated);
+      }
     }
   }, [thirdLevelQuery.data, selectedSchema]);
 
@@ -131,9 +240,16 @@ export default function SchemaLevelTabs({
     if (isLoading || filteredTabs.length === 0) return;
     const isValid = filteredTabs.some((tab) => tab.value === selectedTab);
     if (!isValid) {
-      setSelectedTab(filteredTabs[0].value);
+      setSelectedTab(filteredTabs[0]?.value ?? null);
     }
   }, [data, isLoading, filteredTabs, selectedTab]);
+
+  const effectiveTabValue = useMemo(() => {
+    if (filteredTabs.length === 0) return false;
+    return filteredTabs.some((t) => t.value === selectedTab)
+      ? selectedTab
+      : (filteredTabs[0]?.value ?? false);
+  }, [selectedTab, filteredTabs]);
 
   return (
     <div className="space-y-4">
@@ -145,19 +261,33 @@ export default function SchemaLevelTabs({
             </Box>
           )}
           {!thirdLevelQuery.isLoading && (
-            <Paper>
-              <MenuList>
-                {thirdLevelQuery.data?.map((schema) => (
+            <Paper sx={{ maxHeight: "70vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+              <MenuList sx={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
+                {thirdLevelQuery.data?.map((item) => (
                   <MenuItem
-                    selected={selectedSchema?.id === schema.id}
-                    onClick={() => setSelectedSchema(schema)}
-                    key={schema.id}
-                    value={schema.id}
+                    selected={selectedSchema?.id === item.id}
+                    onClick={() => setSelectedSchema(item)}
+                    key={item.id}
+                    value={item.id}
                     sx={{ px: 2, py: 1, borderRadius: 1 }}
                   >
-                    <Typography variant="subtitle1" fontWeight={500}>
-                      {schema.name}
-                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <Typography variant="subtitle1" fontWeight={500}>
+                        {item.name}
+                      </Typography>
+                      <EditSubProjectTypeDialogTrigger
+                        item={item}
+                        parentId={parentId}
+                        onSuccess={() => {}}
+                      />
+                    </Box>
                   </MenuItem>
                 ))}
                 <MenuItem
@@ -175,27 +305,35 @@ export default function SchemaLevelTabs({
           <AddSubProjectTypeDialog
             open={addDialogOpen}
             onClose={() => setAddDialogOpen(false)}
-            onSuccess={() => refetch()}
             parentId={parentId}
           />
         </Grid>
         <Grid size={9}>
-          {selectedSchema && !isLoading && selectedTab && data && (
+          {selectedSchema && !isLoading && effectiveTabValue && data && (
             <div className="space-y-4">
               <Paper>
-                <Tabs value={selectedTab}>
+                <Tabs value={effectiveTabValue}>
                   {filteredTabs.map((tab) => (
                     <TabWithCheckbox
                       key={tab.value}
                       onClick={() => setSelectedTab(tab.value)}
                       label={tab.name}
                       value={tab.value}
+                      checked={
+                        tab.schema_id != null &&
+                        selectedSchemaIds.has(tab.schema_id)
+                      }
+                      onCheckboxChange={(e) => {
+                        e.stopPropagation();
+                        handleSchemaToggle(tab.value);
+                      }}
+                      disabled={schemaUpdating}
                     />
                   ))}
                 </Tabs>
               </Paper>
               <Paper className="p-4">
-                {renderTabContent(selectedTab, {
+                {renderTabContent(effectiveTabValue, {
                   firstLevelId,
                   secondLevelId: parentId,
                   thirdLevelId: selectedSchema.id,
