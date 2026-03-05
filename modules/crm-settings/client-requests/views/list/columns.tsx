@@ -1,6 +1,7 @@
 import { ClientRequestRow } from "@/services/api/client-requests";
 import { Chip } from "@mui/material";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 export type { ClientRequestRow };
 
@@ -21,11 +22,22 @@ const STATUS_STYLES: Record<string, { bg: ChipColor }> = {
 };
 
 function StatusBadge({ status }: { status: string }) {
+  const t = useTranslations();
   const style = STATUS_STYLES[status] ?? STATUS_STYLES.default;
+  
+  // Get translated status text
+  const getTranslatedStatus = (statusKey: string) => {
+    try {
+      return t(`clientRequests.status.${statusKey}`);
+    } catch {
+      return statusKey;
+    }
+  };
+
   return (
     <Chip
       color={style.bg}
-      label={status}
+      label={getTranslatedStatus(status)}
       size="medium"
       sx={{ textTransform: "capitalize", color: "#000", fontWeight: 500 }}
     />
