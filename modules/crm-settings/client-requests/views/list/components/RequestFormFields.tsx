@@ -16,7 +16,7 @@ import {
     Button,
     Box,
     Collapse,
-    FormHelperText, Autocomplete,
+    FormHelperText, Autocomplete
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -33,7 +33,7 @@ import {useTranslations} from "next-intl";
 import {useQuery} from "@tanstack/react-query";
 import {apiClient} from "@/config/axios-config";
 
-import {useState, useCallback, useEffect, useRef} from "react";
+import {useState, useCallback, useEffect, useRef, useMemo} from "react";
 import {ClientRequestFormValues} from "../validation/requestForm.schema";
 
 import {
@@ -374,13 +374,13 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     };
 
     // Check if broker field should be shown
-    const shouldShowBrokerField = () => {
+    const shouldShowBrokerField = useMemo(() => {
         const sourceName = getSelectedSourceName();
         return sourceName === "الوسطاء" || sourceName === "وسيط";
-    };
+    }, [selectedSource, sourcesData]);
 
     // Filter brokers based on selection
-    const getFilteredBrokers = () => {
+    const filteredBrokers = useMemo(() => {
         // Debug: log the broker data structure
         console.log("All brokers data:", brokersData);
         console.log("Company brokers data:", companyBrokersData);
@@ -403,9 +403,9 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         }
 
         return brokersData || [];
-    };
+    }, [brokerType, brokersData, companyBrokersData]);
     // Filter clients based on client_type selection using branches field
-    const getFilteredClients = () => {
+    const filteredClients = useMemo(() => {
         console.log("getFilteredClients called");
         console.log("clientType:", clientType);
         console.log("clientsData:", clientsData);
@@ -428,17 +428,17 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         }
 
         return clientsData || [];
-    };
+    }, [clientType, clientsData, companyClientsData]);
 
     // Reset client_id when clientType changes
     useEffect(() => {
         setValue("client_id", "");
-    }, [clientType, setValue]);
+    }, [clientType]);
 
     // Reset management_id when branch changes
     useEffect(() => {
         setValue("management_id", "");
-    }, [selectedBranchId, setValue]);
+    }, [selectedBranchId]);
 
     // Sync groupSelections -> { term_service_id, term_ids }[] form value
     // Skip initial mount to avoid hydration mismatch
@@ -634,7 +634,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                         options={employeesData || []}
                                                         getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
                                                         isOptionEqualToValue={(option, value) => option.id === value?.id}
-                                                        value={employeesData?.find((emp) => String(emp.id) === employeeField.value) || null}
+                                                        value={employeesData?.find((emp) => String(emp.id) === employeeField.value) ?? null}
                                                         onChange={(_, newValue) => {
                                                             employeeField.onChange(newValue ? String(newValue.id) : "");
                                                         }}
@@ -656,7 +656,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                     />
                                 )}
 
-                                {shouldShowBrokerField() && (
+                                {shouldShowBrokerField && (
                                     <>
                                         {console.log("Broker field is being rendered, brokerType:", brokerType)}
                                         <FormField
@@ -690,13 +690,13 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                     <FormControl fullWidth>
                                                         <Autocomplete
                                                             key={`${brokerType}-${brokerField.value}`} // Force re-render when brokerType or value changes
-                                                            options={getFilteredBrokers()}
+                                                            options={filteredBrokers}
                                                             getOptionLabel={(option) => option.name}
                                                             isOptionEqualToValue={(option, value) =>
                                                                 option.id === value?.id
                                                             }
                                                             value={
-                                                                getFilteredBrokers().find(
+                                                                filteredBrokers.find(
                                                                     (item) => String(item.id) === brokerField.value
                                                                 ) || null
                                                             }
@@ -801,13 +801,13 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                     <FormControl fullWidth error={!!errors.client_id}>
                         <Autocomplete
                             key={`${clientType}-${field.value}`} // Force re-render when clientType or value changes
-                            options={getFilteredClients()}
+                            options={filteredClients}
                             getOptionLabel={(option) => option.name}
                             isOptionEqualToValue={(option, value) =>
                                 option.id === value?.id
                             }
                             value={
-                                getFilteredClients().find(
+                                filteredClients.find(
                                     (item) => String(item.id) === field.value
                                 ) || null
                             }
