@@ -118,9 +118,15 @@ export function RequestFormDrawer({
   };
 
   // Save as draft - validate then submit with status "draft"
-  const handleSaveAsDraft = handleSubmit(async (data) => {
-    await submitToApi(data, "draft");
-  });
+  const handleSaveAsDraft = handleSubmit(
+    async (data) => {
+      console.log("Draft validation passed, submitting:", data);
+      await submitToApi(data, "draft");
+    },
+    (validationErrors) => {
+      console.error("Draft validation failed:", validationErrors);
+    },
+  );
 
   // Send button - open dialog directly (no validation yet)
   const handleSendClick = () => {
@@ -133,10 +139,12 @@ export function RequestFormDrawer({
   // onError closes dialog so form validation errors become visible
   const handleConfirmSave = handleSubmit(
     async (data) => {
+      console.log("Form validation passed, submitting data:", data);
       setConfirmDialogOpen(false);
       await submitToApi(data, selectedStatusRef.current);
     },
-    () => {
+    (validationErrors) => {
+      console.error("Form validation failed:", validationErrors);
       setConfirmDialogOpen(false);
     },
   );
