@@ -64,6 +64,11 @@ export const ClientRequestsApi = {
       branch_id: args.branch_id,
       management_id: args.management_id,
       attachments: args.attachments,
+      phone: args.phone,
+      email: args.email,
+      employee_id: args.employee_id,
+      broker_id: args.broker_id,
+      broker_type: args.broker_type,
     });
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
@@ -91,6 +96,11 @@ export const ClientRequestsApi = {
       branch_id: args.branch_id,
       management_id: args.management_id,
       attachments: args.attachments,
+      phone: args.phone,
+      email: args.email,
+      employee_id: args.employee_id,
+      broker_id: args.broker_id,
+      broker_type: args.broker_type,
     });
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
