@@ -1,8 +1,4 @@
 import {
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     TextField,
     Radio,
     RadioGroup,
@@ -16,11 +12,9 @@ import {
     Button,
     Box,
     Collapse,
-    FormHelperText, Autocomplete
+    Autocomplete,
 } from "@mui/material";
-import { useRouter } from "@/i18n/navigation";
-
-
+import {useRouter} from "@/i18n/navigation";
 import {ChevronDown, Paperclip} from "lucide-react";
 import {
     Controller,
@@ -32,10 +26,8 @@ import {
 import {useTranslations} from "next-intl";
 import {useQuery} from "@tanstack/react-query";
 import {apiClient} from "@/config/axios-config";
-
 import {useState, useCallback, useEffect, useRef, useMemo} from "react";
 import {ClientRequestFormValues} from "../validation/requestForm.schema";
-
 import {
     ClientRequestsApi,
     TermSettingChild,
@@ -43,13 +35,15 @@ import {
     ClientRequestReceiverFrom,
 } from "@/services/api/client-requests";
 import PhoneField from "@/modules/form-builder/components/fields/PhoneField";
-import {FormField, FormItem} from "@/modules/table/components/ui/form";
 
 interface RequestFormFieldsProps {
     control: Control<ClientRequestFormValues>;
     errors: FieldErrors<ClientRequestFormValues>;
     setValue: (name: string, value: any) => void;
 }
+
+// Stable empty array to avoid creating new [] references on every render
+const EMPTY_OPTIONS: any[] = [];
 
 // Collect only leaf IDs (nodes with no children) in a subtree
 function collectLeafIds(node: TermSettingChild): number[] {
@@ -211,9 +205,6 @@ function TermGroupAccordion({
 export function RequestFormFields({control, errors, setValue}: RequestFormFieldsProps) {
     const t = useTranslations();
     const router = useRouter();
-    const [showInput, setShowInput] = useState(false);
-    const [inputType, setInputType] = useState("");
-    const [showBrokerType, setShowBrokerType] = useState(false);
     const [clientSearchText, setClientSearchText] = useState("");
     const [employeeSearchText, setEmployeeSearchText] = useState("");
     const [brokerSearchText, setBrokerSearchText] = useState("");
@@ -350,95 +341,42 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         enabled: !!selectedBranchId, // Only fetch when branch is selected
     });
 
-    // Debug: Log raw brokersData after fetching
-    console.log("Raw brokersData from useQuery:", brokersData);
-
     // Controller for term_setting_id (multi-select tree)
     const {field: termSettingField} = useController({
         name: "term_setting_id",
         control,
-        defaultValue: [],
     });
 
     // Per-group selection map: groupId -> Set of selected leaf IDs
-    // This prevents cross-group contamination when leaf IDs repeat across groups
     const [groupSelections, setGroupSelections] = useState<
         Record<number, number[]>
     >({});
 
-    // Get selected source name
-    const getSelectedSourceName = () => {
-        if (!selectedSource || !sourcesData) return null;
+    // Derive conditional field visibility from form state (NOT local useState)
+    const {inputType, showInput, showBrokerType} = useMemo(() => {
+        if (!selectedSource || !sourcesData) return {inputType: "", showInput: false, showBrokerType: false};
         const source = sourcesData.find(item => String(item.id) === selectedSource);
-        return source?.name || null;
-    };
-
-    // Check if broker field should be shown
-    const shouldShowBrokerField = useMemo(() => {
-        const sourceName = getSelectedSourceName();
-        return sourceName === "الوسطاء" || sourceName === "وسيط";
+        const name = source?.name || null;
+        if (name === "رقم واتساب") return {inputType: "phone", showInput: true, showBrokerType: false};
+        if (name === "بريد الكتروني") return {inputType: "email", showInput: true, showBrokerType: false};
+        if (name === "موظف") return {inputType: "employee", showInput: true, showBrokerType: false};
+        if (name === "وسيط" || name === "الوسطاء") return {inputType: "broker", showInput: true, showBrokerType: true};
+        return {inputType: "", showInput: false, showBrokerType: false};
     }, [selectedSource, sourcesData]);
 
-    // Filter brokers based on selection
+    // Filter brokers based on broker type
     const filteredBrokers = useMemo(() => {
-        // Debug: log the broker data structure
-        console.log("All brokers data:", brokersData);
-        console.log("Company brokers data:", companyBrokersData);
-        console.log("Broker type selected:", brokerType);
-
-        // If broker type is not selected yet, return individual brokers
-        if (!brokerType) {
-            return brokersData || [];
-        }
-
-        // Filter based on broker type selection using branches field
-        if (brokerType === "individual") {
-            // For "فرد" selection, return individual brokers
-            console.log("Individual brokers:", brokersData);
-            return brokersData || [];
-        } else if (brokerType === "company") {
-            // For "جهه" selection, return company brokers from the new API
-            console.log("Company brokers from /companies/brokers:", companyBrokersData);
-            return companyBrokersData || [];
-        }
-
-        return brokersData || [];
+        if (!brokerType || brokerType === "individual") return brokersData || EMPTY_OPTIONS;
+        if (brokerType === "company") return companyBrokersData || EMPTY_OPTIONS;
+        return brokersData || EMPTY_OPTIONS;
     }, [brokerType, brokersData, companyBrokersData]);
-    // Filter clients based on client_type selection using branches field
+
+    // Filter clients based on client type
     const filteredClients = useMemo(() => {
-        console.log("getFilteredClients called");
-        console.log("clientType:", clientType);
-        console.log("clientsData:", clientsData);
-        console.log("companyClientsData:", companyClientsData);
-
-        // If client type is not selected yet, return individual clients
-        if (!clientType) {
-            return clientsData || [];
-        }
-
-        // Filter based on client type selection using different APIs
-        if (clientType === "individual") {
-            // For "فرد" selection, return individual clients
-            console.log("Individual clients:", clientsData);
-            return clientsData || [];
-        } else if (clientType === "company") {
-            // For "جهه" selection, return company clients from the new API
-            console.log("Company clients from /companies/clients:", companyClientsData);
-            return companyClientsData || [];
-        }
-
-        return clientsData || [];
+        if (!clientType || clientType === "individual") return clientsData || EMPTY_OPTIONS;
+        if (clientType === "company") return companyClientsData || EMPTY_OPTIONS;
+        return clientsData || EMPTY_OPTIONS;
     }, [clientType, clientsData, companyClientsData]);
-
-    // Reset client_id when clientType changes
-    useEffect(() => {
-        setValue("client_id", "");
-    }, [clientType]);
-
-    // Reset management_id when branch changes
-    useEffect(() => {
-        setValue("management_id", "");
-    }, [selectedBranchId]);
 
     // Sync groupSelections -> { term_service_id, term_ids }[] form value
     // Skip initial mount to avoid hydration mismatch
@@ -477,39 +415,27 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 name="client_request_type_id"
                 control={control}
                 render={({field}) => (
-                    <FormControl fullWidth error={!!errors.client_request_type_id}>
-                        <Autocomplete
-                            options={requestTypesData || []}
-                            getOptionLabel={(option) => option.name}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value?.id
-                            }
-                            value={
-                                requestTypesData?.find(
-                                    (item) => String(item.id) === field.value
-                                ) || null
-                            }
-                            onChange={(_, newValue) => {
-                                field.onChange(newValue ? String(newValue.id) : "");
-                            }}
-                            onInputChange={(_, value) => {
-                                setRequestTypeSearchText(value);
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label={t("clientRequests.form.requestType")}
-                                    error={!!errors.client_request_type_id}
-                                    helperText={errors.client_request_type_id?.message}
-                                />
-                            )}
-                        />
-                        {errors.client_request_type_id && (
-                            <FormHelperText>
-                                {errors.client_request_type_id.message}
-                            </FormHelperText>
+                    <Autocomplete
+                        fullWidth
+                        options={requestTypesData || EMPTY_OPTIONS}
+                        getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        value={requestTypesData?.find((item) => String(item.id) === field.value) || null}
+                        onChange={(_, newValue) => {
+                            field.onChange(newValue ? String(newValue.id) : "");
+                        }}
+                        onInputChange={(_, value, reason) => {
+                            if (reason === "input") setRequestTypeSearchText(value);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label={t("clientRequests.form.requestType")}
+                                error={!!errors.client_request_type_id}
+                                helperText={errors.client_request_type_id?.message}
+                            />
                         )}
-                    </FormControl>
+                    />
                 )}
             />
 
@@ -518,254 +444,199 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 name="client_request_receiver_from_id"
                 control={control}
                 render={({field}) => (
-                    <FormControl
+                    <Autocomplete
                         fullWidth
-                        error={!!errors.client_request_receiver_from_id}
-                    >
-                        <InputLabel></InputLabel>
+                        options={sourcesData || EMPTY_OPTIONS}
+                        getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        value={sourcesData?.find((item) => String(item.id) === field.value) || null}
+                        onChange={(_, newValue: ClientRequestReceiverFrom | null) => {
+                            field.onChange(newValue ? String(newValue.id) : "");
+                            // Reset all receiver fields when source changes
+                            setValue("receiver_phone", "");
+                            setValue("receiver_email", "");
+                            setValue("receiver_employee_id", "");
+                            setValue("receiver_broker_id", "");
+                            setValue("receiver_broker_type", "");
+                        }}
+                        onInputChange={(_, value, reason) => {
+                            if (reason === "input") setReceiverSearchText(value);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label={t("clientRequests.form.source")}
+                                error={!!errors.client_request_receiver_from_id}
+                                helperText={errors.client_request_receiver_from_id?.message}
+                            />
+                        )}
+                    />
+                )}
+            />
+
+            {/* Conditional receiver fields — OUTSIDE the source Controller, plain Controller only */}
+            {showInput && inputType === "phone" && (
+                <Controller
+                    control={control}
+                    name="receiver_phone"
+                    render={({field: phoneField, fieldState}) => (
+                        <Box>
+                            <FormLabel required sx={{mb: 0.5, display: 'block'}}>
+                                {t("clientRequests.form.phone")}
+                            </FormLabel>
+                            <PhoneField
+                                field={{
+                                    name: phoneField.name,
+                                    label: t("clientRequests.form.phone"),
+                                    type: "phone",
+                                    placeholder: t("clientRequests.form.phonePlaceholder"),
+                                    required: true,
+                                }}
+                                value={phoneField.value ?? ""}
+                                onChange={phoneField.onChange}
+                                onBlur={phoneField.onBlur}
+                                touched={fieldState.isTouched}
+                                defaultCountry="SA"
+                                international
+                            />
+                        </Box>
+                    )}
+                />
+            )}
+
+            {showInput && inputType === "email" && (
+                <Controller
+                    control={control}
+                    name="receiver_email"
+                    render={({field: emailField, fieldState}) => (
+                        <TextField
+                            {...emailField}
+                            value={emailField.value ?? ""}
+                            type="email"
+                            label={t("clientRequests.form.email")}
+                            placeholder={t("clientRequests.form.emailPlaceholder")}
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message}
+                            fullWidth
+                        />
+                    )}
+                />
+            )}
+
+            {showInput && inputType === "employee" && (
+                <Controller
+                    control={control}
+                    name="receiver_employee_id"
+                    render={({field: employeeField, fieldState}) => (
                         <Autocomplete
-                            options={sourcesData || []}
-                            getOptionLabel={(option) => option.name}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value?.id
-                            }
-                            value={
-                                sourcesData?.find(
-                                    (item) => String(item.id) === field.value
-                                ) || null
-                            }
-                            onChange={(_, newValue: ClientRequestReceiverFrom | null) => {
-                                field.onChange(newValue ? String(newValue.id) : "");
-                                console.log("Selected:", newValue?.name); // Debug log
-                                if (newValue?.name === "رقم واتساب") {
-                                    setInputType("phone");
-                                    setShowInput(true);
-                                } else if (newValue?.name === "بريد الكتروني") {
-                                    setInputType("email");
-                                    setShowInput(true);
-                                } else if (newValue?.name === "موظف") {
-                                    setInputType("employee");
-                                    setShowInput(true);
-                                } else if (newValue?.name === "وسيط" || newValue?.name === "الوسطاء") {
-                                    setInputType("broker");
-                                    setShowInput(true);
-                                    setShowBrokerType(true);
-                                } else {
-                                    setShowInput(false);
-                                    setInputType("");
-                                    setShowBrokerType(false);
-                                }
+                            fullWidth
+                            options={employeesData || EMPTY_OPTIONS}
+                            getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            value={employeesData?.find((emp) => String(emp.id) === employeeField.value) ?? null}
+                            onChange={(_, newValue) => {
+                                employeeField.onChange(newValue ? String(newValue.id) : "");
                             }}
-                            onInputChange={(_, value) => {
-                                setReceiverSearchText(value);
+                            onInputChange={(_, value, reason) => {
+                                if (reason === "input") setEmployeeSearchText(value);
                             }}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label={t("clientRequests.form.source")}
-                                    error={!!errors.client_request_receiver_from_id}
-                                    helperText={errors.client_request_receiver_from_id?.message}
+                                    label={t("clientRequests.form.employee")}
+                                    placeholder={t("clientRequests.form.selectEmployee")}
+                                    error={!!fieldState.error}
+                                    helperText={fieldState.error?.message}
                                 />
-
                             )}
                         />
-                        {showInput && (
-                            <>
-                                {inputType === "phone" && (
-                                    <FormField
-                                        control={control}
-                                        name="receiver_phone"
-                                        render={({field: phoneField, fieldState}) => (
-                                            <FormItem>
-                                                <FormLabel required>{t("clientRequests.form.phone")}</FormLabel>
-                                                <FormControl fullWidth>
-                                                    <PhoneField
-                                                        field={{
-                                                            name: phoneField.name,
-                                                            label: t("clientRequests.form.phone"),
-                                                            type: "phone",
-                                                            placeholder: t("clientRequests.form.phonePlaceholder"),
-                                                            required: true,
-                                                        }}
-                                                        value={phoneField.value ?? ""}
-                                                        onChange={phoneField.onChange}
-                                                        onBlur={phoneField.onBlur}
-                                                        touched={fieldState.isTouched}
-                                                        defaultCountry="SA"
-                                                        international
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
+                    )}
+                />
+            )}
 
-                                {inputType === "email" && (
-                                    <FormField
-                                        control={control}
-                                        name="receiver_email"
-                                        render={({field: emailField, fieldState}) => (
-                                            <FormItem>
-                                                <FormLabel required>{t("clientRequests.form.email")}</FormLabel>
-                                                <FormControl fullWidth>
-                                                    <TextField
-                                                        {...emailField}
-                                                        type="email"
-                                                        placeholder={t("clientRequests.form.emailPlaceholder")}
-                                                        error={!!fieldState.error}
-                                                        helperText={fieldState.error?.message}
-                                                        fullWidth
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
-
-                                {inputType === "employee" && (
-                                    <FormField
-                                        control={control}
-                                        name="receiver_employee_id"
-                                        render={({field: employeeField, fieldState}) => (
-                                            <FormItem>
-                                                <FormLabel required>{t("clientRequests.form.employee")}</FormLabel>
-                                                <FormControl fullWidth>
-                                                    <Autocomplete
-                                                        options={employeesData || []}
-                                                        getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
-                                                        isOptionEqualToValue={(option, value) => option.id === value?.id}
-                                                        value={employeesData?.find((emp) => String(emp.id) === employeeField.value) ?? null}
-                                                        onChange={(_, newValue) => {
-                                                            employeeField.onChange(newValue ? String(newValue.id) : "");
-                                                        }}
-                                                        onInputChange={(_, value) => {
-                                                            setEmployeeSearchText(value);
-                                                        }}
-                                                        renderInput={(params) => (
-                                                            <TextField
-                                                                {...params}
-                                                                placeholder={t("clientRequests.form.selectEmployee")}
-                                                                error={!!fieldState.error}
-                                                                helperText={fieldState.error?.message}
-                                                            />
-                                                        )}
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
-
-                                {shouldShowBrokerField && (
-                                    <>
-                                        {console.log("Broker field is being rendered, brokerType:", brokerType)}
-                                        <FormField
-                                            control={control}
-                                            name="receiver_broker_type"
-                                            render={({field: brokerTypeField, fieldState}) => (
-                                                <FormItem>
-                                                    <FormLabel >بيانات الوسيط</FormLabel>
-                                                    <RadioGroup {...brokerTypeField}
-                                                                value={brokerTypeField.value ?? "individual"} row>
-                                                        <FormControlLabel
-                                                            value="individual"
-                                                            control={<Radio/>}
-                                                            label="فرد"
-                                                        />
-                                                        <FormControlLabel
-                                                            value="company"
-                                                            control={<Radio/>}
-                                                            label="جهه"
-                                                        />
-                                                    </RadioGroup>
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={control}
-                                            name="receiver_broker_id"
-                                            render={({field: brokerField, fieldState}) => (
-                                                <FormItem>
-                                                    <FormControl fullWidth>
-                                                        <Autocomplete
-                                                            key={`${brokerType}-${brokerField.value}`} // Force re-render when brokerType or value changes
-                                                            options={filteredBrokers}
-                                                            getOptionLabel={(option) => option.name}
-                                                            isOptionEqualToValue={(option, value) =>
-                                                                option.id === value?.id
-                                                            }
-                                                            value={
-                                                                filteredBrokers.find(
-                                                                    (item) => String(item.id) === brokerField.value
-                                                                ) || null
-                                                            }
-                                                            onChange={(_, newValue) => {
-                                                                brokerField.onChange(newValue ? String(newValue.id) : "");
-                                                            }}
-                                                            onInputChange={(_, value) => {
-                                                                setBrokerSearchText(value);
-                                                            }}
-                                                            noOptionsText={brokerSearchText ? "لا يوجد وسطاء بهذا الاسم" : "لا يوجد وسطاء"}
-                                                            renderOption={(props, option) => {
-                                                                const { key, ...restProps } = props;
-                                                                if (option.isCreateButton) {
-                                                                    return (
-                                                                        <Box component="li" key={key} {...restProps}>
-                                                                            <Button
-                                                                                fullWidth
-                                                                                variant="outlined"
-                                                                                onClick={(e) => {
-                                                                                    e.preventDefault();
-                                                                                    e.stopPropagation();
-                                                                                    handleCreateBroker();
-                                                                                }}
-                                                                                sx={{ justifyContent: 'flex-start' }}
-                                                                            >
-                                                                                إنشاء وسيط جديد
-                                                                            </Button>
-                                                                        </Box>
-                                                                    );
-                                                                }
-                                                                return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
-                                                            }}
-                                                            filterOptions={(options, params) => {
-                                                                const filtered = options.filter((option) =>
-                                                                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
-                                                                );
-                                                                
-                                                                if (params.inputValue !== '' && filtered.length === 0) {
-                                                                    return [{ isCreateButton: true, name: 'إنشاء وسيط جديد' }];
-                                                                }
-                                                                
-                                                                return filtered;
-                                                            }}
-                                                            renderInput={(params) => (
-                                                                <TextField
-                                                                    {...params}
-                                                                    placeholder="الوسيط"
-                                                                    error={!!fieldState.error}
-                                                                    helperText={fieldState.error?.message}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </>
-                                )}
-                            </>
+            {showInput && showBrokerType && (
+                <>
+                    <Controller
+                        control={control}
+                        name="receiver_broker_type"
+                        render={({field: brokerTypeField}) => (
+                            <Box>
+                                <FormLabel sx={{mb: 0.5, display: 'block'}}>بيانات الوسيط</FormLabel>
+                                <RadioGroup
+                                    {...brokerTypeField}
+                                    value={brokerTypeField.value ?? "individual"}
+                                    row
+                                >
+                                    <FormControlLabel value="individual" control={<Radio/>} label="فرد"/>
+                                    <FormControlLabel value="company" control={<Radio/>} label="جهه"/>
+                                </RadioGroup>
+                            </Box>
                         )}
+                    />
 
-                        {errors.client_request_receiver_from_id && (
-                            <FormHelperText>
-                                {errors.client_request_receiver_from_id.message}
-                            </FormHelperText>
+                    <Controller
+                        control={control}
+                        name="receiver_broker_id"
+                        render={({field: brokerField, fieldState}) => (
+                            <Autocomplete
+                                fullWidth
+                                key={`${brokerType}-${brokerField.value}`}
+                                options={filteredBrokers}
+                                getOptionLabel={(option) => option.name}
+                                isOptionEqualToValue={(option, value) => option.id === value?.id}
+                                value={filteredBrokers.find((item) => String(item.id) === brokerField.value) || null}
+                                onChange={(_, newValue) => {
+                                    if (newValue && 'isCreateButton' in newValue) return;
+                                    brokerField.onChange(newValue ? String(newValue.id) : "");
+                                }}
+                                onInputChange={(_, value, reason) => {
+                                    if (reason === "input") setBrokerSearchText(value);
+                                }}
+                                noOptionsText={brokerSearchText ? "لا يوجد وسطاء بهذا الاسم" : "لا يوجد وسطاء"}
+                                renderOption={(props, option) => {
+                                    const {key, ...restProps} = props;
+                                    if (option.isCreateButton) {
+                                        return (
+                                            <Box component="li" key={key} {...restProps}>
+                                                <Button
+                                                    fullWidth
+                                                    variant="outlined"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleCreateBroker();
+                                                    }}
+                                                    sx={{justifyContent: 'flex-start'}}
+                                                >
+                                                    إنشاء وسيط جديد
+                                                </Button>
+                                            </Box>
+                                        );
+                                    }
+                                    return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                                }}
+                                filterOptions={(options, params) => {
+                                    const filtered = options.filter((option) =>
+                                        option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                                    );
+                                    if (params.inputValue !== '' && filtered.length === 0) {
+                                        return [{isCreateButton: true, name: 'إنشاء وسيط جديد'}];
+                                    }
+                                    return filtered;
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="الوسيط"
+                                        error={!!fieldState.error}
+                                        helperText={fieldState.error?.message}
+                                    />
+                                )}
+                            />
                         )}
-                    </FormControl>
-                )}
-            />
+                    />
+                </>
+            )}
 
 
             {/* بيانات العميل - client_type radio */}
@@ -773,11 +644,20 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 name="client_type"
                 control={control}
                 render={({field}) => (
-                    <FormControl>
+                    <Box>
                         <FormLabel sx={{mb: 0.5}}>
                             {t("clientRequests.form.ownerType")} *
                         </FormLabel>
-                        <RadioGroup {...field} value={field.value ?? "individual"} row>
+                        <RadioGroup
+                            {...field}
+                            value={field.value ?? "individual"}
+                            row
+                            onChange={(e) => {
+                                field.onChange(e.target.value);
+                                // Reset client_id when client type changes
+                                setValue("client_id", "");
+                            }}
+                        >
                             <FormControlLabel
                                 value="individual"
                                 control={<Radio/>}
@@ -789,7 +669,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                 label={t("clientRequests.form.company")}
                             />
                         </RadioGroup>
-                    </FormControl>
+                    </Box>
                 )}
             />
 
@@ -798,75 +678,61 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 name="client_id"
                 control={control}
                 render={({field}) => (
-                    <FormControl fullWidth error={!!errors.client_id}>
-                        <Autocomplete
-                            key={`${clientType}-${field.value}`} // Force re-render when clientType or value changes
-                            options={filteredClients}
-                            getOptionLabel={(option) => option.name}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value?.id
-                            }
-                            value={
-                                filteredClients.find(
-                                    (item) => String(item.id) === field.value
-                                ) || null
-                            }
-                            onChange={(_, newValue) => {
-                                field.onChange(newValue ? String(newValue.id) : "");
-                            }}
-                            onInputChange={(_, value) => {
-                                setClientSearchText(value);
-                            }}
-                            noOptionsText={clientSearchText ? "لا يوجد عملاء بهذا الاسم" : "لا يوجد عملاء"}
-                            renderOption={(props, option) => {
-                                console.log("renderOption called with:", option);
-                                const { key, ...restProps } = props;
-                                if (option.isCreateButton) {
-                                    console.log("Rendering create button");
-                                    return (
-                                        <Box component="li" key={key} {...restProps}>
-                                            <Button
-                                                fullWidth
-                                                variant="outlined"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    console.log("Button clicked!");
-                                                    handleCreateClient();
-                                                }}
-                                                sx={{ justifyContent: 'flex-start' }}
-                                            >
-                                                إنشاء عميل جديد
-                                            </Button>
-                                        </Box>
-                                    );
-                                }
-                                return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
-                            }}
-                            filterOptions={(options, params) => {
-                                const filtered = options.filter((option) =>
-                                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                    <Autocomplete
+                        fullWidth
+                        key={`${clientType}-${field.value}`}
+                        options={filteredClients}
+                        getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        value={filteredClients.find((item) => String(item.id) === field.value) || null}
+                        onChange={(_, newValue) => {
+                            if (newValue && 'isCreateButton' in newValue) return;
+                            field.onChange(newValue ? String(newValue.id) : "");
+                        }}
+                        onInputChange={(_, value, reason) => {
+                            if (reason === "input") setClientSearchText(value);
+                        }}
+                        noOptionsText={clientSearchText ? "لا يوجد عملاء بهذا الاسم" : "لا يوجد عملاء"}
+                        renderOption={(props, option) => {
+                            const {key, ...restProps} = props;
+                            if (option.isCreateButton) {
+                                return (
+                                    <Box component="li" key={key} {...restProps}>
+                                        <Button
+                                            fullWidth
+                                            variant="outlined"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                handleCreateClient();
+                                            }}
+                                            sx={{justifyContent: 'flex-start'}}
+                                        >
+                                            إنشاء عميل جديد
+                                        </Button>
+                                    </Box>
                                 );
-                                
-                                console.log("filterOptions called:", { inputValue: params.inputValue, filteredLength: filtered.length, originalOptions: options.length });
-                                
-                                if (params.inputValue !== '' && filtered.length === 0) {
-                                    console.log("Adding create button option");
-                                    return [{ isCreateButton: true, name: 'إنشاء عميل جديد' }];
-                                }
-                                
-                                return filtered;
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label={t("clientRequests.form.client")}
-                                    error={!!errors.client_id}
-                                    helperText={errors.client_id?.message}
-                                />
-                            )}
-                        />
-                    </FormControl>
+                            }
+                            return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                        }}
+                        filterOptions={(options, params) => {
+                            const filtered = options.filter((option) =>
+                                option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                            );
+                            if (params.inputValue !== '' && filtered.length === 0) {
+                                return [{isCreateButton: true, name: 'إنشاء عميل جديد'}];
+                            }
+                            return filtered;
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label={t("clientRequests.form.client")}
+                                error={!!errors.client_id}
+                                helperText={errors.client_id?.message}
+                            />
+                        )}
+                    />
                 )}
             />
 
@@ -930,39 +796,29 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 name="branch_id"
                 control={control}
                 render={({field}) => (
-                    <FormControl fullWidth error={!!errors.branch_id}>
-                        <Autocomplete
-                            options={branchesData || []}
-                            getOptionLabel={(option) => option.name}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value?.id
-                            }
-                            value={
-                                branchesData?.find(
-                                    (item) => String(item.id) === field.value
-                                ) || null
-                            }
-                            onChange={(_, newValue) => {
-                                field.onChange(newValue ? String(newValue.id) : "");
-                            }}
-                            onInputChange={(_, value) => {
-                                setBranchSearchText(value);
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label={t("clientRequests.form.branch")}
-                                    error={!!errors.branch_id}
-                                    helperText={errors.branch_id?.message}
-                                />
-                            )}
-                        />
-                        {errors.branch_id && (
-                            <FormHelperText>
-                                {errors.branch_id.message}
-                            </FormHelperText>
+                    <Autocomplete
+                        fullWidth
+                        options={branchesData || EMPTY_OPTIONS}
+                        getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        value={branchesData?.find((item) => String(item.id) === field.value) || null}
+                        onChange={(_, newValue) => {
+                            field.onChange(newValue ? String(newValue.id) : "");
+                            // Reset management when branch changes
+                            setValue("management_id", "");
+                        }}
+                        onInputChange={(_, value, reason) => {
+                            if (reason === "input") setBranchSearchText(value);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label={t("clientRequests.form.branch")}
+                                error={!!errors.branch_id}
+                                helperText={errors.branch_id?.message}
+                            />
                         )}
-                    </FormControl>
+                    />
                 )}
             />
 
@@ -971,45 +827,28 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 name="management_id"
                 control={control}
                 render={({field}) => (
-                    <FormControl fullWidth error={!!errors.management_id}>
-                        <Autocomplete
-                            options={managementsData || []}
-                            getOptionLabel={(option) => option.name}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value?.id
-                            }
-                            value={
-                                managementsData?.find(
-                                    (item) => String(item.id) === field.value
-                                ) || null
-                            }
-                            onChange={(_, newValue) => {
-                                field.onChange(newValue ? String(newValue.id) : "");
-                            }}
-                            onInputChange={(_, value) => {
-                                setManagementSearchText(value);
-                            }}
-                            disabled={!selectedBranchId}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label={t("clientRequests.form.management")}
-                                    error={!!errors.management_id}
-                                    helperText={errors.management_id?.message}
-                                />
-                            )}
-                        />
-                        {errors.management_id && (
-                            <FormHelperText>
-                                {errors.management_id.message}
-                            </FormHelperText>
+                    <Autocomplete
+                        fullWidth
+                        options={managementsData || EMPTY_OPTIONS}
+                        getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        value={managementsData?.find((item) => String(item.id) === field.value) || null}
+                        onChange={(_, newValue) => {
+                            field.onChange(newValue ? String(newValue.id) : "");
+                        }}
+                        onInputChange={(_, value, reason) => {
+                            if (reason === "input") setManagementSearchText(value);
+                        }}
+                        disabled={!selectedBranchId}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label={t("clientRequests.form.management")}
+                                error={!!errors.management_id}
+                                helperText={errors.management_id?.message || (!selectedBranchId ? "يرجى اختيار الفرع أولاً" : undefined)}
+                            />
                         )}
-                        {!selectedBranchId && (
-                            <FormHelperText>
-                                يرجى اختيار الفرع أولاً
-                            </FormHelperText>
-                        )}
-                    </FormControl>
+                    />
                 )}
             />
 

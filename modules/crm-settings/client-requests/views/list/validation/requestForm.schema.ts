@@ -20,10 +20,10 @@ export const ClientRequestschema = z.object({
   management_id: z.string().nullable().optional(),
   attachments: z.array(z.instanceof(File)).optional(),
   receiver_phone: z.string().optional(),
-  receiver_email: z.string().email().optional(),
+  receiver_email: z.union([z.string().email(), z.literal("")]).optional(),
   receiver_employee_id: z.string().optional(),
   receiver_broker_id: z.string().optional(),
-  receiver_broker_type: z.enum(["individual", "company"]).optional(),
+  receiver_broker_type: z.union([z.enum(["individual", "company"]), z.literal("")]).optional(),
 });
 
 export type ClientRequestFormValues = z.infer<typeof ClientRequestschema>;
