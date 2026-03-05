@@ -11,7 +11,7 @@ import { useSidebarStore } from "@/store/useSidebarStore";
 import { useParams } from "@i18n/navigation";
 import UsersSubEntityForm from "./users-sub-entity-form";
 import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
-import { CreateClientCxtProvider } from "@/modules/clients/context/CreateClientCxt";
+import { CreateClientCxtProvider, useCreateClientCxt } from "@/modules/clients/context/CreateClientCxt";
 import { BrokersDataCxtProvider } from "@/modules/brokers/context/BrokersDataCxt";
 import { CreateBrokerCxtProvider } from "@/modules/brokers/context/CreateBrokerCxt";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
@@ -19,7 +19,7 @@ import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config"
 import useUserData from "@/hooks/use-user-data";
 import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import { RefreshCcwIcon } from "lucide-react";
 import TabsGroup from "@/components/shared/TabsGroup";
@@ -31,9 +31,10 @@ import { ModelsTypes } from "./users-sub-entity-form/constants/ModelsTypes";
 
 type PropsT = {
   programName: `SuperEntitySlug`;
+  forceOpenCreateForm?: boolean;
 };
 
-const UsersSubEntityTable = ({ programName }: PropsT) => {
+const UsersSubEntityTable = ({ programName, forceOpenCreateForm }: PropsT) => {
   const t = useTranslations();
   // current user data
   const { data: userData } = useUserData();
@@ -70,6 +71,30 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
   const handleRefreshWidgetsData = () => {
     setToggleRefetch((prev) => ++prev);
   };
+
+  // Component to handle force open form inside provider context
+const ForceOpenFormWrapper = ({ children, forceOpen }: { children: React.ReactNode; forceOpen: boolean }) => {
+  const { openCreateClientSheet } = useCreateClientCxt();
+  const [hasOpened, setHasOpened] = useState(false);
+  
+  useEffect(() => {
+    if (forceOpen && !hasOpened && openCreateClientSheet) {
+      console.log("Force opening create form inside provider");
+      openCreateClientSheet();
+      setHasOpened(true); // Mark as opened to prevent reopening
+    }
+  }, [forceOpen, hasOpened, openCreateClientSheet]);
+  
+  return <>{children}</>;
+};
+
+// Handle force open create form
+  useEffect(() => {
+    if (forceOpenCreateForm) {
+      console.log("Force opening create form");
+      // We'll handle this inside the provider below
+    }
+  }, [forceOpenCreateForm]);
 
   const usersConfig = UsersConfigV2({
     canDelete: can(entityPermissions.delete),
@@ -126,13 +151,15 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
                   searchBarActions={
                     <div className="flex items-center gap-3">
                       <Can check={[entityPermissions.create]}>
-                        <UsersSubEntityForm
-                          tableId={TABLE_ID}
-                          sub_entity_id={sub_entity_id}
-                          slug={slug}
-                          registrationFormSlug={registrationFormSlug}
-                          handleRefreshWidgetsData={handleRefreshWidgetsData}
-                        />
+                        <ForceOpenFormWrapper forceOpen={forceOpenCreateForm || false}>
+                          <UsersSubEntityForm
+                            tableId={TABLE_ID}
+                            sub_entity_id={sub_entity_id}
+                            slug={slug}
+                            registrationFormSlug={registrationFormSlug}
+                            handleRefreshWidgetsData={handleRefreshWidgetsData}
+                          />
+                        </ForceOpenFormWrapper>
                       </Can>
                     </div>
                   }

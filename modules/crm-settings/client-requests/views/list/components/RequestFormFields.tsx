@@ -18,6 +18,7 @@ import {
     Collapse,
     FormHelperText, Autocomplete,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 
 import {ChevronDown, Paperclip} from "lucide-react";
@@ -209,6 +210,7 @@ function TermGroupAccordion({
 
 export function RequestFormFields({control, errors, setValue}: RequestFormFieldsProps) {
     const t = useTranslations();
+    const router = useRouter();
     const [showInput, setShowInput] = useState(false);
     const [inputType, setInputType] = useState("");
     const [showBrokerType, setShowBrokerType] = useState(false);
@@ -220,6 +222,10 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     const [requestTypeSearchText, setRequestTypeSearchText] = useState("");
     const [receiverSearchText, setReceiverSearchText] = useState("");
     const isMounted = useRef(false);
+
+    const handleCreateClient = () => {
+        router.push("/create-client/client?action=create");
+    };
 
     // Watch form values for conditional logic - MUST be before useQuery calls
     const selectedSource = useWatch({
@@ -772,6 +778,45 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                             }}
                             onInputChange={(_, value) => {
                                 setClientSearchText(value);
+                            }}
+                            noOptionsText={clientSearchText ? "لا يوجد عملاء بهذا الاسم" : "لا يوجد عملاء"}
+                            renderOption={(props, option) => {
+                                console.log("renderOption called with:", option);
+                                if (option.isCreateButton) {
+                                    console.log("Rendering create button");
+                                    return (
+                                        <Box component="li" {...props}>
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    console.log("Button clicked!");
+                                                    handleCreateClient();
+                                                }}
+                                                sx={{ justifyContent: 'flex-start' }}
+                                            >
+                                                إنشاء عميل جديد
+                                            </Button>
+                                        </Box>
+                                    );
+                                }
+                                return <Box component="li" {...props}>{option.name}</Box>;
+                            }}
+                            filterOptions={(options, params) => {
+                                const filtered = options.filter((option) =>
+                                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                                );
+                                
+                                console.log("filterOptions called:", { inputValue: params.inputValue, filteredLength: filtered.length, originalOptions: options.length });
+                                
+                                if (params.inputValue !== '' && filtered.length === 0) {
+                                    console.log("Adding create button option");
+                                    return [{ isCreateButton: true, name: 'إنشاء عميل جديد' }];
+                                }
+                                
+                                return filtered;
                             }}
                             renderInput={(params) => (
                                 <TextField
