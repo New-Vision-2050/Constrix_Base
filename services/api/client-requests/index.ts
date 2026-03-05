@@ -64,6 +64,11 @@ export const ClientRequestsApi = {
       branch_id: args.branch_id,
       management_id: args.management_id,
       attachments: args.attachments,
+      receiver_phone: args.receiver_phone,
+      receiver_email: args.receiver_email,
+      receiver_employee_id: args.receiver_employee_id,
+      receiver_broker_id: args.receiver_broker_id,
+      receiver_broker_type: args.receiver_broker_type,
     });
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
@@ -91,6 +96,11 @@ export const ClientRequestsApi = {
       branch_id: args.branch_id,
       management_id: args.management_id,
       attachments: args.attachments,
+      receiver_phone: args.receiver_phone,
+      receiver_email: args.receiver_email,
+      receiver_employee_id: args.receiver_employee_id,
+      receiver_broker_id: args.receiver_broker_id,
+      receiver_broker_type: args.receiver_broker_type,
     });
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
@@ -110,15 +120,11 @@ export const ClientRequestsApi = {
 
   delete: (id: string) => baseApi.delete(`client-requests/${id}`),
 
-  getRequestTypes: () =>
-    baseApi.get<GetRequestTypesResponse>(
-      "client-requests/client-request-types",
-    ),
+  getRequestTypes: (searchText?: string) =>
+    baseApi.get(searchText ? `client-requests/client-request-types?name=${searchText}` : "client-requests/client-request-types"),
 
-  getSources: () =>
-    baseApi.get<GetSourcesResponse>(
-      "client-requests/client-request-receiver-from",
-    ),
+  getSources: (searchText?: string) =>
+    baseApi.get(searchText ? `client-requests/client-request-receiver-from?name=${searchText}` : "client-requests/client-request-receiver-from"),
 
   getServices: () =>
     baseApi.get<GetServicesResponse>("client-requests/client-request-services"),
@@ -131,4 +137,21 @@ export const ClientRequestsApi = {
 
   getStats: () =>
     baseApi.get<GetStatsResponse>("client-requests/status/widgets"),
+
+  getBranches: (searchText?: string) =>
+    baseApi.get(searchText ? `management_hierarchies/list?type=branch&name=${searchText}` : "management_hierarchies/list?type=branch"),
+
+  getManagements: (branchId?: string, searchText?: string) => {
+    let url = "management_hierarchies/list?type=management";
+    const params = [];
+    
+    if (branchId) params.push(`branch_id=${branchId}`);
+    if (searchText) params.push(`name=${searchText}`);
+    
+    if (params.length > 0) {
+      url += `&${params.join('&')}`;
+    }
+    
+    return baseApi.get(url);
+  },
 };

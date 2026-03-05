@@ -77,7 +77,9 @@ export const getClientRequestsColumns = (t: (key: string) => string) => [
     key: "branch",
     name: t("clientRequests.table.branch"),
     sortable: false,
-    render: (row: ClientRequestRow) => <span>{"—"}</span>,
+    render: (row: ClientRequestRow) => (
+      <span>{row.branch?.name ?? "—"}</span>
+    ),
   },
   {
     key: "client_request_type",
