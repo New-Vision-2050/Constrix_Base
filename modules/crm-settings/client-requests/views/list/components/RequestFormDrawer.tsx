@@ -102,11 +102,11 @@ export function RequestFormDrawer({
           ? Number(data.management_id)
           : undefined,
         attachments: data.attachments,
-        phone: data.phone,
-        email: data.email,
-        employee_id: data.employee_id,
-        broker_id: data.broker_id,
-        broker_type: data.broker_type,
+        receiver_phone: data.receiver_phone,
+        receiver_email: data.receiver_email,
+        receiver_employee_id: data.receiver_employee_id,
+        receiver_broker_id: data.receiver_broker_id,
+        receiver_broker_type: data.receiver_broker_type,
       };
 
       await ClientRequestsApi.create(apiData);

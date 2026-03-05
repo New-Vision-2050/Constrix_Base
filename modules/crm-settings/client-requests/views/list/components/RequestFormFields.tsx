@@ -222,7 +222,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
 
     const brokerType = useWatch({
         control,
-        name: "broker_type"
+        name: "receiver_broker_type"
     });
 
     const clientType = useWatch({
@@ -507,7 +507,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                 {inputType === "phone" && (
                                     <FormField
                                         control={control}
-                                        name="phone"
+                                        name="receiver_phone"
                                         render={({field: phoneField, fieldState}) => (
                                             <FormItem>
                                                 <FormLabel required>{t("clientRequests.form.phone")}</FormLabel>
@@ -536,7 +536,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                 {inputType === "email" && (
                                     <FormField
                                         control={control}
-                                        name="email"
+                                        name="receiver_email"
                                         render={({field: emailField, fieldState}) => (
                                             <FormItem>
                                                 <FormLabel required>{t("clientRequests.form.email")}</FormLabel>
@@ -558,7 +558,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                 {inputType === "employee" && (
                                     <FormField
                                         control={control}
-                                        name="employee_id"
+                                        name="receiver_employee_id"
                                         render={({field: employeeField, fieldState}) => (
                                             <FormItem>
                                                 <FormLabel required>{t("clientRequests.form.employee")}</FormLabel>
@@ -591,7 +591,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                         {console.log("Broker field is being rendered, brokerType:", brokerType)}
                                         <FormField
                                             control={control}
-                                            name="broker_type"
+                                            name="receiver_broker_type"
                                             render={({field: brokerTypeField, fieldState}) => (
                                                 <FormItem>
                                                     <FormLabel >بيانات الوسيط</FormLabel>
@@ -614,7 +614,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
 
                                         <FormField
                                             control={control}
-                                            name="broker_id"
+                                            name="receiver_broker_id"
                                             render={({field: brokerField, fieldState}) => (
                                                 <FormItem>
                                                     <FormControl fullWidth>
