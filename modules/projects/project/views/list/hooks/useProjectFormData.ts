@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
+import { useState, useCallback, useRef } from "react";
 
 export function useProjectFormData(
   watchProjectTypeId?: string,
@@ -7,6 +8,7 @@ export function useProjectFormData(
   watchManagementId?: string,
   watchOwnerType?: "company" | "individual",
 ) {
+  const [searchParams, setSearchParams] = useState<Record<string, string>>({});
   const { data: projectTypesData } = useQuery({
     queryKey: ["project-types-roots"],
     queryFn: async () => {
@@ -38,42 +40,42 @@ export function useProjectFormData(
   });
 
   const { data: branchesData } = useQuery({
-    queryKey: ["branches"],
+    queryKey: ["branches", searchParams.branch_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getBranches();
+      const response = await AllProjectsApi.getBranches(searchParams.branch_id ? { name: searchParams.branch_id } : {});
       return response.data.payload ?? [];
     },
   });
 
   const { data: managementsData } = useQuery({
-    queryKey: ["managements"],
+    queryKey: ["managements", searchParams.management_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getManagements();
+      const response = await AllProjectsApi.getManagements(searchParams.management_id ? { name: searchParams.management_id } : {});
       return response.data.payload ?? [];
     },
   });
 
   const { data: companyUsersData } = useQuery({
-    queryKey: ["company-users"],
+    queryKey: ["company-users", searchParams.manager_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getCompanyUsers();
+      const response = await AllProjectsApi.getCompanyUsers(searchParams.manager_id ? { name: searchParams.manager_id } : {});
       return response.data.payload ?? [];
     },
   });
 
   const { data: entityClientsData } = useQuery({
-    queryKey: ["entity-clients"],
+    queryKey: ["entity-clients", watchOwnerType, searchParams.entity_clients],
     queryFn: async () => {
-      const response = await AllProjectsApi.getEntityClients();
+      const response = await AllProjectsApi.getEntityClients(searchParams.entity_clients ? { name: searchParams.entity_clients } : {});
       return response.data.payload ?? [];
     },
     enabled: watchOwnerType === "company",
   });
 
   const { data: individualClientsData } = useQuery({
-    queryKey: ["individual-clients"],
+    queryKey: ["individual-clients", watchOwnerType, searchParams.individual_clients],
     queryFn: async () => {
-      const response = await AllProjectsApi.getIndividualClients();
+      const response = await AllProjectsApi.getIndividualClients(searchParams.individual_clients ? { name: searchParams.individual_clients } : {});
       return response.data.payload ?? [];
     },
     enabled: watchOwnerType === "individual",
@@ -95,6 +97,23 @@ export function useProjectFormData(
   //   },
   // });
 
+  const timeoutRefs = useRef<Record<string, NodeJS.Timeout>>({});
+
+  const handleSearchChange = (fieldName: string, searchValue: string) => {
+    // Clear existing timeout for this field
+    if (timeoutRefs.current[fieldName]) {
+      clearTimeout(timeoutRefs.current[fieldName]);
+    }
+    
+    // Set new timeout
+    timeoutRefs.current[fieldName] = setTimeout(() => {
+      setSearchParams(prev => ({
+        ...prev,
+        [fieldName]: searchValue
+      }));
+    }, 300);
+  };
+
   return {
     projectTypesData,
     subProjectTypesData,
@@ -106,5 +125,6 @@ export function useProjectFormData(
     individualClientsData,
     // contractTypesData,
     // projectClassificationsData,
+    onSearchChange: handleSearchChange,
   };
 }

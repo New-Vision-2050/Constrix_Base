@@ -40,15 +40,16 @@ export const AllProjectsApi = {
       `project-types/${projectTypeId}/children`,
     ),
 
-  getBranches: () =>
-    baseApi.get<GetBranchesResponse>("management_hierarchies/list?type=branch"),
+  getBranches: (params?: { name?: string }) =>
+    baseApi.get<GetBranchesResponse>("management_hierarchies/list?type=branch", { params }),
 
-  getManagements: () =>
+  getManagements: (params?: { name?: string }) =>
     baseApi.get<GetManagementsResponse>(
       "management_hierarchies/list?type=management",
+      { params }
     ),
 
-  getCompanyUsers: () => baseApi.get(`company-users/employees`),
+  getCompanyUsers: (params?: { name?: string }) => baseApi.get(`company-users/employees`, { params }),
 
   getEntityClients: (params?: ClientParams) =>
     baseApi.get<GetClientsResponse>("companies/clients", { params }),
