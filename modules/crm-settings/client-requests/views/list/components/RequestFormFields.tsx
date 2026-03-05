@@ -819,10 +819,11 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                             noOptionsText={clientSearchText ? "لا يوجد عملاء بهذا الاسم" : "لا يوجد عملاء"}
                             renderOption={(props, option) => {
                                 console.log("renderOption called with:", option);
+                                const { key, ...restProps } = props;
                                 if (option.isCreateButton) {
                                     console.log("Rendering create button");
                                     return (
-                                        <Box component="li" {...props}>
+                                        <Box component="li" key={key} {...restProps}>
                                             <Button
                                                 fullWidth
                                                 variant="outlined"
@@ -839,7 +840,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                         </Box>
                                     );
                                 }
-                                return <Box component="li" {...props}>{option.name}</Box>;
+                                return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
                             }}
                             filterOptions={(options, params) => {
                                 const filtered = options.filter((option) =>
