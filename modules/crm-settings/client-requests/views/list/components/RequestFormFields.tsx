@@ -587,7 +587,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                                             placeholder: t("clientRequests.form.phonePlaceholder"),
                                                             required: true,
                                                         }}
-                                                        value={phoneField.value || ""}
+                                                        value={phoneField.value ?? ""}
                                                         onChange={phoneField.onChange}
                                                         onBlur={phoneField.onBlur}
                                                         touched={fieldState.isTouched}
