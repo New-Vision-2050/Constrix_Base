@@ -141,4 +141,10 @@ export const ClientRequestsApi = {
 
   getStats: () =>
     baseApi.get<GetStatsResponse>("client-requests/status/widgets"),
+
+  getBranches: () =>
+    baseApi.get("management_hierarchies/list?type=branch"),
+
+  getManagements: (branchId?: string) =>
+    baseApi.get(branchId ? `management_hierarchies/list?type=management&branch_id=${branchId}` : "management_hierarchies/list?type=management"),
 };

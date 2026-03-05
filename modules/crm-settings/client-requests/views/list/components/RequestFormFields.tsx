@@ -230,6 +230,11 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         name: "client_type"
     });
 
+    const selectedBranchId = useWatch({
+        control,
+        name: "branch_id"
+    });
+
     const {data: requestTypesData} = useQuery({
         queryKey: ["client-request-types"],
         queryFn: async () => {
@@ -303,6 +308,23 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
             return response.data.payload || response.data;
         },
         enabled: brokerType === "company", // Only fetch when brokerType is "company"
+    });
+
+    const {data: branchesData} = useQuery({
+        queryKey: ["branches"],
+        queryFn: async () => {
+            const response = await ClientRequestsApi.getBranches();
+            return response.data.payload || response.data;
+        },
+    });
+
+    const {data: managementsData} = useQuery({
+        queryKey: ["managements", selectedBranchId],
+        queryFn: async () => {
+            const response = await ClientRequestsApi.getManagements(selectedBranchId);
+            return response.data.payload || response.data;
+        },
+        enabled: !!selectedBranchId, // Only fetch when branch is selected
     });
 
     // Debug: Log raw brokersData after fetching
@@ -389,6 +411,11 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     useEffect(() => {
         setValue("client_id", "");
     }, [clientType, setValue]);
+
+    // Reset management_id when branch changes
+    useEffect(() => {
+        setValue("management_id", "");
+    }, [selectedBranchId, setValue]);
 
     // Sync groupSelections -> { term_service_id, term_ids }[] form value
     // Skip initial mount to avoid hydration mismatch
@@ -774,6 +801,66 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                     ))}
                 </Box>
             )}
+
+            {/* الفرع - branch_id */}
+            <Controller
+                name="branch_id"
+                control={control}
+                render={({field}) => (
+                    <FormControl fullWidth error={!!errors.branch_id}>
+                        <InputLabel>{t("clientRequests.form.branch")}</InputLabel>
+                        <Select
+                            {...field}
+                            value={field.value ?? ""}
+                            label={t("clientRequests.form.branch")}
+                        >
+                            {branchesData?.map((item) => (
+                                <MenuItem key={item.id} value={String(item.id)}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        {errors.branch_id && (
+                            <FormHelperText>
+                                {errors.branch_id.message}
+                            </FormHelperText>
+                        )}
+                    </FormControl>
+                )}
+            />
+
+            {/* الإدارة - management_id */}
+            <Controller
+                name="management_id"
+                control={control}
+                render={({field}) => (
+                    <FormControl fullWidth error={!!errors.management_id}>
+                        <InputLabel>{t("clientRequests.form.management")}</InputLabel>
+                        <Select
+                            {...field}
+                            value={field.value ?? ""}
+                            label={t("clientRequests.form.management")}
+                            disabled={!selectedBranchId}
+                        >
+                            {managementsData?.map((item) => (
+                                <MenuItem key={item.id} value={String(item.id)}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        {errors.management_id && (
+                            <FormHelperText>
+                                {errors.management_id.message}
+                            </FormHelperText>
+                        )}
+                        {!selectedBranchId && (
+                            <FormHelperText>
+                                يرجى اختيار الفرع أولاً
+                            </FormHelperText>
+                        )}
+                    </FormControl>
+                )}
+            />
 
             {/* المرفقات - attachments */}
             <Controller
