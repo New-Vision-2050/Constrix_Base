@@ -1,8 +1,10 @@
 import { Container } from "@mui/material";
-import CommunicationMessagesTable from "./components/CommunicationMessagesTable";
+import CommunicationMessagesTableV2 from "./components/CommunicationMessagesTableV2";
 
 export default function CommunicationMessagesView() {
-  return <Container maxWidth="xl">
-    <CommunicationMessagesTable />
-  </Container>;
+  return (
+    <Container maxWidth="xl">
+      <CommunicationMessagesTableV2 />
+    </Container>
+  );
 }

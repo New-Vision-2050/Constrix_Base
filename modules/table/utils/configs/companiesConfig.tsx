@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import EnterIcon from "@/public/icons/enter";
 import GearIcon from "@/public/icons/gear";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { ROUTER } from "@/router";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
@@ -142,7 +142,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
       {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
-        action: (e: { id: string;[key: string]: unknown }) => {
+        action: (e: { id: string; [key: string]: unknown }) => {
           fetchCompanyAdmin(e.id).then((data) => {
             const { url, token } = data;
             if (url && token) {
@@ -155,7 +155,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
-        action: (row: { id: string;[key: string]: unknown }) =>
+        action: (row: { id: string; [key: string]: unknown }) =>
           router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
         disabled: can(PERMISSIONS.company.view),
       },
@@ -166,7 +166,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
         action: "send-link",
         dialogComponent: UserSettingDialog,
         disabled: can(PERMISSIONS.company.view),
-        dialogProps: (row: { id: string;[key: string]: unknown }) => {
+        dialogProps: (row: { id: string; [key: string]: unknown }) => {
           return {
             user: row as CompanyData,
             inCompany: true,

@@ -2,6 +2,7 @@ import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { BriefcaseBusiness, UserRound, UsersRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import PublicDocsTab from "../../modules/publicDocs/views/public-docs-tab";
+import EmpsDocsTab from "../../modules/empsDocs/views/emps-docs-tab";
 
 export default function DocsTypesTabs() {
   const t = useTranslations("docs-library.tabsTitles");
@@ -9,13 +10,13 @@ export default function DocsTypesTabs() {
     {
       id: "publicDocs",
       title: t("publicDocs"),
-      content: <PublicDocsTab/>,
+      content: <PublicDocsTab />,
       icon: <UserRound />,
     },
     {
       id: "empsDocs",
       title: t("empsDocs"),
-      content: <>empsDocs</>,
+      content: <EmpsDocsTab />,
       icon: <UsersRound />,
     },
     {

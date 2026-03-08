@@ -87,6 +87,7 @@ export const PERMISSIONS = {
     settings: create("CLIENT_SETTING"),
     broker: create("BROKER"),
     clients: create("CLIENT"),
+    pricesOffers: create("PRICES_OFFERS"),
   },
   // docs library
   library: {
@@ -140,6 +141,7 @@ export const PERMISSIONS = {
     ]), //LIST,VIEW,REPLY=UPDATE,DELETE
     //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
     themes: create("WEBSITE_THEME_SETTING", ["LIST", "VIEW", "ACTIVATE"]), //LIST,SHOW,ACTIVATE
+    BookStore: create("WEBSITE_BOOK_STORE", ["LIST", "CREATE", "UPDATE", "DELETE"]),
   },
   // ecommerce
   ecommerce: {

@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import Link from "@i18n/link";
 
 const NotFound = () => {
   return (

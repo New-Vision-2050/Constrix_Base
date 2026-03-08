@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@i18n/navigation";
 
 export default async function Home() {
-  redirect('/ar/login');
+  redirect({ href: "/login", locale: "ar" });
 }

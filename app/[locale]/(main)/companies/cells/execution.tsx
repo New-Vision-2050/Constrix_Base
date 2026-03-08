@@ -71,6 +71,7 @@ const Execution = ({
   showDelete = true,
   deleteConfirmMessage,
   deleteUrl,
+  onDeleteSuccess,
 }: {
   row: { id: string; [key: string]: unknown };
   executions?: (MenuItem | RenderFunctionType)[];
@@ -82,6 +83,7 @@ const Execution = ({
   showDelete?: boolean;
   deleteConfirmMessage?: string;
   deleteUrl?: string;
+  onDeleteSuccess?: () => void;
 }) => {
   const t = useTranslations();
   const defaultMenuItems = useMemo((): MenuItem[] => {
@@ -112,13 +114,13 @@ const Execution = ({
   const menuItems = useMemo(() => {
     // Filter only MenuItem objects for the dropdown
     const menuItemsOnly = executions.filter(
-      (item): item is MenuItem => typeof item !== "function"
+      (item): item is MenuItem => typeof item !== "function",
     );
     const beforeItems = menuItemsOnly.filter(
-      (item) => item.position !== "after"
+      (item) => item.position !== "after",
     );
     const afterItems = menuItemsOnly.filter(
-      (item) => item.position === "after"
+      (item) => item.position === "after",
     );
 
     return [...beforeItems, ...defaultMenuItems, ...afterItems];
@@ -127,7 +129,7 @@ const Execution = ({
   // Get render functions separately
   const renderFunctions = useMemo(() => {
     return executions.filter(
-      (item): item is RenderFunctionType => typeof item === "function"
+      (item): item is RenderFunctionType => typeof item === "function",
     );
   }, [executions]);
 
@@ -160,7 +162,7 @@ const Execution = ({
   const { reloadTable } = useTableInstance(tableName || "companies-table");
 
   const handleMenuItemClick = (
-    action: string | ((row: { id: string; [key: string]: unknown }) => void)
+    action: string | ((row: { id: string; [key: string]: unknown }) => void),
   ) => {
     if (typeof action === "function") {
       action(row);
@@ -197,15 +199,18 @@ const Execution = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {menuItems.map((item, index) => (
-            <DropdownMenuItem
-              key={index}
-              onClick={() => handleMenuItemClick(item.action)}
-              className={item.color ? `text-${item.color}` : ""}
-              disabled={!item.disabled || false}
-            >
-              {item.icon && <span className="me-2">{item.icon}</span>}
-              {item.label}
-            </DropdownMenuItem>
+          <DropdownMenuItem
+          key={index}
+        onClick={() => handleMenuItemClick(item.action)}
+         disabled={item.disabled ?? false}
+           className={`flex items-center gap-2 ${
+          item.color ? `text-${item.color}` : ""
+          }`}
+         >
+         {item.icon}
+         <span>{item.label}</span>
+         </DropdownMenuItem>
+
           ))}
           {/* Render custom render functions as dropdown items */}
           {renderFunctions.map((renderFn, index) => (
@@ -224,6 +229,7 @@ const Execution = ({
           open={actionState.delete.open}
           onSuccess={() => {
             reloadTable();
+            onDeleteSuccess?.();
           }}
           deleteConfirmMessage={deleteConfirmMessage}
         />
@@ -262,7 +268,6 @@ const Execution = ({
         if (!dialogState || !item.dialogComponent) {
           return null;
         }
-
 
         // Render the custom dialog component
         const DialogComponent = item.dialogComponent;

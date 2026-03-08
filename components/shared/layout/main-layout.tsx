@@ -6,9 +6,10 @@ import { AppSidebar } from "./app-sidebar";
 import { useLocale } from "next-intl";
 import Header from "./header";
 import { useTheme } from "next-themes";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
+import { MobileDrawer } from "./mobile-drawer";
 
 export default function MainLayout({
   children,
@@ -24,6 +25,7 @@ export default function MainLayout({
 }>) {
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
@@ -33,7 +35,7 @@ export default function MainLayout({
   useEffect(() => {
     if (typeof window !== "undefined" && "performance" in window) {
       const entry = performance.getEntriesByType(
-        "navigation"
+        "navigation",
       )[0] as PerformanceNavigationTiming;
       const navType = entry?.type;
 
@@ -42,6 +44,14 @@ export default function MainLayout({
       }
     }
   }, []);
+
+  const handleMobileDrawerToggle = () => {
+    setMobileDrawerOpen((prev) => !prev);
+  };
+
+  const handleMobileDrawerClose = () => {
+    setMobileDrawerOpen(false);
+  };
 
   return (
     <main className="relative" dir={isRtl ? "rtl" : "ltr"}>
@@ -54,10 +64,17 @@ export default function MainLayout({
         className="h-screen w-full fixed top-0 left-0 -z-20"
         particleColor={isLight ? "#18003A" : "#ffffff"}
       />{" "}
+      <MobileDrawer
+        open={mobileDrawerOpen}
+        onClose={handleMobileDrawerClose}
+        userTypes={userTypes}
+        name={name}
+        mainLogo={mainLogo}
+      />
       <SidebarProvider>
         <AppSidebar userTypes={userTypes} name={name} mainLogo={mainLogo} />
         <SidebarInset className="bg-transparent md:overflow-hidden border-none">
-          <Header />
+          <Header onMobileMenuClick={handleMobileDrawerToggle} />
           {children}
         </SidebarInset>
       </SidebarProvider>

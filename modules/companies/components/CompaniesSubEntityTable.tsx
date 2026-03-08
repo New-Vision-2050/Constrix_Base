@@ -7,7 +7,7 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { TableBuilder } from "@/modules/table";
 import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 import CompanySaveDialog from "./CompanySaveDialog";
 import { useTranslations } from "next-intl";
 import { useModal } from "@/hooks/use-modal";

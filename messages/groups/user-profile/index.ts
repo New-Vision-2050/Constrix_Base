@@ -8,13 +8,16 @@ export const userProfileMessages = new MessagesGroup({
       branch: _m("Branch", "الفرع"),
       address: _m("address", "العنوان"),
       appointmentDate: _m("Appointment Date", "تاريخ التعيين"),
-      image: _m("A 6*4 white background image is required.", "يلزم اضافة صورة خلفية بيضاء 6*4")
+      image: _m(
+        "A 6*4 white background image is required.",
+        "يلزم اضافة صورة خلفية بيضاء 6*4",
+      ),
     }),
     uploadPhoto: new MessagesGroup({
       branch: _m("Branch", "الفرع"),
       jobTitle: _m("Job Title", "المسمى الوظيفي"),
       address: _m("Address", "العنوان"),
-      appointmentDate: _m("Appointment Date", "تاريخ التعيين"), 
+      appointmentDate: _m("Appointment Date", "تاريخ التعيين"),
       title: _m("Upload Image", "أضافة صورة"),
       actions: new MessagesGroup({
         checkLabel: _m("Check Image", "التحقق من الصورة"),
@@ -24,14 +27,23 @@ export const userProfileMessages = new MessagesGroup({
         title: new MessagesGroup({
           upload: _m("upload image firstly", "قم برفع الصورة أولأ"),
           validate: _m("validate Image", "تحقق من الصورة"),
-          save: _m("Save Image", "رفع الصورة")
-        })
+          save: _m("Save Image", "رفع الصورة"),
+        }),
       }),
       rules: new MessagesGroup({
-        rule1: _m("Image size must not exceed 5 MB.", "حجم الصورة لا يتعدى 5 ميجابايت."),
-        rule2: _m("Choose an appropriate image size (e.g., 1920x1080 pixels).", "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل)."),
-        rule3: _m("Make sure the background is white.", "تأكد من أن الخلفية بيضاء.")
-      })
+        rule1: _m(
+          "Image size must not exceed 5 MB.",
+          "حجم الصورة لا يتعدى 5 ميجابايت.",
+        ),
+        rule2: _m(
+          "Choose an appropriate image size (e.g., 1920x1080 pixels).",
+          "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
+        ),
+        rule3: _m(
+          "Make sure the background is white.",
+          "تأكد من أن الخلفية بيضاء.",
+        ),
+      }),
     }),
     statisticsCards: new MessagesGroup({
       contractStatus: _m("Contract Status", "حالة العقد"),
@@ -41,14 +53,14 @@ export const userProfileMessages = new MessagesGroup({
       contractStart: _m("Contract Start", "بداية العقد"),
       contractEnd: _m("Contract End", "نهاية العقد"),
       weeklyReport: _m("Weekly Report", "تقرير الأسبوعي"),
-      monthlySalary: _m("Monthly due", "المستحق الشهري")
-    })
+      monthlySalary: _m("Monthly due", "المستحق الشهري"),
+    }),
   }),
   ActivityTimeline: new MessagesGroup({
     title: _m("User Activity Timeline", "سجل الانشطة"),
     createdOperation: _m("Operation created", "عملية انشاء"),
     updatedOperation: _m("Operation updated", "عملية تعديل"),
-    deletedOperation: _m("Operation deleted", "عملية حذف")
+    deletedOperation: _m("Operation deleted", "عملية حذف"),
   }),
   tabs: new MessagesGroup({
     profile: _m("Profile", "الملف الشخصي"),
@@ -57,17 +69,23 @@ export const userProfileMessages = new MessagesGroup({
     usersActions: _m("User Actions", "اجراءات المستخدم"),
     contractTabs: new MessagesGroup({
       personalTab: _m("Personal Data", "البيانات الشخصية"),
-      academicAndExperience: _m("Academic and Experience Data", "البيانات الاكاديمية والخبرة"),
-      employmentAndContractalData: _m("Employment and Contractual Data", "البيانات الوظيفية والتعاقدية"),
+      academicAndExperience: _m(
+        "Academic and Experience Data",
+        "البيانات الاكاديمية والخبرة",
+      ),
+      employmentAndContractalData: _m(
+        "Employment and Contractual Data",
+        "البيانات الوظيفية والتعاقدية",
+      ),
       financialPrivileges: _m("Financial Benefits", "الامتيازات المالية"),
-      contractManagement: _m("Contract Management", "ادارة العقد")
+      contractManagement: _m("Contract Management", "ادارة العقد"),
     }),
     verticalLists: new MessagesGroup({
       personalList: new MessagesGroup({
         personalData: _m("Personal Data", "البيانات الشخصية"),
         bankingData: _m("Banking Information", "المعلومات البنكية"),
         connectionData: _m("Contact Information", "معلومات الاتصال"),
-        iqamaData: _m("Residence Information", "معلومات الاقامة")
+        iqamaData: _m("Residence Information", "معلومات الاقامة"),
       }),
       academicAndExperienceList: new MessagesGroup({
         qualification: _m("Qualification", "المؤهل"),
@@ -75,9 +93,9 @@ export const userProfileMessages = new MessagesGroup({
         experiences: _m("Previous Experience", "الخبرات السابقة"),
         courses: _m("Educational Courses", "الكورسات التعليمية"),
         certifications: _m("Professional Certifications", "الشهادات المهنية"),
-        cv: _m("CV", "السيرة الذاتية")
-      })
-    })
+        cv: _m("CV", "السيرة الذاتية"),
+      }),
+    }),
   }),
   personalData: new MessagesGroup({
     title: _m("Personal Data", "البيانات الشخصية"),
@@ -88,7 +106,7 @@ export const userProfileMessages = new MessagesGroup({
     phone: _m("Phone", "التواصل"),
     otherPhone: _m("Other Phone", "الرقم الاضافي"),
     email: _m("Email", "البريد الالكتروني"),
-    nationalAddress: _m("National Address", "العنوان الوطني")
+    nationalAddress: _m("National Address", "العنوان الوطني"),
   }),
   professionalData: new MessagesGroup({
     title: _m("Professional Data", "البيانات المهنية"),
@@ -97,7 +115,7 @@ export const userProfileMessages = new MessagesGroup({
     department: _m("Department", "القسم"),
     job_type: _m("Job Type", "نوع الوظيفة"),
     job_title: _m("Job Title", "المسمى الوظيفي"),
-    job_code: _m("Job Code", "الرقم الوظيفي")
+    job_code: _m("Job Code", "الرقم الوظيفي"),
   }),
   bankingData: new MessagesGroup({
     title: _m("Banking Data", "المعلومات البنكية"),
@@ -106,18 +124,18 @@ export const userProfileMessages = new MessagesGroup({
     account_type: _m("Account Type", "نوع الحساب"),
     account_holder: _m("Account Holder", "حامل الحساب"),
     currency_name: _m("Currency Name", "العملة"),
-    iban: _m("IBAN", "IBAN")
+    iban: _m("IBAN", "IBAN"),
   }),
   activitiesData: new MessagesGroup({
-    title: _m("Activities", "الانشطة")
+    title: _m("Activities", "الانشطة"),
   }),
   upcomingMeetings: new MessagesGroup({
     title: _m("Upcoming Meetings", "الاجتماعات القادمة"),
-    showAll: _m("Show All", "اظهار الكل")
+    showAll: _m("Show All", "اظهار الكل"),
   }),
   userTeams: new MessagesGroup({
     title: _m("User Teams", "فرق المستخدم"),
-    showAll: _m("Show All", "اظهار الكل")
+    showAll: _m("Show All", "اظهار الكل"),
   }),
   nestedTabs: new MessagesGroup({
     PeronalDataTab: new MessagesGroup({
@@ -128,7 +146,7 @@ export const userProfileMessages = new MessagesGroup({
       gender: _m("Gender", "الجنس"),
       birthDate: _m("Birth Date", "تاريخ الميلاد"),
       birthDateHijri: _m("Birth Date (Hijri)", "تاريخ الميلاد (هجري)"),
-      nationality: _m("Nationality", "الجنسية")
+      nationality: _m("Nationality", "الجنسية"),
     }),
     connectionData: new MessagesGroup({
       title: _m("Contact Information", "بيانات الاتصال"),
@@ -137,13 +155,19 @@ export const userProfileMessages = new MessagesGroup({
       changePhone: _m("Change Phone", "تغيير رقم الجوال"),
       changeEmail: _m("Change Email", "تغيير البريد الالكتروني"),
       phoneRequired: _m("Phone is required", "رقم الجوال مطلوب"),
-      phoneInvalid: _m("Please enter a valid phone number", "برجاء أدخل رقم جوال صحيح"),
+      phoneInvalid: _m(
+        "Please enter a valid phone number",
+        "برجاء أدخل رقم جوال صحيح",
+      ),
       emailRequired: _m("Email is required", "البريد الالكتروني مطلوب"),
-      emailInvalid: _m("Please enter a valid email address", "برجاء أدخل بريد الكتروني صحيح"),
+      emailInvalid: _m(
+        "Please enter a valid email address",
+        "برجاء أدخل بريد الكتروني صحيح",
+      ),
       cancel: _m("Cancel", "إلغاء"),
       otherPhone: _m("Other Phone", "رقم جوال بديل"),
       landlineNumber: _m("Landline Number", "رقم الهاتف الأرضي"),
-      save: _m("Save", "حفظ")
+      save: _m("Save", "حفظ"),
     }),
     passportData: new MessagesGroup({
       title: _m("Passport Data", "بيانات جواز السفر"),
@@ -151,12 +175,24 @@ export const userProfileMessages = new MessagesGroup({
       passportStartDate: _m("Passport Start Date", "تاريخ الانشاء"),
       passportEndDate: _m("Passport End Date", "تاريخ الانتهاء"),
       passportFile: _m("Passport File", "ارفاق جواز السفر"),
-      passportNumberRequired: _m("Passport Number is required", "رقم الجواز مطلوب"),
-      passportNumberPattern: _m("Passport Number must be between 6 and 20 characters or numbers", "رقم الجواز يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا"),
-      passportStartDateRequired: _m("Passport Start Date is required", "تاريخ البدء مطلوب"),
-      passportEndDateRequired: _m("Passport End Date is required", "تاريخ الانتهاء مطلوب"),
+      passportNumberRequired: _m(
+        "Passport Number is required",
+        "رقم الجواز مطلوب",
+      ),
+      passportNumberPattern: _m(
+        "Passport Number must be between 6 and 20 characters or numbers",
+        "رقم الجواز يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+      ),
+      passportStartDateRequired: _m(
+        "Passport Start Date is required",
+        "تاريخ البدء مطلوب",
+      ),
+      passportEndDateRequired: _m(
+        "Passport End Date is required",
+        "تاريخ الانتهاء مطلوب",
+      ),
       save: _m("Save", "حفظ"),
-      cancel: _m("Cancel", "إلغاء")
+      cancel: _m("Cancel", "إلغاء"),
     }),
     identityData: new MessagesGroup({
       title: _m("Identity Data", "البيانات الهوية"),
@@ -166,16 +202,34 @@ export const userProfileMessages = new MessagesGroup({
       identityFile: _m("Identity File", "ارفاق الهوية"),
       nationalId: _m("National ID", "رقم الهوية"),
       nationalIdRequired: _m("National ID is required", "رقم الهوية مطلوب"),
-      nationalIdPattern: _m("National ID must be between 6 and 20 characters or numbers", "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا"),
+      nationalIdPattern: _m(
+        "National ID must be between 6 and 20 characters or numbers",
+        "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+      ),
       attachment: _m("Attachment", "ارفاق"),
-      nationalIdMinLength: _m("National ID must be between 6 and 20 characters or numbers", "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا"),
-      nationalIdMaxLength: _m("National ID must be between 6 and 20 characters or numbers", "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا"),
+      nationalIdMinLength: _m(
+        "National ID must be between 6 and 20 characters or numbers",
+        "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+      ),
+      nationalIdMaxLength: _m(
+        "National ID must be between 6 and 20 characters or numbers",
+        "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+      ),
       identityNumberRequired: _m("Identity Number is required", ""),
-      identityNumberPattern: _m("Identity Number must be between 6 and 20 characters or numbers", ""),
-      identityStartDateRequired: _m("Identity Start Date is required", "تاريخ البدء مطلوب"),
-      identityEndDateRequired: _m("Identity End Date is required", "تاريخ الانتهاء مطلوب"),
+      identityNumberPattern: _m(
+        "Identity Number must be between 6 and 20 characters or numbers",
+        "",
+      ),
+      identityStartDateRequired: _m(
+        "Identity Start Date is required",
+        "تاريخ البدء مطلوب",
+      ),
+      identityEndDateRequired: _m(
+        "Identity End Date is required",
+        "تاريخ الانتهاء مطلوب",
+      ),
       save: _m("Save", "حفظ"),
-      cancel: _m("Cancel", "إلغاء")
+      cancel: _m("Cancel", "إلغاء"),
     }),
     bankingData: new MessagesGroup({
       title: _m("Banking Data", "بيانات الحساب البنكي"),
@@ -201,31 +255,49 @@ export const userProfileMessages = new MessagesGroup({
       accountNumberPlaceholder: _m("Select Account Number", "اختر رقم الحساب"),
       accountType: _m("Account Type", "نوع الحساب"),
       accountTypePlaceholder: _m("Select Account Type", "اختر نوع الحساب"),
-      accountNumberPattern: _m("Account Number must be between 6 and 20 characters or numbers", "رقم الحساب يجب أن يكون بين 6 و 20 حرفًا أو رقمًا"),
+      accountNumberPattern: _m(
+        "Account Number must be between 6 and 20 characters or numbers",
+        "رقم الحساب يجب أن يكون بين 6 و 20 حرفًا أو رقمًا",
+      ),
       accountHolder: _m("Account Holder", "حامل الحساب"),
       accountHolderPlaceholder: _m("Select Account Holder", "اختر حامل الحساب"),
-      accountHolderRequired: _m("Account Holder is required", "حامل الحساب مطلوب"),
+      accountHolderRequired: _m(
+        "Account Holder is required",
+        "حامل الحساب مطلوب",
+      ),
       currencyName: _m("Currency Name", "اسم العملة"),
       currencyNamePlaceholder: _m("Select Currency Name", "اختر اسم العملة"),
       currencyNameRequired: _m("Currency Name is required", "اسم العملة مطلوب"),
       iban: _m("IBAN", "IBAN"),
       ibanPlaceholder: _m("Select IBAN", "اختر IBAN"),
-      ibanPattern: _m("IBAN must be between 6 and 20 characters or numbers", "IBAN يجب أن يكون بين 6 و 20 حرفًا أو رقمًا"),
+      ibanPattern: _m(
+        "IBAN must be between 6 and 20 characters or numbers",
+        "IBAN يجب أن يكون بين 6 و 20 حرفًا أو رقمًا",
+      ),
       bankNameRequired: _m("Bank Name is required", "اسم البنك مطلوب"),
-      accountNumberRequired: _m("Account Number is required", "رقم الحساب مطلوب"),
+      accountNumberRequired: _m(
+        "Account Number is required",
+        "رقم الحساب مطلوب",
+      ),
       accountTypeRequired: _m("Account Type is required", "نوع الحساب مطلوب"),
-      swiftBicPattern: _m("Swift BIC must be between 6 and 20 characters or numbers", "Swift BIC يجب أن يكون بين 6 و 20 حرفًا أو رقمًا"),
+      swiftBicPattern: _m(
+        "Swift BIC must be between 6 and 20 characters or numbers",
+        "Swift BIC يجب أن يكون بين 6 و 20 حرفًا أو رقمًا",
+      ),
       swiftBicRequired: _m("Swift BIC is required", "Swift BIC مطلوب"),
       ibanRequired: _m("IBAN is required", "IBAN مطلوب"),
       noData: _m("No Data Found", "لا توجد بيانات"),
       noDataSubTitle: _m("No Data Found", "لا توجد بيانات"),
       submitButtonText: _m("Submit", " حفظ"),
-      cancelButtonText: _m("Cancel", "إلغاء")
+      cancelButtonText: _m("Cancel", "إلغاء"),
     }),
     addressData: new MessagesGroup({
       title: _m("Address", "العنوان"),
       address: _m("Address", "العنوان"),
-      addressLabel: _m("The address of the employee's home/foreign address", "العنوان السكني بمقر العمل/العنوان الوطنى) "),
+      addressLabel: _m(
+        "The address of the employee's home/foreign address",
+        "العنوان السكني بمقر العمل/العنوان الوطنى) ",
+      ),
       addressPlaceholder: _m("Select Address", "اختر العنوان"),
       addressRequired: _m("Address is required", "العنوان مطلوب"),
       city: _m("City", "المدينة"),
@@ -240,10 +312,16 @@ export const userProfileMessages = new MessagesGroup({
       zipCode: _m("Zip Code", "الرمز البريدي"),
       zipCodePlaceholder: _m("Select Zip Code", "اختر الرمز البريدي"),
       zipCodeRequired: _m("Zip Code is required", "الرمز البريدي مطلوب"),
-      addressValidationMessage: _m("The address must contain only letters, numbers, and valid symbols", "يجب أن يحتوي العنوان على أحرف وأرقام ورموز صالحة فقط"),
-      zipCodeValidationMessage: _m("The zip code must be 5 numbers only", "الرمز البريدي يجب أن يتكون من 5 أرقام فقط"),
+      addressValidationMessage: _m(
+        "The address must contain only letters, numbers, and valid symbols",
+        "يجب أن يحتوي العنوان على أحرف وأرقام ورموز صالحة فقط",
+      ),
+      zipCodeValidationMessage: _m(
+        "The zip code must be 5 numbers only",
+        "الرمز البريدي يجب أن يتكون من 5 أرقام فقط",
+      ),
       submitButtonText: _m("Save", "حفظ"),
-      cancelButtonText: _m("Cancel", "إلغاء")
+      cancelButtonText: _m("Cancel", "إلغاء"),
     }),
     maritalStatusRelatives: new MessagesGroup({
       title: _m("Marital Status / Relatives", "الحالة الاجتماعية / الاقارب"),
@@ -253,12 +331,21 @@ export const userProfileMessages = new MessagesGroup({
       submitButtonText: _m("Save", "حفظ"),
       cancelButtonText: _m("Cancel", "إلغاء"),
       maritalStatus: _m("Marital Status", "الحالة الاجتماعية"),
-      nameValidationMessage: _m("The name must contain only letters (without numbers or symbols)", "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)"),
+      nameValidationMessage: _m(
+        "The name must contain only letters (without numbers or symbols)",
+        "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
+      ),
       name: _m("Name", "الاسم"),
       relationship: _m("Relationship", "العلاقة"),
       phone: _m("Phone", "رقم الهاتف"),
-      relationshipValidationMessage: _m("The relationship must contain only letters (without numbers or symbols)", "يجب أن تحتوي العلاقة على حروف فقط (بدون أرقام أو رموز)"),
-      phoneValidationMessage: _m("Please enter a valid phone number", "برجاء ادخال رقم هاتف صحيح")
+      relationshipValidationMessage: _m(
+        "The relationship must contain only letters (without numbers or symbols)",
+        "يجب أن تحتوي العلاقة على حروف فقط (بدون أرقام أو رموز)",
+      ),
+      phoneValidationMessage: _m(
+        "Please enter a valid phone number",
+        "برجاء ادخال رقم هاتف صحيح",
+      ),
     }),
     socialData: new MessagesGroup({
       title: _m("Social Data", "حسابات التواصل الاجتماعي"),
@@ -270,49 +357,91 @@ export const userProfileMessages = new MessagesGroup({
       linkedin: _m("Linkedin", "لينك اند"),
       submitButtonText: _m("Save", "حفظ"),
       cancelButtonText: _m("Cancel", "إلغاء"),
-      urlValidationMessage: _m("Please enter a valid URL", "يرجى إدخال رابط صحيح"),
-      phoneValidationMessage: _m("Please enter a valid phone number", "برجاء ادخال رقم هاتف صحيح")
+      urlValidationMessage: _m(
+        "Please enter a valid URL",
+        "يرجى إدخال رابط صحيح",
+      ),
+      phoneValidationMessage: _m(
+        "Please enter a valid phone number",
+        "برجاء ادخال رقم هاتف صحيح",
+      ),
     }),
     borderNumberData: new MessagesGroup({
       title: _m("Border Number Data", "بيانات رقم الحدود - الدخول"),
       borderNumber: _m("Border Number", "رقم الحدود - الدخول"),
-      borderNumberPlaceholder: _m("Select Border Number", "اختر رقم الحدود - الدخول"),
-      borderNumberRequired: _m("Border Number is required", "رقم الحدود - الدخول مطلوب"),
-      borderNumberPattern: _m("Border Number must be between 6 and 20 characters or numbers", "رقم الحدود - الدخول يجب أن يكون بين 6 و 20 حرفًا أو رقمًا"),
+      borderNumberPlaceholder: _m(
+        "Select Border Number",
+        "اختر رقم الحدود - الدخول",
+      ),
+      borderNumberRequired: _m(
+        "Border Number is required",
+        "رقم الحدود - الدخول مطلوب",
+      ),
+      borderNumberPattern: _m(
+        "Border Number must be between 6 and 20 characters or numbers",
+        "رقم الحدود - الدخول يجب أن يكون بين 6 و 20 حرفًا أو رقمًا",
+      ),
       borderNumberStartDate: _m("Border Number Start Date", "تاريخ البدء"),
       borderNumberEndDate: _m("Border Number End Date", "تاريخ الانتهاء"),
-      borderNumberAttachment: _m("Border Number Attachment", "ارفاق رقم الحدود"),
-      borderNumberEndDateRequired: _m("Border Number End Date is required", "تاريخ الانتهاء مطلوب"),
+      borderNumberAttachment: _m(
+        "Border Number Attachment",
+        "ارفاق رقم الحدود",
+      ),
+      borderNumberEndDateRequired: _m(
+        "Border Number End Date is required",
+        "تاريخ الانتهاء مطلوب",
+      ),
       submitButtonText: _m("Save", "حفظ"),
-      cancelButtonText: _m("Cancel", "إلغاء")
+      cancelButtonText: _m("Cancel", "إلغاء"),
     }),
     iqamaData: new MessagesGroup({
       title: _m("Iqama Data", "بيانات رقم الأقامة"),
       iqamaNumber: _m("Iqama Number", "رقم الأقامة"),
       iqamaNumberPlaceholder: _m("Select Iqama Number", "اختر رقم الأقامة"),
       iqamaNumberRequired: _m("Iqama Number is required", "رقم الأقامة مطلوب"),
-      iqamaNumberPattern: _m("Iqama Number must be between 6 and 20 characters or numbers", "رقم الأقامة يجب أن يكون بين 6 و 20 حرفًا أو رقمًا"),
+      iqamaNumberPattern: _m(
+        "Iqama Number must be between 6 and 20 characters or numbers",
+        "رقم الأقامة يجب أن يكون بين 6 و 20 حرفًا أو رقمًا",
+      ),
       iqamaStartDate: _m("Iqama Start Date", "تاريخ البدء"),
       iqamaStartDateRequired: _m("Iqama Start Date is required", ""),
       iqamaEndDate: _m("Iqama End Date", "تاريخ الانتهاء"),
       iqamaAttachment: _m("Iqama Attachment", "ارفاق رقم الأقامة"),
-      iqamaEndDateRequired: _m("Iqama End Date is required", "تاريخ الانتهاء مطلوب"),
+      iqamaEndDateRequired: _m(
+        "Iqama End Date is required",
+        "تاريخ الانتهاء مطلوب",
+      ),
       submitButtonText: _m("Save", "حفظ"),
-      cancelButtonText: _m("Cancel", "إلغاء")
+      cancelButtonText: _m("Cancel", "إلغاء"),
     }),
     licenseData: new MessagesGroup({
       title: _m("Working License Data", "بيانات رخصة العمل"),
       licenseNumber: _m("License Number", "رقم رخصة العمل"),
-      licenseNumberPlaceholder: _m("Select License Number", "اختر رقم رخصة العمل"),
-      licenseNumberRequired: _m("License Number is required", "رقم رخصة العمل مطلوب"),
-      licenseNumberPattern: _m("License Number must be between 6 and 20 characters or numbers", "رقم رخصة العمل يجب أن يكون بين 6 و 20 حرفًا أو رقمًا"),
+      licenseNumberPlaceholder: _m(
+        "Select License Number",
+        "اختر رقم رخصة العمل",
+      ),
+      licenseNumberRequired: _m(
+        "License Number is required",
+        "رقم رخصة العمل مطلوب",
+      ),
+      licenseNumberPattern: _m(
+        "License Number must be between 6 and 20 characters or numbers",
+        "رقم رخصة العمل يجب أن يكون بين 6 و 20 حرفًا أو رقمًا",
+      ),
       licenseStartDate: _m("License Start Date", "تاريخ البدء"),
-      licenseStartDateRequired: _m("License Start Date is required", "تاريخ البدء مطلوب"),
+      licenseStartDateRequired: _m(
+        "License Start Date is required",
+        "تاريخ البدء مطلوب",
+      ),
       licenseEndDate: _m("License End Date", "تاريخ الانتهاء"),
       licenseAttachment: _m("License Attachment", "ارفاق رخصة العمل"),
-      licenseEndDateRequired: _m("License End Date is required", "تاريخ الانتهاء مطلوب"),
+      licenseEndDateRequired: _m(
+        "License End Date is required",
+        "تاريخ الانتهاء مطلوب",
+      ),
       submitButtonText: _m("Save", "حفظ"),
-      cancelButtonText: _m("Cancel", "إلغاء")
+      cancelButtonText: _m("Cancel", "إلغاء"),
     }),
     qualificationsData: new MessagesGroup({
       title: _m("Qualifications Data", "المؤهل"),
@@ -320,26 +449,35 @@ export const userProfileMessages = new MessagesGroup({
       noData: _m("No Data Found", "لا توجد بيانات"),
       noDataSubTitle: _m("No Data Found", "لا توجد بيانات"),
       academicQualification: _m("Academic Qualification", "المؤهل"),
-      selectAcademicQualification: _m("Select Academic Qualification", "اختر المؤهل"),
+      selectAcademicQualification: _m(
+        "Select Academic Qualification",
+        "اختر المؤهل",
+      ),
       country: _m("Country", "الدولة"),
       selectCountry: _m("Select Country", "اختر الدولة"),
       university: _m("University", "الجامعة"),
       selectUniversity: _m("Select University", "اختر الجامعة"),
       academicSpecialization: _m("Academic Specialization", "التخصص الأكاديمي"),
-      selectAcademicSpecialization: _m("Select Academic Specialization", "اختر التخصص الأكاديمي"),
+      selectAcademicSpecialization: _m(
+        "Select Academic Specialization",
+        "اختر التخصص الأكاديمي",
+      ),
       graduationDate: _m("Graduation Date", "تاريخ الحصول على الشهادة"),
       studyRate: _m("Study Rate", "المعدلات الدراسية"),
-      studyRateValidation: _m("Study Rate must be numbers only", "المعدلات الدراسية يجب أن تكون أرقام فقط"),
+      studyRateValidation: _m(
+        "Study Rate must be numbers only",
+        "المعدلات الدراسية يجب أن تكون أرقام فقط",
+      ),
       attachDocument: _m("Attach Document", "ارفاق شهادة"),
       save: _m("Save", "حفظ"),
-      cancel: _m("Cancel", "إلغاء")
+      cancel: _m("Cancel", "إلغاء"),
     }),
     briefSummary: new MessagesGroup({
       title: _m("Brief Summary", "نبذه مختصرة"),
       aboutMe: _m("About Me", "نبذه مختصرة"),
       aboutMePlaceholder: _m("Write about you", "اكتب نبذة عنك"),
       save: _m("Save", "حفظ"),
-      cancel: _m("Cancel", "إلغاء")
+      cancel: _m("Cancel", "إلغاء"),
     }),
     academicExperience: new MessagesGroup({
       title: _m("Academic Experience", "الخبرات الأكاديمية"),
@@ -348,10 +486,16 @@ export const userProfileMessages = new MessagesGroup({
       noDataSubTitle: _m("No Data Found", "لا توجد بيانات"),
       jobName: _m("Job Name", "المسمى الوظيفي"),
       jobNamePlaceholder: _m("Job Name", "المسمى الوظيفي"),
-      jobNameValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      jobNameValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       companyName: _m("Company Name", "اسم الشركة"),
       companyNamePlaceholder: _m("Company Name", "اسم الشركة"),
-      companyNameValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      companyNameValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       about: _m("About", "نبذه عن المشاريع والاعمال"),
       aboutPlaceholder: _m("About", "نبذه عن المشاريع والاعمال"),
       company: _m("Company", "الشركة"),
@@ -364,7 +508,7 @@ export const userProfileMessages = new MessagesGroup({
       endDateRequired: _m("End Date is required", "تاريخ الانتهاء مطلوب"),
       delete: _m("Delete", "حذف"),
       save: _m("Save", "حفظ"),
-      cancel: _m("Cancel", "إلغاء")
+      cancel: _m("Cancel", "إلغاء"),
     }),
     certificationsData: new MessagesGroup({
       title: _m("Certifications Data", "الشهادات المهنية"),
@@ -372,37 +516,67 @@ export const userProfileMessages = new MessagesGroup({
       noData: _m("No Data Found", "لا توجد بيانات"),
       noDataSubTitle: _m("No Data Found", "لا توجد بيانات"),
       professionalBodie: _m("Professional Bodie", "الجهة"),
-      professionalBodiePlaceholder: _m("Select Professional Bodie", "اختر الجهة"),
+      professionalBodiePlaceholder: _m(
+        "Select Professional Bodie",
+        "اختر الجهة",
+      ),
       accreditationName: _m("Accreditation Name", "اسم الشهادة"),
       accreditationNamePlaceholder: _m("Accreditation Name", "اسم الشهادة"),
-      accreditationNameValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      accreditationNameValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       accreditationDegree: _m("Accreditation Degree", "الدرجة"),
       accreditationDegreePlaceholder: _m("Accreditation Degree", "الدرجة"),
-      accreditationDegreeValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      accreditationDegreeValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       dateObtain: _m("Date Obtain", "تاريخ الحصول على الشهادة"),
       dateObtainPlaceholder: _m("Date Obtain", "تاريخ الحصول على الشهادة"),
-      dateObtainValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      dateObtainValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       file: _m("File", "ارفق الشهادة"),
       filePlaceholder: _m("File", "ارفق الشهادة"),
       dateEnd: _m("Date End", "تاريخ نهاية الشهادة"),
       dateEndPlaceholder: _m("Date End", "تاريخ نهاية الشهادة"),
-      dateEndValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      dateEndValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       accreditationNumber: _m("Accreditation Number", "رقم الشهادة"),
       accreditationNumberPlaceholder: _m("Accreditation Number", "رقم الشهادة"),
-      accreditationNumberValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      accreditationNumberValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       accreditationDate: _m("Accreditation Date", "تاريخ الشهادة"),
-      accreditationDateRequired: _m("Accreditation Date is required", "تاريخ الشهادة مطلوب"),
+      accreditationDateRequired: _m(
+        "Accreditation Date is required",
+        "تاريخ الشهادة مطلوب",
+      ),
       certificationName: _m("Certification Name", "اسم الشهادة"),
       certificationNamePlaceholder: _m("Certification Name", "اسم الشهادة"),
-      certificationNameValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      certificationNameValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       certificationNumber: _m("Certification Number", "رقم الشهادة"),
       certificationNumberPlaceholder: _m("Certification Number", "رقم الشهادة"),
-      certificationNumberValidation: _m("Should contain only letters", "يجب أن يحتوي فقط على أحرف"),
+      certificationNumberValidation: _m(
+        "Should contain only letters",
+        "يجب أن يحتوي فقط على أحرف",
+      ),
       certificationDate: _m("Certification Date", "تاريخ الشهادة"),
-      certificationDateRequired: _m("Certification Date is required", "تاريخ الشهادة مطلوب"),
+      certificationDateRequired: _m(
+        "Certification Date is required",
+        "تاريخ الشهادة مطلوب",
+      ),
       delete: _m("Delete", "حذف"),
       submitButtonText: _m("Save", "حفظ"),
-      cancelButtonText: _m("Cancel", "إلغاء")
-    })
-  })
+      cancelButtonText: _m("Cancel", "إلغاء"),
+    }),
+  }),
 });

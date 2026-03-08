@@ -4,7 +4,7 @@ import { Branch } from "@/modules/company-profile/types/company";
 import PickupMap from "../../../../../components/shared/pickup-map";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 
 export const addNewBranchFormConfig = (branches: Branch[]) => {
   const { company_id }: { company_id: string | undefined } = useParams();
@@ -137,7 +137,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               totalCountHeader: "X-Total-Count",
               dependsOn: "state_id",
               filterParam: "state_id",
-            }
+            },
           },
           {
             name: "parent_name",

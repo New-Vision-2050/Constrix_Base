@@ -7,10 +7,10 @@ import { Branch, CompanyData } from "@/modules/company-profile/types/company";
 import { apiClient } from "@/config/axios-config";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCookie } from "cookies-next/client";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 
 export const useCurrentCompany = () => {
-  const { company_id }:{company_id:string} = useParams();
+  const { company_id }: { company_id: string } = useParams();
   return useQuery({
     queryKey: ["main-company-data", undefined, company_id],
     queryFn: async () => {
@@ -39,7 +39,7 @@ const CompanyHeader = () => {
     <div className="bg-sidebar rounded-lg w-full flex items-center justify-between p-4">
       <CompanyLogo logo={data?.payload?.logo || ""} isPending={isPending} />
 
-      <div className="flex flex-col text-right w-full pr-6">
+      <div className="flex flex-col  w-full pr-6">
         {isPending && <Skeleton className="h-6 w-[150px] mb-4" />}
         {isSuccess && (
           <h2 className="text-2xl font-bold mb-4">{data?.payload?.name}</h2>
@@ -67,10 +67,10 @@ const CompanyHeader = () => {
   );
 };
 
-const Branches = ()=>{
-  const { company_id }:{company_id:string} = useParams();
+const Branches = () => {
+  const { company_id }: { company_id: string } = useParams();
 
-    const { data, isPending, isSuccess } = useQuery({
+  const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-branches", company_id],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<Branch[]>>(
@@ -86,17 +86,16 @@ const Branches = ()=>{
     },
   });
 
-  return(
-      <>
-
+  return (
+    <>
       {isPending && (
         <div className="flex items-center gap-2">
           <Skeleton className="h-6 w-[150px]" />
         </div>
       )}
-      
-        {isSuccess &&        
-          <div className="flex flex-col  gap-2">
+
+      {isSuccess && (
+        <div className="flex flex-col  gap-2">
           {data?.payload?.map((branch) => (
             <div key={branch.id} className="flex  gap-2">
               <AlertCircle className="w-4 h-4 text-yellow-400" />
@@ -104,11 +103,9 @@ const Branches = ()=>{
             </div>
           ))}
         </div>
-        }
-        
-        </>
-  )
-
-}
+      )}
+    </>
+  );
+};
 
 export default CompanyHeader;

@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from "react";
+import React, { useState } from "react";
 
 import {
   Dialog,
@@ -10,41 +10,66 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import InfoIcon from "@/public/icons/InfoIcon";
 
 type DeleteButtonProps = {
-  render?: ({ onOpen }: { onOpen: VoidFunction }) => ReactNode;
   message?: string;
   onDelete: ({ onClose }: { onClose: VoidFunction }) => void | Promise<void>;
+  open?: boolean;
+  setOpen?: (open: boolean) => void;
+  translations?: {
+    deleteSuccess?: string;
+    deleteError?: string;
+    deleteCancelled?: string;
+  };
 };
 
 const DeleteButton: React.FC<DeleteButtonProps> = ({
-  render,
   message = "Are you sure you want to delete this item?",
   onDelete,
+  open: externalOpen,
+  setOpen: setExternalOpen,
+  translations,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [localOpen, setLocalOpen] = useState(false);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  // Use external state if provided, otherwise use local state
+  const isOpen = externalOpen !== undefined ? externalOpen : localOpen;
+
+  const handleClose = () => {
+    if (setExternalOpen) {
+      setExternalOpen(false);
+    } else {
+      setLocalOpen(false);
+    }
+  };
 
   const { isPending, mutate } = useMutation({
     mutationFn: async () => {
       await onDelete({ onClose: handleClose });
+      toast.success(translations?.deleteSuccess || "Item deleted successfully");
       handleClose();
+    },
+    onError: (error) => {
+      toast.error(translations?.deleteError || "Failed to delete item");
+      console.error("Delete error:", error);
     },
   });
 
+  const handleCancel = () => {
+    toast.info(translations?.deleteCancelled || "Delete cancelled");
+    handleClose();
+  };
+
   return (
     <>
-      {render ? (
-        render({ onOpen: handleOpen })
-      ) : (
-        <Button variant="destructive" onClick={handleOpen}>
-          Delete
-        </Button>
-      )}
-      <Dialog open={open} onOpenChange={handleClose}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) handleClose();
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader className="items-center justify-center mb-9">
             <DialogTitle>
@@ -75,7 +100,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
             </Button>
             <Button
               variant="outline"
-              onClick={handleClose}
+              onClick={handleCancel}
               disabled={isPending}
               className="w-32 h-10"
             >

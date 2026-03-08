@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@i18n/link";
 import { ShieldX, Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";

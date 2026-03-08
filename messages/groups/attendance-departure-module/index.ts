@@ -124,7 +124,11 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
     totalHolidays: _m("Total Holiday Days", "إجمالي أيام الإجازات")
   }),
   Table: new MessagesGroup({
+    action: _m("Action", "الإجراء"),
     mapView: _m("Map View", "الخريطة"),
+    deleteConfirmMessage: _m("Are you sure you want to delete this attendance record?", "هل أنت متأكد من حذف سجل الحضور هذا؟"),
+    deleteSuccess: _m("Attendance record deleted successfully", "تم حذف سجل الحضور بنجاح"),
+    deleteFailed: _m("Failed to delete attendance record", "فشل حذف سجل الحضور"),
     columns: new MessagesGroup({
       name: _m("Name", "الاسم"),
       date: _m("Date", "التاريخ"),
@@ -133,9 +137,21 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
       management: _m("Department", "الادارة"),
       approver: _m("Approved By", "المحدد المعتمد"),
       employeeStatus: _m("Employee Status", "حالة الموظف"),
-      attendanceStatus: _m("Attendance Status", "حالة الحضور")
+      attendanceStatus: _m("Attendance Status", "حالة الحضور"),
+      actions: _m("Actions", "الإجراءات")
+    }),
+    deleteDialog: new MessagesGroup({
+      title: _m("Delete Attendance Record", "حذف سجل الحضور"),
+      message: _m("Are you sure you want to delete this attendance record?", "هل أنت متأكد من حذف سجل الحضور هذا؟"),
+      cancel: _m("Cancel", "إلغاء"),
+      delete: _m("Delete", "حذف"),
+      deleteAction: _m("Delete", "حذف")
     }),
     filters: new MessagesGroup({
+      search: _m("Search", "بحث"),
+      reset: _m("Reset", "مسح"),
+      searchTitle: _m("Search Filters", "فلاتر البحث"),
+      mapView: _m("Map View", "الخريطة"),
       searchPlaceholder: _m("Search", "بحث"),
       branchPlaceholder: _m("Branch", "الفرع"),
       managementPlaceholder: _m("Department", "الادارة"),

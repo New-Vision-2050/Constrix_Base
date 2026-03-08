@@ -34,7 +34,14 @@ export interface Address {
 }
 
 export type ShowAddressResponse = ApiBaseResponse<Address>;
-export type GetAllAddressesResponse = ApiBaseResponse<Address[]>;
+export type GetAllAddressesResponse = ApiBaseResponse<Address[]> & {
+  pagination?: {
+    page: number;
+    next_page: number;
+    last_page: number;
+    result_count: number;
+  };
+};
 
 /**
  * Social Link Response Types
@@ -57,5 +64,11 @@ export interface SocialLink {
 }
 
 export type ShowSocialLinkResponse = ApiBaseResponse<SocialLink>;
-export type ListSocialLinksResponse = ApiBaseResponse<SocialLink[]>;
-
+export type ListSocialLinksResponse = ApiBaseResponse<SocialLink[]> & {
+  pagination?: {
+    page: number;
+    next_page: number;
+    last_page: number;
+    result_count: number;
+  };
+};

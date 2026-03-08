@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, {useEffect} from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Sheet,
@@ -22,6 +22,19 @@ const CreateClientSheet = ({sub_entity_id, handleRefreshWidgetsData}: {sub_entit
   const t = useTranslations("ClientsModule.form");
   const { openCreateClient, closeCreateClientSheet, openCreateClientSheet } =
     useCreateClientCxt();
+
+  // Listen for force open event
+  useEffect(() => {
+    const handleForceOpen = () => {
+      openCreateClientSheet();
+    };
+
+    window.addEventListener('force-open-client-form', handleForceOpen);
+    
+    return () => {
+      window.removeEventListener('force-open-client-form', handleForceOpen);
+    };
+  }, [openCreateClientSheet]);
 
   return (
     <>

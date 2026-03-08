@@ -15,17 +15,18 @@ export const formBuilderMessages = new MessagesGroup({
       MaxSize: _m("Max size", "الحجم الأقصى"),
       FileTypeNotAllowed: _m(
         "File type not allowed. Allowed types",
-        "نوع الملف غير مسموح به. الأنواع المسموح بها"
+        "نوع الملف غير مسموح به. الأنواع المسموح بها",
       ),
       FileSizeExceeds: _m(
         "File size exceeds maximum allowed size",
-        "حجم الملف يتجاوز الحجم الأقصى المسموح به"
+        "حجم الملف يتجاوز الحجم الأقصى المسموح به",
       ),
       UploadFailed: _m("Upload failed", "فشل الرفع"),
       UploadsFailed: _m("uploads failed", "فشل رفع الملفات"),
       UploadSuccessful: _m("Upload successful", "تم الرفع بنجاح"),
       ImageRequired: _m("Image is required", "الصورة مطلوبة"),
     }),
+
     File: new MessagesGroup({
       UploadFile: _m("Upload File", "رفع ملف"),
       UploadFiles: _m("Upload Files", "رفع ملفات"),
@@ -41,11 +42,11 @@ export const formBuilderMessages = new MessagesGroup({
       MaxSize: _m("Max size", "الحجم الأقصى"),
       FileTypeNotAllowed: _m(
         "File type not allowed. Allowed types",
-        "نوع الملف غير مسموح به. الأنواع المسموح بها"
+        "نوع الملف غير مسموح به. الأنواع المسموح بها",
       ),
       FileSizeExceeds: _m(
         "File size exceeds maximum allowed size",
-        "حجم الملف يتجاوز الحجم الأقصى المسموح به"
+        "حجم الملف يتجاوز الحجم الأقصى المسموح به",
       ),
       UploadFailed: _m("Upload failed", "فشل الرفع"),
       UploadsFailed: _m("uploads failed", "فشل رفع الملفات"),
@@ -58,7 +59,7 @@ export const formBuilderMessages = new MessagesGroup({
       NoCountryFound: _m("No country found.", "لم يتم العثور على دولة."),
       InvalidPhoneNumber: _m(
         "Please enter a valid phone number",
-        "يرجى إدخال رقم هاتف صحيح"
+        "يرجى إدخال رقم هاتف صحيح",
       ),
       Countries: new MessagesGroup({
         "20": _m("Egypt", "مصر"),
@@ -83,5 +84,10 @@ export const formBuilderMessages = new MessagesGroup({
         "61": _m("Australia", "أستراليا"),
       }),
     }),
+  }),
+  FileRequired: _m("File is required", "الملف مطلوب"),
+
+  sheetForm: new MessagesGroup({
+    formSucess: _m("Form Submitted Successfully", "تم إرسال النموذج بنجاح"),
   }),
 });

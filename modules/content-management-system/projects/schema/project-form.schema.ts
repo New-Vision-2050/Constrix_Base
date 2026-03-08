@@ -92,11 +92,13 @@ export const createProjectFormSchema = (t: (key: string) => string) =>
               (file) =>
                 file === null ||
                 file === undefined ||
-                file instanceof File
+                file instanceof File ||
+                typeof file === "string" ||
+                (typeof file === "object" && file?.id && file?.url) // Allow {id, url} objects
             ),
           {
             message:
-              t("subImagesInvalid") || "Sub images must be valid files",
+              t("subImagesInvalid") || "Sub images must be valid files or URLs",
           }
         )
         .refine(
@@ -105,6 +107,8 @@ export const createProjectFormSchema = (t: (key: string) => string) =>
             return files.every(
               (file) =>
                 !file ||
+                typeof file === "string" || // Skip validation for URLs
+                (typeof file === "object" && file?.id && file?.url) || // Skip validation for {id, url} objects
                 !(file instanceof File) ||
                 file.size <= maxSize
             );

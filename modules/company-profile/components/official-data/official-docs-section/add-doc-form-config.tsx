@@ -2,7 +2,7 @@ import { baseURL } from "@/config/axios-config";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 import { serialize } from "object-to-formdata";
 import { RegistrationTypes } from "../legal-data-section/registration-types";
 

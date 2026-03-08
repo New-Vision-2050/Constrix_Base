@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import {
-  Form,
-} from "@/modules/table/components/ui/form";
+import { Form } from "@/modules/table/components/ui/form";
 import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
@@ -62,11 +60,17 @@ export default function SetProjectDialog({
   projectId,
 }: SetProjectDialogProps) {
   const isRtl = useIsRtl();
-  const t = useTranslations("content-management-system.projects.addProjectForm");
+  const t = useTranslations(
+    "content-management-system.projects.addProjectForm"
+  );
   const isEditMode = !!projectId;
 
   // Fetch project data when editing
-  const { data: projectData, isLoading: isFetching, refetch } = useQuery({
+  const {
+    data: projectData,
+    isLoading: isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["project", projectId],
     queryFn: async () => {
       // TODO: Replace with actual API call
@@ -99,24 +103,32 @@ export default function SetProjectDialog({
     queryKey: ["company-dashboard-project-types"],
     queryFn: () => CompanyDashboardProjectTypesApi.list(),
     staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
-    gcTime: 10 * 60 * 1000,   // Keep in cache for 10 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
-  const projectTypesOptions = useMemo(() => projectTypesData?.data?.payload?.map((projectType: any) => ({
-    value: projectType.id,
-    label: projectType.name,
-  })) || [], [projectTypesData]);
+  const projectTypesOptions = useMemo(
+    () =>
+      projectTypesData?.data?.payload?.map((projectType: any) => ({
+        value: projectType.id,
+        label: projectType.name,
+      })) || [],
+    [projectTypesData]
+  );
 
   // Fetch services (cached for 5 minutes to avoid unnecessary refetches)
   const { data: servicesData } = useQuery({
     queryKey: ["company-dashboard-services"],
     queryFn: () => CompanyDashboardServicesApi.list(),
     staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
-    gcTime: 10 * 60 * 1000,   // Keep in cache for 10 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
-  const servicesOptions = useMemo(() => servicesData?.data?.payload?.map((service: any) => ({
-    value: service.id,
-    label: service.name,
-  })) || [], [servicesData]);
+  const servicesOptions = useMemo(
+    () =>
+      servicesData?.data?.payload?.map((service: any) => ({
+        value: service.id,
+        label: service.name,
+      })) || [],
+    [servicesData]
+  );
 
   // Show toast for validation errors
   useEffect(() => {
@@ -162,10 +174,14 @@ export default function SetProjectDialog({
 
   const onSubmit = async (data: ProjectFormData) => {
     try {
-      // TODO: Replace with actual API calls
+      // Filter secondary_images to send only new File uploads (not existing images)
+      const newSecondaryImages = data.sub_images?.filter(
+        (item: any) => item instanceof File
+      ) || [];
+
       const payload = {
         main_image: data.main_image,
-        secondary_images: data.sub_images,
+        secondary_images: newSecondaryImages,
         website_project_setting_id: data.type,
         title_ar: data.title_ar,
         title_en: data.title_en,
@@ -225,8 +241,9 @@ export default function SetProjectDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-sidebar border-gray-700 p-4 sm:p-6 ${isRtl ? "rtl" : "ltr"
-          }`}
+        className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-sidebar border-gray-700 p-4 sm:p-6 ${
+          isRtl ? "rtl" : "ltr"
+        }`}
         dir={isRtl ? "rtl" : "ltr"}
       >
         <DialogHeader className="relative">
@@ -251,9 +268,12 @@ export default function SetProjectDialog({
               isSubmitting={isSubmitting}
               isFetching={isFetching}
               t={t}
+              projectId={projectId}
               projectTypeOptions={projectTypesOptions}
               mainImageInitialValue={projectData?.data?.payload?.main_image}
-              subImagesInitialValue={projectData?.data?.payload?.secondary_images}
+              subImagesInitialValue={
+                projectData?.data?.payload?.secondary_images
+              }
             />
 
             {/* Details Array Section */}

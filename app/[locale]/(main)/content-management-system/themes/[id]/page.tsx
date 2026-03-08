@@ -2,7 +2,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import ThemeDetailView from "@/modules/content-management-system/theme-details";
 import { ThemesApi } from "@/services/api/company-dashboard/themes";
-import { notFound } from "next/navigation";
+import { notFound } from "@i18n/navigation";
 
 async function ThemeDetailPage({
   params,

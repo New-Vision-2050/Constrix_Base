@@ -5,9 +5,10 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { AcademicAndExperienceSidebarItems } from "../constants/AcademicAndExperienceSidebarItems";
 import { useTranslations } from "next-intl";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 // declare context types
 type AcademicAndExperienceCxtType = {
@@ -17,7 +18,7 @@ type AcademicAndExperienceCxtType = {
 
 export const AcademicAndExperienceCxt =
   createContext<AcademicAndExperienceCxtType>(
-    {} as AcademicAndExperienceCxtType
+    {} as AcademicAndExperienceCxtType,
   );
 
 // ** create a custom hook to use the context
@@ -25,7 +26,7 @@ export const useAcademicAndExperienceCxt = () => {
   const context = useContext(AcademicAndExperienceCxt);
   if (!context) {
     throw new Error(
-      "useAcademicAndExperienceCxt must be used within a AcademicAndExperienceCxtProvider"
+      "useAcademicAndExperienceCxt must be used within a AcademicAndExperienceCxtProvider",
     );
   }
   return context;
@@ -38,17 +39,31 @@ export const AcademicAndExperienceCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const t = useTranslations(
-    "UserProfile.tabs.verticalLists.academicAndExperienceList"
+    "UserProfile.tabs.verticalLists.academicAndExperienceList",
   );
-  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    AcademicAndExperienceSidebarItems(t)[0]
-  );
+  const { verticalSection, setVerticalSection } = useUserProfileCxt();
+  const sections = AcademicAndExperienceSidebarItems(t);
+  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
 
   // ** handle side effects
+  useEffect(() => {
+    if (verticalSection) {
+      const section = sections.find((s) => s.id === verticalSection);
+      if (section) {
+        setActiveSection(section);
+      } else {
+        setActiveSection(sections[0]);
+      }
+    } else {
+      setActiveSection(sections[0]);
+    }
+  }, [verticalSection]);
 
   // ** declare and define component helper methods
-  const handleChangeActiveSection = (section: UserProfileNestedTab) =>
+  const handleChangeActiveSection = (section: UserProfileNestedTab) => {
     setActiveSection(section);
+    setVerticalSection(section.id);
+  };
 
   // ** return component ui
   return (

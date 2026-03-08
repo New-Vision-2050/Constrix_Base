@@ -4,14 +4,13 @@ import { CompanyAddress } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import PickupMap from "../../../../../components/shared/pickup-map";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 
 export const NationalAddressFormConfig = (
   companyAddress?: CompanyAddress,
   id?: string,
-  company_id?:string
+  company_id?: string
 ) => {
-
   const formId = `NationalAddressFormConfig-${id}-${company_id}`;
   const queryClient = useQueryClient();
 

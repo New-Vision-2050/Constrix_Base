@@ -4,8 +4,8 @@
 import { apiClient } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "@i18n/navigation";
+import { useEffect, useMemo } from "react";
 import { setCookie } from "cookies-next";
 
 interface Config {
@@ -13,7 +13,13 @@ interface Config {
   icons: React.ReactNode[];
 }
 
-const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetch?: number }) => {
+const StatisticsRow = ({
+  config,
+  toggleRefetch,
+}: {
+  config: Config;
+  toggleRefetch?: number;
+}) => {
   // Extract locale from pathname to ensure reactivity when URL changes
   const pathname = usePathname();
   const locale = useMemo(() => {
@@ -33,12 +39,12 @@ const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetc
       // Axios interceptor will automatically add Lang headers from NEXT_LOCALE cookie
       const response = await apiClient.get(config.url);
       return response.data;
-    }
+    },
   });
 
   useEffect(() => {
-    console.log('refetch()', toggleRefetch);
-    refetch()
+    console.log("refetch()", toggleRefetch);
+    refetch();
   }, [toggleRefetch, refetch]);
 
   const payload = useMemo(() => data?.payload || [{}, {}, {}, {}], [data]);
@@ -75,9 +81,10 @@ const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetc
               {/* percentage */}
               <span
                 dir="ltr"
-                className={`text-lg font-semibold ${isSuccess &&
+                className={`text-lg font-semibold ${
+                  isSuccess &&
                   (item.percentage >= 0 ? "text-green-500" : "text-red-500")
-                  }`}
+                }`}
               >
                 {isSuccess && (
                   <>

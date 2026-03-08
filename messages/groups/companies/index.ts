@@ -27,7 +27,9 @@ export const companiesMessages = new MessagesGroup({
   createCompany: _m("Create Company", "انشاء شركة"),
   SaveCompany: _m("The company was saved with number", "تم حفظ الشركة برقم"),
   Validation: new MessagesGroup({
-    englishName: _m("Short name should be in English", "الاسم المختصر يجب ان يكون باللغه الانجليزية"),
+   englishName: _m("The short name must be in English and contain no spaces or special characters",
+  "الاسم المختصر يجب أن يكون باللغة الإنجليزية وبدون مسافات وبدون رموز"),
+  
     arabicName: _m("The name should be in Arabic letters", "الاسم التجاري يجب ان يكون باللغه العربية"),
     arabicFirstName: _m("The first name should be in Arabic letters", "اسم المستخدم الاول يجب ان يكون باللغه العربية"),
     arabicLastName: _m("The last name should be in Arabic letters", "اسم المستخدم الأخير يجب ان يكون باللغه العربية")
@@ -142,6 +144,9 @@ export const companiesMessages = new MessagesGroup({
       "Short name must be English letters only",
       "الاسم المختصر يجب ان يكون بالغة الانجليزية ولا يتخلله رموز"
     ),
+    englishName: _m("The short name must be in English and contain no spaces or special characters",
+  "الاسم المختصر يجب أن يكون باللغة الإنجليزية وبدون مسافات وبدون رموز"),
+  
     SupportManagerLabel: _m("Support Manager", "مسؤول الدعم"),
     SupportManagerPlaceholder: _m("Select support manager", "اختر مسؤول الدعم"),
     SupportManagerRequired: _m("Support manager is required", "اختر مسؤول الدعم"),

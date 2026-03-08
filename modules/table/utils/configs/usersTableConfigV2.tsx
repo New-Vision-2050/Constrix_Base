@@ -18,7 +18,7 @@ import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/e
 import { editIndividualEmployeeFormConfig } from "@/modules/form-builder/configs/editIndividualEmployeeFormConfig";
 import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
 import useUserData from "@/hooks/use-user-data";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 // Define types for the company data
 interface CompanyData {
   id: string;
@@ -57,7 +57,7 @@ export const UsersConfigV2 = (options?: {
   isShareBroker?: boolean;
   currentUserId?: string;
   handleRefreshWidgetsData?: () => void;
-  tableId?: string
+  tableId?: string;
 }) => {
   const router = useRouter();
   const t = useTranslations("Companies");
@@ -70,11 +70,21 @@ export const UsersConfigV2 = (options?: {
     const registrationFromConfig = options?.registrationFormSlug;
     // client model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.CLIENT) {
-      return editIndividualClientFormConfig(tEditSubEntity, undefined, isShareClient, currentUserId)
+      return editIndividualClientFormConfig(
+        tEditSubEntity,
+        undefined,
+        isShareClient,
+        currentUserId
+      );
     }
     // broker model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.BROKER) {
-      return editIndividualBrokerFormConfig(tEditSubEntity, undefined, isShareBroker, currentUserId);
+      return editIndividualBrokerFormConfig(
+        tEditSubEntity,
+        undefined,
+        isShareBroker,
+        currentUserId
+      );
     }
     // employee model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
@@ -82,7 +92,13 @@ export const UsersConfigV2 = (options?: {
     }
     // default fallback (company user form)
     return GetCompanyUserFormConfig(t);
-  }, [options?.registrationFormSlug, t, options?.isShareClient, options?.isShareBroker, options?.currentUserId]);
+  }, [
+    options?.registrationFormSlug,
+    t,
+    options?.isShareClient,
+    options?.isShareBroker,
+    options?.currentUserId,
+  ]);
 
   return {
     url: `${baseURL}/company-users`,
@@ -286,38 +302,48 @@ export const UsersConfigV2 = (options?: {
     allowSearchFieldSelection: true,
     formConfig: finalFormConfig,
     executions: [
-      ...(options?.registrationFormSlug === ModelsTypes.EMPLOYEE ?
-        [{
-          id: "complete-profile",
-          label: tSubTable("CompleteProfile"),
-          icon: <GearIcon className="w-4 h-4" />,
-          action: "complete-profile",
-          dialogComponent: ChooseUserCompany,
-          disabled: options?.canEdit,
-          dialogProps: (row: UserTableRow) => {
-            return {
-              user: row
-            };
-          },
-        }]
-        : [
-          {
-            id: "complate-client-profile",
-            label: options?.registrationFormSlug === ModelsTypes.CLIENT
-              ? tSubTable("CompleteClientProfile")
-              : tSubTable("CompleteBrokerProfile"),
-            action: (row: UserTableRow) => {
-              router.push(`/client-profile/${row.user_id}?role=${options?.registrationFormSlug === ModelsTypes.CLIENT ? '2' : '3'}`);
+      ...(options?.registrationFormSlug === ModelsTypes.EMPLOYEE
+        ? [
+            {
+              id: "complete-profile",
+              label: tSubTable("CompleteProfile"),
+              icon: <GearIcon className="w-4 h-4" />,
+              action: "complete-profile",
+              dialogComponent: ChooseUserCompany,
+              disabled: options?.canEdit,
+              dialogProps: (row: UserTableRow) => {
+                return {
+                  user: row,
+                };
+              },
             },
-            icon: <UserIcon className="w-4 h-4" />,
-            disabled: true
-          }
-        ]),
+          ]
+        : [
+            {
+              id: "complate-client-profile",
+              label:
+                options?.registrationFormSlug === ModelsTypes.CLIENT
+                  ? tSubTable("CompleteClientProfile")
+                  : tSubTable("CompleteBrokerProfile"),
+              action: (row: UserTableRow) => {
+                router.push(
+                  `/client-profile/${row.user_id}?role=${
+                    options?.registrationFormSlug === ModelsTypes.CLIENT
+                      ? "2"
+                      : "3"
+                  }`
+                );
+              },
+              icon: <UserIcon className="w-4 h-4" />,
+              disabled: true,
+            },
+          ]),
       {
         id: "user-settings",
-        label: options?.registrationFormSlug === ModelsTypes.CLIENT
-          ? tSubTable("ClientSettings")
-          : options?.registrationFormSlug === ModelsTypes.BROKER
+        label:
+          options?.registrationFormSlug === ModelsTypes.CLIENT
+            ? tSubTable("ClientSettings")
+            : options?.registrationFormSlug === ModelsTypes.BROKER
             ? tSubTable("BrokerSettings")
             : tSubTable("EmployeeSettings"),
         icon: <GearIcon className="w-4 h-4" />,
@@ -327,11 +353,12 @@ export const UsersConfigV2 = (options?: {
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
-            title: options?.registrationFormSlug === ModelsTypes.CLIENT
-              ? tSubTable("ClientSettings")
-              : options?.registrationFormSlug === ModelsTypes.BROKER
+            title:
+              options?.registrationFormSlug === ModelsTypes.CLIENT
+                ? tSubTable("ClientSettings")
+                : options?.registrationFormSlug === ModelsTypes.BROKER
                 ? tSubTable("BrokerSettings")
-                : tSubTable("EmployeeSettings")
+                : tSubTable("EmployeeSettings"),
           };
         },
       },
@@ -347,7 +374,7 @@ export const UsersConfigV2 = (options?: {
             user: row,
             registrationFormSlug: options?.registrationFormSlug,
             handleRefreshWidgetsData: options?.handleRefreshWidgetsData,
-            tableId: options?.tableId
+            tableId: options?.tableId,
           };
         },
       },

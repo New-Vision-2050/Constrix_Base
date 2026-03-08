@@ -1,6 +1,7 @@
 import Can from "@/lib/permissions/client/Can";
 import { useFunctionalContractualCxt } from "../../context";
 import ContractDataForm from "./contract-data";
+import ContractualRelationshipForm from "./contractual-relationship";
 import JobOfferForm from "./job-offer";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
@@ -15,6 +16,9 @@ export default function ContractualDataTab() {
       </Can>
       <Can check={[PERMISSIONS.profile.contractWork.view]}>
         <ContractDataForm />
+      </Can>
+      <Can check={[PERMISSIONS.profile.contractWork.view]}>
+        <ContractualRelationshipForm />
       </Can>
     </div>
   );
