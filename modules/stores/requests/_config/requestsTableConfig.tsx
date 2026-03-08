@@ -4,6 +4,8 @@ import { TableConfig } from "@/modules/table";
 import { EditIcon, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { OrderStatusChip } from "../components/OrderStatusChip";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface RequestRow {
   order_serial: string;
@@ -28,6 +30,7 @@ type Params = {
 export const useRequestsTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
+  const { can } = usePermissions();
   const tCommon = useTranslations("labels");
   const t = useTranslations("requests.table");
 
@@ -82,7 +85,7 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
       //   </DropdownMenuItem>
       // ),
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.order.update)} onSelect={() => params?.onEdit?.(row.id)}>
           <>
             <EditIcon />
             {tCommon("edit")}
@@ -91,7 +94,7 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.ecommerce.order.delete),
     },
   };
 };

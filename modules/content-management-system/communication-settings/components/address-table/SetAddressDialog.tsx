@@ -24,10 +24,15 @@ interface SetAddressDialogProps {
 export default function SetAddressDialog({ open, onClose, onSuccess, addressId }: SetAddressDialogProps) {
     const t = useTranslations("content-management-system.communicationSetting");
     const isEditMode = !!addressId;
-    const { data: addressData, isLoading,refetch } = useQuery({
+    const { data: addressData, isLoading, refetch } = useQuery({
         queryKey: ["cms-address", addressId],
         queryFn: () => CommunicationSettingsAddressesApi.show(addressId!),
         enabled: isEditMode && open,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+        retry: false,
+        staleTime: Infinity,
     });
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(createAddressSchema(t)),
@@ -59,13 +64,13 @@ export default function SetAddressDialog({ open, onClose, onSuccess, addressId }
                 status: data.status || 1,
                 city_id: 1,
             };
-            
-            isEditMode 
+
+            isEditMode
                 ? await CommunicationSettingsAddressesApi.update(addressId!, payload)
                 : await CommunicationSettingsAddressesApi.create(payload);
-            
+
             toast.success(isEditMode ? t("updateSuccess") : t("createSuccess"));
-            onSuccess?.(); 
+            onSuccess?.();
             reset();
             refetch();
             onClose();
@@ -107,8 +112,8 @@ export default function SetAddressDialog({ open, onClose, onSuccess, addressId }
                                 <FormControl><Input variant="secondary" disabled={isSubmitting || isLoading} {...field} /></FormControl>
                                 <FormErrorMessage /></FormItem>)} />
                     </div>
-                    <AddressMapComponent 
-                        latitude={latitude} 
+                    <AddressMapComponent
+                        latitude={latitude}
                         longitude={longitude}
                         onLocationSelect={(lat, lng) => { setValue("latitude", lat); setValue("longitude", lng); }}
                         disabled={isSubmitting || isLoading}

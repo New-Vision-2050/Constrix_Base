@@ -38,20 +38,20 @@ export default function ProjectsGrid({ OnEditProject, OnDeleteProject, projects 
         }
     ];
 
-     // handle no projects
-     if (projects.length === 0) {
+    // handle no projects
+    if (projects.length === 0) {
         return <StateError message={t("noProjects")} />;
     }
 
     return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {projects.map((project) => (
-            <ProjectCard 
-            key={project.id} 
-            id={project.id} 
-            src={project.main_image || ""} 
-            description={project.description || ""}
-            title={project.name || ""} 
-            actions={actions?.filter((action) => action.show)} />
+            <ProjectCard
+                key={project.id}
+                id={project.id}
+                src={project.main_image || ""}
+                description={project.description || ""}
+                title={project.title ?? project?.name ?? ""}
+                actions={actions?.filter((action) => action.show)} />
         ))}
     </div>
 }

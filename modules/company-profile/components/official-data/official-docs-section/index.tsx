@@ -120,7 +120,7 @@ const OfficialDocsSection = ({
       )}
 
       <SheetFormBuilder
-        config={AddDocFormConfig(id, currentCompanyId)}
+        config={AddDocFormConfig(id, currentCompanyId, handleCloseAddDoc)}
         isOpen={isOpenAddDoc}
         onOpenChange={handleCloseAddDoc}
       />

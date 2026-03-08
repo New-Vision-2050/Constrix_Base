@@ -3,10 +3,14 @@ import { CompanyDocument } from "@/modules/company-profile/types/company";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 import { serialize } from "object-to-formdata";
 
-export const updateDocsFormConfig = (doc: CompanyDocument, id?: string, onSuccess?: () => void) => {
+export const updateDocsFormConfig = (
+  doc: CompanyDocument,
+  id?: string,
+  onSuccess?: () => void
+) => {
   const { company_id }: { company_id: string | undefined } = useParams();
   const queryClient = useQueryClient();
 
@@ -109,9 +113,12 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string, onSucces
               const notificationDate = endDate.toLocaleDateString("en-CA");
               useFormStore
                 .getState()
-                .setValues(`updateDocsFormConfig-${doc.id}-${id}-${company_id}`, {
-                  notification_date: notificationDate,
-                });
+                .setValues(
+                  `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
+                  {
+                    notification_date: notificationDate,
+                  }
+                );
             },
           },
           {

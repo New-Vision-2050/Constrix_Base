@@ -45,12 +45,11 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   isMulti = false,
   setFirstAsDefault = dynamicConfig?.setFirstAsDefault ?? false,
 }) => {
-  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
+const t = useTranslations();
   const { options, loading, error, dataFetched, fetchOptions, hasMore } =
     useDropdownSearch({
       searchTerm: searchValue,
@@ -81,10 +80,17 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       options.length > 0 &&
       (!value || (Array.isArray(value) && value.length === 0))
     ) {
-      const allValues = options.map(option => option.value);
+      const allValues = options.map((option) => option.value);
       onChange(allValues);
     }
-  }, [options, value, dynamicConfig?.selectAll, isMulti, onChange, dataFetched]);
+  }, [
+    options,
+    value,
+    dynamicConfig?.selectAll,
+    isMulti,
+    onChange,
+    dataFetched,
+  ]);
 
   // Find the label(s) for the current value(s)
   const getSelectedLabels = () => {
@@ -93,9 +99,9 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       return value
         .map((val) => {
           const option = options.find((opt) => {
-            return opt.value == val && typeof opt.value == 'string';
+            return opt.value == val && typeof opt.value == "string";
           });
-          
+
           return option ? option.label : val;
         })
         .join(", ");
@@ -151,6 +157,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   }, [open]);
 
 
+  if (loading && Boolean(value)) {
+    return <div className="flex text-center text-sm">
+      <Loader2 className="h-4 w-4 animate-spin" />
+      {t("Main.Loading")}
+    </div>
+  }
+
+
   return (
     <div className="space-y-2">
       {label && <Label className="mb-2 block">{label}</Label>}
@@ -170,14 +184,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 "w-full justify-between bg-sidebar whitespace-normal",
                 (!value ||
                   (isMulti && Array.isArray(value) && value.length === 0)) &&
-                  "text-muted-foreground",
+                "text-muted-foreground",
                 isDisabled && "opacity-50 cursor-not-allowed"
               )}
               onKeyDown={handleKeyDown}
             >
               <div className="flex-1 overflow-hidden text-ellipsis line-clamp-1 text-start">
                 {value &&
-                (!isMulti || (Array.isArray(value) && value.length > 0))
+                  (!isMulti || (Array.isArray(value) && value.length > 0))
                   ? selectedLabel
                   : placeholder}
               </div>
@@ -185,7 +199,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             </Button>
           </PopoverTrigger>
           {(value && !isMulti) ||
-          (isMulti && Array.isArray(value) && value.length > 0) ? (
+            (isMulti && Array.isArray(value) && value.length > 0) ? (
             <Button
               variant="ghost"
               size="icon"
@@ -219,7 +233,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             <div className="flex items-center border-b px-3">
               <CommandInput
                 ref={inputRef}
-                placeholder="بحث..."
+                placeholder={t("Table.Search")}
                 value={searchValue}
                 onValueChange={setSearchValue}
                 className="flex-1 py-3 px-1 outline-none"
@@ -231,8 +245,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               className="max-h-[200px] overflow-auto"
               onScroll={(event) => {
                 const target = event.target as HTMLElement;
-                let total = target.scrollTop + target.clientHeight;
-                let content = target.querySelector(
+                const total = target.scrollTop + target.clientHeight;
+                const content = target.querySelector(
                   `[id='inner-list']`
                 ) as HTMLElement | null;
                 if (
@@ -248,15 +262,15 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 {loading ? (
                   <div className="py-6 text-center text-sm">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
-                    Loading options...
+                    {t("Table.LoadingOptions")}
                   </div>
                 ) : error ? (
                   <div className="py-6 text-center text-sm text-destructive">
-                    Error: {error}
+                    {t("Table.Error")}: {error}
                   </div>
                 ) : (
                   <div className="py-6 text-center text-sm">
-                    {t("Main.NoResultsRound")}
+                    {t("Main.NoResultsFound")}
                   </div>
                 )}
               </CommandEmpty>
@@ -290,8 +304,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                             ? "opacity-100"
                             : "opacity-0"
                           : value == option.value
-                          ? "opacity-100"
-                          : "opacity-0"
+                            ? "opacity-100"
+                            : "opacity-0"
                       )}
                     />
                     {option.label}
@@ -301,7 +315,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                   <div className="py-2 text-center text-sm text-muted-foreground">
                     <div className="flex items-center justify-center">
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Searching...
+                      {t("Table.Searching")}
                     </div>
                   </div>
                 )}

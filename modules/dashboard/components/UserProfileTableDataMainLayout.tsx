@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import EyeIcon from "@/public/icons/eye-icon";
-import { redirect } from "next/navigation";
+import { redirect } from "@i18n/navigation";
 
 type PropsT = {
   title: string;

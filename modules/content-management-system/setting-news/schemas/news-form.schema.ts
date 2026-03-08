@@ -72,29 +72,23 @@ export const createNewsFormSchema = (
         message: t("form.publishDateRequired"),
       }),
 
-    end_date: z
-      .string({
-        required_error: t("form.endDateRequired"),
-      })
-      .min(1, {
-        message: t("form.endDateRequired"),
-      }),
+    end_date: z.string().optional(),
 
     thumbnail_image: isEditMode
       ? z.union([z.instanceof(File), z.string(), z.null()]).optional()
       : z
-          .union([z.instanceof(File), z.null()])
-          .refine((file) => file !== null && file !== undefined, {
-            message: t("form.thumbnailImageRequired"),
-          }),
+        .union([z.instanceof(File), z.null()])
+        .refine((file) => file !== null && file !== undefined, {
+          message: t("form.thumbnailImageRequired"),
+        }),
 
     main_image: isEditMode
       ? z.union([z.instanceof(File), z.string(), z.null()]).optional()
       : z
-          .union([z.instanceof(File), z.null()])
-          .refine((file) => file !== null && file !== undefined, {
-            message: t("form.mainImageRequired"),
-          }),
+        .union([z.instanceof(File), z.null()])
+        .refine((file) => file !== null && file !== undefined, {
+          message: t("form.mainImageRequired"),
+        }),
   });
 
 /**

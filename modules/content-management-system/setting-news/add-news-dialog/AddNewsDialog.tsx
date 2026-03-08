@@ -94,6 +94,13 @@ export default function AddNewsDialog({
     }
   }, [errors]);
 
+  // Reset form to default values when dialog opens or newsId changes
+  useEffect(() => {
+    if (open) {
+      reset(getDefaultNewsFormValues());
+    }
+  }, [open, newsId, reset]);
+
   // Populate form with news data when editing
   useEffect(() => {
     if (isEditMode && newsData?.payload) {
@@ -112,7 +119,7 @@ export default function AddNewsDialog({
         main_image: news.main_image || null, // Will be set via initialValue in ImageUpload
       });
     }
-  }, [isEditMode, newsData, open, reset]);
+  }, [isEditMode, newsData, reset]);
 
   const onSubmit = async (data: NewsFormData) => {
     try {
@@ -162,7 +169,7 @@ export default function AddNewsDialog({
       }
 
       toast.success(
-        isEditMode ? t("form.updateSuccess") : t("form.createSuccess")
+        isEditMode ? t("form.updateSuccess") : t("form.createSuccess"),
       );
       onSuccess?.();
       reset();
@@ -170,7 +177,7 @@ export default function AddNewsDialog({
     } catch (error: unknown) {
       console.error(
         `Error ${isEditMode ? "updating" : "creating"} news:`,
-        error
+        error,
       );
 
       const axiosError = error as AxiosError;

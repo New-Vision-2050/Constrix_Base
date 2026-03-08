@@ -81,10 +81,10 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   const t = useTranslations();
   const [isEditMode] = useState(config.isEditMode || false);
   const [isLoadingEditData, setIsLoadingEditData] = useState(
-    initialIsLoadingEditData || false
+    initialIsLoadingEditData || false,
   );
   const [editError, setEditError] = useState<string | null>(
-    initialEditError || null
+    initialEditError || null,
   );
 
   // Function to load data for editing
@@ -139,7 +139,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             data = data[path];
             if (data === undefined) {
               throw new Error(
-                `Data path '${config.editDataPath}' not found in response`
+                `Data path '${config.editDataPath}' not found in response`,
               );
             }
           }
@@ -168,7 +168,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
         setIsLoadingEditData(false);
       }
     },
-    [config, recordId, setValue, setValues]
+    [config, recordId, setValue, setValues],
   );
 
   // Load edit data when in edit mode
@@ -195,8 +195,8 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                   config.wizardOptions?.allowStepNavigation
                     ? "cursor-pointer"
                     : index <= currentStep
-                    ? "cursor-pointer"
-                    : "cursor-not-allowed opacity-50"
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed opacity-50"
                 }`}
                 onClick={() => {
                   if (
@@ -212,8 +212,8 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                     index < currentStep
                       ? "bg-green-500 text-white"
                       : index === currentStep
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-gray-200 text-gray-500"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   {index + 1}
@@ -332,8 +332,17 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
       <div className="mb-4 text-sm">
         {submitError && (
           <div className="text-destructive border border-destructive/20 p-2 rounded">
-            <span className="font-medium">Error: </span>
-            {submitError}
+            <span className="font-medium">{submitError}</span>
+            {Object.keys(errors).length > 0 && (
+              <ul className="mt-2 list-disc list-inside text-sm">
+                {Object.entries(errors).map(([field, error]) => (
+                  <li key={field}>
+                    <span className="font-medium">{field}:</span>{" "}
+                    {String(error)}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
         {/* {submitSuccess && (

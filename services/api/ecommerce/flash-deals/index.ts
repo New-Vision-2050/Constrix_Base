@@ -14,13 +14,16 @@ export interface CreateFlashDealParams {
 export interface UpdateFlashDealParams extends Partial<CreateFlashDealParams> {}
 
 export const FlashDealsApi = {
+  list: (params?: { search?: string; page?: number; per_page?: number }) =>
+    baseApi.get("ecommerce/dashboard/flash_deals", { params }),
+
   create: (params: CreateFlashDealParams) =>
     baseApi.post(
       "ecommerce/dashboard/flash_deals",
       serialize(params, {
         indices: true,
         booleansAsIntegers: true,
-      })
+      }),
     ),
 
   update: (id: string, params: UpdateFlashDealParams) =>

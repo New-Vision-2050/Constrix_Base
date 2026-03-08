@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -57,7 +57,8 @@ export function BranchDialog({
 
   const { data: branchData, isLoading: isFetching } = useQuery({
     queryKey: ["branch", branchId],
-    queryFn: () => apiClient.get(`/ecommerce/dashboard/store-branches/${branchId}`),
+    queryFn: () =>
+      apiClient.get(`/ecommerce/dashboard/store-branches/${branchId}`),
     enabled: isEditMode && open,
   });
 
@@ -133,12 +134,14 @@ export function BranchDialog({
         email: data.email,
       };
 
-      const url =
-        isEditMode && branchId
-          ? `/ecommerce/dashboard/store-branches/${branchId}`
-          : "/ecommerce/dashboard/store-branches";
-      
-      await apiClient.post(url, payload);
+      if (isEditMode && branchId) {
+        await apiClient.put(
+          `/ecommerce/dashboard/store-branches/${branchId}`,
+          payload
+        );
+      } else {
+        await apiClient.post("/ecommerce/dashboard/store-branches", payload);
+      }
 
       toast.success(
         isEditMode ? "تم تحديث الفرع بنجاح" : "تم إنشاء الفرع بنجاح"
@@ -156,9 +159,7 @@ export function BranchDialog({
         return;
       }
 
-      toast.error(
-        isEditMode ? "فشل في تحديث الفرع" : "فشل في إنشاء الفرع"
-      );
+      toast.error(isEditMode ? "فشل في تحديث الفرع" : "فشل في إنشاء الفرع");
     }
   };
 

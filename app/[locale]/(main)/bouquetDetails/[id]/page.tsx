@@ -1,7 +1,7 @@
 "use client";
 
 import PermissionsBouquet from "@/modules/bouquet/components/permissions";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 
 export default function BouquetDetailsPage() {
   const params = useParams();
@@ -10,7 +10,6 @@ export default function BouquetDetailsPage() {
   return (
     <>
       <PermissionsBouquet packageId={id} />
-
     </>
   );
 }

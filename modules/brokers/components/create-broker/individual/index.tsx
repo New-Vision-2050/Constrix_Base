@@ -20,7 +20,7 @@ export default function CreateIndividualBrokerForm({
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
-    tableStore.reloadTable("brokers-table");
+    tableStore.reloadTable(tableId ?? "brokers-table");
     handleRefreshWidgetsData?.();
     closeCreateBrokerSheet();
   };

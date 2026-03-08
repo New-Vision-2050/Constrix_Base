@@ -14,7 +14,7 @@ import { handleFormSubmissionError } from "./handleFormSubmissionError";
 export const defaultSubmitHandler = async (
   values: Record<string, any>,
   config: FormConfig,
-  options?: RequestOptions
+  options?: RequestOptions,
 ): Promise<{
   success: boolean;
   message?: string;
@@ -138,11 +138,23 @@ export const defaultSubmitHandler = async (
         break;
     }
 
+    const responseData = response?.data;
+
+    // Handle backend returning success: false with HTTP 200
+    if (responseData?.success === false) {
+      return {
+        success: false,
+        message: responseData?.message || "Form submission failed",
+        errors: responseData?.errors || {},
+        data: responseData || {},
+      };
+    }
+
     // Return success response
     return {
       success: true,
-      message: response.data?.message || "Form submitted successfully",
-      data: response.data || {},
+      message: responseData?.message || "Form submitted successfully",
+      data: responseData || {},
     };
   } catch (error: any) {
     return handleFormSubmissionError(error, config);

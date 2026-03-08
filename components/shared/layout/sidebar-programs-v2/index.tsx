@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, useMemo } from "react";
 import { SidebarGroup, SidebarMenu, useSidebar } from "@/components/ui/sidebar";
 import { Project } from "@/types/sidebar-menu";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@i18n/navigation";
 import { useLocale } from "next-intl";
 import { MainProjectSelector } from "./MainProjectSelector";
 import { SubProgramsList } from "./SubProgramsList";
@@ -43,7 +43,11 @@ export function SidebarProgramsListV2({ projects }: PropsT) {
     // If no match, try to match against sub_entities urls
     if (!matchedProject) {
       matchedProject = projects.find((project) =>
-        project.sub_entities?.some((sub) => sub.url === pathnameWithoutLocale)
+        project.sub_entities?.some((sub) => {
+          if (!sub.url) return false;
+          // Use exact match first, or fall back to prefix match
+          return sub.url === pathnameWithoutLocale || pathnameWithoutLocale.startsWith(sub.url);
+        })
       );
     }
 
@@ -74,7 +78,11 @@ export function SidebarProgramsListV2({ projects }: PropsT) {
     // If no match, try to match against sub_entities urls
     if (!matchedProject) {
       matchedProject = projects.find((project) =>
-        project.sub_entities?.some((sub) => sub.url === pathnameWithoutLocale)
+        project.sub_entities?.some((sub) => {
+          if (!sub.url) return false;
+          // Use exact match first, or fall back to prefix match
+          return sub.url === pathnameWithoutLocale || pathnameWithoutLocale.startsWith(sub.url);
+        })
       );
     }
 

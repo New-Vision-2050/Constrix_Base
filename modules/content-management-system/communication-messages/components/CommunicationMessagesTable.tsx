@@ -42,8 +42,8 @@ export default function CommunicationMessagesTable() {
         <ReplyMessageDialog
           messageId={replyingToId}
           open={Boolean(replyingToId)}
+          onDialogSuccess={() => { reloadTable() }}
           onClose={() => {
-            reloadTable();
             setReplyingToId(null);
           }}
         />

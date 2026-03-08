@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ROUTER } from "@/router";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { Button } from "@/components/ui/button";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { UserTableRow } from "@/modules/table/utils/configs/usersTableConfig";
@@ -32,7 +32,8 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
       if (!Boolean(authCompany?.is_central_company)) {
         const company = user.companies[0];
         const userId = user?.user_id ?? company?.users?.[0]?.id ?? "";
-        const role = user?.companies[0]?.roles?.[0]?.role ?? UsersTypes.Employee;
+        const role =
+          user?.companies[0]?.roles?.[0]?.role ?? UsersTypes.Employee;
 
         handleRedirectWithRole(userId, authCompany?.id, role.toString());
         onClose();
@@ -42,8 +43,9 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
       ) {
         const company = user.companies[0];
         const userId = user?.user_id ?? company?.users?.[0]?.id ?? "";
-        const role = user?.companies[0]?.roles?.[0]?.role ?? UsersTypes.Employee;
-        
+        const role =
+          user?.companies[0]?.roles?.[0]?.role ?? UsersTypes.Employee;
+
         handleRedirectWithRole(userId, company?.id, role.toString());
         onClose();
       }
@@ -51,10 +53,16 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
   }, [open, user, router, onClose, authCompanyData]);
 
   // handle redirect to profile page with role
-  const handleRedirectWithRole = (id: string, companyId: string, role: string) => {
+  const handleRedirectWithRole = (
+    id: string,
+    companyId: string,
+    role: string
+  ) => {
     if (!id) return;
     if (role.toString() == UsersTypes.Employee) {
-      router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}&role=${role}`);
+      router.push(
+        `${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}&role=${role}`
+      );
     } else {
       router.push(`${ROUTER.CLIENT_PROFILE}?id=${id}&role=${role}`);
     }

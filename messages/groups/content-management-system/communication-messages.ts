@@ -15,17 +15,29 @@ export const CommunicationMessagesMessages = new MessagesGroup({
   pending: _m("Pending", "قيد الانتظار"),
   replied: _m("Replied", "تم الرد"),
   // Actions
+  actions: _m("Actions", "الإجراءات"),
+  action: _m("Action", "الإجراء"),
   reply: _m("Reply", "رد"),
   details: _m("Details", "التفاصيل"),
   delete: _m("Delete", "حذف"),
+  deleteSuccess: _m("Message deleted successfully", "تم حذف الرسالة بنجاح"),
+  deleteError: _m("Failed to delete message", "فشل حذف الرسالة"),
+  deleteConfirmMessage: _m(
+    "Are you sure you want to delete this message?",
+    "هل أنت متأكد من حذف هذه الرسالة؟"
+  ),
+  // Filters
+  searchPlaceholder: _m(
+    "Search by name, email or message...",
+    "البحث بالاسم أو البريد الإلكتروني أو الرسالة..."
+  ),
+  allStatus: _m("All Status", "جميع الحالات"),
+  reset: _m("Reset", "إعادة تعيين"),
   // Reply dialog
   replyDialog: new MessagesGroup({
     title: _m("Reply to Message", "الرد على الرسالة"),
     replyLabel: _m("Reply", "الرد"),
-    replyPlaceholder: _m(
-      "Enter your reply...",
-      "أدخل ردك..."
-    ),
+    replyPlaceholder: _m("Enter your reply...", "أدخل ردك..."),
     status: _m("Status", "الحالة"),
     send: _m("Send", "إرسال"),
     cancel: _m("Cancel", "إلغاء"),
@@ -38,4 +50,3 @@ export const CommunicationMessagesMessages = new MessagesGroup({
     close: _m("Close", "إغلاق"),
   }),
 });
-

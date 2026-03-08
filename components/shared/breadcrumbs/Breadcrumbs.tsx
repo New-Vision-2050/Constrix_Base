@@ -1,13 +1,14 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import React, { useMemo } from "react";
+import Link from "@i18n/link";
+import { usePathname } from "@i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import type { BreadcrumbsProps, BreadcrumbItem } from "./types";
 import { getRoutesMap } from "./routes-map";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { isDisabledBreadcrumbSegment } from "./disabled-list";
+import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   homeLabel,
@@ -17,9 +18,30 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("breadcrumbs");
+  const { data } = useSidebarMenu();
 
-  // Get routes map based on current language
-  const defaultRoutesMap = getRoutesMap(locale, t);
+  const dynamicRoutes = useMemo(() => {
+    return data?.map((item) => {
+      const sub_entities = item?.sub_entities ?? [];
+      const sub_entities_routes = sub_entities.map((sub_entity) => {
+        return {
+          [sub_entity.slug]: sub_entity.name,
+        };
+      });
+      console.log("sub_entities_routes", sub_entities_routes);
+      return sub_entities_routes;
+    });
+  }, [data]);
+  const dynamicRoutesNames = useMemo(() => {
+    const flatRoutes = dynamicRoutes?.flat() || [];
+    return Object.assign({}, ...flatRoutes);
+  }, [dynamicRoutes]);
+
+  // Get routes map based on current language and merge with dynamic routes
+  const defaultRoutesMap = useMemo(() => {
+    const staticRoutes = getRoutesMap(locale, t);
+    return { ...staticRoutes, ...dynamicRoutesNames };
+  }, [locale, t, dynamicRoutesNames]);
 
   // Merge custom routes map with default one
   const routesMap = { ...defaultRoutesMap, ...(customRoutesMap || {}) };
@@ -70,9 +92,12 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   // Check if a segment should be disabled (super entity slug or in custom disabled list)
   const isSegmentDisabled = (segment: string): boolean => {
     const superEntityValues = Object.values(SUPER_ENTITY_SLUG);
-    return superEntityValues.includes(segment) || isDisabledBreadcrumbSegment(segment);
+    return (
+      superEntityValues.includes(segment) ||
+      isDisabledBreadcrumbSegment(segment)
+    );
   };
-  
+
   // Get label for ID segments from translation file
   const getIdSegmentLabel = (): string => {
     // Get the translation key for "details" from the breadcrumbs namespace
@@ -194,7 +219,9 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
               {crumb.isActive ? (
                 <span className="text-pink-500 font-medium">{crumb.label}</span>
               ) : crumb.isDisabled ? (
-                <span className="text-gray-400 cursor-not-allowed opacity-60">{crumb.label}</span>
+                <span className="text-gray-400 cursor-not-allowed opacity-60">
+                  {crumb.label}
+                </span>
               ) : (
                 <Link
                   href={crumb.href}

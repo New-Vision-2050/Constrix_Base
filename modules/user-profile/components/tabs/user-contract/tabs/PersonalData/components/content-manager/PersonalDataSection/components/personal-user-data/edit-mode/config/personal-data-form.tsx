@@ -8,10 +8,12 @@ import {
 } from "@/modules/table/components/ui/HijriCalendar";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
+import { useAuthStore } from "@/modules/auth/store/use-auth";
 
 export const PersonalDataFormConfig = () => {
   const t = useTranslations();
   const { userId } = useUserProfileCxt();
+  const authUser = useAuthStore.getState().user;
   const { userPersonalData } = usePersonalDataTabCxt();
   const {
     handleRefetchUserPersonalData,
@@ -121,6 +123,9 @@ export const PersonalDataFormConfig = () => {
                 );
             },
             validation: [],
+            maxDate: {
+              value: new Date().toDateString()
+            }
           },
           {
             name: "birthdate_hijri",
@@ -138,6 +143,9 @@ export const PersonalDataFormConfig = () => {
                 );
             },
             validation: [],
+            maxDate: {
+              value: new Date().toDateString()
+            }
           },
           {
             name: "country_id",
@@ -184,11 +192,20 @@ export const PersonalDataFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-    onSuccess: () => {
+    onSuccess: (values) => {
+      // update auth user name if it is the same as the user personal data name
+      if (userId === authUser?.id) {
+        if (authUser?.name !== values.name) {
+          useAuthStore.getState().setUser({
+            ...authUser,
+            name: values.name,
+          });
+        }
+      }
       handleRefetchProfileData();
       handleRefetchUserPersonalData();
       handleRefetchDataStatus();
-    },
+  },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
@@ -202,5 +219,5 @@ export const PersonalDataFormConfig = () => {
       });
     },
   };
-  return PersonalFormConfig;
+return PersonalFormConfig;
 };

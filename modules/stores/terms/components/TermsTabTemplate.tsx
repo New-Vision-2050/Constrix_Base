@@ -10,6 +10,9 @@ import { TermsApi } from "@/services/api/ecommerce/terms";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TermsType } from "@/types/api/ecommerce/terms";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 interface TermsTabTemplateProps {
   type: TermsType;
@@ -21,6 +24,7 @@ export default function TermsTabTemplate({
   title,
 }: TermsTabTemplateProps) {
   const t = useTranslations();
+  const { can } = usePermissions();
   const [contentAr, setContentAr] = useState("");
   const [contentEn, setContentEn] = useState("");
   const [activeTab, setActiveTab] = useState("ar");
@@ -57,17 +61,17 @@ export default function TermsTabTemplate({
       toast.error("المحتوى العربي مطلوب / Arabic content is required");
       return;
     }
-    
+
     if (!contentEn.trim()) {
       toast.error("المحتوى الإنجليزي مطلوب / English content is required");
       return;
     }
 
-    updateMutation.mutate({ 
-      description: { 
-        ar: contentAr, 
-        en: contentEn 
-      } 
+    updateMutation.mutate({
+      description: {
+        ar: contentAr,
+        en: contentEn
+      }
     });
   };
 
@@ -84,16 +88,18 @@ export default function TermsTabTemplate({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">{title}</h2>
-        <Button
-          onClick={handleSave}
-          disabled={updateMutation.isPending || isLoading}
-          className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
-        >
-          {updateMutation.isPending && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          )}
-          {t("terms.save") || "حفظ"}
-        </Button>
+        <Can check={[PERMISSIONS.ecommerce.page.update]}>
+          <Button
+            onClick={handleSave}
+            disabled={updateMutation.isPending || isLoading}
+            className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
+          >
+            {updateMutation.isPending && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            {t("terms.save") || "حفظ"}
+          </Button>
+        </Can>
       </div>
 
       <Tabs
@@ -103,14 +109,14 @@ export default function TermsTabTemplate({
         dir="rtl"
       >
         <TabsList className="inline-flex gap-8 bg-transparent border-b border-gray-700 w-auto">
-          <TabsTrigger 
-            value="ar" 
+          <TabsTrigger
+            value="ar"
             className="text-sm data-[state=active]:text-pink-500 data-[state=active]:border-b-2 data-[state=active]:border-pink-500 data-[state=inactive]:text-white rounded-none pb-3 bg-transparent"
           >
             اللغة العربية (AR)
           </TabsTrigger>
-          <TabsTrigger 
-            value="en" 
+          <TabsTrigger
+            value="en"
             className="text-sm data-[state=active]:text-pink-500 data-[state=active]:border-b-2 data-[state=active]:border-pink-500 data-[state=inactive]:text-white rounded-none pb-3 bg-transparent"
           >
             اللغة الإنجليزية (EN)
@@ -139,6 +145,7 @@ export default function TermsTabTemplate({
             </div>
           )}
           <RichTextEditor
+            disabled={!can(PERMISSIONS.ecommerce.page.update)}
             value={contentEn}
             onChange={setContentEn}
             placeholder={t("terms.enterContent") || "Enter content here..."}

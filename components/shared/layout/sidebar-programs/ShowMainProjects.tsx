@@ -1,7 +1,7 @@
 import RegularList from "../../RegularList";
 import { SetStateAction } from "react";
 import { Project } from "@/types/sidebar-menu";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -21,9 +21,9 @@ export default function ShowMainProjects({
 }: PropsT) {
   const t = useTranslations();
   const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
-  
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const isDarkMode = currentTheme === "dark";
+
   return (
     <div className="w-full">
       <label
@@ -63,8 +63,8 @@ const MainProjectsList = (props: MainProjectsListProps) => {
   // declare and define helper methods
   const router = useRouter();
   const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const isDarkMode = currentTheme === "dark";
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProject =
       projects.find((project) => project.name === e.target.value) ||
@@ -84,8 +84,8 @@ const MainProjectsList = (props: MainProjectsListProps) => {
       onChange={handleChange}
       className={cn(
         "block w-full h-[55px] px-2 py-[5px] text-[18px] font-semibold rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 my-[10px] border-0",
-        isDarkMode 
-          ? "bg-[#2D174D] text-white" 
+        isDarkMode
+          ? "bg-[#2D174D] text-white"
           : "bg-white text-gray-900 border border-gray-300"
       )}
     >

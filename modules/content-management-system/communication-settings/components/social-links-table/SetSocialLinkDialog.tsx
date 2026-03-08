@@ -40,10 +40,15 @@ export default function SetSocialLinkDialog({
     const t = useTranslations("content-management-system.communicationSetting.socialLinksTable");
     const isEditMode = !!socialLinkId;
 
-    const { data: socialLinkData, isLoading,refetch } = useQuery({
+    const { data: socialLinkData, isLoading, refetch } = useQuery({
         queryKey: ["cms-social-link", socialLinkId],
         queryFn: () => CommunicationSettingsSocialLinksApi.show(socialLinkId!),
         enabled: isEditMode && open,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+        retry: false,
+        staleTime: Infinity,
     });
 
     const form = useForm<SocialLinkFormData>({

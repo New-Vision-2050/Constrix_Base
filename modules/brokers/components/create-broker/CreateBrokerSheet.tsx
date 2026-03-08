@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, {useEffect} from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Sheet,
@@ -28,6 +28,25 @@ const CreateBrokerSheet = ({
   const t = useTranslations("BrokersModule.form");
   const { openCreateBroker, closeCreateBrokerSheet, openCreateBrokerSheet } =
     useCreateBrokerCxt();
+
+  // Listen for force open events
+  useEffect(() => {
+    const handleForceOpen = () => {
+      openCreateBrokerSheet();
+    };
+
+    const handleForceOpen2 = () => {
+      openCreateBrokerSheet();
+    };
+
+    window.addEventListener('force-open-broker-form', handleForceOpen);
+    window.addEventListener('open-broker-now', handleForceOpen2);
+    
+    return () => {
+      window.removeEventListener('force-open-broker-form', handleForceOpen);
+      window.removeEventListener('open-broker-now', handleForceOpen2);
+    };
+  }, [openCreateBrokerSheet]);
 
   return (
     <>

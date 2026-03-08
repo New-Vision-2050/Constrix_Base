@@ -19,7 +19,7 @@ export const sidebarMessages = new MessagesGroup({
   OrganizationalStructure: _m("Organizational Structure", "الهيكل التنظيمي"),
   AttendanceDeparture: _m(
     "Attendance and Departure",
-    "الحضور والانصراف اليومي"
+    "الحضور والانصراف اليومي",
   ),
   HumanResources: _m("Human Resources", "الموارد البشرية"),
   ProgramManagement: _m("Program Management", "ادارة البرامج"),
@@ -28,7 +28,9 @@ export const sidebarMessages = new MessagesGroup({
   CRM: _m("CRM", "علاقات العملاء"),
   clients: _m("Clients", "العملاء"),
   brokers: _m("Brokers", "الوسطاء"),
-  CRMSettings: _m("CRM Settings", "اعدادات علاقات العملاء"),
+  PricesOffers: _m("Prices & Offers", "عروض الأسعار"),
+  ClientRequests: _m("Client Requests", "طلبات العملاء"),
+  CRMSettings: _m("CRM Settings", "اعدادات"),
   ecommerce: _m("E-commerce", "المتجر"),
   "docs-library": _m("Docs Library", "مستندات والبيانات"),
   "docs-library-docs": _m("Docs", "المستندات"),

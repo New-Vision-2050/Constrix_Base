@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import InfoIcon from "@/public/icons/info";
 import DateField from "@/modules/form-builder/components/fields/DateField";
 import { FieldConfig } from "@/modules/form-builder/types/formTypes";
+import { useTranslations } from "next-intl";
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   description,
   showDatePicker,
 }) => {
+  const t = useTranslations("common");
   const [activationDate, setActivationDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,7 +90,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             loading={isLoading}
             {...(showDatePicker ? { disabled: !!!activationDate } : {})}
           >
-            تاكيد
+            {t("confirm")}
           </Button>
           <Button
             variant="outline"
@@ -96,7 +98,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             className="w-32 h-10"
             disabled={isLoading}
           >
-            الغاء
+            {t("cancel")}
           </Button>
         </DialogFooter>
       </DialogContent>

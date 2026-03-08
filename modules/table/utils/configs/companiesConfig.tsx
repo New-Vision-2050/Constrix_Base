@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import EnterIcon from "@/public/icons/enter";
 import GearIcon from "@/public/icons/gear";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { ROUTER } from "@/router";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
@@ -49,7 +49,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
       },
       {
         key: "company_field",
-        label: "النشاط",
+        label: t("activity"),
         searchable: true,
         render: (value: any[] | null) => (
           <div className="line-clamp-3">

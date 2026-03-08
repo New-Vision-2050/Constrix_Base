@@ -82,7 +82,7 @@ export default function AddServiceDialog({
     })) || [];
 
   // Fetch service data when editing
-  const { data: serviceData, isLoading: isFetching } =
+  const { data: serviceData, isLoading: isFetching, refetch } =
     useQuery<ShowServiceResponse>({
       queryKey: ["service", serviceId],
       queryFn: async () => {
@@ -90,6 +90,11 @@ export default function AddServiceDialog({
         return response.data;
       },
       enabled: isEditMode && open && !!serviceId,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      staleTime: Infinity,
     });
 
   const form = useForm({
@@ -126,26 +131,26 @@ export default function AddServiceDialog({
       reset({
         name_ar: service.name_ar || "",
         name_en: service.name_en || "",
-        request_id: service.request_id || "",
-        category_id: service.category_id?.toString() || "",
+        request_id: service.reference_number || "",
+        category_id: service.category_website_cms_id?.toString() || "",
         description_ar: service.description_ar || "",
         description_en: service.description_en || "",
-        status: service.status || false,
-        icon_image: service.icon_image?.url || null,
-        main_image: service.main_image?.url || null,
+        status: service.status == 1,
+        icon_image: service.icon || null,
+        main_image: service.main_image || null,
         previous_works:
-          service.previous_works?.map(
+          service.previous_work?.map(
             (
               work: {
                 id: string;
                 description: string;
-                image?: { url?: string };
+                image?: string;
               },
               index: number
             ) => ({
               id: work.id || `${index + 1}`,
               description: work.description || "",
-              image: (work.image?.url || null) as File | string | null,
+              image: (work.image || null) as File | string | null,
             })
           ) || [],
       });
@@ -197,8 +202,9 @@ export default function AddServiceDialog({
       toast.success(
         isEditMode ? tForm("updateSuccess") : tForm("createSuccess")
       );
+      refetch();
       onSuccess?.();
-      reset();
+      reset({});
       onClose();
     } catch (error) {
       console.error(
@@ -235,7 +241,7 @@ export default function AddServiceDialog({
         className={`max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto overflow-x-hidden`}
       >
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold text-white">
+          <DialogTitle className="text-center text-lg font-semibold ">
             {isEditMode
               ? t("editService") || "Edit service"
               : t("addService") || "Add new service"}
@@ -246,7 +252,7 @@ export default function AddServiceDialog({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Featured Services Toggle - Top Section */}
             <div className="flex items-center justify-between gap-4">
-              <h3 className="text-sm font-semibold text-white">
+              <h3 className="text-sm font-semibold">
                 {tForm("featuredServicesTitle") ||
                   "Featured service (show on homepage)"}
               </h3>
@@ -286,7 +292,7 @@ export default function AddServiceDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : serviceData?.payload?.icon_image?.url
+                              : serviceData?.payload?.icon
                           }
                           minHeight="200px"
                         />
@@ -314,7 +320,7 @@ export default function AddServiceDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : serviceData?.payload?.main_image?.url
+                              : serviceData?.payload?.main_image
                           }
                           minHeight="200px"
                         />
@@ -332,14 +338,14 @@ export default function AddServiceDialog({
                   name="name_ar"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-white" required>
+                      <FormLabel className="text-xs " required>
                         {tForm("nameAr")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          className="mt-1 bg-sidebar  border-gray-700"
                           placeholder={tForm("nameArPlaceholder")}
                           {...field}
                         />
@@ -353,14 +359,14 @@ export default function AddServiceDialog({
                   name="name_en"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-white" required>
+                      <FormLabel className="text-xs " required>
                         {tForm("nameEn")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          className="mt-1 bg-sidebar  border-gray-700"
                           placeholder={tForm("nameEnPlaceholder")}
                           {...field}
                         />
@@ -378,7 +384,7 @@ export default function AddServiceDialog({
                 name="category_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("category")}
                     </FormLabel>
                     <FormControl>
@@ -388,7 +394,7 @@ export default function AddServiceDialog({
                         disabled={isSubmitting || isFetching}
                       >
                         <SelectTrigger
-                          className="mt-1 bg-sidebar border-gray-700 text-white h-12"
+                          className="mt-1 bg-sidebar border-gray-700  h-12"
                           showClear={!!field.value}
                           onClear={() => field.onChange("")}
                         >
@@ -420,14 +426,14 @@ export default function AddServiceDialog({
                 name="request_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white">
+                    <FormLabel className="text-xs ">
                       {tForm("requestId")}
                     </FormLabel>
                     <FormControl>
                       <Input
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
-                        className="mt-1 bg-sidebar text-white border-gray-700"
+                        className="mt-1 bg-sidebar  border-gray-700"
                         placeholder={tForm("requestIdPlaceholder")}
                         {...field}
                       />
@@ -445,14 +451,14 @@ export default function AddServiceDialog({
                 name="description_ar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("descriptionAr")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
                         rows={6}
-                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        className="mt-1 resize-none bg-sidebar  border-gray-700"
                         placeholder={tForm("descriptionArPlaceholder")}
                         {...field}
                       />
@@ -468,14 +474,14 @@ export default function AddServiceDialog({
                 name="description_en"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("descriptionEn")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
                         rows={6}
-                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        className="mt-1 resize-none bg-sidebar  border-gray-700"
                         placeholder={tForm("descriptionEnPlaceholder")}
                         {...field}
                       />
@@ -493,7 +499,11 @@ export default function AddServiceDialog({
               isSubmitting={isSubmitting || isFetching}
               onAdd={addPreviousWork}
               onRemove={removePreviousWork}
-              initialPreviousWorks={serviceData?.payload?.previous_works}
+              initialPreviousWorks={serviceData?.payload?.previous_work?.map((work) => ({
+                id: work.id,
+                description: work.description,
+                image: work.image ? { url: work.image } : undefined,
+              }))}
             />
 
             {/* Submit Button */}
@@ -501,7 +511,7 @@ export default function AddServiceDialog({
               <Button
                 type="submit"
                 disabled={isSubmitting || isFetching}
-                className="w-full text-white"
+                className="w-full "
               >
                 {(isSubmitting || isFetching) && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

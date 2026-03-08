@@ -5,7 +5,6 @@ import { RequestOptions } from "../types/requestTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
 import { useFormInstance, useFormStore } from "./useFormStore";
-
 interface UseSheetFormProps {
   config: FormConfig;
   recordId?: string | number | null; // Optional record ID for editing
@@ -62,6 +61,7 @@ interface UseSheetFormResult {
 
 import { apiClient } from "@/config/axios-config";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 export function useSheetForm({
   config,
@@ -98,7 +98,7 @@ export function useSheetForm({
     setIsValid,
     hasValidatingFields,
   } = useFormInstance(actualFormId, config.initialValues || {});
-
+  const t = useTranslations("FormBuilder");
   // Local state for sheet-specific functionality
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -162,7 +162,7 @@ export function useSheetForm({
     (fieldName: string) => {
       setError(fieldName, null);
     },
-    [setError]
+    [setError],
   );
 
   // Validate all form fields
@@ -190,12 +190,12 @@ export function useSheetForm({
         if (field.hidden || field.disabled) {
           return;
         }
-        
+
         // Check if field is required and has validation
         if (field.validation && config.formId) {
           // Check if field has been touched (blurred)
           const fieldTouched = formState.touched[field.name];
-          
+
           if (fieldTouched) {
             // Field has been touched, get existing validation result from store
             const existingError = formState.errors[field.name];
@@ -209,7 +209,7 @@ export function useSheetForm({
               field.name,
               values[field.name],
               field.validation,
-              values
+              values,
             );
             if (!fieldIsValid) {
               isValid = false;
@@ -260,7 +260,7 @@ export function useSheetForm({
         if (isStepBased) {
           console.log(
             "Submitting step-based form with step responses:",
-            stepResponses
+            stepResponses,
           );
 
           // Include data from step responses in the final values
@@ -291,7 +291,8 @@ export function useSheetForm({
         // Call the onSubmit handler from config or use default handler
         const submitHandler =
           config.onSubmit ||
-          ((values, formConfig) => defaultSubmitHandler(values, formConfig, requestOptions));
+          ((values, formConfig) =>
+            defaultSubmitHandler(values, formConfig, requestOptions));
         const result = await submitHandler(finalValues, config);
         if (result.success) {
           setSubmitSuccess(true);
@@ -311,7 +312,7 @@ export function useSheetForm({
 
           toast({
             title: "Success",
-            description: "Form Submitted Successfully",
+            description: t("sheetForm.formSucess"),
           });
 
           // Close the sheet after successful submission
@@ -335,8 +336,8 @@ export function useSheetForm({
             });
           }
 
-          // Handle Laravel validation errors if enabled
-          if (config.laravelValidation?.enabled && result.errors) {
+          // Handle validation errors from backend
+          if (result.errors) {
             const formattedErrors: Record<string, string | React.ReactNode> =
               {};
 
@@ -385,7 +386,7 @@ export function useSheetForm({
       setSubmitting,
       setErrors,
       hasValidatingFields,
-    ]
+    ],
   );
 
   // Validate only the fields in the current step
@@ -564,7 +565,7 @@ export function useSheetForm({
         setCurrentStep(step);
       }
     },
-    [config.wizardOptions, currentStep, totalSteps, values]
+    [config.wizardOptions, currentStep, totalSteps, values],
   );
 
   // Submit the current step
@@ -602,7 +603,8 @@ export function useSheetForm({
       // Call the onStepSubmit handler or use the default handler
       const submitHandler =
         config.wizardOptions?.onStepSubmit ||
-        ((step, values, formConfig) => defaultStepSubmitHandler(step, values, formConfig));
+        ((step, values, formConfig) =>
+          defaultStepSubmitHandler(step, values, formConfig));
 
       const result = await submitHandler(currentStep, values, config);
 
@@ -675,20 +677,22 @@ export function useSheetForm({
 
       return response.data;
     },
-    [stepResponses]
+    [stepResponses],
   );
 
   // Handle form cancel
   const handleCancel = useCallback(() => {
+    resetForm();
+if(isStepBased){setCurrentStep(0);
     closeSheet();
-
+}
     // Call onCancel callback if provided
     if (onCancel) {
       onCancel();
     } else if (config.onCancel) {
       config.onCancel();
     }
-  }, [closeSheet, onCancel, config.onCancel]);
+  }, [closeSheet, isStepBased, setCurrentStep, resetForm, onCancel, config.onCancel]);
 
   return {
     isOpen,

@@ -6,7 +6,7 @@ import ReactQueryProvider from "@/providers/react-query";
 import { getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { NextIntlClientProvider } from "next-intl";
-import { notFound } from "next/navigation";
+import { notFound } from "@i18n/navigation";
 import { Toaster } from "@/modules/table/components/ui/toaster";
 import { Toaster as SonnerToaster } from "sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import CustomThemeProvider from "@/theme/theme";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import NextTopLoader from "nextjs-toploader";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const theSans = localFont({
   src: [
@@ -73,7 +74,7 @@ export default async function RootLayout({
   const direction = locale === "ar" ? "rtl" : "ltr";
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
-      <body className={cn(theSans.variable, "!pointer-events-auto")}>
+      <body className={cn(theSans.variable, "!pointer-events-auto")} suppressHydrationWarning>
         <NextTopLoader />
         <AppRouterCacheProvider>
           <ThemeProvider
@@ -84,11 +85,13 @@ export default async function RootLayout({
           >
             <CustomThemeProvider direction={direction}>
               <NextIntlClientProvider messages={messages}>
-                <main>
-                  <ReactQueryProvider>{children}</ReactQueryProvider>
-                </main>
-                <Toaster />
-                <SonnerToaster />
+                <NuqsAdapter>
+                  <main>
+                    <ReactQueryProvider>{children}</ReactQueryProvider>
+                  </main>
+                  <Toaster />
+                  <SonnerToaster />
+                </NuqsAdapter>
               </NextIntlClientProvider>
             </CustomThemeProvider>
           </ThemeProvider>

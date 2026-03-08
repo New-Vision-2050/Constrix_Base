@@ -5,6 +5,9 @@ import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FormLabel from "@/components/shared/FormLabel";
 import { Typography } from "@mui/material";
+import ConfirmationDialog from "./ConfirmationDialog";
+import { useTranslations } from "next-intl";
+import { Media } from "@/modules/docs-library/modules/publicDocs/types/Directory";
 
 interface ImageUploadProps {
   label: string;
@@ -14,16 +17,18 @@ interface ImageUploadProps {
   onChange?: (file: File | null) => void;
   onMultipleChange?: (files: File[]) => void;
   value?: File | string | null;
-  initialValue?: string | string[] | null;
+  initialValue?: string | Media[] | null;
   className?: string;
   minHeight?: string;
   multiple?: boolean;
   accept?: string;
+  showDeleteConfirm?: boolean;
+  OnDelete?: (input: any) => Promise<void>;
 }
 
 export default function ImageUpload({
   label,
-  maxSize = "3MB - الحجم الأقصى",
+  maxSize,
   dimensions = "2160 × 2160",
   required = false,
   onChange,
@@ -33,11 +38,24 @@ export default function ImageUpload({
   minHeight = "200px",
   multiple = false,
   accept = "image/*",
+  showDeleteConfirm = false,
+  OnDelete,
 }: ImageUploadProps) {
+  const t = useTranslations(
+    "content-management-system.projects.addProjectForm",
+  );
+  const tCommon = useTranslations("common.imageUpload");
   const [imagePreview, setImagePreview] = useState<string>("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [initialPreviews, setInitialPreviews] = useState<string[]>([]);
+  const [initialPreviews, setInitialPreviews] = useState<any[]>([]);
   const [uploadId, setUploadId] = useState<string>("");
+
+  // Default maxSize with translation if not provided
+  const displayMaxSize = maxSize || `3MB - ${tCommon("maxSizeLabel")}`;
+
+  // open delete dialog
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<any>(null);
 
   // Initialize uploadId only on client side to avoid hydration mismatch
   React.useEffect(() => {
@@ -63,11 +81,9 @@ export default function ImageUpload({
       // Append new files to existing ones instead of replacing
       const updatedFiles = [...selectedFiles, ...newFiles];
       setSelectedFiles(updatedFiles);
-      onMultipleChange?.(updatedFiles);
-      // Clear initial previews when user starts uploading new files
-      if (newFiles.length > 0) {
-        setInitialPreviews([]);
-      }
+      // Merge initial previews (URLs) with new files to preserve existing images
+      const mergedData = [...initialPreviews, ...updatedFiles];
+      onMultipleChange?.(mergedData as any);
       // Reset input to allow selecting the same file again
       e.target.value = "";
     } else {
@@ -95,19 +111,43 @@ export default function ImageUpload({
     }
   };
 
+  const handleConfirmDelete = async () => {
+    await OnDelete?.(itemToDelete);
+
+    // Find and remove the specific item from initialPreviews
+    if (multiple) {
+      const itemIndex = initialPreviews.findIndex((item) => {
+        if (typeof item === "string") {
+          return item === itemToDelete;
+        }
+        return item?.id === itemToDelete?.id;
+      });
+
+      if (itemIndex !== -1) {
+        removeInitialImage(itemIndex);
+      }
+    } else {
+      removeImage();
+    }
+
+    setOpenDeleteDialog(false);
+    setItemToDelete(null);
+  };
+
   const removeFile = (index: number) => {
     const newFiles = selectedFiles.filter((_, i) => i !== index);
     setSelectedFiles(newFiles);
-    onMultipleChange?.(newFiles);
+    // Merge initial previews with remaining files
+    const mergedData = [...initialPreviews, ...newFiles];
+    onMultipleChange?.(mergedData as any);
   };
 
   const removeInitialImage = (index: number) => {
     const newPreviews = initialPreviews.filter((_, i) => i !== index);
     setInitialPreviews(newPreviews);
-    // If all initial images are removed, trigger onChange with empty array
-    if (newPreviews.length === 0) {
-      onMultipleChange?.([]);
-    }
+    // Merge remaining initial previews with selected files
+    const mergedData = [...newPreviews, ...selectedFiles];
+    onMultipleChange?.(mergedData as any);
   };
 
   return (
@@ -133,7 +173,14 @@ export default function ImageUpload({
               />
               <button
                 type="button"
-                onClick={removeImage}
+                onClick={() => {
+                  if (showDeleteConfirm) {
+                    setItemToDelete(imagePreview);
+                    setOpenDeleteDialog(true);
+                  } else {
+                    removeImage();
+                  }
+                }}
                 className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
               >
                 <X className="w-4 h-4" />
@@ -155,7 +202,7 @@ export default function ImageUpload({
                   className="border-primary text-primary hover:bg-primary hover:text-white"
                   onClick={() => document.getElementById(uploadId)?.click()}
                 >
-                  إرفاق
+                  {tCommon("attach")}
                 </Button>
               </label>
               <input
@@ -174,41 +221,54 @@ export default function ImageUpload({
       {multiple && (
         <>
           {/* Display initial images from edit mode */}
-          {initialPreviews.length > 0 && selectedFiles.length === 0 && (
+          {initialPreviews.length > 0 && (
             <div className="space-y-3">
-              {initialPreviews.map((url, index) => (
-                <div
-                  key={index}
-                  className="relative border-2 border-dashed border-[#3c345a] rounded-lg p-3 hover:border-primary/50 transition-colors flex items-center gap-4"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(26, 11, 46, 0.3) 0%, rgba(45, 27, 78, 0.3) 50%, rgba(26, 11, 46, 0.3) 100%)",
-                  }}
-                >
-                  <div className="flex-shrink-0">
-                    <img
-                      src={url}
-                      alt={`Image ${index + 1}`}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <Typography
-                      sx={{ fontSize: "14px", color: "text.secondary" }}
-                    >
-                      صورة موجودة {index + 1}
-                    </Typography>
-                  </div>
-                  {/* Remove button */}
-                  <button
-                    type="button"
-                    onClick={() => removeInitialImage(index)}
-                    className="flex-shrink-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+              {initialPreviews.map((item, index) => {
+                const imageUrl =
+                  typeof item === "string" ? item : item?.url || "";
+                return (
+                  <div
+                    key={`initial-${index}`}
+                    className="relative border-2 border-dashed border-[#3c345a] rounded-lg p-3 hover:border-primary/50 transition-colors flex items-center gap-4"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, rgba(26, 11, 46, 0.3) 0%, rgba(45, 27, 78, 0.3) 50%, rgba(26, 11, 46, 0.3) 100%)",
+                    }}
                   >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                    <div className="flex-shrink-0">
+                      <img
+                        src={imageUrl}
+                        alt={`Image ${index + 1}`}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <Typography
+                          sx={{ fontSize: "14px", color: "text.secondary" }}
+                        >
+                          صورة موجودة {index + 1}
+                        </Typography>
+                      </div>
+                    </div>
+                    {/* Remove button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (showDeleteConfirm) {
+                          setItemToDelete(item);
+                          setOpenDeleteDialog(true);
+                        } else {
+                          removeInitialImage(index);
+                        }
+                      }}
+                      className="flex-shrink-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
 
@@ -318,7 +378,7 @@ export default function ImageUpload({
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-white"
               >
-                إرفاق
+                {tCommon("attach")}
               </Button>
               <input
                 id={uploadId}
@@ -331,6 +391,17 @@ export default function ImageUpload({
             </div>
           )}
         </>
+      )}
+
+      {/* delete media confirmation dialog */}
+      {showDeleteConfirm && (
+        <ConfirmationDialog
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+          onConfirm={handleConfirmDelete}
+          description={t("deleteConfirmMessage") ?? ""}
+          showDatePicker={false}
+        />
       )}
     </div>
   );

@@ -97,9 +97,13 @@ const Cxt = createContext<CxtType | undefined>(undefined);
 // Provider component
 interface PropsT {
   children: ReactNode;
+  fixedType?: string;
 }
 
-export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
+export const PublicDocsCxtProvider: React.FC<PropsT> = ({
+  children,
+  fixedType,
+}) => {
   // ** declare and define helper variables
   const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
@@ -152,7 +156,8 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
     limit,
     page,
     searchData,
-    sort
+    sort,
+    fixedType,
   );
 
   const handleRefetchUsersList = () => refetchUsersList();
@@ -272,7 +277,7 @@ export const usePublicDocsCxt = () => {
   const context = useContext(Cxt);
   if (context === undefined) {
     throw new Error(
-      "usePublicDocsCxt must be used within a PublicDocsCxtProvider"
+      "usePublicDocsCxt must be used within a PublicDocsCxtProvider",
     );
   }
   return context;

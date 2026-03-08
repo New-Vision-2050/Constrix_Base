@@ -3,7 +3,7 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { tableIcon } from "@/modules/program-settings/users-settings/tableIcon";
 import React, { memo } from "react";
-import Link from "next/link";
+import Link from "@i18n/link";
 import { Project } from "@/types/sidebar-menu";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -75,7 +75,7 @@ export const SubProgramsList = memo(function SubProgramsList({
         >
           {visibleSubEntities.map((sub, index) => {
             const subUrl = sub.url || `/${activeProject?.slug}/${sub.slug}`;
-            const isActive = subUrl === activeUrl;
+            const isActive = sub.isActive || subUrl === activeUrl;
 
             return (
               <motion.div

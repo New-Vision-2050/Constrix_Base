@@ -1,6 +1,7 @@
 import { _m, MessagesGroup } from "../../types";
 
 export const formBuilderMessages = new MessagesGroup({
+  
   Fields: new MessagesGroup({
     Image: new MessagesGroup({
       UploadImage: _m("Upload Image", "رفع صورة"),
@@ -20,6 +21,7 @@ export const formBuilderMessages = new MessagesGroup({
       UploadSuccessful: _m("Upload successful", "تم الرفع بنجاح"),
       ImageRequired: _m("Image is required", "الصورة مطلوبة")
     }),
+    
     File: new MessagesGroup({
       UploadFile: _m("Upload File", "رفع ملف"),
       UploadFiles: _m("Upload Files", "رفع ملفات"),
@@ -40,5 +42,12 @@ export const formBuilderMessages = new MessagesGroup({
       UploadSuccessful: _m("Upload successful", "تم الرفع بنجاح"),
       FileRequired: _m("File is required", "الملف مطلوب")
     })
-  })
+  }),
+
+  sheetForm : new MessagesGroup({
+        formSucess: _m("Form Submitted Successfully", "تم إرسال النموذج بنجاح")
+    }),
+
+
 });
+

@@ -21,6 +21,7 @@ interface ReplyMessageDialogProps {
   messageId: string | null;
   open: boolean;
   onClose: () => void;
+  onDialogSuccess: () => void;
 }
 
 /**
@@ -33,6 +34,7 @@ export default function ReplyMessageDialog({
   messageId,
   open,
   onClose,
+  onDialogSuccess
 }: ReplyMessageDialogProps) {
   const t = useTranslations("content-management-system.communicationMessages.replyDialog");
   const [reply, setReply] = useState("");
@@ -40,7 +42,7 @@ export default function ReplyMessageDialog({
   const queryClient = useQueryClient();
 
   // Fetch message details with caching
-  const { data: messageData, isLoading: isFetching,refetch } = useQuery({
+  const { data: messageData, isLoading: isFetching, refetch } = useQuery({
     queryKey: ["communication-message", messageId],
     queryFn: () => CommunicationMessagesApi.show(messageId!),
     enabled: Boolean(messageId) && open,
@@ -53,6 +55,7 @@ export default function ReplyMessageDialog({
       CommunicationMessagesApi.reply(messageId!, { status: +status as 0 | 1, reply_message: data.reply_message }),
     onSuccess: () => {
       toast.success(t("success"));
+      onDialogSuccess();
       refetch();
       handleClose();
     },

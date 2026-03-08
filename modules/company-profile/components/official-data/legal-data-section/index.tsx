@@ -25,6 +25,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import SetLegalDataForm from "./set-legal-data";
+import AddLegalDataSheet from "./set-legal-data/AddLegalDataSheet";
 
 const LegalDataSection = ({
   currentCompanyId,
@@ -34,7 +36,7 @@ const LegalDataSection = ({
   id?: string;
 }) => {
   const { can } = usePermissions();
-  const { data, isPending, isSuccess } = useQuery({
+  const { data, isPending, isSuccess, refetch } = useQuery({
     queryKey: ["company-legal-data", id, currentCompanyId],
     queryFn: async () => {
       const response = await apiClient.get<
@@ -59,6 +61,13 @@ const LegalDataSection = ({
   const [isOpenMyReq, handleOpenMyReq, handleCloseMyReq] = useModal();
   const [isOpenReqForm, handleOpenReqForm, handleCloseReqForm] = useModal();
   const [isOpenMyForm, handleOpenMyForm, handleCloseMyForm] = useModal();
+
+  // add legal data sheet
+  const [
+    isOpenAddLegalDataSheet,
+    handleOpenAddLegalDataSheet,
+    handleCloseAddLegalDataSheet,
+  ] = useModal();
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
@@ -99,7 +108,9 @@ const LegalDataSection = ({
                   },
                   {
                     title: "اضافة بيان قانوني",
-                    onClick: handleOpenMyForm,
+                    onClick: () => {
+                      handleOpenAddLegalDataSheet();
+                    },
                   },
                 ],
                 disabledEdit: !can([
@@ -112,13 +123,36 @@ const LegalDataSection = ({
           {!!companyLegalData && companyLegalData.length > 0 ? (
             <>
               {mode === "Preview" ? (
-                <LegalDataPreview companyLegalData={companyLegalData} />
+                <>
+                  <LegalDataPreview companyLegalData={companyLegalData} />
+                </>
               ) : (
-                <LegalDataForm
-                  companyLegalData={companyLegalData}
-                  id={id}
-                  handleEditClick={handleEditClick}
+                <SetLegalDataForm
+                  initialData={{
+                    data: companyLegalData.map((item) => ({
+                      id: item.id,
+                      registration_type_id: `${item.registration_type_id}_${item.registration_type_type}`,
+                      registration_type: item.registration_type,
+                      registration_number: item.registration_number || "",
+                      start_date: item.start_date,
+                      end_date: item.end_date,
+                      files:
+                        item.file?.map((file) =>
+                          typeof file === "string" ? { url: file } : file
+                        ) || [],
+                    })),
+                  }}
+                  mode="edit"
+                  onCancel={handleEditClick}
+                  onSuccess={() => {
+                    refetch();
+                  }}
                 />
+                // <LegalDataForm
+                //   companyLegalData={companyLegalData}
+                //   id={id}
+                //   handleEditClick={handleEditClick}
+                // />
               )}
             </>
           ) : (
@@ -127,6 +161,15 @@ const LegalDataSection = ({
               <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
             </div>
           )}
+          <AddLegalDataSheet
+            open={isOpenAddLegalDataSheet}
+            onOpenChange={handleCloseAddLegalDataSheet}
+            companyId={currentCompanyId}
+            branchId={id}
+            onSuccess={() => {
+              refetch();
+            }}
+          />
         </FormFieldSet>
       )}
 

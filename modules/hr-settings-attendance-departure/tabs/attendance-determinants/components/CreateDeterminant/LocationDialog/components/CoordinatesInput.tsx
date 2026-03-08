@@ -1,5 +1,7 @@
 import React from "react";
+import TextField from "@mui/material/TextField";
 import { useTranslations } from "next-intl";
+import { Box } from "@mui/material";
 
 interface CoordinatesInputProps {
   longitude: string;
@@ -8,6 +10,7 @@ interface CoordinatesInputProps {
   onLongitudeChange: (value: string) => void;
   onLatitudeChange: (value: string) => void;
   onRadiusChange: (value: string) => void;
+  onRadiusBlur?: (value: string) => void;
   disabled?: boolean;
 }
 
@@ -18,54 +21,56 @@ export default function CoordinatesInput({
   onLongitudeChange,
   onLatitudeChange,
   onRadiusChange,
+  onRadiusBlur,
   disabled = false,
 }: CoordinatesInputProps) {
   const t = useTranslations("location");
 
-  // Common input classes
-  const inputClasses =
-    "w-full px-3 py-2 rounded-lg border focus:border-pink-500 focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400";
+  const radiusNumber = radius === "" ? NaN : Number(radius);
+  const radiusError =
+    radius !== "" && Number.isFinite(radiusNumber) && radiusNumber < 200;
+
   return (
-    <div className="grid grid-cols-2 gap-4 mb-6">
-      <div>
-        <label className="block text-gray-700 dark:text-white text-sm mb-2">
-          {t("longitude")}:
-        </label>
-        <input
+    <Box className="grid grid-cols-2 gap-4 mb-6">
+      <Box>
+        <TextField
+          fullWidth
+          size="small"
           type="number"
+          label={`${t("longitude")}`}
           value={longitude}
           onChange={(e) => onLongitudeChange(e.target.value)}
-          className={inputClasses}
           placeholder="46.6753"
           disabled={disabled}
         />
-      </div>
-      <div>
-        <label className="block text-gray-700 dark:text-white text-sm mb-2">
-          {t("latitude")}:
-        </label>
-        <input
+      </Box>
+      <Box>
+        <TextField
+          fullWidth
+          size="small"
           type="number"
+          label={`${t("latitude")}`}
           value={latitude}
           onChange={(e) => onLatitudeChange(e.target.value)}
-          className={inputClasses}
           placeholder="24.7136"
           disabled={disabled}
         />
-      </div>
-      <div className="col-span-2">
-        <label className="block text-gray-700 dark:text-white text-sm mb-2">
-          {t("radius")} ({t("meters")}):
-        </label>
-        <input
+      </Box>
+      <Box className="col-span-2">
+        <TextField
+          fullWidth
+          size="small"
           type="number"
-          value={parseInt(radius || "0", 10) || 0}
+          label={`${t("radius")} (${t("meters")})`}
+          value={radius}
           onChange={(e) => onRadiusChange(e.target.value)}
-          className={inputClasses}
+          onBlur={(e) => onRadiusBlur?.(e.target.value)}
           placeholder="1000"
-          min="0"
+          error={radiusError}
+          helperText={radiusError ? `${t("radius")} >= 200` : ""}
+          inputProps={{ min: 200 }}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

@@ -15,13 +15,17 @@ export const ContentManagementSystemCommunicationSettingsMessages =
     table: new MessagesGroup({
       title: _m("Addresses", "العناوين"),
       address: _m("Address", "العنوان"),
+      name: _m("Name", "الأسم"),
       city: _m("City", "المدينة"),
       latitude: _m("Latitude", "خط العرض"),
       longitude: _m("Longitude", "خط الطول"),
       edit: _m("Edit", "تعديل"),
+      delete: _m("Delete", "حذف"),
       addAddress: _m("Add Address", "إضافة عنوان"),
       addAddressTitle: _m("Add New Address", "إضافة عنوان جديد"),
       editAddressTitle: _m("Edit Address", "تعديل العنوان"),
+      search: _m("Search", "بحث"),
+      actions: _m("Actions", "إجراءات"),
     }),
 
     // Social Links Table Translations
@@ -31,6 +35,8 @@ export const ContentManagementSystemCommunicationSettingsMessages =
       type: _m("Type", "النوع"),
       url: _m("URL", "الرابط"),
       edit: _m("Edit", "تعديل"),
+      delete: _m("Delete", "حذف"),
+      actions: _m("Actions", "إجراءات"),
       addSocialLink: _m("Add Social Link", "إضافة رابط اجتماعي"),
 
       // Dialog Translations
@@ -42,7 +48,7 @@ export const ContentManagementSystemCommunicationSettingsMessages =
       iconLabel: _m("Social Icon", "أيقونة"),
       iconPlaceholder: _m("Icon URL or identifier", "رابط الأيقونة أو المعرّف"),
       saveButton: _m("Save", "حفظ"),
-
+      search: _m("Search", "البحث  "),
       // Success Messages
       createSuccess: _m(
         "Social link created successfully",

@@ -12,11 +12,13 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { response } from "@/app/[locale]/(main)/users/data";
 
 const TheStatus = ({
+  disabled = false,
   theStatus,
   id,
 }: {
   theStatus: "active" | "inActive";
   id: string;
+  disabled?: boolean;
 }) => {
   const t = useTranslations();
   const [isActive, setIsActive] = useState(!!theStatus);
@@ -80,7 +82,7 @@ const TheStatus = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={!can(PERMISSIONS.package.update)}
+          disabled={disabled || !can(PERMISSIONS.package.update)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

@@ -15,7 +15,7 @@ import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
 import { useAuthStore } from "../../store/use-auth";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { setCookie } from "cookies-next";
 import { ROUTER } from "@/router";
 import { useTranslations } from "next-intl";
@@ -26,7 +26,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
 
 const ValidatePhonePhase = ({
   handleSetStep,
-  handleStepBack
+  handleStepBack,
 }: {
   handleSetStep: (step: LoginPhase) => void;
   handleStepBack: () => void;
@@ -102,28 +102,28 @@ const ValidatePhonePhase = ({
 
   return (
     <div className="relative flex flex-col gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-0 left-0"
-            onClick={() => handleStepBack()}
-            type="button"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-0 left-0"
+        onClick={() => handleStepBack()}
+        type="button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </Button>
       <div className="space-y-4">
         <h1 className="text-2xl text-start">{t("Title")}</h1>
         <p>
@@ -179,7 +179,7 @@ const ValidatePhonePhase = ({
         />
       )}
 
-{/*       <div className="flex items-center gap-2">
+      {/*       <div className="flex items-center gap-2">
         <Button
           type="button"
           variant={"link"}
