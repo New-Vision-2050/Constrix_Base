@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { TermServiceSettingsApi } from "@/services/api/crm-settings/term-service-settings";
 import { LinearProgress } from "@mui/material";
-import { ServiceItemAccordion } from "./components/ServiceItemAccordion";
-import { AddServiceDialog } from "./components/AddServiceDialog";
-import { EditServiceDialog } from "./components/EditServiceDialog";
-import ConfirmDeleteDialog from "./components/CofirmDeleteDialog";
+import { ServiceItemAccordion } from "./ServiceItemAccordion";
+import { AddServiceDialog } from "./AddServiceDialog";
+import { EditServiceDialog } from "./EditServiceDialog";
+import ConfirmDeleteDialog from "./CofirmDeleteDialog";
 import type { TermServiceSettingItem } from "@/services/api/crm-settings/term-service-settings/types/response";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 interface ServicesCardProps {
   projectTypeId: number | null;
@@ -19,6 +22,10 @@ interface ServicesCardProps {
 
 export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
   const t = useTranslations("CRMSettingsModule.servicesSettings");
+  const { can } = usePermissions();
+
+  const canEdit = can(PERMISSIONS.crm.serviceSettings.update);
+  const canDelete = can(PERMISSIONS.crm.serviceSettings.delete);
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -76,33 +83,48 @@ export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
               selectable={false}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              canEdit={canEdit}
+              canDelete={canDelete}
             />
           ))}
       </Paper>
 
-      <AddServiceDialog
-        open={addDialogOpen}
-        onClose={() => setAddDialogOpen(false)}
-        onSuccess={() => {
-          refetch();
-          setAddDialogOpen(false);
-        }}
-        projectTypeId={projectTypeId ?? undefined}
-      />
-      <EditServiceDialog
-        open={editDialogOpen}
-        item={editItem}
-        projectTypeId={projectTypeId ?? undefined}
-        onClose={() => {
-          setEditDialogOpen(false);
-          setEditItem(null);
-        }}
-        onSuccess={() => {
-          refetch();
-          setEditDialogOpen(false);
-          setEditItem(null);
-        }}
-      />
+      <Can
+        check={[
+          PERMISSIONS.crm.serviceSettings.create,
+        ]}
+      >
+        <AddServiceDialog
+          open={addDialogOpen}
+          onClose={() => setAddDialogOpen(false)}
+          onSuccess={() => {
+            refetch();
+            setAddDialogOpen(false);
+          }}
+          projectTypeId={projectTypeId ?? undefined}
+          />
+      </Can>
+      <Can check={[
+        PERMISSIONS.crm.serviceSettings.update,
+      ]}> 
+        <EditServiceDialog
+          open={editDialogOpen}
+          item={editItem}
+          projectTypeId={projectTypeId ?? undefined}
+          onClose={() => {
+            setEditDialogOpen(false);
+            setEditItem(null);
+          }}
+          onSuccess={() => {
+            refetch();
+            setEditDialogOpen(false);
+            setEditItem(null);
+          }}
+        />
+      </Can>
+      <Can check={[
+            PERMISSIONS.crm.serviceSettings.delete,
+          ]}>
       <ConfirmDeleteDialog
         open={deleteDialogOpen}
         deleteId={deleteId}
@@ -116,6 +138,7 @@ export default function ServicesCard({ projectTypeId }: ServicesCardProps) {
           setDeleteId(null);
         }}
       />
+      </Can>
     </div>
   );
 }

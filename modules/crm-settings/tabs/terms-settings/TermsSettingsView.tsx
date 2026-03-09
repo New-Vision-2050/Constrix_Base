@@ -6,9 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 import LinearProgress from "@mui/material/LinearProgress";
-import MainItemsCard from "../components/main-items-card";
+import MainItemsCard from "../../components/main-items-card";
 
-export default function TermsTab() {
+export default function TermsSettingsView() {
   const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(null);
 
   const { data, isLoading: isLoadingRoots } = useQuery({

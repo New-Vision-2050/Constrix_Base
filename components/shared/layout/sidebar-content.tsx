@@ -141,7 +141,7 @@ export function SidebarContentWrapper({
             url: ROUTER.CRM.pricesOffers,
             icon: FileText,
             isActive: fullPath === ROUTER.CRM.pricesOffers,
-            show: !isCentralCompany,
+            show: !isCentralCompany && can([PERMISSIONS.crm.pricesOffers.list]),
           };
 
           const crmSettings = {
@@ -358,7 +358,16 @@ export function SidebarContentWrapper({
           ROUTER.CRM.clientRequests,
         ].some((route) => path === route || path.endsWith(route)),
         show: !isCentralCompany,
-        sub_entities: [],
+        sub_entities: [
+          {
+            name: t("Sidebar.PricesOffers"),
+            url: ROUTER.CRM.pricesOffers,
+            icon: FileText,
+            isActive: fullPath === ROUTER.CRM.pricesOffers,
+            show: can([PERMISSIONS.crm.pricesOffers.list]),
+          }
+        ],
+        
       },
       {
         name: t("Sidebar.docs-library"),

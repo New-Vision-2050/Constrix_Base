@@ -28,6 +28,8 @@ export interface ServiceItemAccordionProps {
   onToggleWithDescendants?: (ids: number[], checked: boolean) => void;
   onEdit?: (item: TermServiceSettingItem) => void;
   onDelete?: (id: number) => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
   depth?: number;
   inGrid?: boolean;
   parentId?: number;
@@ -109,6 +111,8 @@ export function ServiceItemAccordion({
   onToggleWithDescendants: onToggleWithDescendantsProp,
   onEdit,
   onDelete,
+  canEdit = true,
+  canDelete = true,
   depth = 0,
   inGrid = false,
   parentId,
@@ -338,11 +342,13 @@ export function ServiceItemAccordion({
             {selectable && (
               <span className="text-sm text-gray-500">({selectedCount}/{leafIds.length})</span>
             )}
-            {depth === 0 && (onEdit || onDelete) && (
+            {depth === 0 && (onEdit || onDelete) && (canEdit || canDelete) && (
               <ServiceItemActions
                 item={item as TermServiceSettingItem}
                 onEdit={onEdit ?? (() => {})}
                 onDelete={onDelete ?? (() => {})}
+                canEdit={canEdit}
+                canDelete={canDelete}
               />
             )}
           </Box>
@@ -371,6 +377,10 @@ export function ServiceItemAccordion({
                 handleToggle(id, checked, parentId ?? item.id)
               }
               onToggleWithDescendants={handleToggleWithDescendants}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              canEdit={canEdit}
+              canDelete={canDelete}
               depth={depth + 1}
               inGrid={(item.children || []).every((c) => !c.children?.length)}
               parentId={item.id}

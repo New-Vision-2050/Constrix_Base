@@ -14,6 +14,9 @@ import ConfirmDeleteDialog from "@/modules/company-profile/components/official-d
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,28 +37,49 @@ interface RowActionsProps {
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   onView: (id: number) => void;
+  canView?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
   t: any;
 }
 
-function RowActions({ row, onEdit, onDelete, onView, t }: RowActionsProps) {
+function RowActions({
+  row,
+  onEdit,
+  onDelete,
+  onView,
+  canView = true,
+  canEdit = true,
+  canDelete = true,
+  t,
+}: RowActionsProps) {
+  const hasAnyAction = canView || canEdit || canDelete;
+  if (!hasAnyAction) return null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="h-8">
-          {t('table.actions')}
+          {t("table.actions")}
           <ChevronDown className="h-4 w-4 mr-1" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => onView(row.id)}>
-          {t('actions.view')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onEdit(row.id)}>
-          {t('actions.edit')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onDelete(row.id)} className="text-destructive">
-          {t('actions.delete')}
-        </DropdownMenuItem>
+        {canView && (
+          <DropdownMenuItem onClick={() => onView(row.id)}>
+            {t("actions.view")}
+          </DropdownMenuItem>
+        )}
+        {canEdit && (
+          <DropdownMenuItem onClick={() => onEdit(row.id)}>
+            {t("actions.edit")}
+          </DropdownMenuItem>
+        )}
+        {canDelete && (
+          <DropdownMenuItem onClick={() => onDelete(row.id)} className="text-destructive">
+            {t("actions.delete")}
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -65,10 +89,17 @@ interface ServicesDropdownProps {
   termSetting: TermSetting;
   allServices: Array<{ id: number; name: string }>;
   onUpdate: () => void;
+  canUpdate?: boolean;
   t: any;
 }
 
-function ServicesDropdown({ termSetting, allServices, onUpdate, t }: ServicesDropdownProps) {
+function ServicesDropdown({
+  termSetting,
+  allServices,
+  onUpdate,
+  canUpdate = true,
+  t,
+}: ServicesDropdownProps) {
   const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(
     termSetting.services?.map(s => s.id) || []
   );
@@ -103,11 +134,13 @@ function ServicesDropdown({ termSetting, allServices, onUpdate, t }: ServicesDro
     }
   };
   
+  if (!canUpdate) return <span className="text-muted-foreground">—</span>;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="h-8" disabled={isUpdating}>
-          {t('actions.selectServices')}
+          {t("actions.selectServices")}
           <ChevronDown className="h-4 w-4 mr-1" />
         </Button>
       </DropdownMenuTrigger>
@@ -129,7 +162,15 @@ function ServicesDropdown({ termSetting, allServices, onUpdate, t }: ServicesDro
 }
 
 function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
-  const t = useTranslations('CRMSettingsModule.terms');
+  const t = useTranslations("CRMSettingsModule.terms");
+  const { can } = usePermissions();
+
+  const canView = can(PERMISSIONS.crm.termSettings.view);
+  const canEdit = can(PERMISSIONS.crm.termSettings.update);
+  const canDelete = can(PERMISSIONS.crm.termSettings.delete);
+  const canCreate = can(PERMISSIONS.crm.termSettings.create);
+  const canUpdate = can(PERMISSIONS.crm.termSettings.update);
+
   // Dialog states
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editingTermId, setEditingTermId] = useState<number | null>(null);
@@ -232,7 +273,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
   const columns = [
     {
       key: "id",
-      name: t('table.referenceNumber'),
+      name: t("table.referenceNumber"),
       sortable: true,
       render: (row: TermSetting) => (
         <span className="font-medium">{row.id}</span>
@@ -240,20 +281,23 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
     },
     {
       key: "name",
-      name: t('table.name'),
+      name: t("table.name"),
       sortable: true,
-      render: (row: TermSetting) => (
-        <button
-          onClick={() => handleNameClick(row)}
-          className="text-primary hover:underline font-medium text-right"
-        >
-          {row.name}
-        </button>
-      ),
+      render: (row: TermSetting) =>
+        canView ? (
+          <button
+            onClick={() => handleNameClick(row)}
+            className="text-primary hover:underline font-medium text-right"
+          >
+            {row.name}
+          </button>
+        ) : (
+          <span className="font-medium text-right">{row.name}</span>
+        ),
     },
     {
       key: "description",
-      name: t('table.description'),
+      name: t("table.description"),
       sortable: true,
       render: (row: TermSetting) => (
         <span className="text-muted-foreground">{row.description || "-"}</span>
@@ -261,7 +305,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
     },
     {
       key: "children_count",
-      name: t('table.childrenCount'),
+      name: t("table.childrenCount"),
       sortable: true,
       render: (row: TermSetting) => (
         <span className="text-center block">{row.children_count}</span>
@@ -269,43 +313,49 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
     },
     {
       key: "services",
-      name: t('table.services'),
+      name: t("table.services"),
       sortable: false,
       render: (row: TermSetting) => (
-        <ServicesDropdown 
-          termSetting={row} 
-          allServices={allServices} 
+        <ServicesDropdown
+          termSetting={row}
+          allServices={allServices}
           onUpdate={refetch}
+          canUpdate={canUpdate}
           t={t}
         />
       ),
     },
     {
       key: "status",
-      name: t('table.status'),
+      name: t("table.status"),
       sortable: false,
       render: (row: TermSetting) => (
         <div className="flex items-center gap-2">
-          <Switch
-            checked={row.is_active === 1}
-            onCheckedChange={() => handleToggleActive(row.id, row.is_active)}
-          />
+          {canUpdate && (
+            <Switch
+              checked={row.is_active === 1}
+              onCheckedChange={() => handleToggleActive(row.id, row.is_active)}
+            />
+          )}
           <span className="text-sm">
-            {row.is_active === 1 ? t('table.active') : t('table.inactive')}
+            {row.is_active === 1 ? t("table.active") : t("table.inactive")}
           </span>
         </div>
       ),
     },
     {
       key: "actions",
-      name: t('table.actions'),
+      name: t("table.actions"),
       sortable: false,
-      render: (row: TermSetting) => (
+        render: (row: TermSetting) => (
         <RowActions
           row={row}
           onEdit={setEditingTermId}
           onDelete={handleDeleteClick}
           onView={handleViewClick}
+          canView={canView}
+          canEdit={canEdit}
+          canDelete={canDelete}
           t={t}
         />
       ),
@@ -332,10 +382,12 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
           <TermSettingsTable.TopActions
             state={tableState}
             customActions={
-              <Button onClick={() => setAddDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                {t('actions.addMainTerm')}
-              </Button>
+              <Can check={[PERMISSIONS.crm.termSettings.create]}>
+                <Button disabled={!canCreate} onClick={() => setAddDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("actions.addMainTerm")}
+                </Button>
+              </Can>
             }
           />
         }
@@ -346,27 +398,31 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       />
 
       {/* Add Dialog */}
-      <AddProjectTermDialog
-        open={addDialogOpen}
-        onClose={() => setAddDialogOpen(false)}
-        onSuccess={() => {
-          refetch();
-          setAddDialogOpen(false);
-        }}
-        projectTypeId={projectTypeId}
-      />
+      <Can check={[PERMISSIONS.crm.termSettings.create]}>
+        <AddProjectTermDialog
+          open={addDialogOpen}
+          onClose={() => setAddDialogOpen(false)}
+          onSuccess={() => {
+            refetch();
+            setAddDialogOpen(false);
+          }}
+          projectTypeId={projectTypeId}
+        />
+      </Can>
 
       {/* Edit Dialog */}
-      <EditProjectTermDialog
-        open={Boolean(editingTermId)}
-        onClose={() => setEditingTermId(null)}
-        onSuccess={() => {
-          refetch();
-          setEditingTermId(null);
-        }}
-        termSettingId={editingTermId}
-        projectTypeId={projectTypeId}
-      />
+      <Can check={[PERMISSIONS.crm.termSettings.update]}>
+        <EditProjectTermDialog
+          open={Boolean(editingTermId)}
+          onClose={() => setEditingTermId(null)}
+          onSuccess={() => {
+            refetch();
+            setEditingTermId(null);
+          }}
+          termSettingId={editingTermId}
+          projectTypeId={projectTypeId}
+        />
+      </Can>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDeleteDialog
@@ -377,7 +433,15 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
       />
 
       {/* Item Actions Dialog */}
-      <ItemActionsDialog
+      <Can
+        check={[
+          PERMISSIONS.crm.termSettings.view,
+          PERMISSIONS.crm.termSettings.update,
+          PERMISSIONS.crm.termSettings.delete,
+          PERMISSIONS.crm.termSettings.create,
+        ]}
+      >
+        <ItemActionsDialog
         open={itemActionsDialogOpen}
         onClose={() => {
           setItemActionsDialogOpen(false);
@@ -407,6 +471,7 @@ function ProjectTermsView({ projectTypeId }: ProjectTermsViewProps) {
           }
         }}
       />
+      </Can>
     </div>
   );
 }

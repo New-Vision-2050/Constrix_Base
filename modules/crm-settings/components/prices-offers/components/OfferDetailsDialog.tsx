@@ -12,10 +12,10 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { FileText } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { ClientRequestRow } from "@/services/api/client-requests/types/response";
+import type { ClientRequestRow, PriceOfferStatus } from "@/services/api/client-requests/types/response";
 import OfferStatusChip from "./OfferStatusChip";
 import Link from "next/link";
-import { truncateFileName } from "./index";
+import { truncateFileName } from "../PeicesOffersView";
 
 interface OfferDetailsDialogProps {
   open: boolean;
@@ -45,7 +45,7 @@ export default function OfferDetailsDialog({
     { label: t("management"), value: row.management?.name ?? "—" },
     { label: t("department"), value: row.branch?.name ?? "—" },
     { label: t("financialResponsible"), value: row.financial_responsible?.name ?? "—" },
-    { label: t("offerStatus"), value: null, render: row.client_price_offer_status ? <OfferStatusChip status={row.client_price_offer_status} /> : "—" },
+    { label: t("offerStatus"), value: null, render: row.client_price_offer_status ? <OfferStatusChip status={row.client_price_offer_status as PriceOfferStatus} /> : "—" },
     { label: t("mediator"), value: row.management?.name ?? "—" },
     { label: t("requestType"), value: row.client_request_type?.name ?? "—" },
     {
