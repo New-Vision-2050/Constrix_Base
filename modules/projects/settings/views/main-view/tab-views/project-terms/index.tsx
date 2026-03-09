@@ -23,6 +23,9 @@ import {
   ViewProjectTermDialog,
 } from "./components/dialogs";
 import { SettingsTabItemProps } from "../../types";
+import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Mock data for demonstration
 const mockProjectItems: PRJ_ProjectTerm[] = [
@@ -171,8 +174,12 @@ function ProjectTermsView({
             label="الإجراءات"
             onChange={(e) => handleAction(e.target.value as string, row)}
           >
-            <MenuItem value="edit">تعديل</MenuItem>
-            <MenuItem value="delete">حذف</MenuItem>
+            <Can check={[PERMISSIONS.projectTerm.update]}>
+              <MenuItem value="edit">تعديل</MenuItem>
+            </Can>
+            <Can check={[PERMISSIONS.projectTerm.delete]}>
+              <MenuItem value="delete">حذف</MenuItem>
+            </Can>
             <MenuItem value="view">عرض</MenuItem>
           </Select>
         </FormControl>
@@ -291,14 +298,16 @@ function ProjectTermsView({
 
       {/* Action Button Above Table */}
       <Box className="flex justify-end mb-4">
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          className="bg-blue-600 hover:bg-blue-700"
-          onClick={() => setAddDialogOpen(true)}
-        >
-          إضافة بند رئيسي
-        </Button>
+        <Can check={[PERMISSIONS.projectTerm.create]}>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            className="bg-blue-600 hover:bg-blue-700"
+            onClick={() => setAddDialogOpen(true)}
+          >
+            إضافة بند رئيسي
+          </Button>
+        </Can>
       </Box>
 
       <Paper>
@@ -336,4 +345,6 @@ function ProjectTermsView({
   );
 }
 
-export default ProjectTermsView;
+export default withPermissions(ProjectTermsView, [
+  PERMISSIONS.projectTerm.list,
+]);

@@ -148,6 +148,12 @@ export const PERMISSIONS = {
       "DELETE",
     ]),
   },
+  // Project Type Settings
+  projectType: create("PROJECT_TYPE", ["CREATE", "UPDATE"]),
+
+  // Project Terms (بنود المشروع)
+  projectTerm: create("PROJECT_TERM", ["LIST", "CREATE", "UPDATE", "DELETE"]),
+
   // Project Management
   projectManagement: create("PROJECT_MANAGEMENT", [
     "LIST",
