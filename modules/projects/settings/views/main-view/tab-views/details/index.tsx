@@ -3,58 +3,51 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { UpdateDataSettingsArgs } from "@/services/api/projects/project-types/types/args";
 import { SettingsTabItemProps } from "../../types";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Grid,
+  Typography,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const items = [
+const accordionSx = {
+  "&:before": { display: "none" },
+  boxShadow: "none",
+  border: "1px solid",
+  borderColor: "divider",
+  borderRadius: 2,
+  "&.Mui-expanded": { margin: 0 },
+};
+
+const sections = [
   {
-    label: "الرقم المرجعي",
-    value: "reference-number",
-    apiKey: "is_reference_number" as keyof UpdateDataSettingsArgs,
+    title: "الجدول الرئيسي",
+    items: [
+      { label: "الرقم المرجعي", apiKey: "is_reference_number" as keyof UpdateDataSettingsArgs },
+      { label: "رقم العقد", apiKey: "is_number_contract" as keyof UpdateDataSettingsArgs },
+      { label: "مركز التكلفة", apiKey: "is_central_cost" as keyof UpdateDataSettingsArgs },
+    ],
   },
   {
-    label: "اسم المشروع",
-    value: "project-name",
-    apiKey: "is_name_project" as keyof UpdateDataSettingsArgs,
+    title: "جدول البيانات",
+    items: [
+      { label: "اسم المشروع", apiKey: "is_name_project" as keyof UpdateDataSettingsArgs },
+      { label: "تاريخ البدء", apiKey: "is_start_date" as keyof UpdateDataSettingsArgs },
+      { label: "قيمة المشروع", apiKey: "is_project_value" as keyof UpdateDataSettingsArgs },
+    ],
   },
   {
-    label: "المفصل",
-    value: "detailed",
-    apiKey: "is_client" as keyof UpdateDataSettingsArgs,
-  },
-  {
-    label: "المهندس المسؤول",
-    value: "responsible-engineer",
-    apiKey: "is_responsible_engineer" as keyof UpdateDataSettingsArgs,
-  },
-  {
-    label: "رقم العقد",
-    value: "contract-number",
-    apiKey: "is_number_contract" as keyof UpdateDataSettingsArgs,
-  },
-  {
-    label: "مركز التكلفة",
-    value: "cost-center",
-    apiKey: "is_central_cost" as keyof UpdateDataSettingsArgs,
-  },
-  {
-    label: "قيمة المشروع",
-    value: "project-value",
-    apiKey: "is_project_value" as keyof UpdateDataSettingsArgs,
-  },
-  {
-    label: "تاريخ البدء",
-    value: "start-date",
-    apiKey: "is_start_date" as keyof UpdateDataSettingsArgs,
-  },
-  {
-    label: "نسبة الانجاز",
-    value: "completion-percentage",
-    apiKey: "is_achievement_percentage" as keyof UpdateDataSettingsArgs,
+    title: "جدول العميل",
+    items: [
+      { label: "نسبة الانجاز", apiKey: "is_achievement_percentage" as keyof UpdateDataSettingsArgs },
+      { label: "المفصل", apiKey: "is_client" as keyof UpdateDataSettingsArgs },
+      { label: "المهندس المسؤول", apiKey: "is_responsible_engineer" as keyof UpdateDataSettingsArgs },
+    ],
   },
 ];
-
-interface DetailsViewProps {
-  projectTypeId: number | null;
-}
 
 function DetailsView({ thirdLevelId: projectTypeId }: SettingsTabItemProps) {
   const queryClient = useQueryClient();
@@ -100,15 +93,55 @@ function DetailsView({ thirdLevelId: projectTypeId }: SettingsTabItemProps) {
 
   return (
     <div className="w-full">
-      {items.map((item) => (
-        <HorizontalSwitch
-          key={item.value}
-          checked={data?.[item.apiKey] ?? false}
-          onChange={(checked) => handleSwitchChange(item.apiKey, checked)}
-          label={item.label}
-          disabled={updateMutation.isPending}
-        />
-      ))}
+      <Accordion defaultExpanded sx={accordionSx}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          sx={{
+            "& .MuiAccordionSummary-content": {
+              alignItems: "center",
+            },
+          }}
+        >
+          <Typography variant="body1" fontWeight={600}>
+            البيانات الرئيسية
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container spacing={2}>
+            {sections.map((section) => (
+              <Grid size={{ xs: 12, md: 4 }} key={section.title}>
+                <Accordion defaultExpanded sx={accordionSx}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    sx={{
+                      "& .MuiAccordionSummary-content": {
+                        alignItems: "center",
+                      },
+                    }}
+                  >
+                    <Typography variant="body2" fontWeight={500}>
+                      {section.title}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                      {section.items.map((item) => (
+                        <HorizontalSwitch
+                          key={item.apiKey}
+                          checked={data?.[item.apiKey] ?? false}
+                          onChange={(checked) => handleSwitchChange(item.apiKey, checked)}
+                          label={item.label}
+                          disabled={updateMutation.isPending}
+                        />
+                      ))}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              </Grid>
+            ))}
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
     </div>
   );
 }
