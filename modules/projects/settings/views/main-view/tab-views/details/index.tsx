@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useTranslations } from "next-intl";
 
 const accordionSx = {
   "&:before": { display: "none" },
@@ -22,35 +23,38 @@ const accordionSx = {
   "&.Mui-expanded": { margin: 0 },
 };
 
-const sections = [
+const sectionsConfig = [
   {
-    title: "الجدول الرئيسي",
+    titleKey: "mainTable",
     items: [
-      { label: "الرقم المرجعي", apiKey: "is_reference_number" as keyof UpdateDataSettingsArgs },
-      { label: "رقم العقد", apiKey: "is_number_contract" as keyof UpdateDataSettingsArgs },
-      { label: "مركز التكلفة", apiKey: "is_central_cost" as keyof UpdateDataSettingsArgs },
+      { labelKey: "referenceNumber", apiKey: "is_reference_number" as keyof UpdateDataSettingsArgs },
+      { labelKey: "contractNumber", apiKey: "is_number_contract" as keyof UpdateDataSettingsArgs },
+      { labelKey: "costCenter", apiKey: "is_central_cost" as keyof UpdateDataSettingsArgs },
     ],
   },
   {
-    title: "جدول البيانات",
+    titleKey: "dataTable",
     items: [
-      { label: "اسم المشروع", apiKey: "is_name_project" as keyof UpdateDataSettingsArgs },
-      { label: "تاريخ البدء", apiKey: "is_start_date" as keyof UpdateDataSettingsArgs },
-      { label: "قيمة المشروع", apiKey: "is_project_value" as keyof UpdateDataSettingsArgs },
+      { labelKey: "projectName", apiKey: "is_name_project" as keyof UpdateDataSettingsArgs },
+      { labelKey: "startDate", apiKey: "is_start_date" as keyof UpdateDataSettingsArgs },
+      { labelKey: "projectValue", apiKey: "is_project_value" as keyof UpdateDataSettingsArgs },
     ],
   },
   {
-    title: "جدول العميل",
+    titleKey: "clientTable",
     items: [
-      { label: "نسبة الانجاز", apiKey: "is_achievement_percentage" as keyof UpdateDataSettingsArgs },
-      { label: "المفصل", apiKey: "is_client" as keyof UpdateDataSettingsArgs },
-      { label: "المهندس المسؤول", apiKey: "is_responsible_engineer" as keyof UpdateDataSettingsArgs },
+      { labelKey: "achievementPercentage", apiKey: "is_achievement_percentage" as keyof UpdateDataSettingsArgs },
+      { labelKey: "detailed", apiKey: "is_client" as keyof UpdateDataSettingsArgs },
+      { labelKey: "responsibleEngineer", apiKey: "is_responsible_engineer" as keyof UpdateDataSettingsArgs },
     ],
   },
-];
+] as const;
 
 function DetailsView({ thirdLevelId: projectTypeId }: SettingsTabItemProps) {
   const queryClient = useQueryClient();
+  const t = useTranslations("projectSettings.projectTypes.details");
+  const tSections = useTranslations("projectSettings.projectTypes.details.sections");
+  const tItems = useTranslations("projectSettings.projectTypes.details.items");
 
   const { data, isLoading } = useQuery({
     queryKey: ["project-type-data-settings", projectTypeId],
@@ -84,11 +88,11 @@ function DetailsView({ thirdLevelId: projectTypeId }: SettingsTabItemProps) {
   };
 
   if (!projectTypeId) {
-    return <div className="w-full">الرجاء اختيار نوع مشروع</div>;
+    return <div className="w-full">{t("selectProjectType")}</div>;
   }
 
   if (isLoading) {
-    return <div className="w-full">جاري التحميل...</div>;
+    return <div className="w-full">{t("loading")}</div>;
   }
 
   return (
@@ -103,13 +107,13 @@ function DetailsView({ thirdLevelId: projectTypeId }: SettingsTabItemProps) {
           }}
         >
           <Typography variant="body1" fontWeight={600}>
-            البيانات الرئيسية
+            {t("mainData")}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Grid container spacing={2}>
-            {sections.map((section) => (
-              <Grid size={{ xs: 12, md: 4 }} key={section.title}>
+            {sectionsConfig.map((section) => (
+              <Grid size={{ xs: 12, md: 4 }} key={section.titleKey}>
                 <Accordion defaultExpanded sx={accordionSx}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
@@ -120,7 +124,7 @@ function DetailsView({ thirdLevelId: projectTypeId }: SettingsTabItemProps) {
                     }}
                   >
                     <Typography variant="body2" fontWeight={500}>
-                      {section.title}
+                      {tSections(section.titleKey)}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
@@ -130,7 +134,7 @@ function DetailsView({ thirdLevelId: projectTypeId }: SettingsTabItemProps) {
                           key={item.apiKey}
                           checked={data?.[item.apiKey] ?? false}
                           onChange={(checked) => handleSwitchChange(item.apiKey, checked)}
-                          label={item.label}
+                          label={tItems(item.labelKey)}
                           disabled={updateMutation.isPending}
                         />
                       ))}

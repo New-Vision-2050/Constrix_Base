@@ -48,4 +48,25 @@ export const projectTypesMessages = new MessagesGroup({
     successMessage: _m("Sub category added successfully", "تم اضافة التصنيف الفرعي بنجاح"),
     errorMessage: _m("Failed to add sub category", "فشل في اضافة التصنيف الفرعي"),
   }),
+  details: new MessagesGroup({
+    mainData: _m("Main Data", "البيانات الرئيسية"),
+    selectProjectType: _m("Please select a project type", "الرجاء اختيار نوع مشروع"),
+    loading: _m("Loading...", "جاري التحميل..."),
+    sections: new MessagesGroup({
+      mainTable: _m("Main Table", "الجدول الرئيسي"),
+      dataTable: _m("Data Table", "جدول البيانات"),
+      clientTable: _m("Client Table", "جدول العميل"),
+    }),
+    items: new MessagesGroup({
+      referenceNumber: _m("Reference Number", "الرقم المرجعي"),
+      contractNumber: _m("Contract Number", "رقم العقد"),
+      costCenter: _m("Cost Center", "مركز التكلفة"),
+      projectName: _m("Project Name", "اسم المشروع"),
+      startDate: _m("Start Date", "تاريخ البدء"),
+      projectValue: _m("Project Value", "قيمة المشروع"),
+      achievementPercentage: _m("Achievement Percentage", "نسبة الانجاز"),
+      detailed: _m("Detailed", "المفصل"),
+      responsibleEngineer: _m("Responsible Engineer", "المهندس المسؤول"),
+    }),
+  }),
 });
