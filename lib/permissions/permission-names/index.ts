@@ -84,11 +84,14 @@ export const PERMISSIONS = {
   },
   // CRM
   crm: {
-    settings: create("CLIENT_SETTING"),
+    settings: create("CLIENT_SETTING",["UPDATE"]),
     broker: create("BROKER"),
-    clients: create("CLIENT"),
-    pricesOffers: create("PRICES_OFFERS"),
+    clients: create("CLIENT", ["UPDATE"]),
+    pricesOffers: create("PRICE_OFFER", ["LIST"]),
+    serviceSettings: create("TERM_SERVICE_SETTING", ["LIST", "VIEW", "CREATE", "UPDATE", "DELETE"]),
+    termSettings: create("TERM_SETTING", ["LIST", "VIEW", "CREATE", "UPDATE", "DELETE"]),
   },
+
   // docs library
   library: {
     folder: create("FOLDER"),

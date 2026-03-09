@@ -1,56 +1,11 @@
-"use client";
-
-import { ProjectTypesApi } from "@/services/api/projects/project-types";
-import { PRJ_ProjectType } from "@/types/api/projects/project-type";
-import { LinearProgress, Paper, Tab, Tabs } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import ServicesCard from "./ServicesCard";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import ServicesSettingsView from "./ServicesSettingsView";
 
 export default function ServicesSettings() {
-  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(
-    null,
-  );
-
-  const { data, isLoading: isLoadingRoots } = useQuery({
-    queryKey: ["project-types", "roots"],
-    queryFn: async () => {
-      const response = await ProjectTypesApi.getRoots();
-      return response.data.payload ?? [];
-    },
-  });
-
-  const roots = useMemo(() => data ?? [], [data]);
-
-  useEffect(() => {
-    if (roots.length > 0 && !selectedRoot) {
-      setSelectedRoot(roots[0]);
-    }
-  }, [roots, selectedRoot]);
-
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-4">
-        {isLoadingRoots && <LinearProgress />}
-        {!isLoadingRoots && (
-          <Paper>
-            <Tabs
-              value={selectedRoot?.id ?? false}
-              onChange={(_, value: number) => {
-                const root = roots.find((r) => r.id === value);
-                if (root) setSelectedRoot(root);
-              }}
-            >
-              {roots.map((root) => (
-                <Tab key={root.id} label={root.name} value={root.id} />
-              ))}
-            </Tabs>
-          </Paper>
-        )}
-        {!isLoadingRoots && (
-          <ServicesCard projectTypeId={selectedRoot?.id || null} />
-        )}
-      </div>
-    </div>
-  );
+    <Can check={[PERMISSIONS.crm.serviceSettings.list]}>
+      <ServicesSettingsView />
+    </Can>
+  )
 }
