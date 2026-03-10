@@ -10,6 +10,7 @@ import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
+import LoadingBackdrop from "@/components/shared/loading-backdrop";
 
 const IdentifierPhase = ({
   handleSetStep,
@@ -53,7 +54,7 @@ const IdentifierPhase = ({
           setValue("first_login", data.payload.first_login?.toString());
           setValue(
             "login_option_alternatives",
-            data.payload.login_way.step.login_option_alternatives
+            data.payload.login_way.step.login_option_alternatives,
           );
           setValue("by", data.payload.login_way.by);
           setValue("type", data.payload.login_way.type);
@@ -81,16 +82,17 @@ const IdentifierPhase = ({
         onError(error) {
           const messageKey = getErrorMessage(error);
           setErrorMessage(
-            messageKey || t("Errors.Authentication.UserNotFound")
+            messageKey || t("Errors.Authentication.UserNotFound"),
           );
           handleOpen();
         },
-      }
+      },
     );
   };
 
   return (
     <>
+      <LoadingBackdrop open={isPending} />
       <h1 className="text-xl sm:text-2xl text-center mb-4">
         {t("Login.SignIn")}
       </h1>

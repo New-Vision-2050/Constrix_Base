@@ -23,6 +23,7 @@ import { useState } from "react";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { getErrorMessage } from "@/utils/errorHandler";
+import LoadingBackdrop from "@/components/shared/loading-backdrop";
 
 const ValidatePhonePhase = ({
   handleSetStep,
@@ -92,94 +93,96 @@ const ValidatePhonePhase = ({
         onError: (error) => {
           const messageKey = getErrorMessage(error);
           setErrorMessage(
-            messageKey || t("Errors.Authentication.InvalidIdentifier")
+            messageKey || t("Errors.Authentication.InvalidIdentifier"),
           );
           handleOpen();
         },
-      }
+      },
     );
   };
 
   return (
-    <div className="relative flex flex-col gap-4">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-0 left-0"
-        onClick={() => handleStepBack()}
-        type="button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+    <>
+      <LoadingBackdrop open={isPending} />
+      <div className="relative flex flex-col gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-0 left-0"
+          onClick={() => handleStepBack()}
+          type="button"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </Button>
-      <div className="space-y-4">
-        <h1 className="text-2xl text-start">{t("Title")}</h1>
-        <p>
-          <span className="opacity-50">{t("EnterVerificationCode")} </span>
-          <span dir="ltr">{by}</span>
-        </p>
-      </div>
-      <Controller
-        name="validatePhoneOtp"
-        control={control}
-        render={({ field }) => (
-          <div className="flex flex-col px-4">
-            <div dir="ltr">
-              <InputOTP
-                maxLength={5}
-                value={field.value}
-                onChange={field.onChange}
-              >
-                <InputOTPGroup>
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <InputOTPSlot
-                      key={index}
-                      index={index}
-                      isError={!!errors?.validatePhoneOtp?.message}
-                    />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </Button>
+        <div className="space-y-4">
+          <h1 className="text-2xl text-start">{t("Title")}</h1>
+          <p>
+            <span className="opacity-50">{t("EnterVerificationCode")} </span>
+            <span dir="ltr">{by}</span>
+          </p>
+        </div>
+        <Controller
+          name="validatePhoneOtp"
+          control={control}
+          render={({ field }) => (
+            <div className="flex flex-col px-4">
+              <div dir="ltr">
+                <InputOTP
+                  maxLength={5}
+                  value={field.value}
+                  onChange={field.onChange}
+                >
+                  <InputOTPGroup>
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <InputOTPSlot
+                        key={index}
+                        index={index}
+                        isError={!!errors?.validatePhoneOtp?.message}
+                      />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+              <InputError error={errors?.validatePhoneOtp?.message} />
             </div>
-            <InputError error={errors?.validatePhoneOtp?.message} />
-          </div>
-        )}
-      />
-      <Button
-        loading={isPending}
-        onClick={handleSubmit(onSubmit)}
-        type="submit"
-        form="login-form"
-        className="w-full"
-      >
-        {loginT("Login")}
-      </Button>
-      <OtpHub
-        resendFor="resend-otp"
-        token={token ?? ""}
-        identifier={identifier}
-      />
-
-      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
-        <AnotherCheckingWay
-          loginOptionAlternatives={loginOptionAlternatives}
-          handleSetStep={handleSetStep}
+          )}
         />
-      )}
+        <Button
+          loading={isPending}
+          onClick={handleSubmit(onSubmit)}
+          type="submit"
+          form="login-form"
+          className="w-full"
+        >
+          {loginT("Login")}
+        </Button>
+        <OtpHub
+          resendFor="resend-otp"
+          token={token ?? ""}
+          identifier={identifier}
+        />
 
-      {/*       <div className="flex items-center gap-2">
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <AnotherCheckingWay
+            loginOptionAlternatives={loginOptionAlternatives}
+            handleSetStep={handleSetStep}
+          />
+        )}
+
+        {/*       <div className="flex items-center gap-2">
         <Button
           type="button"
           variant={"link"}
@@ -194,12 +197,13 @@ const ValidatePhonePhase = ({
           />
         )}
       </div> */}
-      <ErrorDialog
-        isOpen={isOpen}
-        handleClose={handleClose}
-        desc={errorMessage}
-      />
-    </div>
+        <ErrorDialog
+          isOpen={isOpen}
+          handleClose={handleClose}
+          desc={errorMessage}
+        />
+      </div>
+    </>
   );
 };
 

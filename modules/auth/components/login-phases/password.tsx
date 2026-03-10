@@ -17,6 +17,7 @@ import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
+import LoadingBackdrop from "@/components/shared/loading-backdrop";
 
 const PasswordPhase = ({
   handleSetStep,
@@ -32,7 +33,7 @@ const PasswordPhase = ({
 
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
     useForgetPassword();
-  const { mutate, isPending } = useLoginSteps();
+  const { mutate, isPending, isSuccess } = useLoginSteps();
   const {
     register,
     formState: { errors },
@@ -83,13 +84,13 @@ const PasswordPhase = ({
             // handle redirect based on user type
             if (userTypes.length > 0) {
               const isEmployee = userTypes.some(
-                (userType) => userType.role == UsersRole.Employee
+                (userType) => userType.role == UsersRole.Employee,
               );
               const isBroker = userTypes.some(
-                (userType) => userType.role == UsersRole.Broker
+                (userType) => userType.role == UsersRole.Broker,
               );
               const isClient = userTypes.some(
-                (userType) => userType.role == UsersRole.Client
+                (userType) => userType.role == UsersRole.Client,
               );
               if (isEmployee) {
                 router.push(ROUTER.USER_PROFILE);
@@ -97,7 +98,7 @@ const PasswordPhase = ({
                 router.push(
                   `${ROUTER.CLIENT_PROFILE}?role=${
                     isClient ? UsersRole.Client : UsersRole.Broker
-                  }`
+                  }`,
                 );
               }
             } else {
@@ -120,11 +121,11 @@ const PasswordPhase = ({
         onError(error) {
           const messageKey = getErrorMessage(error);
           setErrorMessage(
-            messageKey || t("Errors.Authentication.InvalidCredentials")
+            messageKey || t("Errors.Authentication.InvalidCredentials"),
           );
           handleOpen();
         },
-      }
+      },
     );
   };
 
@@ -137,82 +138,85 @@ const PasswordPhase = ({
         onSuccess: () => {
           handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);
         },
-      }
+      },
     );
   };
 
   return (
-    <div className="relative flex flex-col gap-3">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-0 left-0"
-        onClick={() => handleStepBack()}
-        type="button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </Button>
-      <h1 className="text-xl sm:text-2xl text-center mb-4">
-        {t("Login.EnterPassword")}
-      </h1>
-      <div className="space-y-4 my-2">
-        <Input
-          type="password"
-          {...register("password")}
-          label={t("Login.Password")}
-          error={errors?.password?.message}
-        />
-
+    <>
+      <LoadingBackdrop open={isPending || isSuccess} />
+      <div className="relative flex flex-col gap-3">
         <Button
-          size={"lg"}
-          className="w-full mt-4"
-          loading={isPending}
-          onClick={handleSubmit(handleLogin)}
-          type="submit"
-          form="login-form"
+          variant="ghost"
+          size="icon"
+          className="absolute top-0 left-0"
+          onClick={() => handleStepBack()}
+          type="button"
         >
-          {t("Login.Login")}
-        </Button>
-
-        <div className="flex justify-center">
-          <Button
-            loading={isPendingForgetPassword}
-            variant={"link"}
-            onClick={handleForgetPhase}
-            className="text-sm sm:text-base"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            {t("Login.ForgotPassword")}
-          </Button>
-        </div>
-
-        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
-          <div className="mt-2">
-            <AnotherCheckingWay
-              loginOptionAlternatives={loginOptionAlternatives}
-              handleSetStep={handleSetStep}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
             />
+          </svg>
+        </Button>
+        <h1 className="text-xl sm:text-2xl text-center mb-4">
+          {t("Login.EnterPassword")}
+        </h1>
+        <div className="space-y-4 my-2">
+          <Input
+            type="password"
+            {...register("password")}
+            label={t("Login.Password")}
+            error={errors?.password?.message}
+          />
+
+          <Button
+            size={"lg"}
+            className="w-full mt-4"
+            loading={isPending}
+            onClick={handleSubmit(handleLogin)}
+            type="submit"
+            form="login-form"
+          >
+            {t("Login.Login")}
+          </Button>
+
+          <div className="flex justify-center">
+            <Button
+              loading={isPendingForgetPassword}
+              variant={"link"}
+              onClick={handleForgetPhase}
+              className="text-sm sm:text-base"
+            >
+              {t("Login.ForgotPassword")}
+            </Button>
           </div>
-        )}
+
+          {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+            <div className="mt-2">
+              <AnotherCheckingWay
+                loginOptionAlternatives={loginOptionAlternatives}
+                handleSetStep={handleSetStep}
+              />
+            </div>
+          )}
+        </div>
+        <ErrorDialog
+          isOpen={isOpen}
+          handleClose={handleClose}
+          desc={errorMessage}
+        />
       </div>
-      <ErrorDialog
-        isOpen={isOpen}
-        handleClose={handleClose}
-        desc={errorMessage}
-      />
-    </div>
+    </>
   );
 };
 

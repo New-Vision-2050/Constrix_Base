@@ -16,6 +16,7 @@ import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import OtpHub from "../resend-otp/otp-hub";
 import { useValidateResetPasswordOtp } from "../../store/mutations";
 import { useTranslations } from "next-intl";
+import LoadingBackdrop from "@/components/shared/loading-backdrop";
 
 const ForgetPasswordPhase = ({
   handleSetStep,
@@ -47,96 +48,99 @@ const ForgetPasswordPhase = ({
           setValue("token", res.payload.token);
           handleSetStep(LOGIN_PHASES.RESET_PASSWORD);
         },
-      }
+      },
     );
   };
 
   return (
-    <div className="relative flex flex-col gap-3">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-0 left-0"
-        onClick={() => handleStepBack()}
-        type="button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+    <>
+      <LoadingBackdrop open={isPending} />
+      <div className="relative flex flex-col gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-0 left-0"
+          onClick={() => handleStepBack()}
+          type="button"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </Button>
-      <>
-      <h1 className="text-2xl text-center">
-        {first_login == "1"
-          ? t("ForgotPassword.SetUpPassword")
-          : t("ForgotPassword.Title")}
-      </h1>
-      <p>
-        <span className="opacity-50 block">
-          {t("ForgotPassword.EnterTemporaryPassword")}
-        </span>
-        {identifier}
-      </p>
-      <Controller
-        name="forgetPasswordOtp"
-        control={control}
-        render={({ field }) => (
-          <div className="flex flex-col px-4">
-            <div dir="ltr">
-              <InputOTP
-                maxLength={5}
-                value={field.value}
-                onChange={(val) => {
-                  const digitsOnly = val.replace(/\D/g, "");
-                  field.onChange(digitsOnly);
-                }}
-              >
-                <InputOTPGroup>
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <InputOTPSlot
-                      key={index}
-                      index={index}
-                      isError={!!errors?.forgetPasswordOtp?.message}
-                    />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-            <InputError
-              error={
-                errors?.forgetPasswordOtp?.message ||
-                error?.response?.data?.error
-              }
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
             />
-          </div>
-        )}
-      />
-      <Button
-        onClick={handleSubmit(onSubmit)}
-        loading={isPending}
-        type="submit"
-        form="login-form"
-        className="w-full"
-      >
-        {t("ForgotPassword.Confirm")}
-      </Button>{" "}
-      <OtpHub
-        identifier={identifier}
-        resendFor={"forget-password"}
-        token={token ?? ""}
-      />
-      </>
-    </div>
+          </svg>
+        </Button>
+        <>
+          <h1 className="text-2xl text-center">
+            {first_login == "1"
+              ? t("ForgotPassword.SetUpPassword")
+              : t("ForgotPassword.Title")}
+          </h1>
+          <p>
+            <span className="opacity-50 block">
+              {t("ForgotPassword.EnterTemporaryPassword")}
+            </span>
+            {identifier}
+          </p>
+          <Controller
+            name="forgetPasswordOtp"
+            control={control}
+            render={({ field }) => (
+              <div className="flex flex-col px-4">
+                <div dir="ltr">
+                  <InputOTP
+                    maxLength={5}
+                    value={field.value}
+                    onChange={(val) => {
+                      const digitsOnly = val.replace(/\D/g, "");
+                      field.onChange(digitsOnly);
+                    }}
+                  >
+                    <InputOTPGroup>
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <InputOTPSlot
+                          key={index}
+                          index={index}
+                          isError={!!errors?.forgetPasswordOtp?.message}
+                        />
+                      ))}
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+                <InputError
+                  error={
+                    errors?.forgetPasswordOtp?.message ||
+                    error?.response?.data?.error
+                  }
+                />
+              </div>
+            )}
+          />
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            loading={isPending}
+            type="submit"
+            form="login-form"
+            className="w-full"
+          >
+            {t("ForgotPassword.Confirm")}
+          </Button>{" "}
+          <OtpHub
+            identifier={identifier}
+            resendFor={"forget-password"}
+            token={token ?? ""}
+          />
+        </>
+      </div>
+    </>
   );
 };
 
