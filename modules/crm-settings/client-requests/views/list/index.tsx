@@ -16,6 +16,9 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
+import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 import { ClientRequestRow, getClientRequestsColumns } from "./columns";
 import { statisticsConfig } from "./components/statistics-config";
@@ -25,7 +28,7 @@ const CLIENT_REQUESTS_QUERY_KEY = "client-requests-list";
 
 const ClientRequestsTableLayout = HeadlessTableLayout<ClientRequestRow>("crl");
 
-export default function ClientRequestsList() {
+function ClientRequestsList() {
   const t = useTranslations();
   const queryClient = useQueryClient();
 
@@ -130,15 +133,17 @@ export default function ClientRequestsList() {
             </Button>
           )}
         >
-          <MenuItem
-            onClick={() => {
-              setDeletingRequestId(row.id);
-              setDeleteDialogOpen(true);
-            }}
-          >
-            <Trash2 className="w-4 h-4 ml-2" />
-            {t("labels.delete")}
-          </MenuItem>
+          <Can check={[PERMISSIONS.clientRequest.delete]}>
+            <MenuItem
+              onClick={() => {
+                setDeletingRequestId(row.id);
+                setDeleteDialogOpen(true);
+              }}
+            >
+              <Trash2 className="w-4 h-4 ml-2" />
+              {t("labels.delete")}
+            </MenuItem>
+          </Can>
         </CustomMenu>
       ),
     },
@@ -265,9 +270,11 @@ export default function ClientRequestsList() {
             <ClientRequestsTableLayout.TopActions
               state={state}
               customActions={
-                <Button variant="contained" onClick={handleAddNew}>
-                  {t("clientRequests.addRequest")}
-                </Button>
+                <Can check={[PERMISSIONS.clientRequest.create]}>
+                  <Button variant="contained" onClick={handleAddNew}>
+                    {t("clientRequests.addRequest")}
+                  </Button>
+                </Can>
               }
             />
           }
@@ -281,6 +288,7 @@ export default function ClientRequestsList() {
         />
 
         {/* Delete Confirmation Dialog */}
+        <Can check={[PERMISSIONS.clientRequest.delete]}>
         <DeleteButton
           message={t("clientRequests.deleteConfirm")}
           onDelete={async () => {
@@ -300,6 +308,7 @@ export default function ClientRequestsList() {
             deleteCancelled: t("labels.deleteCancelled"),
           }}
         />
+        </Can>
 
         {/* Add/Edit Drawer */}
         <RequestFormDrawer
@@ -311,3 +320,7 @@ export default function ClientRequestsList() {
     </>
   );
 }
+
+export default withPermissions(ClientRequestsList, [
+  PERMISSIONS.clientRequest.list,
+]);

@@ -19,6 +19,9 @@ import { useRouter } from "next/navigation";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
+import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useQuery } from "@tanstack/react-query";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
 import { ProjectRow, getProjectsColumns } from "./columns";
@@ -33,7 +36,7 @@ const ProjectsTableLayout =
 
 const PROJECTS_QUERY_KEY = "all-projects-list";
 
-export default function ProjectsList() {
+function ProjectsList() {
   const t = useTranslations();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -144,18 +147,24 @@ export default function ProjectsList() {
               </Button>
             )}
           >
-            <MenuItem onClick={() => handleEdit(row.id)}>
-              <EditIcon className="w-4 h-4 ml-2" />
-              {t("labels.edit")}
-            </MenuItem>
-            <MenuItem onClick={() => handleDelete(row.id)}>
-              <Trash2 className="w-4 h-4 ml-2" />
-              {t("labels.delete")}
-            </MenuItem>
-            <MenuItem onClick={() => handleView(row.id)}>
-              <Eye className="w-4 h-4 ml-2" />
-              {t("labels.show")}
-            </MenuItem>
+            <Can check={[PERMISSIONS.projectManagement.update]}>
+              <MenuItem onClick={() => handleEdit(row.id)}>
+                <EditIcon className="w-4 h-4 ml-2" />
+                {t("labels.edit")}
+              </MenuItem>
+            </Can>
+            <Can check={[PERMISSIONS.projectManagement.delete]}>
+              <MenuItem onClick={() => handleDelete(row.id)}>
+                <Trash2 className="w-4 h-4 ml-2" />
+                {t("labels.delete")}
+              </MenuItem>
+            </Can>
+            <Can check={[PERMISSIONS.projectManagement.view]}>
+              <MenuItem onClick={() => handleView(row.id)}>
+                <Eye className="w-4 h-4 ml-2" />
+                {t("labels.show")}
+              </MenuItem>
+            </Can>
           </CustomMenu>
         ),
       },
@@ -200,9 +209,11 @@ export default function ProjectsList() {
   );
 
   const addButton = (
-    <Button variant="contained" color="primary" onClick={handleAddNew}>
-      {t("project.addProject")}
-    </Button>
+    <Can check={[PERMISSIONS.projectManagement.create]}>
+      <Button variant="contained" color="primary" onClick={handleAddNew}>
+        {t("project.addProject")}
+      </Button>
+    </Can>
   );
 
   return (
@@ -330,23 +341,29 @@ export default function ProjectsList() {
       />
 
       {/* ── Delete Confirmation Dialog ─────────────────────────────────────── */}
-      <DeleteButton
-        message={t("project.deleteConfirm")}
-        onDelete={async () => {
-          if (!deletingProjectId) return;
-          await AllProjectsApi.delete(deletingProjectId);
-          queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
-          setDeleteDialogOpen(false);
-          setDeletingProjectId(null);
-        }}
-        open={deleteDialogOpen}
-        setOpen={setDeleteDialogOpen}
-        translations={{
-          deleteSuccess: t("labels.deleteSuccess"),
-          deleteError: t("labels.deleteError"),
-          deleteCancelled: t("labels.deleteCancelled"),
-        }}
-      />
+      <Can check={[PERMISSIONS.projectManagement.delete]}>
+        <DeleteButton
+          message={t("project.deleteConfirm")}
+          onDelete={async () => {
+            if (!deletingProjectId) return;
+            await AllProjectsApi.delete(deletingProjectId);
+            queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+            setDeleteDialogOpen(false);
+            setDeletingProjectId(null);
+          }}
+          open={deleteDialogOpen}
+          setOpen={setDeleteDialogOpen}
+          translations={{
+            deleteSuccess: t("labels.deleteSuccess"),
+            deleteError: t("labels.deleteError"),
+            deleteCancelled: t("labels.deleteCancelled"),
+          }}
+        />
+      </Can>
     </Box>
   );
 }
+
+export default withPermissions(ProjectsList, [
+  PERMISSIONS.projectManagement.list,
+]);
