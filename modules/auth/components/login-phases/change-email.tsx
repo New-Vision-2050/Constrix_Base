@@ -1,13 +1,19 @@
-import React from "react";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import {
   ChangeEmailType,
   ValidateEmailType,
 } from "../../validator/login-schema";
 import { useFormContext } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import {
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const ChangeEmailPhase = ({
   handleSetStep,
@@ -35,60 +41,57 @@ const ChangeEmailPhase = ({
   };
 
   return (
-    <div className="relative flex flex-col gap-3">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-0 left-0"
+    <Box position="relative">
+      <IconButton
+        sx={{ position: "absolute", top: 0, left: 0 }}
         onClick={() => handleStepBack()}
         type="button"
+        aria-label="go-back"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </Button>
-      <h1 className="text-2xl text-center">{t("ChangeEmail.Title")}</h1>
-      <Input
-        label={t("ChangeEmail.NewEmail")}
-        {...register("newEmail")}
-        error={errors?.newEmail?.message}
-      />
-      <Input
-        label={t("ChangeEmail.ConfirmNewEmail")}
-        {...register("confirmNewEmail")}
-        error={errors?.confirmNewEmail?.message}
-      />
-      <p className="opacity-50">{t("ChangeEmail.NoCopy")}</p>
-      <div className="flex flex-col gap-2 items-center">
-        <Button
-          type="submit"
-          form="login-form"
-          onClick={handleSubmit(onSubmit)}
-          className="w-full"
-        >
-          {t("ChangeEmail.Confirm")}
-        </Button>
-        <Button
-          onClick={handleReturn}
-          type="button"
-          variant={"link"}
-          className="text-primary w-fit underline"
-        >
-          {t("ChangeEmail.BackToLogin")}
-        </Button>
-      </div>
-    </div>
+        <ArrowBackIcon />
+      </IconButton>
+      <Stack spacing={2}>
+        <Typography variant="h5" textAlign="center">
+          {t("ChangeEmail.Title")}
+        </Typography>
+        <TextField
+          label={t("ChangeEmail.NewEmail")}
+          {...register("newEmail")}
+          error={!!errors?.newEmail?.message}
+          helperText={errors?.newEmail?.message}
+          fullWidth
+        />
+        <TextField
+          label={t("ChangeEmail.ConfirmNewEmail")}
+          {...register("confirmNewEmail")}
+          error={!!errors?.confirmNewEmail?.message}
+          helperText={errors?.confirmNewEmail?.message}
+          fullWidth
+        />
+        <Typography color="text.secondary" sx={{ opacity: 0.7 }}>
+          {t("ChangeEmail.NoCopy")}
+        </Typography>
+        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+          <Button
+            type="submit"
+            form="login-form"
+            onClick={handleSubmit(onSubmit)}
+            fullWidth
+            variant="contained"
+          >
+            {t("ChangeEmail.Confirm")}
+          </Button>
+          <Button
+            onClick={handleReturn}
+            type="button"
+            variant="text"
+            sx={{ width: "fit-content", textDecoration: "underline", textTransform: "none" }}
+          >
+            {t("ChangeEmail.BackToLogin")}
+          </Button>
+        </Box>
+      </Stack>
+    </Box>
   );
 };
 

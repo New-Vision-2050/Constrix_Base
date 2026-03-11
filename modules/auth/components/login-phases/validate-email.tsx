@@ -12,7 +12,14 @@ import {
   InputOTPSlot,
   InputError,
 } from "@/components/ui/input-otp";
-import { Button } from "@/components/ui/button";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import AnotherCheckingWay from "../another-checking-way";
 import { useLoginSteps } from "../../store/mutations";
@@ -27,6 +34,7 @@ import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { getErrorMessage } from "@/utils/errorHandler";
 import LoadingBackdrop from "@/components/shared/loading-backdrop";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const ValidateEmailPhase = ({
   handleSetStep,
@@ -108,41 +116,34 @@ const ValidateEmailPhase = ({
   return (
     <>
       <LoadingBackdrop open={isPending} />
-      <div className="relative flex flex-col gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-0 left-0"
+      <Box position="relative">
+        <IconButton
+          sx={{ position: "absolute", top: 0, left: 0 }}
           onClick={() => handleStepBack()}
           type="button"
+          aria-label="go-back"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </Button>
-        <div className="space-y-4">
-          <h1 className="text-2xl text-start">{t("Title")}</h1>
-          <p>
-            <span className="opacity-50">{t("EnterVerificationCode")} </span>
-            <span dir="ltr">{by}</span>
-          </p>
-        </div>
+          <ArrowBackIcon />
+        </IconButton>
+        <Stack spacing={2}>
+          <Stack spacing={1}>
+            <Typography variant="h5" textAlign="left">
+              {t("Title")}
+            </Typography>
+            <Typography component="p">
+              <Typography component="span" color="text.secondary" sx={{ opacity: 0.7 }}>
+                {t("EnterVerificationCode")}{" "}
+              </Typography>
+              <Typography component="span" dir="ltr">
+                {by}
+              </Typography>
+            </Typography>
+          </Stack>
         <Controller
           name="validateEmailOtp"
           control={control}
           render={({ field }) => (
-            <div className="flex flex-col px-4">
+            <Box display="flex" flexDirection="column" px={2}>
               <div dir="ltr">
                 <InputOTP
                   maxLength={5}
@@ -161,15 +162,17 @@ const ValidateEmailPhase = ({
                 </InputOTP>
               </div>
               <InputError error={errors?.validateEmailOtp?.message} />
-            </div>
+            </Box>
           )}
         />
         <Button
-          loading={isPending}
+          disabled={isPending}
+          endIcon={isPending ? <CircularProgress size={18} /> : undefined}
           onClick={handleSubmit(onSubmit)}
           type="submit"
           form="login-form"
-          className="w-full"
+          fullWidth
+          variant="contained"
         >
           {loginT("Next")}
         </Button>
@@ -178,12 +181,17 @@ const ValidateEmailPhase = ({
           token={getValues("token") ?? ""}
           resendFor="resend-otp"
         />
-        <div className="flex items-center gap-2">
+        <Box display="flex" alignItems="center" gap={1}>
           <Button
             onClick={handleSecurityQuestionsPhase}
             type="button"
-            variant={"link"}
-            className="text-primary p-0 h-auto underline"
+            variant="text"
+            sx={{
+              p: 0,
+              minWidth: "auto",
+              textDecoration: "underline",
+              textTransform: "none",
+            }}
           >
             {t("ChangeEmailAddress")}
           </Button>
@@ -193,13 +201,14 @@ const ValidateEmailPhase = ({
               handleSetStep={handleSetStep}
             />
           )}
-        </div>
+        </Box>
         <ErrorDialog
           isOpen={isOpen}
           handleClose={handleClose}
           desc={errorMessage}
         />
-      </div>
+        </Stack>
+      </Box>
     </>
   );
 };

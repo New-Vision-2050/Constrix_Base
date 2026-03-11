@@ -11,12 +11,20 @@ import {
   InputOTPSlot,
   InputError,
 } from "@/components/ui/input-otp";
-import { Button } from "@/components/ui/button";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import OtpHub from "../resend-otp/otp-hub";
 import { useValidateResetPasswordOtp } from "../../store/mutations";
 import { useTranslations } from "next-intl";
 import LoadingBackdrop from "@/components/shared/loading-backdrop";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const ForgetPasswordPhase = ({
   handleSetStep,
@@ -55,46 +63,37 @@ const ForgetPasswordPhase = ({
   return (
     <>
       <LoadingBackdrop open={isPending} />
-      <div className="relative flex flex-col gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-0 left-0"
+      <Box position="relative">
+        <IconButton
+          sx={{ position: "absolute", top: 0, left: 0 }}
           onClick={() => handleStepBack()}
           type="button"
+          aria-label="go-back"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </Button>
-        <>
-          <h1 className="text-2xl text-center">
+          <ArrowBackIcon />
+        </IconButton>
+        <Stack spacing={2}>
+          <Typography variant="h5" textAlign="center">
             {first_login == "1"
               ? t("ForgotPassword.SetUpPassword")
               : t("ForgotPassword.Title")}
-          </h1>
-          <p>
-            <span className="opacity-50 block">
+          </Typography>
+          <Typography component="p">
+            <Typography
+              component="span"
+              display="block"
+              color="text.secondary"
+              sx={{ opacity: 0.7 }}
+            >
               {t("ForgotPassword.EnterTemporaryPassword")}
-            </span>
+            </Typography>
             {identifier}
-          </p>
+          </Typography>
           <Controller
             name="forgetPasswordOtp"
             control={control}
             render={({ field }) => (
-              <div className="flex flex-col px-4">
+              <Box display="flex" flexDirection="column" px={2}>
                 <div dir="ltr">
                   <InputOTP
                     maxLength={5}
@@ -121,25 +120,27 @@ const ForgetPasswordPhase = ({
                     error?.response?.data?.error
                   }
                 />
-              </div>
+              </Box>
             )}
           />
           <Button
             onClick={handleSubmit(onSubmit)}
-            loading={isPending}
+            disabled={isPending}
+            endIcon={isPending ? <CircularProgress size={18} /> : undefined}
             type="submit"
             form="login-form"
-            className="w-full"
+            fullWidth
+            variant="contained"
           >
             {t("ForgotPassword.Confirm")}
-          </Button>{" "}
+          </Button>
           <OtpHub
             identifier={identifier}
             resendFor={"forget-password"}
             token={token ?? ""}
           />
-        </>
-      </div>
+        </Stack>
+      </Box>
     </>
   );
 };

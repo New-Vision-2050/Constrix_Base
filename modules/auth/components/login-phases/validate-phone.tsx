@@ -3,7 +3,14 @@ import {
   IdentifierType,
   ValidatePhoneType,
 } from "../../validator/login-schema";
-import { Button } from "@/components/ui/button";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import AnotherCheckingWay from "../another-checking-way";
 import {
   InputError,
@@ -24,6 +31,7 @@ import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { getErrorMessage } from "@/utils/errorHandler";
 import LoadingBackdrop from "@/components/shared/loading-backdrop";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const ValidatePhonePhase = ({
   handleSetStep,
@@ -104,41 +112,34 @@ const ValidatePhonePhase = ({
   return (
     <>
       <LoadingBackdrop open={isPending} />
-      <div className="relative flex flex-col gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-0 left-0"
+      <Box position="relative">
+        <IconButton
+          sx={{ position: "absolute", top: 0, left: 0 }}
           onClick={() => handleStepBack()}
           type="button"
+          aria-label="go-back"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </Button>
-        <div className="space-y-4">
-          <h1 className="text-2xl text-start">{t("Title")}</h1>
-          <p>
-            <span className="opacity-50">{t("EnterVerificationCode")} </span>
-            <span dir="ltr">{by}</span>
-          </p>
-        </div>
+          <ArrowBackIcon />
+        </IconButton>
+        <Stack spacing={2}>
+          <Stack spacing={1}>
+            <Typography variant="h5" textAlign="left">
+              {t("Title")}
+            </Typography>
+            <Typography component="p">
+              <Typography component="span" color="text.secondary" sx={{ opacity: 0.7 }}>
+                {t("EnterVerificationCode")}{" "}
+              </Typography>
+              <Typography component="span" dir="ltr">
+                {by}
+              </Typography>
+            </Typography>
+          </Stack>
         <Controller
           name="validatePhoneOtp"
           control={control}
           render={({ field }) => (
-            <div className="flex flex-col px-4">
+            <Box display="flex" flexDirection="column" px={2}>
               <div dir="ltr">
                 <InputOTP
                   maxLength={5}
@@ -157,15 +158,17 @@ const ValidatePhonePhase = ({
                 </InputOTP>
               </div>
               <InputError error={errors?.validatePhoneOtp?.message} />
-            </div>
+            </Box>
           )}
         />
         <Button
-          loading={isPending}
+          disabled={isPending}
+          endIcon={isPending ? <CircularProgress size={18} /> : undefined}
           onClick={handleSubmit(onSubmit)}
           type="submit"
           form="login-form"
-          className="w-full"
+          fullWidth
+          variant="contained"
         >
           {loginT("Login")}
         </Button>
@@ -202,7 +205,8 @@ const ValidatePhonePhase = ({
           handleClose={handleClose}
           desc={errorMessage}
         />
-      </div>
+        </Stack>
+      </Box>
     </>
   );
 };

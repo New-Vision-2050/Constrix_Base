@@ -1,10 +1,16 @@
-import React from "react";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { SecurityQuestionsType } from "../../validator/login-schema";
 import { useFormContext } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import {
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const SecurityQuestionsPhase = ({
   handleSetStep,
@@ -25,50 +31,45 @@ const SecurityQuestionsPhase = ({
   };
 
   return (
-    <div className="relative flex flex-col gap-3">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-0 left-0"
+    <Box position="relative">
+      <IconButton
+        sx={{ position: "absolute", top: 0, left: 0 }}
         onClick={() => handleStepBack()}
         type="button"
+        aria-label="go-back"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        <ArrowBackIcon />
+      </IconButton>
+      <Stack spacing={2}>
+        <Typography variant="h5" textAlign="center">
+          {t("SecurityQuestions.Title")}
+        </Typography>
+        <TextField
+          {...register("animal")}
+          label={t("SecurityQuestions.PetQuestion")}
+          error={!!errors?.animal?.message}
+          helperText={errors?.animal?.message}
+          fullWidth
+        />
+        <TextField
+          {...register("team")}
+          label={t("SecurityQuestions.TeamQuestion")}
+          error={!!errors?.team?.message}
+          helperText={errors?.team?.message}
+          fullWidth
+        />
+        <Button
+          size="large"
+          fullWidth
+          variant="contained"
+          type="submit"
+          form="login-form"
+          onClick={handleSubmit(onSubmit)}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </Button>
-      <h1 className="text-2xl text-center">{t("SecurityQuestions.Title")}</h1>
-      <Input
-        {...register("animal")}
-        label={t("SecurityQuestions.PetQuestion")}
-        error={errors?.animal?.message}
-      />
-      <Input
-        {...register("team")}
-        label={t("SecurityQuestions.TeamQuestion")}
-        error={errors?.team?.message}
-      />
-      <Button
-        size={"lg"}
-        className="w-full"
-        type="submit"
-        form="login-form"
-        onClick={handleSubmit(onSubmit)}
-      >
-        {t("SecurityQuestions.Next")}
-      </Button>
-    </div>
+          {t("SecurityQuestions.Next")}
+        </Button>
+      </Stack>
+    </Box>
   );
 };
 

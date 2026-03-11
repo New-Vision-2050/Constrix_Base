@@ -13,6 +13,7 @@ import ChangeEmailPhase from "./change-email";
 import ValidatePhonePhase from "./validate-phone";
 import { useEffect } from "react";
 import fetchLoginAdmin from "@/modules/companies/api/fetch-login-admin";
+import { Box } from "@mui/material";
 
 
 const LoginProvider = () => {
@@ -48,10 +49,11 @@ const LoginProvider = () => {
 
   return (
     <FormProvider {...form}>
-      <form
+      <Box
+        component="form"
         id="login-form"
-        className="space-y-6 sm:space-y-8"
         onSubmit={handleFormSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: { xs: 3, sm: 4 } }}
       >
         {step === LOGIN_PHASES.IDENTIFIER && (
           <IdentifierPhase handleSetStep={handleSetStep} />
@@ -103,7 +105,7 @@ const LoginProvider = () => {
             handleStepBack={handleStepBack}
           />
         )}
-      </form>
+      </Box>
     </FormProvider>
   );
 };

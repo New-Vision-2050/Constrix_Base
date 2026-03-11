@@ -2,8 +2,15 @@
 
 import { useFormContext } from "react-hook-form";
 import { LoginType } from "../../validator/login-schema";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useForgetPassword, useLoginSteps } from "../../store/mutations";
 import { useAuthStore } from "../../store/use-auth";
@@ -18,6 +25,7 @@ import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
 import LoadingBackdrop from "@/components/shared/loading-backdrop";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const PasswordPhase = ({
   handleSetStep,
@@ -145,44 +153,34 @@ const PasswordPhase = ({
   return (
     <>
       <LoadingBackdrop open={isPending || isSuccess} />
-      <div className="relative flex flex-col gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-0 left-0"
+      <Box position="relative">
+        <IconButton
+          sx={{ position: "absolute", top: 0, left: 0 }}
           onClick={() => handleStepBack()}
           type="button"
+          aria-label="go-back"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </Button>
-        <h1 className="text-xl sm:text-2xl text-center mb-4">
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" textAlign="center" mb={2}>
           {t("Login.EnterPassword")}
-        </h1>
-        <div className="space-y-4 my-2">
-          <Input
+        </Typography>
+        <Stack spacing={2} my={1}>
+          <TextField
             type="password"
             {...register("password")}
             label={t("Login.Password")}
-            error={errors?.password?.message}
+            error={!!errors?.password?.message}
+            helperText={errors?.password?.message}
+            fullWidth
           />
 
           <Button
-            size={"lg"}
-            className="w-full mt-4"
-            loading={isPending}
+            size="large"
+            fullWidth
+            variant="contained"
+            disabled={isPending}
+            endIcon={isPending ? <CircularProgress size={18} /> : undefined}
             onClick={handleSubmit(handleLogin)}
             type="submit"
             form="login-form"
@@ -190,32 +188,37 @@ const PasswordPhase = ({
             {t("Login.Login")}
           </Button>
 
-          <div className="flex justify-center">
+          <Box display="flex" justifyContent="center">
             <Button
-              loading={isPendingForgetPassword}
-              variant={"link"}
+              disabled={isPendingForgetPassword}
+              endIcon={
+                isPendingForgetPassword ? (
+                  <CircularProgress size={16} />
+                ) : undefined
+              }
+              variant="text"
               onClick={handleForgetPhase}
-              className="text-sm sm:text-base"
+              size="small"
             >
               {t("Login.ForgotPassword")}
             </Button>
-          </div>
+          </Box>
 
           {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
-            <div className="mt-2">
+            <Box mt={1}>
               <AnotherCheckingWay
                 loginOptionAlternatives={loginOptionAlternatives}
                 handleSetStep={handleSetStep}
               />
-            </div>
+            </Box>
           )}
-        </div>
+        </Stack>
         <ErrorDialog
           isOpen={isOpen}
           handleClose={handleClose}
           desc={errorMessage}
         />
-      </div>
+      </Box>
     </>
   );
 };
