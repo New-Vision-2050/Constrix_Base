@@ -13,6 +13,8 @@ import EditProjectTypeDialog from "../../../../components/dialogs/edit-project-t
 import { APP_ICONS } from "@/constants/icons";
 import SchemaLevelTabs from "./schema-level-tabs";
 import { Settings } from "@mui/icons-material";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface SecondLevelTabsProps {
   parentId: number;
@@ -111,11 +113,13 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
                         >
                           {IconComponent && <IconComponent size={16} />}
                           {item.name}
-                          <EditProjectTypeDialogTrigger
-                            item={item}
-                            parentId={parentId}
-                            onSuccess={() => refetch()}
-                          />
+                          <Can check={[PERMISSIONS.projectType.update]}>
+                            <EditProjectTypeDialogTrigger
+                              item={item}
+                              parentId={parentId}
+                              onSuccess={() => refetch()}
+                            />
+                          </Can>
                         </Box>
                       }
                     />
@@ -123,18 +127,20 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
                 })}
               </Tabs>
               <Box sx={{ flexShrink: 0 }}>
-                <DialogTrigger
-                  component={AddProjectTypeDialog}
-                  dialogProps={{
-                    parentId,
-                    onSuccess: () => refetch(),
-                  }}
-                  render={({ onOpen }) => (
-                    <IconButton onClick={onOpen} sx={{ mr: 1 }} color="primary">
-                      <AddIcon />
-                    </IconButton>
-                  )}
-                />
+                <Can check={[PERMISSIONS.projectType.create]}>
+                  <DialogTrigger
+                    component={AddProjectTypeDialog}
+                    dialogProps={{
+                      parentId,
+                      onSuccess: () => refetch(),
+                    }}
+                    render={({ onOpen }) => (
+                      <IconButton onClick={onOpen} sx={{ mr: 1 }} color="primary">
+                        <AddIcon />
+                      </IconButton>
+                    )}
+                  />
+                </Can>
               </Box>
             </div>
           </Paper>

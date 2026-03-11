@@ -1,5 +1,6 @@
 import { Attachment } from "@/types/admin-request";
 
+
 export interface Pagination {
   last_page: number;
   result_count: number;
@@ -21,6 +22,7 @@ export type GetServicesResponse = ApiPayload<ClientRequestService[]>;
 export type GetClientsResponse = ApiPayload<Client[]>;
 export type GetTermSettingsResponse = ApiPayload<TermSettingGroup[]>;
 export type GetStatsResponse = ApiPayload<Record<string, number>>;
+export type GetPriceOffersWidgetsResponse = ApiPayload<PriceOfferWidget[]>;
 
 export interface TermSettingChild {
   id: number;
@@ -63,6 +65,16 @@ export interface Client {
   email?: string;
   phone?: string;
 }
+
+export interface PriceOfferWidget {
+  code: string;
+  title: string;
+  total: number;
+  percentage?: number;
+}
+
+export type PriceOfferStatus = "accepted" | "pending" | "rejected" | "draft";
+
 
 export interface ClientRequestRow {
   id: string;

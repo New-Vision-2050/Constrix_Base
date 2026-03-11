@@ -1,8 +1,13 @@
 "use client";
 import { useFormContext } from "react-hook-form";
 import { IdentifierType } from "../../validator/login-schema";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import {
+  Button,
+  CircularProgress,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginWays } from "../../store/mutations";
 import { useEffect, useState } from "react";
@@ -10,6 +15,7 @@ import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
+import LoadingBackdrop from "@/components/shared/loading-backdrop";
 
 const IdentifierPhase = ({
   handleSetStep,
@@ -53,7 +59,7 @@ const IdentifierPhase = ({
           setValue("first_login", data.payload.first_login?.toString());
           setValue(
             "login_option_alternatives",
-            data.payload.login_way.step.login_option_alternatives
+            data.payload.login_way.step.login_option_alternatives,
           );
           setValue("by", data.payload.login_way.by);
           setValue("type", data.payload.login_way.type);
@@ -81,37 +87,42 @@ const IdentifierPhase = ({
         onError(error) {
           const messageKey = getErrorMessage(error);
           setErrorMessage(
-            messageKey || t("Errors.Authentication.UserNotFound")
+            messageKey || t("Errors.Authentication.UserNotFound"),
           );
           handleOpen();
         },
-      }
+      },
     );
   };
 
   return (
     <>
-      <h1 className="text-xl sm:text-2xl text-center mb-4">
+      <LoadingBackdrop open={isPending} />
+      <Typography variant="h5" textAlign="center" mb={2}>
         {t("Login.SignIn")}
-      </h1>
-      <div className="space-y-4">
-        <Input
+      </Typography>
+      <Stack spacing={2}>
+        <TextField
           {...register("identifier")}
           label={t("Login.Identifier")}
-          error={errors?.identifier?.message}
+          error={!!errors?.identifier?.message}
+          helperText={errors?.identifier?.message}
+          fullWidth
         />
 
         <Button
-          size={"lg"}
-          className="w-full mt-4"
-          loading={isPending}
+          size="large"
+          fullWidth
+          variant="contained"
+          disabled={isPending}
+          endIcon={isPending ? <CircularProgress size={18} /> : undefined}
           onClick={handleSubmit(onSubmit)}
           type="submit"
           form="login-form"
         >
           {t("Login.Next")}
         </Button>
-      </div>
+      </Stack>
 
       <ErrorDialog
         isOpen={isOpen}

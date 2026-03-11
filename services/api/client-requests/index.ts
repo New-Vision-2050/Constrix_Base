@@ -12,6 +12,7 @@ import {
   GetClientsResponse,
   GetTermSettingsResponse,
   GetStatsResponse,
+  GetPriceOffersWidgetsResponse,
 } from "./types";
 
 export * from "./types";
@@ -154,4 +155,5 @@ export const ClientRequestsApi = {
     
     return baseApi.get(url);
   },
+  getPriceOffersWidgets: () => baseApi.get<GetPriceOffersWidgetsResponse>("client-requests/price-offer/widgets"),
 };

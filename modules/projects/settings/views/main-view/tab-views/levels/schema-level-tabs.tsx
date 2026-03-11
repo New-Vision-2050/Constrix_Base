@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddSubProjectTypeDialog from "../../../../components/dialogs/add-sub-project-type";
 import EditSubProjectTypeDialog from "../../../../components/dialogs/edit-sub-project-type";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import {
   TAB_SCHEMA_ID_MAP,
   useProjectSettingsTabs,
@@ -282,23 +284,27 @@ export default function SchemaLevelTabs({
                       <Typography variant="subtitle1" fontWeight={500}>
                         {item.name}
                       </Typography>
-                      <EditSubProjectTypeDialogTrigger
-                        item={item}
-                        parentId={parentId}
-                        onSuccess={() => {}}
-                      />
+                      <Can check={[PERMISSIONS.projectType.update]}>
+                        <EditSubProjectTypeDialogTrigger
+                          item={item}
+                          parentId={parentId}
+                          onSuccess={() => {}}
+                        />
+                      </Can>
                     </Box>
                   </MenuItem>
                 ))}
-                <MenuItem
-                  onClick={() => setAddDialogOpen(true)}
-                  sx={{ px: 2, py: 1, borderRadius: 1, color: "primary.main" }}
-                >
-                  <AddIcon fontSize="small" sx={{ mr: 1 }} />
-                  <Typography variant="subtitle1" fontWeight={500}>
-                    {t("add")}
-                  </Typography>
-                </MenuItem>
+                <Can check={[PERMISSIONS.projectType.create]}>
+                  <MenuItem
+                    onClick={() => setAddDialogOpen(true)}
+                    sx={{ px: 2, py: 1, borderRadius: 1, color: "primary.main" }}
+                  >
+                    <AddIcon fontSize="small" sx={{ mr: 1 }} />
+                    <Typography variant="subtitle1" fontWeight={500}>
+                      {t("add")}
+                    </Typography>
+                  </MenuItem>
+                </Can>
               </MenuList>
             </Paper>
           )}

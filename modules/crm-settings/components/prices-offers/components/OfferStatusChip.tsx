@@ -1,13 +1,13 @@
 import { useTranslations } from "next-intl";
 import { Chip } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import type { ClientRequestStatus } from "@/services/api/client-requests/types/response";
+import { PriceOfferStatus } from "@/services/api/client-requests/types/response";
 
 export default function OfferStatusChip({
   status,
   onPendingClick,
 }: {
-  status: ClientRequestStatus;
+  status: PriceOfferStatus;
   onPendingClick?: () => void;
 }) {
   const t = useTranslations("pricesOffers.table");

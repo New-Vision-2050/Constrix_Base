@@ -18,12 +18,16 @@ export interface ServiceItemActionsProps {
   item: TermServiceSettingItem;
   onEdit: (item: TermServiceSettingItem) => void;
   onDelete: (id: number) => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
 export function ServiceItemActions({
   item,
   onEdit,
   onDelete,
+  canEdit = true,
+  canDelete = true,
 }: ServiceItemActionsProps) {
   const t = useTranslations("CRMSettingsModule.servicesSettings");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -68,13 +72,14 @@ export function ServiceItemActions({
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <MenuItem onClick={handleEdit}>
+        <MenuItem disabled={!canEdit} onClick={handleEdit}>
           <ListItemIcon>
             <BorderColorIcon fontSize="small" color="primary" />
           </ListItemIcon>
           <ListItemText>{t("editService")}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleDelete}>
+
+        <MenuItem disabled={!canDelete} onClick={handleDelete}>
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { FieldConfig, ValidationRule } from '../../types/formTypes';
-import { cn } from '@/lib/utils';
-import { Input } from '@/modules/table/components/ui/input';
-import { Button } from '@/modules/table/components/ui/button';
+import React, { useState, useEffect, useMemo } from "react";
+import { FieldConfig, ValidationRule } from "../../types/formTypes";
+import { cn } from "@/lib/utils";
+import { Input } from "@/modules/table/components/ui/input";
+import { Button } from "@/modules/table/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -13,27 +13,27 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 // Country codes for phone numbers with flags
-const countryCodes = [
-  { value: '+20', label: 'Egypt (+20)', flag: '🇪🇬', code: '+20' },
-  { value: '+966', label: 'Saudi Arabia (+966)', flag: '🇸🇦', code: '+966' },
-  { value: '+971', label: 'UAE (+971)', flag: '🇦🇪', code: '+971' },
-  { value: '+65', label: 'Singapore (+65)', flag: '🇸🇬', code: '+65' },
-  { value: '+82', label: 'South Korea (+82)', flag: '🇰🇷', code: '+82' },
-  { value: '+34', label: 'Spain (+34)', flag: '🇪🇸', code: '+34' },
-  { value: '+52', label: 'Mexico (+52)', flag: '🇲🇽', code: '+52' },
-  { value: '+31', label: 'Netherlands (+31)', flag: '🇳🇱', code: '+31' },
-  { value: '+90', label: 'Turkey (+90)', flag: '🇹🇷', code: '+90' },
-  { value: '+1', label: 'United States (+1)', flag: '🇺🇸', code: '+1' },
-  { value: '+44', label: 'United Kingdom (+44)', flag: '🇬🇧', code: '+44' },
-  { value: '+91', label: 'India (+91)', flag: '🇮🇳', code: '+91' },
-  { value: '+86', label: 'China (+86)', flag: '🇨🇳', code: '+86' },
-  { value: '+49', label: 'Germany (+49)', flag: '🇩🇪', code: '+49' },
-  { value: '+33', label: 'France (+33)', flag: '🇫🇷', code: '+33' },
-  { value: '+81', label: 'Japan (+81)', flag: '🇯🇵', code: '+81' },
-  { value: '+39', label: 'Italy (+39)', flag: '🇮🇹', code: '+39' },
-  { value: '+7', label: 'Russia (+7)', flag: '🇷🇺', code: '+7' },
-  { value: '+55', label: 'Brazil (+55)', flag: '🇧🇷', code: '+55' },
-  { value: '+61', label: 'Australia (+61)', flag: '🇦🇺', code: '+61' },
+const countryCodesData = [
+  { value: "+20", label: "Egypt (+20)", flag: "🇪🇬", code: "+20" },
+  { value: "+966", label: "Saudi Arabia (+966)", flag: "🇸🇦", code: "+966" },
+  { value: "+971", label: "UAE (+971)", flag: "🇦🇪", code: "+971" },
+  { value: "+65", label: "Singapore (+65)", flag: "🇸🇬", code: "+65" },
+  { value: "+82", label: "South Korea (+82)", flag: "🇰🇷", code: "+82" },
+  { value: "+34", label: "Spain (+34)", flag: "🇪🇸", code: "+34" },
+  { value: "+52", label: "Mexico (+52)", flag: "🇲🇽", code: "+52" },
+  { value: "+31", label: "Netherlands (+31)", flag: "🇳🇱", code: "+31" },
+  { value: "+90", label: "Turkey (+90)", flag: "🇹🇷", code: "+90" },
+  { value: "+1", label: "United States (+1)", flag: "🇺🇸", code: "+1" },
+  { value: "+44", label: "United Kingdom (+44)", flag: "🇬🇧", code: "+44" },
+  { value: "+91", label: "India (+91)", flag: "🇮🇳", code: "+91" },
+  { value: "+86", label: "China (+86)", flag: "🇨🇳", code: "+86" },
+  { value: "+49", label: "Germany (+49)", flag: "🇩🇪", code: "+49" },
+  { value: "+33", label: "France (+33)", flag: "🇫🇷", code: "+33" },
+  { value: "+81", label: "Japan (+81)", flag: "🇯🇵", code: "+81" },
+  { value: "+39", label: "Italy (+39)", flag: "🇮🇹", code: "+39" },
+  { value: "+7", label: "Russia (+7)", flag: "🇷🇺", code: "+7" },
+  { value: "+55", label: "Brazil (+55)", flag: "🇧🇷", code: "+55" },
+  { value: "+61", label: "Australia (+61)", flag: "🇦🇺", code: "+61" },
 ];
 
 interface PhoneFieldProps {
@@ -53,11 +53,23 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   onChange,
   onBlur,
 }) => {
-  // translate messages
-  const t = useTranslations("common");
+  const t = useTranslations("FormBuilder.Fields.Phone");
+
+  // Country codes with translated labels
+  const countryCodes = useMemo(
+    () =>
+      countryCodesData.map((country) => ({
+        ...country,
+        label:
+          t(`Countries.${country.value.replace("+", "")}`) +
+          ` (${country.code})`,
+      })),
+    [t]
+  );
+
   // Parse the value into country code and phone number
-  const [countryCode, setCountryCode] = useState('+966');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState("+966");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [open, setOpen] = useState(false);
   const [localError, setLocalError] = useState<string | undefined>(undefined);
 
@@ -71,41 +83,47 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
 
   // Find the selected country code object
   const selectedCountry = useMemo(() => {
-    return countryCodes.find(country => country.value === countryCode) || countryCodes[0];
+    return (
+      countryCodes.find((country) => country.value === countryCode) ||
+      countryCodes[0]
+    );
   }, [countryCode]);
 
   // Parse value whenever it changes (for initial values and edit mode)
   useEffect(() => {
     if (value) {
       // Handle different phone number formats
-      let code = '+966'; // Default country code
-      let number = '';
+      let code = "+966"; // Default country code
+      let number = "";
 
       // Clean the value by removing any extra spaces
       const cleanValue = value.trim();
 
       // Case 1: Value starts with + (e.g., +966542138116 or +966 542138116)
-      if (cleanValue.startsWith('+')) {
+      if (cleanValue.startsWith("+")) {
         // Try to extract country code and phone number
         const match = cleanValue.match(/^(\+\d+)[\s-]?(.*)$/);
         if (match) {
           const [, extractedCode, extractedNumber] = match;
 
           // Find if this is a valid country code in our list
-          const foundCountry = countryCodes.find(country =>
-            extractedCode === country.value ||
-            country.value.startsWith(extractedCode)
+          const foundCountry = countryCodes.find(
+            (country) =>
+              extractedCode === country.value ||
+              country.value.startsWith(extractedCode)
           );
 
           if (foundCountry) {
             code = foundCountry.value;
-            number = extractedNumber || '';
+            number = extractedNumber || "";
           } else {
             // If no matching country code found, try to extract based on common lengths
             // Most country codes are 1-4 digits
             for (let i = 1; i <= 4; i++) {
               const potentialCode = extractedCode.substring(0, i + 1); // +1, +2, +3, +4 digits
-              const foundCountry = countryCodes.find(country => country.value === potentialCode);
+              const foundCountry = countryCodes.find(
+                (country) => country.value === potentialCode
+              );
               if (foundCountry) {
                 code = foundCountry.value;
                 number = cleanValue.substring(i + 1); // +1 for the + character
@@ -114,13 +132,13 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
             }
 
             // If still no match, use the default and put everything in the number
-            if (code === '+966' && !number) {
+            if (code === "+966" && !number) {
               number = cleanValue.substring(1); // Remove the + and use as number
             }
           }
         } else {
           // Just a + with no digits after it
-          number = '';
+          number = "";
         }
       }
       // Case 2: Value doesn't start with + (e.g., 966542138116)
@@ -129,8 +147,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
         let matched = false;
 
         // Sort country codes by length (descending) to match longer codes first
-        const sortedCodes = [...countryCodes].sort((a, b) =>
-          b.value.length - a.value.length
+        const sortedCodes = [...countryCodes].sort(
+          (a, b) => b.value.length - a.value.length
         );
 
         for (const country of sortedCodes) {
@@ -150,8 +168,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
       }
 
       // Special case for numbers like 966542138116 (Saudi Arabia)
-      if (cleanValue.startsWith('966') && cleanValue.length > 9) {
-        code = '+966';
+      if (cleanValue.startsWith("966") && cleanValue.length > 9) {
+        code = "+966";
         number = cleanValue.substring(3);
 
         // Don't trigger onChange to avoid infinite loop
@@ -172,7 +190,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
 
     // Validate the combined value
     if (phoneNumber && !validatePhone(combinedValue)) {
-      setLocalError("Please enter a valid phone number");
+      setLocalError(t("InvalidPhoneNumber"));
     } else {
       setLocalError(undefined);
     }
@@ -185,14 +203,14 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
     const newPhoneNumber = e.target.value;
 
     // Allow only digits, spaces, and hyphens in the phone number field
-    const sanitizedPhoneNumber = newPhoneNumber.replace(/[^\d\s-]/g, '');
+    const sanitizedPhoneNumber = newPhoneNumber.replace(/[^\d\s-]/g, "");
 
     setPhoneNumber(sanitizedPhoneNumber);
     const combinedValue = `${countryCode} ${sanitizedPhoneNumber}`.trim();
 
     // Validate the combined value
     if (sanitizedPhoneNumber && !validatePhone(combinedValue)) {
-      setLocalError("Please enter a valid phone number");
+      setLocalError(t("InvalidPhoneNumber"));
     } else {
       setLocalError(undefined);
     }
@@ -210,11 +228,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
             value={phoneNumber}
             onChange={handlePhoneNumberChange}
             onBlur={onBlur}
-            placeholder={field.placeholder || "Enter phone number"}
-            className={cn(
-              "w-full",
-              !!error && touched ? "border-red-500" : ""
-            )}
+            placeholder={field.placeholder || t("EnterPhoneNumber")}
+            className={cn("w-full", !!error && touched ? "border-red-500" : "")}
             disabled={field.disabled}
             required={field.required}
           />
@@ -239,9 +254,9 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0">
               <Command>
-                <CommandInput placeholder="Search country..." />
+                <CommandInput placeholder={t("SearchCountry")} />
                 <CommandList>
-                  <CommandEmpty>{t("noCountryCode")}</CommandEmpty>
+                  <CommandEmpty>{t("NoCountryFound")}</CommandEmpty>
                   <CommandGroup>
                     {countryCodes.map((country) => (
                       <CommandItem
@@ -252,10 +267,12 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            countryCode === country.value ? "opacity-100" : "opacity-0"
+                            countryCode === country.value
+                              ? "opacity-100"
+                              : "opacity-0"
                           )}
                         />
-                        <span className="mr-2">{country.flag}</span>
+                        {/* <span className="mr-2">{country.flag}</span> */}
                         <span>{country.label}</span>
                       </CommandItem>
                     ))}
@@ -270,7 +287,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
       {/* Show either the form validation error or our local validation error */}
       {((error && touched) || localError) && (
         <div className="text-red-500 text-sm mt-1">
-          {typeof error === 'string' ? error || localError : error}
+          {typeof error === "string" ? error || localError : error}
         </div>
       )}
 

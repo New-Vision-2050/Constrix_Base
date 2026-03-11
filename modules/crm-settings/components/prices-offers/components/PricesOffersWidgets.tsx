@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import StatisticsCardHeader from "../../../organizational-structure/components/StatisticsCard/StatisticsCardHeader";
+import StatisticsCardHeader from "../../../../organizational-structure/components/StatisticsCard/StatisticsCardHeader";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import TopicIcon from "@mui/icons-material/Topic";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
@@ -21,7 +21,7 @@ export default function PricesOffersWidgets() {
   const { data: widgetsData } = useQuery({
     queryKey: ["client-requests", "price-offer", "widgets"],
     queryFn: async () => {
-      const response = await ClientRequestsApi.widgets();
+      const response = await ClientRequestsApi.getPriceOffersWidgets();
       return response.data;
     },
   });
