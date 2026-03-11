@@ -24,7 +24,6 @@ import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
-import LoadingBackdrop from "@/components/shared/loading-backdrop";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const PasswordPhase = ({
@@ -41,7 +40,7 @@ const PasswordPhase = ({
 
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
     useForgetPassword();
-  const { mutate, isPending, isSuccess } = useLoginSteps();
+  const { mutate, isPending , isSuccess} = useLoginSteps();
   const {
     register,
     formState: { errors },
@@ -152,7 +151,6 @@ const PasswordPhase = ({
 
   return (
     <>
-      <LoadingBackdrop open={isPending || isSuccess} />
       <Box position="relative">
         <IconButton
           sx={{ position: "absolute", top: 0, left: 0 }}
@@ -179,13 +177,15 @@ const PasswordPhase = ({
             size="large"
             fullWidth
             variant="contained"
-            disabled={isPending}
-            endIcon={isPending ? <CircularProgress size={18} /> : undefined}
+            disabled={isPending || isSuccess}
+            endIcon={isPending || isSuccess ? <CircularProgress size={18} /> : undefined}
             onClick={handleSubmit(handleLogin)}
             type="submit"
             form="login-form"
           >
-            {t("Login.Login")}
+            {isPending && t("Login.Loading")}
+            {isSuccess && t("Login.LoginSuccess")}
+            {!isPending && !isSuccess && t("Login.Login")}
           </Button>
 
           <Box display="flex" justifyContent="center">
