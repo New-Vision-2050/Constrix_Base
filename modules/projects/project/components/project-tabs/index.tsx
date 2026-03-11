@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
-import { GetProjectTabsList } from "./constants/ProjectTabsList";
+import { useProjectTabsList } from "./constants/ProjectTabsList";
 
 export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
+  const tabsList = useProjectTabsList();
 
   return (
     <HorizontalTabs
@@ -13,9 +14,8 @@ export default function ProjectTabs() {
       onTabClick={(tab) => {
         setActiveTab(tab.id);
       }}
-      list={GetProjectTabsList()}
+      list={tabsList}
       value={activeTab}
     />
   );
 }
-
