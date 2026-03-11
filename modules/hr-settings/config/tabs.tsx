@@ -1,10 +1,28 @@
 import React from "react";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
-import { CircleUser, Inbox } from "lucide-react";
+import { CircleUser, Inbox, Building } from "lucide-react";
 import BackpackIcon from "@/public/icons/backpack";
 import HRSettingsAttendanceDeparture from "@/modules/hr-settings-attendance-departure";
 import { useTranslations } from "next-intl";
 import HRSettingsVacations from "@/modules/hr-settings-vacations";
+import HorizontalTabs from "@/components/shared/HorizontalTabs";
+import InsuranceCompanyComponent from "@/modules/hr-settings/components/InsuranceCompany";
+
+// ServiceTabs component for sub-tabs inside service
+const ServiceTabs: React.FC = () => {
+  const t = useTranslations("hr-settings.tabs");
+  
+  const serviceTabs = [
+    {
+      id: "insurance-company",
+      title: t("insuranceCompany"),
+      icon: <Building />,
+      content: <InsuranceCompanyComponent />,
+    },
+  ];
+
+  return <HorizontalTabs list={serviceTabs} />;
+};
 
 // Tabs config for HR settings - this will be used in HRSettingsTabs component
 const createHRSettingsTabs = (): SystemTab[] => {
@@ -33,7 +51,7 @@ const createHRSettingsTabs = (): SystemTab[] => {
       id: "branches",
       title: t("service"),
       icon: <BackpackIcon />,
-      content: <>{t("service")}</>,
+      content: <ServiceTabs />,
     },
     {
       id: "job-titles",
