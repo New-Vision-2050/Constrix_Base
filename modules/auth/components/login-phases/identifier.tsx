@@ -15,7 +15,6 @@ import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
-import LoadingBackdrop from "@/components/shared/loading-backdrop";
 
 const IdentifierPhase = ({
   handleSetStep,
@@ -97,7 +96,6 @@ const IdentifierPhase = ({
 
   return (
     <>
-      <LoadingBackdrop open={isPending} />
       <Typography variant="h5" textAlign="center" mb={2}>
         {t("Login.SignIn")}
       </Typography>
@@ -120,7 +118,7 @@ const IdentifierPhase = ({
           type="submit"
           form="login-form"
         >
-          {t("Login.Next")}
+          {isPending ? t("Login.Loading") : t("Login.Next")}
         </Button>
       </Stack>
 
