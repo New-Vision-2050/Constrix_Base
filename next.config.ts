@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
   // Add cache busting for static assets
   generateBuildId: async () => {
     // Use environment variable if available, otherwise use timestamp
