@@ -63,6 +63,7 @@ export const UsersConfigV2 = (options?: {
   const t = useTranslations("Companies");
   const tSubTable = useTranslations("Companies.SubEntitiesTable");
   const tEditSubEntity = useTranslations("EditSubEntityMessages");
+  const tUsers = useTranslations("Users");
   // define final form config for EDIT mode
   // Note: This config is used when clicking "Edit" button in the table
   const finalFormConfig = useMemo(() => {
@@ -91,7 +92,7 @@ export const UsersConfigV2 = (options?: {
       return editIndividualEmployeeFormConfig(tEditSubEntity);
     }
     // default fallback (company user form)
-    return GetCompanyUserFormConfig(t);
+    return GetCompanyUserFormConfig(t, undefined, tUsers);
   }, [
     options?.registrationFormSlug,
     t,

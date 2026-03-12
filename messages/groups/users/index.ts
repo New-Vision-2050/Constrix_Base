@@ -1,0 +1,46 @@
+import { _m, MessagesGroup } from "../../types";
+
+export const usersMessages = new MessagesGroup({
+  createUser: _m("Create User", "إنشاء مستخدم"),
+  individual: _m("Individual", "فرد"),
+  entity: _m("Entity", "جهة"),
+  chooseCompany: new MessagesGroup({
+    title: _m("Please choose a company", "برجاء أختيار الشركة"),
+    cancel: _m("Cancel", "الغاء"),
+  }),
+  deleteRow: new MessagesGroup({
+    deleteFailed: _m("Delete failed", "فشل الحذف"),
+  }),
+  table: new MessagesGroup({
+    name: _m("Name", "الاسم"),
+    phone: _m("Phone Number", "رقم الجوال"),
+    company: _m("Company", "الشركة"),
+    userType: _m("User Type", "نوع المستخدم"),
+    completeProfile: _m("Complete Profile", "اكمال الملف الشخصي"),
+    emailOrPhone: _m("Email / Phone", "البريد الإليكتروني / الجوال"),
+  }),
+  form: new MessagesGroup({
+    title: _m("Create User", "إنشاء مستخدم"),
+    company: _m("Company", "الشركة"),
+    companyPlaceholder: _m("Select Company", "اختر الشركة"),
+    companyRequired: _m("Select Company", "اختر الشركة"),
+    firstName: _m("First Name", "اسم المستخدم الاول"),
+    firstNamePlaceholder: _m("Enter first name", "ادخل اسم المستخدم الاول"),
+    firstNameRequired: _m("First name is required", "اسم المستخدم الاول مطلوب"),
+    nameMinLength: _m("Name must contain at least two characters.", "الاسم يجب أن يحتوي على حرفين على الأقل."),
+    lastName: _m("Last Name", "اسم المستخدم الأخير"),
+    lastNamePlaceholder: _m("Enter last name", "اسم المستخدم الأخير"),
+    lastNameRequired: _m("Last name is required", "الاسم مطلوب"),
+    email: _m("Email", "البريد الإلكتروني"),
+    emailPlaceholder: _m("Enter email", "ادخل البريد الإلكتروني"),
+    emailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
+    emailInvalid: _m("Please enter a valid email address.", "يرجى إدخال عنوان بريد إلكتروني صالح."),
+    phone: _m("Phone", "الهاتف"),
+    phonePlaceholder: _m("Please enter your phone number.", "يرجى إدخال رقم هاتفك."),
+    jobTitle: _m("Job Title", "المسمى الوظيفي"),
+    jobTitlePlaceholder: _m("Select Job Title", "اختر المسمى الوظيفي"),
+    jobTitleRequired: _m("Job title is required.", "المسمى الوظيفي مطلوب."),
+    save: _m("Save", "حفظ"),
+    cancel: _m("Cancel", "إلغاء"),
+  }),
+});
