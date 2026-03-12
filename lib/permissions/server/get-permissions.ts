@@ -1,44 +1,33 @@
 import { cache } from "react";
 import { Permission } from "../types/permission";
-import { apiClient } from "@/config/axios-config";
-import { getCurrentHost } from "@/utils/get-current-host";
-import { cookies } from "next/headers";
+import { usersApi } from "@/services/api/users";
+import { UserMePayload } from "@/services/api/users/types/response";
 
 type PermissionsResponse = {
+  user: UserMePayload;
   permissions: Permission[];
   isSuperAdmin: boolean;
   isCentralCompany: boolean;
 };
 const empty: PermissionsResponse = {
+  user: null as unknown as UserMePayload,
   permissions: [],
   isSuperAdmin: false,
   isCentralCompany: false,
 };
+
 export const getPermissions = cache(async (): Promise<PermissionsResponse> => {
   try {
-    const currentHost = await getCurrentHost();
-    const cookieStore = await cookies();
-    const nvToken = cookieStore.get("new-vision-token")?.value;
+    const { data } = await usersApi.getMe();
+    const payload = data?.payload ?? null;
+    if (!payload) return empty;
 
-    if (!nvToken) {
-      return empty;
-    }
+    const permissions = (payload.permissions ?? []) as unknown as Permission[];
+    const isSuperAdmin = Boolean(payload.is_super_admin);
+    const isCentralCompany = Boolean(payload.is_central_company);
 
-    const permissionsRes = await apiClient.get("users/me", {
-      headers: {
-        Authorization: `Bearer ${nvToken}`,
-        "X-Domain": currentHost,
-      },
-    });
-
-    const permissions = permissionsRes.data.payload
-      ?.permissions as Permission[];
-    const isSuperAdmin = Boolean(permissionsRes.data.payload?.is_super_admin);
-    const isCentralCompany = Boolean(
-      permissionsRes.data.payload?.is_central_company
-    );
-
-    return { permissions, isSuperAdmin, isCentralCompany };
+    console.log('from permissions', payload);
+    return { permissions, isSuperAdmin, isCentralCompany , user: payload };
   } catch {
     return empty;
   }
