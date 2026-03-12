@@ -1,312 +1,325 @@
 "use client";
 
 import { useMemo } from "react";
-import { Box, Button, Chip, MenuItem } from "@mui/material";
-import { ChevronDown, EditIcon, MapPin } from "lucide-react";
+import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Download, File } from "lucide-react";
 import HeadlessTableLayout from "@/components/headless/table";
-import CustomMenu from "@/components/headless/custom-menu";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { AttachmentSetting } from "@/services/api/all-projects/types/response";
 
 // ============================================================================
 // Types
 // ============================================================================
 
-interface WorkOrderAttachment {
+interface AttachmentRow {
   id: string;
-  orderNumber: string;
-  orderType: string;
-  assignDate: string;
-  contractor: string;
-  district: string;
-  duration: string;
-  location: string;
-  status: string;
-  consultancyOrder: string;
-  section: string;
-  estimatedCost: number;
-  lastAction: string;
-  lastActionDate: string;
+  name: string;
+  type: string;
+  size: string;
+  creator: string;
+  createdAt: string;
+  lastUpdated: string;
 }
 
 // ============================================================================
 // Mock Data
 // ============================================================================
 
-const MOCK_DATA: WorkOrderAttachment[] = [
+const MOCK_CONTRACT_ATTACHMENTS: AttachmentRow[] = [
   {
     id: "1",
-    orderNumber: "12345678",
-    orderType: "802",
-    assignDate: "18/03/2024",
-    contractor: "شركة الغرابلي",
-    district: "السلامة",
-    duration: "5 ايام",
-    location: "الموقع",
-    status: "جاري",
-    consultancyOrder: "913",
-    section: "قسم مكة",
-    estimatedCost: 2791,
-    lastAction: "195",
-    lastActionDate: "18/03/2024",
+    name: "انشاءات_محلية",
+    type: "PDF",
+    size: "17.3MB",
+    creator: "مصطفى رضوان",
+    createdAt: "05/08/2024",
+    lastUpdated: "05/08/2024 08:30م",
   },
   {
     id: "2",
-    orderNumber: "12345678",
-    orderType: "802",
-    assignDate: "18/03/2024",
-    contractor: "شركة الغرابلي",
-    district: "السلامة",
-    duration: "5 ايام",
-    location: "الموقع",
-    status: "جاري",
-    consultancyOrder: "913",
-    section: "قسم مكة",
-    estimatedCost: 2791,
-    lastAction: "195",
-    lastActionDate: "18/03/2024",
-  },
-  {
-    id: "3",
-    orderNumber: "12345678",
-    orderType: "802",
-    assignDate: "18/03/2024",
-    contractor: "شركة الغرابلي",
-    district: "السلامة",
-    duration: "5 ايام",
-    location: "الموقع",
-    status: "جاري",
-    consultancyOrder: "913",
-    section: "قسم مكة",
-    estimatedCost: 2791,
-    lastAction: "195",
-    lastActionDate: "18/03/2024",
-  },
-  {
-    id: "4",
-    orderNumber: "12345678",
-    orderType: "802",
-    assignDate: "18/03/2024",
-    contractor: "شركة الغرابلي",
-    district: "السلامة",
-    duration: "5 ايام",
-    location: "الموقع",
-    status: "جاري",
-    consultancyOrder: "913",
-    section: "قسم مكة",
-    estimatedCost: 2791,
-    lastAction: "195",
-    lastActionDate: "18/03/2024",
-  },
-  {
-    id: "5",
-    orderNumber: "12345678",
-    orderType: "802",
-    assignDate: "18/03/2024",
-    contractor: "شركة الغرابلي",
-    district: "السلامة",
-    duration: "5 ايام",
-    location: "الموقع",
-    status: "جاري",
-    consultancyOrder: "913",
-    section: "قسم مكة",
-    estimatedCost: 2791,
-    lastAction: "195",
-    lastActionDate: "18/03/2024",
+    name: "انشاءات_محلية",
+    type: "PDF",
+    size: "17.3MB",
+    creator: "مصطفى رضوان",
+    createdAt: "05/08/2024",
+    lastUpdated: "05/08/2024 08:30م",
   },
 ];
 
-// ============================================================================
-// Table Instance
-// ============================================================================
-
-const AttachmentsTableLayout =
-  HeadlessTableLayout<WorkOrderAttachment>("attachments");
-
-// ============================================================================
-// Column Definitions
-// ============================================================================
-
-const getColumns = () => [
+const MOCK_TERMS_ATTACHMENTS: AttachmentRow[] = [
   {
-    key: "orderNumber",
-    name: "رقم امر العمل",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.orderNumber}</span>,
+    id: "1",
+    name: "انشاءات_محلية",
+    type: "PDF",
+    size: "17.3MB",
+    creator: "مصطفى رضوان",
+    createdAt: "05/08/2024",
+    lastUpdated: "05/08/2024 08:30م",
   },
   {
-    key: "orderType",
-    name: "نوع امر العمل",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.orderType}</span>,
-  },
-  {
-    key: "assignDate",
-    name: "تاريخ الاسناد",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.assignDate}</span>,
-  },
-  {
-    key: "contractor",
-    name: "اسم المقاول",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.contractor}</span>,
-  },
-  {
-    key: "district",
-    name: "الحي",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.district}</span>,
-  },
-  {
-    key: "duration",
-    name: "مدة التنفيذ",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.duration}</span>,
-  },
-  {
-    key: "location",
-    name: "الموقع",
-    sortable: false,
-    render: () => <MapPin className="w-5 h-5" style={{ color: "#f59e0b" }} />,
-  },
-  {
-    key: "status",
-    name: "حالة امر العمل",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => (
-      <Chip
-        label={row.status}
-        size="small"
-        sx={{
-          backgroundColor: "#16a34a",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: "0.75rem",
-        }}
-      />
-    ),
-  },
-  {
-    key: "consultancyOrder",
-    name: "امر عمل استشاري",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.consultancyOrder}</span>,
-  },
-  {
-    key: "section",
-    name: "القسم",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.section}</span>,
-  },
-  {
-    key: "estimatedCost",
-    name: "التكلفة التقديرية",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => (
-      <span className="flex items-center gap-1">
-        <ChevronDown className="w-4 h-4 text-green-500" />
-        {row.estimatedCost.toLocaleString()}
-      </span>
-    ),
-  },
-  {
-    key: "lastAction",
-    name: "اخر اجراء",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.lastAction}</span>,
-  },
-  {
-    key: "lastActionDate",
-    name: "تاريخ اخر اجراء",
-    sortable: false,
-    render: (row: WorkOrderAttachment) => <span>{row.lastActionDate}</span>,
+    id: "2",
+    name: "انشاءات_محلية",
+    type: "PDF",
+    size: "17.3MB",
+    creator: "مصطفى رضوان",
+    createdAt: "05/08/2024",
+    lastUpdated: "05/08/2024 08:30م",
   },
 ];
 
+const DEFAULT_SETTING: AttachmentSetting = {
+  id: 0,
+  project_type_id: 0,
+  is_name: 1,
+  is_type: 1,
+  is_size: 1,
+  is_creator: 1,
+  is_create_date: 1,
+  is_downloadable: 1,
+  created_at: "",
+  updated_at: "",
+};
+
 // ============================================================================
-// Component
+// Table Instances (unique keys per section)
 // ============================================================================
 
-export default function AttachmentsTab() {
-  const params = AttachmentsTableLayout.useTableParams({
+const ContractTableLayout = HeadlessTableLayout<AttachmentRow>(
+  "contract-attachments",
+);
+const TermsTableLayout =
+  HeadlessTableLayout<AttachmentRow>("terms-attachments");
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function allZero(s: AttachmentSetting): boolean {
+  return (
+    s.is_name === 0 &&
+    s.is_type === 0 &&
+    s.is_size === 0 &&
+    s.is_creator === 0 &&
+    s.is_create_date === 0 &&
+    s.is_downloadable === 0
+  );
+}
+
+function buildColumns(setting: AttachmentSetting) {
+  const cols: {
+    key: string;
+    name: string;
+    sortable: boolean;
+    render: (row: AttachmentRow) => React.ReactNode;
+  }[] = [];
+
+  if (setting.is_name === 1) {
+    cols.push({
+      key: "name",
+      name: "اسم الملف",
+      sortable: false,
+      render: (row) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <File className="w-4 h-4" style={{ flexShrink: 0 }} />
+          <span>{row.name}</span>
+        </Box>
+      ),
+    });
+  }
+
+  if (setting.is_type === 1) {
+    cols.push({
+      key: "type",
+      name: "النوع",
+      sortable: false,
+      render: (row) => <span>{row.type}</span>,
+    });
+  }
+
+  if (setting.is_size === 1) {
+    cols.push({
+      key: "size",
+      name: "الحجم",
+      sortable: false,
+      render: (row) => <span>{row.size}</span>,
+    });
+  }
+
+  if (setting.is_creator === 1) {
+    cols.push({
+      key: "creator",
+      name: "المنشئ",
+      sortable: false,
+      render: (row) => <span>{row.creator}</span>,
+    });
+  }
+
+  if (setting.is_create_date === 1) {
+    cols.push({
+      key: "createdAt",
+      name: "تاريخ الانشاء",
+      sortable: false,
+      render: (row) => <span>{row.createdAt}</span>,
+    });
+  }
+
+  if (setting.is_downloadable === 1) {
+    cols.push({
+      key: "download",
+      name: "التحميل",
+      sortable: false,
+      render: () => (
+        <IconButton size="small">
+          <Download className="w-4 h-4" />
+        </IconButton>
+      ),
+    });
+  }
+
+  return cols;
+}
+
+// ============================================================================
+// Attachment Section
+// ============================================================================
+
+interface AttachmentSectionProps {
+  title: string;
+  lastUpdated: string;
+  Layout: typeof ContractTableLayout;
+  data: AttachmentRow[];
+  setting: AttachmentSetting;
+}
+
+function AttachmentSection({
+  title,
+  lastUpdated,
+  Layout,
+  data,
+  setting,
+}: AttachmentSectionProps) {
+  const columns = useMemo(() => buildColumns(setting), [setting]);
+
+  const params = Layout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
 
-  const data = useMemo(() => MOCK_DATA, []);
-  const totalPages = 3;
-  const totalItems = 13;
-
-  const columns = [
-    ...getColumns(),
-    {
-      key: "actions",
-      name: "خيارات",
-      sortable: false,
-      render: () => (
-        <CustomMenu
-          renderAnchor={({ onClick }) => (
-            <Button
-              size="small"
-              variant="contained"
-              color="inherit"
-              endIcon={<ChevronDown className="w-4 h-4" />}
-              onClick={onClick}
-              sx={{ backgroundColor: "#3f3f5a", color: "#fff" }}
-            >
-              اجراء
-            </Button>
-          )}
-        >
-          <MenuItem onClick={() => {}}>
-            <EditIcon className="w-4 h-4 ml-2" />
-            تعديل
-          </MenuItem>
-        </CustomMenu>
-      ),
-    },
-  ];
-
-  const state = AttachmentsTableLayout.useTableState({
+  const state = Layout.useTableState({
     data,
     columns,
-    totalPages,
-    totalItems,
+    totalPages: 1,
+    totalItems: data.length,
     params,
-    selectable: true,
-    getRowId: (row: WorkOrderAttachment) => row.id,
+    getRowId: (row: AttachmentRow) => row.id,
     loading: false,
-    searchable: true,
-    onExport: async () => {
-      // TODO: implement export
-    },
   });
 
   return (
-    <Box sx={{ p: 3 }}>
-      <AttachmentsTableLayout
-        filters={
-          <AttachmentsTableLayout.TopActions
-            state={state}
-            customActions={
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Button variant="contained" color="primary" onClick={() => {}}>
-                  ارفاق ملفات
-                </Button>
-                <Button variant="outlined" onClick={() => {}}>
-                  تحميل جميع المرفقات
-                </Button>
-              </Box>
-            }
-          />
-        }
-        table={
-          <AttachmentsTableLayout.Table
-            state={state}
-            loadingOptions={{ rows: 5 }}
-          />
-        }
-        pagination={<AttachmentsTableLayout.Pagination state={state} />}
+    <Box sx={{ mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1,
+          px: 1,
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight="bold">
+          {title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          آخر تحديث : {lastUpdated}
+        </Typography>
+      </Box>
+
+      <Layout
+        table={<Layout.Table state={state} loadingOptions={{ rows: 3 }} />}
+        pagination={<Layout.Pagination state={state} />}
       />
+    </Box>
+  );
+}
+
+// ============================================================================
+// Main Component
+// ============================================================================
+
+export default function AttachmentsTab() {
+  const { projectData } = useProject();
+  const permissions = projectData?.permissions;
+
+  const contractSetting = permissions?.attachment_contract_setting ?? null;
+  const termsSetting = permissions?.attachment_terms_contract_setting ?? null;
+
+  const effectiveContractSetting = contractSetting ?? DEFAULT_SETTING;
+  const effectiveTermsSetting = termsSetting ?? DEFAULT_SETTING;
+
+  const showContractSection = !contractSetting || !allZero(contractSetting);
+  const showTermsSection = !termsSetting || !allZero(termsSetting);
+  const nothingToShow =
+    contractSetting &&
+    termsSetting &&
+    !showContractSection &&
+    !showTermsSection;
+
+  const contractLastUpdated = MOCK_CONTRACT_ATTACHMENTS[0]?.lastUpdated ?? "";
+  const termsLastUpdated = MOCK_TERMS_ATTACHMENTS[0]?.lastUpdated ?? "";
+
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* ── Action Buttons ──────────────────────────────────────── */}
+      <Box
+        sx={{ display: "flex", gap: 1.5, mb: 3, justifyContent: "flex-end" }}
+      >
+        <Button variant="contained" color="primary" sx={{ fontWeight: "bold" }}>
+          اضافة مرفق
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Download className="w-4 h-4" />}
+          sx={{ fontWeight: "bold" }}
+        >
+          تحميل جميع المرفقات
+        </Button>
+      </Box>
+
+      {/* ── Contract Attachments ─────────────────────────────────── */}
+      {showContractSection && (
+        <AttachmentSection
+          title="مرفقات العقود"
+          lastUpdated={contractLastUpdated}
+          Layout={ContractTableLayout}
+          data={MOCK_CONTRACT_ATTACHMENTS}
+          setting={effectiveContractSetting}
+        />
+      )}
+
+      {/* ── Terms Attachments ────────────────────────────────────── */}
+      {showTermsSection && (
+        <AttachmentSection
+          title="مرفقات البنود"
+          lastUpdated={termsLastUpdated}
+          Layout={TermsTableLayout}
+          data={MOCK_TERMS_ATTACHMENTS}
+          setting={effectiveTermsSetting}
+        />
+      )}
+
+      {/* ── Empty State ──────────────────────────────────────────── */}
+      {nothingToShow && (
+        <Box sx={{ textAlign: "center", py: 8 }}>
+          <Typography color="text.secondary">لا توجد مرفقات متاحة</Typography>
+        </Box>
+      )}
     </Box>
   );
 }
