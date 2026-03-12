@@ -16,6 +16,8 @@ export const companiesMessages = new MessagesGroup({
   Active: _m("Active", "نشط"),
   Inactive: _m("Inactive", "غير نشط"),
   LoginAsManager: _m("Login as Company Manager (Edit)", "الدخول كـ مدير شركة (تعديل)"),
+  CompleteCompanyProfile: _m("Complete Company Profile", "اكمال ملف الشركة"),
+  SendLink: _m("Send Link", "ارسال رابط"),
   completeProfileData: _m("complete profile data", "أستكمال بيانات"),
   PackageSettings: _m("Package and Program Settings", "اعدادات الباقة والبرامج"),
   Delete: _m("Delete (Archive)", "حذف (أرشفة)"),

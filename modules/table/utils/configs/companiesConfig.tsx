@@ -153,7 +153,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
         disabled: can(PERMISSIONS.company.view),
       },
       {
-        label: "اكمال ملف الشركة",
+        label: t("CompleteCompanyProfile"),
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: { id: string; [key: string]: unknown }) =>
           router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
@@ -161,7 +161,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
       },
       {
         id: "send-link",
-        label: "ارسال رابط",
+        label: t("SendLink"),
         icon: <GearIcon className="w-4 h-4" />,
         action: "send-link",
         dialogComponent: UserSettingDialog,
