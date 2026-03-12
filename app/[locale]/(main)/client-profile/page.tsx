@@ -1,11 +1,9 @@
-import { baseURL } from "@/config/axios-config";
 import { ClientProfileData } from "./[id]/types";
-import { baseApi } from "@/config/axios/instances/base";
 import { notFound } from "@i18n/navigation";
 import ClientProfileModule from "@/modules/client-profile";
+import { fetchUserMe } from "@/lib/user/fetch-user-me";
 
 export default async function ClientProfilePage() {
-  // fetch me data
   const meData = await fetchMeData();
 
   if (!meData) {
@@ -16,11 +14,6 @@ export default async function ClientProfilePage() {
 }
 
 export async function fetchMeData(): Promise<ClientProfileData | null> {
-  try {
-    const response = await baseApi.get(`${baseURL}/users/me`);
-    return response.data.payload;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    return null;
-  }
+  const payload = await fetchUserMe();
+  return payload as ClientProfileData | null;
 }
