@@ -70,7 +70,12 @@ export const StructureTableConfig = () => {
           return (
             <div className="line-clamp-3">
               {companies.map((company) => (
-                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"} style={{width: "fit-content"}}>
+                <p
+                  key={company.id}
+                  className="line-clamp-1 h-5"
+                  dir={"ltr"}
+                  style={{ width: "fit-content" }}
+                >
                   {company?.phone || ""}
                 </p>
               ))}
@@ -113,11 +118,11 @@ export const StructureTableConfig = () => {
                           "w-5 h-5 flex items-center justify-center",
                           role.status === 1 && "text-[#18CB5F]",
                           role.status === 0 && "text-[#FF4747]",
-                          role.status === -1 && "text-[#F19B02]"
+                          role.status === -1 && "text-[#F19B02]",
                         )}
                       >
                         {React.createElement(
-                          rulesIcons[(index + 1) as keyof typeof rulesIcons]
+                          rulesIcons[(index + 1) as keyof typeof rulesIcons],
                         )}
                       </span>
                     ) : (

@@ -43,6 +43,7 @@ export interface UserTableRow {
 export const UsersConfig = () => {
   const { can } = usePermissions();
   const t = useTranslations("Companies");
+  const tUsers = useTranslations("Users");
 
   return {
     url: `${baseURL}/company-users`,
@@ -50,7 +51,7 @@ export const UsersConfig = () => {
     columns: [
       {
         key: "name",
-        label: "الاسم",
+        label: tUsers("table.name"),
         sortable: true,
         searchable: true,
         render: (_: unknown, row: UserTableRow) => (
@@ -66,7 +67,7 @@ export const UsersConfig = () => {
       },
       {
         key: "phone",
-        label: "رقم الجوال",
+        label: tUsers("table.phone"),
         render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
@@ -87,7 +88,7 @@ export const UsersConfig = () => {
       },
       {
         key: "companies",
-        label: "الشركة",
+        label: tUsers("table.company"),
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
             {value &&
@@ -101,7 +102,7 @@ export const UsersConfig = () => {
       },
       {
         key: "user-type",
-        label: "نوع المستخدم",
+        label: tUsers("table.userType"),
         render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
@@ -149,7 +150,7 @@ export const UsersConfig = () => {
         key: "company_id",
         searchType: {
           type: "dropdown",
-          placeholder: "الشركة",
+          placeholder: tUsers("table.company"),
           dynamicDropdown: {
             url: `${baseURL}/companies`,
             valueField: "id",
@@ -178,7 +179,7 @@ export const UsersConfig = () => {
         key: "email_or_phone",
         searchType: {
           type: "text",
-          placeholder: "البريد الإليكتروني / الجوال",
+          placeholder: tUsers("table.emailOrPhone"),
         },
       },
     ],
@@ -195,10 +196,10 @@ export const UsersConfig = () => {
     allowSearchFieldSelection: true,
     enableExport: can(PERMISSIONS.user.export),
     // deleteUrl: `${baseURL}/company-users`,
-    formConfig: GetCompanyUserFormConfig(t),
+    formConfig: GetCompanyUserFormConfig(t, undefined, tUsers),
     executions: [
       {
-        label: "اكمال الملف الشخصي",
+        label: tUsers("table.completeProfile"),
         icon: <GearIcon className="w-4 h-4" />,
         action: "openDialog",
         dialogComponent: ChooseUserCompany, // Your custom dialog component
