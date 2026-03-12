@@ -365,7 +365,9 @@ export const useTableStore = create<TableState>((set) => ({
           ...tableState,
           loading: true,
           // Set the _forceRefetch property to the current timestamp
-          _forceRefetch: timestamp
+          _forceRefetch: timestamp,
+          // Reset pagination to first page for better UX
+          currentPage: 1
         }
       }
     };
