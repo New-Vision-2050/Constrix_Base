@@ -88,8 +88,14 @@ export const useTableFetchEffect = ({
       return;
     }
 
+    // Always allow fetch if _forceRefetch is set (this ensures instant updates)
+    if (_forceRefetch && process.env.NODE_ENV === 'development') {
+      console.log("[TableFetch] Force refetch detected, proceeding with fetch");
+    }
+
     // Additional check: if a fetch is already in progress with the same parameters, skip
-    if (fetchInProgress && currentParamsSignature === lastFetchParams) {
+    // But allow it if _forceRefetch is set (this ensures instant updates)
+    if (fetchInProgress && currentParamsSignature === lastFetchParams && !_forceRefetch) {
       if (process.env.NODE_ENV === 'development') {
         console.log("[TableFetch] Skipping duplicate fetch - already in progress");
       }
@@ -107,7 +113,8 @@ export const useTableFetchEffect = ({
       debounceTimeout = null;
     }
 
-    // Set a new debounce timeout with longer delay to better prevent race conditions
+    // Set a new debounce timeout with minimal delay for force refetch
+    const debounceDelay = _forceRefetch ? 10 : 200; // Instant for force refetch, normal for others
     debounceTimeout = setTimeout(() => {
       // Double-check if parameters are still the same after debounce
       const latestParamsSignature = JSON.stringify({
@@ -141,7 +148,7 @@ export const useTableFetchEffect = ({
 
       // Proceed with the fetch
       performFetch();
-    }, 200); // Increased debounce time to better prevent race conditions
+    }, debounceDelay); // Dynamic debounce delay
 
     // Function to perform the actual fetch
     function performFetch() {
@@ -154,6 +161,7 @@ export const useTableFetchEffect = ({
       }
 
       // Check if we've fetched too recently (within 500ms to prevent rapid successive calls)
+      // But allow it if _forceRefetch is set (this ensures instant updates)
       const now = Date.now();
       if (now - lastFetchTime < 500 && !_forceRefetch) {
         if (process.env.NODE_ENV === 'development') {
