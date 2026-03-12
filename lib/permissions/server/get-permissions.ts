@@ -22,11 +22,9 @@ export const getPermissions = cache(async (): Promise<PermissionsResponse> => {
     const payload = data?.payload ?? null;
     if (!payload) return empty;
 
-    const permissions = payload.permissions ?? [];
-    const isSuperAdmin = Boolean((payload as { is_super_admin?: unknown }).is_super_admin);
-    const isCentralCompany = Boolean(
-      (payload as { is_central_company?: unknown }).is_central_company
-    );
+    const permissions = (payload.permissions ?? []) as unknown as Permission[];
+    const isSuperAdmin = Boolean(payload.is_super_admin);
+    const isCentralCompany = Boolean(payload.is_central_company);
 
     console.log('from permissions', payload);
     return { permissions, isSuperAdmin, isCentralCompany , user: payload };
