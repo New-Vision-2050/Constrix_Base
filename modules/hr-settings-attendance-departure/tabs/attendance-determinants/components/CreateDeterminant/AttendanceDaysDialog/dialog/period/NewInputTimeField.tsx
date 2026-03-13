@@ -216,10 +216,10 @@ const NewInputTimeField = ({
       defaultValue={value?.split(":")[0] || ""}
       onValueChange={(val) => setSelectedHour(val)}
     >
-      <SelectTrigger className="w-[70px] bg-gray-800 border-gray-700">
+      <SelectTrigger className="w-[70px] bg-pink-500 border-pink-300 text-white">
         <SelectValue placeholder="HH" />
       </SelectTrigger>
-      <SelectContent className="bg-gray-800 border-gray-700 text-white">
+      <SelectContent className="bg-pink-500  border-pink-300 text-white">
         {_dayAvsilableHours?.map((hour) => (
           <SelectItem
             key={hour.value}
@@ -319,10 +319,10 @@ const NewInputTimeField = ({
       value={selectedMinute}
       onValueChange={(val) => setSelectedMinute(val)}
     >
-      <SelectTrigger className="w-[70px] bg-gray-800 border-gray-700">
+      <SelectTrigger className="w-[70px] bg-pink-500 border-pink-300 text-white">
         <SelectValue placeholder="MM" />
       </SelectTrigger>
-      <SelectContent className="bg-gray-800 border-gray-700 text-white">
+      <SelectContent className="bg-pink-500 border-pink-00 text-white">
         {availableMinutes?.map((minute) => (
           <SelectItem
             key={minute.value}

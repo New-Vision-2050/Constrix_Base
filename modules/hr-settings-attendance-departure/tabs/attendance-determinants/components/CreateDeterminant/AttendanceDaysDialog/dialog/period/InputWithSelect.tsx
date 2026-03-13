@@ -79,12 +79,12 @@ export const InputWithSelect: React.FC<InputWithSelectProps> = ({
           value={inputValue}
           onChange={(e) => onInputChange(e.target.value)}
           placeholder={inputPlaceholder}
-          className="focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent h-full border border-1 border-gray-400"
+          className="focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent h-full border-r-0 flex-1"
         />
         <select
           value={selectValue}
           onChange={(e) => onSelectChange(e.target.value)}
-          className="rounded-l-none border-l-0 focus:ring-0 focus:ring-offset-0 bg-pink-500 text-white"
+          className="rounded-l-none border-l-0 focus:ring-0 focus:ring-offset-0 bg-pink-500 text-white w-32"
         >
           {selectOptions.map((option) => (
             <option key={option.id} value={option.id}>
