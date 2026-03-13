@@ -13,6 +13,7 @@ export default function UserAddressSection() {
   const { handleRefetchUserContactData, userContactDataLoading } =
     useConnectionDataCxt();
   const t = useTranslations("UserProfile.nestedTabs.addressData");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
 
   return (
     <Can check={[PERMISSIONS.profile.addressInfo.view]}>
@@ -26,8 +27,8 @@ export default function UserAddressSection() {
         }}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            { title: tActions("myRequests"), onClick: () => {}, disabled: true },
+            { title: tActions("createRequest"), onClick: () => {}, disabled: true },
           ],
           disabledEdit: !can([PERMISSIONS.profile.addressInfo.update]),
         }}

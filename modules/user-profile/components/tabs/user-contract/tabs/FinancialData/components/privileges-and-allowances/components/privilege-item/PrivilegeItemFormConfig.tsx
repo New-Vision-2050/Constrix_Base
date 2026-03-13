@@ -6,6 +6,7 @@ import { useFinancialDataCxt } from "../../../../context/financialDataCxt";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
 import { AllowancesTypes } from "../../AllowancesEnum";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   privilegeData?: UserPrivilege;
@@ -22,6 +23,8 @@ export const PrivilegeItemFormConfig = ({
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefreshPrivilegesList, privileges } = useFinancialDataCxt();
 
+  const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const privilegeItemFormConfig: FormConfig = {
     formId: `privilege-form-${privilegeData?.id}`,
     laravelValidation: {
@@ -193,10 +196,10 @@ export const PrivilegeItemFormConfig = ({
       },
     ],
     initialValues: privilegeData,
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tActions("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

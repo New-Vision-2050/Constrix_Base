@@ -13,11 +13,13 @@ import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { useTranslations } from "next-intl";
 
 type PropsT = { bank: BankAccount };
 
 export default function BankSection({ bank }: PropsT) {
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.nestedTabs.bankingData");
   // declare and define component state & vars
   const [menuItems, setMenuItems] = useState<DropdownItemT[]>([]);
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -33,7 +35,7 @@ export default function BankSection({ bank }: PropsT) {
       if (!bankTypes || bankAccounts.length === 0) {
         return [
           {
-            title: "حذف البنك",
+            title: t("deleteBank"),
             onClick: () => {
               if (bankAccounts.length === 1) handleOpen();
               else setOpenDeleteDialog(true);
@@ -50,7 +52,7 @@ export default function BankSection({ bank }: PropsT) {
           },
         })),
         {
-          title: "حذف البنك",
+          title: t("deleteBank"),
           onClick: () => {
             if (bankAccounts.length === 1) handleOpen();
             else setOpenDeleteDialog(true);
@@ -58,7 +60,7 @@ export default function BankSection({ bank }: PropsT) {
         },
       ];
     });
-  }, [bankAccounts, bankTypes]);
+  }, [bankAccounts, bankTypes, t]);
 
   // declare and define component methods
   const handleDeleteBank = async () => {
@@ -79,7 +81,7 @@ export default function BankSection({ bank }: PropsT) {
       });
       // refresh banking data after update
       handleRefreshBankingData();
-      toast.success("تم تحديث نوع الحساب البنكي بنجاح");
+      toast.success(t("bankTypeUpdatedSuccess"));
     } catch (err) {
       console.log("update bank type error", err);
     }
@@ -90,7 +92,7 @@ export default function BankSection({ bank }: PropsT) {
     <>
       <Can check={[PERMISSIONS.profile.bankInfo.view]}>
         <TabTemplate
-          title={bank?.bank_name ?? "Bank Account"}
+          title={bank?.bank_name ?? t("bankAccount")}
           reviewMode={<UserProfileBankingDataReview bank={bank} />}
           editMode={<BankingDataSectionEditMode bank={bank} />}
           settingsBtn={{
@@ -102,15 +104,13 @@ export default function BankSection({ bank }: PropsT) {
       <ErrorDialog
         isOpen={isOpen}
         handleClose={handleClose}
-        desc={
-          "لا يمكنك حذف حساب افتراضي، قم بإضافة حساب بنكي اخر على الاقل للحذف"
-        }
+        desc={t("cannotDeleteDefaultBank")}
       />
       <ConfirmationDialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
         onConfirm={handleDeleteBank}
-        description={"هل أنت متأكد أنك تريد حذف هذا البنك؟"}
+        description={t("confirmDeleteBank")}
       />
     </>
   );

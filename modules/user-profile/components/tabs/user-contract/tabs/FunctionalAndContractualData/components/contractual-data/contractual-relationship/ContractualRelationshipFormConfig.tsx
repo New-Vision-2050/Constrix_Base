@@ -1,8 +1,8 @@
-import {FormConfig, useFormStore} from "@/modules/form-builder";
+import {FormConfig} from "@/modules/form-builder";
 import {baseURL} from "@/config/axios-config";
-import {serialize} from "object-to-formdata";
 import {useUserProfileCxt} from "@/modules/user-profile/context/user-profile-cxt";
 import {useFunctionalContractualCxt} from "../../../context";
+import {useTranslations} from "next-intl";
 import {Contract} from "@/modules/user-profile/types/Contract";
 import {formatDateYYYYMMDD} from "@/utils/format-date-y-m-d";
 import {defaultSubmitHandler} from "@/modules/form-builder/utils/defaultSubmitHandler";
@@ -12,6 +12,8 @@ type PropsT = {
 };
 
 export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
+    const t = useTranslations("common");
+    const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
     const {userId, handleRefetchDataStatus, handleRefetchWidgetData} =
         useUserProfileCxt();
     const {handleRefetchContractData, timeUnits} =
@@ -84,10 +86,10 @@ export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
             file: contract?.files,
         },
         
-        submitButtonText: "حفظ",
-        cancelButtonText: "إلغاء",
+        submitButtonText: t("save"),
+        cancelButtonText: t("cancel"),
         showReset: false,
-        resetButtonText: "Clear Form",
+        resetButtonText: tActions("clearForm"),
         showSubmitLoader: true,
         resetOnSuccess: false,
         showCancelButton: false,

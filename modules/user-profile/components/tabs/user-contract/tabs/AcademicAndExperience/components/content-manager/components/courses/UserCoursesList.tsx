@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import RegularList from "@/components/shared/RegularList";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import SingleCourse from "./single-course";
@@ -8,14 +9,15 @@ import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function UserCoursesList() {
+  const t = useTranslations("UserProfile.nestedTabs.coursesData");
   const { userCourses, userCoursesLoading } = useUserAcademicTabsCxt();
 
   // handle there is no data found
   if (!userCoursesLoading && userCourses && userCourses.length === 0)
     return (
       <NoDataFounded
-        title="لا يوجد بيانات"
-        subTitle="لا يوجد بيانات تخص الكورسات للمستخدم قم باضافة كورس / دورة"
+        title={t("noData")}
+        subTitle={t("noDataSubTitle")}
       />
     );
 

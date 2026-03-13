@@ -8,6 +8,7 @@ import { Trash2, Copy, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { apiClient } from "@/config/axios-config";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   isRTL: boolean;
@@ -20,6 +21,7 @@ type PropsT = {
 };
 
 export default function PreviewTextFieldSuffixIcon(props: PropsT) {
+  const t = useTranslations("UserProfile.previewTextField");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -117,7 +119,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
             className={`absolute top-[8px] text-slate-400 ${
               isRTL ? (Boolean(mediaId) ? "left-[120px]" : "left-[50px]") : (Boolean(mediaId) ? "right-[120px]" : "right-[50px]")
             }`}
-            title={copied ? "تم النسخ!" : "نسخ القيمة"}
+            title={copied ? t("copied") : t("copy")}
             onClick={handleCopy}
             style={{
               cursor: "pointer",
@@ -134,7 +136,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
             className={`absolute top-[8px] text-slate-400 ${
               isRTL ? "left-[85px]" : "right-[85px]"
             }`}
-            title={loading ? "جاري التنفيذ" : "حذف"}
+            title={loading ? t("loading") : t("delete")}
             onClick={() => {
               if (!mediaId) return;
               setOpen(true);
@@ -154,7 +156,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
         open={open}
         onClose={handleCancel}
         onConfirm={handleDeleteMedia}
-        description={`هل أنت متاكد من حذف الملف؟`}
+        description={t("confirmDeleteFile")}
         showDatePicker={false}
       />
     </>

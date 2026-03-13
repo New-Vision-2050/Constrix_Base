@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SetStateAction, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import CloudUploadIcon from "@/public/icons/cloud-upload";
 import FormFieldSet from "../../../../../components/FormFieldSet";
@@ -64,12 +65,14 @@ export default function UploadCvDialog(props: PropsT) {
     }
   };
 
+  const t = useTranslations("UserProfile.nestedTabs.userCV");
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-center text-lg">
-            السيرة الذاتية
+            {t("cvTitle")}
           </DialogTitle>
         </DialogHeader>
 
@@ -78,9 +81,9 @@ export default function UploadCvDialog(props: PropsT) {
           <div className="flex flex-col gap-4 items-center justify-center">
             <label className="w-10/12 h-60 p-3 bg-sidebar flex flex-col items-center justify-around text-black cursor-pointer gap-4">
               <CloudUploadIcon additionalClass="w-[70px] h-[70px] text-pink-600" />
-              <p className="text-md font-bold dark:text-white">قم بارفاق المستند </p>
+              <p className="text-md font-bold dark:text-white">{t("attachDocument")}</p>
               <p className="text-center text-sm text-gray-500">
-                يُسمح بتنسيق PDF أو JPG أو PNG، والحجم الأقصى هو 200 ميجابايت
+                {t("fileFormatHint")}
               </p>
               <VisuallyHiddenInput
                 type="file"
@@ -89,20 +92,20 @@ export default function UploadCvDialog(props: PropsT) {
               />
 
               <span className="text-white border p-2 rounded-lg bg-pink-600">
-                أرفاق
+                {t("attach")}
               </span>
             </label>
           </div>
           {/* cv files */}
           {uploadedFile && (
             <div className="flex flex-col items-center justify-center gap-6">
-              <FormFieldSet title={"ارفاق السيرة الذاتية"}>
+              <FormFieldSet title={t("uploadCv")}>
                 <UploadedFile
                   file={uploadedFile}
                   setUploadedFile={setUploadedFile}
                 />
               </FormFieldSet>
-              <Button onClick={handleFileUpload}>تحديث</Button>
+              <Button onClick={handleFileUpload}>{t("update")}</Button>
             </div>
           )}
         </div>

@@ -1,6 +1,7 @@
 import { apiClient, baseURL } from "@/config/axios-config";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { SalaryTypes } from "./salary_type_enum";
@@ -81,7 +82,8 @@ const calculateHourlyRate = (
 };
 
 export const SalaryFormConfig = () => {
-  // declare and define component state and variables
+  const t = useTranslations("common");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
 
@@ -336,10 +338,10 @@ export const SalaryFormConfig = () => {
       description: userSalary?.description,
       hour_rate: userSalary?.hour_rate,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tActions("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,
