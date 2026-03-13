@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import ContractDataFormPreviewMode from "./ContractDataFormPreviewMode";
 import ContractDataFormEditMode from "./ContractDataFormEditMode";
 import { useFunctionalContractualCxt } from "../../../context";
@@ -11,18 +12,19 @@ export default function ContractDataForm() {
   const { userContractData, userContractDataLoading } =
     useFunctionalContractualCxt();
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.nestedTabs");
 
   return (
     <Can check={[PERMISSIONS.profile.contractWork.view]}>
       <TabTemplate
-        title={"عقد العمل"}
+        title={t("employmentContract")}
         loading={userContractDataLoading}
         reviewMode={<ContractDataFormPreviewMode contract={userContractData} />}
         editMode={<ContractDataFormEditMode contract={userContractData} />}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            { title: t("commonActions.myRequests"), onClick: () => {}, disabled: true },
+            { title: t("commonActions.createRequest"), onClick: () => {}, disabled: true },
           ],
           disabledEdit: !can([PERMISSIONS.profile.contractWork.update]),
         }}

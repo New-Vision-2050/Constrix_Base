@@ -1,6 +1,7 @@
 import { FormConfig } from "@/modules/form-builder";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 import { useFunctionalContractualCxt } from "../../../context";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
@@ -14,6 +15,8 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
   const { userId } = useUserProfileCxt();
   const { handleRefetchJobOffer } = useFunctionalContractualCxt();
 
+  const t = useTranslations("UserProfile.nestedTabs.jobOffer");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const jobOfferFormConfig: FormConfig = {
     formId: `job-offer-data-form-${offer?.id}`,
     sections: [
@@ -71,10 +74,10 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
       date_accept: offer?.date_accept,
       file: offer?.files,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tActions("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

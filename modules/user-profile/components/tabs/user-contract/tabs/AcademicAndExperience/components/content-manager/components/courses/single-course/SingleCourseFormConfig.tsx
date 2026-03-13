@@ -1,5 +1,6 @@
 import { FormConfig } from "@/modules/form-builder";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Course } from "@/modules/user-profile/types/Course";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
@@ -16,7 +17,8 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
   const formType = course ? "Edit" : "Create";
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCourses } = useUserAcademicTabsCxt();
-
+  const t = useTranslations("UserProfile.nestedTabs.academicExperience");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const singleCourseFormConfig: FormConfig = {
     formId: `user-courses-data-form-${course?.id ?? ""}`,
     laravelValidation: {
@@ -122,10 +124,10 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       date_end: course?.date_end,
       file: course?.file,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tActions("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

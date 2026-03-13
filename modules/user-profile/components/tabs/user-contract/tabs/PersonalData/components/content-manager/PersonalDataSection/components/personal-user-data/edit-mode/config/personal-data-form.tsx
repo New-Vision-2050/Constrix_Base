@@ -53,9 +53,7 @@ export const PersonalDataFormConfig = () => {
                     .filter((term) => term.length > 0);
                   return nameTerms.length === 3;
                 },
-                message:
-                  t("PersonalDataForm.nameThreeTerms") ||
-                  "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+                message: t("PersonalDataForm.nameThreeTerms"),
               },
               {
                 type: "custom",
@@ -85,9 +83,7 @@ export const PersonalDataFormConfig = () => {
                   const lettersOnlyRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z]+$/;
                   return lettersOnlyRegex.test(value);
                 },
-                message:
-                  t("PersonalDataForm.nameLettersOnly") ||
-                  "يجب أن يحتوي اللقب على حروف فقط (بدون أرقام أو رموز)",
+                message: t("PersonalDataForm.nicknameLettersOnly"),
               },
             ],
           },

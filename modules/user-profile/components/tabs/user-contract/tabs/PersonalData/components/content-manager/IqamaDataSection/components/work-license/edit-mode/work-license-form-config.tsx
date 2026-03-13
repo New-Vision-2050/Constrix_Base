@@ -11,6 +11,7 @@ export const WorkLicenseFormConfig = () => {
     usePersonalDataTabCxt();
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.licenseData");
+  const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   const workLicenseFormConfig: FormConfig = {
     formId: "ConnectionInformation-license-data-form",
@@ -96,7 +97,7 @@ export const WorkLicenseFormConfig = () => {
     submitButtonText: t("submitButtonText"),
     cancelButtonText: t("cancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tCommon("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import Can from "@/lib/permissions/client/Can";
 import { useFunctionalContractualCxt } from "../../context";
 import ContractDataForm from "./contract-data";
@@ -6,11 +7,12 @@ import JobOfferForm from "./job-offer";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function ContractualDataTab() {
+  const t = useTranslations("UserProfile.nestedTabs.contractData");
   const { userJobOffersData } = useFunctionalContractualCxt();
 
   return (
     <div className="p-4 flex-grow flex flex-col gap-12">
-      <p className="text-lg font-bold">البيانات التعاقدية</p>
+      <p className="text-lg font-bold">{t("title")}</p>
       <Can check={[PERMISSIONS.profile.jobOffer.view]}>
         <JobOfferForm offer={userJobOffersData} />
       </Can>

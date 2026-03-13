@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 export default function ProfileBriefSummary() {
   // declare and define component state and vars
   const t = useTranslations("UserProfile.nestedTabs.briefSummary");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const { handleRefetchUserBrief } = useUserAcademicTabsCxt();
   const { can } = usePermissions();
 
@@ -30,7 +31,7 @@ export default function ProfileBriefSummary() {
               disabled: !can([PERMISSIONS.profile.aboutMe.update]),
             },
             {
-              title: "أنشاء طلب",
+              title: tActions("createRequest"),
               onClick: () => {},
               disabled: !can([PERMISSIONS.profile.aboutMe.update]),
             },

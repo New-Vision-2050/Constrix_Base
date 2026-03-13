@@ -418,7 +418,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
                 {isSubmittingStep ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    جاري الحفظ
+                    {config.submitButtonLoadingText ?? t("FormBuilder.saving")}
                   </span>
                 ) : (
                   config.wizardOptions?.submitButtonTextPerStep || "Submit Step"
@@ -451,7 +451,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
                 {isSubmitting && config.showSubmitLoader ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    جاري الحفظ
+                    {config.submitButtonLoadingText ?? t("FormBuilder.saving")}
                   </span>
                 ) : (
                   config.wizardOptions?.finishButtonText ||
@@ -473,7 +473,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
             {isSubmitting && config.showSubmitLoader ? (
               <span className="flex items-center">
                 <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                جاري الحفظ
+                {config.submitButtonLoadingText ?? t("FormBuilder.saving")}
               </span>
             ) : (
               config.submitButtonText || "Submit"

@@ -10,6 +10,10 @@ export const personalDataFormMessages = new MessagesGroup({
   nickname: _m("Nickname", "اسم الشهرة"),
   nicknamePlaceholder: _m("Enter nickname", "ادخل اسم الشهرة"),
   nicknameRequired: _m("Nickname is required", "اسم الشهرة مطلوب"),
+  nicknameLettersOnly: _m(
+    "Nickname must contain only letters (no numbers or symbols)",
+    "يجب أن يحتوي اللقب على حروف فقط (بدون أرقام أو رموز)",
+  ),
   gender: _m("Gender", "الجنس"),
   genderPlaceholder: _m("Select gender", "اختر الجنس"),
   genderMale: _m("Male", "ذكر"),

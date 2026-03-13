@@ -2,6 +2,7 @@ import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 import { useFunctionalContractualCxt } from "../../../context";
 import { Contract } from "@/modules/user-profile/types/Contract";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
@@ -45,6 +46,8 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
   const { handleRefetchContractData, timeUnits } =
     useFunctionalContractualCxt();
 
+  const t = useTranslations("UserProfile.nestedTabs.contractData");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const contractDataFormConfig: FormConfig = {
     formId: `user-contract-data-form-${contract?.id}`,
     apiUrl: `${baseURL}/employment_contracts`,
@@ -571,10 +574,10 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
         contract?.probation_period_unit?.id || timeUnits?.[0]?.id,
       file: contract?.files,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tActions("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

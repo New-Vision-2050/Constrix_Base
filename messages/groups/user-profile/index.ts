@@ -137,7 +137,88 @@ export const userProfileMessages = new MessagesGroup({
     title: _m("User Teams", "فرق المستخدم"),
     showAll: _m("Show All", "اظهار الكل"),
   }),
+  previewTextField: new MessagesGroup({
+    loading: _m("Processing...", "جاري التنفيذ"),
+    delete: _m("Delete", "حذف"),
+    copy: _m("Copy value", "نسخ القيمة"),
+    copied: _m("Copied!", "تم النسخ!"),
+    confirmDeleteFile: _m(
+      "Are you sure you want to delete this file?",
+      "هل أنت متأكد من حذف الملف؟",
+    ),
+  }),
+  cvUpload: new MessagesGroup({
+    cvTitle: _m("CV", "السيرة الذاتية"),
+    attachDocument: _m("Attach the document", "قم بارفاق المستند"),
+    fileFormatHint: _m(
+      "PDF, JPG or PNG format allowed, max size 200 MB",
+      "يُسمح بتنسيق PDF أو JPG أو PNG، والحجم الأقصى هو 200 ميجابايت",
+    ),
+    attach: _m("Attach", "أرفاق"),
+    uploadCv: _m("Upload CV", "ارفاق السيرة الذاتية"),
+    update: _m("Update", "تحديث"),
+  }),
   nestedTabs: new MessagesGroup({
+    contractualRelationship: _m("Contractual Relationship", "العلاقة التعاقدية"),
+    employmentContract: _m("Employment Contract", "عقد العمل"),
+    jobOffer: new MessagesGroup({
+      save: _m("Save", "حفظ"),
+      cancel: _m("Cancel", "إلغاء"),
+      title: _m("Job Offer", "العرض الوظيفي"),
+    }),
+    contractData: new MessagesGroup({
+      save: _m("Save", "حفظ"),
+      cancel: _m("Cancel", "إلغاء"),
+      title: _m("Contractual Data", "البيانات التعاقدية"),
+    }),
+    jobData: new MessagesGroup({
+      title: _m("Job Data", "البيانات الوظيفية"),
+    }),
+    salary: _m("Salary", "الراتب"),
+    basicSalary: _m("Basic Salary", "الراتب الاساسي"),
+    allowanceName: _m("Allowance Name", "أسم البدل"),
+    privilegesAndAllowances: new MessagesGroup({
+      title: _m("Privileges and Allowances", "الامتيازات و البدلات"),
+      addPrivilege: _m("Add Privilege", "اضافة امتياز"),
+      save: _m("Save", "حفظ"),
+      cancel: _m("Cancel", "إلغاء"),
+      noData: _m("No Data Found", "لا يوجد بيانات"),
+      noDataSubTitle: _m(
+        "No allowances for user. Please add a new allowance.",
+        "لا يوجد بدلات للمستخدم قم باضافة بدل جديد",
+      ),
+    }),
+    coursesData: new MessagesGroup({
+      header: _m("Educational Courses", "الكورسات التعليمية"),
+      addCourse: _m("Add Course", "اضافة كورس"),
+      noData: _m("No Data Found", "لا يوجد بيانات"),
+      noDataSubTitle: _m(
+        "No course data for user. Please add a course.",
+        "لا يوجد بيانات تخص الكورسات للمستخدم قم باضافة كورس / دورة",
+      ),
+    }),
+    userCV: new MessagesGroup({
+      cvTitle: _m("CV", "السيرة الذاتية"),
+      attachDocument: _m("Attach the document", "قم بارفاق المستند"),
+      fileFormatHint: _m(
+        "PDF, JPG or PNG format allowed, max size 200 MB",
+        "يُسمح بتنسيق PDF أو JPG أو PNG، والحجم الأقصى هو 200 ميجابايت",
+      ),
+      attach: _m("Attach", "أرفاق"),
+      uploadCv: _m("Upload CV", "ارفاق السيرة الذاتية"),
+      update: _m("Update", "تحديث"),
+      noData: _m("No Data Found", "لا يوجد بيانات"),
+      noDataSubTitle: _m(
+        "No CV available. Please attach your CV.",
+        "لا يوجد سيرة ذاتية. قم بارفاق السيرة الذاتية",
+      ),
+    }),
+    commonActions: new MessagesGroup({
+      myRequests: _m("My Requests", "طلباتي"),
+      createRequest: _m("Create Request", "أنشاء طلب"),
+      clearForm: _m("Clear Form", "مسح النموذج"),
+      delete: _m("Delete", "حذف"),
+    }),
     PeronalDataTab: new MessagesGroup({
       title: _m("Personal Data", "البيانات الشخصية"),
       name: _m("Full Name", "الاسم ثلاثي"),
@@ -168,6 +249,14 @@ export const userProfileMessages = new MessagesGroup({
       otherPhone: _m("Other Phone", "رقم جوال بديل"),
       landlineNumber: _m("Landline Number", "رقم الهاتف الأرضي"),
       save: _m("Save", "حفظ"),
+      verificationCodeSent: _m(
+        "Verification code sent to email",
+        "تم إرسال رمز التحقق إلى البريد الإلكتروني",
+      ),
+      verificationCodeError: _m(
+        "Error sending verification code",
+        "حدث خطأ أثناء إرسال رمز التحقق",
+      ),
     }),
     passportData: new MessagesGroup({
       title: _m("Passport Data", "بيانات جواز السفر"),
@@ -196,7 +285,7 @@ export const userProfileMessages = new MessagesGroup({
     }),
     identityData: new MessagesGroup({
       title: _m("Identity Data", "البيانات الهوية"),
-      identityNumber: _m("Identity Number", ""),
+      identityNumber: _m("Identity Number", "رقم الهوية"),
       identityStartDate: _m("Identity Start Date", "تاريخ البدء"),
       identityEndDate: _m("Identity End Date", "تاريخ الانتهاء"),
       identityFile: _m("Identity File", "ارفاق الهوية"),
@@ -215,10 +304,10 @@ export const userProfileMessages = new MessagesGroup({
         "National ID must be between 6 and 20 characters or numbers",
         "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
       ),
-      identityNumberRequired: _m("Identity Number is required", ""),
+      identityNumberRequired: _m("Identity Number is required", "رقم الهوية مطلوب"),
       identityNumberPattern: _m(
         "Identity Number must be between 6 and 20 characters or numbers",
-        "",
+        "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
       ),
       identityStartDateRequired: _m(
         "Identity Start Date is required",
@@ -471,20 +560,42 @@ export const userProfileMessages = new MessagesGroup({
       ),
       country: _m("Country", "الدولة"),
       selectCountry: _m("Select Country", "اختر الدولة"),
+      countryRequired: _m("Country is required", "الدولة مطلوبة"),
       university: _m("University", "الجامعة"),
       selectUniversity: _m("Select University", "اختر الجامعة"),
+      universityRequired: _m("University is required", "الجامعة مطلوبة"),
       academicSpecialization: _m("Academic Specialization", "التخصص الأكاديمي"),
       selectAcademicSpecialization: _m(
         "Select Academic Specialization",
         "اختر التخصص الأكاديمي",
       ),
+      academicQualificationRequired: _m(
+        "Academic Qualification is required",
+        "المؤهل الأكاديمي مطلوب",
+      ),
+      academicSpecializationRequired: _m(
+        "Academic Specialization is required",
+        "التخصص الأكاديمي مطلوب",
+      ),
       graduationDate: _m("Graduation Date", "تاريخ الحصول على الشهادة"),
+      graduationDateInvalid: _m(
+        "Graduation date must be a valid date",
+        "يجب أن يكون تاريخ التخرج تاريخا صحيحًا",
+      ),
+      graduationDateRequired: _m(
+        "Graduation Date is required",
+        "تاريخ التخرج مطلوب",
+      ),
       studyRate: _m("Study Rate", "المعدلات الدراسية"),
+      studyRateRequired: _m("Study Rate is required", "معدل الدراسة مطلوب"),
       studyRateValidation: _m(
-        "Study Rate must be numbers only",
-        "المعدلات الدراسية يجب أن تكون أرقام فقط",
+        "Study Rate must be numbers only (0-100)",
+        "المعدلات الدراسية يجب أن تكون أرقام فقط (0-100)",
       ),
       attachDocument: _m("Attach Document", "ارفاق شهادة"),
+      fieldRequired: _m("Field required", "الحقل مطلوب"),
+      validationFailed: _m("Validation failed", "فشل التحقق من الصحة"),
+      clearForm: _m("Clear Form", "مسح النموذج"),
       save: _m("Save", "حفظ"),
       cancel: _m("Cancel", "إلغاء"),
     }),

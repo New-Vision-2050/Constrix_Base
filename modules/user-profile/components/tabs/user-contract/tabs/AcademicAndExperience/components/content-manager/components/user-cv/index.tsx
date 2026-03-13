@@ -1,25 +1,24 @@
+import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import FormFieldSet from "../../../../../components/FormFieldSet";
 import PencilLineIcon from "@/public/icons/pencil-line";
 import PdfViewer from "./PdfViewer";
 import UploadCvDialog from "./UploadCvDialog";
-import { useState } from "react";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function UserCV() {
+  const t = useTranslations("UserProfile.nestedTabs.userCV");
   const [open, setOpen] = useState(false);
   const { userCV } = useUserAcademicTabsCxt();
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-lg font-bold text-gray-700">
-        البيانات الوظيفية والتعاقدية
-      </p>
       <FormFieldSet
-        title={"السيرة الذاتية"}
+        title={t("cvTitle")}
         secondTitle={
           <Can check={[PERMISSIONS.profile.cv.update]}>
             <Button variant={"ghost"} onClick={() => setOpen(true)}>
@@ -33,8 +32,8 @@ export default function UserCV() {
             <PdfViewer src={userCV?.files?.url ?? ""} />
           ) : (
             <NoDataFounded
-              title="لا يوجد بيانات"
-              subTitle="لا يوجد سيرة ذاتية , قم بارفاق السيرة الذاتية"
+              title={t("noData")}
+              subTitle={t("noDataSubTitle")}
             />
           )}
         </Can>

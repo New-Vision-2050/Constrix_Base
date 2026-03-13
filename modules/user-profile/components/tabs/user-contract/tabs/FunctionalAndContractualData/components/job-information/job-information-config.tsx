@@ -2,10 +2,13 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 import { useFunctionalContractualCxt } from "../../context";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const JobFormConfig = () => {
+  const t = useTranslations("common");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const { userId, handleRefetchDataStatus, companyId } = useUserProfileCxt();
   const { professionalData, company, handleRefetchProfessionalData } =
     useFunctionalContractualCxt();
@@ -218,10 +221,10 @@ export const JobFormConfig = () => {
       attendance_constraint_id: professionalData?.attendance_constraint?.id,
       roles: professionalData?.roles,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tActions("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

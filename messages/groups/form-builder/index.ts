@@ -90,4 +90,5 @@ export const formBuilderMessages = new MessagesGroup({
   sheetForm: new MessagesGroup({
     formSucess: _m("Form Submitted Successfully", "تم إرسال النموذج بنجاح"),
   }),
+  saving: _m("Saving...", "جاري الحفظ"),
 });

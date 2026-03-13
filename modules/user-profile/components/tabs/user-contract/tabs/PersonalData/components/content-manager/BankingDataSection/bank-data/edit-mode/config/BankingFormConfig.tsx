@@ -18,6 +18,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
   const { userId, handleRefetchDataStatus, handleRefetchProfileData } =
     useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.bankingData");
+  const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   // form config
 
@@ -210,7 +211,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
     submitButtonText: t("submitButtonText"),
     cancelButtonText: t("cancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tCommon("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: formType === "Create" ? true : false,
     showCancelButton: false,

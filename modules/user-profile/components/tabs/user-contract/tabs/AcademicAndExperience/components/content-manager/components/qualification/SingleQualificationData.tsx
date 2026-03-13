@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import SingleQualificationDataPreview from "./preview-mode";
 import SingleQualificationDataEditMode from "./edit-mode";
 import { Qualification } from "@/modules/user-profile/types/qualification";
@@ -11,7 +12,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 type PropsT = { qualification: Qualification };
 export default function SingleQualificationData({ qualification }: PropsT) {
-  // declare and define component state and vars
+  const t = useTranslations("UserProfile.nestedTabs.commonActions");
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
   const { can } = usePermissions();
@@ -30,10 +31,10 @@ export default function SingleQualificationData({ qualification }: PropsT) {
           }
           settingsBtn={{
             items: [
-              { title: "طلباتي", onClick: () => {}, disabled: true },
-              { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+              { title: t("myRequests"), onClick: () => {}, disabled: true },
+              { title: t("createRequest"), onClick: () => {}, disabled: true },
               {
-                title: "حذف",
+                title: t("delete"),
                 onClick: () => {
                   setDeleteDialog(true);
                 },
