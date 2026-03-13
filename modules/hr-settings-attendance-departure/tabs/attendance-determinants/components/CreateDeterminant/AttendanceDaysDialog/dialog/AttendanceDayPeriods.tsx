@@ -25,7 +25,7 @@ export default function AttendanceDayPeriods() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between items-center my-1">
-        <p className="text-lg font-semibold">فترات عمل اليوم</p>
+        <p className="text-lg font-semibold">{t("Dayworkhours")}</p>
         <TooltipProvider>
           <div className="flex items-center gap-2">
             <Tooltip>
@@ -48,8 +48,8 @@ export default function AttendanceDayPeriods() {
                 <TooltipContent>
                   <p>
                     {!selectedDay
-                      ? t("selectDayFirst") || "يجب اختيار اليوم أولا"
-                      : "لا يمكن إضافة فترة جديدة عند وجود فترة ممتدة لليوم التالي"}
+                      ? t("selectDayFirst")
+                      : t("cannotAddPeriod")}
                   </p>
                 </TooltipContent>
               )}
