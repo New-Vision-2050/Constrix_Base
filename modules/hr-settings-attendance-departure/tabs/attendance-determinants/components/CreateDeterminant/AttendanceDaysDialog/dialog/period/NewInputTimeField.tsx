@@ -216,16 +216,16 @@ const NewInputTimeField = ({
       defaultValue={value?.split(":")[0] || ""}
       onValueChange={(val) => setSelectedHour(val)}
     >
-      <SelectTrigger className="w-[70px] bg-pink-500 border-pink-300 text-white">
+      <SelectTrigger className="w-[70px] bg-primary border-primary text-primary-foreground">
         <SelectValue placeholder="HH" />
       </SelectTrigger>
-      <SelectContent className="bg-pink-500  border-pink-300 text-white">
+      <SelectContent className="bg-primary border-primary text-primary-foreground">
         {_dayAvsilableHours?.map((hour) => (
           <SelectItem
             key={hour.value}
             value={hour.value}
             disabled={!hour.available}
-            className="text-white hover:bg-gray-700"
+            className="text-primary-foreground hover:bg-secondary"
           >
             {hour.label}
           </SelectItem>
@@ -319,16 +319,16 @@ const NewInputTimeField = ({
       value={selectedMinute}
       onValueChange={(val) => setSelectedMinute(val)}
     >
-      <SelectTrigger className="w-[70px] bg-pink-500 border-pink-300 text-white">
+      <SelectTrigger className="w-[70px] bg-primary border-primary text-primary-foreground">
         <SelectValue placeholder="MM" />
       </SelectTrigger>
-      <SelectContent className="bg-pink-500 border-pink-00 text-white">
+      <SelectContent className="bg-primary border-primary text-primary-foreground">
         {availableMinutes?.map((minute) => (
           <SelectItem
             key={minute.value}
             value={minute.value}
             disabled={!minute.available}
-            className="text-white hover:bg-gray-700"
+            className="text-primary-foreground hover:bg-secondary"
           >
             {minute.label}
           </SelectItem>
@@ -340,10 +340,10 @@ const NewInputTimeField = ({
   // Show editable dropdowns in both create and edit modes
   return (
     <div className="flex flex-col space-y-1">
-      {label && <label className="text-sm text-gray-400">{label}</label>}
+      {label && <label className="text-sm text-muted-foreground">{label}</label>}
       <div className="flex items-center space-x-1">
         {hourSelect}
-        <span className="text-gray-400">:</span>
+        <span className="text-muted-foreground">:</span>
         {minuteSelect}
       </div>
     </div>
