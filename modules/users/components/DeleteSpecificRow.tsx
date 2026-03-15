@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { useTranslations } from "next-intl";
 import InfoIcon from "@/public/icons/InfoIcon";
+
 import { Button } from "@/components/ui/button";
 import { UserTableRow } from "@/modules/table/config/EmployeeTableConfig";
 import { useMemo, useState } from "react";
@@ -31,6 +32,7 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
   const { open, onClose, user, registrationFormSlug, handleRefreshWidgetsData, tableId } = props;
   const t = useTranslations("Companies");
   const t2 = useTranslations("companyProfile.officialDocs.docsSettingsDialog");
+  const tUsers = useTranslations("Users");
 
   const [isLoading, setIsLoading] = useState(false);
   const finalFormConfig = useMemo(() => {
@@ -85,7 +87,7 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
       const errorMsg = 
         error?.response?.data?.error || 
         error?.response?.data?.message || 
-        "فشل الحذف";
+        tUsers("deleteRow.deleteFailed");
       
       console.log("Final error message:", errorMsg);
       toast.error(errorMsg);

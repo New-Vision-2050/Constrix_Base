@@ -14,6 +14,7 @@ import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { UserTableRow } from "@/modules/table/utils/configs/usersTableConfig";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import { UsersTypes } from "@/modules/program-settings/constants/users-types";
+import { useTranslations } from "next-intl";
 
 interface PropsT {
   open: boolean;
@@ -22,7 +23,7 @@ interface PropsT {
 }
 
 const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
-  // declare and define vars and state
+  const t = useTranslations("Users");
   const router = useRouter();
   const { data: authCompanyData, isLoading } = useCurrentAuthCompany();
   // handle redirect to user profile page if user has one company
@@ -82,7 +83,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
             >
               ✕
             </button>
-            <p className="text-lg font-bold">برجاء أختيار الشركة</p>
+            <p className="text-lg font-bold">{t("chooseCompany.title")}</p>
           </DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
@@ -113,7 +114,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
         </DialogDescription>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} className="w-32 h-10">
-            الغاء
+            {t("chooseCompany.cancel")}
           </Button>
         </DialogFooter>
       </DialogContent>
