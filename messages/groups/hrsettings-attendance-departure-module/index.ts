@@ -24,6 +24,17 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
     cancelButtonText: _m("Cancel", "إلغاء"),
     form: new MessagesGroup({
       AttendanceDaysDialog: new MessagesGroup({
+        save: _m("Save", "حفظ"),
+        noScheduledDays: _m("No scheduled days", "لا يوجد أيام مجدولة"),
+        cannotAddPeriod: _m("Cannot add period when there is an extended period for the next day", "لا يمكن إضافة فترة جديدة عند وجود فترة ممتدة لليوم التالي"),
+        Dayworkhours: _m("Work Hours", "عدد ساعات العمل"),
+        DayworkhoursPlaceholder: _m("8", "8"),
+        noResults: _m("No results found", "لا توجد نتائج"),
+        search: _m("Search", "بحث"),
+        Day: _m("Day", "اليوم"),
+        selectDay: _m("Select Day", "اختر يوم"),
+        addDay: _m("Add Day", "إضافة يوم"),
+        removeDay: _m("Remove Day", "حذف يوم"),
         periods: _m("Periods", "الفترات"),
         timePeriodLabel: _m("Time Period", "الفترة الزمنية"),
         startTimeLabel: _m("Start Time", "البداية"),
@@ -46,7 +57,18 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
         periodStartPlaceholder: _m("09:00", "09:00"),
         periodEndPlaceholder: _m("17:00", "17:00"),
         periodStartRequired: _m("Period start time is required", "بداية الفترة مطلوبة"),
-        periodEndRequired: _m("Period end time is required", "نهاية الفترة مطلوبة")
+        periodEndRequired: _m("Period end time is required", "نهاية الفترة مطلوبة"),
+        locationTypeRequired: _m("Location type is required", "يجب اختيار نوع الموقع"),
+        determinantSettings: _m("Determinant Settings", "إعدادات المحدد"),
+        outsideZoneFor: _m("Outside zone for", "خارج المحدد لمدة"),
+        outsideZoneNumbersOnly: _m("Outside zone must be numbers only", "خارج المحدد لمدة يجب أن تكون أرقام فقط"),
+        attendanceRegistrationVia: _m("Attendance registration via", "تسجيل الحضور و الانصراف من خلال"),
+        attendanceRegistrationRequired: _m("Attendance registration method is required", "تسجيل الحضور و الانصراف من خلال يجب أن يختار"),
+        location: _m("Location", "الموقع"),
+        duplicateDayError: _m("This day has already been selected", "هذا اليوم تم اختياره بالفعل"),
+        minute: _m("minute", "دقيقة"),
+        hour: _m("hour", "ساعة"),
+        day: _m("day", "يوم")
       }),
       addAttendanceDays: _m("Add Attendance Days", "أضافة أيام حضور"),
       editAttendanceDay: _m("Edit Attendance Day", "تعديل يوم حضور"),
@@ -63,6 +85,7 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
       branches: _m("Branches", "الفروع"),
       branchesRequired: _m("At least one branch must be selected", "يجب اختيار فرع واحد على الأقل"),
       locationType: _m("Location Type", "نوع الموقع"),
+      locationTypeRequired: _m("Location type is required", "يجب اختيار نوع الموقع"),
       mainLocation: _m("Default branch location", "موقع الفرع الافتراضي"),
       customLocation: _m("Custom location for each branch", "موقع مخصص لكل فرع"),
       openMap: _m("Open Map", "فتح الخريطة"),
@@ -84,7 +107,15 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
       submitButtonText: _m("Save Determinant", "حفظ المحدد"),
       cancelButtonText: _m("Cancel", "إلغاء"),
       nextButtonText: _m("Next", "التالي"),
-      prevButtonText: _m("Previous", "السابق")
+      prevButtonText: _m("Previous", "السابق"),
+      addAttendanceDays: _m("Add Attendance Days", "أضافة أيام حضور"),
+      determinantSettings: _m("Determinant Settings", "إعدادات المحدد"),
+      outsideZoneFor: _m("Outside zone for", "خارج المحدد لمدة"),
+      outsideZoneNumbersOnly: _m("Outside zone must be numbers only", "خارج المحدد لمدة يجب أن تكون أرقام فقط"),
+      attendanceRegistrationVia: _m("Attendance registration via", "تسجيل الحضور و الانصراف من خلال"),
+      attendanceRegistrationRequired: _m("Attendance registration method is required", "تسجيل الحضور و الانصراف من خلال يجب أن يختار"),
+      location: _m("Location", "الموقع"),
+      duplicateDayError: _m("This day has already been selected", "هذا اليوم تم اختياره بالفعل")
     }),
     determinantsList: new MessagesGroup({
       allDeterminants: _m("All Determinants", "جميع المحددات")
