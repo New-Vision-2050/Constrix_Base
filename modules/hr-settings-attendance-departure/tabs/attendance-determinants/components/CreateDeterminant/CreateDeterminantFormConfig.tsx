@@ -1,5 +1,4 @@
 import { FormConfig } from "@/modules/form-builder";
-import { useEffect, useMemo } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
@@ -13,7 +12,6 @@ import {
   ScheduleDisplay,
   WeeklyScheduleDays,
 } from "./components/ScheduleDisplay";
-import { useTranslations } from "next-intl";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -44,19 +42,13 @@ type PropsT = {
     latitude?: number;
     longitude?: number;
   }>;
-  // Optional translation function
   t?: (key: string) => string;
-  // Optional constraint for editing mode
   editConstraint?: any;
+  translations: (key: string, defaultValue?: string) => string;
+  formTranslations: (key: string, defaultValue?: string) => string;
 };
-// Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
-  // Props
-  const { refetchConstraints, t, editConstraint } = props;
-  
-  // Translation functions
-  const translations = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog");
-  const formTranslations = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form");
+  const { refetchConstraints, t, editConstraint, translations, formTranslations } = props;
 
   // Function to get text with default value
   const getText = (key: string, defaultText: string) => {
@@ -815,7 +807,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
       return await defaultSubmitHandler(
         data,
-        getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint }),
+        getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint, translations, formTranslations }),
         {
           url: Boolean(editConstraint)
             ? `${baseURL}/attendance/constraints/${editConstraint.id}`

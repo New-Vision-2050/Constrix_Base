@@ -24,6 +24,12 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants"
   );
+  const formTranslations = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form"
+  );
+  const dialogTranslations = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog"
+  );
 
   return (
     <div className="flex items-center justify-between w-full mb-4">
@@ -39,6 +45,8 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
               refetchConstraints,
               branchesData,
               t,
+              translations: dialogTranslations,
+              formTranslations,
             })}
             trigger={<Button>{t("createDeterminant")}</Button>}
           />
