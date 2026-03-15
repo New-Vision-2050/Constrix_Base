@@ -74,7 +74,7 @@ function AttendanceDeterminantsTabContent() {
     t,
     editConstraint: editingConstraint,
     attendanceDaysDialogTranslations: attendanceDaysDialogTranslations,
-    formTranslationsFn: formTranslations,
+    formTranslationsFn: (key: string) => formTranslations(key),
   });
 
   return (

@@ -67,7 +67,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   
   // Helper function to get translation - translations are already defined in messages
   const getFormTranslation = (key: string, fallback?: string) => {
-    return formTranslationsFn ? formTranslationsFn(key) : (fallback || key);
+    if (formTranslationsFn) {
+      const result = formTranslationsFn(key);
+      return result === key ? (fallback || key) : result;
+    }
+    return fallback || key;
   };
 
   // Function to get text with default value
@@ -406,7 +410,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 <div className="py-2">
                   {/* Use the ScheduleDisplay component */}
                   <ScheduleDisplay
-                    t={translations}
+                    t={getFormTranslation}
                     weeklySchedule={_weekly_schedule as WeeklyScheduleDays}
                   />
                 </div>
@@ -462,7 +466,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           {
             name: "out_zone_rules_value",
             label: getFormTranslation("outsideZoneFor", "خارج المحدد لمدة"),
-            type: "number",
+            type: "text",
             placeholder: getFormTranslation("outsideZoneFor", "خارج المحدد لمدة"),
             postfix: (
               <div className="w-full h-full">

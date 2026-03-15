@@ -44,10 +44,10 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   const normalizeRadius = (value: string) => {
-    if (value === "") return "200";
+    if (value === "") return "";
     const numericValue = Number(value);
-    if (!Number.isFinite(numericValue)) return "200";
-    return numericValue < 200 ? "200" : value;
+    if (!Number.isFinite(numericValue)) return value;
+    return numericValue < 200 && numericValue > 0 ? "200" : String(numericValue);
   };
 
   // Initialize selected branch when branches are available
@@ -68,18 +68,15 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     isDefault: false,
     latitude: "",
     longitude: "",
-    radius: "1000",
+    radius: "200",
   });
 
   // Update currentBranchData when selected branch changes
   React.useEffect(() => {
     if (selectedBranch) {
       const branchData = getBranchLocation(selectedBranch);
-      // Ensure radius always has a value to prevent controlled/uncontrolled warning
-      setCurrentBranchData({
-        ...branchData,
-        radius: branchData.radius || "1000",
-      });
+      // Allow empty radius values - don't force fallback
+      setCurrentBranchData(branchData);
     }
   }, [selectedBranch, getBranchLocation]);
 
@@ -98,7 +95,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
         // Update branch location in context
         const updatedData = {
           isDefault: true,
-          radius: branchLocation.radius ?? "1000",
+          radius: "200",
           latitude: branchLocation.latitude,
           longitude: branchLocation.longitude,
         };
@@ -148,20 +145,48 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
       setCurrentBranchData({
         ...currentBranchData,
         ...updateData,
-        radius: field === "radius" ? value : (currentBranchData.radius || "1000"),
+        radius: field === "radius" ? value : currentBranchData.radius,
       });
     }
   };
 
   const handleRadiusBlur = (value: string) => {
     if (!selectedBranch) return;
-    const normalized = normalizeRadius(value);
-    if (normalized === value) return;
-    updateBranchLocation(selectedBranch, { radius: normalized });
-    setCurrentBranchData({
-      ...currentBranchData,
-      radius: normalized,
-    });
+    
+    // If value is empty, keep it empty
+    if (value === "") {
+      updateBranchLocation(selectedBranch, { radius: "" });
+      setCurrentBranchData({
+        ...currentBranchData,
+        radius: "",
+      });
+      return;
+    }
+    
+    // For non-empty values, validate and normalize
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) {
+      // Invalid number, keep as is
+      updateBranchLocation(selectedBranch, { radius: value });
+      setCurrentBranchData({
+        ...currentBranchData,
+        radius: value,
+      });
+    } else if (numericValue < 200) {
+      // Valid number but less than minimum, set to 200
+      updateBranchLocation(selectedBranch, { radius: "200" });
+      setCurrentBranchData({
+        ...currentBranchData,
+        radius: "200",
+      });
+    } else {
+      // Valid number >= 200, use it
+      updateBranchLocation(selectedBranch, { radius: String(numericValue) });
+      setCurrentBranchData({
+        ...currentBranchData,
+        radius: String(numericValue),
+      });
+    }
   };
 
   // Handle map click
