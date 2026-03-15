@@ -139,33 +139,39 @@ export function LocationDialogProvider({
     branchId: string,
     data: Partial<BranchLocationData>,
   ) => {
+    // Get current location data or defaults
+    const currentLocation = branchLocations[branchId];
+    const defaults = defaultCoordinates[branchId] || {
+      latitude: "24.7136",
+      longitude: "46.6753",
+      radius: "100",
+    };
+
     // If isDefault is true, we need to use the default coordinates from defaultCoordinates
     if (data.isDefault === true) {
-      const branchDefaults = defaultCoordinates[branchId] || {
-        latitude: "24.7136",
-        longitude: "46.6753",
-        radius: "100",
-      };
-
       // Update with default coordinates when isDefault is true
       setBranchLocations((prev) => ({
         ...prev,
         [branchId]: {
-          ...prev[branchId],
+          ...currentLocation,
           branchId,
           isDefault: true,
-          latitude: branchDefaults.latitude,
-          longitude: branchDefaults.longitude,
-          radius: branchDefaults.radius,
+          latitude: defaults.latitude,
+          longitude: defaults.longitude,
+          radius: defaults.radius,
         },
       }));
     } else {
+      // When isDefault is false or undefined, preserve existing data and update with new data
       setBranchLocations((prev) => ({
         ...prev,
         [branchId]: {
-          ...prev[branchId],
+          ...currentLocation,
           branchId,
-          ...data,
+          isDefault: data.isDefault === false ? false : (currentLocation?.isDefault || false),
+          latitude: data.latitude !== undefined ? data.latitude : (currentLocation?.latitude || defaults.latitude),
+          longitude: data.longitude !== undefined ? data.longitude : (currentLocation?.longitude || defaults.longitude),
+          radius: data.radius !== undefined ? data.radius : (currentLocation?.radius || defaults.radius),
         },
       }));
     }

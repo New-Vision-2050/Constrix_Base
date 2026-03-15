@@ -75,7 +75,11 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   React.useEffect(() => {
     if (selectedBranch) {
       const branchData = getBranchLocation(selectedBranch);
-      setCurrentBranchData(branchData);
+      // Ensure radius always has a value to prevent controlled/uncontrolled warning
+      setCurrentBranchData({
+        ...branchData,
+        radius: branchData.radius || "1000",
+      });
     }
   }, [selectedBranch, getBranchLocation]);
 
@@ -140,9 +144,11 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
       updateBranchLocation(selectedBranch, updateData);
 
       // Update local state to immediately reflect in UI
+      // Ensure radius always has a value
       setCurrentBranchData({
         ...currentBranchData,
         ...updateData,
+        radius: field === "radius" ? value : (currentBranchData.radius || "1000"),
       });
     }
   };
