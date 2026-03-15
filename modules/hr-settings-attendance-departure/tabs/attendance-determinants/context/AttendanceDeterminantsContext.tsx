@@ -79,6 +79,9 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 
   console.log("citiesData", citiesData);
 
+  // State for active constraint
+  const [activeConstraint, setActiveConstraint] = useState<Constraint>();
+
   // refresh active constraint when data updated
   useEffect(() => {
     if (constraintsData && activeConstraint) {
@@ -89,7 +92,7 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
         setActiveConstraint(updatedConstraint);
       }
     }
-  }, [constraintsData]);
+  }, [constraintsData, activeConstraint]);
 
   // handle change page
   const handlePageChange = (pageNumber: number) => {
@@ -100,9 +103,6 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   const handleLimitChange = (limit: number) => {
     setLimit(limit);
   };
-
-  // State for active constraint
-  const [activeConstraint, setActiveConstraint] = useState<Constraint>();
 
   // Handle click on a constraint
   const handleConstraintClick = (id: string) => {
