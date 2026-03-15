@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 export default function WorkingTimeCardInformation() {
   const t = useTranslations("UserProfile.header.statisticsCards");
   return (
-    <div className="flex flex-col justify-between gap-6">
+    <div className="flex min-w-0 flex-col justify-between gap-4 overflow-hidden">
       <div>
         <h2 className="text-lg font-bold mb-1">{t("workingTime")}</h2>
         <p className="text-md">{t("weeklyReport")}</p>

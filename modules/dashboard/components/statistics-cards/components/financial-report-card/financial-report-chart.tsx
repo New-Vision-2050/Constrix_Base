@@ -22,16 +22,16 @@ export default function FinancialReportChart() {
           size: "70%",
           labels: {
             show: true,
-            name: { offsetY: 20, fontSize: "0.875rem" },
+            name: { offsetY: 14, fontSize: "0.7rem" },
             value: {
-              offsetY: -15,
-              fontSize: "1.125rem",
+              offsetY: -10,
+              fontSize: "0.875rem",
               fontWeight: 500,
               formatter: (val: string) => `${val}`,
             },
             total: {
               show: true,
-              fontSize: "0.8125rem",
+              fontSize: "0.65rem",
               label: "Total",
               formatter: (): string => totalHours,
             },
@@ -42,11 +42,11 @@ export default function FinancialReportChart() {
   };
 
   return (
-    <div>
+    <div className="w-[110px] h-[110px] flex items-center justify-center overflow-hidden">
       <Chart
         type="donut"
-        height={140}
-        width={140}
+        height={110}
+        width={110}
         options={options}
         series={[74, 26]}
       />

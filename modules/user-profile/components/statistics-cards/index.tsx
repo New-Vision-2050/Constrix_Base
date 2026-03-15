@@ -7,7 +7,7 @@ import { useUserProfileCxt } from "../../context/user-profile-cxt";
 export default function StatisticsCardsSection() {
   const { widgetData } = useUserProfileCxt();
   return (
-    <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-4">
+    <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-4">
       <ContractStatusCard contractData={widgetData?.contract} />
       <WorkingTimeCard />
       <FinancialReportCard />

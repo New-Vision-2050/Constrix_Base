@@ -9,7 +9,7 @@ export default function TasksStatisticCard() {
   const t = useTranslations("UserProfile.header.statisticsCards");
   
   return (
-    <div className="relative min-h-[177px] min-w-[250px] bg-sidebar shadow-md rounded-lg p-4 flex justify-between">
+    <div className="relative min-h-[177px] min-w-[250px] w-[250px] flex-shrink-0 overflow-hidden bg-sidebar shadow-md rounded-lg p-4 flex justify-between">
       <div className="flex flex-col justify-between gap-5 w-full">
         <div className="flex flex-col items-start gap-2">
           <h3 className="text-lg font-bold">{t("tasks")}</h3>
