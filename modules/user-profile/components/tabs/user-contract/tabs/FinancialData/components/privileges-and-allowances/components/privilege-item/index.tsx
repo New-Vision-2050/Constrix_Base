@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import PrivilegeItemEditMode from "./PrivilegeItemEditMode";
 import PrivilegeItemPreviewMode from "./PrivilegeItemPreviewMode";
@@ -10,10 +11,11 @@ type PropsT = {
 };
 
 export default function PrivilegeItem(props: PropsT) {
+  const t = useTranslations("UserProfile.nestedTabs");
   const { privilegeData } = props;
   return (
     <TabTemplate
-      title={privilegeData?.privilege?.name ?? "أسم البدل"}
+      title={privilegeData?.privilege?.name ?? t("allowanceName")}
       editMode={
         <Can check={[PERMISSIONS.profile.privileges.update]}>
           <PrivilegeItemEditMode privilegeData={privilegeData} />
@@ -26,8 +28,8 @@ export default function PrivilegeItem(props: PropsT) {
       }
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {}, disabled: true },
-          { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+          { title: t("commonActions.myRequests"), onClick: () => {}, disabled: true },
+          { title: t("commonActions.createRequest"), onClick: () => {}, disabled: true },
         ],
       }}
     />

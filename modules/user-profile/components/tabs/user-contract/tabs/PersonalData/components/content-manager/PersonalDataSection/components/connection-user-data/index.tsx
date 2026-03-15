@@ -14,6 +14,7 @@ export default function ConnectionDataSectionPersonalForm() {
   const { userConnectionDataLoading } = usePersonalDataTabCxt();
   const { can } = usePermissions();
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
 
   return (
     <Can check={[PERMISSIONS.userProfile.contact.view]}>
@@ -25,8 +26,8 @@ export default function ConnectionDataSectionPersonalForm() {
           editMode={<UserProfileConnectionDataEditForm2 />}
           settingsBtn={{
             items: [
-              { title: "طلباتي", onClick: () => {}, disabled: true },
-              { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+              { title: tActions("myRequests"), onClick: () => {}, disabled: true },
+              { title: tActions("createRequest"), onClick: () => {}, disabled: true },
             ],
             disabledEdit: !can(PERMISSIONS.userProfile.contact.update),
           }}

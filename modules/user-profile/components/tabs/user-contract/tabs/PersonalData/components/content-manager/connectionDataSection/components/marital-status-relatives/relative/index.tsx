@@ -8,6 +8,7 @@ import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   relative: Relative;
@@ -18,10 +19,13 @@ export default function RelativeData({ relative }: PropsT) {
   const { handleRefetchUserRelativesData, userContactDataLoading } =
     useConnectionDataCxt();
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
+
   return (
     <Can check={[PERMISSIONS.profile.maritalStatus.view]}>
       <TabTemplate
-        title={"الحالة الاجتماعية"}
+        title={t("maritalStatus")}
         loading={userContactDataLoading}
         reviewMode={
           <MaritalStatusRelativesSectionPreviewMode relative={relative} />
@@ -30,7 +34,7 @@ export default function RelativeData({ relative }: PropsT) {
         settingsBtn={{
           items: [
             {
-              title: "حذف",
+              title: tActions("delete"),
               onClick: () => {
                 setDeleteDialog(true);
               },

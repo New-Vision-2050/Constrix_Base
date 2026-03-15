@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import SingleCoursePreviewMode from "./SingleCoursePreviewMode";
 import SingleCourseEditMode from "./SingleCourseEditMode";
 import { Course } from "@/modules/user-profile/types/Course";
@@ -16,7 +17,7 @@ export default function SingleCourse({ course }: PropsT) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserCourses } = useUserAcademicTabsCxt();
   const { can } = usePermissions();
-
+  const t = useTranslations("UserProfile.nestedTabs.academicExperience");
   // return component ui
   return (
     <>
@@ -28,17 +29,17 @@ export default function SingleCourse({ course }: PropsT) {
           settingsBtn={{
             items: [
               {
-                title: "طلباتي",
+                title: t("myRequests"),
                 onClick: () => {},
                 disabled: !can([PERMISSIONS.profile.courses.update]),
               },
               {
-                title: "أنشاء طلب",
+                title: t("createRequest"),
                 onClick: () => {},
                 disabled: !can([PERMISSIONS.profile.courses.update]),
               },
               {
-                title: "حذف",
+                title: t("delete"),
                 onClick: () => {
                   setDeleteDialog(true);
                 },

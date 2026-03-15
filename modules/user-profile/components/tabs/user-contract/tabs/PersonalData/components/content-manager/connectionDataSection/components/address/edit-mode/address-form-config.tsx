@@ -10,7 +10,8 @@ export const AddressFormConfig = () => {
     useUserProfileCxt();
   const { userContactData, handleRefetchUserContactData } =
     useConnectionDataCxt();
-    const t = useTranslations("UserProfile.nestedTabs.addressData");
+  const t = useTranslations("UserProfile.nestedTabs.addressData");
+  const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   const addressFormConfig: FormConfig = {
     formId: "ConnectionInformation-address-data-form",
@@ -65,7 +66,7 @@ export const AddressFormConfig = () => {
     submitButtonText: t("submitButtonText"),
     cancelButtonText: t("cancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tCommon("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

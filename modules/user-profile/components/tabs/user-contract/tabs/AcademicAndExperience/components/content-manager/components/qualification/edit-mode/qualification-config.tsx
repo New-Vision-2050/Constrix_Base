@@ -36,6 +36,7 @@ export const QualificationFormConfig = ({
             name: "country_id",
             label: t("country"),
             placeholder: t("selectCountry"),
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -47,13 +48,16 @@ export const QualificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [],
+            validation: [
+              { type: "required", message: t("countryRequired") },
+            ],
           },
           {
             type: "select",
             name: "university_id",
             label: t("university"),
             placeholder: t("selectUniversity"),
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/universities`,
               valueField: "id",
@@ -67,13 +71,16 @@ export const QualificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [],
+            validation: [
+              { type: "required", message: t("universityRequired") },
+            ],
           },
           {
             type: "select",
             name: "academic_qualification_id",
             label: t("academicQualification"),
             placeholder: t("selectAcademicQualification"),
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/academic_qualifications`,
               valueField: "id",
@@ -85,13 +92,16 @@ export const QualificationFormConfig = ({
               itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [],
+            validation: [
+              { type: "required", message: t("academicQualificationRequired") },
+            ],
           },
           {
             type: "select",
             name: "academic_specialization_id",
             label: t("academicSpecialization"),
             placeholder: t("selectAcademicSpecialization"),
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/academic_specializations`,
               valueField: "id",
@@ -105,14 +115,19 @@ export const QualificationFormConfig = ({
               dependsOn: "academic_qualification_id",
               filterParam: "academic_qualification_id",
             },
-            validation: [],
+            validation: [
+              { type: "required", message: t("academicSpecializationRequired") },
+            ],
           },
           {
             type: "date",
             name: "graduation_date",
             label: t("graduationDate"),
             placeholder: t("graduationDate"),
-            validation: [],
+            required: true,
+            validation: [
+              { type: "required", message: t("graduationDateRequired") },
+            ],
             maxDate: {
               value: new Date().toDateString()
             }
@@ -122,7 +137,9 @@ export const QualificationFormConfig = ({
             name: "study_rate",
             label: t("studyRate"),
             placeholder: t("studyRate"),
+            required: true,
             validation: [
+              { type: "required", message: t("studyRateRequired") },
               {
                 type: "pattern",
                 value: "^[0-9]+(\\.[0-9]+)?$",
@@ -168,7 +185,7 @@ export const QualificationFormConfig = ({
     submitButtonText: t("save"),
     cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: formType === "Create" ? true : false,
     showCancelButton: false,
@@ -201,10 +218,7 @@ export const QualificationFormConfig = ({
           ? `/qualifications/${qualification?.id}`
           : "/qualifications";
 
-      // const _body = formType === "Edit" ? body : serialize(body);
-      // const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
-
-      return await defaultSubmitHandler(
+      const result = await defaultSubmitHandler(
         serialize(body),
         qualificationFormConfig,
         {
@@ -212,6 +226,30 @@ export const QualificationFormConfig = ({
           method: "POST",
         }
       );
+
+      // Translate API validation errors to current locale
+      if (!result.success && result.errors) {
+        const translatedErrors: Record<string, string | string[]> = {};
+        Object.entries(result.errors).forEach(([field, messages]) => {
+          const translatedMessage = t("fieldRequired");
+          translatedErrors[field] = Array.isArray(messages)
+            ? [translatedMessage]
+            : translatedMessage;
+        });
+
+        const translatedMessage =
+          result.message === "Validation failed"
+            ? t("validationFailed")
+            : result.message;
+
+        return {
+          ...result,
+          message: translatedMessage,
+          errors: translatedErrors,
+        };
+      }
+
+      return result;
     },
   };
   return qualificationFormConfig;

@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +13,7 @@ import { useEffect, useState } from "react";
 import AddPrivilegeDialog from "./AddPrivilegeDialog";
 
 export function AddNewPrivilege() {
+  const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances");
   const { privileges, addedPrivilegesList } = useFinancialDataCxt();
   const [addedPrivilegesTypes, setAddedPrivilegesTypes] = useState<string[]>();
   const [open, setOpen] = useState(false);
@@ -37,7 +39,7 @@ export function AddNewPrivilege() {
     <>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <Button>اضافة امتياز</Button>
+          <Button>{t("addPrivilege")}</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-auto">
           <DropdownMenuGroup>
