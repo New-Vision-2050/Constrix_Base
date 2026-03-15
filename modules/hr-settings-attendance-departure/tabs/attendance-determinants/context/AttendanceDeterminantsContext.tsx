@@ -56,7 +56,7 @@ const AttendanceDeterminantsContext = createContext<
 export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const {
     data: constraintsData,
