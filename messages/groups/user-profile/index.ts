@@ -128,6 +128,7 @@ export const userProfileMessages = new MessagesGroup({
   }),
   activitiesData: new MessagesGroup({
     title: _m("Activities", "الانشطة"),
+    noActivities: _m("No activities found", "لا يوجد انشطة"),
   }),
   upcomingMeetings: new MessagesGroup({
     title: _m("Upcoming Meetings", "الاجتماعات القادمة"),
