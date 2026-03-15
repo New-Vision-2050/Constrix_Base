@@ -257,6 +257,7 @@ export interface FormConfig {
   showCancelButton?: boolean; // Whether to show the cancel button
   showBackButton?: boolean; // Whether to show the back button in step-based forms
   submitButtonText?: string;
+  submitButtonLoadingText?: string;
   resetButtonText?: string;
   cancelButtonText?: string;
   showSubmitLoader?: boolean;

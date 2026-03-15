@@ -3,14 +3,42 @@ import { baseURL } from "@/config/axios-config";
 import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import {useTranslations} from "next-intl";
 
-export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
+export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>, onClose?: () => void, tUsers?: ReturnType<typeof useTranslations>): FormConfig {
+  const u = tUsers ?? ((key: string) => {
+    const map: Record<string, string> = {
+      "form.title": "إنشاء مستخدم",
+      "form.company": "الشركة",
+      "form.companyPlaceholder": "اختر الشركة",
+      "form.companyRequired": "اختر الشركة",
+      "form.firstName": "اسم المستخدم الاول",
+      "form.firstNamePlaceholder": "ادخل اسم المستخدم الاول",
+      "form.firstNameRequired": "اسم المستخدم الاول مطلوب",
+      "form.nameMinLength": "الاسم يجب أن يحتوي على حرفين على الأقل.",
+      "form.lastName": "اسم المستخدم الأخير",
+      "form.lastNamePlaceholder": "اسم المستخدم الأخير",
+      "form.lastNameRequired": "الاسم مطلوب",
+      "form.email": "البريد الإلكتروني",
+      "form.emailPlaceholder": "ادخل البريد الإلكتروني",
+      "form.emailRequired": "البريد الإلكتروني مطلوب",
+      "form.emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+      "form.phone": "الهاتف",
+      "form.phonePlaceholder": "يرجى إدخال رقم هاتفك.",
+      "form.jobTitle": "المسمى الوظيفي",
+      "form.jobTitlePlaceholder": "اختر المسمى الوظيفي",
+      "form.jobTitleRequired": "المسمى الوظيفي مطلوب.",
+      "form.save": "حفظ",
+      "form.cancel": "إلغاء",
+    };
+    return map[key] ?? key;
+  }) as ReturnType<typeof useTranslations>;
+
   return {
     formId: "company-user-form",
-    title: "إنشاء مستخدم",
+    title: u("form.title"),
     apiUrl: `${baseURL}/company-users`,
     laravelValidation: {
       enabled: true,
-      errorsPath: "errors", // This is the default in Laravel
+      errorsPath: "errors",
     },
     sections: [
       {
@@ -25,8 +53,8 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
           {
             type: "select",
             name: "company_id",
-            label: "الشركة",
-            placeholder: "اختر الشركة",
+            label: u("form.company"),
+            placeholder: u("form.companyPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/companies`,
@@ -42,20 +70,20 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
             validation: [
               {
                 type: "required",
-                                message: 'اختر الشركة',
+                message: u("form.companyRequired"),
               },
             ],
           },
           {
             name: "first_name",
-            label: "اسم المستخدم الاول",
+            label: u("form.firstName"),
             type: "text",
-            placeholder: "ادخل اسم المستخدم الاول",
+            placeholder: u("form.firstNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "اسم المستخدم الاول مطلوب",
+                message: u("form.firstNameRequired"),
               },
               {
                 type: "pattern",
@@ -65,20 +93,20 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
               {
                 type: "minLength",
                 value: 2,
-                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
+                message: u("form.nameMinLength"),
               },
             ],
           },
           {
             name: "last_name",
-            label: "اسم المستخدم الأخير",
+            label: u("form.lastName"),
             type: "text",
-            placeholder: "اسم المستخدم الأخير",
+            placeholder: u("form.lastNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "الاسم مطلوب",
+                message: u("form.lastNameRequired"),
               },
               {
                 type: "pattern",
@@ -88,24 +116,24 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
               {
                 type: "minLength",
                 value: 2,
-                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
+                message: u("form.nameMinLength"),
               },
             ],
           },
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: u("form.email"),
             type: "email",
-            placeholder: "ادخل البريد الإلكتروني",
+            placeholder: u("form.emailPlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "البريد الإلكتروني مطلوب",
+                message: u("form.emailRequired"),
               },
               {
                 type: "email",
-                message: "يرجى إدخال عنوان بريد إلكتروني صالح.",
+                message: u("form.emailInvalid"),
               },
               {
                 type: "apiValidation",
@@ -131,10 +159,10 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
           },
           {
             name: "phone",
-            label: "الهاتف",
+            label: u("form.phone"),
             type: "phone",
             required: true,
-            placeholder: "يرجى إدخال رقم هاتفك.",
+            placeholder: u("form.phonePlaceholder"),
             validation: [
               {
                 type: "phone",
@@ -146,8 +174,8 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
             type: "select",
             name: "job_title_id",
             disabled: true,
-            label: "المسمى الوظيفي",
-            placeholder: "اختر المسمى الوظيفي",
+            label: u("form.jobTitle"),
+            placeholder: u("form.jobTitlePlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/job_titles/list`,
@@ -164,15 +192,15 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
             validation: [
               {
                 type: "required",
-                message: "المسمى الوظيفي مطلوب.",
+                message: u("form.jobTitleRequired"),
               },
             ],
           },
         ],
       },
     ],
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: u("form.save"),
+    cancelButtonText: u("form.cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

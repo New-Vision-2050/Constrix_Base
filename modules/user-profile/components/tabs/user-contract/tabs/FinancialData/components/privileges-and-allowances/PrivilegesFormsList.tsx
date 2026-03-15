@@ -1,9 +1,11 @@
+import { useTranslations } from "next-intl";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import PrivilegeItem from "./components/privilege-item";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
 
 export default function PrivilegesFormsList() {
+  const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances");
   const { addedPrivilegesList, addedPrivilegesListLoading } =
     useFinancialDataCxt();
 
@@ -11,8 +13,8 @@ export default function PrivilegesFormsList() {
   if (addedPrivilegesList && addedPrivilegesList.length === 0)
     return (
       <NoDataFounded
-        title="لا يوجد بيانات"
-        subTitle="لا يوجد بدلات للمستخدم قم باضافة بدل جديد"
+        title={t("noData")}
+        subTitle={t("noDataSubTitle")}
       />
     );
 

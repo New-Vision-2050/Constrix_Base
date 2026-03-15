@@ -9,6 +9,7 @@ export const ConnectionInformationFormConfig = () => {
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userContactData } = useConnectionDataCxt();
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
+  const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   const _ConnectionInformationFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
@@ -82,7 +83,7 @@ export const ConnectionInformationFormConfig = () => {
     submitButtonText: t("save"),
     cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tCommon("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

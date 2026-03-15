@@ -16,6 +16,7 @@ import { useTableStore } from "@/modules/table/store/useTableStore";
 const UsersPage = () => {
   const config = UsersConfig();
   const t = useTranslations("Companies");
+  const tUsers = useTranslations("Users");
   const [refreshWidget, setRefreshWidget] = useState(0);
   // handle reload table
 
@@ -33,8 +34,8 @@ const UsersPage = () => {
           <div className="flex items-center gap-3">
             <Can check={[PERMISSIONS.user.create]}>
               <SheetFormBuilder
-                config={GetCompanyUserFormConfig(t)}
-                trigger={<Button>إنشاء مستخدم</Button>}
+                config={GetCompanyUserFormConfig(t, undefined, tUsers)}
+                trigger={<Button>{tUsers("createUser")}</Button>}
                 onSuccess={(values) => {
                   setRefreshWidget((prev) => ++prev);
                   const tableStore = useTableStore.getState();

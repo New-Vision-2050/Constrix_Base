@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { useAttendanceDayCxt } from "../context/AttendanceDayCxt";
 import { useFormStore } from "@/modules/form-builder";
 import { DAYS_OF_WEEK } from "../constants/days";
+import { useTranslations } from "next-intl";
 
 export default function SaveButton() {
   const { selectedDay, dayPeriods } = useAttendanceDayCxt();
+  const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog");
 
   const handleSave = () => {
     // prepare periods - keep extends_to_next_day info within the same day
@@ -58,7 +60,7 @@ export default function SaveButton() {
       onClick={handleSave}
       className="w-full"
     >
-      حفظ
+      {t("save", "حفظ")}
     </Button>
   );
 }

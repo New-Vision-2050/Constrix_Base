@@ -13,6 +13,7 @@ export default function SocialDataSection() {
     useConnectionDataCxt();
   const { can } = usePermissions();
   const t = useTranslations("UserProfile.nestedTabs.socialData");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
 
   return (
     <Can check={[PERMISSIONS.profile.socialMedia.view]}>
@@ -26,8 +27,8 @@ export default function SocialDataSection() {
         }}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            { title: tActions("myRequests"), onClick: () => {}, disabled: true },
+            { title: tActions("createRequest"), onClick: () => {}, disabled: true },
           ],
           disabledEdit: !can([PERMISSIONS.profile.socialMedia.update]),
         }}

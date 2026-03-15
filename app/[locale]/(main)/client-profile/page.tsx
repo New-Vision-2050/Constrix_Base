@@ -1,26 +1,17 @@
-import { baseURL } from "@/config/axios-config";
-import { ClientProfileData } from "./[id]/types";
-import { baseApi } from "@/config/axios/instances/base";
 import { notFound } from "@i18n/navigation";
 import ClientProfileModule from "@/modules/client-profile";
+import { usersApi } from "@/services/api/users";
 
 export default async function ClientProfilePage() {
-  // fetch me data
-  const meData = await fetchMeData();
+
+  const { data } = await usersApi.getMe();
+  const meData = data?.payload ?? null;
 
   if (!meData) {
     return notFound();
   }
 
-  return <ClientProfileModule profileData={meData} />;
+  const profileData = meData.user ?? meData;
+  return <ClientProfileModule profileData={profileData} />;
 }
 
-export async function fetchMeData(): Promise<ClientProfileData | null> {
-  try {
-    const response = await baseApi.get(`${baseURL}/users/me`);
-    return response.data.payload;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    return null;
-  }
-}

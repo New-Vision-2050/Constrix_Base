@@ -13,6 +13,7 @@ export default function PersonalDataSectionPersonalForm() {
     usePersonalDataTabCxt();
   const { can } = usePermissions();
   const t = useTranslations("UserProfile.nestedTabs.PeronalDataTab");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
 
   return (
     <Can check={[PERMISSIONS.profile.personalInfo.view]}>
@@ -26,8 +27,8 @@ export default function PersonalDataSectionPersonalForm() {
         }}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {} },
-            { title: "أنشاء طلب", onClick: () => {} },
+            { title: tActions("myRequests"), onClick: () => {} },
+            { title: tActions("createRequest"), onClick: () => {} },
           ],
           disabledEdit: !can(PERMISSIONS.profile.personalInfo.update),
         }}

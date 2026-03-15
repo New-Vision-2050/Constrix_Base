@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import UserCertificationPreview from "./UserCertificationPreview";
 import UserCertificationEdit from "./UserCertificationEdit";
 import { Certification } from "@/modules/user-profile/types/Certification";
@@ -12,7 +13,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 type PropsT = { certification: Certification };
 
 export default function UserCertification({ certification }: PropsT) {
-  // declare and define component state and vars
+  const t = useTranslations("UserProfile.nestedTabs.commonActions");
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
   const { can } = usePermissions();
@@ -29,10 +30,10 @@ export default function UserCertification({ certification }: PropsT) {
           editMode={<UserCertificationEdit certification={certification} />}
           settingsBtn={{
             items: [
-              { title: "طلباتي", onClick: () => {}, disabled: true },
-              { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+              { title: t("myRequests"), onClick: () => {}, disabled: true },
+              { title: t("createRequest"), onClick: () => {}, disabled: true },
               {
-                title: "حذف",
+                title: t("delete"),
                 onClick: () => {
                   setDeleteDialog(true);
                 },

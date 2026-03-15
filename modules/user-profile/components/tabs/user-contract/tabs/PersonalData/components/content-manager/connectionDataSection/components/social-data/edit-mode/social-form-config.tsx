@@ -10,6 +10,7 @@ export const SocialMediaSitesFormConfig = () => {
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSocialData } = useConnectionDataCxt();
   const t = useTranslations("UserProfile.nestedTabs.socialData");
+  const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   const socialMediaSitesFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
@@ -109,7 +110,7 @@ export const SocialMediaSitesFormConfig = () => {
     submitButtonText: t("submitButtonText"),
     cancelButtonText: t("cancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: tCommon("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

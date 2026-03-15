@@ -13,6 +13,7 @@ export default function PassportDataSectionPersonalForm() {
     usePersonalDataTabCxt();
   const { can } = usePermissions();
   const t = useTranslations("UserProfile.nestedTabs.passportData");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
 
   return (
     <Can check={[PERMISSIONS.profile.passportInfo.view]}>
@@ -26,8 +27,8 @@ export default function PassportDataSectionPersonalForm() {
         }}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            { title: tActions("myRequests"), onClick: () => {}, disabled: true },
+            { title: tActions("createRequest"), onClick: () => {}, disabled: true },
           ],
           disabledEdit: !can(PERMISSIONS.profile.passportInfo.update),
         }}

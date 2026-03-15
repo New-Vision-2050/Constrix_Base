@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import JobOfferFormPreviewMode from "./JobOfferPreviewMode";
 import JobOfferEditMode from "./JobOfferEditMode";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
@@ -10,10 +11,11 @@ type PropsT = {
   offer: JobOffer | undefined;
 };
 export default function JobOfferForm({ offer }: PropsT) {
+  const t = useTranslations("UserProfile.nestedTabs.jobOffer");
   const { userJobOffersDataLoading } = useFunctionalContractualCxt();
   return (
     <TabTemplate
-      title={"العرض الوظيفي"}
+      title={t("title")}
       loading={userJobOffersDataLoading}
       reviewMode={
         <Can check={[PERMISSIONS.profile.jobOffer.view]}>

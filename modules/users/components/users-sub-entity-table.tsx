@@ -11,9 +11,15 @@ import { useSidebarStore } from "@/store/useSidebarStore";
 import { useParams } from "@i18n/navigation";
 import UsersSubEntityForm from "./users-sub-entity-form";
 import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
-import { CreateClientCxtProvider, useCreateClientCxt } from "@/modules/clients/context/CreateClientCxt";
+import {
+  CreateClientCxtProvider,
+  useCreateClientCxt,
+} from "@/modules/clients/context/CreateClientCxt";
 import { BrokersDataCxtProvider } from "@/modules/brokers/context/BrokersDataCxt";
-import { CreateBrokerCxtProvider, useCreateBrokerCxt } from "@/modules/brokers/context/CreateBrokerCxt";
+import {
+  CreateBrokerCxtProvider,
+  useCreateBrokerCxt,
+} from "@/modules/brokers/context/CreateBrokerCxt";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config";
 import useUserData from "@/hooks/use-user-data";
@@ -35,7 +41,11 @@ type PropsT = {
   currentSlug?: string;
 };
 
-const UsersSubEntityTable = ({ programName, forceOpenCreateForm, currentSlug }: PropsT) => {
+const UsersSubEntityTable = ({
+  programName,
+  forceOpenCreateForm,
+  currentSlug,
+}: PropsT) => {
   const t = useTranslations();
   // current user data
   const { data: userData } = useUserData();
@@ -74,35 +84,49 @@ const UsersSubEntityTable = ({ programName, forceOpenCreateForm, currentSlug }: 
   };
 
   // Component to handle both client and broker form force open
-const FormWrapper = ({ children, forceOpen, registrationFormSlug }: { children: React.ReactNode; forceOpen?: boolean; registrationFormSlug?: string }) => {
-  const { openCreateClientSheet } = useCreateClientCxt();
-  const { openCreateBrokerSheet } = useCreateBrokerCxt();
-  const [hasOpened, setHasOpened] = useState(false);
-  
-  useEffect(() => {
-    // Only proceed if forceOpen is true and we haven't opened yet
-    if (!forceOpen || hasOpened) return;
-    
-    // Check if we should open broker form based on registrationFormSlug
-    if (registrationFormSlug === ModelsTypes.BROKER) {
-      // Open broker form
-      openCreateBrokerSheet();
-      setHasOpened(true);
-      
-      // Dispatch event for CreateBrokerSheet
-      window.dispatchEvent(new CustomEvent('force-open-broker-form'));
-    } else {
-      // Open client form (default behavior)
-      openCreateClientSheet();
-      setHasOpened(true);
-      
-      // Dispatch event for CreateClientSheet
-      window.dispatchEvent(new CustomEvent('force-open-client-form'));
-    }
-  }, [forceOpen, hasOpened, registrationFormSlug, openCreateClientSheet, openCreateBrokerSheet]);
-  
-  return <>{children}</>;
-};
+  const FormWrapper = ({
+    children,
+    forceOpen,
+    registrationFormSlug,
+  }: {
+    children: React.ReactNode;
+    forceOpen?: boolean;
+    registrationFormSlug?: string;
+  }) => {
+    const { openCreateClientSheet } = useCreateClientCxt();
+    const { openCreateBrokerSheet } = useCreateBrokerCxt();
+    const [hasOpened, setHasOpened] = useState(false);
+
+    useEffect(() => {
+      // Only proceed if forceOpen is true and we haven't opened yet
+      if (!forceOpen || hasOpened) return;
+
+      // Check if we should open broker form based on registrationFormSlug
+      if (registrationFormSlug === ModelsTypes.BROKER) {
+        // Open broker form
+        openCreateBrokerSheet();
+        setHasOpened(true);
+
+        // Dispatch event for CreateBrokerSheet
+        window.dispatchEvent(new CustomEvent("force-open-broker-form"));
+      } else {
+        // Open client form (default behavior)
+        openCreateClientSheet();
+        setHasOpened(true);
+
+        // Dispatch event for CreateClientSheet
+        window.dispatchEvent(new CustomEvent("force-open-client-form"));
+      }
+    }, [
+      forceOpen,
+      hasOpened,
+      registrationFormSlug,
+      openCreateClientSheet,
+      openCreateBrokerSheet,
+    ]);
+
+    return <>{children}</>;
+  };
 
   const usersConfig = UsersConfigV2({
     canDelete: can(entityPermissions.delete),
@@ -118,7 +142,7 @@ const FormWrapper = ({ children, forceOpen, registrationFormSlug }: { children: 
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"
       ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
-      : optionalAttr?.includes(field.name || field.key)
+      : optionalAttr?.includes(field.name || field.key),
   );
 
   const tableConfig: TableConfig = {
@@ -159,7 +183,10 @@ const FormWrapper = ({ children, forceOpen, registrationFormSlug }: { children: 
                   searchBarActions={
                     <div className="flex items-center gap-3">
                       <Can check={[entityPermissions.create]}>
-                        <FormWrapper forceOpen={forceOpenCreateForm} registrationFormSlug={registrationFormSlug}>
+                        <FormWrapper
+                          forceOpen={forceOpenCreateForm}
+                          registrationFormSlug={registrationFormSlug}
+                        >
                           <UsersSubEntityForm
                             tableId={TABLE_ID}
                             sub_entity_id={sub_entity_id}
@@ -180,35 +207,43 @@ const FormWrapper = ({ children, forceOpen, registrationFormSlug }: { children: 
     </>
   );
 
-  // Define tabs for client view
   const clientTabs: Tab[] = [
     {
-      label: "فرد",
+      label: t("Users.individual"),
       icon: <Users size={18} />,
       value: "individual",
       component: IndividualUsersTable,
     },
     {
-      label: "جهة",
+      label: t("Users.entity"),
       icon: <Building2 size={18} />,
       value: "company",
-      component: <ClientCompaniesTable sub_entity_id={sub_entity_id} registration_form_id={registration_form_id} />,
+      component: (
+        <ClientCompaniesTable
+          sub_entity_id={sub_entity_id}
+          registration_form_id={registration_form_id}
+        />
+      ),
     },
   ];
 
-  // Define tabs for broker view
   const brokerTabs: Tab[] = [
     {
-      label: "فرد",
+      label: t("Users.individual"),
       icon: <Users size={18} />,
       value: "individual",
       component: IndividualUsersTable,
     },
     {
-      label: "جهة",
+      label: t("Users.entity"),
       icon: <Building2 size={18} />,
       value: "company",
-      component: <BrokerCompaniesTable sub_entity_id={sub_entity_id} registration_form_id={registration_form_id} />,
+      component: (
+        <BrokerCompaniesTable
+          sub_entity_id={sub_entity_id}
+          registration_form_id={registration_form_id}
+        />
+      ),
     },
   ];
 
@@ -218,7 +253,7 @@ const FormWrapper = ({ children, forceOpen, registrationFormSlug }: { children: 
         toggleRefetch={toggleRefetch}
         config={subEntityStatisticsConfig(
           sub_entity_id ?? "",
-          registration_form_id ?? ""
+          registration_form_id ?? "",
         )}
       />
       {isClientView ? (

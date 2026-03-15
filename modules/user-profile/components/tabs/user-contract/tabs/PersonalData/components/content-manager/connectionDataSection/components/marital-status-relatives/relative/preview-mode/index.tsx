@@ -1,5 +1,6 @@
 import { Relative } from "@/modules/user-profile/types/relative";
 import PreviewTextField from "../../../../../../../../components/previewTextField";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   relative: Relative;
@@ -9,13 +10,13 @@ export default function MaritalStatusRelativesSectionPreviewMode({
   relative,
 }: PropsT) {
   const isNotMarried = relative?.marital_status?.type === "not-married";
-
+  const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row one columns*/}
       <div className="p-2 col-span-2">
         <PreviewTextField
-          label="الحالة الاجتماعية"
+          label={t("maritalStatus")}
           value={relative?.marital_status?.name}
           valid={Boolean(relative?.marital_status?.name)}
           type="select"

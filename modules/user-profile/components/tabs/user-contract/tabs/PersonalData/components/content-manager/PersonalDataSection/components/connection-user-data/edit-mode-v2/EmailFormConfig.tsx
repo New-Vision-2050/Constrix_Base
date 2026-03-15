@@ -70,13 +70,13 @@ export const EmailFormConfig = () => {
         
         return {
           success: true,
-          message: "تم إرسال رمز التحقق إلى البريد الإلكتروني",
+          message: t("verificationCodeSent"),
         };
       } catch (error) {
         console.log("error", error);
         return {
           success: false,
-          message: "حدث خطأ أثناء إرسال رمز التحقق",
+          message: t("verificationCodeError"),
         };
       }
     },

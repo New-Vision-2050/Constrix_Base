@@ -13,6 +13,7 @@ export default function IdentityDataSectionPersonalForm() {
     usePersonalDataTabCxt();
   const { can } = usePermissions();
   const t = useTranslations("UserProfile.nestedTabs.identityData");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
 
   return (
     <Can check={[PERMISSIONS.userProfile.identity.view]}>
@@ -34,8 +35,8 @@ export default function IdentityDataSectionPersonalForm() {
         }}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            { title: tActions("myRequests"), onClick: () => {}, disabled: true },
+            { title: tActions("createRequest"), onClick: () => {}, disabled: true },
           ],
           disabledEdit: !can(PERMISSIONS.userProfile.identity.update),
         }}

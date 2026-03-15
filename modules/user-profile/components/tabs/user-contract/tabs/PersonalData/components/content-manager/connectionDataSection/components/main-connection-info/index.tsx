@@ -13,6 +13,7 @@ export default function MainUserConnectionInfoSection() {
   const { handleRefetchUserContactData, userContactDataLoading } =
     useConnectionDataCxt();
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
+  const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
 
   return (
     <Can check={[PERMISSIONS.profile.contactInfo.view]}>
@@ -26,8 +27,8 @@ export default function MainUserConnectionInfoSection() {
         }}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            { title: tActions("myRequests"), onClick: () => {}, disabled: true },
+            { title: tActions("createRequest"), onClick: () => {}, disabled: true },
           ],
           disabledEdit: !can([PERMISSIONS.profile.contactInfo.update]),
         }}
