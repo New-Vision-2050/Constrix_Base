@@ -3,7 +3,8 @@ import { cookies } from "next/headers";
 import React from "react";
 import Providers from "./providers";
 import withPermissionsProvider from "@/lib/permissions/server/with-permissions-provider";
-import { fetchMeData } from "./client-profile/page";
+import { usersApi } from "@/services/api/users";
+
 
 async function RootLayout({
   children,
@@ -11,8 +12,8 @@ async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const meData = await fetchMeData();
-  const userTypes = meData?.user_types ?? [];
+  const meData = await usersApi.getMe();
+  const userTypes = meData?.data?.payload?.user_types ?? [];
   const companyCookie = cookieStore.get("company-data")?.value;
   const company = companyCookie ? JSON.parse(companyCookie) : null;
 
