@@ -169,6 +169,7 @@ const ValidatePhonePhase = ({
           form="login-form"
           fullWidth
           variant="contained"
+          color="primary"
         >
           {loginT("Login")}
         </Button>

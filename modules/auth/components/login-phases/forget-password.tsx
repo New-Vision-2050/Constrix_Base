@@ -131,6 +131,7 @@ const ForgetPasswordPhase = ({
             form="login-form"
             fullWidth
             variant="contained"
+            color="primary"
           >
             {t("ForgotPassword.Confirm")}
           </Button>
