@@ -1,5 +1,4 @@
 import { FormConfig } from "@/modules/form-builder";
-import { useEffect, useMemo } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
@@ -43,15 +42,12 @@ type PropsT = {
     latitude?: number;
     longitude?: number;
   }>;
-  // Optional translation function
   t?: (key: string) => string;
-  // Optional constraint for editing mode
   editConstraint?: any;
   // Translation functions passed as parameters
   attendanceDaysDialogTranslations?: (key: string) => string;
   formTranslationsFn?: (key: string) => string;
 };
-// Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   // Props
   const { 
@@ -832,7 +828,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
       return await defaultSubmitHandler(
         data,
-        getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint }),
+        getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint, translations, formTranslations }),
         {
           url: Boolean(editConstraint)
             ? `${baseURL}/attendance/constraints/${editConstraint.id}`
