@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   DeterminantDetails,
@@ -63,6 +65,20 @@ function AttendanceDeterminantsTabContent() {
     // Keep a small delay before clearing state to avoid rendering issues
     setTimeout(() => setEditingConstraint(null), 300);
   };
+
+  // Call translation hooks at top level to maintain hooks order
+  const attendanceDaysDialogTranslations = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog");
+  const formTranslations = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form");
+
+  // Get form config - this needs to be called unconditionally to maintain hooks order
+  const formConfig = getDynamicDeterminantFormConfig({
+    refetchConstraints,
+    branchesData,
+    t,
+    editConstraint: editingConstraint,
+    attendanceDaysDialogTranslations: attendanceDaysDialogTranslations,
+    formTranslationsFn: (key: string) => formTranslations(key),
+  });
 
   return (
     <Can check={[PERMISSIONS.attendance.settings.view]}>
@@ -132,14 +148,7 @@ function AttendanceDeterminantsTabContent() {
         {/* Form for editing determinants */}
         {editingConstraint && (
           <SheetFormBuilder
-            config={getDynamicDeterminantFormConfig({
-              refetchConstraints,
-              branchesData,
-              t,
-              editConstraint: editingConstraint,
-              translations: dialogTranslations,
-              formTranslations,
-            })}
+            config={formConfig}
             isOpen={isFormOpen}
             onOpenChange={(open) => {
               if (!open) handleCloseForm();

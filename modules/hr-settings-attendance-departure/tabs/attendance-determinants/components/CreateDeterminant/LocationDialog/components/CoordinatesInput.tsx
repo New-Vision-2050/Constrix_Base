@@ -60,7 +60,7 @@ export default function CoordinatesInput({
         <TextField
           fullWidth
           size="small"
-          type="number"
+          type="text"
           label={`${t("radius")} (${t("meters")})`}
           value={radius}
           onChange={(e) => onRadiusChange(e.target.value)}
@@ -68,7 +68,10 @@ export default function CoordinatesInput({
           placeholder="1000"
           error={radiusError}
           helperText={radiusError ? `${t("radius")} >= 200` : ""}
-          inputProps={{ min: 200 }}
+          inputProps={{
+            inputMode: 'numeric',
+            pattern: '[0-9]*'
+          }}
         />
       </Box>
     </Box>
