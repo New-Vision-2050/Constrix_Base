@@ -62,6 +62,7 @@ const SecurityQuestionsPhase = ({
           size="large"
           fullWidth
           variant="contained"
+          color="primary"
           type="submit"
           form="login-form"
           onClick={handleSubmit(onSubmit)}
