@@ -8,7 +8,7 @@ type PropsT = {
 
 export default function ContractStatusCard({ contractData }: PropsT) {
   return (
-    <div className="flex min-h-[177px] w-[250px] flex-col justify-between bg-sidebar shadow-md rounded-lg p-4">
+    <div className="flex min-h-[177px] w-[250px] min-w-[250px] flex-shrink-0 flex-col justify-between overflow-hidden bg-sidebar shadow-md rounded-lg p-4">
       {/* Header Section */}
       <ContractStatusHeader contractData={contractData}/>
 

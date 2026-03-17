@@ -43,20 +43,20 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
 
   // declare and define
   return (
-    <div className="flex flex-col gap-4 mt-4">
-      <div className="flex items-center justify-between">
+    <div className="flex min-w-0 flex-col gap-3 mt-3">
+      <div className="flex min-w-0 items-center justify-between gap-2">
         {/* Start Date */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-pink-100 flex items-center justify-center rounded-md">
-              <CalendarRangeIcon additionalClass="text-pink-500 w-[15px]" />
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 shrink-0 bg-pink-100 flex items-center justify-center rounded-md">
+              <CalendarRangeIcon additionalClass="text-pink-500 w-[12px]" />
             </div>
-            <span className="text-sm">{t("contractStart")}</span>
+            <span className="text-xs truncate">{t("contractStart")}</span>
           </div>
-          <span className="text-lg font-semibold ">
+          <span className="text-base font-semibold truncate">
             {`${startPercentage} %`}
           </span>
-          <span className="text-sm ">{contractData?.start_date}</span>
+          <span className="text-xs truncate">{contractData?.start_date}</span>
         </div>
 
         {/* Divider */}
@@ -65,21 +65,23 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
         </div>
 
         {/* End Date */}
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">{t("contractEnd")}</span>
-            <div className="w-6 h-6 bg-yellow-100 flex items-center justify-center rounded-md">
-              <CalendarRangeIcon additionalClass="text-yellow-500 w-[15px]" />
+        <div className="flex min-w-0 flex-1 flex-col items-end overflow-hidden">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs truncate">{t("contractEnd")}</span>
+            <div className="w-5 h-5 shrink-0 bg-yellow-100 flex items-center justify-center rounded-md">
+              <CalendarRangeIcon additionalClass="text-yellow-500 w-[12px]" />
             </div>
           </div>
-          <span className="text-lg font-semibold">
+          <span className="text-base font-semibold truncate">
             {`${endPercentage} %`}
           </span>
-          <span className="text-sm">{contractData?.end_date}</span>
+          <span className="text-xs truncate">{contractData?.end_date}</span>
         </div>
       </div>
       {/* Progress Bar */}
-      <ContractStatusProgressBar value={passedPercentage ?? 1} />
+      <div className="min-w-0">
+        <ContractStatusProgressBar value={passedPercentage ?? 1} />
+      </div>
     </div>
   );
 }
