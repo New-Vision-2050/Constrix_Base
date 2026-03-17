@@ -4,16 +4,32 @@ import React from "react";
 import Providers from "./providers";
 import withPermissionsProvider from "@/lib/permissions/server/with-permissions-provider";
 import { usersApi } from "@/services/api/users";
-
+import { redirect } from "next/navigation";
+import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
 
 async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
   const cookieStore = await cookies();
-  const meData = await usersApi.getMe();
-  const userTypes = meData?.data?.payload?.user_types ?? [];
+  const nvToken = cookieStore.get("new-vision-token")?.value;
+
+  if (!nvToken) {
+    redirect(`/${locale}/login`);
+  }
+
+  let userTypes: UserRoleType[] = [];
+  try {
+    const meData = await usersApi.getMe();
+    userTypes = meData?.data?.payload?.user_types ?? [];
+  } catch {
+    redirect(`/${locale}/login`);
+  }
+
   const companyCookie = cookieStore.get("company-data")?.value;
   const company = companyCookie ? JSON.parse(companyCookie) : null;
 

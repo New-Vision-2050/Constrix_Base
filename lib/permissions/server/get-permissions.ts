@@ -26,7 +26,6 @@ export const getPermissions = cache(async (): Promise<PermissionsResponse> => {
     const isSuperAdmin = Boolean(payload.is_super_admin);
     const isCentralCompany = Boolean(payload.is_central_company);
 
-    console.log('from permissions', payload);
     return { permissions, isSuperAdmin, isCentralCompany , user: payload };
   } catch {
     return empty;
