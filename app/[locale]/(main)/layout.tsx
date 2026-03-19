@@ -5,6 +5,7 @@ import Providers from "./providers";
 import withPermissionsProvider from "@/lib/permissions/server/with-permissions-provider";
 import { usersApi } from "@/services/api/users";
 import { redirect } from "next/navigation";
+import { deleteCookie } from "cookies-next";
 import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
 
 async function RootLayout({
@@ -19,7 +20,8 @@ async function RootLayout({
   const nvToken = cookieStore.get("new-vision-token")?.value;
 
   if (!nvToken) {
-    redirect(`/${locale}/login`);
+    deleteCookie("new-vision-token");
+    redirect("/");
   }
 
   let userTypes: UserRoleType[] = [];
@@ -27,7 +29,8 @@ async function RootLayout({
     const meData = await usersApi.getMe();
     userTypes = meData?.data?.payload?.user_types ?? [];
   } catch {
-    redirect(`/${locale}/login`);
+    deleteCookie("new-vision-token");
+    redirect("/");
   }
 
   const companyCookie = cookieStore.get("company-data")?.value;
