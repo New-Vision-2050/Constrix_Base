@@ -2,8 +2,6 @@ import { cache } from "react";
 import { Permission } from "../types/permission";
 import { usersApi } from "@/services/api/users";
 import { UserMePayload } from "@/services/api/users/types/response";
-import {deleteCookie} from "cookies-next";
-import {redirect} from "next/navigation";
 
 type PermissionsResponse = {
   user: UserMePayload;
@@ -30,7 +28,6 @@ export const getPermissions = cache(async (): Promise<PermissionsResponse> => {
 
     return { permissions, isSuperAdmin, isCentralCompany , user: payload };
   } catch {
-    deleteCookie("new-vision-token");
-    redirect("/");
+    return empty;
   }
 });

@@ -22,6 +22,7 @@ const LoginProvider = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
+    
     if (token) {
       fetchLoginAdmin(token)
         .then((loginToken) => {
