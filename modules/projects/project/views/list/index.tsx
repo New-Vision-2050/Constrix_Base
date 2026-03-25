@@ -38,6 +38,7 @@ const PROJECTS_QUERY_KEY = "all-projects-list";
 
 function ProjectsList() {
   const t = useTranslations();
+  const tProject = useTranslations("project");
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -127,10 +128,10 @@ function ProjectsList() {
   // ── Columns ──────────────────────────────────────────────────────────────
   const columns = useMemo(
     () => [
-      ...getProjectsColumns(),
+      ...getProjectsColumns(tProject),
       {
         key: "actions",
-        name: t("project.tableActions"),
+        name: tProject("tableActions"),
         sortable: false,
         render: (row: ProjectRow) => (
           <CustomMenu
@@ -143,7 +144,7 @@ function ProjectsList() {
                 onClick={onClick}
                 sx={{ bgcolor: "#3f3f5a", color: "#fff", minWidth: 80 }}
               >
-                {t("project.tableActions")}
+                {tProject("tableActions")}
               </Button>
             )}
           >
@@ -169,7 +170,7 @@ function ProjectsList() {
         ),
       },
     ],
-    [t, handleEdit, handleDelete, handleView],
+    [t, tProject, handleEdit, handleDelete, handleView],
   );
 
   // ── Table state ──────────────────────────────────────────────────────────
@@ -326,6 +327,7 @@ function ProjectsList() {
                   onEdit={() => handleEdit(project.id)}
                   onDelete={() => handleDelete(project.id)}
                   t={t}
+                  tProject={tProject}
                 />
               ))}
             </Box>

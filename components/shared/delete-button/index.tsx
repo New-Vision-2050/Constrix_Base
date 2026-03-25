@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import InfoIcon from "@/public/icons/InfoIcon";
 
 type DeleteButtonProps = {
@@ -26,13 +27,16 @@ type DeleteButtonProps = {
 };
 
 const DeleteButton: React.FC<DeleteButtonProps> = ({
-  message = "Are you sure you want to delete this item?",
+  message,
   onDelete,
   open: externalOpen,
   setOpen: setExternalOpen,
   translations,
 }) => {
+  const t = useTranslations("labels");
   const [localOpen, setLocalOpen] = useState(false);
+
+  const dialogMessage = message ?? t("deleteConfirmMessage");
 
   // Use external state if provided, otherwise use local state
   const isOpen = externalOpen !== undefined ? externalOpen : localOpen;
@@ -52,13 +56,13 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
       handleClose();
     },
     onError: (error) => {
-      toast.error(translations?.deleteError || "Failed to delete item");
+      toast.error(translations?.deleteError ?? t("deleteError"));
       console.error("Delete error:", error);
     },
   });
 
   const handleCancel = () => {
-    toast.info(translations?.deleteCancelled || "Delete cancelled");
+    toast.info(translations?.deleteCancelled ?? t("deleteCancelled"));
     handleClose();
   };
 
@@ -85,7 +89,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
           <DialogDescription asChild>
             <div>
               <h3 className="text-center !text-2xl mb-9">
-                {message ?? "هل انت متاكد تريد الحذف؟"}
+                {dialogMessage}
               </h3>
             </div>
           </DialogDescription>
@@ -96,7 +100,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
               loading={isPending}
               className="w-32 h-10"
             >
-              حذف{" "}
+              {t("delete")} {" "}
             </Button>
             <Button
               variant="outline"
@@ -104,7 +108,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
               disabled={isPending}
               className="w-32 h-10"
             >
-              الغاء
+              {t("cancel")}
             </Button>
           </DialogFooter>
         </DialogContent>

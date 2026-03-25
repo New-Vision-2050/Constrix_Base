@@ -8,13 +8,14 @@ import {
 } from "@mui/material";
 import { EditIcon, Trash2, MoreVertical } from "lucide-react";
 import CustomMenu from "@/components/headless/custom-menu";
-import { ProjectRow, STATUS_MAP } from "../columns";
+import { ProjectRow, PROJECT_STATUS_MAP } from "../columns";
 
 interface ProjectCardProps {
   project: ProjectRow;
   onEdit: () => void;
   onDelete: () => void;
   t: (key: string) => string;
+  tProject: (key: string) => string;
 }
 
 export function ProjectCard({
@@ -22,22 +23,35 @@ export function ProjectCard({
   onEdit,
   onDelete,
   t,
+  tProject,
 }: ProjectCardProps) {
   const statusCfg =
-    project.status !== undefined ? STATUS_MAP[project.status] : undefined;
+    project.status !== undefined
+      ? PROJECT_STATUS_MAP[project.status]
+      : undefined;
 
-
+  const emptyCell = tProject("emptyCell");
 
   const fields = [
-    { label: "الرقم المرجعي", value: project.serial_number  },
-    { label: "اسم العميل", value: project.project_owner_name ?? "—" },
     {
-      label: "المهندس المسؤول",
-      value: project.responsible_employee_name ?? "—",
+      labelKey: "columnRefNumber",
+      value:
+        project.serial_number ??
+        project.ref_number ??
+        project.id ??
+        emptyCell,
     },
-    { label: "الادارة", value: project.management_name ?? "—" },
-    { label: "بداية المشروع", value: project.start_date ?? "—" },
-    { label: "نهاية المشروع", value: project.end_date ?? "—" },
+    {
+      labelKey: "columnClientName",
+      value: project.project_owner_name ?? emptyCell,
+    },
+    {
+      labelKey: "columnResponsibleEngineer",
+      value: project.responsible_employee_name ?? emptyCell,
+    },
+    { labelKey: "management", value: project.management_name ?? emptyCell },
+    { labelKey: "columnProjectStart", value: project.start_date ?? emptyCell },
+    { labelKey: "columnProjectEnd", value: project.end_date ?? emptyCell },
   ];
 
   return (
@@ -93,14 +107,14 @@ export function ProjectCard({
       </Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
-        {fields.map(({ label, value }) => (
-          <Box key={label}>
+        {fields.map(({ labelKey, value }) => (
+          <Box key={labelKey}>
             <Typography
               variant="caption"
               color="text.secondary"
               display="block"
             >
-              {label}
+              {tProject(labelKey)}
             </Typography>
             <Typography variant="body2" fontWeight="medium">
               {String(value)}
@@ -112,7 +126,7 @@ export function ProjectCard({
       {statusCfg && (
         <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
           <Chip
-            label={statusCfg.label}
+            label={tProject(statusCfg.labelKey)}
             size="small"
             sx={{
               backgroundColor: statusCfg.bg,

@@ -184,7 +184,7 @@ export function ProjectFormFields({
             label={t("project.projectName")}
             fullWidth
             error={!!errors.name}
-            helperText={errors.name?.message}
+            helperText={errors.name && t("project.projectNameRequired")}
           />
         )}
       />

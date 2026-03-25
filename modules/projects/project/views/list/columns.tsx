@@ -1,6 +1,8 @@
 import React from "react";
 import { Box, Chip, LinearProgress, Typography } from "@mui/material";
 
+export type ProjectColumnTranslator = (key: string) => string;
+
 // Project row type interface
 export interface ProjectRow {
   id: number | string;
@@ -31,19 +33,29 @@ export interface ProjectRow {
   project_view?: string;
 }
 
-export const STATUS_MAP: Record<number, { label: string; bg: string }> = {
-  1: { label: "جاري", bg: "#16a34a" },
-  0: { label: "قيد التنفيذ", bg: "#d97706" },
-  [-1]: { label: "متوقف", bg: "#b91c1c" },
-  2: { label: "مكتمل", bg: "#2563eb" },
+/** Status chip colors + translation keys (use with `useTranslations("project")`). */
+export const PROJECT_STATUS_MAP: Record<
+  number,
+  { labelKey: string; bg: string }
+> = {
+  1: { labelKey: "statusOngoing", bg: "#16a34a" },
+  0: { labelKey: "statusInProgress", bg: "#d97706" },
+  [-1]: { labelKey: "statusStopped", bg: "#b91c1c" },
+  2: { labelKey: "statusCompleted", bg: "#2563eb" },
 };
 
-function StatusChip({ status }: { status?: number }) {
-  const cfg = status !== undefined ? STATUS_MAP[status] : undefined;
-  if (!cfg) return <span>—</span>;
+function StatusChip({
+  status,
+  t,
+}: {
+  status?: number;
+  t: ProjectColumnTranslator;
+}) {
+  const cfg = status !== undefined ? PROJECT_STATUS_MAP[status] : undefined;
+  if (!cfg) return <span>{t("emptyCell")}</span>;
   return (
     <Chip
-      label={cfg.label}
+      label={t(cfg.labelKey)}
       size="small"
       sx={{
         backgroundColor: cfg.bg,
@@ -74,18 +86,25 @@ function ProgressBar({ value, color }: { value?: number; color: string }) {
   );
 }
 
-export const getProjectsColumns = () => [
+export const getProjectsColumns = (t: ProjectColumnTranslator) => [
   {
     key: "serial_number",
-    name: "الرقم المرجعي",
+    name: t("columnRefNumber"),
     sortable: false,
     render: (row: ProjectRow) => {
-      return <span>{row.serial_number ?? row.ref_number ?? row.id ?? "--"}</span>;
+      return (
+        <span>
+          {row.serial_number ??
+            row.ref_number ??
+            row.id ??
+            t("emptyCell")}
+        </span>
+      );
     },
   },
   {
     key: "name",
-    name: "اسم المشروع",
+    name: t("projectName"),
     sortable: false,
     render: (row: ProjectRow) => (
       <span className="font-medium">{row.name}</span>
@@ -93,75 +112,97 @@ export const getProjectsColumns = () => [
   },
   {
     key: "client",
-    name: "اسم العميل",
+    name: t("columnClientName"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.project_owner_name ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.project_owner_name ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "project_type_name",
-    name: "نوع المشروع",
+    name: t("projectType"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.project_type_name ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.project_type_name ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "sub_project_type",
-    name: "تصنيف المشروع",
+    name: t("projectClassification"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.sub_project_type_name ?? row.sub_project_type ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>
+        {row.sub_project_type_name ?? row.sub_project_type ?? t("emptyCell")}
+      </span>
+    ),
   },
   {
     key: "sub_sub_project_type_name",
-    name: "التصنيف الفرعي",
+    name: t("columnSubSubClassification"),
     sortable: false,
     render: (row: ProjectRow) => (
-      <span>{row.sub_sub_project_type_name ?? "—"}</span>
+      <span>{row.sub_sub_project_type_name ?? t("emptyCell")}</span>
     ),
   },
   {
     key: "branch_name",
-    name: "الفرع التابع",
+    name: t("columnBranchAffiliated"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.branch_name ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.branch_name ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "management",
-    name: "الادارة",
+    name: t("management"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.management_name ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.management_name ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "responsible_employee",
-    name: "المهندس المسؤول",
+    name: t("columnResponsibleEngineer"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.responsible_employee_name ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.responsible_employee_name ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "project_manager",
-    name: "مدير المشروع",
+    name: t("projectManager"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.manager_name ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.manager_name ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "contract_number",
-    name: "رقم العقد",
+    name: t("columnContractNumber"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.contract_number ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.contract_number ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "start_date",
-    name: "بداية المشروع",
+    name: t("columnProjectStart"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.start_date ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.start_date ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "end_date",
-    name: "نهاية المشروع",
+    name: t("columnProjectEnd"),
     sortable: false,
-    render: (row: ProjectRow) => <span>{row.end_date ?? "—"}</span>,
+    render: (row: ProjectRow) => (
+      <span>{row.end_date ?? t("emptyCell")}</span>
+    ),
   },
   {
     key: "forward_time",
-    name: "التقدم الزمني",
+    name: t("columnTimeProgress"),
     sortable: false,
     render: (row: ProjectRow) => (
       <ProgressBar value={row.completion_percentage} color="#16a34a" />
@@ -169,22 +210,24 @@ export const getProjectsColumns = () => [
   },
   {
     key: "completion_percentage",
-    name: "الانجاز",
+    name: t("columnAchievement"),
     sortable: false,
-    render: (row: ProjectRow) => <ProgressBar value={20} color="#d97706" />,
+    render: (row: ProjectRow) => (
+      <ProgressBar value={row.completion_percentage} color="#d97706" />
+    ),
   },
   {
     key: "status",
-    name: "حالة المشروع",
+    name: t("projectStatus"),
     sortable: false,
-    render: (row: ProjectRow) => <StatusChip status={row.status} />,
+    render: (row: ProjectRow) => <StatusChip status={row.status} t={t} />,
   },
   {
     key: "project_view",
-    name: "عرض المشروع",
+    name: t("columnProjectView"),
     sortable: false,
     render: (row: ProjectRow) => (
-      <span className="text-sm">{row.project_view ?? "—"}</span>
+      <span className="text-sm">{row.project_view ?? t("emptyCell")}</span>
     ),
   },
 ];
