@@ -78,6 +78,7 @@ const ChangeEmailPhase = ({
             onClick={handleSubmit(onSubmit)}
             fullWidth
             variant="contained"
+            color="primary"
           >
             {t("ChangeEmail.Confirm")}
           </Button>

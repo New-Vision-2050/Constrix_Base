@@ -173,6 +173,7 @@ const ValidateEmailPhase = ({
           form="login-form"
           fullWidth
           variant="contained"
+          color="primary"
         >
           {loginT("Next")}
         </Button>
