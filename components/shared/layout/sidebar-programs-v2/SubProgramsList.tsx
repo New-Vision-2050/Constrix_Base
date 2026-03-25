@@ -143,7 +143,7 @@ export const SubProgramsList = memo(function SubProgramsList({
                           style: {
                             width: "20px",
                             height: "20px",
-                            fill: isActive ? "currentColor" : undefined,
+                            fill: isActive ? "currentColor" : palette.text.primary,
                           },
                         })
                       ) : (
