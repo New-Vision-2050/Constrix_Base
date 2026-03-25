@@ -83,6 +83,10 @@ export const getRoutesMap = (
       "هيكل المنظمة"
     ),
     "work-panel": getText("work-panel", "لوحة العمل"),
+    projects: {
+      label: getText("projects", "المشاريع"),
+      href: "/projects",
+    },
     permissions: getText("permissions", "صلاحيات"),
     programs: getText("programs", "البرامج"),
     roles: getText("roles", "الصلاحيات"),
