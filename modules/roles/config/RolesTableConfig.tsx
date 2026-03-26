@@ -54,7 +54,7 @@ export const useRolesTableConfig = ({
                 `/role_and_permissions/roles/${row.id}/status`,
                 {
                   status: Number(isActive),
-                }
+                },
               );
             }}
             confirmDescription={(isActive) =>
@@ -131,7 +131,7 @@ export const useRolesTableConfig = ({
             isEdit: can(PERMISSIONS.role.update),
             selectedId: row.id,
           }),
-        disabled: can(PERMISSIONS.role.update),
+        disabled: !can(PERMISSIONS.role.update),
       },
     ],
     executionConfig: {
