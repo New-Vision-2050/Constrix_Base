@@ -237,6 +237,15 @@ const t = useTranslations();
                 value={searchValue}
                 onValueChange={setSearchValue}
                 className="flex-1 py-3 px-1 outline-none"
+                onFocus={(e) => {
+                  // Prevent default selection behavior
+                  e.preventDefault();
+                  // Set cursor to end of text
+                  const target = e.target as HTMLInputElement;
+                  setTimeout(() => {
+                    target.setSelectionRange(target.value.length, target.value.length);
+                  }, 0);
+                }}
               />
             </div>
             <CommandList
