@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from "axios";
 import { baseApi } from "@/config/axios/instances/base";
 import {
   CreateClientRequestArgs,
@@ -53,7 +54,10 @@ export const ClientRequestsApi = {
   show: (id: string) =>
     baseApi.get<ShowClientRequestResponse>(`client-requests/${id}`),
 
-  create: (args: CreateClientRequestArgs) => {
+  create: (
+    args: CreateClientRequestArgs,
+    requestConfig?: Pick<AxiosRequestConfig, "onUploadProgress">,
+  ) => {
     const form = toFormData({
       client_request_type_id: args.client_request_type_id,
       client_request_receiver_from_id: args.client_request_receiver_from_id,
@@ -82,6 +86,7 @@ export const ClientRequestsApi = {
     });
     return baseApi.post<CreateClientRequestResponse>("client-requests", form, {
       headers: { "Content-Type": "multipart/form-data" },
+      ...requestConfig,
     });
   },
 

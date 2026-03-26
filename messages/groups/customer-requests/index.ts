@@ -24,6 +24,7 @@ export const clientRequestsMessages = new MessagesGroup({
   }),
   status: new MessagesGroup({
     pending: _m("Pending", "قيد الانتظار"),
+    draft: _m("Draft", "مسودة"),
     accepted: _m("Accepted", "مقبول"),
     inProgress: _m("In Progress", "قيد الانجاز"),
     approved: _m("Approved", "مقبول"),
@@ -75,6 +76,19 @@ export const clientRequestsMessages = new MessagesGroup({
     saveAsDraft: _m("Save as Draft", "حفظ كـ مسودة"),
     send: _m("Send", "ارسال"),
     cancel: _m("Cancel", "إلغاء"),
+    addAttachments: _m("Add attachments", "إضافة مرفقات"),
+    attachmentsDialogTitle: _m("Attachments", "المرفقات"),
+    attachmentsTableFile: _m("File", "الملف"),
+    selectFile: _m("Choose file", "اختر ملفًا"),
+    size: _m("Size", "الحجم"),
+    addAttachmentRow: _m("Add file", "إضافة ملف"),
+    removeAttachmentRow: _m("Remove file", "حذف الملف"),
+    attachmentsUploadProgress: _m(
+      "Upload progress: {percent}%",
+      "تقدم الرفع: {percent}٪",
+    ),
+    attachmentsDone: _m("Done", "تم"),
+    attachmentsCancel: _m("Cancel", "إلغاء"),
   }),
   dialog: new MessagesGroup({
     sendAs: _m("Send As", "أرسال ك"),

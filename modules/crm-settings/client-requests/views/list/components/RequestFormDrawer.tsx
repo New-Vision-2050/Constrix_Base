@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   CircularProgress,
+  LinearProgress,
   Divider,
   Dialog,
   DialogContent,
@@ -13,7 +14,8 @@ import {
   RadioGroup,
   FormControlLabel,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import type { AxiosRequestConfig } from "axios";
+import { useForm, useWatch } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +25,7 @@ import {
 } from "../validation/requestForm.schema";
 
 import { RequestFormFields } from "./RequestFormFields";
+import { AttachmentsDialog } from "./AttachmentsDialog";
 import {
   ClientRequestsApi,
   CreateClientRequestArgs,
@@ -34,6 +37,8 @@ interface RequestFormDrawerProps {
   queryKey: string;
 }
 
+const EMPTY_ATTACHMENTS: File[] = [];
+
 export function RequestFormDrawer({
   open,
   onClose,
@@ -44,7 +49,9 @@ export function RequestFormDrawer({
 
   // Confirmation dialog state
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [attachmentsDialogOpen, setAttachmentsDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("pending");
+  const [uploadProgress, setUploadProgress] = useState(0);
   const selectedStatusRef = useRef<string>("pending");
 
   const {
@@ -81,39 +88,69 @@ export function RequestFormDrawer({
         attachments: [],
       });
       setSelectedStatus("pending");
+      setUploadProgress(0);
     }
   }, [open, reset]);
 
+  const watchedAttachments =
+    (useWatch({ control, name: "attachments" }) as File[] | undefined) ??
+    EMPTY_ATTACHMENTS;
+
+  const buildCreateArgs = (
+    data: ClientRequestFormValues,
+    status: string,
+  ): CreateClientRequestArgs => ({
+    client_request_type_id: Number(data.client_request_type_id),
+    client_request_receiver_from_id: Number(
+      data.client_request_receiver_from_id,
+    ),
+    client_type: data.client_type,
+    client_id: data.client_id,
+    content: data.content,
+    status_client_request: status,
+    service_ids: data.service_ids,
+    term_setting_id: data.term_setting_id,
+    branch_id: data.branch_id ? Number(data.branch_id) : undefined,
+    management_id: data.management_id
+      ? Number(data.management_id)
+      : undefined,
+    attachments: data.attachments,
+    receiver_phone: data.receiver_phone,
+    receiver_email: data.receiver_email,
+    receiver_employee_id: data.receiver_employee_id,
+    receiver_broker_id: data.receiver_broker_id,
+    receiver_broker_type:
+      data.receiver_broker_type === "" || data.receiver_broker_type == null
+        ? undefined
+        : data.receiver_broker_type,
+  });
+
+  const performCreate = async (
+    data: ClientRequestFormValues,
+    status: string,
+    requestConfig?: Pick<AxiosRequestConfig, "onUploadProgress">,
+  ) => {
+    const apiData = buildCreateArgs(data, status);
+    await ClientRequestsApi.create(apiData, requestConfig);
+    queryClient.invalidateQueries({ queryKey: [queryKey] });
+  };
+
   const submitToApi = async (data: ClientRequestFormValues, status: string) => {
     try {
-      const apiData: CreateClientRequestArgs = {
-        client_request_type_id: Number(data.client_request_type_id),
-        client_request_receiver_from_id: Number(
-          data.client_request_receiver_from_id,
-        ),
-        client_type: data.client_type,
-        client_id: data.client_id,
-        content: data.content,
-        status_client_request: status,
-        service_ids: data.service_ids,
-        term_setting_id: data.term_setting_id,
-        branch_id: data.branch_id ? Number(data.branch_id) : undefined,
-        management_id: data.management_id
-          ? Number(data.management_id)
-          : undefined,
-        attachments: data.attachments,
-        receiver_phone: data.receiver_phone,
-        receiver_email: data.receiver_email,
-        receiver_employee_id: data.receiver_employee_id,
-        receiver_broker_id: data.receiver_broker_id,
-        receiver_broker_type: data.receiver_broker_type,
-      };
-
-      await ClientRequestsApi.create(apiData);
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      setUploadProgress(0);
+      await performCreate(data, status, {
+        onUploadProgress: (e) => {
+          const total = e.total ?? 0;
+          if (total > 0) {
+            setUploadProgress(Math.round((e.loaded * 100) / total));
+          }
+        },
+      });
+      setUploadProgress(100);
       handleClose();
     } catch (error) {
       console.error("Error saving request:", error);
+      setUploadProgress(0);
     }
   };
 
@@ -153,6 +190,7 @@ export function RequestFormDrawer({
     onClose();
     reset();
     setConfirmDialogOpen(false);
+    setAttachmentsDialogOpen(false);
   };
 
   return (
@@ -189,10 +227,31 @@ export function RequestFormDrawer({
             p: 2,
           }}
         >
-          <RequestFormFields control={control} errors={errors} setValue={setValue} />
+          <RequestFormFields
+            control={control}
+            errors={errors}
+            setValue={setValue}
+            attachmentCount={watchedAttachments.length}
+            onOpenAttachmentsDialog={() => setAttachmentsDialogOpen(true)}
+          />
         </Box>
 
         <Divider />
+
+        {(isSubmitting || uploadProgress > 0) && (
+          <Box sx={{ px: 2, pt: 1 }}>
+            <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+              {t("clientRequests.form.attachmentsUploadProgress", {
+                percent: uploadProgress,
+              })}
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={uploadProgress}
+              sx={{ height: 8, borderRadius: 1 }}
+            />
+          </Box>
+        )}
 
         {/* Footer buttons */}
         <Box sx={{ p: 2, display: "flex", gap: 1.5 }}>
@@ -281,6 +340,16 @@ export function RequestFormDrawer({
           </Button>
         </DialogActions>
       </Dialog>
+
+      <AttachmentsDialog
+        open={attachmentsDialogOpen}
+        onClose={() => setAttachmentsDialogOpen(false)}
+        initialFiles={watchedAttachments}
+        onDone={(files) => {
+          setValue("attachments", files);
+          setAttachmentsDialogOpen(false);
+        }}
+      />
     </>
   );
 }
