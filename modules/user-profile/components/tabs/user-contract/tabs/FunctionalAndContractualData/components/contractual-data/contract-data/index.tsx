@@ -13,7 +13,7 @@ export default function ContractDataForm() {
     useFunctionalContractualCxt();
   const { can } = usePermissions();
   const t = useTranslations("UserProfile.nestedTabs");
-
+  
   return (
     <Can check={[PERMISSIONS.profile.contractWork.view]}>
       <TabTemplate
