@@ -19,6 +19,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import {
   ClientRequestschema,
   ClientRequestFormValues,
@@ -92,6 +93,33 @@ export function RequestFormDrawer({
     }
   }, [open, reset]);
 
+  const getErrorMessage = (error: unknown): string => {
+    const fallback = t("labels.deleteError");
+    if (!error || typeof error !== "object") return fallback;
+
+    const axiosLike = error as {
+      response?: {
+        data?: {
+          message?: string;
+          error?: string;
+          errors?: Record<string, string[] | string>;
+        };
+      };
+      message?: string;
+    };
+
+    const data = axiosLike.response?.data;
+    if (data?.errors) {
+      const flatErrors = Object.values(data.errors).flatMap((value) =>
+        Array.isArray(value) ? value : [value],
+      );
+      if (flatErrors.length > 0 && flatErrors[0]) return flatErrors[0];
+    }
+    if (data?.message) return data.message;
+    if (data?.error) return data.error;
+    return axiosLike.message || fallback;
+  };
+
   const watchedAttachments =
     (useWatch({ control, name: "attachments" }) as File[] | undefined) ??
     EMPTY_ATTACHMENTS;
@@ -111,9 +139,7 @@ export function RequestFormDrawer({
     service_ids: data.service_ids,
     term_setting_id: data.term_setting_id,
     branch_id: data.branch_id ? Number(data.branch_id) : undefined,
-    management_id: data.management_id
-      ? Number(data.management_id)
-      : undefined,
+    management_id: data.management_id ? Number(data.management_id) : undefined,
     attachments: data.attachments,
     receiver_phone: data.receiver_phone,
     receiver_email: data.receiver_email,
@@ -151,6 +177,8 @@ export function RequestFormDrawer({
     } catch (error) {
       console.error("Error saving request:", error);
       setUploadProgress(0);
+      toast.error(getErrorMessage(error));
+      throw error;
     }
   };
 
@@ -176,9 +204,12 @@ export function RequestFormDrawer({
   // onError closes dialog so form validation errors become visible
   const handleConfirmSave = handleSubmit(
     async (data) => {
-      console.log("Form validation passed, submitting data:", data);
-      setConfirmDialogOpen(false);
-      await submitToApi(data, selectedStatusRef.current);
+      try {
+        await submitToApi(data, selectedStatusRef.current);
+        setConfirmDialogOpen(false);
+      } catch {
+        // keep dialog open so user can see and retry after  error
+      }
     },
     (validationErrors) => {
       console.error("Form validation failed:", validationErrors);
