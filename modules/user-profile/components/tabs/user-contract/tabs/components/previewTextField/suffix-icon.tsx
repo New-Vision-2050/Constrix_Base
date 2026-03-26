@@ -17,6 +17,7 @@ type PropsT = {
   mediaId?: string | number;
   fireAfterDeleteMedia?: () => void;
   enableCopy?: boolean;
+  enableDelete?: boolean;
   value?: string;
 };
 
@@ -25,7 +26,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const { isRTL, type, fileUrl, mediaId, fireAfterDeleteMedia, enableCopy, value } = props;
+  const { isRTL, type, fileUrl, mediaId, fireAfterDeleteMedia, enableCopy, value , enableDelete} = props;
   
   // Reset copied state after 2 seconds
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
         )}
 
         {/* Delete Icon */}
-        {(type === "image" || type == "pdf") && Boolean(mediaId) && (
+        { enableDelete && (type === "image" || type == "pdf") && Boolean(mediaId) && (
           <span
             className={`absolute top-[8px] text-slate-400 ${
               isRTL ? "left-[85px]" : "right-[85px]"

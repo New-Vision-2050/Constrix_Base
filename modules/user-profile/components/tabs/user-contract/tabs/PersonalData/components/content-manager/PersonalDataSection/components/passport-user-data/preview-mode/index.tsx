@@ -53,6 +53,7 @@ export default function UserProfilePassportDataReview() {
               value={media?.name ?? "---"}
               type={media?.type == "image" ? "image" : "pdf"}
               fileUrl={media?.url}
+              enableDelete={false}
             />
           </div>
         ))
