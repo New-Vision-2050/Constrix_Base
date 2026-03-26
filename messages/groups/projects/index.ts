@@ -16,6 +16,7 @@ export const projectMessages = new MessagesGroup({
   ),
   subSubProjectType: _m("Sub Sub Project Type", "النوع الفرعي الثانوي للمشروع"),
   projectName: _m("Project Name", "اسم المشروع"),
+  projectNameRequired: _m("Project name is required", "اسم المشروع مطلوب"),
   branch: _m("Branch", "الفرع"),
   branchRequired: _m("Branch is required", "الفرع مطلوب"),
   management: _m("Management", "الإدارة"),
@@ -40,4 +41,19 @@ export const projectMessages = new MessagesGroup({
     "Are you sure you want to delete this project?",
     "هل أنت متأكد من حذف هذا المشروع؟"
   ),
+  columnRefNumber: _m("Ref. No.", "الرقم المرجعي"),
+  columnClientName: _m("Client name", "اسم العميل"),
+  columnResponsibleEngineer: _m(
+    "Responsible engineer",
+    "المهندس المسؤول"
+  ),
+  columnContractNumber: _m("Contract number", "رقم العقد"),
+  columnProjectStart: _m("Project start", "بداية المشروع"),
+  columnProjectEnd: _m("Project end", "نهاية المشروع"),
+  columnTimeProgress: _m("Time progress", "التقدم الزمني"),
+  columnAchievement: _m("Achievement", "الإنجاز"),
+  columnProjectView: _m("Project view", "عرض المشروع"),
+  columnBranchAffiliated: _m("Affiliated branch", "الفرع التابع"),
+  columnSubSubClassification: _m("Sub-classification", "التصنيف الفرعي"),
+  emptyCell: _m("—", "—"),
 });

@@ -2,7 +2,7 @@ import { MessagesGroup, _m } from "@/messages";
 
 export const ContentManagementSystemNewsMessages = new MessagesGroup({
   addNews: _m("Add News", "إضافة خبر"),
-  editNews: _m("Edit News", "تعديل خبر"),
+  editNews: _m("Edit News", "تعديل "),
   areYouSureReactivate: _m(
     "Are you sure you want to reactivate this news?",
     "هل أنت متأكد أنك تريد إعادة تفعيل هذا الخبر؟"
@@ -92,6 +92,6 @@ export const ContentManagementSystemNewsMessages = new MessagesGroup({
     endDate: _m("End Date", "تاريخ الانتهاء"),
     status: _m("Status", "الحالة"),
     actions: _m("Actions", "الإجراءات"),
-    editNews: _m("Edit News", "تعديل خبر"),
+    editNews: _m("Edit News", "تعديل"),
   }),
 });

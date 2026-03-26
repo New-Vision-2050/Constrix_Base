@@ -129,7 +129,7 @@ const UsersSubEntityTable = ({
   };
 
   const usersConfig = UsersConfigV2({
-    canDelete: can(entityPermissions.delete),
+    canDelete: true,
     canEdit: can(entityPermissions.update),
     canView: can(entityPermissions.view),
     registrationFormSlug,

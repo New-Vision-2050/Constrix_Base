@@ -150,14 +150,14 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
             }
           });
         },
-        disabled: can(PERMISSIONS.company.view),
+        disabled: !can(PERMISSIONS.company.view),
       },
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: { id: string; [key: string]: unknown }) =>
           router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
-        disabled: can(PERMISSIONS.company.view),
+        disabled: !can(PERMISSIONS.company.view),
       },
       {
         id: "send-link",
@@ -165,7 +165,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
         icon: <GearIcon className="w-4 h-4" />,
         action: "send-link",
         dialogComponent: UserSettingDialog,
-        disabled: can(PERMISSIONS.company.view),
+        disabled: !can(PERMISSIONS.company.view),
         dialogProps: (row: { id: string; [key: string]: unknown }) => {
           return {
             user: row as CompanyData,
