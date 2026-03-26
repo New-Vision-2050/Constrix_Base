@@ -9,4 +9,7 @@ export const imageUploadCropMessages = new MessagesGroup({
   cropDialogTitle: _m("Crop Image", "قص الصورة"),
   cancel: _m("Cancel", "إلغاء"),
   save: _m("Save", "حفظ"),
+  cropEditor: _m("Crop Editor", "محرر القص"),
+  resultPreview: _m("Result Preview", "معاينة النتيجة"),
+
 });
