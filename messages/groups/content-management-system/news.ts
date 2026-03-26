@@ -69,8 +69,8 @@ export const ContentManagementSystemNewsMessages = new MessagesGroup({
       "Both thumbnail and main images are required",
       "الصورة المصغرة والصورة الرئيسية مطلوبتان"
     ),
-    imageMaxSize: _m("Max image size: 3MB", "اقصى حجم الصورة : 3 ميجابايت"),
-    imageDimensions: _m("2160x2160", "2160x2160"),
+    imageMaxSize: _m("3MB - Max size", "3 ميجابايت - الحجم الأقصى"),
+    imageDimensions: _m("2160 × 2160", "2160 × 2160"),
     updateSuccess: _m("News updated successfully!", "تم تحديث الخبر بنجاح!"),
     updateError: _m(
       "Failed to update news. Please try again.",
