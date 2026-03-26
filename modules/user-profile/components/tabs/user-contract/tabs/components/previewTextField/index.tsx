@@ -29,7 +29,6 @@ type PropsT = {
   openInNewTab?: boolean; // Option to open links in a new window
   displayText?: string; // Alternative text to display instead of the actual link
   enableCopy?: boolean; // Option to enable copy icon to copy the value
-  enableDelete?: boolean; // Option to enable delete icon to delete the media
 };
 
 const PreviewTextField = ({
@@ -45,7 +44,6 @@ const PreviewTextField = ({
   openInNewTab = false, // Default value (false) opens the link in the same window
   displayText, // Alternative text to display
   enableCopy = false, // Default value (false) disables copy functionality
-  enableDelete = false, // Default value (false) disables delete functionality
 }: PropsT) => {
   // get current locale for RTL/LTR
   const locale = useLocale();
@@ -139,7 +137,6 @@ const PreviewTextField = ({
 
       {/* suffix icon */}
       <PreviewTextFieldSuffixIcon
-        enableDelete={enableDelete}
         fileUrl={fileUrl}
         isRTL={isRTL}
         type={type}
