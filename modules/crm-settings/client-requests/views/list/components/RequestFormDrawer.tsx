@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Alert,
   CircularProgress,
   LinearProgress,
   Divider,
@@ -20,6 +19,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import {
   ClientRequestschema,
   ClientRequestFormValues,
@@ -53,7 +53,6 @@ export function RequestFormDrawer({
   const [attachmentsDialogOpen, setAttachmentsDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("pending");
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const selectedStatusRef = useRef<string>("pending");
 
   const {
@@ -91,7 +90,6 @@ export function RequestFormDrawer({
       });
       setSelectedStatus("pending");
       setUploadProgress(0);
-      setSubmitError(null);
     }
   }, [open, reset]);
 
@@ -165,7 +163,6 @@ export function RequestFormDrawer({
 
   const submitToApi = async (data: ClientRequestFormValues, status: string) => {
     try {
-      setSubmitError(null);
       setUploadProgress(0);
       await performCreate(data, status, {
         onUploadProgress: (e) => {
@@ -180,7 +177,7 @@ export function RequestFormDrawer({
     } catch (error) {
       console.error("Error saving request:", error);
       setUploadProgress(0);
-      setSubmitError(getErrorMessage(error));
+      toast.error(getErrorMessage(error));
       throw error;
     }
   };
@@ -261,15 +258,6 @@ export function RequestFormDrawer({
             p: 2,
           }}
         >
-          {submitError && (
-            <Alert
-              severity="error"
-              onClose={() => setSubmitError(null)}
-              sx={{ mb: 1 }}
-            >
-              {submitError}
-            </Alert>
-          )}
           <RequestFormFields
             control={control}
             errors={errors}
