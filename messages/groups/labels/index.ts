@@ -45,5 +45,9 @@ export const labelsMessages = new MessagesGroup({
   deleteSuccess: _m("Item deleted successfully", "تم حذف العنصر بنجاح"),
   deleteError: _m("Failed to delete item", "فشل في حذف العنصر"),
   deleteCancelled: _m("Delete cancelled", "تم إلغاء الحذف"),
+  deleteConfirmMessage: _m(
+    "Are you sure you want to delete this item?",
+    "هل أنت متأكد من حذف هذا العنصر؟"
+  ),
   show: _m("show", "عرض"),
 });
