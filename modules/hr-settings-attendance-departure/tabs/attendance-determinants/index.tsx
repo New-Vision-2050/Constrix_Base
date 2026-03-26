@@ -21,14 +21,17 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Container component that uses the context
 function AttendanceDeterminantsTabContent() {
-  // Using translation function
   const t = useTranslations(
-    "HRSettingsAttendanceDepartureModule.attendanceDeterminants"
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants",
+  );
+  const formTranslations = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form",
+  );
+  const dialogTranslations = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog",
   );
 
-  // State to control the determinant being edited
   const [editingConstraint, setEditingConstraint] = useState<any>(null);
-  // State to control form opening
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   // Using context to access states and functions
@@ -63,17 +66,13 @@ function AttendanceDeterminantsTabContent() {
     setTimeout(() => setEditingConstraint(null), 300);
   };
 
-  // Call translation hooks at top level to maintain hooks order
-  const attendanceDaysDialogTranslations = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog");
-  const formTranslations = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form");
-
   // Get form config - this needs to be called unconditionally to maintain hooks order
   const formConfig = getDynamicDeterminantFormConfig({
     refetchConstraints,
     branchesData,
     t,
     editConstraint: editingConstraint,
-    attendanceDaysDialogTranslations: attendanceDaysDialogTranslations,
+    attendanceDaysDialogTranslations: dialogTranslations,
     formTranslationsFn: (key: string) => formTranslations(key),
   });
 

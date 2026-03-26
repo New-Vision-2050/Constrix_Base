@@ -17,6 +17,7 @@ export const projectTypesMessages = new MessagesGroup({
     nameLabel: _m("Category Name", "اسم التصنيف"),
     nameRequired: _m("Category name is required", "اسم التصنيف مطلوب"),
     iconRequired: _m("Icon selection is required", "اختيار الأيقونة مطلوب"),
+    referenceRequired: _m("Project reference is required", "مرجعية المشروع مطلوبة"),
     referenceLabel: _m("Project Reference", "مرجعية المشروع"),
     projectElementsLabel: _m("Select Project Elements", "تحديد عناصر المشروع"),
     successMessage: _m("Project type added successfully", "تم اضافة نوع المشروع بنجاح"),

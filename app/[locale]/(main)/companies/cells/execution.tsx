@@ -94,7 +94,6 @@ const Execution = ({
         label: t("Companies.Edit"),
         icon: <EditIcon className="w-4 h-4" />,
         action: "edit",
-        disabled: true,
       });
     }
 
@@ -104,7 +103,6 @@ const Execution = ({
         icon: <TrashIcon className="w-4 h-4" />,
         action: "delete",
         color: "red-500",
-        disabled: true,
       });
     }
 
@@ -199,18 +197,17 @@ const Execution = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {menuItems.map((item, index) => (
-          <DropdownMenuItem
-          key={index}
-        onClick={() => handleMenuItemClick(item.action)}
-         disabled={item.disabled ?? false}
-           className={`flex items-center gap-2 ${
-          item.color ? `text-${item.color}` : ""
-          }`}
-         >
-         {item.icon}
-         <span>{item.label}</span>
-         </DropdownMenuItem>
-
+            <DropdownMenuItem
+              key={index}
+              onClick={() => handleMenuItemClick(item.action)}
+              disabled={item.disabled ?? false}
+              className={`flex items-center gap-2 ${
+                item.color ? `text-${item.color}` : ""
+              }`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </DropdownMenuItem>
           ))}
           {/* Render custom render functions as dropdown items */}
           {renderFunctions.map((renderFn, index) => (

@@ -121,11 +121,11 @@ export const UsersConfig = () => {
                           "w-5 h-5 flex items-center justify-center",
                           role.status === 1 && "text-[#18CB5F]",
                           role.status === 0 && "text-[#FF4747]",
-                          role.status === -1 && "text-[#F19B02]"
+                          role.status === -1 && "text-[#F19B02]",
                         )}
                       >
                         {React.createElement(
-                          rulesIcons[(index + 1) as keyof typeof rulesIcons]
+                          rulesIcons[(index + 1) as keyof typeof rulesIcons],
                         )}
                       </span>
                     ) : (
@@ -208,7 +208,7 @@ export const UsersConfig = () => {
             user: row,
           };
         },
-        disabled: can(PERMISSIONS.user.view)
+        disabled: !can(PERMISSIONS.user.view),
       },
     ],
     executionConfig: {

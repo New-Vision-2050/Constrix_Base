@@ -9,6 +9,7 @@ import ReactCrop, {
 import "react-image-crop/dist/ReactCrop.css";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export interface ImageCropOptions {
   maxWidth?: number;
@@ -124,6 +125,7 @@ export default function ImageCrop({
   cropEditorClassName,
   resultClassName,
 }: ImageCropProps) {
+  const t = useTranslations("ImageUploadCrop");
   const {
     maxWidth,
     maxHeight,
@@ -416,7 +418,7 @@ export default function ImageCrop({
       {/* Crop Editor Section */}
       <Card className={cn("overflow-hidden", cropEditorClassName)}>
         <CardContent className="p-4">
-          <h3 className="text-sm font-semibold mb-4">Crop Editor</h3>
+          <h3 className="text-sm font-semibold mb-4">{t("cropEditor")}</h3>
           <div className="relative w-full">
             <ReactCrop
               crop={crop}
@@ -454,7 +456,7 @@ export default function ImageCrop({
       {/* Result Preview Section */}
       <Card className={cn("overflow-hidden", resultClassName)}>
         <CardContent className="p-4">
-          <h3 className="text-sm font-semibold mb-4">Result Preview</h3>
+          <h3 className="text-sm font-semibold mb-4">{t("resultPreview")}</h3>
           <div className="relative w-full min-h-[200px] flex items-center justify-center border border-dashed rounded-lg bg-muted/50">
             {isLoading ? (
               <div className="flex flex-col items-center gap-2">

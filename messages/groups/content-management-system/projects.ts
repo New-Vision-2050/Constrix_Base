@@ -64,8 +64,8 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
       "Featured Services (Display on Homepage)",
       "أبرز الخدمات (العرض في الصفحة الرئيسية)"
     ),
-    mainImage: _m("Main Image", "صورة رئيسية"),
-    subImages: _m("Sub Images (Attach images)", "الصور الفرعية (أرفاق صور)"),
+    mainImage: _m("Main Image", "الصورة الرئيسية"),
+    subImages: _m("Sub Images", "الصور الفرعية"),
     type: _m("Project Type", "نوع المشروع"),
     typePlaceholder: _m("Select Project Type", "أختار نوع المشروع"),
     nameAr: _m("Project Name in Arabic", "إسم المشروع عربي"),

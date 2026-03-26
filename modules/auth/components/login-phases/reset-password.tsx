@@ -95,6 +95,7 @@ const ResetPasswordPhase = ({
           onClick={handleSubmit(onSubmit)}
           fullWidth
           variant="contained"
+          color="primary"
           type="submit"
           form="login-form"
           sx={{ mt: 2 }}

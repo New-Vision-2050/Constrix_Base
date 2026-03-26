@@ -21,7 +21,7 @@ export default function ProjectsGrid({ OnEditProject, OnDeleteProject, projects 
         {
             label: t("editProject"),
             icon: <EditIcon className="w-4 h-4 text-blue-500" />,
-            disabled: true,
+            disabled: false,
             action: (row) => {
                 OnEditProject(row.id);
             },
@@ -30,7 +30,7 @@ export default function ProjectsGrid({ OnEditProject, OnDeleteProject, projects 
         {
             label: t("deleteProject"),
             icon: <TrashIcon className="w-4 h-4 text-red-500" />,
-            disabled: true,
+            disabled: false,
             action: (row) => {
                 OnDeleteProject(row.id);
             },

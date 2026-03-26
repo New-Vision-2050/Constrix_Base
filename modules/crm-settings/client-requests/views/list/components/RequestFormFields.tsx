@@ -4,9 +4,6 @@ import {
     RadioGroup,
     FormControlLabel,
     FormLabel,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
     Typography,
     Checkbox,
     Button,
@@ -22,6 +19,7 @@ import {
     Controller,
     Control,
     FieldErrors,
+    UseFormSetValue,
     useController,
     useWatch,
 } from "react-hook-form";
@@ -32,6 +30,8 @@ import {useState, useCallback, useEffect, useRef, useMemo} from "react";
 import {ClientRequestFormValues} from "../validation/requestForm.schema";
 import {
     ClientRequestsApi,
+    Client,
+    ClientRequestType,
     TermSettingChild,
     TermSettingGroup,
     ClientRequestReceiverFrom,
@@ -41,11 +41,29 @@ import PhoneField from "@/modules/form-builder/components/fields/PhoneField";
 interface RequestFormFieldsProps {
     control: Control<ClientRequestFormValues>;
     errors: FieldErrors<ClientRequestFormValues>;
-    setValue: (name: string, value: any) => void;
+    setValue: UseFormSetValue<ClientRequestFormValues>;
+    attachmentCount: number;
+    onOpenAttachmentsDialog: () => void;
 }
 
+type SelectOption = {
+    id?: string | number;
+    name: string;
+    isCreateButton?: boolean;
+};
+
+type EmployeeOption = {
+    id: string | number;
+    name?: string;
+    first_name?: string;
+    last_name?: string;
+};
+
 // Stable empty array to avoid creating new [] references on every render
-const EMPTY_OPTIONS: any[] = [];
+const EMPTY_OPTIONS: SelectOption[] = [];
+const EMPTY_EMPLOYEE_OPTIONS: EmployeeOption[] = [];
+const EMPTY_REQUEST_TYPES: ClientRequestType[] = [];
+const EMPTY_SOURCES: ClientRequestReceiverFrom[] = [];
 
 // Collect only leaf IDs (nodes with no children) in a subtree
 function collectLeafIds(node: TermSettingChild): number[] {
@@ -187,7 +205,13 @@ function TermGroupSelect({
     );
 }
 
-export function RequestFormFields({control, errors, setValue}: RequestFormFieldsProps) {
+export function RequestFormFields({
+    control,
+    errors,
+    setValue,
+    attachmentCount,
+    onOpenAttachmentsDialog,
+}: RequestFormFieldsProps) {
     const t = useTranslations();
     const router = useRouter();
     const [clientSearchText, setClientSearchText] = useState("");
@@ -228,7 +252,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         name: "branch_id"
     });
 
-    const {data: requestTypesData} = useQuery({
+    const {data: requestTypesData} = useQuery<ClientRequestType[]>({
         queryKey: ["client-request-types", requestTypeSearchText],
         queryFn: async () => {
             const response = await ClientRequestsApi.getRequestTypes(requestTypeSearchText);
@@ -236,7 +260,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         },
     });
 
-    const {data: sourcesData} = useQuery({
+    const {data: sourcesData} = useQuery<ClientRequestReceiverFrom[]>({
         queryKey: ["client-request-receiver-from", receiverSearchText],
         queryFn: async () => {
             const response = await ClientRequestsApi.getSources(receiverSearchText);
@@ -244,23 +268,15 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         },
     });
 
-    const {data: servicesData} = useQuery({
-        queryKey: ["client-request-services"],
-        queryFn: async () => {
-            const response = await ClientRequestsApi.getServices();
-            return response.data.payload;
-        },
-    });
-
-    const {data: clientsData} = useQuery({
+    const {data: clientsData} = useQuery<Client[]>({
         queryKey: ["company-users-clients", clientSearchText],
         queryFn: async () => {
-            const response = await ClientRequestsApi.getClients({ name: clientSearchText });
+            const response = await ClientRequestsApi.getClients({ search: clientSearchText });
             return response.data.payload;
         },
     });
 
-    const {data: companyClientsData} = useQuery({
+    const {data: companyClientsData} = useQuery<SelectOption[]>({
         queryKey: ["company-clients", clientSearchText],
         queryFn: async () => {
             const response = await apiClient.get("/companies/clients", { 
@@ -279,7 +295,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         },
     });
 
-    const {data: employeesData} = useQuery({
+    const {data: employeesData} = useQuery<EmployeeOption[]>({
         queryKey: ["employees", employeeSearchText],
         queryFn: async () => {
             const response = await apiClient.get("/company-users/employees", {
@@ -289,7 +305,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         },
     });
 
-    const {data: brokersData} = useQuery({
+    const {data: brokersData} = useQuery<SelectOption[]>({
         queryKey: ["brokers", brokerSearchText],
         queryFn: async () => {
             const response = await apiClient.get("/company-users/brokers", {
@@ -299,7 +315,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         },
     });
 
-    const {data: companyBrokersData} = useQuery({
+    const {data: companyBrokersData} = useQuery<SelectOption[]>({
         queryKey: ["company-brokers"],
         queryFn: async () => {
             // TODO: Replace with actual company brokers endpoint when available
@@ -309,7 +325,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         enabled: brokerType === "company", // Only fetch when brokerType is "company"
     });
 
-    const {data: branchesData} = useQuery({
+    const {data: branchesData} = useQuery<SelectOption[]>({
         queryKey: ["branches", branchSearchText],
         queryFn: async () => {
             const response = await ClientRequestsApi.getBranches(branchSearchText);
@@ -317,10 +333,10 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
         },
     });
 
-    const {data: managementsData} = useQuery({
+    const {data: managementsData} = useQuery<SelectOption[]>({
         queryKey: ["managements", selectedBranchId, managementSearchText],
         queryFn: async () => {
-            const response = await ClientRequestsApi.getManagements(selectedBranchId, managementSearchText);
+            const response = await ClientRequestsApi.getManagements(selectedBranchId ?? undefined, managementSearchText);
             return response.data.payload || response.data;
         },
         enabled: !!selectedBranchId, // Only fetch when branch is selected
@@ -343,7 +359,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
     // Derive conditional field visibility from form state (NOT local useState)
     const {inputType, showInput, showBrokerType} = useMemo(() => {
         if (!selectedSource || !sourcesData) return {inputType: "", showInput: false, showBrokerType: false};
-        const source = sourcesData.find(item => String(item.id) === selectedSource);
+        const source = sourcesData.find((item) => String(item.id) === selectedSource);
         const name = source?.name || null;
         if (name === "رقم واتساب") return {inputType: "phone", showInput: true, showBrokerType: false};
         if (name === "بريد الكتروني") return {inputType: "email", showInput: true, showBrokerType: false};
@@ -405,7 +421,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 render={({field}) => (
                     <Autocomplete
                         fullWidth
-                        options={requestTypesData || EMPTY_OPTIONS}
+                        options={requestTypesData || EMPTY_REQUEST_TYPES}
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
                         value={requestTypesData?.find((item) => String(item.id) === field.value) || null}
@@ -434,11 +450,11 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 render={({field}) => (
                     <Autocomplete
                         fullWidth
-                        options={sourcesData || EMPTY_OPTIONS}
+                        options={sourcesData || EMPTY_SOURCES}
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
                         value={sourcesData?.find((item) => String(item.id) === field.value) || null}
-                        onChange={(_, newValue: ClientRequestReceiverFrom | null) => {
+                        onChange={(_, newValue) => {
                             field.onChange(newValue ? String(newValue.id) : "");
                             // Reset all receiver fields when source changes
                             setValue("receiver_phone", "");
@@ -484,8 +500,6 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                 onChange={phoneField.onChange}
                                 onBlur={phoneField.onBlur}
                                 touched={fieldState.isTouched}
-                                defaultCountry="SA"
-                                international
                             />
                         </Box>
                     )}
@@ -518,10 +532,10 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                     render={({field: employeeField, fieldState}) => (
                         <Autocomplete
                             fullWidth
-                            options={employeesData || EMPTY_OPTIONS}
+                            options={employeesData || EMPTY_EMPLOYEE_OPTIONS}
                             getOptionLabel={(option) => option.name || `${option.first_name} ${option.last_name}`}
                             isOptionEqualToValue={(option, value) => option.id === value?.id}
-                            value={employeesData?.find((emp) => String(emp.id) === employeeField.value) ?? null}
+                            value={employeesData?.find((emp: EmployeeOption) => String(emp.id) === employeeField.value) ?? null}
                             onChange={(_, newValue) => {
                                 employeeField.onChange(newValue ? String(newValue.id) : "");
                             }}
@@ -572,7 +586,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                                 options={filteredBrokers}
                                 getOptionLabel={(option) => option.name}
                                 isOptionEqualToValue={(option, value) => option.id === value?.id}
-                                value={filteredBrokers.find((item) => String(item.id) === brokerField.value) || null}
+                                value={filteredBrokers.find((item: SelectOption) => String(item.id) === brokerField.value) || null}
                                 onChange={(_, newValue) => {
                                     if (newValue && 'isCreateButton' in newValue) return;
                                     brokerField.onChange(newValue ? String(newValue.id) : "");
@@ -672,7 +686,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                         options={filteredClients}
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
-                        value={filteredClients.find((item) => String(item.id) === field.value) || null}
+                        value={filteredClients.find((item: SelectOption) => String(item.id) === field.value) || null}
                         onChange={(_, newValue) => {
                             if (newValue && 'isCreateButton' in newValue) return;
                             field.onChange(newValue ? String(newValue.id) : "");
@@ -786,7 +800,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                         options={branchesData || EMPTY_OPTIONS}
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
-                        value={branchesData?.find((item) => String(item.id) === field.value) || null}
+                        value={branchesData?.find((item: SelectOption) => String(item.id) === field.value) || null}
                         onChange={(_, newValue) => {
                             field.onChange(newValue ? String(newValue.id) : "");
                             // Reset management when branch changes
@@ -817,7 +831,7 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                         options={managementsData || EMPTY_OPTIONS}
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
-                        value={managementsData?.find((item) => String(item.id) === field.value) || null}
+                        value={managementsData?.find((item: SelectOption) => String(item.id) === field.value) || null}
                         onChange={(_, newValue) => {
                             field.onChange(newValue ? String(newValue.id) : "");
                         }}
@@ -837,35 +851,20 @@ export function RequestFormFields({control, errors, setValue}: RequestFormFields
                 )}
             />
 
-            {/* المرفقات - attachments */}
-            <Controller
-                name="attachments"
-                control={control}
-                render={({field}) => (
-                    <Box sx={{display: "flex", alignItems: "center", gap: 1}}>
-                        <Button
-                            variant="outlined"
-                            component="label"
-                            startIcon={<Paperclip size={16}/>}
-                            size="small"
-                        >
-                            {field.value && field.value.length > 0
-                                ? `${field.value.length} ${t("clientRequests.form.attachments")}`
-                                : t("clientRequests.form.attachments")}
-                            <input
-                                type="file"
-                                hidden
-                                multiple
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                                onChange={(e) => {
-                                    const files = Array.from(e.target.files ?? []);
-                                    field.onChange(files);
-                                }}
-                            />
-                        </Button>
-                    </Box>
-                )}
-            />
+            {/* المرفقات - attachments (managed in AttachmentsDialog) */}
+            <Box sx={{display: "flex", alignItems: "center", gap: 1}}>
+                <Button
+                    variant="outlined"
+                    startIcon={<Paperclip size={16}/>}
+                    size="small"
+                    type="button"
+                    onClick={onOpenAttachmentsDialog}
+                >
+                    {attachmentCount > 0
+                        ? `${attachmentCount} ${t("clientRequests.form.attachments")}`
+                        : t("clientRequests.form.addAttachments")}
+                </Button>
+            </Box>
         </>
     );
 }

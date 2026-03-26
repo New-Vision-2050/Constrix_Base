@@ -7,6 +7,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  InputAdornment,
   Stack,
   TextField,
   Typography,
@@ -25,6 +26,8 @@ import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const PasswordPhase = ({
   handleSetStep,
@@ -37,6 +40,7 @@ const PasswordPhase = ({
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, handleOpen, handleClose] = useModal();
+  const [showPassword, setShowPassword] = useState(false);
 
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
     useForgetPassword();
@@ -70,6 +74,7 @@ const PasswordPhase = ({
 
   const handleLogin = () => {
     const data = getValues();
+    
     mutate(
       {
         identifier: data.identifier,
@@ -165,18 +170,48 @@ const PasswordPhase = ({
         </Typography>
         <Stack spacing={2} my={1}>
           <TextField
-            type="password"
+            type={showPassword ? "text" : "password"}
             {...register("password")}
             label={t("Login.Password")}
             error={!!errors?.password?.message}
             helperText={errors?.password?.message}
             fullWidth
+            sx={{
+              // Hide browser's default password reveal (Edge, IE)
+              "& input::-ms-reveal": { display: "none" },
+              "& input::-ms-clear": { display: "none" },
+              // Hide browser's default password reveal (Safari)
+              "& input::-webkit-textfield-decoration-container": { display: "none" },
+              "& input::-webkit-credentials-auto-fill-button": {
+                visibility: "hidden",
+                display: "none",
+                pointerEvents: "none",
+                height: 0,
+                width: 0,
+                margin: 0,
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={showPassword ? "hide password" : "show password"}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <Button
             size="large"
             fullWidth
             variant="contained"
+            color="primary"
             disabled={isPending || isSuccess}
             endIcon={isPending || isSuccess ? <CircularProgress size={18} /> : undefined}
             onClick={handleSubmit(handleLogin)}

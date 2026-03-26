@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Control, useWatch } from "react-hook-form";
+import { Control } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -19,10 +19,10 @@ import {
 } from "@/components/ui/select";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import ImageUpload from "@/components/shared/ImageUpload";
 import { ProjectFormData } from "../../schema/project-form.schema";
 import { CompanyDashboardProjectsApi } from "@/services/api/company-dashboard/projects";
 import { toast } from "sonner";
+import ProjectImageUpload from "../ProjectImageUpload";
 
 /**
  * Project Details Section Component
@@ -49,12 +49,6 @@ export default function ProjectDetailsSection({
   subImagesInitialValue,
   projectId,
 }: ProjectDetailsSectionProps) {
-  const isFeatured = useWatch({
-    control,
-    name: "is_featured",
-    defaultValue: false,
-  });
-
   return (
     <div className="space-y-4">
       {/* Featured Toggle */}
@@ -80,73 +74,70 @@ export default function ProjectDetailsSection({
         )}
       />
 
-      {/* Images and Titles Row - Responsive Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
-        {/* w-20% width - Main Image */}
-        <div className="lg:col-span-2">
-          <FormField
-            control={control}
-            name="main_image"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <ImageUpload
-                    label={t("mainImage") || "Main Image"}
-                    maxSize="3MB - الحجم الأقصى"
-                    dimensions="2160 × 2160"
-                    required={false}
-                    onChange={(file) => field.onChange(file)}
-                    initialValue={mainImageInitialValue}
-                    minHeight="200px"
-                    className="mt-1"
-                  />
-                </FormControl>
-                <FormErrorMessage />
-              </FormItem>
-            )}
-          />
+      {/* Two compact uploads (first in DOM → RTL right) + title fields (wider); row stretch matches img 2 */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5 lg:items-stretch">
+        <div className="flex min-h-[200px] flex-col gap-4 sm:flex-row lg:col-span-2 lg:min-h-0">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <FormField
+              control={control}
+              name="main_image"
+              render={({ field }) => (
+                <FormItem className="flex h-full min-h-0 flex-col">
+                  <FormControl className="flex flex-1">
+                    <ProjectImageUpload
+                      label={t("mainImage") || "Main Image"}
+                      required={false}
+                      onChange={(file) => field.onChange(file)}
+                      initialValue={mainImageInitialValue}
+                      className="mt-1 flex-1"
+                    />
+                  </FormControl>
+                  <FormErrorMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col">
+            <FormField
+              control={control}
+              name="sub_images"
+              render={({ field }) => (
+                <FormItem className="flex h-full min-h-0 flex-col">
+                  <FormControl className="flex flex-1">
+                    <ProjectImageUpload
+                      label={t("subImages") || "Sub Images"}
+                      required={false}
+                      multiple={true}
+                      onMultipleChange={(files) => field.onChange(files)}
+                      initialValue={subImagesInitialValue}
+                      className="mt-1 flex-1"
+                      showDeleteConfirm={true}
+                      OnDelete={async (input) => {
+                        try {
+                          await CompanyDashboardProjectsApi.deleteMedia(
+                            projectId ?? "",
+                            input.id ?? ""
+                          );
+                          toast.success(
+                            t("deleteSuccess") ||
+                              "Image deleted successfully!"
+                          );
+                        } catch {
+                          toast.error(
+                            t("deleteError") || "Failed to delete image"
+                          );
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormErrorMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
-        {/* w-20% width - Sub Images */}
-        <div className="lg:col-span-2">
-          <FormField
-            control={control}
-            name="sub_images"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <ImageUpload
-                    label={t("subImages") || "Sub Images"}
-                    maxSize="3MB - الحجم الأقصى"
-                    dimensions="2160 × 2160"
-                    required={false}
-                    multiple={true}
-                    onMultipleChange={(files) => field.onChange(files)}
-                    initialValue={subImagesInitialValue}
-                    minHeight="200px"
-                    className="mt-1"
-                    showDeleteConfirm={true}
-                    OnDelete={async (input) => {
-                      try {
-                        await CompanyDashboardProjectsApi.deleteMedia(
-                          projectId ?? "",
-                          input.id ?? ""
-                        );
-                        toast.success(t("deleteSuccess") || "Image deleted successfully!");
-                      } catch (error) {
-                        toast.error(t("deleteError") || "Failed to delete image");
-                      }
-                    }}
-                  />
-                </FormControl>
-                <FormErrorMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* w-60% width - Project Title Arabic & English */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="flex min-h-0 flex-col gap-4 lg:col-span-3">
           {/* Project Title Arabic */}
           <FormField
             control={control}
