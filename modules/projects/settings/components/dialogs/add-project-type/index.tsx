@@ -53,7 +53,7 @@ export default function AddProjectTypeDialog({
       z.object({
         name: z.string().min(1, t("nameRequired")),
         icon_id: z.string().min(1, t("iconRequired")),
-        reference_project_type_id: z.string().nullable(),
+        reference_project_type_id: z.string().min(1, t("referenceRequired")),
         selected_tab_values: z.array(z.string()).nullable(),
       }),
     [t],
@@ -79,7 +79,7 @@ export default function AddProjectTypeDialog({
     defaultValues: {
       name: "",
       icon_id: "",
-      reference_project_type_id: null,
+      reference_project_type_id: "",
       selected_tab_values: null,
     },
   });
@@ -122,7 +122,7 @@ export default function AddProjectTypeDialog({
     [referenceSchemas, allTabs],
   );
 
-  const handleReferenceChange = (value: string | null) => {
+  const handleReferenceChange = (value: string) => {
     setValue("reference_project_type_id", value);
     setValue("selected_tab_values", null);
   };
@@ -195,7 +195,7 @@ export default function AddProjectTypeDialog({
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <form onSubmit={handleSubmit(handleFormSubmit)} noValidate>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             {...register("name")}
@@ -219,21 +219,17 @@ export default function AddProjectTypeDialog({
             fullWidth
             error={!!errors.reference_project_type_id}
             disabled={isSubmitting}
+            required
           >
             <InputLabel id="reference-select-label">{t("referenceLabel")}</InputLabel>
             <Select
               labelId="reference-select-label"
               label={t("referenceLabel")}
-              value={watch("reference_project_type_id") ?? ""}
+              value={watch("reference_project_type_id")}
               onChange={(e) =>
-                handleReferenceChange(
-                  e.target.value ? String(e.target.value) : null,
-                )
+                handleReferenceChange(String(e.target.value))
               }
             >
-              <MenuItem value="">
-                <em>{t("referenceLabel")}</em>
-              </MenuItem>
               {secondLevelItems.map((item) => (
                 <MenuItem key={item.id} value={item.id.toString()}>
                   {item.name}
@@ -241,7 +237,7 @@ export default function AddProjectTypeDialog({
               ))}
             </Select>
             {errors.reference_project_type_id && (
-              <FormHelperText>
+              <FormHelperText error>
                 {errors.reference_project_type_id.message}
               </FormHelperText>
             )}
