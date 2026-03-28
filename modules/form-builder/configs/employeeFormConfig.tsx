@@ -7,10 +7,10 @@ import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 
 export function employeeFormConfig(
   t: (key: string) => string,
-  handleCloseForm?: () => void
+  handleCloseForm?: () => void,
 ): FormConfig {
   const formId = "employee-form";
-  
+
   return {
     formId,
     title: t("SubEntitiesForm.AddEmployee"),
@@ -69,6 +69,26 @@ export function employeeFormConfig(
             type: "email",
             placeholder: t("SubEntitiesForm.EnterEmail"),
             required: true,
+            onChange: () => {
+              // Clear retrieved data when email is changed
+              const currentValues =
+                useFormStore.getState().forms[formId]?.values;
+              if (currentValues?.mailReceived) {
+                useFormStore.getState().setValues(formId, {
+                  phone: "",
+                  first_name: "",
+                  last_name: "",
+                  country_id: "",
+                  user_id: "",
+                  payload: "",
+                  roles: "",
+                  newEmail: false,
+                  mailReceived: false,
+                  employee_in_another_company: "",
+                  employee_in_company: "",
+                });
+              }
+            },
             validation: [
               {
                 type: "required",
@@ -90,14 +110,14 @@ export function employeeFormConfig(
                       branchesIds?: string[],
                       roleTwoIds?: string[], //client
                       roleThreeIds?: string[], //broker
-                      handleOnSuccess?: () => void
+                      handleOnSuccess?: () => void,
                     ) =>
                       RetrieveEmployeeFormConfig(
                         userId,
                         branchesIds,
                         roleTwoIds,
                         roleThreeIds,
-                        handleOnSuccess
+                        handleOnSuccess,
                       )
                     }
                   />
@@ -422,7 +442,7 @@ export function employeeFormConfig(
         country_id: Boolean(formData?.country_id) ? formData?.country_id : null,
         first_name: formData?.first_name || null,
         last_name: formData?.last_name || null,
-        phone: formData?.phone || null
+        phone: formData?.phone || null,
       };
 
       return await defaultSubmitHandler(body, employeeFormConfig(t));
