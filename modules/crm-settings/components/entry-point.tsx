@@ -6,6 +6,7 @@ import ClientsSettings from "../tabs/clients-settings";
 import { CRMSettingDataCxtProvider } from "../context/CRMSettingData";
 import ServicesSettings from "../tabs/services-settings";
 import TermsSettings from "../tabs/terms-settings";
+import ProceduresSettings from "../tabs/procedures-settings";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useMemo } from "react";
@@ -40,14 +41,18 @@ export default function CRMSettingsEntryPoint() {
         content: <ServicesSettings />,
         permission: PERMISSIONS.crm.serviceSettings.view,
       },
+      {
+        id: "proceduresSettings",
+        title: t("proceduresSettings"),
+        content: <ProceduresSettings />,
+      },
     ],
     [t],
   );
 
-
-
   const crmSettingsTabs = useMemo(
-    () => allTabs.filter((tab) => can(tab.permission)),
+    () =>
+      allTabs.filter((tab) => (tab.permission ? can(tab.permission) : true)),
     [allTabs, can],
   );
 
