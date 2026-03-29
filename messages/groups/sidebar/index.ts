@@ -57,7 +57,7 @@ export const sidebarMessages = new MessagesGroup({
     CommunicationMessages: _m("Communication Messages", "رسائل التواصل"),
     CommunicationSettings: _m("Communication Settings", "اعدادات التواصل"),
     Categories: _m("Categories", "اعدادات الفئات"),
-    Icons: _m("Icons", "اعدادات الأيقونات"),
+    Icons: _m("Icons Settings", "اعدادات الأيقونات"),
     Services: _m("Services", "اعدادات الخدمات"),
     OurServices: _m("Our Services", "صفحة خدماتنا"),
     Projects: _m("Projects", "اعدادات المشاريع"),

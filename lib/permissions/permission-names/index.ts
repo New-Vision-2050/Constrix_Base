@@ -151,8 +151,15 @@ export const PERMISSIONS = {
       "DELETE",
     ]),
   },
-  // Project Type Settings
-  projectType: create("PROJECT_TYPE", ["CREATE", "UPDATE"]),
+  // Project Type Settings (work-panel.project-settings*project-type.*)
+  projectType: create("PROJECT_TYPE", [
+    "LIST",
+    "VIEW",
+    "CREATE",
+    "UPDATE",
+    "DELETE",
+    "EXPORT",
+  ]),
 
   // Project Terms (بنود المشروع)
   projectTerm: create("PROJECT_TERM", ["LIST", "CREATE", "UPDATE", "DELETE"]),

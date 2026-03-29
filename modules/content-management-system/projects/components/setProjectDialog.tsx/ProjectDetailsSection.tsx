@@ -152,7 +152,7 @@ export default function ProjectDetailsSection({
                     variant="secondary"
                     disabled={isSubmitting || isFetching}
                     className="mt-1"
-                    placeholder="SAAS"
+                    placeholder={t("titleArPlaceholder") || "Enter Project Title Arabic"}
                     {...field}
                   />
                 </FormControl>
@@ -175,7 +175,7 @@ export default function ProjectDetailsSection({
                     variant="secondary"
                     disabled={isSubmitting || isFetching}
                     className="mt-1"
-                    placeholder="SAAS"
+                    placeholder={t("titleEnPlaceholder") || "Enter Project Title English"}
                     {...field}
                   />
                 </FormControl>
@@ -240,7 +240,7 @@ export default function ProjectDetailsSection({
                   variant="secondary"
                   disabled={isSubmitting || isFetching}
                   className="mt-1"
-                  placeholder="SAAS"
+                  placeholder={t("nameArPlaceholder") || "Enter Project Name Arabic"}
                   {...field}
                 />
               </FormControl>
@@ -263,7 +263,7 @@ export default function ProjectDetailsSection({
                   variant="secondary"
                   disabled={isSubmitting || isFetching}
                   className="mt-1"
-                  placeholder="SAAS"
+                  placeholder={t("nameEnPlaceholder") || "Enter Project Name English"}
                   {...field}
                 />
               </FormControl>

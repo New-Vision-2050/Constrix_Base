@@ -107,7 +107,7 @@ export default function ProjectDetailsArray({
                       variant="secondary"
                       disabled={isSubmitting || isFetching}
                       className="mt-1"
-                      placeholder="SAAS"
+                      placeholder={t("detailArPlaceholder") || "Enter Detail Arabic"}
                       {...field}
                     />
                   </FormControl>
@@ -130,7 +130,7 @@ export default function ProjectDetailsArray({
                       variant="secondary"
                       disabled={isSubmitting || isFetching}
                       className="mt-1"
-                      placeholder="SAAS"
+                      placeholder={t("detailEnPlaceholder") || "Enter Detail English"}
                       {...field}
                     />
                   </FormControl>

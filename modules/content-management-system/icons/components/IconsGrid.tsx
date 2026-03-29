@@ -128,7 +128,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
 
     const iconActions: ShowableMenuItem[] = [
         {
-            label: "Edit",
+            label: t("editIcon"),
             icon: <EditIcon className="w-4 h-4" />,
             disabled: true,
             action: (row: { id: string }) => {
@@ -137,7 +137,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
             show: can(PERMISSIONS.CMS.icons.update),
         },
         {
-            label: "Delete",
+            label: t("deleteIcon"),
             icon: <TrashIcon className="w-4 h-4" />,
             disabled: true,
             action: (row: { id: string }) => {

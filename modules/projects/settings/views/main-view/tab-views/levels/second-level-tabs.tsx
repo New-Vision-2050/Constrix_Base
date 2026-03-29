@@ -30,30 +30,32 @@ function EditProjectTypeDialogTrigger({
   onSuccess: () => void;
 }) {
   return (
-    <DialogTrigger
-      component={EditProjectTypeDialog}
-      dialogProps={{
-        parentId,
-        projectType: item,
-        onSuccess,
-      }}
-      render={({ onOpen }) => (
-        <IconButton
-          component="div"
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpen();
-          }}
-          color="primary"
-          sx={{ cursor: "pointer" }}
-        >
-          <Settings
-            sx={{ fontSize: 20 }}
-            className="text-gray-500 cursor-pointer"
-          />
-        </IconButton>
-      )}
-    />
+    <Can check={[PERMISSIONS.projectType.update]}>
+      <DialogTrigger
+        component={EditProjectTypeDialog}
+        dialogProps={{
+          parentId,
+          projectType: item,
+          onSuccess,
+        }}
+        render={({ onOpen }) => (
+          <IconButton
+            component="div"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen();
+            }}
+            color="primary"
+            sx={{ cursor: "pointer" }}
+          >
+            <Settings
+              sx={{ fontSize: 20 }}
+              className="text-gray-500 cursor-pointer"
+            />
+          </IconButton>
+        )}
+      />
+    </Can>
   );
 }
 
@@ -135,7 +137,11 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
                       onSuccess: () => refetch(),
                     }}
                     render={({ onOpen }) => (
-                      <IconButton onClick={onOpen} sx={{ mr: 1 }} color="primary">
+                      <IconButton
+                        onClick={onOpen}
+                        sx={{ mr: 1 }}
+                        color="primary"
+                      >
                         <AddIcon />
                       </IconButton>
                     )}
@@ -145,13 +151,13 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
             </div>
           </Paper>
           {selectedItem && (
-            <SchemaLevelTabs
-              key={selectedItem.id}
-              firstLevelId={parentId}
-              parentId={selectedItem.id}
-              parentProjectType={selectedItem}
-              onParentUpdate={() => refetch()}
-            />
+            <Can check={[PERMISSIONS.projectType.view]}>
+              <SchemaLevelTabs
+                key={selectedItem.id}
+                firstLevelId={parentId}
+                parentId={selectedItem.id}
+              />
+            </Can>
           )}
         </>
       )}

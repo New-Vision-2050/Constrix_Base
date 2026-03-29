@@ -24,7 +24,6 @@ import {
 } from "./components/dialogs";
 import { SettingsTabItemProps } from "../../types";
 import Can from "@/lib/permissions/client/Can";
-import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Mock data for demonstration
@@ -345,6 +344,8 @@ function ProjectTermsView({
   );
 }
 
-export default withPermissions(ProjectTermsView, [
-  PERMISSIONS.projectTerm.list,
-]);
+// export default withPermissions(ProjectTermsView, [
+//   PERMISSIONS.projectTerm.list,
+// ]);
+
+export default ProjectTermsView;

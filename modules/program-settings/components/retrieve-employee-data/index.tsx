@@ -10,7 +10,7 @@ type PropsT = {
     branchesIds?: string[],
     roleTwoIds?: string[], //client
     roleThreeIds?: string[], //broker
-    handleOnSuccess?: () => void
+    handleOnSuccess?: () => void,
   ) => FormConfig;
   handleCloseForm?: () => void;
 };
@@ -49,9 +49,7 @@ export default function RetrieveEmployeeData(props: PropsT) {
     return (
       <EmployeeInvalidMailDialog
         formId={formId}
-        dialogStatement={
-          dialogStatement || t("EmailAlreadyAdded")
-        }
+        dialogStatement={dialogStatement || t("EmailAlreadyAdded")}
         onSuccess={() => {
           handleCloseForm?.();
         }}

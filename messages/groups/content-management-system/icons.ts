@@ -3,7 +3,8 @@ import { MessagesGroup, _m } from "@/messages";
 export const ContentManagementSystemIconsMessages = new MessagesGroup({
   title: _m("Icons", "الأيقونات"),
   addIcon: _m("Add Icon", "اضافة ايقونة جديدة"),
-  editIcon: _m("Edit Icon", "تعديل ايقونة"),
+  editIcon: _m("Edit", "تعديل"),
+  deleteIcon: _m("Delete", "حذف"),
   noIconsFound: _m("No icons found", "لا توجد أيقونات"),
   confirmDeleteMessage:_m("Are you sure you deleted the icon?","هل انت متاكد من حذف الأيقونة؟"),
   form: new MessagesGroup({

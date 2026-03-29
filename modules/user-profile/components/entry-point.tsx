@@ -11,6 +11,8 @@ import { MapPinIcon } from "lucide-react";
 import BackpackIcon from "@/public/icons/backpack";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
 import ProfileRoleSelector from "@/modules/client-profile/components/ProfileRoleSelector";
+import { useConnectionDataCxt } from "./tabs/user-contract/tabs/PersonalData/components/content-manager/connectionDataSection/context/ConnectionDataCxt";
+import { useFunctionalContractualCxt } from "./tabs/user-contract/tabs/FunctionalAndContractualData/context";
 
 
 
@@ -20,27 +22,30 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
   const [openDialog, setOpenDialog] = useState(false);
   const { user, isLoading, userPersonalData, handleUpdateImage } =
     useUserProfileCxt();
-  // sub items - branch-jobtitle-address
+  
+  const { userContactData } = useConnectionDataCxt();
+  const { userContractData } =
+  useFunctionalContractualCxt();
   const subItems: ProfileSubItem[] = [
     {
       label: t("branch"),
       icon: <MapPinIcon />,
-      value: user?.branch ?? "",
+      value: user?.branch ?? "-",
     },
     {
       label: t("jobTitle"),
       icon: <BackpackIcon />,
-      value: user?.job_title ?? "",
+      value: user?.job_title ?? "-",
     },
     {
       label: t("address"),
-      icon: <MapPinIcon />,
-      value: user?.address ?? "",
+      icon: <MapPinIcon />,      
+      value: userContactData?.address ?? "-",
     },
     {
       label: t("appointmentDate"),
       icon: <CalendarRangeIcon />,
-      value: user?.date_appointment ?? "",
+      value: userContractData?.start_date ?? "-",
     },
   ];
 
@@ -57,7 +62,8 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
         }
         subItems={subItems}
         job_title={user?.job_title}
-        address={user?.address}
+        branch={user?.branch ?? ""}
+        address={userContactData?.address ?? ""}
         date_appointment={user?.date_appointment}
         setOpenUploadImgDialog={setOpenDialog}
         actionSlot={<ProfileRoleSelector id={userPersonalData?.id ?? ''} userTypes={userPersonalData?.user_types ?? []} readonly={false} />}

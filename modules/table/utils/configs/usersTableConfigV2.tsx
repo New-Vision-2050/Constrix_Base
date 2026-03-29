@@ -75,7 +75,7 @@ export const UsersConfigV2 = (options?: {
         tEditSubEntity,
         undefined,
         isShareClient,
-        currentUserId
+        currentUserId,
       );
     }
     // broker model - use simplified edit form
@@ -84,7 +84,7 @@ export const UsersConfigV2 = (options?: {
         tEditSubEntity,
         undefined,
         isShareBroker,
-        currentUserId
+        currentUserId,
       );
     }
     // employee model - use simplified edit form
@@ -133,10 +133,10 @@ export const UsersConfigV2 = (options?: {
         key: "phone",
         label: tSubTable("Phone"),
         render: (_: unknown, row: UserTableRow) => {
-          const companies = row.companies || [];
+          // const companies = row.companies || [];
           return (
             <div className="line-clamp-3 flex flex-col items-start justify-start">
-              {companies.map((company) => (
+              {/* {companies.map((company) => (
                 <p
                   key={company.id}
                   className="line-clamp-1 h-5"
@@ -145,7 +145,8 @@ export const UsersConfigV2 = (options?: {
                 >
                   {company?.phone || ""}
                 </p>
-              ))}
+              ))} */}
+              <p>{row.phone || ""}</p>
             </div>
           );
         },
@@ -204,11 +205,11 @@ export const UsersConfigV2 = (options?: {
                           "w-5 h-5 flex items-center justify-center",
                           role.status === 1 && "text-[#18CB5F]",
                           role.status === 0 && "text-[#FF4747]",
-                          role.status === -1 && "text-[#F19B02]"
+                          role.status === -1 && "text-[#F19B02]",
                         )}
                       >
                         {React.createElement(
-                          rulesIcons[(index + 1) as keyof typeof rulesIcons]
+                          rulesIcons[(index + 1) as keyof typeof rulesIcons],
                         )}
                       </span>
                     ) : (
@@ -332,7 +333,7 @@ export const UsersConfigV2 = (options?: {
                     options?.registrationFormSlug === ModelsTypes.CLIENT
                       ? "2"
                       : "3"
-                  }`
+                  }`,
                 );
               },
               icon: <UserIcon className="w-4 h-4" />,
@@ -345,8 +346,8 @@ export const UsersConfigV2 = (options?: {
           options?.registrationFormSlug === ModelsTypes.CLIENT
             ? tSubTable("ClientSettings")
             : options?.registrationFormSlug === ModelsTypes.BROKER
-            ? tSubTable("BrokerSettings")
-            : tSubTable("EmployeeSettings"),
+              ? tSubTable("BrokerSettings")
+              : tSubTable("EmployeeSettings"),
         icon: <GearIcon className="w-4 h-4" />,
         action: "user-settings",
         dialogComponent: UserSettingDialog,
@@ -358,8 +359,8 @@ export const UsersConfigV2 = (options?: {
               options?.registrationFormSlug === ModelsTypes.CLIENT
                 ? tSubTable("ClientSettings")
                 : options?.registrationFormSlug === ModelsTypes.BROKER
-                ? tSubTable("BrokerSettings")
-                : tSubTable("EmployeeSettings"),
+                  ? tSubTable("BrokerSettings")
+                  : tSubTable("EmployeeSettings"),
           };
         },
       },
