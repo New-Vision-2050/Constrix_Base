@@ -190,7 +190,7 @@ export default function ImageUpload({
             <>
               <Upload className="w-12 h-12 text-gray-600 mb-3" />
               <Typography sx={{ fontSize: "14px", mb: 1 }}>
-                {maxSize}
+                {displayMaxSize}
               </Typography>
               <Typography sx={{ fontSize: "14px", mb: 4 }}>
                 {dimensions}
@@ -366,7 +366,7 @@ export default function ImageUpload({
               <Typography
                 sx={{ color: "text.primary", fontSize: "14px", mb: 1 }}
               >
-                {maxSize}
+                {displayMaxSize}
               </Typography>
               <Typography
                 sx={{ color: "text.disabled", fontSize: "12px", mb: 4 }}
