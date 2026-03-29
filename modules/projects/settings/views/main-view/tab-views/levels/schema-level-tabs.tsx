@@ -26,6 +26,7 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddSubProjectTypeDialog from "../../../../components/dialogs/add-sub-project-type";
 import EditSubProjectTypeDialog from "../../../../components/dialogs/edit-sub-project-type";
 import Can from "@/lib/permissions/client/Can";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useProjectSettingsTabs } from "../../../../constants/current-tabs";
 import {
@@ -82,31 +83,33 @@ function EditSubProjectTypeDialogTrigger({
   onSuccess: () => void;
 }) {
   return (
-    <DialogTrigger
-      component={EditSubProjectTypeDialog}
-      dialogProps={{
-        parentId,
-        projectType: item,
-        onSuccess,
-      }}
-      render={({ onOpen }) => (
-        <IconButton
-          component="div"
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpen();
-          }}
-          color="primary"
-          size="small"
-          sx={{ cursor: "pointer" }}
-        >
-          <Settings
-            sx={{ fontSize: 18 }}
-            className="text-gray-500 cursor-pointer"
-          />
-        </IconButton>
-      )}
-    />
+    <Can check={[PERMISSIONS.projectType.update]}>
+      <DialogTrigger
+        component={EditSubProjectTypeDialog}
+        dialogProps={{
+          parentId,
+          projectType: item,
+          onSuccess,
+        }}
+        render={({ onOpen }) => (
+          <IconButton
+            component="div"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen();
+            }}
+            color="primary"
+            size="small"
+            sx={{ cursor: "pointer" }}
+          >
+            <Settings
+              sx={{ fontSize: 18 }}
+              className="text-gray-500 cursor-pointer"
+            />
+          </IconButton>
+        )}
+      />
+    </Can>
   );
 }
 
@@ -156,6 +159,8 @@ export default function SchemaLevelTabs({
   const t = useTranslations("Projects.Settings.projectTypes");
   const allTabs = useProjectSettingsTabs();
   const queryClient = useQueryClient();
+  const { can } = usePermissions();
+  const canUpdateProjectType = can([PERMISSIONS.projectType.update]);
 
   const [selectedSchema, setSelectedSchema] = useState<PRJ_ProjectType | null>(
     null,
@@ -291,6 +296,7 @@ export default function SchemaLevelTabs({
     tabValue: string,
   ) => {
     e.stopPropagation();
+    if (!canUpdateProjectType) return;
     if (thirdLevelId == null || !BULK_TOGGLE_SUPPORTED_TABS.has(tabValue)) {
       return;
     }
@@ -357,8 +363,9 @@ export default function SchemaLevelTabs({
   }, [selectedTab, filteredTabs]);
 
   return (
-    <div className="space-y-4">
-      <Grid container spacing={2}>
+    <Can check={[PERMISSIONS.projectType.list]}>
+      <div className="space-y-4">
+        <Grid container spacing={2}>
         <Grid size={3}>
           {thirdLevelQuery.isLoading && (
             <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
@@ -444,6 +451,7 @@ export default function SchemaLevelTabs({
                     );
                     const loading = isBulkTabDataLoading(tab.value);
                     const bulkCheckboxDisabled =
+                      !canUpdateProjectType ||
                       bulkTogglesUpdating ||
                       loading ||
                       bulkState === null;
@@ -479,6 +487,7 @@ export default function SchemaLevelTabs({
           )}
         </Grid>
       </Grid>
-    </div>
+      </div>
+    </Can>
   );
 }

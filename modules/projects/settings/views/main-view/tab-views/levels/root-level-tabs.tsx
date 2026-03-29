@@ -6,6 +6,8 @@ import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useEffect, useState } from "react";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import SecondLevelTabs from "./second-level-tabs";
 
 export default function RootLevelTabs() {
@@ -28,28 +30,30 @@ export default function RootLevelTabs() {
   }, [roots, selectedRoot]);
 
   return (
-    <div className="space-y-4">
-      {isLoading && <LinearProgress />}
-      {!isLoading && (
-        <>
-          <Paper>
-            <Tabs
-              value={selectedRoot?.id ?? false}
-              onChange={(_, value: number) => {
-                const root = roots.find((r) => r.id === value);
-                if (root) setSelectedRoot(root);
-              }}
-            >
-              {roots.map((root) => (
-                <Tab key={root.id} label={root.name} value={root.id} />
-              ))}
-            </Tabs>
-          </Paper>
-          {selectedRoot && (
-            <SecondLevelTabs key={selectedRoot.id} parentId={selectedRoot.id} />
-          )}
-        </>
-      )}
-    </div>
+    <Can check={[PERMISSIONS.projectType.list]}>
+      <div className="space-y-4">
+        {isLoading && <LinearProgress />}
+        {!isLoading && (
+          <>
+            <Paper>
+              <Tabs
+                value={selectedRoot?.id ?? false}
+                onChange={(_, value: number) => {
+                  const root = roots.find((r) => r.id === value);
+                  if (root) setSelectedRoot(root);
+                }}
+              >
+                {roots.map((root) => (
+                  <Tab key={root.id} label={root.name} value={root.id} />
+                ))}
+              </Tabs>
+            </Paper>
+            {selectedRoot && (
+              <SecondLevelTabs key={selectedRoot.id} parentId={selectedRoot.id} />
+            )}
+          </>
+        )}
+      </div>
+    </Can>
   );
 }
