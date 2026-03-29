@@ -64,6 +64,12 @@ export const ContentManagementSystemMainSettingsMessages = new MessagesGroup({
     cancel: _m("Cancel", "إلغاء"),
     updateSuccess: _m("Settings updated successfully!", "تم تحديث الإعدادات بنجاح!"),
     updateError: _m("Failed to update settings. Please try again.", "فشل تحديث الإعدادات. يرجى المحاولة مرة أخرى."),
+    projectTitle: _m("Project Title", "عنوان المشروع"),
+    projectTitlePlaceholder: _m("Enter Project Title", "أدخل عنوان المشروع"),
+    projectDescriptionAr: _m("Project Description in Arabic", "وصف المشروع بالعربي"),
+    projectDescriptionArPlaceholder: _m("Enter Project Description in Arabic", "أدخل وصف المشروع بالعربي"),
+    projectDescriptionEn: _m("Project Description in English", "وصف المشروع بالانجليزي"),
+    projectDescriptionEnPlaceholder: _m("Enter Project Description in English", "أدخل وصف المشروع بالانجليزي"),
     homepageIconOptions: new MessagesGroup({
       companies: _m("Companies", "الشركات"),
       accreditations: _m("Accreditations", "الاعتمادات"),
