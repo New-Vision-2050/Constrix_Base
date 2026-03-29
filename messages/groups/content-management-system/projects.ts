@@ -68,17 +68,19 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     subImages: _m("Sub Images", "الصور الفرعية"),
     type: _m("Project Type", "نوع المشروع"),
     typePlaceholder: _m("Select Project Type", "أختار نوع المشروع"),
-    nameAr: _m("Project Name in Arabic", "إسم المشروع عربي"),
-    nameEn: _m("Project Name in English", "إسم المشروع الانجليزية"),
+    nameAr: _m("Project Title in Arabic", "عنوان المشروع بالعربية"),
+    nameArPlaceholder: _m("Enter Project Title in Arabic", "أدخل عنوان المشروع بالعربي"),
+    nameEn: _m("Project Title in English", "عنوان المشروع بالإنجليزية"),
+    nameEnPlaceholder: _m("Enter Project Title in English", "أدخل عنوان المشروع بالانجليزي"),
     descriptionAr: _m("Project Description in Arabic", "وصف المشروع عربي"),
     descriptionEn: _m(
       "Project Description in English",
       "وصف المشروع الانجليزية"
     ),
-    descriptionArPlaceholder: _m("Enter description in Arabic", "أدخل الوصف"),
+    descriptionArPlaceholder: _m("Enter Project Description in Arabic", "أدخل وصف المشروع بالعربي"),
     descriptionEnPlaceholder: _m(
-      "Enter description in English",
-      "Enter description"
+      "Enter Project Description in English",
+      "أدخل وصف المشروع بالانجليزي"
     ),
     details: _m("Details", "التفاصيل"),
     addDetail: _m("Add Detail", "إضافة تفاصيل"),

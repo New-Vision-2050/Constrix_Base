@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -21,6 +21,12 @@ import {
   FormHelperText,
   CircularProgress,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs, { type Dayjs } from "dayjs";
+import "dayjs/locale/ar";
+import "dayjs/locale/en";
 import { Controller } from "react-hook-form";
 import ImageUpload from "@/components/shared/ImageUpload";
 import { useIsRtl } from "@/hooks/use-is-rtl";
@@ -40,6 +46,12 @@ import {
 import { AddNewsDialogProps, Category, AxiosError } from "../types";
 import { CategoryTypes } from "../../categories/enums/Category-types";
 
+function parseNewsFormDate(value: string | undefined): Dayjs | null {
+  if (!value) return null;
+  const parsed = dayjs(value, "YYYY-MM-DD", true);
+  return parsed.isValid() ? parsed : null;
+}
+
 export default function AddNewsDialog({
   open,
   onClose,
@@ -47,6 +59,7 @@ export default function AddNewsDialog({
   newsId,
 }: AddNewsDialogProps) {
   const isRtl = useIsRtl();
+  const locale = useLocale();
   const t = useTranslations("content-management-system.news");
   const isEditMode = !!newsId;
 
@@ -204,6 +217,8 @@ export default function AddNewsDialog({
   };
 
   // Map categories to match Category interface
+  const dayjsLocale = locale === "ar" ? "ar" : "en";
+
   const categories: Category[] =
     categoriesData?.payload?.map((category) => ({
       id: category.id,
@@ -229,7 +244,11 @@ export default function AddNewsDialog({
       </DialogTitle>
 
       <DialogContent sx={{ maxHeight: "90vh", overflow: "auto" }}>
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          adapterLocale={dayjsLocale}
+        >
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
           {/* Title Fields and Image Uploads Row */}
           <Grid container spacing={3} sx={{ mb: 3 }}>
             {/* Right Column - Image Uploads */}
@@ -243,8 +262,8 @@ export default function AddNewsDialog({
                       <Box>
                         <ImageUpload
                           label={t("form.thumbnailImage")}
-                          maxSize="3MB - الحجم الأقصى"
-                          dimensions="2160 × 2160"
+                          maxSize={t("form.imageMaxSize")}
+                          dimensions={t("form.imageDimensions")}
                           required={!isEditMode}
                           onChange={(file) => field.onChange(file)}
                           initialValue={
@@ -271,8 +290,8 @@ export default function AddNewsDialog({
                       <Box>
                         <ImageUpload
                           label={t("form.mainImage")}
-                          maxSize="3MB - الحجم الأقصى"
-                          dimensions="2160 × 2160"
+                          maxSize={t("form.imageMaxSize")}
+                          dimensions={t("form.imageDimensions")}
                           required={!isEditMode}
                           onChange={(file) => field.onChange(file)}
                           initialValue={
@@ -389,17 +408,27 @@ export default function AddNewsDialog({
                 control={control}
                 name="publish_date"
                 render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    type="date"
+                  <DatePicker
                     label={t("form.publishDate")}
-                    required
+                    value={parseNewsFormDate(field.value)}
+                    onChange={(newValue) => {
+                      field.onChange(
+                        newValue ? newValue.format("YYYY-MM-DD") : "",
+                      );
+                    }}
                     disabled={isSubmitting || isFetching}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    size="small"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      textField: {
+                        required: true,
+                        fullWidth: true,
+                        size: "small",
+                        error: !!fieldState.error,
+                        helperText: fieldState.error?.message,
+                        onBlur: field.onBlur,
+                        name: field.name,
+                        inputRef: field.ref,
+                      },
+                    }}
                   />
                 )}
               />
@@ -409,17 +438,27 @@ export default function AddNewsDialog({
                 control={control}
                 name="end_date"
                 render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    type="date"
+                  <DatePicker
                     label={t("form.endDate")}
-                    required
+                    value={parseNewsFormDate(field.value)}
+                    onChange={(newValue) => {
+                      field.onChange(
+                        newValue ? newValue.format("YYYY-MM-DD") : "",
+                      );
+                    }}
                     disabled={isSubmitting || isFetching}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    size="small"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      textField: {
+                        required: true,
+                        fullWidth: true,
+                        size: "small",
+                        error: !!fieldState.error,
+                        helperText: fieldState.error?.message,
+                        onBlur: field.onBlur,
+                        name: field.name,
+                        inputRef: field.ref,
+                      },
+                    }}
                   />
                 )}
               />
@@ -463,7 +502,8 @@ export default function AddNewsDialog({
               )}
             />
           </Box>
-        </Box>
+          </Box>
+        </LocalizationProvider>
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>

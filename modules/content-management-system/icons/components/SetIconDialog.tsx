@@ -331,7 +331,7 @@ export default function SetIconDialog({
                                                     placeholder={t("categoryPlaceholder") || "أختار الفئة"}
                                                 />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent dir={isRtl ? "rtl" : "ltr"}>
                                                 {categories.map((category: any) => (
                                                     <SelectItem key={category.id} value={category.id?.toString()}>
                                                         {category.name || category?.name_ar || category.id}
