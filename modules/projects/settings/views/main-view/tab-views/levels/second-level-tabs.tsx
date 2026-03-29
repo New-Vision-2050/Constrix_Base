@@ -149,8 +149,6 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
               key={selectedItem.id}
               firstLevelId={parentId}
               parentId={selectedItem.id}
-              parentProjectType={selectedItem}
-              onParentUpdate={() => refetch()}
             />
           )}
         </>

@@ -27,10 +27,13 @@ import AddSubProjectTypeDialog from "../../../../components/dialogs/add-sub-proj
 import EditSubProjectTypeDialog from "../../../../components/dialogs/edit-sub-project-type";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useProjectSettingsTabs } from "../../../../constants/current-tabs";
 import {
-  TAB_SCHEMA_ID_MAP,
-  useProjectSettingsTabs,
-} from "../../../../constants/current-tabs";
+  BULK_TOGGLE_SUPPORTED_TABS,
+  bulkToggleTabSettings,
+  getTabBulkCheckboxState,
+  isTabFullyEnabled,
+} from "./schema-tab-bulk-settings";
 import DetailsView from "../details";
 import ProjectTermsView from "../project-terms";
 import AttachmentsView from "../attachments";
@@ -67,8 +70,6 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
 interface SchemaLevelTabsProps {
   firstLevelId: number;
   parentId: number;
-  parentProjectType: PRJ_ProjectType;
-  onParentUpdate?: () => void;
 }
 
 function EditSubProjectTypeDialogTrigger({
@@ -99,7 +100,10 @@ function EditSubProjectTypeDialogTrigger({
           size="small"
           sx={{ cursor: "pointer" }}
         >
-          <Settings sx={{ fontSize: 18 }} className="text-gray-500 cursor-pointer" />
+          <Settings
+            sx={{ fontSize: 18 }}
+            className="text-gray-500 cursor-pointer"
+          />
         </IconButton>
       )}
     />
@@ -110,6 +114,8 @@ const TabWithCheckbox = ({
   label,
   value,
   checked,
+  indeterminate,
+  hideCheckbox,
   onClick,
   onCheckboxChange,
   disabled,
@@ -117,6 +123,8 @@ const TabWithCheckbox = ({
   label: string;
   value: string;
   checked: boolean;
+  indeterminate?: boolean;
+  hideCheckbox?: boolean;
   onClick: () => void;
   onCheckboxChange: (e: React.MouseEvent) => void;
   disabled?: boolean;
@@ -127,11 +135,14 @@ const TabWithCheckbox = ({
     onClick={onClick}
     label={
       <div className="flex items-center">
-        <Checkbox
-          checked={checked}
-          onClick={onCheckboxChange}
-          disabled={disabled}
-        />
+        {!hideCheckbox && (
+          <Checkbox
+            checked={checked}
+            indeterminate={indeterminate}
+            onClick={onCheckboxChange}
+            disabled={disabled}
+          />
+        )}
         <Typography variant="subtitle2">{label}</Typography>
       </div>
     }
@@ -141,18 +152,17 @@ const TabWithCheckbox = ({
 export default function SchemaLevelTabs({
   firstLevelId,
   parentId,
-  parentProjectType,
-  onParentUpdate,
 }: SchemaLevelTabsProps) {
   const t = useTranslations("Projects.Settings.projectTypes");
   const allTabs = useProjectSettingsTabs();
   const queryClient = useQueryClient();
 
-  const [selectedSchema, setSelectedSchema] =
-    useState<PRJ_ProjectType | null>(null);
+  const [selectedSchema, setSelectedSchema] = useState<PRJ_ProjectType | null>(
+    null,
+  );
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
-  const [schemaUpdating, setSchemaUpdating] = useState(false);
+  const [bulkTogglesUpdating, setBulkTogglesUpdating] = useState(false);
 
   const thirdLevelQuery = useQuery({
     queryKey: ["third-level-project-types", parentId],
@@ -180,46 +190,139 @@ export default function SchemaLevelTabs({
     [schemas, allTabs],
   );
 
-  const selectedSchemaIds = useMemo(
-    () => new Set(schemas.map((s) => s.id)),
-    [schemas],
+  const thirdLevelId = selectedSchema?.id ?? null;
+
+  const dataSettingsQuery = useQuery({
+    queryKey: ["project-type-data-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getDataSettings(thirdLevelId!);
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "project-details"),
+  });
+
+  const attachmentContractQuery = useQuery({
+    queryKey: ["attachment-contract-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getAttachmentContractSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "attachments"),
+  });
+
+  const attachmentTermsQuery = useQuery({
+    queryKey: ["attachment-terms-contract-settings", thirdLevelId],
+    queryFn: async () => {
+      const response =
+        await ProjectTypesApi.getAttachmentTermsContractSettings(thirdLevelId!);
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "attachments"),
+  });
+
+  const contractorSettingsQuery = useQuery({
+    queryKey: ["contractor-contract-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getContractorContractSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "contractors"),
+  });
+
+  const employeeSettingsQuery = useQuery({
+    queryKey: ["employee-contract-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getEmployeeContractSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled: thirdLevelId != null && filteredTabs.some((t) => t.value === "team"),
+  });
+
+  const bulkSettingsData = useMemo(
+    () => ({
+      dataSettings: dataSettingsQuery.data,
+      attachment: attachmentContractQuery.data,
+      attachmentTerms: attachmentTermsQuery.data,
+      contractor: contractorSettingsQuery.data,
+      employee: employeeSettingsQuery.data,
+    }),
+    [
+      dataSettingsQuery.data,
+      attachmentContractQuery.data,
+      attachmentTermsQuery.data,
+      contractorSettingsQuery.data,
+      employeeSettingsQuery.data,
+    ],
   );
 
-  const handleSchemaToggle = async (tabValue: string) => {
-    const schemaId = TAB_SCHEMA_ID_MAP[tabValue];
-    if (schemaId == null) return;
-    const isCurrentlySelected = selectedSchemaIds.has(schemaId);
-    const newSchemaIds = isCurrentlySelected
-      ? schemas.filter((s) => s.id !== schemaId).map((s) => s.id)
-      : [...schemas.map((s) => s.id), schemaId]
-          .filter((id, i, arr) => arr.indexOf(id) === i)
-          .sort((a, b) => a - b);
+  const isBulkTabDataLoading = (tabValue: string) => {
+    switch (tabValue) {
+      case "project-details":
+        return dataSettingsQuery.isLoading;
+      case "attachments":
+        return (
+          attachmentContractQuery.isLoading || attachmentTermsQuery.isLoading
+        );
+      case "contractors":
+        return contractorSettingsQuery.isLoading;
+      case "team":
+        return employeeSettingsQuery.isLoading;
+      default:
+        return false;
+    }
+  };
 
-    setSchemaUpdating(true);
+  const handleTabBulkCheckbox = async (
+    e: React.MouseEvent,
+    tabValue: string,
+  ) => {
+    e.stopPropagation();
+    if (thirdLevelId == null || !BULK_TOGGLE_SUPPORTED_TABS.has(tabValue)) {
+      return;
+    }
+    if (isBulkTabDataLoading(tabValue)) return;
+
+    const enableAll = !isTabFullyEnabled(tabValue, bulkSettingsData);
+
+    setBulkTogglesUpdating(true);
     try {
-      await ProjectTypesApi.updateSecondLevelProjectType(parentId, {
-        parent_id: firstLevelId,
-        name: parentProjectType.name,
-        icon: parentProjectType.icon,
-        reference_project_type_id:
-          parentProjectType.reference_project_type_id ?? null,
-        schema_ids: newSchemaIds,
-        is_active: true,
+      await bulkToggleTabSettings(thirdLevelId, tabValue, enableAll);
+      await queryClient.invalidateQueries({
+        queryKey: ["project-type-data-settings", thirdLevelId],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["project-types", "schemas", parentId],
+      await queryClient.invalidateQueries({
+        queryKey: ["attachment-contract-settings", thirdLevelId],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["project-types", "children", firstLevelId],
+      await queryClient.invalidateQueries({
+        queryKey: ["attachment-terms-contract-settings", thirdLevelId],
       });
-      onParentUpdate?.();
+      await queryClient.invalidateQueries({
+        queryKey: ["contractor-contract-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["employee-contract-settings", thirdLevelId],
+      });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       toast.error(
-        err?.response?.data?.message ?? "Failed to update project schemas",
+        err?.response?.data?.message ?? "Failed to update tab settings",
       );
     } finally {
-      setSchemaUpdating(false);
+      setBulkTogglesUpdating(false);
     }
   };
 
@@ -263,7 +366,14 @@ export default function SchemaLevelTabs({
             </Box>
           )}
           {!thirdLevelQuery.isLoading && (
-            <Paper sx={{ maxHeight: "70vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <Paper
+              sx={{
+                maxHeight: "70vh",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <MenuList sx={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
                 {thirdLevelQuery.data?.map((item) => (
                   <MenuItem
@@ -297,7 +407,12 @@ export default function SchemaLevelTabs({
                 <Can check={[PERMISSIONS.projectType.create]}>
                   <MenuItem
                     onClick={() => setAddDialogOpen(true)}
-                    sx={{ px: 2, py: 1, borderRadius: 1, color: "primary.main" }}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      color: "primary.main",
+                    }}
                   >
                     <AddIcon fontSize="small" sx={{ mr: 1 }} />
                     <Typography variant="subtitle1" fontWeight={500}>
@@ -319,23 +434,38 @@ export default function SchemaLevelTabs({
             <div className="space-y-4">
               <Paper>
                 <Tabs value={effectiveTabValue}>
-                  {filteredTabs.map((tab) => (
-                    <TabWithCheckbox
-                      key={tab.value}
-                      onClick={() => setSelectedTab(tab.value)}
-                      label={tab.name}
-                      value={tab.value}
-                      checked={
-                        tab.schema_id != null &&
-                        selectedSchemaIds.has(tab.schema_id)
-                      }
-                      onCheckboxChange={(e) => {
-                        e.stopPropagation();
-                        handleSchemaToggle(tab.value);
-                      }}
-                      disabled={schemaUpdating}
-                    />
-                  ))}
+                  {filteredTabs.map((tab) => {
+                    const supportsBulk = BULK_TOGGLE_SUPPORTED_TABS.has(
+                      tab.value,
+                    );
+                    const bulkState = getTabBulkCheckboxState(
+                      tab.value,
+                      bulkSettingsData,
+                    );
+                    const loading = isBulkTabDataLoading(tab.value);
+                    const bulkCheckboxDisabled =
+                      bulkTogglesUpdating ||
+                      loading ||
+                      bulkState === null;
+
+                    return (
+                      <TabWithCheckbox
+                        key={tab.value}
+                        onClick={() => setSelectedTab(tab.value)}
+                        label={tab.name}
+                        value={tab.value}
+                        hideCheckbox={!supportsBulk}
+                        checked={bulkState?.checked ?? false}
+                        indeterminate={bulkState?.indeterminate ?? false}
+                        onCheckboxChange={(e) => {
+                          handleTabBulkCheckbox(e, tab.value);
+                        }}
+                        disabled={
+                          supportsBulk ? bulkCheckboxDisabled : false
+                        }
+                      />
+                    );
+                  })}
                 </Tabs>
               </Paper>
               <Paper className="p-4">
