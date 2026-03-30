@@ -32,6 +32,11 @@ export interface ProcedureStep {
     financial: boolean;
   };
   employee: Employee;
+  /** Step label when provided by API */
+  name?: string | null;
+  /** Selected management hierarchy id when persisted by API */
+  management_id?: string | number | null;
+  management_name?: string | null;
 }
 
 export interface GetStepsResponse {

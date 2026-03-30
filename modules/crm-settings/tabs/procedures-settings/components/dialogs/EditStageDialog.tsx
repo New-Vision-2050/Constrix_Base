@@ -18,56 +18,83 @@ import {
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { APP_ICONS } from "@/constants/icons";
-import { PRJ_ProjectType } from "@/types/api/projects/project-type";
+import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
+import { Stage } from "@/services/api/crm-settings/procedure-settings/types/response";
+import { useToast } from "@/modules/table/hooks/use-toast";
 
 interface EditStageDialogProps {
   open: boolean;
   onClose: () => void;
-  stage: PRJ_ProjectType | null;
-  parentId: number;
+  procedure: Stage | null;
   onSuccess: () => void;
+  /** Called after the procedure is deleted (before onSuccess). */
+  onDeleted?: (procedureId: string) => void;
 }
 
 export default function EditStageDialog({
   open,
   onClose,
-  stage,
-  parentId,
+  procedure,
   onSuccess,
+  onDeleted,
 }: EditStageDialogProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings.stages");
+  const tRoot = useTranslations("CRMSettingsModule.proceduresSettings");
+  const { toast } = useToast();
 
   const [name, setName] = useState("");
-  const [executionType, setExecutionType] = useState("sequential");
+  const [executionType, setExecutionType] = useState("sequence");
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [durationPercentage, setDurationPercentage] = useState("");
+  const [percentageError, setPercentageError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (stage) {
-      setName(stage.name || "");
-      setSelectedIcon(stage.icon || null);
-    }
-  }, [stage]);
+    if (!open || !procedure) return;
+    setName(procedure.name || "");
+    setExecutionType(
+      procedure.execute_type === "parallel" ? "parallel" : "sequence",
+    );
+    setSelectedIcon(procedure.icon || null);
+    setDurationPercentage(
+      procedure.percentage != null ? String(procedure.percentage) : "",
+    );
+    setPercentageError("");
+  }, [open, procedure]);
 
   const handleSubmit = async () => {
-    if (!name.trim() || !stage) return;
+    if (!name.trim() || !procedure) return;
+
+    const percentageValue = parseInt(durationPercentage, 10) || 0;
+    if (percentageValue > 100) {
+      setPercentageError(t("percentageMax"));
+      return;
+    }
+    setPercentageError("");
 
     setIsSubmitting(true);
     try {
-      // TODO: Implement API call to update stage
-      console.log("Updating stage:", {
-        id: stage.id,
-        name,
-        executionType,
-        selectedIcon,
-        durationPercentage,
-        parentId,
+      await ProcedureSettingsApi.updateStage(procedure.id, {
+        name: name.trim(),
+        execute_type: executionType,
+        icon: selectedIcon || procedure.icon,
+        percentage: percentageValue,
+        type: procedure.type,
+      });
+      toast({
+        title: tRoot("actions.edit"),
+        description: tRoot("messages.procedureUpdated"),
+        variant: "default",
       });
       onSuccess();
       handleClose();
     } catch (error) {
-      console.error("Error updating stage:", error);
+      console.error("Error updating procedure:", error);
+      toast({
+        title: tRoot("actions.edit"),
+        description: tRoot("messages.error"),
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -75,16 +102,36 @@ export default function EditStageDialog({
 
   const handleClose = () => {
     setName("");
-    setExecutionType("sequential");
+    setExecutionType("sequence");
     setSelectedIcon(null);
     setDurationPercentage("");
+    setPercentageError("");
     onClose();
   };
 
   const handleDelete = async () => {
-    if (!stage) return;
-    // TODO: Implement delete functionality
-    console.log("Deleting stage:", stage.id);
+    if (!procedure) return;
+    setIsSubmitting(true);
+    try {
+      await ProcedureSettingsApi.deleteStage(procedure.id);
+      onDeleted?.(procedure.id);
+      toast({
+        title: tRoot("actions.delete"),
+        description: tRoot("messages.procedureDeleted"),
+        variant: "default",
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      console.error("Error deleting procedure:", error);
+      toast({
+        title: tRoot("actions.delete"),
+        description: tRoot("messages.error"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -109,7 +156,7 @@ export default function EditStageDialog({
               onChange={(e) => setExecutionType(e.target.value)}
             >
               <FormControlLabel
-                value="sequential"
+                value="sequence"
                 control={<Radio />}
                 label={t("sequential")}
               />
@@ -150,21 +197,26 @@ export default function EditStageDialog({
           <TextField
             label={t("stageDurationPercentage")}
             value={durationPercentage}
-            onChange={(e) => setDurationPercentage(e.target.value)}
+            onChange={(e) => {
+              setDurationPercentage(e.target.value);
+              if (percentageError) setPercentageError("");
+            }}
             fullWidth
             size="small"
             type="number"
             inputProps={{ min: 0, max: 100 }}
+            error={!!percentageError}
+            helperText={percentageError}
           />
         </Box>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: "space-between" }}>
-        <Button onClick={handleDelete} color="error" disabled={isSubmitting}>
+      <DialogActions>
+        {/* <Button onClick={handleDelete} color="error" disabled={isSubmitting}>
           {t("delete")}
-        </Button>
+        </Button> */}
         <Box>
           <Button onClick={handleClose} disabled={isSubmitting} sx={{ mr: 1 }}>
-            {t("save")}
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleSubmit}

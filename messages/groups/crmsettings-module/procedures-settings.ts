@@ -25,6 +25,10 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "Stage duration percentage %",
       "نسبة مدة المراحل %",
     ),
+    percentageMax: _m(
+      "Percentage must not exceed 100.",
+      "يجب ألا تتجاوز النسبة 100٪.",
+    ),
   }),
   procedures: new MessagesGroup({
     title: _m("Procedures", "الإجراءات"),
