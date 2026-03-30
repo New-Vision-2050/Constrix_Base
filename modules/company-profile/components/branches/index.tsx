@@ -1,6 +1,6 @@
 "use client";
 import { MapPin, CircleCheck } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BranchesInfo from "./branches-info";
 import OfficialData from "../official-data";
@@ -16,7 +16,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 const Branches = () => {
   const { company_id } = useParams();
-
+  const t = useTranslations();
   const { can } = usePermissions();
 
   const locale = useLocale();
@@ -60,7 +60,7 @@ const Branches = () => {
 
   const tabs: (Tab & { show: boolean; disabled: boolean })[] = [
     {
-      label: "معلومات الفروع",
+      label: t("Sidebar.BranchesInformation"),
       value: "general",
       component: (
         <Can check={[PERMISSIONS.companyProfile.branch.list]}>

@@ -3,54 +3,56 @@ import { CompanyAddress } from "@/modules/company-profile/types/company";
 import FieldPreview from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 import { CircleCheckIcon, MapPin } from "lucide-react";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 const NationalAddressDataPreview = ({
   companyAddress,
 }: {
   companyAddress: CompanyAddress;
 }) => {
+  const t = useTranslations("companyProfileLegalDataForm");
   const previewData = [
     {
       valid: Boolean(companyAddress.country_name),
-      label: "الدولة",
+      label: t("country"),
       value: companyAddress.country_name ?? "",
       needRequest: true,
     },
     {
       valid: Boolean(companyAddress.state_name),
-      label: "المنطقة",
+      label: t("region"),
       value: companyAddress.state_name ?? "",
     },
     {
       valid: Boolean(companyAddress.city_name),
-      label: "المدينة",
+      label: t("city"),
       value: companyAddress.city_name ?? "",
     },
     {
       valid: Boolean(companyAddress.neighborhood_name),
-      label: "الحي",
+      label: t("district"),
       value: companyAddress.neighborhood_name ?? "",
     },
 
     {
       valid: Boolean(companyAddress.building_number),
-      label: "رقم المبنى",
+      label: t("buildingNumber"),
       value: companyAddress.building_number ?? "",
     },
     {
       valid: Boolean(companyAddress.additional_phone),
-      label: "الرقم الاضافي",
+      label: t("additionalNumber"),
       value: companyAddress.additional_phone ?? "",
     },
 
     {
       valid: Boolean(companyAddress.postal_code),
-      label: "الرمز البريدي",
+      label: t("postalCode"),
       value: companyAddress.postal_code ?? "",
     },
     {
       valid: Boolean(companyAddress.street_name),
-      label: "الشارع",
+      label: t("street"),
       value: companyAddress.street_name ?? "",
     },
   ];
