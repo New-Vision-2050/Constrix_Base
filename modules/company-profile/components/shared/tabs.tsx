@@ -8,12 +8,15 @@ import Branches from "../branches";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { useTranslations } from "next-intl";
 
 const CompanyProfileTabs = (): Tab[] => {
   const { can } = usePermissions();
+  const t = useTranslations();
+  
   const tabs: (Tab & { show: boolean })[] = [
     {
-      label: "البيانات الرسمية",
+      label: t("Sidebar.OfficialData"),
       icon: <User size={18} />,
       value: "official-data",
       component: <OfficialData />,
@@ -26,7 +29,7 @@ const CompanyProfileTabs = (): Tab[] => {
       ]),
     },
     {
-      label: "الفروع",
+      label: t("Sidebar.Branches"),
       icon: <MapPin size={18} />,
       value: "branches",
       component: <Branches />,
@@ -49,10 +52,11 @@ export const CompanyProfile = () => {
 };
 export const CompanyTabs = (): Tab[] => {
   const { can } = usePermissions();
+  const t = useTranslations();
 
   const tabs: (Tab & { show: boolean })[] = [
     {
-      label: "ملف الشركة",
+      label: t("Sidebar.CompanyProfile"),
       icon: <User size={18} />,
       value: "company",
       component: <CompanyProfile />,
@@ -66,31 +70,31 @@ export const CompanyTabs = (): Tab[] => {
       ]),
     },
     {
-      label: "اعدادات الموقع والتطبيق",
+      label: t("Sidebar.WebsiteAndAppSettings"),
       icon: <Users size={18} />,
       value: "location",
       show: true,
     },
     {
-      label: "المشاريع",
+      label: t("Sidebar.Projects"),
       icon: <Lock size={18} />,
       value: "projects",
       show: true,
     },
     {
-      label: "البيانات المالية",
+      label: t("Sidebar.FinancialData"),
       icon: <DollarSign size={18} />,
       value: "finance",
       show: true,
     },
     {
-      label: "الاجازات",
+      label: t("Sidebar.Vacations"),
       icon: <Send size={18} />,
       value: "leaves",
       show: true,
     },
     {
-      label: "اجراءات المستخدم",
+      label: t("Sidebar.UserActions"),
       icon: <Lock size={18} />,
       value: "user-actions",
       show: true,

@@ -1,36 +1,37 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Lock, MapPin } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import AdminStructureTaps from "./admin-structure/admin-structure-taps";
 
 const CompanyFileTaps = () => {
   const locale = useLocale();
+  const t = useTranslations();
   const isRtl = locale === "ar";
 
   const tabs = [
     {
-      label: "البيانات الرسمية",
+      label: t("Sidebar.OfficialData"),
       icon: <User size={18} />,
       value: "data",
     },
     {
-      label: "الفروع",
+      label: t("Sidebar.Branches"),
       icon: <MapPin size={18} />,
       value: "branches",
     },
     {
-      label: "الهيكل الإداري",
+      label: t("Sidebar.AdministrativeStructure"),
       icon: <Lock size={18} />,
       value: "structure",
       component: <AdminStructureTaps />,
     },
     {
-      label: "الموارد البشرية",
+      label: t("Sidebar.HumanResources"),
       icon: <Lock size={18} />,
       value: "hr",
     },
     {
-      label: "الآوراق الرسمية",
+      label: t("Sidebar.OfficialPapers"),
       icon: <Lock size={18} />,
       value: "paper",
     },
