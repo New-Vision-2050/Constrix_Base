@@ -23,6 +23,11 @@ import {
 } from "@/utils/fetchDropdownOptions";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import { ProcedureStep } from "@/services/api/crm-settings/procedure-settings/types/response";
+import {
+  coerceStepBoolean,
+  formsKindToProceduresTableUi,
+  parseProcedureStepFormsKind,
+} from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
 import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import { useToast } from "@/modules/table/hooks/use-toast";
 
@@ -34,12 +39,32 @@ interface EmployeeOption {
 
 interface Procedure {
   id?: number;
+  /** Step title from API `name` */
+  stepName: string;
   employee_id: string;
   is_accept: boolean;
   is_approve: boolean;
   duration: number;
+  /** UI Select values; mapped to API `approve` | `accept` | `financial` on submit */
   forms: string;
   relevantDepartment: string;
+}
+
+/** API expects `approve` | `accept` | `financial` — UI uses approval / accreditation / financial */
+function mapFormsUiToApi(ui: string): CreateStepArgs["forms"] {
+  switch (ui) {
+    case "financial":
+      return "financial";
+    case "accreditation":
+      return "accept";
+    case "approval":
+    default:
+      return "approve";
+  }
+}
+
+function mapFormsApiToUi(step: ProcedureStep): string {
+  return formsKindToProceduresTableUi(parseProcedureStepFormsKind(step));
 }
 
 interface ProceduresTableProps {
@@ -57,6 +82,7 @@ export interface ProceduresTableRef {
     is_approve: boolean;
     duration: number;
     forms: string;
+    stepName?: string;
   }) => Promise<void>;
 }
 
@@ -69,6 +95,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
 
     const [procedures, setProcedures] = useState<Procedure[]>([
       {
+        stepName: "",
         employee_id: "",
         is_accept: false,
         is_approve: false,
@@ -81,26 +108,32 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
     // Fetch procedure steps from API
     const { data: stepsData } = useQuery({
       queryKey: ["procedure-steps", stageId],
-      queryFn: () => ProcedureSettingsApi.getSteps(stageId),
+      queryFn: async () => {
+        const response = await ProcedureSettingsApi.getSteps(stageId);
+        return response.data;
+      },
       enabled: !!stageId,
     });
 
     // Update procedures when API data is loaded
     useEffect(() => {
       if (stepsData?.payload) {
-        const apiProcedures = stepsData.payload.map((step: ProcedureStep) => ({
-          id: step.id,
-          employee_id: step.employee_id,
-          is_accept: step.is_accept,
-          is_approve: step.is_approve,
-          duration: step.duration,
-          forms: step.forms.approve
-            ? "approval"
-            : step.forms.financial
-              ? "financial"
-              : "accept",
-          relevantDepartment: "hr", // Default value, can be updated based on API
-        }));
+        const apiProcedures = stepsData.payload.map((step: ProcedureStep) => {
+          const deptId =
+            step.management_id != null && String(step.management_id).length > 0
+              ? String(step.management_id)
+              : "hr";
+          return {
+            id: step.id,
+            stepName: step.name?.trim() ? String(step.name) : "",
+            employee_id: step.employee_id,
+            is_accept: coerceStepBoolean(step.is_accept),
+            is_approve: coerceStepBoolean(step.is_approve),
+            duration: step.duration,
+            forms: mapFormsApiToUi(step),
+            relevantDepartment: deptId,
+          };
+        });
         setProcedures(apiProcedures);
       }
     }, [stepsData]);
@@ -121,12 +154,14 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       );
 
       for (const procedure of validProcedures) {
+        const nameTrimmed = procedure.stepName?.trim() ?? "";
         const stepData: CreateStepArgs = {
           employee_id: procedure.employee_id,
           is_accept: procedure.is_accept,
           is_approve: procedure.is_approve,
           duration: procedure.duration,
-          forms: procedure.forms,
+          forms: mapFormsUiToApi(procedure.forms),
+          ...(nameTrimmed ? { name: nameTrimmed } : {}),
         };
 
         try {
@@ -140,6 +175,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
 
     const addNewProcedure = () => {
       const newProcedure: Procedure = {
+        stepName: "",
         employee_id: "",
         is_accept: false,
         is_approve: false,
@@ -156,6 +192,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       is_approve: boolean;
       duration: number;
       forms: string;
+      stepName?: string;
     }) => {
       // Validate required fields
       if (!procedureData.employee_id) {
@@ -167,12 +204,14 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
         return;
       }
 
+      const nameTrim = procedureData.stepName?.trim();
       const stepData: CreateStepArgs = {
         employee_id: procedureData.employee_id,
         is_accept: procedureData.is_accept,
         is_approve: procedureData.is_approve,
         duration: procedureData.duration,
-        forms: procedureData.forms,
+        forms: mapFormsUiToApi(procedureData.forms),
+        ...(nameTrim ? { name: nameTrim } : {}),
       };
 
       try {
@@ -234,6 +273,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>{t("steps.stepName")}</TableCell>
                 <TableCell>{t("procedures.employee")}</TableCell>
                 <TableCell>{t("procedures.approval")}</TableCell>
                 <TableCell>{t("procedures.accreditation")}</TableCell>
@@ -245,6 +285,17 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
             <TableBody>
               {procedures.map((procedure, index) => (
                 <TableRow key={procedure.id || index}>
+                  <TableCell sx={{ minWidth: 140 }}>
+                    <TextField
+                      size="small"
+                      placeholder={t("steps.enterStepName")}
+                      value={procedure.stepName ?? ""}
+                      onChange={(e) =>
+                        handleFieldChange(index, "stepName", e.target.value)
+                      }
+                      fullWidth
+                    />
+                  </TableCell>
                   <TableCell>
                     <Select
                       size="small"

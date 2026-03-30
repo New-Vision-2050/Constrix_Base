@@ -12,9 +12,8 @@ interface SubTab {
 }
 
 const MOCK_SUB_TABS: SubTab[] = [
-  { id: 1, name: "clientRequests", type: "client_request" },
-  { id: 2, name: "contracts", type: "contract" },
-  { id: 3, name: "priceOffers", type: "price_offer" },
+  { id: 1, name: "contracts", type: "contract" },
+  { id: 2, name: "priceOffers", type: "price_offer" },
 ];
 
 export default function SubTypeTabs() {
@@ -40,7 +39,7 @@ export default function SubTypeTabs() {
           ))}
         </Tabs>
       </Paper>
-      {selectedTab === 1 && <StagesView currentTabType={getCurrentTabType()} />}
+      {selectedTab === 2 && <StagesView currentTabType={getCurrentTabType()} />}
     </div>
   );
 }

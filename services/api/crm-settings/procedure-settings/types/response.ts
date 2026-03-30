@@ -19,18 +19,26 @@ export interface Employee {
   email: string;
 }
 
+/** Backend may return enum string or legacy boolean map */
+export type ProcedureStepForms =
+  | "approve"
+  | "accept"
+  | "financial"
+  | {
+      approve: boolean;
+      accept: boolean;
+      financial: boolean;
+    };
+
 export interface ProcedureStep {
   id: number;
   procedure_setting_id: string;
   employee_id: string;
-  is_accept: boolean;
-  is_approve: boolean;
+  /** API may send boolean or 0/1 */
+  is_accept: boolean | number;
+  is_approve: boolean | number;
   duration: number;
-  forms: {
-    approve: boolean;
-    accept: boolean;
-    financial: boolean;
-  };
+  forms: ProcedureStepForms;
   employee: Employee;
   /** Step label when provided by API */
   name?: string | null;
