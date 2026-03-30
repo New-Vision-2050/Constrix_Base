@@ -14,14 +14,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import MyRequests from "./my-requests";
 import { Button } from "@/components/ui/button";
 import { officialData } from "@/modules/company-profile/types/company";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
-
 const OfficialDataSection = ({
   officialData,
   currentCompanyId,
@@ -36,6 +35,7 @@ const OfficialDataSection = ({
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
   const { can } = usePermissions();
+  const t = useTranslations("Sidebar");
 
   const [isOpenReqForm, handleOpenReqForm, handleCloseReqForm] = useModal();
   const [isOpenMyReq, handleOpenMyReq, handleCloseMyReq] = useModal();
@@ -47,7 +47,7 @@ const OfficialDataSection = ({
   return (
     <>
       <FormFieldSet
-        title="البيانات الرسمية"
+        title={t("OfficialData")}
         valid={Object.values(officialData).every((value) =>
           Array.isArray(value) ? value.length > 0 : Boolean(value)
         )}
@@ -58,11 +58,11 @@ const OfficialDataSection = ({
             settingsBtn={{
               items: [
                 {
-                  title: "طلباتي",
+                  title: t("MyRequests"),
                   onClick: handleOpenMyReq,
                 },
                 {
-                  title: "طلب تعديل البيانات الرسمية",
+                  title: t("RequestOfficialDataUpdate"),
                   onClick: handleOpenReqForm,
                 },
               ],
