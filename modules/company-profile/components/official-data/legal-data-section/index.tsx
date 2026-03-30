@@ -2,7 +2,7 @@ import { useModal } from "@/hooks/use-modal";
 import FieldSetSecondTitle from "@/modules/user-profile/components/tabs/user-contract/tabs/components/FieldSetSecondTitle";
 import FormFieldSet from "@/modules/user-profile/components/tabs/user-contract/tabs/components/FormFieldSet";
 import InfoIcon from "@/public/icons/InfoIcon";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import LegalDataPreview from "./legal-data-preview";
 import {
@@ -36,6 +36,7 @@ const LegalDataSection = ({
   id?: string;
 }) => {
   const { can } = usePermissions();
+  const t = useTranslations("companyProfileLegalDataForm");
   const { data, isPending, isSuccess, refetch } = useQuery({
     queryKey: ["company-legal-data", id, currentCompanyId],
     queryFn: async () => {
@@ -84,7 +85,7 @@ const LegalDataSection = ({
 
       {isSuccess && (
         <FormFieldSet
-          title="البيانات القانونية"
+          title={t("title")}
           valid={
             !!companyLegalData &&
             companyLegalData.length > 0 &&
@@ -99,15 +100,15 @@ const LegalDataSection = ({
               settingsBtn={{
                 items: [
                   {
-                    title: "طلباتي",
+                    title: t("myRequests"),
                     onClick: handleOpenMyReq,
                   },
                   {
-                    title: "طلب تعديل البيانات القانونية",
+                    title: t("requestLegalDataUpdate"),
                     onClick: handleOpenReqForm,
                   },
                   {
-                    title: "اضافة بيان قانوني",
+                    title: t("addLegalData"),
                     onClick: () => {
                       handleOpenAddLegalDataSheet();
                     },
@@ -158,7 +159,7 @@ const LegalDataSection = ({
           ) : (
             <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
               <InfoIcon additionClass="text-orange-500 " />
-              <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
+              <p className="text-center px-5">{t("completeRegistrationData")}</p>
             </div>
           )}
           <AddLegalDataSheet
@@ -179,7 +180,7 @@ const LegalDataSection = ({
           className={`h-fit max-h-[100vh] overflow-scroll`}
         >
           <SheetHeader>
-            <SheetTitle>طلباتي</SheetTitle>
+            <SheetTitle>{t("myRequests")}</SheetTitle>
           </SheetHeader>
           <MyRequests
             type="companyLegalDataUpdate"
@@ -187,7 +188,7 @@ const LegalDataSection = ({
             branch_id={id}
           />
           <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
-            الرجوع
+            {t("goBack")}
           </Button>
         </SheetContent>
       </Sheet>
