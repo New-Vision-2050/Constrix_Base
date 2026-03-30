@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import AddStageDialog from "./dialogs/AddStageDialog";
+import EditStageDialog from "./dialogs/EditStageDialog";
 import StepCard from "./StepCard";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import {
@@ -48,6 +49,8 @@ export default function StagesView({
     null,
   );
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [procedureToEdit, setProcedureToEdit] = useState<Stage | null>(null);
   const [draftStepKeys, setDraftStepKeys] = useState<Record<string, string[]>>(
     {},
   );
@@ -243,7 +246,16 @@ export default function StagesView({
                   <Typography variant="subtitle2" fontWeight={500}>
                     {procedure.name}
                   </Typography>
-                  <IconButton size="small" sx={{ ml: "auto" }}>
+                  <IconButton
+                    size="small"
+                    sx={{ ml: "auto" }}
+                    aria-label={t("stages.editStage")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProcedureToEdit(procedure);
+                      setEditDialogOpen(true);
+                    }}
+                  >
                     <Settings sx={{ fontSize: 24 }} />
                   </IconButton>
                 </Box>
@@ -300,6 +312,32 @@ export default function StagesView({
         onSuccess={(newStage) => {
           handleCreateProcedure(newStage);
           setAddDialogOpen(false);
+        }}
+      />
+      <EditStageDialog
+        open={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setProcedureToEdit(null);
+        }}
+        procedure={procedureToEdit}
+        onDeleted={(procedureId) => {
+          setDraftStepKeys((prev) => {
+            const next = { ...prev };
+            delete next[procedureId];
+            return next;
+          });
+          queryClient.removeQueries({
+            queryKey: ["procedure-steps", procedureId],
+          });
+        }}
+        onSuccess={async () => {
+          await refetch();
+          if (procedureToEdit) {
+            await queryClient.invalidateQueries({
+              queryKey: ["procedure-steps", procedureToEdit.id],
+            });
+          }
         }}
       />
     </div>
