@@ -1,13 +1,15 @@
 import PreviewTextField from "../../../components/previewTextField";
 import { useFunctionalContractualCxt } from "../../context";
+import { useTranslations } from "next-intl";
 
 export default function JobInformationPreviewMode() {
   const { professionalData } = useFunctionalContractualCxt();
+  const tJobData = useTranslations("UserProfile.nestedTabs.jobData");
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
-          label="الفرع"
+          label={tJobData("branch")}
           value={professionalData?.branch?.name ?? ""}
           valid={Boolean(professionalData?.branch?.name)}
           required
@@ -16,7 +18,7 @@ export default function JobInformationPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="الادارة"
+          label={tJobData("management")}
           value={professionalData?.management?.name ?? ""}
           valid={Boolean(professionalData?.management?.name)}
           required
@@ -34,7 +36,7 @@ export default function JobInformationPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="نوع الوظيفة"
+          label={tJobData("jobType")}
           value={professionalData?.job_type?.name ?? ""}
           valid={Boolean(professionalData?.job_type?.name)}
           required
@@ -43,7 +45,7 @@ export default function JobInformationPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="المسمى الوظيفي"
+          label={tJobData("jobTitle")}
           value={professionalData?.job_title?.name ?? ""}
           valid={Boolean(professionalData?.job_title?.name)}
           required
@@ -52,7 +54,7 @@ export default function JobInformationPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="الرقم الوظيفي"
+          label={tJobData("jobCode")}
           value={professionalData?.job_code ?? ""}
           valid={Boolean(professionalData?.job_code)}
           required
@@ -61,7 +63,7 @@ export default function JobInformationPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="المحدد"
+          label={tJobData("attendanceConstraint")}
           value={professionalData?.attendance_constraint?.constraint_name ?? ""}
           valid={Boolean(professionalData?.attendance_constraint?.constraint_name)}
           required
@@ -70,7 +72,7 @@ export default function JobInformationPreviewMode() {
       
       <div className="p-2">
         <PreviewTextField
-          label="الصلاحيات"
+          label={tJobData("roles")}
           value={professionalData?.roles?.join(", ") ?? ""}
           valid={Boolean(professionalData?.roles?.length)}
           required

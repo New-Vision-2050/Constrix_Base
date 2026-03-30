@@ -24,16 +24,16 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
         fields: [
           {
             name: "job_offer_number",
-            label: "رقم العرض",
+            label: t("offerNumber"),
             type: "text",
-            placeholder: "رقم العرض",
+            placeholder: t("offerNumber"),
             validation: [],
           },
           {
-            label: "تاريخ الارسال",
+            label: t("dateSent"),
             type: "date",
             name: "date_send",
-            placeholder: "تاريخ الارسال",
+            placeholder: t("dateSent"),
             maxDate: {
               formId: `job-offer-data-form-${offer?.id}`,
               field: "date_accept",
@@ -41,10 +41,10 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             validation: [],
           },
           {
-            label: "تاريخ الموافقة",
+            label: t("approvalDate"),
             type: "date",
             name: "date_accept",
-            placeholder: "تاريخ الموافقة",
+            placeholder: t("approvalDate"),
             minDate: {
               formId: `job-offer-data-form-${offer?.id}`,
               field: "date_send",
@@ -52,7 +52,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             validation: [],
           },
           {
-            label: "ارفاق العرض",
+            label: t("attachOffer"),
             type: "file",
             fileConfig: {
               allowedFileTypes: [

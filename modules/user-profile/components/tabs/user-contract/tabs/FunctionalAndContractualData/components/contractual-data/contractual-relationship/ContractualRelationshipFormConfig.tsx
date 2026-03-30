@@ -14,6 +14,7 @@ type PropsT = {
 export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
     const t = useTranslations("common");
     const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
+    const tContractual = useTranslations("UserProfile.nestedTabs.contractualRelationship");
     const {userId, handleRefetchDataStatus, handleRefetchWidgetData} =
         useUserProfileCxt();
     const {handleRefetchContractData, timeUnits} =
@@ -31,9 +32,9 @@ export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
                 fields: [
                     {
                         name: "contractual_relationship_type_id",
-                        label: "العلاقه التعاقديه",
+                        label: tContractual("title"),
                         type: "select",
-                        placeholder: "العلاقه التعاقديه",
+                        placeholder: tContractual("title"),
                         required: true,
                         dynamicOptions: {
                             url: `${baseURL}/contractual-relationship/types`,
@@ -45,31 +46,31 @@ export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
                         validation: [
                             {
                                 type: "required",
-                                message: "العلاقه التعاقديه مطلوبة",
+                                message: tContractual("title") + " " + t("required"),
                             },
                         ],
                     },
                     {
                         name: "employment_name",
-                        label: " اسم صاحب العمل",
+                        label: tContractual("employerName"),
                         type: "text",
-                        placeholder: "أدخل اسم صاحب العمل",
+                        placeholder: tContractual("employerName"),
                         validation: [
                             {
                                 type: "text",
-                                message: "يجب إدخال اسم صاحب العمل",
+                                message: tContractual("employerName") + " " + t("required"),
                             },
                         ],
                     },
                     {
                         name: "registration_number",
-                        label: "رقم السجل ",
+                        label: tContractual("recordNumber"),
                         type: "text",
-                        placeholder: "رقم السجل",
+                        placeholder: tContractual("recordNumber"),
                         validation: [
                             {
                                 type: "text",
-                                message: "يجب إدخال رقم السجل  ",
+                                message: tContractual("recordNumber") + " " + t("required"),
                             },
                         ],
                     },

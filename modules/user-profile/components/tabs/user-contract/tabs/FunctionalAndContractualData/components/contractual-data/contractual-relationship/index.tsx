@@ -16,7 +16,7 @@ export default function ContractualRelationshipForm() {
   return (
     <Can check={[PERMISSIONS.profile.contractWork.view]}>
       <TabTemplate
-        title={t("contractualRelationship")}
+        title={t("contractualRelationship.title")}
         loading={userContractDataLoading}
         reviewMode={<ContractualRelationshipFormPreviewMode contract={userContractData} />}
         editMode={<ContractualRelationshipFormEditMode contract={userContractData} />}
