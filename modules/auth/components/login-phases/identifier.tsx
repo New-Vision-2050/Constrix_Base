@@ -112,7 +112,6 @@ const IdentifierPhase = ({
           size="large"
           fullWidth
           variant="contained"
-          color="primary"
           disabled={isPending}
           endIcon={isPending ? <CircularProgress size={18} /> : undefined}
           onClick={handleSubmit(onSubmit)}
