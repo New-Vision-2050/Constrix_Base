@@ -187,7 +187,7 @@ export function SidebarContentWrapper({
       ROUTER.COMPANY_PROFILE,
     ];
     const rolesObj = {
-      name: "الادوار",
+      name: t("Sidebar.Roles"),
       url: ROUTER.ROLES,
       icon: RollerCoasterIcon,
       isActive: pageName === ROUTER.ROLES,
@@ -195,7 +195,7 @@ export function SidebarContentWrapper({
     };
 
     const permissionsObj = {
-      name: "الصلاحيات",
+      name: t("Sidebar.Powers"),
       url: ROUTER.PERMISSIONS,
       icon: LayoutDashboardIcon,
       isActive: pageName === ROUTER.PERMISSIONS,
@@ -204,7 +204,7 @@ export function SidebarContentWrapper({
 
     const data: Project[] = [
       {
-        name: "لوحه العمل",
+        name: t("Sidebar.WorkPanel"),
         urls: [
           ROUTER.WORK_PANEL_SETTINGS,
           ROUTER.PROJECTS_SETTINGS,
@@ -218,7 +218,7 @@ export function SidebarContentWrapper({
         show: !isCentralCompany,
         sub_entities: [
           {
-            name: "الاعدادات",
+            name: t("Sidebar.WorkPanelSettings"),
             url: ROUTER.WORK_PANEL_SETTINGS,
             icon: SettingsIcon,
             isActive:
@@ -227,7 +227,7 @@ export function SidebarContentWrapper({
             show: !isCentralCompany,
           },
           {
-            name: "المشاريع",
+            name: t("Sidebar.Projects"),
             url: ROUTER.ALL_PROJECTS,
             icon: FolderClosed, // Using FolderClosed as it's already imported
             isActive:
@@ -409,7 +409,7 @@ export function SidebarContentWrapper({
             ]),
           },
           {
-            name: "اعداد ملف الشركة",
+            name: t("Sidebar.DashboardSettings"),
             url: ROUTER.COMPANY_PROFILE,
             icon: InboxIcon,
             isActive: pageName === ROUTER.COMPANY_PROFILE,
