@@ -20,4 +20,10 @@ export interface CreateStepArgs {
   is_approve: boolean;
   duration: number;
   forms: string; // "approve" | "accept" | "financial" | "approve"
+  /** Step display name (optional; sent when API supports it). */
+  name?: string;
+  /** Selected management hierarchy id (when not HR). */
+  management_id?: string;
+  /** Display name of selected management (optional; when API expects it). */
+  management_name?: string;
 }

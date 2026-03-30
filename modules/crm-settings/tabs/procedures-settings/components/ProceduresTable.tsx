@@ -17,7 +17,10 @@ import {
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
-import { fetchDropdownOptions } from "@/utils/fetchDropdownOptions";
+import {
+  fetchManagementHierarchyOptions,
+  type ManagementHierarchyOption,
+} from "@/utils/fetchDropdownOptions";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import { ProcedureStep } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
@@ -27,12 +30,6 @@ interface EmployeeOption {
   id: string;
   name: string;
   email: string;
-}
-
-interface DropdownOption {
-  id: string;
-  name: string;
-  value: string;
 }
 
 interface Procedure {
@@ -218,10 +215,10 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       },
     });
     // Fetch managements for dropdown
-    const { data: managements = [] } = useQuery<DropdownOption[]>({
-      queryKey: ["managements"],
+    const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
+      queryKey: ["managements", "hierarchy", "management"],
       queryFn: () =>
-        fetchDropdownOptions(
+        fetchManagementHierarchyOptions(
           `${baseURL}/management_hierarchies/list?type=management`,
         ),
     });
@@ -337,7 +334,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
                         {t("procedures.humanResources")}
                       </MenuItem>
                       {managements.map((management) => (
-                        <MenuItem key={management.id} value={management.value}>
+                        <MenuItem key={management.id} value={management.id}>
                           {management.name}
                         </MenuItem>
                       ))}
