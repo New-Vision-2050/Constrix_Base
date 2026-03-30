@@ -84,6 +84,7 @@ const calculateHourlyRate = (
 export const SalaryFormConfig = () => {
   const t = useTranslations("common");
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
+  const tSalary = useTranslations("UserProfile.nestedTabs.basicSalaryEdit");
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
 
@@ -101,9 +102,9 @@ export const SalaryFormConfig = () => {
         fields: [
           {
             name: "salary_type_code",
-            label: "الراتب الاساسي",
+            label: tSalary("basicSalary"),
             type: "select",
-            placeholder: "الراتب الاساسي",
+            placeholder: tSalary("placeholders.basicSalary"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/salary_types`,
@@ -116,7 +117,7 @@ export const SalaryFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "الراتب الاساسي مطلوب",
+                message: tSalary("validation.basicSalaryRequired"),
               },
             ],
             onChange: async (
@@ -164,13 +165,13 @@ export const SalaryFormConfig = () => {
           },
           {
             name: "salary",
-            label: "مبلغ الراتب الاساسي",
+            label: tSalary("basicSalaryAmount"),
             type: "text",
-            placeholder: "مبلغ الراتب الاساسي",
+            placeholder: tSalary("placeholders.basicSalaryAmount"),
             validation: [
               {
                 type: "required",
-                message: "مبلغ الراتب الاساسي مطلوب",
+                message: tSalary("validation.basicSalaryAmountRequired"),
               },
             ],
             condition: (values) =>
@@ -193,13 +194,13 @@ export const SalaryFormConfig = () => {
           },
           {
             name: "salary",
-            label: "مبلغ الراتب الاساسي",
+            label: tSalary("basicSalaryAmount"),
             type: "text",
-            placeholder: "مبلغ الراتب الاساسي",
+            placeholder: tSalary("placeholders.basicSalaryAmount"),
             validation: [
               {
                 type: "required",
-                message: "مبلغ الراتب الاساسي مطلوب",
+                message: tSalary("validation.basicSalaryAmountRequired"),
               },
             ],
             condition: (values) =>
@@ -238,8 +239,8 @@ export const SalaryFormConfig = () => {
           {
             type: "select",
             name: "period_id",
-            label: "دورة القبض",
-            placeholder: "اختر دورة القبض",
+            label: tSalary("paymentCycle"),
+            placeholder: tSalary("placeholders.paymentCycle"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/periods`,
@@ -255,7 +256,7 @@ export const SalaryFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "ادخل دورة القبض",
+                message: tSalary("validation.paymentCycleRequired"),
               },
             ],
             onChange: async (
@@ -312,16 +313,16 @@ export const SalaryFormConfig = () => {
           },
           {
             name: "hour_rate",
-            label: "قيمة الساعة",
+            label: tSalary("hourlyRate"),
             type: "number",
             postfix: "ر.س",
-            placeholder: "قيمة الساعة",
+            placeholder: tSalary("placeholders.hourlyRate"),
             condition: (values) =>
               values.salary_type_code === SalaryTypes.constants,
             validation: [
               {
                 type: "required",
-                message: "قيمة الساعة مطلوب",
+                message: tSalary("validation.hourlyRateRequired"),
               },
             ],
             // Make this field readonly since it's now calculated automatically
