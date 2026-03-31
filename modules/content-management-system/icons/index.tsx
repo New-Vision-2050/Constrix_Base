@@ -23,7 +23,7 @@ function CMSIconsModule() {
   const [sortBy, setSortBy] = useState("");
   // pagination
   const [page, setPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(9);
 
   const OnEditIcon = (id: string) => {
     setEditingIconId(id);
