@@ -1,17 +1,19 @@
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import PreviewTextField from "../../../../components/previewTextField";
 import { useFunctionalContractualCxt } from "../../../context";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   offer: JobOffer | undefined;
 };
 export default function JobOfferFormPreviewMode({ offer }: PropsT) {
   const { handleRefetchJobOffer } = useFunctionalContractualCxt();
+  const t = useTranslations("UserProfile.nestedTabs.jobOffer");
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
-          label="رقم العرض"
+          label={t("offerNumber")}
           value={offer?.job_offer_number ?? ""}
           valid={Boolean(offer?.job_offer_number)}
         />
@@ -19,7 +21,7 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الارسال"
+          label={t("dateSent")}
           value={offer?.date_send ?? ""}
           valid={Boolean(offer?.date_send)}
           type="date"
@@ -28,7 +30,7 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الموافقة"
+          label={t("approvalDate")}
           value={offer?.date_accept ?? ""}
           valid={Boolean(offer?.date_accept)}
         />
@@ -43,7 +45,7 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
                 handleRefetchJobOffer();
               }}
               valid={Boolean(media?.name)}
-              label="ارفاق العرض"
+              label={t("attachOffer")}
               value={media?.name ?? "---"}
               type={media?.type == "image" ? "image" : "pdf"}
               fileUrl={media?.url}
@@ -54,7 +56,7 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
         <div className="p-2">
           <PreviewTextField
             valid={false}
-            label="ارفاق العرض"
+            label={t("attachOffer")}
             value={"---"}
             type={"pdf"}
           />

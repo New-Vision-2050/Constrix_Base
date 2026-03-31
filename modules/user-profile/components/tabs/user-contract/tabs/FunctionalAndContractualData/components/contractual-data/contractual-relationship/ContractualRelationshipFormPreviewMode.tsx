@@ -1,17 +1,19 @@
 import { Contract } from "@/modules/user-profile/types/Contract";
 import PreviewTextField from "../../../../components/previewTextField";
 import { useFunctionalContractualCxt } from "../../../context";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   contract?: Contract | undefined;
 };
 export default function ContractualRelationshipFormPreviewMode({ contract }: PropsT) {
   const { handleRefetchContractData } = useFunctionalContractualCxt();
+  const tContractual = useTranslations("UserProfile.nestedTabs.contractualRelationship");
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
-          label="العلاقه التعاقديه "
+          label={tContractual("title")}
           value={contract?.contractual_relationship_type?.name ?? ""}
           valid={Boolean(contract?.contractual_relationship_type)}
         />
@@ -19,7 +21,7 @@ export default function ContractualRelationshipFormPreviewMode({ contract }: Pro
 
       <div className="p-2">
         <PreviewTextField
-          label="اسم صاحب العمل"
+          label={tContractual("employerName")}
           value={contract?.employment_name ?? ""}
           valid={Boolean(contract?.employment_name)}
         />
@@ -27,7 +29,7 @@ export default function ContractualRelationshipFormPreviewMode({ contract }: Pro
 
       <div className="p-2">
         <PreviewTextField
-          label="رقم السجل"
+          label={tContractual("recordNumber")}
           value={contract?.registration_number ?? ""}
           valid={Boolean(contract?.registration_number)}
         />

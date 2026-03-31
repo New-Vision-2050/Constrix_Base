@@ -9,6 +9,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 export const JobFormConfig = () => {
   const t = useTranslations("common");
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
+  const tJobData = useTranslations("UserProfile.nestedTabs.jobData");
   const { userId, handleRefetchDataStatus, companyId } = useUserProfileCxt();
   const { professionalData, company, handleRefetchProfessionalData } =
     useFunctionalContractualCxt();
@@ -24,9 +25,9 @@ export const JobFormConfig = () => {
         fields: [
           {
             name: "branch_id",
-            label: "الفرع",
+            label: tJobData("branch"),
             type: "select",
-            placeholder: "الفرع",
+            placeholder: tJobData("branch"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch&company_id=${
@@ -41,15 +42,15 @@ export const JobFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "الفرع مطلوب",
+                message: tJobData("validation.branchRequired"),
               },
             ],
           },
           {
             name: "management_id",
-            label: "الادارة",
+            label: tJobData("management"),
             type: "select",
-            placeholder: "الادارة",
+            placeholder: tJobData("management"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=management&company_id=${
@@ -67,7 +68,7 @@ export const JobFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "الادارة مطلوب",
+                message: tJobData("validation.managementRequired"),
               },
             ],
           },
@@ -99,9 +100,9 @@ export const JobFormConfig = () => {
           // },
           {
             name: "job_type_id",
-            label: "نوع الوظيفة",
+            label: tJobData("jobType"),
             type: "select",
-            placeholder: "نوع الوظيفة",
+            placeholder: tJobData("jobType"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/job_types/list?company_id=${
@@ -119,15 +120,15 @@ export const JobFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "نوع الوظيفة مطلوب",
+                message: tJobData("validation.jobTypeRequired"),
               },
             ],
           },
           {
             name: "job_title_id",
-            label: "المسمى الوظيفي",
+            label: tJobData("jobTitle"),
             type: "select",
-            placeholder: "المسمى الوظيفي",
+            placeholder: tJobData("jobTitle"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/job_titles/list?company_id=${
@@ -147,28 +148,28 @@ export const JobFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "المسمى الوظيفي مطلوب",
+                message: tJobData("validation.jobTitleRequired"),
               },
             ],
           },
           {
             name: "job_code",
-            label: "الرقم الوظيفي",
+            label: tJobData("jobCode"),
             type: "text",
-            placeholder: "الرقم الوظيفي",
+            placeholder: tJobData("jobCode"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "الرقم الوظيفي مطلوب",
+                message: tJobData("validation.jobCodeRequired"),
               },
             ],
           },
           {
             name: "attendance_constraint_id",
-            label: "المحدد",
+            label: tJobData("attendanceConstraint"),
             type: "select",
-            placeholder: "المحدد",
+            placeholder: tJobData("attendanceConstraint"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/attendance/constraints/list`,
@@ -181,15 +182,15 @@ export const JobFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "المحدد مطلوب",
+                message: tJobData("validation.attendanceConstraintRequired"),
               },
             ],
           },
            {
             name: "roles",
-            label: "الصلاحيات",
+            label: tJobData("roles"),
             type: "select",
-            placeholder: "الصلاحيات",
+            placeholder: tJobData("roles"),
             required: true,
             isMulti: true,
             dynamicOptions: {
@@ -203,7 +204,7 @@ export const JobFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "المحدد مطلوب",
+                message: tJobData("validation.rolesRequired"),
               },
             ],
           },
