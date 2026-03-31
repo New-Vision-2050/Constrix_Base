@@ -5,7 +5,6 @@ import {
   Box,
   IconButton,
   FormHelperText,
-  Collapse,
   Typography,
   Button,
 } from "@mui/material";
@@ -21,6 +20,7 @@ interface IconPickerProps {
   disabled?: boolean;
   error?: string;
   label?: string;
+  icons?: typeof APP_ICONS;
 }
 
 export default function IconPicker({
@@ -29,10 +29,11 @@ export default function IconPicker({
   disabled = false,
   error,
   label = "اختيار Icon",
+  icons = APP_ICONS,
 }: IconPickerProps) {
   const [expanded, setExpanded] = useState(false);
 
-  const selectedIndex = APP_ICONS.findIndex((icon) => icon.id === value);
+  const selectedIndex = icons.findIndex((icon) => icon.id === value);
   const selectedIsOutsideFirst7 = selectedIndex >= COLLAPSED_COUNT - 1;
 
   // When collapsed:
@@ -40,12 +41,12 @@ export default function IconPicker({
   // - 8th slot: selected icon (if outside first 7), otherwise icons[7]
   const collapsedIcons = selectedIsOutsideFirst7
     ? [
-        ...APP_ICONS.slice(0, COLLAPSED_COUNT - 1),
-        APP_ICONS[selectedIndex],
+        ...icons.slice(0, COLLAPSED_COUNT - 1),
+        icons[selectedIndex],
       ]
-    : APP_ICONS.slice(0, COLLAPSED_COUNT);
+    : icons.slice(0, COLLAPSED_COUNT);
 
-  const visibleIcons = expanded ? APP_ICONS : collapsedIcons;
+  const visibleIcons = expanded ? icons : collapsedIcons;
 
   return (
     <Box>
@@ -86,7 +87,7 @@ export default function IconPicker({
           );
         })}
 
-        {!expanded && APP_ICONS.length > COLLAPSED_COUNT && (
+        {!expanded && icons.length > COLLAPSED_COUNT && (
           <Button
             onClick={() => setExpanded(true)}
             disabled={disabled}
@@ -95,7 +96,7 @@ export default function IconPicker({
             endIcon={<ExpandMoreIcon />}
             sx={{ borderRadius: 1, alignSelf: "center", px: 1.5 }}
           >
-            {APP_ICONS.length - COLLAPSED_COUNT}+
+            {icons.length - COLLAPSED_COUNT}+
           </Button>
         )}
 
