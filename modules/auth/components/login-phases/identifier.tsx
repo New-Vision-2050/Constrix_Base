@@ -112,12 +112,12 @@ const IdentifierPhase = ({
           size="large"
           fullWidth
           variant="contained"
-          color="primary"
           disabled={isPending}
           endIcon={isPending ? <CircularProgress size={18} /> : undefined}
           onClick={handleSubmit(onSubmit)}
           type="submit"
           form="login-form"
+          sx={{ bgcolor: 'primary.main' }}
         >
           {isPending ? t("Login.Loading") : t("Login.Next")}
         </Button>
