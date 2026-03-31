@@ -576,7 +576,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
         {/* Files list */}
         {filesInfo.length > 0 && (
           <div className="mb-4  rounded-lg p-4">
-            <h3 className=" text-sm mb-4">المستندات المرفقة</h3>
+            <h3 className=" text-sm mb-4">{t("AttachedDocuments")}</h3>
             <div className="flex flex-col gap-4">
               {filesInfo.map((fileInfo, index) => (
                 <div
