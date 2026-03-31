@@ -73,6 +73,13 @@ export default function CustomThemeProvider({
               fontWeight: 700,
               textTransform: "none",
             },
+            containedPrimary: ({ theme }) => ({
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+              "&:hover": {
+                backgroundColor: theme.palette.primary.dark,
+              },
+            }),
           },
         },
 
