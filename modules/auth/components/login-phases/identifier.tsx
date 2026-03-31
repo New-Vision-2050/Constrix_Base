@@ -118,6 +118,10 @@ const IdentifierPhase = ({
           onClick={handleSubmit(onSubmit)}
           type="submit"
           form="login-form"
+          sx={(theme) => ({
+            backgroundColor: `${theme.palette.primary.main} !important`,
+            color: `${theme.palette.primary.contrastText} !important`,
+          })}
         >
           {isPending ? t("Login.Loading") : t("Login.Next")}
         </Button>
