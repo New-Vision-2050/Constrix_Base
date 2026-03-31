@@ -50,12 +50,7 @@ export default function FormSelect<T extends FieldValues>({
             displayEmpty: Boolean(placeholder),
           }}
         >
-          {placeholder && (
-            <MenuItem value="" disabled>
-              {placeholder}
-            </MenuItem>
-          )}
-          {options.map((opt) => (
+                    {options.map((opt) => (
             <MenuItem key={opt.value} value={opt.value}>
               {opt.label}
             </MenuItem>

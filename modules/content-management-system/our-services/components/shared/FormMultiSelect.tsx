@@ -52,7 +52,7 @@ export default function FormMultiSelect<T extends FieldValues>({
             renderValue: (selected) => {
               const selectedArray = selected as string[];
               if (selectedArray.length === 0) {
-                return <span style={{ opacity: 0.5 }}>{placeholder}</span>;
+                return <span style={{ opacity: 0.5 }}>{label}</span>;
               }
               return (
                 <Stack direction="row" flexWrap="wrap" gap={0.5}>
