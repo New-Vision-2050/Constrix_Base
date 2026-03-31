@@ -1,13 +1,9 @@
 "use client";
 import { useFormContext } from "react-hook-form";
 import { IdentifierType } from "../../validator/login-schema";
-import {
-  Button,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Stack, TextField, Typography } from "@mui/material";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginWays } from "../../store/mutations";
 import { useEffect, useState } from "react";
@@ -109,17 +105,22 @@ const IdentifierPhase = ({
         />
 
         <Button
-          size="large"
-          fullWidth
-          color="primary"
-          variant="contained"
-          disabled={isPending}
-          endIcon={isPending ? <CircularProgress size={18} /> : undefined}
-          onClick={handleSubmit(onSubmit)}
           type="submit"
           form="login-form"
+          variant="default"
+          size="lg"
+          disabled={isPending}
+          onClick={handleSubmit(onSubmit)}
+          className="h-11 w-full rounded-lg border-0 bg-primary px-4 text-base font-bold text-primary-foreground shadow-none hover:bg-primary/90 focus-visible:ring-primary disabled:opacity-70 [&_svg]:size-[18px]"
         >
-          {isPending ? t("Login.Loading") : t("Login.Next")}
+          {isPending ? (
+            <>
+              {t("Login.Loading")}
+              <Loader2 className="animate-spin" aria-hidden />
+            </>
+          ) : (
+            t("Login.Next")
+          )}
         </Button>
       </Stack>
 
