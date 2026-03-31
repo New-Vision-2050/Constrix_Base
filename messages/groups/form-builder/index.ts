@@ -52,6 +52,7 @@ export const formBuilderMessages = new MessagesGroup({
       UploadsFailed: _m("uploads failed", "فشل رفع الملفات"),
       UploadSuccessful: _m("Upload successful", "تم الرفع بنجاح"),
       FileRequired: _m("File is required", "الملف مطلوب"),
+      AttachedDocuments: _m("Attached Documents", "المستندات المرفقة"),
     }),
     Phone: new MessagesGroup({
       EnterPhoneNumber: _m("Enter phone number", "أدخل رقم الهاتف"),
