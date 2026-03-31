@@ -196,3 +196,17 @@ html {
     background-position: 200% 0;
   }
 }
+
+button.MuiButton-root.MuiButton-containedPrimary,
+button.MuiButton-root.MuiButton-contained.MuiButton-colorPrimary {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  background-image: none !important;
+}
+
+@media (hover: hover) {
+  button.MuiButton-root.MuiButton-containedPrimary:hover:not(:disabled),
+  button.MuiButton-root.MuiButton-contained.MuiButton-colorPrimary:hover:not(:disabled) {
+    filter: brightness(0.92);
+  }
+}
