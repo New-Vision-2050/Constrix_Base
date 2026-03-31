@@ -5,15 +5,17 @@ import { serialize } from "object-to-formdata";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
 import { RegistrationTypes } from "./registration-types";
+import { useTranslations } from "next-intl";
 
 export const LegalDataAddReqFormEditConfig = (
   id?: string,
   company_id?: string
 ) => {
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfileLegalDataForm");
   const LegalDataAddReqFormEditConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
-    title: "اضافة بيان قانوني",
+    title: t("addLegalData"),
     apiUrl: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
     laravelValidation: {
       enabled: true,
@@ -25,8 +27,8 @@ export const LegalDataAddReqFormEditConfig = (
           {
             type: "select",
             name: "registration_type_id",
-            label: "نوع التسجل",
-            placeholder: "نوع التسجل",
+            label: t("registrationTypeLabel"),
+            placeholder: t("registrationType"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/company_registration_types`,
@@ -42,15 +44,15 @@ export const LegalDataAddReqFormEditConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل نوع التسجل",
+                message: t("registrationType"),
               },
             ],
           },
           {
             name: "regestration_number",
-            label: "رقم السجل التجاري",
+            label: t("registrationNumber"),
             type: "text",
-            placeholder: "رقم السجل التجاري",
+            placeholder: t("registrationNumberPlaceholder"),
             condition: (values) => {
               // Disable the field if registration_type_id is 3 (Without Commercial Register)
               const typeId = values["registration_type_id"]?.split("_")?.[1];
@@ -61,15 +63,15 @@ export const LegalDataAddReqFormEditConfig = (
                 type: "pattern",
                 value: /^(700|40|101)\d*$/,
                 message:
-                  "يجب أن يبدأ الرقم بـ 700 أو 40 أو 101 ويحتوي على أرقام فقط",
+                  t("registrationNumberPattern"),
               },
             ],
           },
           {
             name: "start_date",
-            label: "تاريخ الإصدار",
+            label: t("startDate"),
             type: "date",
-            placeholder: "تاريخ الإصدار",
+            placeholder: t("startDatePlaceholder"),
             required: true,
             maxDate: {
               formId: `company-official-data-form-${id}-${company_id}`,
@@ -78,15 +80,15 @@ export const LegalDataAddReqFormEditConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الإصدار",
+                message: t("startDateRequired"),
               },
             ],
           },
           {
             name: "end_date",
-            label: "تاريخ الانتهاء",
+            label: t("endDate"),
             type: "date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("endDatePlaceholder"),
             required: true,
             minDate: {
               formId: `company-official-data-form-${id}-${company_id}`,
@@ -95,14 +97,14 @@ export const LegalDataAddReqFormEditConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الانتهاء",
+                message: t("endDateRequired"),
               },
             ],
           },
           {
             type: "file",
             name: "file",
-            label: "اضافة مرفق",
+            label: t("attachFile"),
             isMulti: true,
             fileConfig: {
               showThumbnails: true,
@@ -118,8 +120,8 @@ export const LegalDataAddReqFormEditConfig = (
         ],
       },
     ],
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

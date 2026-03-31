@@ -25,6 +25,7 @@ export const PrivilegeItemFormConfig = ({
 
   const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances");
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
+  const tEdit = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances.edit");
   const privilegeItemFormConfig: FormConfig = {
     formId: `privilege-form-${privilegeData?.id}`,
     laravelValidation: {
@@ -37,8 +38,8 @@ export const PrivilegeItemFormConfig = ({
           {
             type: "select",
             name: "medical_insurance_id",
-            label: "رقم البوليصة التامين الطبي",
-            placeholder: "اختر رقم البوليصة",
+            label: tEdit("medicalInsurancePolicyNumber"),
+            placeholder: tEdit("placeholders.medicalInsurancePolicyNumber"),
             condition: (values) => {
               // Show this field only when privilege is MedicalInsurance
               const selectedPrivilege = privileges?.find(p => p.id === values.privilege_id);
@@ -64,15 +65,15 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "اختر رقم البوليصة",
+                message: tEdit("validation.medicalInsurancePolicyNumberRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "type_privilege_id",
-            label: "نوع البدل (عائلي - فردي)",
-            placeholder: "اختر البدل",
+            label: tEdit("allowanceType"),
+            placeholder: tEdit("placeholders.allowanceType"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/type_privileges`,
@@ -88,15 +89,15 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل البدل",
+                message: tEdit("validation.allowanceTypeRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "type_allowance_code",
-            label: "نوع البدل (ثابت - نسبة - توفير)",
-            placeholder: "اختر البدل",
+            label: tEdit("allowanceTypeCategory"),
+            placeholder: tEdit("placeholders.allowanceTypeCategory"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/type_allowances`,
@@ -108,59 +109,59 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل البدل",
+                message: tEdit("validation.allowanceTypeCategoryRequired"),
               },
             ],
           },
           {
             name: "charge_amount",
-            label: "معدل حساب النسبة من اصل الراتب",
+            label: tEdit("calculationRate"),
             type: "text",
             postfix: "%",
             condition: (values) => {
               if (values.type_allowance_code == null) return false;
               return values.type_allowance_code === AllowancesTypes?.Percentage;
             },
-            placeholder: "معدل حساب النسبة من اصل الراتب",
+            placeholder: tEdit("placeholders.calculationRate"),
             validation: [
               {
                 type: "required",
-                message: "معدل حساب النسبة من اصل الراتب مطلوب",
+                message: tEdit("validation.calculationRateRequired"),
               },
               {
                 type: "pattern",
                 value: /^\d+(\.\d+)?$/,
-                message: "يجب إدخال رقم فقط",
+                message: tEdit("validation.calculationRateInvalid"),
               }
             ],
           },
           {
             name: "charge_amount",
-            label: "المبلغ",
+            label: tEdit("amount"),
             type: "text",
             postfix: "ر.س",
             condition: (values) => {
               if (values.type_allowance_code == null) return false;
               return values.type_allowance_code === AllowancesTypes?.Constant;
             },
-            placeholder: "المبلغ",
+            placeholder: tEdit("placeholders.amount"),
             validation: [
               {
                 type: "required",
-                message: "المبلغ مطلوب",
+                message: tEdit("validation.amountRequired"),
               },
               {
                 type: "pattern",
                 value: /^\d+(\.\d+)?$/,
-                message: "يجب إدخال رقم فقط",
+                message: tEdit("validation.amountInvalid"),
               }
             ],
           },
           {
             type: "select",
             name: "period_id",
-            label: "وحدة المدة",
-            placeholder: "اختر البدل",
+            label: tEdit("periodUnit"),
+            placeholder: tEdit("placeholders.periodUnit"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/periods`,
@@ -180,16 +181,16 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل البدل",
+                message: tEdit("validation.periodUnitRequired"),
               },
             ],
           },
 
           {
             name: "description",
-            label: "وصف",
+            label: tEdit("description"),
             type: "textarea",
-            placeholder: "وصف",
+            placeholder: tEdit("placeholders.description"),
           },
         ],
         columns: 2,

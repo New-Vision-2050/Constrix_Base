@@ -6,6 +6,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
     clientRequests: _m("Client Requests", "طلبات العملاء"),
     contracts: _m("Contracts", "العقود"),
     priceOffers: _m("Price Offers", "عرض السعر"),
+    meetings: _m("Meetings", "اجتماع"),
   }),
   stages: new MessagesGroup({
     title: _m("Stages", "المراحل"),

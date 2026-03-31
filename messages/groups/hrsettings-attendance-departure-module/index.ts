@@ -23,6 +23,7 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
     submitButtonText: _m("Save Determinant", "حفظ المحدد"),
     cancelButtonText: _m("Cancel", "إلغاء"),
     form: new MessagesGroup({
+      noScheduledDays: _m("No scheduled days", "لا يوجد أيام مجدولة"),
       AttendanceDaysDialog: new MessagesGroup({
         save: _m("Save", "حفظ"),
         noScheduledDays: _m("No scheduled days", "لا يوجد أيام مجدولة"),

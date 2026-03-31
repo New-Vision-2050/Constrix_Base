@@ -4,6 +4,7 @@ import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
 import { RegistrationTypes } from "./registration-types";
+import { useTranslations } from "next-intl";
 
 type LegalDataReqFormEditConfigProps = {
   companyLegalData: CompanyLegalData[];
@@ -17,9 +18,10 @@ export const LegalDataReqFormEditConfig = ({
   id,
 }: LegalDataReqFormEditConfigProps) => {
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfileLegalDataForm");
   const LegalDataReqFormEditConfig: FormConfig = {
     formId: `LegalDataReqFormEditConfig-${id}-${company_id}`,
-    title: "طلب تعديل البيان القانوني",
+    title: t("requestLegalDataUpdate"),
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
       enabled: true,
@@ -38,8 +40,8 @@ export const LegalDataReqFormEditConfig = ({
                 {
                   type: "select",
                   name: "registration_type_id",
-                  label: "نوع التسجل",
-                  placeholder: "نوع التسجل",
+                  label: t("registrationTypeLabel"),
+                  placeholder: t("registrationType"),
                   dynamicOptions: {
                     url: `${baseURL}/company_registration_types`,
                     valueField: "id",
@@ -97,8 +99,8 @@ export const LegalDataReqFormEditConfig = ({
     initialValues: {
       data: companyLegalData,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

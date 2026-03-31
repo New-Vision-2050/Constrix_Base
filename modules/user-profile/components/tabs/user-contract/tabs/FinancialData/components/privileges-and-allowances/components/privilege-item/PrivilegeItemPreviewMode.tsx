@@ -1,12 +1,14 @@
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
 import PreviewTextField from "../../../../../components/previewTextField";
 import { AllowancesTypes } from "../../AllowancesEnum";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   privilegeData: UserPrivilege;
 };
 
 export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
+  const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances.view");
   const isSaving =
     privilegeData?.type_allowance_code === AllowancesTypes?.Saving;
   const isPercentage =
@@ -25,7 +27,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
       {isMedicalInsurance && (
         <div className="p-2">
           <PreviewTextField
-            label="رقم البوليصة التامين الطبي"
+            label={t("medicalInsurancePolicyNumber")}
             value={privilegeData?.medical_insurance?.policy_number || "---"}
             valid={Boolean(privilegeData?.medical_insurance?.policy_number)}
             required
@@ -37,7 +39,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
       {isMedicalInsurance && (
         <div className="p-2">
           <PreviewTextField
-            label="نوع البدل"
+            label={t("allowanceType")}
             value={privilegeData?.type_privilege?.name}
             valid={Boolean(privilegeData?.type_privilege?.name)}
             required
@@ -49,7 +51,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
       {!isMedicalInsurance && (
         <div className="p-2">
           <PreviewTextField
-            label="نوع البدل"
+            label={t("allowanceType")}
             value={privilegeData?.type_privilege?.name}
             valid={Boolean(privilegeData?.type_privilege?.name)}
             required
@@ -59,7 +61,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="نوع البدل"
+          label={t("allowanceType")}
           value={privilegeData?.type_allowance?.name}
           valid={Boolean(privilegeData?.type_allowance?.name)}
           required
@@ -70,7 +72,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
         <>
           <div className="p-2">
             <PreviewTextField
-              label="معدل حساب النسبة من اصل الراتب"
+              label={t("calculationRate")}
               value={chargeAmountValue}
               valid={Boolean(privilegeData?.charge_amount)}
               required
@@ -79,7 +81,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
           {isPercentage && (
             <div className="p-2">
               <PreviewTextField
-                label="وحدة المدة"
+                label={t("periodUnit")}
                 value={privilegeData?.period?.name}
                 valid={Boolean(privilegeData?.period?.name)}
                 required
@@ -96,7 +98,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="وصف"
+          label={t("description")}
           value={privilegeData?.description}
           valid={Boolean(privilegeData?.description)}
           required

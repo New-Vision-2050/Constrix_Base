@@ -1,12 +1,14 @@
 import React from "react";
 import { officialData } from "@/modules/company-profile/types/company";
 import PreviewField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
+import { useTranslations } from "next-intl";
 
 const OfficialDataPreview = ({
   officialData,
 }: {
   officialData: officialData;
 }) => {
+  const t = useTranslations();
   const {
     branch,
     name,
@@ -22,36 +24,36 @@ const OfficialDataPreview = ({
 
   const previewData = [
     {
-      label: "اسم الشركة",
+      label: t("Sidebar.CompanyName"),
       value: name ?? "",
       valid: Boolean(name),
       needRequest: true,
     },
     {
       valid: Boolean(branch),
-      label: "اسم الفرع",
+      label: t("Sidebar.BranchName"),
       value: branch ?? "",
     },
     {
       valid: Boolean(name_en),
-      label: "اسم الشركة بالانجليزي",
+      label: t("Sidebar.CompanyNameInEnglish"),
       value: name_en ?? "",
       containerClassName: "col-span-2",
     },
     {
       valid: Boolean(company_type),
-      label: "كيان الشركة",
+      label: t("Sidebar.CompanyEntity"),
       value: company_type ?? "",
     },
     {
       valid: Boolean(country_name),
-      label: "دولة المركز الرئيسي",
+      label: t("Sidebar.HeadquarterCountry"),
       value: country_name ?? "",
       needRequest: true,
     },
     {
       valid: Boolean(company_field) && company_field?.length > 0,
-      label: "مجال الشركة",
+      label: t("Sidebar.CompanyField"),
       value: Boolean(company_field)
         ? company_field?.map((field) => field?.name).join(" , ")
         : "",
@@ -59,23 +61,23 @@ const OfficialDataPreview = ({
     },
     {
       valid: Boolean(phone),
-      label: "رقم الجوال",
+      label: t("Sidebar.MobileNumber"),
       value: phone ?? "",
     },
     {
       valid: Boolean(email),
-      label: "البريد الالكتروني",
+      label: t("Sidebar.Email"),
       value: email ?? "",
     },
     {
       valid: Boolean(company_access_programs),
-      label: "البرنامج",
+      label: t("Sidebar.Program"),
       value: company_access_programs?.[0]?.name ?? "",
       needRequest: true,
     },
     {
       valid: Boolean(packages),
-      label: "الباقة",
+      label: t("Sidebar.Package"),
       value: packages?.[0]?.name ?? "",
       needRequest: true,
     },

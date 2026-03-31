@@ -4,12 +4,14 @@ import { officialData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export const CompanyOfficialData = (
   officialData: officialData,
   id?: string
 ) => {
   const { company_id }: { company_id: string | undefined } = useParams();
+  const t = useTranslations();
   console.log("officialData", officialData);
   const queryClient = useQueryClient();
   const OfficialDataFormConfig: FormConfig = {
@@ -25,41 +27,41 @@ export const CompanyOfficialData = (
         fields: [
           {
             name: "name",
-            label: "اسم الشركة",
+            label: t("Sidebar.CompanyName"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("Sidebar.CompanyName"),
             disabled: true,
           },
           {
             name: "branch_name",
-            label: "اسم الفرع",
+            label: t("Sidebar.BranchName"),
             type: "text",
-            placeholder: "اسم الفرع",
+            placeholder: t("Sidebar.BranchName"),
             validation: [
               {
                 type: "required",
-                message: "اسم الفرع مطلوب",
+                message: t("Sidebar.BranchName") + " مطلوب",
               },
             ],
           },
           {
             name: "name_en",
-            label: "اسم الشركة بالانجليزي",
+            label: t("Sidebar.CompanyNameInEnglish"),
             type: "text",
             placeholder: "يجب كتابة الاسم باللغة الانجليزية",
             validation: [
               {
                 type: "required",
-                message: "اسم الشركة مطلوب",
+                message: t("Sidebar.CompanyName") + " مطلوب",
               },
             ],
             gridArea: 2,
           },
           {
             name: "company_type_id",
-            label: "كيان الشركة",
+            label: t("Sidebar.CompanyEntity"),
             type: "select",
-            placeholder: "كيان الشركة",
+            placeholder: t("Sidebar.CompanyEntity"),
             dynamicOptions: {
               url: `${baseURL}/company_types`,
               valueField: "id",
@@ -74,29 +76,29 @@ export const CompanyOfficialData = (
             validation: [
               {
                 type: "required",
-                message: "كيان الشركة مطلوب",
+                message: t("Sidebar.CompanyEntity") + " مطلوب",
               },
             ],
           },
           {
             name: "country",
-            label: "دولة المركز الرئيسي",
+            label: t("Sidebar.HeadquarterCountry"),
             type: "text",
-            placeholder: "دولة المركز الرئيسي",
+            placeholder: t("Sidebar.HeadquarterCountry"),
             disabled: true,
           },
           {
             name: "company_field",
-            label: "مجال الشركة",
+            label: t("Sidebar.CompanyField"),
             type: "text",
-            placeholder: "مجال الشركة",
+            placeholder: t("Sidebar.CompanyField"),
             disabled: true,
           },
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("Sidebar.MobileNumber"),
             type: "phone",
-            placeholder: "رقم الجوال",
+            placeholder: t("Sidebar.MobileNumber"),
             validation: [
               {
                 type: "phone",
@@ -110,25 +112,25 @@ export const CompanyOfficialData = (
           },
           {
             name: "email",
-            label: "البريد الالكتروني",
+            label: t("Sidebar.Email"),
             type: "text",
-            placeholder: "البريد الالكتروني",
+            placeholder: t("Sidebar.Email"),
             validation: [
               {
                 type: "required",
-                message: "ادخل البريد الالكتروني",
+                message: "ادخل " + t("Sidebar.Email"),
               },
               {
                 type: "email",
-                message: "البريد الالكتروني غير صحيح",
+                message: t("Sidebar.Email") + " غير صحيح",
               },
             ],
           },
           {
             name: "program_id",
-            label: "البرنامج",
+            label: t("Sidebar.Program"),
             type: "select",
-            placeholder: "البرنامج",
+            placeholder: t("Sidebar.Program"),
             dynamicOptions: {
               url: `${baseURL}/company_access_programs/list?company_field=${officialData?.company_field.map(
                 (item) => item.id
@@ -147,9 +149,9 @@ export const CompanyOfficialData = (
           },
           {
             name: "packages",
-            label: "الباقة",
+            label: t("Sidebar.Package"),
             type: "select",
-            placeholder: "الباقة",
+            placeholder: t("Sidebar.Package"),
             dynamicOptions: {
               url: `${baseURL}/packages/list`,
               valueField: "id",

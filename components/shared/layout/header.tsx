@@ -33,7 +33,7 @@ const Header = ({ onMobileMenuClick }: HeaderProps) => {
             <Menu size={20} />
           </IconButton>
           <Breadcrumbs
-            homeLabel={locale === "ar" ? "الرئيسية" : "Home"}
+            homeLabel={t("home")}
             className="breadcrumbs-container"
             routesMap={routesMap}
           />

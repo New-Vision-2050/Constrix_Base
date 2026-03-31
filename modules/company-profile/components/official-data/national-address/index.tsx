@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
+import { useTranslations } from "next-intl";
 
 const NationalAddress = ({
   id,
@@ -23,6 +24,7 @@ const NationalAddress = ({
   id?: string;
   currentCompanyId?: string;
 }) => {
+  const t = useTranslations("companyProfileLegalDataForm");
   const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-address", id, currentCompanyId],
     queryFn: async () => {
@@ -48,7 +50,7 @@ const NationalAddress = ({
   const noAddressMessage = (
     <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
       <InfoIcon additionClass="text-orange-500 " />
-      <p className="text-center px-5">يجب تحديد عنوان واحد على الاقل</p>
+      <p className="text-center px-5">{t("specifyAtLeastOneAddress")}</p>
     </div>
   );
 
@@ -64,7 +66,7 @@ const NationalAddress = ({
 
       {isSuccess && (
         <FormFieldSet
-          title="العنوان الوطني"
+          title={t("nationalAddress")}
           valid={!!companyAddress}
           secondTitle={
             <Can check={[PERMISSIONS.companyProfile.address.update]}>

@@ -828,10 +828,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
       return await defaultSubmitHandler(
         data,
-        getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint, translations, formTranslations }),
+        getDynamicDeterminantFormConfig(props),
         {
           url: Boolean(editConstraint)
-            ? `${baseURL}/attendance/constraints/${editConstraint.id}`
+            ? `${baseURL}/attendance/constraints/${editConstraint?.id}`
             : `${baseURL}/attendance/constraints`,
           method: Boolean(editConstraint) ? "PUT" : "POST",
         }

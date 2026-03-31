@@ -25,6 +25,11 @@ import {
 } from "@/utils/fetchDropdownOptions";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import { ProcedureStep } from "@/services/api/crm-settings/procedure-settings/types/response";
+import {
+  coerceStepBoolean,
+  formsKindToStepCardUi,
+  parseProcedureStepFormsKind,
+} from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
 import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import { useToast } from "@/modules/table/hooks/use-toast";
 
@@ -45,9 +50,7 @@ interface StepFormData {
 }
 
 function mapFormsFromApi(step: ProcedureStep): string {
-  if (step.forms.financial) return "financial";
-  if (step.forms.accept) return "accept";
-  return "approve";
+  return formsKindToStepCardUi(parseProcedureStepFormsKind(step));
 }
 
 function formFromServerStep(step: ProcedureStep): StepFormData {
@@ -58,8 +61,8 @@ function formFromServerStep(step: ProcedureStep): StepFormData {
   return {
     stepName: step.name?.trim() ? String(step.name) : "",
     employee_id: step.employee_id ?? "",
-    is_accept: step.is_accept,
-    is_approve: step.is_approve,
+    is_accept: coerceStepBoolean(step.is_accept),
+    is_approve: coerceStepBoolean(step.is_approve),
     duration: step.duration,
     forms: mapFormsFromApi(step),
     relevantDepartment: deptId,
