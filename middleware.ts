@@ -53,6 +53,13 @@ export async function middleware(req: NextRequest) {
 
   const res = intlMiddleware(req);
 
+  // Set NEXT_LOCALE cookie for locale persistence
+  res.cookies.set("NEXT_LOCALE", locale, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+    sameSite: "lax",
+  });
+
   if ((!existingCompanyCookie && currentHost) || isLoginPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
