@@ -10,6 +10,7 @@ import { useToast } from "@/modules/table/hooks/use-toast";
 import AddStageDialog from "./dialogs/AddStageDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
 import StepCard from "./StepCard";
+import { APP_ICONS } from "@/constants/icons";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import {
   Stage,
@@ -187,9 +188,12 @@ export default function StagesView({
   };
 
   const getIconComponent = (iconName: string) => {
+    const matchedIcon = APP_ICONS.find((icon) => icon.id === iconName);
+    if (matchedIcon) {
+      const IconComponent = matchedIcon.component;
+      return <IconComponent size={18} />;
+    }
     switch (iconName) {
-      case "settings":
-        return <Settings sx={{ fontSize: 18 }} />;
       case "delete":
         return <Delete sx={{ fontSize: 18 }} />;
       case "link":
