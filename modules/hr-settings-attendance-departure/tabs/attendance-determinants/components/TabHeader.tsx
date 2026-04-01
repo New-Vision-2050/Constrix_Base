@@ -19,7 +19,7 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
 
   const textColor = isDarkMode ? "text-white" : "text-gray-900";
 
-  const { activeConstraint, refetchConstraints, branchesData } =
+  const { activeConstraint, refetchConstraints, refetchConstraintsList, handleNewDeterminantCreated, branchesData } =
     useAttendanceDeterminants();
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants"
@@ -43,6 +43,8 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
           <SheetFormBuilder
             config={getDynamicDeterminantFormConfig({
               refetchConstraints,
+              refetchConstraintsList,
+              onNewDeterminantCreated: handleNewDeterminantCreated,
               branchesData,
               t,
               translations: dialogTranslations,
