@@ -50,4 +50,5 @@ export const labelsMessages = new MessagesGroup({
     "هل أنت متأكد من حذف هذا العنصر؟"
   ),
   show: _m("show", "عرض"),
+  chooseIcon: _m("Choose Icon", "اختر ايقونة"),
 });
