@@ -45,6 +45,9 @@ interface AttendanceDeterminantsContextType {
 
   // cities data
   citiesData: City[] | undefined;
+  
+  // Function to handle newly created determinant
+  handleNewDeterminantCreated: (determinant: any) => void;
 }
 
 // Create the context with an initial value
@@ -123,6 +126,16 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     }
   };
 
+  // Handle newly created determinant
+  const handleNewDeterminantCreated = (determinant: any) => {
+    // Wait a moment for the refetch to complete, then select the new determinant
+    setTimeout(() => {
+      if (determinant?.id) {
+        setActiveConstraint(determinant);
+      }
+    }, 500); // Give some time for the refetch to complete
+  };
+
   // Context value to export
   const contextValue: AttendanceDeterminantsContextType = {
     constraintsData: constraintsData?.payload,
@@ -143,7 +156,9 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     constraintsListError,
     refetchConstraintsList,
     // cities data
-    citiesData
+    citiesData,
+    // Add new function
+    handleNewDeterminantCreated,
   };
 
   return (
