@@ -116,7 +116,9 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
       attendanceRegistrationVia: _m("Attendance registration via", "تسجيل الحضور و الانصراف من خلال"),
       attendanceRegistrationRequired: _m("Attendance registration method is required", "تسجيل الحضور و الانصراف من خلال يجب أن يختار"),
       location: _m("Location", "الموقع"),
-      duplicateDayError: _m("This day has already been selected", "هذا اليوم تم اختياره بالفعل")
+      duplicateDayError: _m("This day has already been selected", "هذا اليوم تم اختياره بالفعل"),
+      submitButtonText: _m("Save Determinant", "حفظ المحدد"),
+      cancelButtonText: _m("Cancel", "إلغاء")
     }),
     determinantsList: new MessagesGroup({
       allDeterminants: _m("All Determinants", "جميع المحددات")

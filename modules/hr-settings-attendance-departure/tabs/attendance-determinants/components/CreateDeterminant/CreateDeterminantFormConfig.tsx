@@ -8,6 +8,7 @@ import { getTimeUnits } from "../../constants/determinants";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import AttendanceDaysDialog from "./AttendanceDaysDialog";
+import { useTranslations } from "next-intl";
 import {
   ScheduleDisplay,
   WeeklyScheduleDays,
@@ -69,10 +70,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     }
     return fallback || key;
   };
-
+const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.form");
   // Function to get text with default value
   const getText = (key: string, defaultText: string) => {
-    return t ? t(key) : defaultText;
+    return t ? formT(key) : defaultText;
   };
 
   // ------------- set default type attendance -------------
@@ -85,8 +86,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   // ------------- set default title -------------
   const isEdit = Boolean(editConstraint);
   const title = isEdit
-    ? getFormTranslation("editTitle", "تعديل محدد")
-    : getFormTranslation("title", "إضافة محدد جديد");
+    ? formT("editTitle")
+    : formT("title");
 
   // ------------- set default location type -------------
   //latitude - longitude
@@ -164,37 +165,31 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     },
     sections: [
       {
-        title: getFormTranslation("basicInfo", "المعلومات الأساسية"),
+        title: formT("basicInfo"),
         fields: [
           {
             type: "text",
             name: "constraint_name",
-            label: getFormTranslation("determinantName", "اسم المحدد"),
-            placeholder: getFormTranslation("determinantName", "اسم المحدد"),
+            label: formT("determinantName"),
+            placeholder: formT("determinantName"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: getFormTranslation(
-                  "determinantNameRequired",
-                  "اسم المحدد مطلوب"
-                ),
+                message: formT("determinantNameRequired"),
               },
               {
                 type: "pattern",
                 value: /^[\p{L}\p{N}\s]+$/u,
-                message: getFormTranslation(
-                  "determinantNamePattern",
-                  "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط"
-                ),
+                message: formT("determinantNamePattern"),
               },
             ],
           },
           {
             type: "select",
             name: "constraint_type",
-            label: getFormTranslation("systemType", "نظام المحدد"),
-            placeholder: getFormTranslation("systemType", "نظام المحدد"),
+            label: formT("systemType"),
+            placeholder: formT("systemType"),
             dynamicOptions: {
               url: `${baseURL}/attendance/constraints/types`,
               valueField: "code",
@@ -210,10 +205,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             validation: [
               {
                 type: "required",
-                message: getFormTranslation(
-                  "systemTypeRequired",
-                  "نظام المحدد مطلوب"
-                ),
+                message: formT("systemTypeRequired"),
               },
             ],
           },
@@ -233,8 +225,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             type: "select",
             isMulti: true,
             name: "branch_ids",
-            label: getFormTranslation("branches", "الفروع"),
-            placeholder: getFormTranslation("branches", "الفروع"),
+            label: formT("branches"),
+            placeholder: formT("branches"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
@@ -250,25 +242,22 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             validation: [
               {
                 type: "required",
-                message: getFormTranslation(
-                  "branchesRequired",
-                  "يجب اختيار فرع واحد على الأقل"
-                ),
+                message: formT("branchesRequired"),
               },
             ],
           },
           {
             type: "radio",
             name: "location_type",
-            label: getFormTranslation("locationType", "نوع الموقع"),
+            label: formT("locationType"),
             options: [
               {
                 value: "main",
-                label: getFormTranslation("mainLocation", "موقع الفرع الافتراضي"),
+                label: formT("mainLocation"),
               },
               {
                 value: "custom",
-                label: getFormTranslation("customLocation", "موقع مخصص لكل فرع"),
+                label: formT("customLocation"),
               },
             ],
             onChange: (value) => {
@@ -287,10 +276,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             validation: [
               {
                 type: "required",
-                message: getFormTranslation(
-                  "locationTypeRequired",
-                  "يجب اختيار نوع الموقع"
-                ),
+                message: formT("locationTypeRequired"),
               },
             ],
           },
@@ -312,7 +298,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                       );
                   }}
                 >
-                  {getFormTranslation("openMap", "فتح الخريطة")}
+                  {formT("openMap")}
                 </Button>
               );
             },
@@ -370,7 +356,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               return (
                 <div className="flex items-center justify-between">
                   <p className="text-white font-bold">
-                    {getFormTranslation("addAttendanceDays", "أضافة أيام حضور")}
+                    {formT("addAttendanceDays")}
                   </p>
                   <Button
                     onClick={() => {
@@ -447,7 +433,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             render: () => {
               return (
                 <div>
-                  <p className="font-bold">{getFormTranslation("determinantSettings", "إعدادات المحدد")}</p>
+                  <p className="font-bold">{formT("determinantSettings")}</p>
                 </div>
               );
             },
@@ -461,9 +447,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           },
           {
             name: "out_zone_rules_value",
-            label: getFormTranslation("outsideZoneFor", "خارج المحدد لمدة"),
+            label: formT("outsideZoneFor"),
             type: "text",
-            placeholder: getFormTranslation("outsideZoneFor", "خارج المحدد لمدة"),
+            placeholder: formT("outsideZoneFor"),
             postfix: (
               <div className="w-full h-full">
                 <select
@@ -499,24 +485,24 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: getFormTranslation("outsideZoneNumbersOnly", "خارج المحدد لمدة يجب أن تكون أرقام فقط"),
+                message: formT("outsideZoneNumbersOnly"),
               },
             ],
           },
           {
             type: "checkboxGroup",
             name: "type_attendance",
-            label: getFormTranslation("attendanceRegistrationVia", "تسجيل الحضور و الانصراف من خلال"),
+            label: formT("attendanceRegistrationVia"),
             isMulti: true,
             options: [
-              { value: "location", label: getFormTranslation("location", "الموقع") },
+              { value: "location", label: formT("location") },
               // { value: "fingerprint", label: "بصمة الوجة" },
             ],
             required: true,
             validation: [
               {
                 type: "required",
-                message: getFormTranslation("attendanceRegistrationRequired", "تسجيل الحضور و الانصراف من خلال يجب أن يختار"),
+                message: formT("attendanceRegistrationRequired"),
               },
             ],
           },
@@ -837,7 +823,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         }
       );
     },
-    submitButtonText: getFormTranslation("submitButtonText", "حفظ المحدد"),
-    cancelButtonText: getFormTranslation("cancelButtonText", "إلغاء"),
+    submitButtonText: formT("submitButtonText"),
+    cancelButtonText: formT("cancelButtonText"),
   };
 };
