@@ -12,6 +12,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { APP_ICONS } from "@/constants/icons";
+import { useTranslations } from "next-intl";
 
 const COLLAPSED_COUNT = 8;
 
@@ -28,8 +29,9 @@ export default function IconPicker({
   onChange,
   disabled = false,
   error,
-  label = "اختيار Icon",
+  label = "choose icon",
 }: IconPickerProps) {
+  const t = useTranslations("labels");
   const [expanded, setExpanded] = useState(false);
 
   const selectedIndex = APP_ICONS.findIndex((icon) => icon.id === value);
@@ -54,8 +56,8 @@ export default function IconPicker({
           variant="body2"
           color={error ? "error" : "text.secondary"}
           sx={{ mb: 1 }}
-        >
-          {label}
+          >
+          {t("chooseIcon")}
         </Typography>
       )}
 
@@ -108,7 +110,7 @@ export default function IconPicker({
             endIcon={<ExpandLessIcon />}
             sx={{ borderRadius: 1, alignSelf: "center", px: 1.5 }}
           >
-            عرض أقل
+            {t("showLess")}
           </Button>
         )}
       </Box>
