@@ -110,7 +110,7 @@ export default function IconPicker({
             endIcon={<ExpandLessIcon />}
             sx={{ borderRadius: 1, alignSelf: "center", px: 1.5 }}
           >
-            عرض أقل
+            {t("showLess")}
           </Button>
         )}
       </Box>

@@ -51,4 +51,5 @@ export const labelsMessages = new MessagesGroup({
   ),
   show: _m("show", "عرض"),
   chooseIcon: _m("Choose Icon", "اختر ايقونة"),
+  showLess: _m("Show Less", "عرض أقل"),
 });
