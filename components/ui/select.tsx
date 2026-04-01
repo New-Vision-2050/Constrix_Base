@@ -150,7 +150,7 @@ const SelectItem = forwardRef<
     <SelectPrimitive.Item
       ref={ref}
       className={cn(
-        "relative cursor-pointer flex w-full select-none items-center rounded-sm py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative cursor-pointer flex w-full select-none items-center rounded-sm py-1.5 text-sm outline-none focus:bg-sky-700/100 dark:focus:bg-sky-600/50 hover:bg-sky-700/100 dark:hover:bg-sky-600/50 focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         isRtl ? "pl-2 pr-8" : "pl-8 pr-2",
         className
       )}

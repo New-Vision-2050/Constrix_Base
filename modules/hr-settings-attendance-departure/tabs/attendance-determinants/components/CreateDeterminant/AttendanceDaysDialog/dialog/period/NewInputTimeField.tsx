@@ -216,16 +216,16 @@ const NewInputTimeField = ({
       defaultValue={value?.split(":")[0] || ""}
       onValueChange={(val) => setSelectedHour(val)}
     >
-      <SelectTrigger className="w-[70px] bg-primary border-primary text-primary-foreground">
+      <SelectTrigger className="w-[70px] bg-primary border-gray-300 text-black-foreground">
         <SelectValue placeholder="HH" />
       </SelectTrigger>
-      <SelectContent className="bg-primary border-primary text-primary-foreground">
+      <SelectContent className="bg-gray-300 border-gray-300 text-black">
         {_dayAvsilableHours?.map((hour) => (
           <SelectItem
             key={hour.value}
             value={hour.value}
             disabled={!hour.available}
-            className="text-primary-foreground hover:bg-secondary"
+            className="bg-gray-300 text-black"
           >
             {hour.label}
           </SelectItem>
@@ -319,16 +319,16 @@ const NewInputTimeField = ({
       value={selectedMinute}
       onValueChange={(val) => setSelectedMinute(val)}
     >
-      <SelectTrigger className="w-[70px] bg-primary border-primary text-primary-foreground">
+      <SelectTrigger className="w-[70px] bg-primary border-gray-300 text-black-foreground">
         <SelectValue placeholder="MM" />
       </SelectTrigger>
-      <SelectContent className="bg-primary border-primary text-primary-foreground">
+      <SelectContent className="bg-gray-300 border-gray-300 text-black">
         {availableMinutes?.map((minute) => (
           <SelectItem
             key={minute.value}
             value={minute.value}
             disabled={!minute.available}
-            className="text-primary-foreground hover:bg-secondary"
+            className="bg-gray-300 text-black"
           >
             {minute.label}
           </SelectItem>

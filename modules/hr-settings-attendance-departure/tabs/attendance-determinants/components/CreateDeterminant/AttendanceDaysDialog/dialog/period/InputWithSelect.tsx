@@ -87,7 +87,11 @@ export const InputWithSelect: React.FC<InputWithSelectProps> = ({
           className="rounded-l-none border-l-0 focus:ring-0 focus:ring-offset-0 bg-primary text-white w-32"
         >
           {selectOptions.map((option) => (
-            <option key={option.id} value={option.id}>
+            <option
+              key={option.id}
+              value={option.id}
+              className="bg-gray-300 text-black"
+            >
               {option.name}
             </option>
           ))}
