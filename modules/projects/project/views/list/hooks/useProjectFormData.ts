@@ -42,7 +42,9 @@ export function useProjectFormData(
   const { data: branchesData } = useQuery({
     queryKey: ["branches", searchParams.branch_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getBranches(searchParams.branch_id ? { name: searchParams.branch_id } : {});
+      const response = await AllProjectsApi.getBranches(
+        searchParams.branch_id ? { name: searchParams.branch_id } : {},
+      );
       return response.data.payload ?? [];
     },
   });
@@ -50,7 +52,9 @@ export function useProjectFormData(
   const { data: managementsData } = useQuery({
     queryKey: ["managements", searchParams.management_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getManagements(searchParams.management_id ? { name: searchParams.management_id } : {});
+      const response = await AllProjectsApi.getManagements(
+        searchParams.management_id ? { name: searchParams.management_id } : {},
+      );
       return response.data.payload ?? [];
     },
   });
@@ -58,7 +62,7 @@ export function useProjectFormData(
   const { data: companyUsersData } = useQuery({
     queryKey: ["company-users", searchParams.manager_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getCompanyUsers(searchParams.manager_id ? { name: searchParams.manager_id } : {});
+      const response = await AllProjectsApi.getCompanyUsers();
       return response.data.payload ?? [];
     },
   });
@@ -66,16 +70,28 @@ export function useProjectFormData(
   const { data: entityClientsData } = useQuery({
     queryKey: ["entity-clients", watchOwnerType, searchParams.entity_clients],
     queryFn: async () => {
-      const response = await AllProjectsApi.getEntityClients(searchParams.entity_clients ? { name: searchParams.entity_clients } : {});
+      const response = await AllProjectsApi.getEntityClients(
+        searchParams.entity_clients
+          ? { name: searchParams.entity_clients }
+          : {},
+      );
       return response.data.payload ?? [];
     },
     enabled: watchOwnerType === "company",
   });
 
   const { data: individualClientsData } = useQuery({
-    queryKey: ["individual-clients", watchOwnerType, searchParams.individual_clients],
+    queryKey: [
+      "individual-clients",
+      watchOwnerType,
+      searchParams.individual_clients,
+    ],
     queryFn: async () => {
-      const response = await AllProjectsApi.getIndividualClients(searchParams.individual_clients ? { name: searchParams.individual_clients } : {});
+      const response = await AllProjectsApi.getIndividualClients(
+        searchParams.individual_clients
+          ? { name: searchParams.individual_clients }
+          : {},
+      );
       return response.data.payload ?? [];
     },
     enabled: watchOwnerType === "individual",
@@ -104,12 +120,12 @@ export function useProjectFormData(
     if (timeoutRefs.current[fieldName]) {
       clearTimeout(timeoutRefs.current[fieldName]);
     }
-    
+
     // Set new timeout
     timeoutRefs.current[fieldName] = setTimeout(() => {
-      setSearchParams(prev => ({
+      setSearchParams((prev) => ({
         ...prev,
-        [fieldName]: searchValue
+        [fieldName]: searchValue,
       }));
     }, 300);
   };
