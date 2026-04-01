@@ -43,6 +43,7 @@ function AttendanceDeterminantsTabContent() {
     handleConstraintClick,
     branchesData,
     refetchConstraints,
+    refetchConstraintsList,
     handleLimitChange,
     handlePageChange,
     page,
@@ -69,6 +70,7 @@ function AttendanceDeterminantsTabContent() {
   // Get form config - this needs to be called unconditionally to maintain hooks order
   const formConfig = getDynamicDeterminantFormConfig({
     refetchConstraints,
+    refetchConstraintsList,
     branchesData,
     t,
     editConstraint: editingConstraint,

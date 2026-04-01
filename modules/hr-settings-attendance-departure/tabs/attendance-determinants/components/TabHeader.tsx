@@ -12,14 +12,20 @@ interface TabHeaderProps {
   title: string;
 }
 
-const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
+const TabHeader: React.FC<TabHeaderProps> = ({ title: _title }) => {
+  void _title;
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDarkMode = currentTheme === "dark";
 
   const textColor = isDarkMode ? "text-white" : "text-gray-900";
 
-  const { activeConstraint, refetchConstraints, branchesData } =
+  const {
+    activeConstraint,
+    refetchConstraints,
+    refetchConstraintsList,
+    branchesData,
+  } =
     useAttendanceDeterminants();
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants"
@@ -43,10 +49,12 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
           <SheetFormBuilder
             config={getDynamicDeterminantFormConfig({
               refetchConstraints,
+              refetchConstraintsList,
               branchesData,
               t,
-              translations: dialogTranslations,
-              formTranslations,
+              attendanceDaysDialogTranslations: (key: string) =>
+                dialogTranslations(key),
+              formTranslationsFn: (key: string) => formTranslations(key),
             })}
             trigger={<Button>{t("createDeterminant")}</Button>}
           />

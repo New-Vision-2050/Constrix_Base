@@ -1,5 +1,8 @@
 import { FormConfig } from "@/modules/form-builder";
-import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
+import {
+  useFormInstance,
+  useFormStore,
+} from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
@@ -27,13 +30,59 @@ const dayNames = {
   saturday: "السبت",
 };
 
-const daysList = Object.entries(dayNames).map(([key, value]) => ({
-  value: key,
-  label: value,
-}));
+const FORM_ID = "create-determinant-form";
+
+const hasEnabledWeeklyScheduleDay = (weeklySchedule: unknown) => {
+  if (!Array.isArray(weeklySchedule)) return false;
+  return weeklySchedule.some((item: any) => {
+    if (!item || typeof item !== "object") return false;
+    if (!Array.isArray(item.periods) || item.periods.length === 0) return false;
+    return item.periods.some(
+      (period: any) =>
+        period &&
+        typeof period === "object" &&
+        String(period.from || "").trim() &&
+        String(period.to || "").trim(),
+    );
+  });
+};
+
+function AttendanceDaysSummary({
+  title,
+}: {
+  title: string;
+}) {
+  const formInstance = useFormInstance(FORM_ID);
+  const error = formInstance.errors?.attendance_days;
+  return (
+    <div className="flex items-center justify-between flex-wrap">
+      <p className="text-white font-bold">{title}</p>
+      {!!error && (
+        <p className="w-full mt-2 text-sm text-destructive">{String(error)}</p>
+      )}
+    </div>
+  );
+}
+
+const remapDeterminantBackendErrors = (
+  errors: Record<string, string | string[]>,
+) => {
+  const mapped = { ...errors };
+  if (mapped["constraint_config.time_rules.weekly_schedule"]) {
+    mapped.attendance_days =
+      mapped["constraint_config.time_rules.weekly_schedule"];
+    delete mapped["constraint_config.time_rules.weekly_schedule"];
+  }
+  if (mapped["constraint_config.type_attendance"]) {
+    mapped.type_attendance = mapped["constraint_config.type_attendance"];
+    delete mapped["constraint_config.type_attendance"];
+  }
+  return mapped;
+};
 
 type PropsT = {
   refetchConstraints: () => void;
+  refetchConstraintsList?: () => void;
   branchesData?: Array<{
     id: string;
     name: string;
@@ -51,12 +100,14 @@ type PropsT = {
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   // Props
   const { 
-    refetchConstraints, 
-    t, 
+    refetchConstraints,
+    refetchConstraintsList,
+    t: _t,
     editConstraint, 
     attendanceDaysDialogTranslations,
     formTranslationsFn 
   } = props;
+  void _t;
   
   // Translation functions (passed as parameters instead of hooks)
   const translations = attendanceDaysDialogTranslations || ((key: string) => key);
@@ -68,11 +119,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       return result === key ? (fallback || key) : result;
     }
     return fallback || key;
-  };
-
-  // Function to get text with default value
-  const getText = (key: string, defaultText: string) => {
-    return t ? t(key) : defaultText;
   };
 
   // ------------- set default type attendance -------------
@@ -139,7 +185,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
   // ------------- return form config -------------
   return {
-    formId: "create-determinant-form",
+    formId: FORM_ID,
     title,
     apiUrl: `${baseURL}/attendance/constraints`,
     initialValues: {
@@ -306,7 +352,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     useFormStore
                       ?.getState()
                       .setValue(
-                        "create-determinant-form",
+                        FORM_ID,
                         "show_location_dialog",
                         true
                       );
@@ -323,14 +369,14 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             name: "show_location_dialog",
             label: "",
             defaultValue: false,
-            render: (props: any) => {
+            render: () => {
               const location_type = useFormStore
                 ?.getState()
-                .getValues("create-determinant-form").location_type;
+                .getValues(FORM_ID).location_type;
 
               const show_location_dialog = useFormStore
                 ?.getState()
-                .getValues("create-determinant-form").show_location_dialog;
+                .getValues(FORM_ID).show_location_dialog;
 
               const showDialog =
                 (location_type === "custom" &&
@@ -346,7 +392,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     useFormStore
                       ?.getState()
                       .setValue(
-                        "create-determinant-form",
+                        FORM_ID,
                         "show_location_dialog",
                         false
                       );
@@ -368,16 +414,16 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             label: "",
             render: () => {
               return (
-                <div className="flex items-center justify-between">
-                  <p className="text-white font-bold">
-                    {getFormTranslation("addAttendanceDays", "أضافة أيام حضور")}
-                  </p>
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <AttendanceDaysSummary
+                    title={getFormTranslation("addAttendanceDays", "أضافة أيام حضور")}
+                  />
                   <Button
                     onClick={() => {
                       useFormStore
                         ?.getState()
                         .setValue(
-                          "create-determinant-form",
+                          FORM_ID,
                           "show_attendance_days_dialog",
                           true
                         );
@@ -388,6 +434,17 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </div>
               );
             },
+            validation: [
+              {
+                type: "custom",
+                validator: (_, values) =>
+                  hasEnabledWeeklyScheduleDay(values?.weekly_schedule),
+                message: getFormTranslation(
+                  "attendanceDaysRequired",
+                  "يجب إضافة يوم حضور واحد على الأقل",
+                ),
+              },
+            ],
           },
           {
             name: "show_attendance_days",
@@ -396,7 +453,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             render: () => {
               const _weekly_schedule = useFormStore
                 ?.getState()
-                .getValue("create-determinant-form", "weekly_schedule");
+                .getValue(FORM_ID, "weekly_schedule");
               console.log(
                 "show_attendance_days_weekly_schedule",
                 _weekly_schedule
@@ -422,7 +479,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               const showDialog = useFormStore
                 ?.getState()
                 .getValues(
-                  "create-determinant-form"
+                  FORM_ID
                 ).show_attendance_days_dialog;
               return (
                 <AttendanceDaysDialog
@@ -431,7 +488,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     useFormStore
                       ?.getState()
                       .setValue(
-                        "create-determinant-form",
+                        FORM_ID,
                         "show_attendance_days_dialog",
                         false
                       );
@@ -474,7 +531,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                   }
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
-                    formStore.setValues(`create-determinant-form`, {
+                    formStore.setValues(FORM_ID, {
                       out_zone_rules_unit: e.target.value,
                     });
                   }}
@@ -515,7 +572,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             required: true,
             validation: [
               {
-                type: "required",
+                type: "custom",
+                validator: (value) =>
+                  Array.isArray(value) && value.length > 0,
                 message: getFormTranslation("attendanceRegistrationRequired", "تسجيل الحضور و الانصراف من خلال يجب أن يختار"),
               },
             ],
@@ -526,9 +585,49 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     ],
     onSuccess: () => {
       refetchConstraints();
+      refetchConstraintsList?.();
     },
     resetOnSuccess: true,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const validationErrors: Record<string, string> = {};
+      if (!String(formData.constraint_name || "").trim()) {
+        validationErrors.constraint_name = getFormTranslation(
+          "determinantNameRequired",
+          "اسم المحدد مطلوب",
+        );
+      }
+      if (!String(formData.constraint_type || "").trim()) {
+        validationErrors.constraint_type = getFormTranslation(
+          "systemTypeRequired",
+          "نظام المحدد مطلوب",
+        );
+      }
+      if (!hasEnabledWeeklyScheduleDay(formData.weekly_schedule)) {
+        validationErrors.attendance_days = getFormTranslation(
+          "attendanceDaysRequired",
+          "يجب إضافة يوم حضور واحد على الأقل",
+        );
+      }
+      if (
+        !Array.isArray(formData.type_attendance) ||
+        formData.type_attendance.length === 0
+      ) {
+        validationErrors.type_attendance = getFormTranslation(
+          "attendanceRegistrationRequired",
+          "تسجيل الحضور و الانصراف من خلال يجب أن يختار",
+        );
+      }
+      if (Object.keys(validationErrors).length > 0) {
+        return {
+          success: false,
+          message: getFormTranslation(
+            "validationFailed",
+            "يرجى مراجعة الحقول المطلوبة",
+          ),
+          errors: validationErrors,
+        };
+      }
+
       // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
         const weeklySchedule = formData.weekly_schedule as Array<any>;
@@ -677,7 +776,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                   : [];
 
                 // Collect working hours for the day
-                let dayPeriods: any[] = [];
+                const dayPeriods: any[] = [];
 
                 // Collect all working periods for this day
                 // Ensure daySchedules is iterable
@@ -826,7 +925,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         },
       };
 
-      return await defaultSubmitHandler(
+      const result = await defaultSubmitHandler(
         data,
         getDynamicDeterminantFormConfig(props),
         {
@@ -836,6 +935,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           method: Boolean(editConstraint) ? "PUT" : "POST",
         }
       );
+      if (!result.success && result.errors) {
+        return {
+          ...result,
+          errors: remapDeterminantBackendErrors(result.errors),
+        };
+      }
+      return result;
     },
     submitButtonText: getFormTranslation("submitButtonText", "حفظ المحدد"),
     cancelButtonText: getFormTranslation("cancelButtonText", "إلغاء"),
