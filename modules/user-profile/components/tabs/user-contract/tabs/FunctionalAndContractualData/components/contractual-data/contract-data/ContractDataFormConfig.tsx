@@ -56,16 +56,16 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
         fields: [
           {
             name: "contract_number",
-            label: "رقم العقد",
+            label: t("contractNumber"),
             type: "text",
-            placeholder: "رقم العقد",
+            placeholder: t("contractNumber"),
             validation: [],
           },
           {
             name: "start_date",
-            label: "تاريخ المباشرة",
+            label: t("commencementDate"),
             type: "date",
-            placeholder: "تاريخ المباشرة",
+            placeholder: t("commencementDate"),
             maxDate: {
               formId: `user-contract-data-form-${contract?.id}`,
               field: "commencement_date",
@@ -74,9 +74,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "commencement_date",
-            label: "تاريخ البدء",
+            label: t("contractStartDate"),
             type: "date",
-            placeholder: "تاريخ البدء",
+            placeholder: t("contractStartDate"),
             minDate: {
               formId: `user-contract-data-form-${contract?.id}`,
               field: "start_date",
@@ -92,9 +92,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "contract_duration",
-            label: "مدة العقد",
+            label: t("contractDuration"),
             type: "text",
-            placeholder: "مدة العقد",
+            placeholder: t("contractDuration"),
             onChange: (
               newValue: any,
               values: Record<string, any>,
@@ -205,7 +205,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "مدة العقد يجب أن تكون أرقام فقط",
+                message: t("contractDuration") + " " + t("validation.numbersOnly"),
               },
             ],
           },
@@ -218,9 +218,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "notice_period",
-            label: "فترة الاشعار",
+            label: t("noticePeriod"),
             type: "text",
-            placeholder: "فترة الاشعار",
+            placeholder: t("noticePeriod"),
             postfix: (
               <div className="w-full h-full">
                 <select
@@ -275,7 +275,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "فترة الاشعار يجب أن تكون أرقام فقط",
+                message: t("noticePeriod") + " " + t("validation.numbersOnly"),
               },
               {
                 type: "custom",
@@ -318,7 +318,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                   );
                   return noticePeriodInDays <= contractDurationInDays;
                 },
-                message: "فترة الاشعار يجب أن لا تكون أكبر من مدة العقد",
+                message: t("validation.noticePeriodGreaterThanContract"),
               },
             ],
           },
@@ -336,9 +336,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "probation_period",
-            label: "فترة التجربة",
+            label: t("probationPeriod"),
             type: "text",
-            placeholder: "فترة التجربة",
+            placeholder: t("probationPeriod"),
             postfix: (
               <div className="w-full h-full">
                 <select
@@ -393,7 +393,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "فترة التجربة يجب أن تكون أرقام فقط",
+                message: t("probationPeriod") + " " + t("validation.numbersOnly"),
               },
               {
                 type: "custom",
@@ -425,15 +425,15 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
                   return probationPeriodInDays <= contractDurationInDays;
                 },
-                message: "فترة التجربة يجب أن لا تكون أكبر من مدة العقد",
+                message: t("validation.probationPeriodGreaterThanContract"),
               },
             ],
           },
           {
             name: "type_working_hour_id",
-            label: "نوع ساعات العمل",
+            label: t("workingHoursType"),
             type: "select",
-            placeholder: "نوع ساعات العمل",
+            placeholder: t("workingHoursType"),
             dynamicOptions: {
               url: `${baseURL}/type_working_hours`,
               valueField: "id",
@@ -446,29 +446,29 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "working_hours",
-            label: "ساعات العمل الاسبوعية",
+            label: t("weeklyWorkingHours"),
             type: "text",
-            placeholder: "ساعات العمل الاسبوعية",
-            postfix: "ساعة",
+            placeholder: t("weeklyWorkingHours"),
+            postfix: t("hour"),
             validation: [
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "ساعات العمل يجب أن تكون أرقام فقط",
+                message: t("validation.workingHoursNumbersOnly"),
               },
             ],
           },
           {
             name: "annual_leave",
-            label: "ايام الاجازات السنوية",
+            label: t("annualLeaveDays"),
             type: "text",
-            placeholder: "ايام الاجازات السنوية",
-            postfix: "ايام",
+            placeholder: t("annualLeaveDays"),
+            postfix: t("day"),
             validation: [
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "أيام الإجازات يجب أن تكون أرقام فقط",
+                message: t("validation.annualLeaveNumbersOnly"),
               },
               {
                 type: "custom",
@@ -498,15 +498,15 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                   return annualLeaveDays <= contractDurationInDays;
                 },
                 message:
-                  "عدد أيام الإجازات السنوية لا يمكن أن يكون أكبر من مدة العقد",
+                  t("validation.annualLeaveGreaterThanContract"),
               },
             ],
           },
           {
             type: "select",
             name: "state_id",
-            label: "مكان العمل",
-            placeholder: "اختر مكان العمل",
+            label: t("workPlace"),
+            placeholder: t("workPlace"),
             dynamicOptions: {
               url: `${baseURL}/countries/get-states-by-branch`,
               valueField: "id",
@@ -522,9 +522,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "right_terminate_id",
-            label: "حق الانهاء خلال فترة التجربة",
+            label: t("rightToTerminateDuringProbation"),
             type: "select",
-            placeholder: "حق الانهاء خلال فترة التجربة",
+            placeholder: t("rightToTerminateDuringProbation"),
             dynamicOptions: {
               url: `${baseURL}/right_terminates`,
               valueField: "id",
@@ -537,9 +537,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "file",
-            label: "ارفاق العقد",
+            label: t("attachOffer"),
             type: "file",
-            placeholder: "ارفاق العقد",
+            placeholder: t("attachOffer"),
             isMulti: true,
             fileConfig: {
               allowedFileTypes: [

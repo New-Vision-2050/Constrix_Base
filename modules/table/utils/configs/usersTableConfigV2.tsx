@@ -312,7 +312,7 @@ export const UsersConfigV2 = (options?: {
               icon: <GearIcon className="w-4 h-4" />,
               action: "complete-profile",
               dialogComponent: ChooseUserCompany,
-              disabled: options?.canEdit,
+              disabled: !options?.canEdit,
               dialogProps: (row: UserTableRow) => {
                 return {
                   user: row,
@@ -337,7 +337,6 @@ export const UsersConfigV2 = (options?: {
                 );
               },
               icon: <UserIcon className="w-4 h-4" />,
-              disabled: true,
             },
           ]),
       {
@@ -351,7 +350,7 @@ export const UsersConfigV2 = (options?: {
         icon: <GearIcon className="w-4 h-4" />,
         action: "user-settings",
         dialogComponent: UserSettingDialog,
-        disabled: options?.canView,
+        disabled: !options?.canView,
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
@@ -370,7 +369,7 @@ export const UsersConfigV2 = (options?: {
         action: "delete-user",
         icon: <Trash2 className="w-4 h-4 text-red-500" />,
         dialogComponent: DeleteSpecificRowDialog,
-        disabled: Boolean(options?.canDelete),
+        disabled: Boolean(!options?.canDelete),
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
