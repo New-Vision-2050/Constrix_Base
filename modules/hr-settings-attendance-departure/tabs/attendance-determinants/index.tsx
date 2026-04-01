@@ -51,6 +51,8 @@ function AttendanceDeterminantsTabContent() {
     constraintsList,
     constraintsListLoading,
     constraintsListError,
+    refetchConstraintsList,
+    handleNewDeterminantCreated,
   } = useAttendanceDeterminants();
 
   // Function to handle editing a determinant
@@ -69,6 +71,8 @@ function AttendanceDeterminantsTabContent() {
   // Get form config - this needs to be called unconditionally to maintain hooks order
   const formConfig = getDynamicDeterminantFormConfig({
     refetchConstraints,
+    refetchConstraintsList,
+    onNewDeterminantCreated: handleNewDeterminantCreated,
     branchesData,
     t,
     editConstraint: editingConstraint,

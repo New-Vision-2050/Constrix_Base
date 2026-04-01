@@ -34,6 +34,8 @@ const daysList = Object.entries(dayNames).map(([key, value]) => ({
 
 type PropsT = {
   refetchConstraints: () => void;
+  refetchConstraintsList: () => void;
+  onNewDeterminantCreated?: (determinant: any) => void;
   branchesData?: Array<{
     id: string;
     name: string;
@@ -52,6 +54,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   // Props
   const { 
     refetchConstraints, 
+    refetchConstraintsList,
+    onNewDeterminantCreated,
     t, 
     editConstraint, 
     attendanceDaysDialogTranslations,
@@ -524,8 +528,18 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       },
       // Day sections will be added dynamically based on working_days selection
     ],
-    onSuccess: () => {
+    onSuccess: (response: any) => {
+      // Refetch both constraints and constraints list to update the UI
       refetchConstraints();
+      refetchConstraintsList();
+      
+      // If this is a new determinant (not edit) and we have response data, select it
+      if (!editConstraint && response?.data && onNewDeterminantCreated) {
+        // For POST requests, the response should contain the newly created determinant
+        // The exact structure depends on your API response
+        const newDeterminant = response.data;
+        onNewDeterminantCreated(newDeterminant);
+      }
     },
     resetOnSuccess: true,
     onSubmit: async (formData: Record<string, unknown>) => {
