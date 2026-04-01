@@ -5,9 +5,12 @@ import PickupMap from "../../../../../components/shared/pickup-map";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export const addNewBranchFormConfig = (branches: Branch[]) => {
   const { company_id }: { company_id: string | undefined } = useParams();
+  const t = useTranslations("companyProfile.branches.form");
+  const tLocation = useTranslations("location");
 
   const mainBranch = branches.find((branch) => !Boolean(branch.parent_id));
 
@@ -21,7 +24,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
         queryKey: ["company-branches", company_id],
       });
     },
-    title: "اضافة فرع جديد",
+    title: t("addNewTitle"),
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -31,18 +34,18 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
         fields: [
           {
             name: "name",
-            label: "اسم الفرع",
-            placeholder: "اسم الفرع",
+            label: t("branchName"),
+            placeholder: t("branchNamePlaceholder"),
             type: "text",
             validation: [
               {
                 type: "required",
-                message: "ادخل اسم الفرع",
+                message: t("branchNameRequired"),
               },
             ],
           },
           {
-            label: "تعديل الموقع من الخريطة",
+            label: tLocation("chooseLocationCoordinates"),
             name: "map",
             type: "text",
             render: () => (
@@ -72,8 +75,8 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           {
             type: "select",
             name: "country_id",
-            label: "الدولة",
-            placeholder: "الدولة",
+            label: t("country"),
+            placeholder: t("countryPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
@@ -89,15 +92,15 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             validation: [
               {
                 type: "required",
-                message: "الدولة",
+                message: t("countryRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "state_id",
-            label: "المحافظة",
-            placeholder: "المحافظة",
+            label: t("governorate"),
+            placeholder: t("governoratePlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
@@ -115,15 +118,15 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             validation: [
               {
                 type: "required",
-                message: "ادخل المنطقة",
+                message: t("governorateRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "city_id",
-            label: "المدينة",
-            placeholder: "المدينة",
+            label: t("city"),
+            placeholder: t("cityPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
@@ -141,15 +144,15 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           },
           {
             name: "parent_name",
-            label: "الفرع الرئيسي",
+            label: t("mainBranch"),
             type: "text",
             disabled: true,
           },
           {
             type: "select",
             name: "manager_id",
-            label: "مدير الفرع",
-            placeholder: "اختر مدير الفرع",
+            label: t("branchManager"),
+            placeholder: t("branchManagerPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/users`,
@@ -165,13 +168,13 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             validation: [
               {
                 type: "required",
-                message: "مدير الفرع",
+                message: t("branchManagerRequired"),
               },
             ],
           },
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("mobileNumber"),
             type: "phone",
             required: true,
             validation: [
@@ -183,18 +186,18 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           },
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("email"),
             type: "email",
-            placeholder: "البريد الالكتروني",
+            placeholder: t("emailPlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "ادخل البريد الالكتروني",
+                message: t("emailRequired"),
               },
               {
                 type: "email",
-                message: "البريد الالكتروني غير صحيح",
+                message: t("emailInvalid"),
               },
             ],
           },
@@ -225,8 +228,8 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
         ],
       },
     ],
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

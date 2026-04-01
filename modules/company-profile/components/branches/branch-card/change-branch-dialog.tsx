@@ -13,6 +13,7 @@ import { changeBranchForm } from "./change-branch-form-config";
 import { Branch } from "@/modules/company-profile/types/company";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
+import { useTranslations } from "next-intl";
 
 const ChangeBranchDialog = ({
   branchId,
@@ -22,6 +23,7 @@ const ChangeBranchDialog = ({
   branches: Branch[];
 }) => {
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile.branches");
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () =>
@@ -53,7 +55,7 @@ const ChangeBranchDialog = ({
     <>
       <div className="mt-4 flex justify-end">
         <Button onClick={handleOpen} loading={isPending}>
-          تغيير الفرع
+          {t("changeBranchDialog.changeBranch")}
         </Button>
       </div>
       <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -61,7 +63,7 @@ const ChangeBranchDialog = ({
           <DialogHeader className="gap-3 items-center">
             <InfoIcon />
             <DialogTitle className="text-center my-5">
-              لا يمكن تغيير الفرع الا عند اختيار فرع رئيسي اخر{" "}
+              {t("changeBranchDialog.cannotChangeMessage")}
             </DialogTitle>
           </DialogHeader>
           <FormContent config={changeBranchForm(branchId, branches)} />
