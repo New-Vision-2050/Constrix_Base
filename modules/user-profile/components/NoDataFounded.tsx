@@ -12,7 +12,7 @@ export default function NoDataFounded(props: PropsT) {
     <div className="w-full min-h-32 flex items-center justify-center">
       <div className="flex flex-col gap-1 text-center">
         <p className="text-lg font-bold">
-          {subTitle || title || "There is No Data Found"}
+          {subTitle || title || "-"}
         </p>
         {children && <>{children}</>}
       </div>
