@@ -12,7 +12,8 @@ interface TabHeaderProps {
   title: string;
 }
 
-const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
+const TabHeader: React.FC<TabHeaderProps> = ({ title: _title }) => {
+  void _title;
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDarkMode = currentTheme === "dark";
@@ -47,8 +48,9 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
               onNewDeterminantCreated: handleNewDeterminantCreated,
               branchesData,
               t,
-              translations: dialogTranslations,
-              formTranslations,
+              attendanceDaysDialogTranslations: (key: string) =>
+                dialogTranslations(key),
+              formTranslationsFn: (key: string) => formTranslations(key),
             })}
             trigger={<Button>{t("createDeterminant")}</Button>}
           />

@@ -1,5 +1,8 @@
 import { FormConfig } from "@/modules/form-builder";
-import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
+import {
+  useFormInstance,
+  useFormStore,
+} from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
@@ -28,10 +31,55 @@ const dayNames = {
   saturday: "السبت",
 };
 
-const daysList = Object.entries(dayNames).map(([key, value]) => ({
-  value: key,
-  label: value,
-}));
+const FORM_ID = "create-determinant-form";
+
+const hasEnabledWeeklyScheduleDay = (weeklySchedule: unknown) => {
+  if (!Array.isArray(weeklySchedule)) return false;
+  return weeklySchedule.some((item: any) => {
+    if (!item || typeof item !== "object") return false;
+    if (!Array.isArray(item.periods) || item.periods.length === 0) return false;
+    return item.periods.some(
+      (period: any) =>
+        period &&
+        typeof period === "object" &&
+        String(period.from || "").trim() &&
+        String(period.to || "").trim(),
+    );
+  });
+};
+
+function AttendanceDaysSummary({
+  title,
+}: {
+  title: string;
+}) {
+  const formInstance = useFormInstance(FORM_ID);
+  const error = formInstance.errors?.attendance_days;
+  return (
+    <div className="flex items-center justify-between flex-wrap">
+      <p className="text-white font-bold">{title}</p>
+      {!!error && (
+        <p className="w-full mt-2 text-sm text-destructive">{String(error)}</p>
+      )}
+    </div>
+  );
+}
+
+const remapDeterminantBackendErrors = (
+  errors: Record<string, string | string[]>,
+) => {
+  const mapped = { ...errors };
+  if (mapped["constraint_config.time_rules.weekly_schedule"]) {
+    mapped.attendance_days =
+      mapped["constraint_config.time_rules.weekly_schedule"];
+    delete mapped["constraint_config.time_rules.weekly_schedule"];
+  }
+  if (mapped["constraint_config.type_attendance"]) {
+    mapped.type_attendance = mapped["constraint_config.type_attendance"];
+    delete mapped["constraint_config.type_attendance"];
+  }
+  return mapped;
+};
 
 type PropsT = {
   refetchConstraints: () => void;
@@ -62,6 +110,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     attendanceDaysDialogTranslations,
     formTranslationsFn 
   } = props;
+  void _t;
   
   // Translation functions (passed as parameters instead of hooks)
   const translations = attendanceDaysDialogTranslations || ((key: string) => key);
@@ -144,7 +193,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
 
   // ------------- return form config -------------
   return {
-    formId: "create-determinant-form",
+    formId: FORM_ID,
     title,
     apiUrl: `${baseURL}/attendance/constraints`,
     initialValues: {
@@ -296,7 +345,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                     useFormStore
                       ?.getState()
                       .setValue(
-                        "create-determinant-form",
+                        FORM_ID,
                         "show_location_dialog",
                         true
                       );
@@ -313,14 +362,14 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
             name: "show_location_dialog",
             label: "",
             defaultValue: false,
-            render: (props: any) => {
+            render: () => {
               const location_type = useFormStore
                 ?.getState()
-                .getValues("create-determinant-form").location_type;
+                .getValues(FORM_ID).location_type;
 
               const show_location_dialog = useFormStore
                 ?.getState()
-                .getValues("create-determinant-form").show_location_dialog;
+                .getValues(FORM_ID).show_location_dialog;
 
               const showDialog =
                 (location_type === "custom" &&
@@ -336,7 +385,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                     useFormStore
                       ?.getState()
                       .setValue(
-                        "create-determinant-form",
+                        FORM_ID,
                         "show_location_dialog",
                         false
                       );
@@ -367,7 +416,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                       useFormStore
                         ?.getState()
                         .setValue(
-                          "create-determinant-form",
+                          FORM_ID,
                           "show_attendance_days_dialog",
                           true
                         );
@@ -378,6 +427,17 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                 </div>
               );
             },
+            validation: [
+              {
+                type: "custom",
+                validator: (_, values) =>
+                  hasEnabledWeeklyScheduleDay(values?.weekly_schedule),
+                message: getFormTranslation(
+                  "attendanceDaysRequired",
+                  "يجب إضافة يوم حضور واحد على الأقل",
+                ),
+              },
+            ],
           },
           {
             name: "show_attendance_days",
@@ -386,7 +446,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
             render: () => {
               const _weekly_schedule = useFormStore
                 ?.getState()
-                .getValue("create-determinant-form", "weekly_schedule");
+                .getValue(FORM_ID, "weekly_schedule");
               console.log(
                 "show_attendance_days_weekly_schedule",
                 _weekly_schedule
@@ -412,7 +472,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
               const showDialog = useFormStore
                 ?.getState()
                 .getValues(
-                  "create-determinant-form"
+                  FORM_ID
                 ).show_attendance_days_dialog;
               return (
                 <AttendanceDaysDialog
@@ -421,7 +481,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                     useFormStore
                       ?.getState()
                       .setValue(
-                        "create-determinant-form",
+                        FORM_ID,
                         "show_attendance_days_dialog",
                         false
                       );
@@ -464,7 +524,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                   }
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
-                    formStore.setValues(`create-determinant-form`, {
+                    formStore.setValues(FORM_ID, {
                       out_zone_rules_unit: e.target.value,
                     });
                   }}
@@ -529,6 +589,45 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
     },
     resetOnSuccess: true,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const validationErrors: Record<string, string> = {};
+      if (!String(formData.constraint_name || "").trim()) {
+        validationErrors.constraint_name = getFormTranslation(
+          "determinantNameRequired",
+          "اسم المحدد مطلوب",
+        );
+      }
+      if (!String(formData.constraint_type || "").trim()) {
+        validationErrors.constraint_type = getFormTranslation(
+          "systemTypeRequired",
+          "نظام المحدد مطلوب",
+        );
+      }
+      if (!hasEnabledWeeklyScheduleDay(formData.weekly_schedule)) {
+        validationErrors.attendance_days = getFormTranslation(
+          "attendanceDaysRequired",
+          "يجب إضافة يوم حضور واحد على الأقل",
+        );
+      }
+      if (
+        !Array.isArray(formData.type_attendance) ||
+        formData.type_attendance.length === 0
+      ) {
+        validationErrors.type_attendance = getFormTranslation(
+          "attendanceRegistrationRequired",
+          "تسجيل الحضور و الانصراف من خلال يجب أن يختار",
+        );
+      }
+      if (Object.keys(validationErrors).length > 0) {
+        return {
+          success: false,
+          message: getFormTranslation(
+            "validationFailed",
+            "يرجى مراجعة الحقول المطلوبة",
+          ),
+          errors: validationErrors,
+        };
+      }
+
       // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
         const weeklySchedule = formData.weekly_schedule as Array<any>;
@@ -677,7 +776,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                   : [];
 
                 // Collect working hours for the day
-                let dayPeriods: any[] = [];
+                const dayPeriods: any[] = [];
 
                 // Collect all working periods for this day
                 // Ensure daySchedules is iterable
@@ -826,7 +925,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
         },
       };
 
-      return await defaultSubmitHandler(
+      const result = await defaultSubmitHandler(
         data,
         getDynamicDeterminantFormConfig(props),
         {
@@ -836,6 +935,13 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
           method: Boolean(editConstraint) ? "PUT" : "POST",
         }
       );
+      if (!result.success && result.errors) {
+        return {
+          ...result,
+          errors: remapDeterminantBackendErrors(result.errors),
+        };
+      }
+      return result;
     },
     submitButtonText: formT("submitButtonText"),
     cancelButtonText: formT("cancelButtonText"),

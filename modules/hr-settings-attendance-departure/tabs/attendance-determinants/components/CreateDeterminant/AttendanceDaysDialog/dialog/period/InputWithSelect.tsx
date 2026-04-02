@@ -79,6 +79,7 @@ export const InputWithSelect: React.FC<InputWithSelectProps> = ({
           value={inputValue}
           onChange={(e) => onInputChange(e.target.value)}
           placeholder={inputPlaceholder}
+          min={inputType === "number" ? 0 : undefined}
           className="focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent h-full border-r-0 flex-1"
         />
         <select
