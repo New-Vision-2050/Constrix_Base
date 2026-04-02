@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Branch } from "@/modules/company-profile/types/company";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { addNewBranchFormConfig } from "../branches-info/add-new-branch-form-config";
@@ -31,6 +32,7 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
   const [isAssignUsersOpen, handleAssignUsersOpen, handleAssignUsersClose] =
     useModal();
   const local = useLocale();
+  const t = useTranslations("companyProfile.branches.card");
   const isRTL = local === "ar";
   const isMainBranch = branch?.parent_id === null;
   const isMultipleBranch = branches.length > 1;
@@ -38,11 +40,11 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
   console.log("branchbranch", branch);
 
   const detailRows = [
-    { label: "مدير الفرع", value: branch.manager?.name ?? "-" },
-    { label: "عدد الموظفين", value: branch.user_count ?? 0 },
+    { label: t("branchManager"), value: branch.manager?.name ?? "-" },
+    { label: t("employeeCount"), value: branch.user_count ?? 0 },
     // { label: "عدد الاقسام", value: branch.department_count ?? 0 },
-    { label: "البريد الالكتروني", value: branch.email ?? "—" },
-    { label: "رقم الجوال", value: branch.phone ?? "—" },
+    { label: t("email"), value: branch.email ?? "—" },
+    { label: t("mobileNumber"), value: branch.phone ?? "—" },
   ];
 
   return (
@@ -64,7 +66,7 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
                 : "bg-[#463D5D] text-primary hover:bg-[#463D5D] "
             )}
           >
-            {isMainBranch ? "رئيسي" : "فرعي"}
+            {isMainBranch ? t("main") : t("sub")}
           </Badge>
           <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
             <DropdownMenuTrigger className="text-foreground">
@@ -75,7 +77,7 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
                 onClick={handleOpen}
                 className="text-start block"
               >
-                تعديل
+                {t("edit")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -96,7 +98,7 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
           {/* Users Can Edit Branch (users can access) */}
           <div className="flex group">
             <div className="w-1/3 bg-background p-4 text-right font-medium">
-              المستخدمين
+              {t("users")}
             </div>
             <div className="w-2/3 p-4 text-right border-b group-last:border-b-0">
               <div className="flex items-center justify-between">

@@ -29,7 +29,7 @@ type PropsT = {
 export default function AssignUsersToBranch(props: PropsT) {
   const { data } = useCompanyEmployees();
   const { data: authCompany } = useCurrentAuthCompany();
-  const t = useTranslations("companyProfile.tabs.branches.assignUsersDialog");
+  const t = useTranslations("companyProfile.branches.assignUsersDialog");
   const {
     branchId,
     usersIds,
@@ -72,11 +72,11 @@ export default function AssignUsersToBranch(props: PropsT) {
         body
       );
 
-      toast.success("تم تعيين المستخدمين بنجاح");
+      toast.success(t("assignSuccess"));
       handleBranchesRefetch();
       handleClose();
     } catch (error) {
-      toast.error("حدث خطأ أثناء تعيين المستخدمين");
+      toast.error(t("assignError"));
       console.log("Error in handleAssign", error);
     } finally {
       setIsLoading(false);

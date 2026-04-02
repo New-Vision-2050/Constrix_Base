@@ -44,6 +44,7 @@ import WorkOrdersView from "../work-orders";
 import FinancialView from "../financial";
 import ContractManagementView from "../contract-management";
 import { SettingsTabItemProps } from "../../types";
+import { APP_ICONS } from "@/constants/icons";
 
 function renderTabContent(tab: string, props: SettingsTabItemProps) {
   switch (tab) {
@@ -366,127 +367,133 @@ export default function SchemaLevelTabs({
     <Can check={[PERMISSIONS.projectType.list]}>
       <div className="space-y-4">
         <Grid container spacing={2}>
-        <Grid size={3}>
-          {thirdLevelQuery.isLoading && (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-              <CircularProgress size={28} />
-            </Box>
-          )}
-          {!thirdLevelQuery.isLoading && (
-            <Paper
-              sx={{
-                maxHeight: "70vh",
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <MenuList sx={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
-                {thirdLevelQuery.data?.map((item) => (
-                  <MenuItem
-                    selected={selectedSchema?.id === item.id}
-                    onClick={() => setSelectedSchema(item)}
-                    key={item.id}
-                    value={item.id}
-                    sx={{ px: 2, py: 1, borderRadius: 1 }}
-                  >
-                    <Box
+          <Grid size={3}>
+            {thirdLevelQuery.isLoading && (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                <CircularProgress size={28} />
+              </Box>
+            )}
+            {!thirdLevelQuery.isLoading && (
+              <Paper
+                sx={{
+                  maxHeight: "70vh",
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <MenuList sx={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
+                  {thirdLevelQuery.data?.map((item) => {
+                    const appIcon = APP_ICONS.find((i) => i.id === item.icon);
+                    const IconComponent = appIcon?.component;
+                    return (
+                      <MenuItem
+                        selected={selectedSchema?.id === item.id}
+                        onClick={() => setSelectedSchema(item)}
+                        key={item.id}
+                        value={item.id}
+                        sx={{ px: 2, py: 1, borderRadius: 1 }}
+                      >
+                        {IconComponent && <IconComponent size={16} />}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            width: "100%",
+                            marginX: "10px",
+                          }}
+                        >
+                          <Typography variant="subtitle1" fontWeight={500}>
+                            {item.name}
+                          </Typography>
+                          <Can check={[PERMISSIONS.projectType.update]}>
+                            <EditSubProjectTypeDialogTrigger
+                              item={item}
+                              parentId={parentId}
+                              onSuccess={() => {}}
+                            />
+                          </Can>
+                        </Box>
+                      </MenuItem>
+                    );
+                  })}
+                  <Can check={[PERMISSIONS.projectType.create]}>
+                    <MenuItem
+                      onClick={() => setAddDialogOpen(true)}
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
+                        px: 2,
+                        py: 1,
+                        borderRadius: 1,
+                        color: "primary.main",
                       }}
                     >
+                      <AddIcon fontSize="small" sx={{ mr: 1 }} />
                       <Typography variant="subtitle1" fontWeight={500}>
-                        {item.name}
+                        {t("add")}
                       </Typography>
-                      <Can check={[PERMISSIONS.projectType.update]}>
-                        <EditSubProjectTypeDialogTrigger
-                          item={item}
-                          parentId={parentId}
-                          onSuccess={() => {}}
-                        />
-                      </Can>
-                    </Box>
-                  </MenuItem>
-                ))}
-                <Can check={[PERMISSIONS.projectType.create]}>
-                  <MenuItem
-                    onClick={() => setAddDialogOpen(true)}
-                    sx={{
-                      px: 2,
-                      py: 1,
-                      borderRadius: 1,
-                      color: "primary.main",
-                    }}
-                  >
-                    <AddIcon fontSize="small" sx={{ mr: 1 }} />
-                    <Typography variant="subtitle1" fontWeight={500}>
-                      {t("add")}
-                    </Typography>
-                  </MenuItem>
-                </Can>
-              </MenuList>
-            </Paper>
-          )}
-          <AddSubProjectTypeDialog
-            open={addDialogOpen}
-            onClose={() => setAddDialogOpen(false)}
-            parentId={parentId}
-          />
-        </Grid>
-        <Grid size={9}>
-          {selectedSchema && !isLoading && effectiveTabValue && data && (
-            <div className="space-y-4">
-              <Paper>
-                <Tabs value={effectiveTabValue}>
-                  {filteredTabs.map((tab) => {
-                    const supportsBulk = BULK_TOGGLE_SUPPORTED_TABS.has(
-                      tab.value,
-                    );
-                    const bulkState = getTabBulkCheckboxState(
-                      tab.value,
-                      bulkSettingsData,
-                    );
-                    const loading = isBulkTabDataLoading(tab.value);
-                    const bulkCheckboxDisabled =
-                      !canUpdateProjectType ||
-                      bulkTogglesUpdating ||
-                      loading ||
-                      bulkState === null;
+                    </MenuItem>
+                  </Can>
+                </MenuList>
+              </Paper>
+            )}
+            <AddSubProjectTypeDialog
+              open={addDialogOpen}
+              onClose={() => setAddDialogOpen(false)}
+              parentId={parentId}
+            />
+          </Grid>
+          <Grid size={9}>
+            {selectedSchema && !isLoading && effectiveTabValue && data && (
+              <div className="space-y-4">
+                <Paper>
+                  <Tabs value={effectiveTabValue}>
+                    {filteredTabs.map((tab) => {
+                      const supportsBulk = BULK_TOGGLE_SUPPORTED_TABS.has(
+                        tab.value,
+                      );
+                      const bulkState = getTabBulkCheckboxState(
+                        tab.value,
+                        bulkSettingsData,
+                      );
+                      const loading = isBulkTabDataLoading(tab.value);
+                      const bulkCheckboxDisabled =
+                        !canUpdateProjectType ||
+                        bulkTogglesUpdating ||
+                        loading ||
+                        bulkState === null;
 
-                    return (
-                      <TabWithCheckbox
-                        key={tab.value}
-                        onClick={() => setSelectedTab(tab.value)}
-                        label={tab.name}
-                        value={tab.value}
-                        hideCheckbox={!supportsBulk}
-                        checked={bulkState?.checked ?? false}
-                        indeterminate={bulkState?.indeterminate ?? false}
-                        onCheckboxChange={(e) => {
-                          handleTabBulkCheckbox(e, tab.value);
-                        }}
+                      return (
+                        <TabWithCheckbox
+                          key={tab.value}
+                          onClick={() => setSelectedTab(tab.value)}
+                          label={tab.name}
+                          value={tab.value}
+                          hideCheckbox={!supportsBulk}
+                          checked={bulkState?.checked ?? false}
+                          indeterminate={bulkState?.indeterminate ?? false}
+                          onCheckboxChange={(e) => {
+                            handleTabBulkCheckbox(e, tab.value);
+                          }}
                         disabled={
                           supportsBulk ? bulkCheckboxDisabled : false
                         }
-                      />
-                    );
+                        />
+                      );
+                    })}
+                  </Tabs>
+                </Paper>
+                <Paper className="p-4">
+                  {renderTabContent(effectiveTabValue, {
+                    firstLevelId,
+                    secondLevelId: parentId,
+                    thirdLevelId: selectedSchema.id,
                   })}
-                </Tabs>
-              </Paper>
-              <Paper className="p-4">
-                {renderTabContent(effectiveTabValue, {
-                  firstLevelId,
-                  secondLevelId: parentId,
-                  thirdLevelId: selectedSchema.id,
-                })}
-              </Paper>
-            </div>
-          )}
+                </Paper>
+              </div>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
       </div>
     </Can>
   );

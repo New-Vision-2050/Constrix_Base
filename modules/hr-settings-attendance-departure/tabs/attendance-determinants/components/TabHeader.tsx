@@ -20,12 +20,7 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title: _title }) => {
 
   const textColor = isDarkMode ? "text-white" : "text-gray-900";
 
-  const {
-    activeConstraint,
-    refetchConstraints,
-    refetchConstraintsList,
-    branchesData,
-  } =
+  const { activeConstraint, refetchConstraints, refetchConstraintsList, handleNewDeterminantCreated, branchesData } =
     useAttendanceDeterminants();
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants"
@@ -50,6 +45,7 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title: _title }) => {
             config={getDynamicDeterminantFormConfig({
               refetchConstraints,
               refetchConstraintsList,
+              onNewDeterminantCreated: handleNewDeterminantCreated,
               branchesData,
               t,
               attendanceDaysDialogTranslations: (key: string) =>

@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
 import PickupMap from "@/components/shared/pickup-map";
+import { useTranslations } from "next-intl";
 
 export const updateBranchFormConfig = (
   branches: Branch[],
@@ -13,6 +14,8 @@ export const updateBranchFormConfig = (
 ) => {
   const mainBranch = branches.find((branch) => !Boolean(branch.parent_id));
   const { company_id }: { company_id: string | undefined } = useParams();
+  const t = useTranslations("companyProfile.branches.form");
+  const tLocation = useTranslations("location");
 
   const queryClient = useQueryClient();
   const formId = `update-branch-form-${company_id}-${branch.id}`;
@@ -25,7 +28,7 @@ export const updateBranchFormConfig = (
         queryKey: ["company-branches", company_id],
       });
     },
-    title: "تعديل الفرع",
+    title: t("editTitle"),
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -35,18 +38,18 @@ export const updateBranchFormConfig = (
         fields: [
           {
             name: "name",
-            label: "اسم الفرع",
-            placeholder: "اسم الفرع",
+            label: t("branchName"),
+            placeholder: t("branchNamePlaceholder"),
             type: "text",
             validation: [
               {
                 type: "required",
-                message: "ادخل اسم الفرع",
+                message: t("branchNameRequired"),
               },
             ],
           },
           {
-            label: "تعديل الموقع من الخريطة",
+            label: tLocation("chooseLocationCoordinates"),
             name: "map",
             type: "text",
             render: () => (
@@ -71,15 +74,15 @@ export const updateBranchFormConfig = (
             type: "text",
             render: () => (
               <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+                {t("mapNote")}
               </p>
             ),
           },
           {
             type: "select",
             name: "country_id",
-            label: "الدولة",
-            placeholder: "الدولة",
+            label: t("country"),
+            placeholder: t("countryPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
@@ -95,15 +98,15 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "الدولة",
+                message: t("countryRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "state_id",
-            label: "المحافظة",
-            placeholder: "المحافظة",
+            label: t("governorate"),
+            placeholder: t("governoratePlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
@@ -121,15 +124,15 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل المنطقة",
+                message: t("governorateRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "city_id",
-            label: "المدينة",
-            placeholder: "المدينة",
+            label: t("city"),
+            placeholder: t("cityPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
@@ -147,15 +150,15 @@ export const updateBranchFormConfig = (
           },
           {
             name: "parent_name",
-            label: "الفرع الرئيسي",
+            label: t("mainBranch"),
             type: "text",
             disabled: true,
           },
           {
             type: "select",
             name: "manager_id",
-            label: "مدير الفرع",
-            placeholder: "اختر مدير الفرع",
+            label: t("branchManager"),
+            placeholder: t("branchManagerPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/users`,
@@ -171,13 +174,13 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "مدير الفرع",
+                message: t("branchManagerRequired"),
               },
             ],
           },
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("mobileNumber"),
             type: "phone",
             required: true,
             validation: [
@@ -189,18 +192,18 @@ export const updateBranchFormConfig = (
           },
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("email"),
             type: "email",
-            placeholder: "البريد الالكتروني",
+            placeholder: t("emailPlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "ادخل البريد الالكتروني",
+                message: t("emailRequired"),
               },
               {
                 type: "email",
-                message: "البريد الالكتروني غير صحيح",
+                message: t("emailInvalid"),
               },
             ],
           },
@@ -212,7 +215,7 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل دائرة العرض",
+                message: t("latitudeRequired"),
               },
             ],
           },
@@ -224,7 +227,7 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل خط الطول",
+                message: t("longitudeRequired"),
               },
             ],
           },
@@ -236,8 +239,8 @@ export const updateBranchFormConfig = (
       parent_id: mainBranch?.id ?? "",
       parent_name: mainBranch?.name ?? "",
     },
-    submitButtonText: "تعديل",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("edit"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

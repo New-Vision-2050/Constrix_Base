@@ -52,6 +52,8 @@ function AttendanceDeterminantsTabContent() {
     constraintsList,
     constraintsListLoading,
     constraintsListError,
+    refetchConstraintsList,
+    handleNewDeterminantCreated,
   } = useAttendanceDeterminants();
 
   // Function to handle editing a determinant
@@ -71,6 +73,7 @@ function AttendanceDeterminantsTabContent() {
   const formConfig = getDynamicDeterminantFormConfig({
     refetchConstraints,
     refetchConstraintsList,
+    onNewDeterminantCreated: handleNewDeterminantCreated,
     branchesData,
     t,
     editConstraint: editingConstraint,

@@ -117,7 +117,9 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
       attendanceDaysRequired: _m("At least one attendance day is required", "يجب إضافة يوم حضور واحد على الأقل"),
       validationFailed: _m("Please review the required fields", "يرجى مراجعة الحقول المطلوبة"),
       location: _m("Location", "الموقع"),
-      duplicateDayError: _m("This day has already been selected", "هذا اليوم تم اختياره بالفعل")
+      duplicateDayError: _m("This day has already been selected", "هذا اليوم تم اختياره بالفعل"),
+      submitButtonText: _m("Save Determinant", "حفظ المحدد"),
+      cancelButtonText: _m("Cancel", "إلغاء")
     }),
     determinantsList: new MessagesGroup({
       allDeterminants: _m("All Determinants", "جميع المحددات")
