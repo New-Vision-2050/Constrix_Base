@@ -130,7 +130,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
         {
             label: t("editIcon"),
             icon: <EditIcon className="w-4 h-4" />,
-            disabled: true,
+            disabled:false,
             action: (row: { id: string }) => {
                 OnEdit(row.id);
             },
@@ -139,7 +139,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
         {
             label: t("deleteIcon"),
             icon: <TrashIcon className="w-4 h-4" />,
-            disabled: true,
+            disabled: false,
             action: (row: { id: string }) => {
                 setIconIdToDelete(row.id);
                 setOpenDeleteDialog(true);
