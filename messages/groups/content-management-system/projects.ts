@@ -187,6 +187,8 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
       "بيان المشروع بالإنجليزية يجب أن يكون على الأقل حرفين إذا تم توفيره"
     ),
     serviceRequired: _m("Service is required", "الخدمة مطلوبة"),
+    detailArPlaceholder: _m( "Enter Detail in Arabic", "أدخل بيان المشروع بالعربية"),
+    detailEnPlaceholder: _m( "Enter Detail in English", "أدخل بيان المشروع بالإنجليزية"),
   }),
   projectTypesTable: new MessagesGroup({
     addProjectType: _m("Add New Project Type", "اضافة نوع مشروع جديد"),
