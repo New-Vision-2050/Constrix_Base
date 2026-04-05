@@ -52,7 +52,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("countryRequired"),
               },
             ],
           },
@@ -77,7 +77,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("bankRequired"),
               },
             ],
           },
@@ -98,7 +98,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("accountTypeRequired"),
               },
             ],
           },
@@ -122,7 +122,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("currencyRequired"),
               },
             ],
           },
@@ -135,12 +135,12 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("ibanRequired"),
               },
               {
                 type: "pattern",
                 value: "^[A-Z]{2}[0-9A-Z]{13,32}$",
-                message: t("fieldRequired"),
+                message: t("ibanPattern"),
               },
             ],
           },
@@ -153,7 +153,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("userNameRequired"),
               },
             ],
           },
@@ -166,12 +166,12 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("accountNumberRequired"),
               },
               {
                 type: "pattern",
                 value: "^[0-9]{8,32}$",
-                message: t("fieldRequired"),
+                message: t("accountNumberPattern"),
               },
             ],
           },
@@ -184,12 +184,12 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: t("fieldRequired"),
+                message: t("swiftBicRequired"),
               },
               {
                 type: "pattern",
                 value: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-                message: t("fieldRequired"),
+                message: t("swiftBicPattern"),
               },
             ],
           },
@@ -230,34 +230,10 @@ export const BankingDataFormConfig = (props: PropsT) => {
       const method = formType !== "Edit" ? "POST" : "PUT";
       const url = `/bank_accounts${formType === "Edit" ? `/${bank?.id}` : ""}`;
 
-      const result = await defaultSubmitHandler(body, BankingFormConfig, {
+      return defaultSubmitHandler(body, BankingFormConfig, {
         url: url,
         method: method,
       });
-
-      // Translate API validation errors to current locale
-      if (!result.success && result.errors) {
-        const translatedErrors: Record<string, string | string[]> = {};
-        Object.entries(result.errors).forEach(([field, messages]) => {
-          const translatedMessage = t("fieldRequired");
-          translatedErrors[field] = Array.isArray(messages)
-            ? [translatedMessage]
-            : translatedMessage;
-        });
-
-        const translatedMessage =
-          result.message === "Validation failed"
-            ? t("validationFailed")
-            : result.message;
-
-        return {
-          ...result,
-          message: translatedMessage,
-          errors: translatedErrors,
-        };
-      }
-
-      return result;
     },
   };
   return BankingFormConfig;
