@@ -191,29 +191,16 @@ export function useSheetForm({
           return;
         }
 
-        // Check if field is required and has validation
         if (field.validation && config.formId) {
-          // Check if field has been touched (blurred)
-          const fieldTouched = formState.touched[field.name];
-
-          if (fieldTouched) {
-            // Field has been touched, get existing validation result from store
-            const existingError = formState.errors[field.name];
-            if (existingError) {
-              isValid = false;
-            }
-          } else {
-            // Field hasn't been touched, validate it now
-            const fieldIsValid = store.validateField(
-              config.formId,
-              field.name,
-              values[field.name],
-              field.validation,
-              values,
-            );
-            if (!fieldIsValid) {
-              isValid = false;
-            }
+          const fieldIsValid = store.validateField(
+            config.formId,
+            field.name,
+            values[field.name],
+            field.validation,
+            values,
+          );
+          if (!fieldIsValid) {
+            isValid = false;
           }
         }
       });
