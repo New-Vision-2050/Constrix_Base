@@ -25,7 +25,10 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
     type: string;
   }>>([]);
 
-  const getMaritalStatusType = (id: string): string | undefined => {
+  const getMaritalStatusType = (id: string | undefined): string | undefined => {
+    // Return undefined if id is not provided
+    if (!id) return undefined;
+    
     // First try to find in loaded options
     const foundType = maritalStatusOptions.find((item) => item.id === id)?.type;
     if (foundType) return foundType;
@@ -82,7 +85,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const maritalStatusId = values.marital_status_id as string;
               const type = getMaritalStatusType(maritalStatusId);
-              return type !== "not-married";
+              return type && type !== "not-married";
             },
             validation: [
               {
@@ -105,7 +108,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const maritalStatusId = values.marital_status_id as string;
               const type = getMaritalStatusType(maritalStatusId);
-              return type !== "not-married";
+              return type && type !== "not-married";
             },
             validation: [
               {
@@ -128,7 +131,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const maritalStatusId = values.marital_status_id as string;
               const type = getMaritalStatusType(maritalStatusId);
-              return type !== "not-married";
+              return type && type !== "not-married";
             },
             validation: [
               {
