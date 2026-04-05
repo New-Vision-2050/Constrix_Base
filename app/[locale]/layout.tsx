@@ -13,7 +13,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
 import CustomThemeProvider from "@/theme/theme";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import MuiCacheProvider from "@/providers/mui-cache-provider";
 import NextTopLoader from "nextjs-toploader";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -74,9 +74,12 @@ export default async function RootLayout({
   const direction = locale === "ar" ? "rtl" : "ltr";
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
-      <body className={cn(theSans.variable, "!pointer-events-auto")} suppressHydrationWarning>
+      <body
+        className={cn(theSans.variable, "!pointer-events-auto")}
+        suppressHydrationWarning
+      >
         <NextTopLoader />
-        <AppRouterCacheProvider>
+        <MuiCacheProvider direction={direction}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -95,7 +98,7 @@ export default async function RootLayout({
               </NextIntlClientProvider>
             </CustomThemeProvider>
           </ThemeProvider>
-        </AppRouterCacheProvider>
+        </MuiCacheProvider>
       </body>
     </html>
   );

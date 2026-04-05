@@ -192,8 +192,8 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
     });
 
   // ------------- return form config -------------
-  return {
-    formId: FORM_ID,
+  const formConfig: FormConfig = {
+    formId: "create-determinant-form",
     title,
     apiUrl: `${baseURL}/attendance/constraints`,
     initialValues: {
@@ -927,7 +927,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
 
       const result = await defaultSubmitHandler(
         data,
-        getDynamicDeterminantFormConfig(props),
+        formConfig,
         {
           url: Boolean(editConstraint)
             ? `${baseURL}/attendance/constraints/${editConstraint?.id}`
@@ -946,4 +946,6 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
     submitButtonText: formT("submitButtonText"),
     cancelButtonText: formT("cancelButtonText"),
   };
+  
+  return formConfig;
 };
