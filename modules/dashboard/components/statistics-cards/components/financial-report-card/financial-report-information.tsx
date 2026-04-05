@@ -8,13 +8,13 @@ export default function FinancialReportInformation() {
   return (
     <div className="flex min-w-0 flex-col gap-4 overflow-hidden">
       <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
           {t("financialReport")}
         </h3>
         <p className="text-sm text-gray-500">{t("monthlySalary")}</p>
       </div>
       <div>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-1">
           {totalAmount}
         </h3>
         <div className="flex gap-1 items-center">
