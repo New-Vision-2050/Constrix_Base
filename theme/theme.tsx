@@ -105,7 +105,7 @@ export default function CustomThemeProvider({
         },
       },
     });
-  }, [isLight]);
+  }, [isLight, direction]);
 
   const withResponsiveFontSizes = useMemo(
     () => responsiveFontSizes(theme),
