@@ -5,11 +5,11 @@ export default function WorkingTimeCardInformation() {
   return (
     <div className="flex min-w-0 flex-col justify-between gap-4 overflow-hidden">
       <div>
-        <h2 className="text-lg font-bold mb-1">{t("workingTime")}</h2>
-        <p className="text-md">{t("weeklyReport")}</p>
+        <h2 className="text-sm font-semibold mb-1">{t("workingTime")}</h2>
+        <p className="text-sm text-gray-500">{t("weeklyReport")}</p>
       </div>
       <div>
-        <h3 className="text-xl font-bold mb-2">
+        <h3 className="text-sm font-semibold mb-2">
           231<span>س</span> 14
           <span>د</span>
         </h3>
