@@ -78,7 +78,7 @@ export function createTableComponent<TRow>() {
       const rowId = getRowId(row, index);
       return selectable.selectedRows.some(
         (selectedRow, selectedIndex) =>
-          getRowId(selectedRow, selectedIndex) === rowId
+          getRowId(selectedRow, selectedIndex) === rowId,
       );
     };
 
@@ -113,7 +113,7 @@ export function createTableComponent<TRow>() {
       if (isSelected) {
         const newSelection = selectable.selectedRows.filter(
           (selectedRow, selectedIndex) =>
-            getRowId(selectedRow, selectedIndex) !== rowId
+            getRowId(selectedRow, selectedIndex) !== rowId,
         );
         selectable.onSelectionChange(newSelection);
       } else {
@@ -201,7 +201,7 @@ export function createTableComponent<TRow>() {
       <TableContainer>
         <Table
           sx={{
-            tableLayout: "fixed",
+            tableLayout: "auto",
             borderTopWidth: 1,
             borderTopColor: "divider",
             borderTopStyle: "solid",
@@ -258,41 +258,41 @@ export function createTableComponent<TRow>() {
             {loading
               ? renderLoadingState()
               : data.length === 0
-              ? renderEmptyState()
-              : data.map((row, index) => {
-                  const selected = isRowSelected(row, index);
-                  const isSticky =
-                    stateSelection?.isRowFromOtherPage(row) || false;
-                  return (
-                    <TableRow
-                      key={index}
-                      hover
-                      selected={selected}
-                      sx={{
-                        "&:last-child td, &:last-child th": { border: 0 },
-                        ...(isSticky && {
-                          backgroundColor: "action.hover",
-                          borderLeft: "3px solid",
-                          borderLeftColor: "primary.main",
-                        }),
-                      }}
-                    >
-                      {selectable && (
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={selected}
-                            onChange={() => handleRowSelect(row, index)}
-                          />
-                        </TableCell>
-                      )}
-                      {columns.map((column) => (
-                        <TableCell key={column.key}>
-                          {column.render(row, index, column)}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                })}
+                ? renderEmptyState()
+                : data.map((row, index) => {
+                    const selected = isRowSelected(row, index);
+                    const isSticky =
+                      stateSelection?.isRowFromOtherPage(row) || false;
+                    return (
+                      <TableRow
+                        key={index}
+                        hover
+                        selected={selected}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                          ...(isSticky && {
+                            backgroundColor: "action.hover",
+                            borderLeft: "3px solid",
+                            borderLeftColor: "primary.main",
+                          }),
+                        }}
+                      >
+                        {selectable && (
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selected}
+                              onChange={() => handleRowSelect(row, index)}
+                            />
+                          </TableCell>
+                        )}
+                        {columns.map((column) => (
+                          <TableCell key={column.key}>
+                            {column.render(row, index, column)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })}
           </TableBody>
         </Table>
       </TableContainer>

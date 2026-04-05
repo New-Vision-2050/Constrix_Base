@@ -8,7 +8,6 @@ import { DarkPalette } from "./dark.palette";
 import { useMemo, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { LightPalette } from "./light.palette";
-import RTLProvider from "./rtl";
 
 // Extend the TypeBackground and PaletteColorOptions interfaces
 declare module "@mui/material/styles" {
@@ -110,13 +109,11 @@ export default function CustomThemeProvider({
 
   const withResponsiveFontSizes = useMemo(
     () => responsiveFontSizes(theme),
-    [theme]
+    [theme],
   );
 
   return (
-    <ThemeProvider theme={withResponsiveFontSizes}>
-      <RTLProvider direction={direction || "ltr"}>{children}</RTLProvider>
-    </ThemeProvider>
+    <ThemeProvider theme={withResponsiveFontSizes}>{children}</ThemeProvider>
   );
 }
 type CustomThemeProviderProps = {
