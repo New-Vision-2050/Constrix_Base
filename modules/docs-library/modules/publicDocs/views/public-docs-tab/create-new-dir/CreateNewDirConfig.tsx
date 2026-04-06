@@ -13,6 +13,8 @@ export function getCreateNewDirConfig(
   parentId?: string,
   /** When set (project attachments tab), `parent_id` defaults to project root and `project_id` is sent on create. */
   projectId?: string,
+  /** When true, password field is omitted (project attachments). */
+  hidePassword?: boolean,
 ): FormConfig {
   const isEdit = Boolean(editedDoc);
   const formId = "create-new-dir-form";
@@ -24,6 +26,8 @@ export function getCreateNewDirConfig(
       ? `${baseURL}/folders/${editedDoc?.id}`
       : `${baseURL}/folders`,
     isEditMode: isEdit,
+    /** Backend expects POST for folder updates (not PUT). */
+    editApiMethod: "POST",
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -59,6 +63,7 @@ export function getCreateNewDirConfig(
             label: t("password"),
             type: "password",
             placeholder: t("passwordPlaceholder"),
+            ...(hidePassword ? { condition: () => false } : {}),
           },
           // public or private
           {
@@ -125,7 +130,14 @@ export function getCreateNewDirConfig(
       }
       return await defaultSubmitHandler(
         serialize(payload),
-        getCreateNewDirConfig(t, onSuccessFn, editedDoc, parentId, projectId),
+        getCreateNewDirConfig(
+          t,
+          onSuccessFn,
+          editedDoc,
+          parentId,
+          projectId,
+          hidePassword,
+        ),
         {
           url: isEdit
             ? `${baseURL}/folders/${editedDoc?.id}`

@@ -4,6 +4,7 @@ import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { getCreateNewDirConfig } from "./CreateNewDirConfig";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { useMemo } from "react";
+import { hidePasswordFieldForProjectScopedView } from "../utils/docs-attachment-form-options";
 
 interface PropsType {
   onClose: () => void;
@@ -26,10 +27,19 @@ export default function CreateNewDirForm({ onClose }: PropsType) {
     handleRefetchFoldersList();
   };
 
+  const hidePassword = hidePasswordFieldForProjectScopedView(projectId);
+
   const _config = useMemo(
     () =>
-      getCreateNewDirConfig(t, onSuccessFn, editedDoc, parentId, projectId),
-    [editedDoc, parentId, projectId],
+      getCreateNewDirConfig(
+        t,
+        onSuccessFn,
+        editedDoc,
+        parentId,
+        projectId,
+        hidePassword,
+      ),
+    [editedDoc, parentId, projectId, hidePassword],
   );
 
   // form builder vars

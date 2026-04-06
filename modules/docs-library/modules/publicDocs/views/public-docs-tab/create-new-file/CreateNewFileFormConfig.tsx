@@ -12,6 +12,8 @@ export function getCreateNewFileFormConfig(
   editedDoc?: DocumentT,
   parentId?: string,
   projectId?: string,
+  /** When true, password field is omitted (project attachments). */
+  hidePassword?: boolean,
 ): FormConfig {
   const isEdit = Boolean(editedDoc);
   const formId = "create-new-file-form";
@@ -21,6 +23,8 @@ export function getCreateNewFileFormConfig(
     formId,
     apiUrl: `${baseURL}/files`,
     isEditMode: isEdit,
+    /** Backend expects POST for file updates (not PUT). */
+    editApiMethod: "POST",
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -66,6 +70,7 @@ export function getCreateNewFileFormConfig(
             label: t("password"),
             type: "password",
             placeholder: t("passwordPlaceholder"),
+            ...(hidePassword ? { condition: () => false } : {}),
           },
           // created at
           {
@@ -153,7 +158,14 @@ export function getCreateNewFileFormConfig(
       }
       return await defaultSubmitHandler(
         serialize(payload),
-        getCreateNewFileFormConfig(t, onSuccessFn, editedDoc, parentId, projectId),
+        getCreateNewFileFormConfig(
+          t,
+          onSuccessFn,
+          editedDoc,
+          parentId,
+          projectId,
+          hidePassword,
+        ),
         {
           url: isEdit
             ? `${baseURL}/files/${editedDoc?.id}`

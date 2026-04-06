@@ -5,6 +5,7 @@ import { getCreateNewFileFormConfig } from "./CreateNewFileFormConfig";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { useMemo } from "react";
 import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import { hidePasswordFieldForProjectScopedView } from "../utils/docs-attachment-form-options";
 
 type PropsT = {
   onClose: () => void;
@@ -22,6 +23,8 @@ export default function CreateNewFileFormContent({ onClose }: PropsT) {
     refetchDocs();
   };
 
+  const hidePassword = hidePasswordFieldForProjectScopedView(projectId);
+
   const _config = useMemo(
     () =>
       getCreateNewFileFormConfig(
@@ -30,8 +33,9 @@ export default function CreateNewFileFormContent({ onClose }: PropsT) {
         editedDoc,
         parentId,
         projectId,
+        hidePassword,
       ),
-    [editedDoc, parentId, projectId],
+    [editedDoc, parentId, projectId, hidePassword],
   );
 
   // form builder vars
