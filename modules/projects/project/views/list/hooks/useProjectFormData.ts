@@ -7,6 +7,7 @@ export function useProjectFormData(
   watchSubProjectTypeId?: string,
   watchManagementId?: string,
   watchOwnerType?: "company" | "individual",
+  watchBranchId?: string,
 ) {
   const [searchParams, setSearchParams] = useState<Record<string, string>>({});
   const { data: projectTypesData } = useQuery({
@@ -50,13 +51,15 @@ export function useProjectFormData(
   });
 
   const { data: managementsData } = useQuery({
-    queryKey: ["managements", searchParams.management_id],
+    queryKey: ["managements", watchBranchId, searchParams.management_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getManagements(
-        searchParams.management_id ? { name: searchParams.management_id } : {},
-      );
+      const params: { name?: string; branch_id?: number } = {};
+      if (searchParams.management_id) params.name = searchParams.management_id;
+      if (watchBranchId) params.branch_id = Number(watchBranchId);
+      const response = await AllProjectsApi.getManagements(params);
       return response.data.payload ?? [];
     },
+    enabled: !!watchBranchId,
   });
 
   const { data: companyUsersData } = useQuery({

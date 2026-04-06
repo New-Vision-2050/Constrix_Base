@@ -69,6 +69,7 @@ export function ProjectFormDrawer({
 
   const watchProjectTypeId = watch("project_type_id");
   const watchSubProjectTypeId = watch("sub_project_type_id");
+  const watchBranchId = watch("branch_id");
   const watchManagementId = watch("management_id");
   const watchOwnerType = watch("project_owner_type");
 
@@ -77,7 +78,16 @@ export function ProjectFormDrawer({
     watchSubProjectTypeId,
     watchManagementId,
     watchOwnerType,
+    watchBranchId,
   );
+
+  // Reset management and manager when branch changes
+  useEffect(() => {
+    if (watchBranchId && !editingProjectId) {
+      setValue("management_id", "");
+      setValue("manager_id", "");
+    }
+  }, [watchBranchId, setValue, editingProjectId]);
 
   // Auto-select management director based on chosen management
   // Only runs when managementsData is loaded to avoid overwriting with empty string
@@ -228,6 +238,7 @@ export function ProjectFormDrawer({
           errors={errors}
           watchProjectTypeId={watchProjectTypeId}
           watchSubProjectTypeId={watchSubProjectTypeId}
+          watchBranchId={watchBranchId}
           watchManagementId={watchManagementId}
           watchOwnerType={watchOwnerType}
           {...formData}

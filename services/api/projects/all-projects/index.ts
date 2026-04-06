@@ -43,7 +43,7 @@ export const AllProjectsApi = {
   getBranches: (params?: { name?: string }) =>
     baseApi.get<GetBranchesResponse>("management_hierarchies/list?type=branch", { params }),
 
-  getManagements: (params?: { name?: string }) =>
+  getManagements: (params?: { name?: string; branch_id?: number }) =>
     baseApi.get<GetManagementsResponse>(
       "management_hierarchies/list?type=management",
       { params }
