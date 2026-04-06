@@ -7,6 +7,7 @@ import {
 import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
 import { SetStateAction } from "react";
 import { SingleCourseFormConfig } from "./single-course/SingleCourseFormConfig";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   open: boolean;
@@ -15,13 +16,14 @@ type PropsT = {
 
 export default function CreateCourseDialog(props: PropsT) {
   // declare and define component state and variables
+  const t = useTranslations("UserProfile.nestedTabs.academicExperience");
   const { open, setOpen } = props;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-center">اضافة كورس جديد</DialogTitle>
+          <DialogTitle className="text-center">{t("addCourse")}</DialogTitle>
         </DialogHeader>
         <FormContent
           config={SingleCourseFormConfig({
