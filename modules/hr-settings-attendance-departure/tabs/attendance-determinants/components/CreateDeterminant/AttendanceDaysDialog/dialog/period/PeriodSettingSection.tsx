@@ -60,7 +60,7 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
         label={t("earlyPeriodLabel")}
         inputType="number"
         inputDisabled={isEdit}
-        inputValue={period?.early_period || ""}
+        inputValue={period?.early_period ?? ""}
         onInputChange={handleEarlyPeriodChange}
         inputPlaceholder="30"
         selectOptions={timeUnitOptions}
@@ -73,7 +73,7 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
       <InputWithSelect
         label={t("latenessPeriodLabel")}
         inputType="number"
-        inputValue={period?.lateness_period || ""}
+        inputValue={period?.lateness_period ?? ""}
         onInputChange={handleLatenessPeriodChange}
         inputPlaceholder="30"
         selectOptions={timeUnitOptions}
