@@ -62,13 +62,6 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           valid={Boolean(bank?.iban)}
         />
       </div>
-      <div className="p-2">
-        <PreviewTextField
-          label="رمز الـ SWIFT/BIC"
-          value={bank?.swift_bic ?? ""}
-          valid={Boolean(bank?.swift_bic)}
-        />
-      </div>
     </div>
   );
 }
