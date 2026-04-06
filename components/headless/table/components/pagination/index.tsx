@@ -30,6 +30,7 @@ export function createPaginationComponent<TRow>() {
     const { pagination } = state;
     const t = useTranslations("Table");
     const locale = useLocale();
+    console.log("Locale from table pagination component", locale);
 
     return (
       <Grid container spacing={2}>
