@@ -1,6 +1,11 @@
 "use client";
 
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+} from "react";
 import useDocsWidgets from "../hooks/useDocsWidgets";
 import { DocsWidgetsT } from "../api/get-docs-widgets";
 
@@ -13,6 +18,11 @@ interface CxtType {
 
 // Create the context
 const Cxt = createContext<CxtType | undefined>(undefined);
+
+/** Safe outside `DocsLibraryCxtProvider` (returns `undefined`). */
+export function useOptionalDocsLibraryCxt() {
+  return useContext(Cxt);
+}
 
 // Provider component
 interface PropsT {

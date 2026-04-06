@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import ShareDialog from "../../../views/public-docs-tab/share-dialog";
-import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 /**
  * Action buttons component
@@ -41,15 +41,16 @@ export const ActionButtons = ({ document, isFolder }: ActionButtonsProps) => {
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const [openDelete, setOpenDelete] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
-  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
+  const docsLibrary = useOptionalDocsLibraryCxt();
   const {
+    projectId,
     setOpenDirDialog,
     setOpenFileDialog,
     setEditedDoc,
     refetchDocs,
     selectedDocument,
     storeSelectedDocument,
-    clearSelectedDocs
+    clearSelectedDocs,
   } = usePublicDocsCxt();
 
   // check current doc in details
@@ -66,7 +67,9 @@ export const ActionButtons = ({ document, isFolder }: ActionButtonsProps) => {
       setOpenDelete(false);
       clearSelectedDocs();
       refetchDocs();
-      if (!isFolder) handleRefetchDocsWidgets();
+      if (!isFolder && !projectId) {
+        docsLibrary?.handleRefetchDocsWidgets();
+      }
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));

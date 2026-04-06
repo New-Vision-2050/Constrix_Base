@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 export default function GridItem({
   document,
@@ -39,6 +39,7 @@ export default function GridItem({
   // declare and define component variables
   const date = new Date(document?.created_at);
   const {
+    projectId,
     setOpenDirWithPassword,
     setTempParentId,
     setParentId,
@@ -53,7 +54,7 @@ export default function GridItem({
     setDocToView,
   } = usePublicDocsCxt();
   const { can } = usePermissions();
-  const { handleRefetchDocsWidgets, handleChangeParentId } = useDocsLibraryCxt();
+  const docsLibrary = useOptionalDocsLibraryCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -113,7 +114,9 @@ export default function GridItem({
         setTempParentId(document.id);
       } else {
         setParentId(document.id);
-        handleChangeParentId(document.id);
+        if (!projectId) {
+          docsLibrary?.handleChangeParentId(document.id);
+        }
       }
       setVisitedDirs((prev) => [...prev, document]);
     }
@@ -135,7 +138,9 @@ export default function GridItem({
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
       refetchDocs();
-      if (!isDir) handleRefetchDocsWidgets();
+      if (!isDir && !projectId) {
+        docsLibrary?.handleRefetchDocsWidgets();
+      }
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Copy, FolderSymlink, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import useCopyMoveFile from "../../../hooks/useCopyMoveFile";
 
@@ -32,15 +32,22 @@ export default function CopyMoveDialog({ open, onClose, type }: PropsType) {
     isLoadingFoldersList,
     selectedDocs,
     refetchDocs,
-    clearSelectedDocs
+    clearSelectedDocs,
+    projectId,
   } = usePublicDocsCxt();
-  const [value, setValue] = useState(foldersList?.[0]?.name);
+  const [value, setValue] = useState<string | undefined>(undefined);
 
-  // mutation for copy/move
+  useEffect(() => {
+    if (foldersList?.[0] && value === undefined) {
+      setValue(foldersList[0].id);
+    }
+  }, [foldersList, value]);
+
   const copyMoveMutation = useCopyMoveFile({
     type,
+    projectId,
     onSuccess: () => {
-      clearSelectedDocs(); 
+      clearSelectedDocs();
       onClose();
       if (type == "move") refetchDocs();
     },

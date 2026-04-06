@@ -10,10 +10,15 @@ export function getCreateNewDirConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
   editedDoc?: DocumentT,
-  parentId?: string
+  parentId?: string,
+  /** When set (project attachments tab), `parent_id` defaults to project root and `project_id` is sent on create. */
+  projectId?: string,
+  /** When true, password field is omitted (project attachments). */
+  hidePassword?: boolean,
 ): FormConfig {
   const isEdit = Boolean(editedDoc);
   const formId = "create-new-dir-form";
+  const folderScopeId = parentId ?? projectId;
 
   return {
     formId,
@@ -21,13 +26,15 @@ export function getCreateNewDirConfig(
       ? `${baseURL}/folders/${editedDoc?.id}`
       : `${baseURL}/folders`,
     isEditMode: isEdit,
+    /** Backend expects POST for folder updates (not PUT). */
+    editApiMethod: "POST",
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
     },
     initialValues: {
       name: editedDoc?.name ?? "",
-      parent_id: isEdit ? editedDoc?.parent_id : parentId,
+      parent_id: isEdit ? editedDoc?.parent_id : folderScopeId,
       // password: ,
       access_type: editedDoc?.access_type ?? "public",
       user_ids: editedDoc?.users?.map((usr) => usr.id) ?? [],
@@ -56,6 +63,7 @@ export function getCreateNewDirConfig(
             label: t("password"),
             type: "password",
             placeholder: t("passwordPlaceholder"),
+            ...(hidePassword ? { condition: () => false } : {}),
           },
           // public or private
           {
@@ -81,7 +89,7 @@ export function getCreateNewDirConfig(
             isMulti: true,
             placeholder: t("usersPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/folders/${parentId}/users`,
+              url: `${baseURL}/folders/${folderScopeId}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -116,14 +124,25 @@ export function getCreateNewDirConfig(
     // editDataTransformer: (data) => {},
     onSuccess: onSuccessFn,
     onSubmit: async (formData) => {
+      const payload = { ...formData } as Record<string, unknown>;
+      if (projectId) {
+        payload.project_id = projectId;
+      }
       return await defaultSubmitHandler(
-        serialize(formData),
-        getCreateNewDirConfig(t, onSuccessFn),
+        serialize(payload),
+        getCreateNewDirConfig(
+          t,
+          onSuccessFn,
+          editedDoc,
+          parentId,
+          projectId,
+          hidePassword,
+        ),
         {
           url: isEdit
             ? `${baseURL}/folders/${editedDoc?.id}`
             : `${baseURL}/folders`,
-        }
+        },
       );
     },
     submitButtonText: t("submitButtonText"),

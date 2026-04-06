@@ -3,7 +3,7 @@ import Contract from "./component/Contract";
 import Items from "./component/Items";
 import React from "react";
 import { Box } from "@mui/material";
-import { SettingsTabItemProps } from "../types";
+import { SettingsTabItemProps } from "../../types";
 
 export default function AttachmentsView({
   thirdLevelId: projectTypeId,

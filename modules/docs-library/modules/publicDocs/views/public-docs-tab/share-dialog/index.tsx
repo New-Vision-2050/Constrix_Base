@@ -11,10 +11,25 @@ import {
 } from "@/components/ui/dialog";
 import { Copy, FolderSymlink, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import type { DocumentT } from "../../../types/Directory";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+
+/** Files chosen in the table, or the file open in the preview dialog (`docToView`). */
+function getFilesToShare(
+  selectedDocs: DocumentT[],
+  docToView: DocumentT | undefined,
+): DocumentT[] {
+  const fromTable = (selectedDocs ?? []).filter((doc) => Boolean(doc?.is_file));
+  if (fromTable.length) return fromTable;
+  const previewFile =
+    docToView &&
+    (Boolean(docToView.is_file) || Boolean(docToView.file?.url));
+  if (previewFile) return [docToView];
+  return [];
+}
 
 type PropsType = {
   open: boolean;
@@ -26,10 +41,15 @@ export default function ShareDialog({ open, onClose }: PropsType) {
   const lang = useLocale();
   const isRtl = lang === "ar";
   // translate
-  const { usersList, selectedDocs } = usePublicDocsCxt();
+  const { usersList, selectedDocs, docToView } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.shareDialog");
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const filesToShare = useMemo(
+    () => getFilesToShare(selectedDocs ?? [], docToView),
+    [selectedDocs, docToView],
+  );
 
   const handleSelectionChange = (selectedValues: string[]) => {
     setSelectedIds(selectedValues);
@@ -39,9 +59,7 @@ export default function ShareDialog({ open, onClose }: PropsType) {
     setLoading(true);
     try {
       const _url = baseURL + "/files/share";
-      const files = selectedDocs?.filter((doc) =>
-        Boolean(doc.reference_number)
-      );
+      const files = filesToShare;
       if (!files?.length) {
         toast.error(t("noFilesSelected"));
         return;
@@ -61,9 +79,7 @@ export default function ShareDialog({ open, onClose }: PropsType) {
 
   const handleClickLink = () => {
     try {
-      const files = selectedDocs?.filter((doc) =>
-        Boolean(doc.reference_number)
-      );
+      const files = filesToShare;
       if (!files?.length) {
         toast.error(t("noFilesSelected"));
         return;
