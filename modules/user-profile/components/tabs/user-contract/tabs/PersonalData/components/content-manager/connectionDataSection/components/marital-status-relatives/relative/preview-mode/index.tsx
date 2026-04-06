@@ -27,14 +27,14 @@ export default function MaritalStatusRelativesSectionPreviewMode({
         <>
           <div className="p-2">
             <PreviewTextField
-              label="اسم شخص في حالة الطواري"
+              label={t("relativeName")}
               value={relative?.name}
               valid={Boolean(relative?.name)}
             />
           </div>
           <div className="p-2">
             <PreviewTextField
-              label="علاقة الشخص بحاله الطواري"
+              label={t("relationship")}
               value={relative?.relationship}
               valid={Boolean(relative?.relationship)}
             />
@@ -45,7 +45,7 @@ export default function MaritalStatusRelativesSectionPreviewMode({
       {!isNotMarried && (
         <div className="p-2 col-span-2">
           <PreviewTextField
-            label=" رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ"
+            label={t("phone")}
             value={relative?.phone}
             valid={Boolean(relative?.phone)}
           />

@@ -10,15 +10,21 @@ export function getCreateNewFileFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
   editedDoc?: DocumentT,
-  parentId?: string
+  parentId?: string,
+  projectId?: string,
+  /** When true, password field is omitted (project attachments). */
+  hidePassword?: boolean,
 ): FormConfig {
   const isEdit = Boolean(editedDoc);
   const formId = "create-new-file-form";
+  const folderScopeId = parentId ?? projectId;
 
   return {
     formId,
     apiUrl: `${baseURL}/files`,
     isEditMode: isEdit,
+    /** Backend expects POST for file updates (not PUT). */
+    editApiMethod: "POST",
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -26,7 +32,7 @@ export function getCreateNewFileFormConfig(
     initialValues: {
       name: editedDoc?.name ?? "",
       reference_number: editedDoc?.reference_number ?? "",
-      parent_id: isEdit ? editedDoc?.parent_id : parentId,
+      parent_id: isEdit ? editedDoc?.parent_id : folderScopeId,
       // password: editedDoc?.password,
       start_date: editedDoc?.start_date ?? new Date().toISOString(),
       end_date: editedDoc?.end_date ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -64,6 +70,7 @@ export function getCreateNewFileFormConfig(
             label: t("password"),
             type: "password",
             placeholder: t("passwordPlaceholder"),
+            ...(hidePassword ? { condition: () => false } : {}),
           },
           // created at
           {
@@ -111,7 +118,7 @@ export function getCreateNewFileFormConfig(
             isMulti: true,
             placeholder: t("usersPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/folders/${parentId}/users`,
+              url: `${baseURL}/folders/${folderScopeId}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -145,14 +152,25 @@ export function getCreateNewFileFormConfig(
     // editDataTransformer: (data) => {},
     onSuccess: onSuccessFn,
     onSubmit: async (formData) => {
+      const payload = { ...formData } as Record<string, unknown>;
+      if (projectId) {
+        payload.project_id = projectId;
+      }
       return await defaultSubmitHandler(
-        serialize(formData),
-        getCreateNewFileFormConfig(t, onSuccessFn),
+        serialize(payload),
+        getCreateNewFileFormConfig(
+          t,
+          onSuccessFn,
+          editedDoc,
+          parentId,
+          projectId,
+          hidePassword,
+        ),
         {
           url: isEdit
             ? `${baseURL}/files/${editedDoc?.id}`
             : `${baseURL}/files`,
-        }
+        },
       );
     },
     submitButtonText: t("submitButtonText"),

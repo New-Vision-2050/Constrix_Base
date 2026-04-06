@@ -8,6 +8,7 @@ import {
 import { X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import CreateNewFileFormContent from "./CreateNewFileFormContent";
+import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 
 type PropsType = {
   open: boolean;
@@ -19,9 +20,17 @@ export default function CreateNewFileDialog({ open, onClose }: PropsType) {
   const isRtl = lang === "ar";
   // translate
   const t = useTranslations("docs-library.publicDocs.createNewFileDialog");
+  const { setEditedDoc } = usePublicDocsCxt();
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setEditedDoc(undefined);
+      onClose();
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-md w-full" dir={isRtl ? "rtl" : "ltr"}>
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-semibold text-foreground">

@@ -4,6 +4,7 @@ import { SearchFields } from "../../components/search-fields";
 import ModeViewsManager from "./ModeViewsManager";
 import AllBranchesBtnList from "./AllBranchesList";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
+import { hideBranchesSectionForProjectScopedView } from "./utils/docs-attachment-form-options";
 import VisitedDirsList from "./VisitedDirsList";
 import DocViewDialog from "./DocViewDialog";
 
@@ -13,8 +14,7 @@ export default function PublicDocsTabEntryPoint() {
     storeSelectedDocument,
     searchData,
     setSearchData,
-    docToView,
-    setDocToView,
+    projectId,
   } = usePublicDocsCxt();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
@@ -47,7 +47,9 @@ export default function PublicDocsTabEntryPoint() {
         onViewModeChange={handleViewModeChange}
         isLoading={false}
       />
-      <AllBranchesBtnList />
+      {!hideBranchesSectionForProjectScopedView(projectId) && (
+        <AllBranchesBtnList />
+      )}
       <VisitedDirsList />
       <ModeViewsManager viewMode={viewMode} />
       <DocViewDialog />

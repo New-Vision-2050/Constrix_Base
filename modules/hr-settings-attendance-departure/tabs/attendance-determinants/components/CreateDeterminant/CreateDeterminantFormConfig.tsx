@@ -127,14 +127,16 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
           dayConfig?.periods?.map((period) => ({
             from: period.start_time,
             to: period.end_time,
-            early_period:
-              (dayConfig as any)?.early_clock_in_rules?.early_period ||
-              DEFAULT_TIME_THRESHOLD_MINUTES,
+            early_period: (() => {
+              const v = (dayConfig as any)?.early_clock_in_rules?.early_period;
+              return v != null && v !== "" ? Number(v) : DEFAULT_TIME_THRESHOLD_MINUTES;
+            })(),
             early_unit:
               (dayConfig as any)?.early_clock_in_rules?.early_unit || "minute",
-            lateness_period:
-              (dayConfig as any)?.lateness_rules?.lateness_period ||
-              DEFAULT_TIME_THRESHOLD_MINUTES,
+            lateness_period: (() => {
+              const v = (dayConfig as any)?.lateness_rules?.lateness_period;
+              return v != null && v !== "" ? Number(v) : DEFAULT_TIME_THRESHOLD_MINUTES;
+            })(),
             lateness_unit:
               (dayConfig as any)?.lateness_rules?.lateness_unit || "minute",
             extends_to_next_day: Boolean(period?.extends_to_next_day) ? 1 : undefined,
@@ -782,13 +784,15 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
 
                 // Get the first period's rules (if exists) or use defaults
                 const firstPeriod = currentDaySchedule?.periods?.[0] || {};
-                const earlyPeriod =
-                  Number(firstPeriod.early_period) ||
-                  DEFAULT_TIME_THRESHOLD_MINUTES;
+                const earlyPeriod = (() => {
+                  const v = firstPeriod.early_period;
+                  return v != null && v !== "" ? Number(v) : DEFAULT_TIME_THRESHOLD_MINUTES;
+                })();
                 const earlyUnit = firstPeriod.early_unit || "minute";
-                const latenessPeriod =
-                  Number(firstPeriod.lateness_period) ||
-                  DEFAULT_TIME_THRESHOLD_MINUTES;
+                const latenessPeriod = (() => {
+                  const v = firstPeriod.lateness_period;
+                  return v != null && v !== "" ? Number(v) : DEFAULT_TIME_THRESHOLD_MINUTES;
+                })();
                 const latenessUnit = firstPeriod.lateness_unit || "minute";
 
                 // Add the day to the final object with enhanced structure

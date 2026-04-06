@@ -32,7 +32,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 /**
  * DocumentsHeader component for document management interface
@@ -50,7 +50,9 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 }) => {
   const t = useTranslations("docs-library.publicDocs.header");
   const { can } = usePermissions();
+  const docsLibrary = useOptionalDocsLibraryCxt();
   const {
+    projectId,
     sort,
     setSort,
     openDirDialog,
@@ -63,7 +65,6 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     clearSelectedDocs,
     storeSelectedDocument,
   } = usePublicDocsCxt();
-  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const [cpMvDialogType, setcpMvDialogType] = useState<"copy" | "move">("copy");
   const [openCopyMoveDialog, setOpenCopyMoveDialog] = useState(false);
@@ -88,7 +89,9 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       setOpenDelete(false);
       clearSelectedDocs();
       refetchDocs();
-      if (!isDirectory) handleRefetchDocsWidgets();
+      if (!isDirectory && !projectId) {
+        docsLibrary?.handleRefetchDocsWidgets();
+      }
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));
