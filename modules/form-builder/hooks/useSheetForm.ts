@@ -192,15 +192,38 @@ export function useSheetForm({
         }
 
         if (field.validation && config.formId) {
-          const fieldIsValid = store.validateField(
-            config.formId,
-            field.name,
-            values[field.name],
-            field.validation,
-            values,
+          // Exclude apiValidation rules from the sync validation pass —
+          // they were already triggered (and their result stored) while the
+          // user was typing. Re-running them here schedules a new debounced
+          // API call and sets validatingFields=true, which causes handleSubmit
+          // to return early on every click instead of submitting.
+          const syncRules = field.validation.filter(
+            (r) => r.type !== "apiValidation",
           );
-          if (!fieldIsValid) {
-            isValid = false;
+
+          if (syncRules.length > 0) {
+            const fieldIsValid = store.validateField(
+              config.formId,
+              field.name,
+              values[field.name],
+              syncRules,
+              values,
+            );
+            if (!fieldIsValid) {
+              isValid = false;
+            }
+          }
+
+          // For fields that have an apiValidation rule, honour the error that
+          // the API already wrote into the store (if any).
+          const hasApiRule = field.validation.some(
+            (r) => r.type === "apiValidation",
+          );
+          if (hasApiRule) {
+            const existingApiError = formState.errors[field.name];
+            if (existingApiError) {
+              isValid = false;
+            }
           }
         }
       });
@@ -670,16 +693,24 @@ export function useSheetForm({
   // Handle form cancel
   const handleCancel = useCallback(() => {
     resetForm();
-if(isStepBased){setCurrentStep(0);
-    closeSheet();
-}
+    if (isStepBased) {
+      setCurrentStep(0);
+      closeSheet();
+    }
     // Call onCancel callback if provided
     if (onCancel) {
       onCancel();
     } else if (config.onCancel) {
       config.onCancel();
     }
-  }, [closeSheet, isStepBased, setCurrentStep, resetForm, onCancel, config.onCancel]);
+  }, [
+    closeSheet,
+    isStepBased,
+    setCurrentStep,
+    resetForm,
+    onCancel,
+    config.onCancel,
+  ]);
 
   return {
     isOpen,
