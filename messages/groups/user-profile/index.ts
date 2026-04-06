@@ -607,6 +607,8 @@ export const userProfileMessages = new MessagesGroup({
         "Please enter a valid phone number",
         "برجاء ادخال رقم هاتف صحيح",
       ),
+      relativeName: _m("Relative Name", "اسم القريب"),
+      phoneRelative: _m("Phone Relative", "رقم الهاتف الخاص بالقريب"),
     }),
     socialData: new MessagesGroup({
       title: _m("Social Data", "حسابات التواصل الاجتماعي"),
