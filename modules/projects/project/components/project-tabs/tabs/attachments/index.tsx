@@ -1,15 +1,15 @@
 "use client";
 
-import { ProjectAttachmentsCxtProvider } from "./context/project-attachments-cxt";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
-import ProjectAttachmentsEntryPoint from "./entry-point";
+import { PublicDocsCxtProvider } from "@/modules/docs-library/modules/publicDocs/contexts/public-docs-cxt";
+import PublicDocsTabEntryPoint from "@/modules/docs-library/modules/publicDocs/views/public-docs-tab/entry-point";
 
 export default function AttachmentsTab() {
   const { projectId } = useProject();
 
   return (
-    <ProjectAttachmentsCxtProvider projectId={projectId}>
-      <ProjectAttachmentsEntryPoint />
-    </ProjectAttachmentsCxtProvider>
+    <PublicDocsCxtProvider projectId={projectId}>
+      <PublicDocsTabEntryPoint />
+    </PublicDocsCxtProvider>
   );
 }

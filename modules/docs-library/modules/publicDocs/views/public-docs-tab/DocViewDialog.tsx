@@ -18,18 +18,18 @@ import {
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 import { useTranslations } from "next-intl";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import ShareDialog from "./share-dialog";
 
 export default function DocViewDialog() {
   const [loading, setLoading] = useState(false);
-  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
+  const docsLibrary = useOptionalDocsLibraryCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
-  const { docToView, setDocToView, refetchDocs } = usePublicDocsCxt();
+  const { docToView, setDocToView, refetchDocs, projectId } = usePublicDocsCxt();
   const fileType = docToView?.file?.type;
   const isImg = fileType == "image";
   const [isFavorite, setIsFavorite] = useState(
@@ -53,7 +53,9 @@ export default function DocViewDialog() {
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
       refetchDocs();
-      handleRefetchDocsWidgets();
+      if (!projectId) {
+        docsLibrary?.handleRefetchDocsWidgets();
+      }
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));

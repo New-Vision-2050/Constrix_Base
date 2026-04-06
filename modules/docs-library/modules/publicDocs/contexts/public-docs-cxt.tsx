@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, ReactNode, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 import useDocsData from "../hooks/useDocsData";
 import { DocsResPaginatedT, GetDocsResT } from "../apis/get-docs";
 import { DocumentT } from "../types/Directory";
@@ -9,141 +15,90 @@ import { SelectOption } from "@/types/select-option";
 import { SearchFormData } from "../components/search-fields";
 import useUsersData from "../hooks/useUsersData";
 
-// Define context type
 interface CxtType {
-  // show item details
   showItemDetials: boolean;
   toggleShowItemDetials: () => void;
-  // docs
   docs: GetDocsResT | undefined;
   docsPagination: DocsResPaginatedT | undefined;
   isLoadingDocs: boolean;
   refetchDocs: () => void;
-
-  // selectedDocument
   selectedDocument: DocumentT | undefined;
   storeSelectedDocument: (document: DocumentT | undefined) => void;
-
-  // branchId
   branchId: string;
   handleSetBranchId: (branchId: string) => void;
-  // dialogs control
   openDirDialog: boolean;
   setOpenDirDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openFileDialog: boolean;
   setOpenFileDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openDirWithPassword: boolean;
   setOpenDirWithPassword: React.Dispatch<React.SetStateAction<boolean>>;
-
-  // edited doc
   editedDoc: DocumentT | undefined;
   setEditedDoc: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
-
-  // folder parent id
   parentId: string | undefined;
   setParentId: React.Dispatch<React.SetStateAction<string | undefined>>;
-
-  // deleted doc id
   deletedDocId: string | undefined;
   setDeletedDocId: React.Dispatch<React.SetStateAction<string | undefined>>;
-
-  // dir password
   dirPassword: string | undefined;
   setDirPassword: React.Dispatch<React.SetStateAction<string | undefined>>;
-  // tempParentId
   tempParentId: string;
   setTempParentId: React.Dispatch<React.SetStateAction<string>>;
-  // selected docs
   selectedDocs: DocumentT[];
   toggleDocInSelectedDocs: (doc: DocumentT) => void;
   clearSelectedDocs: () => void;
-
-  // pagination variables
   limit: number;
   setLimit: React.Dispatch<React.SetStateAction<number>>;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
-
-  // folders list
   foldersList: SelectOption[] | undefined;
   isLoadingFoldersList: boolean;
   isErrorFoldersList: boolean;
   handleRefetchFoldersList: () => void;
-
-  // search params
   searchData: SearchFormData;
   setSearchData: React.Dispatch<React.SetStateAction<SearchFormData>>;
-
-  // visited dir
   visitedDirs: DocumentT[];
   setVisitedDirs: React.Dispatch<React.SetStateAction<DocumentT[]>>;
-
-  // sort
   sort: string;
   setSort: React.Dispatch<React.SetStateAction<string>>;
-
-  // users list
   usersList: SelectOption[] | undefined;
   handleRefetchUsersList: () => void;
-
-  // docToView
   docToView: DocumentT | undefined;
   setDocToView: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
+  /** Set when viewing project attachments — folder APIs are project-scoped. */
+  projectId?: string;
 }
 
-// Create the context
 const Cxt = createContext<CxtType | undefined>(undefined);
 
-// Provider component
-interface PropsT {
+type LibraryProps = {
   children: ReactNode;
   fixedType?: string;
-}
+};
 
-export const PublicDocsCxtProvider: React.FC<PropsT> = ({
-  children,
-  fixedType,
-}) => {
-  // ** declare and define helper variables
+function LibraryPublicDocsProviderInner({ children, fixedType }: LibraryProps) {
   const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
   const [branchId, setBranchId] = useState("all");
-  // dialogs control
   const [openDirDialog, setOpenDirDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
   const [openDirWithPassword, setOpenDirWithPassword] = useState(false);
-  // deleted doc id
   const [deletedDocId, setDeletedDocId] = useState<string>();
-  // edited doc
   const [editedDoc, setEditedDoc] = useState<DocumentT | undefined>(undefined);
-  // parent id
   const [parentId, setParentId] = useState<string>();
   const [dirPassword, setDirPassword] = useState<string>();
   const [tempParentId, setTempParentId] = useState("");
-  // selected docs
   const [selectedDocs, setSelectedDocs] = useState<DocumentT[]>([]);
-
-  // visited dirs
   const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
-
-  // users list
-  const { data: usersList, refetch: refetchUsersList } = useUsersData();
-
-  // docToView
   const [docToView, setDocToView] = useState<DocumentT | undefined>(undefined);
-
-  // sort
   const [sort, setSort] = useState("desc");
-
-  // search params
   const [searchData, setSearchData] = useState<SearchFormData>({
     endDate: "",
     type: "",
     documentType: "",
   });
-  // pagination variables
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+
+  const { data: usersList, refetch: refetchUsersList } = useUsersData();
 
   const {
     data: docsResponse,
@@ -160,9 +115,6 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
     fixedType,
   );
 
-  const handleRefetchUsersList = () => refetchUsersList();
-
-  // folders list
   const {
     data: foldersList,
     isLoading: isLoadingFoldersList,
@@ -170,18 +122,14 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
     refetch: refetchFoldersList,
   } = useFoldersList();
 
-  //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
-
   const storeSelectedDocument = (document: DocumentT | undefined) => {
     setSelectedDocument(document);
   };
-
-  const handleSetBranchId = (branchId: string) => setBranchId(branchId);
+  const handleSetBranchId = (id: string) => setBranchId(id);
 
   const toggleDocInSelectedDocs = (doc: DocumentT) => {
     const _doc = selectedDocs.find((d) => d.id === doc.id);
-
     if (_doc) {
       setSelectedDocs(selectedDocs.filter((d) => d.id !== _doc.id));
     } else {
@@ -193,86 +141,240 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
     setSelectedDocs([]);
   };
 
-  const handleRefetchFoldersList = () => refetchFoldersList();
-
-  // ** return provider
   return (
     <Cxt.Provider
       value={{
-        // show item details
         showItemDetials,
-        // toggle show item details
         toggleShowItemDetials,
-        // docs
         docs: docsResponse?.payload,
         docsPagination: docsResponse?.pagination,
         isLoadingDocs,
         refetchDocs,
-        // selectedDocument
         selectedDocument,
         storeSelectedDocument,
-        // branchId
         branchId,
         handleSetBranchId,
-        // dialogs control
         openDirDialog,
         setOpenDirDialog,
         openFileDialog,
         setOpenFileDialog,
         openDirWithPassword,
         setOpenDirWithPassword,
-        // edited doc
         editedDoc,
         setEditedDoc,
-        // folder parent id
         parentId,
         setParentId,
-        // deleted doc id
         deletedDocId,
         setDeletedDocId,
-        // dir password
         dirPassword,
         setDirPassword,
-        // temp parent id
         tempParentId,
         setTempParentId,
-        // selected docs
         selectedDocs,
         toggleDocInSelectedDocs,
         clearSelectedDocs,
-        // pagination variables
         limit,
         setLimit,
         page,
         setPage,
-        // folders list
         foldersList,
         isLoadingFoldersList,
         isErrorFoldersList,
-        handleRefetchFoldersList,
-        // search params
+        handleRefetchFoldersList: () => refetchFoldersList(),
         searchData,
         setSearchData,
-        // visited dirs
         visitedDirs,
         setVisitedDirs,
-        // sort
         sort,
         setSort,
-        // docToView
         docToView,
         setDocToView,
-        // users list
         usersList,
-        handleRefetchUsersList,
+        handleRefetchUsersList: () => refetchUsersList(),
+        projectId: undefined,
       }}
     >
       {children}
     </Cxt.Provider>
   );
+}
+
+type ProjectProps = {
+  children: ReactNode;
+  fixedType?: string;
+  projectId: string;
+  initialParentId?: string;
 };
 
-// Custom hook to use the context
+function ProjectPublicDocsProviderInner({
+  children,
+  fixedType,
+  projectId,
+  initialParentId,
+}: ProjectProps) {
+  const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
+  const [showItemDetials, setShowItemDetials] = useState(false);
+  const [branchId, setBranchId] = useState("all");
+  const [openDirDialog, setOpenDirDialog] = useState(false);
+  const [openFileDialog, setOpenFileDialog] = useState(false);
+  const [openDirWithPassword, setOpenDirWithPassword] = useState(false);
+  const [deletedDocId, setDeletedDocId] = useState<string>();
+  const [editedDoc, setEditedDoc] = useState<DocumentT | undefined>(undefined);
+  const [parentId, setParentId] = useState<string | undefined>(initialParentId);
+  const [dirPassword, setDirPassword] = useState<string>();
+  const [tempParentId, setTempParentId] = useState("");
+  const [selectedDocs, setSelectedDocs] = useState<DocumentT[]>([]);
+  const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
+  const [docToView, setDocToView] = useState<DocumentT | undefined>(undefined);
+  const [sort, setSort] = useState("desc");
+  const [searchData, setSearchData] = useState<SearchFormData>({
+    endDate: "",
+    type: "",
+    documentType: "",
+    search: "",
+  });
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset list when scope changes only
+  }, [branchId, parentId]);
+
+  const { data: usersList, refetch: refetchUsersList } = useUsersData();
+
+  const {
+    data: docsResponse,
+    isLoading: isLoadingDocs,
+    refetch: refetchDocs,
+  } = useDocsData(
+    branchId,
+    parentId,
+    dirPassword,
+    limit,
+    page,
+    searchData,
+    sort,
+    fixedType,
+    projectId,
+  );
+
+  const {
+    data: foldersList,
+    isLoading: isLoadingFoldersList,
+    isError: isErrorFoldersList,
+    refetch: refetchFoldersList,
+  } = useFoldersList(projectId);
+
+  const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
+  const storeSelectedDocument = (document: DocumentT | undefined) => {
+    setSelectedDocument(document);
+  };
+  const handleSetBranchId = (id: string) => setBranchId(id);
+
+  const toggleDocInSelectedDocs = (doc: DocumentT) => {
+    const existing = selectedDocs.find((d) => d.id === doc.id);
+    if (existing) {
+      setSelectedDocs(selectedDocs.filter((d) => d.id !== existing.id));
+    } else {
+      setSelectedDocs([...selectedDocs, doc]);
+    }
+  };
+
+  const clearSelectedDocs = () => {
+    setSelectedDocs([]);
+  };
+
+  return (
+    <Cxt.Provider
+      value={{
+        showItemDetials,
+        toggleShowItemDetials,
+        docs: docsResponse?.payload,
+        docsPagination: docsResponse?.pagination,
+        isLoadingDocs,
+        refetchDocs,
+        selectedDocument,
+        storeSelectedDocument,
+        branchId,
+        handleSetBranchId,
+        openDirDialog,
+        setOpenDirDialog,
+        openFileDialog,
+        setOpenFileDialog,
+        openDirWithPassword,
+        setOpenDirWithPassword,
+        editedDoc,
+        setEditedDoc,
+        parentId,
+        setParentId,
+        deletedDocId,
+        setDeletedDocId,
+        dirPassword,
+        setDirPassword,
+        tempParentId,
+        setTempParentId,
+        selectedDocs,
+        toggleDocInSelectedDocs,
+        clearSelectedDocs,
+        limit,
+        setLimit,
+        page,
+        setPage,
+        foldersList,
+        isLoadingFoldersList,
+        isErrorFoldersList,
+        handleRefetchFoldersList: () => refetchFoldersList(),
+        searchData,
+        setSearchData,
+        visitedDirs,
+        setVisitedDirs,
+        sort,
+        setSort,
+        docToView,
+        setDocToView,
+        usersList,
+        handleRefetchUsersList: () => refetchUsersList(),
+        projectId,
+      }}
+    >
+      {children}
+    </Cxt.Provider>
+  );
+}
+
+interface PropsT {
+  children: ReactNode;
+  fixedType?: string;
+  projectId?: string;
+  /** Initial folder scope when `projectId` is set (defaults to project root in API). */
+  initialParentId?: string;
+}
+
+export const PublicDocsCxtProvider: React.FC<PropsT> = ({
+  children,
+  fixedType,
+  projectId,
+  initialParentId,
+}) => {
+  if (projectId) {
+    return (
+      <ProjectPublicDocsProviderInner
+        fixedType={fixedType}
+        projectId={projectId}
+        initialParentId={initialParentId}
+      >
+        {children}
+      </ProjectPublicDocsProviderInner>
+    );
+  }
+  return (
+    <LibraryPublicDocsProviderInner fixedType={fixedType}>
+      {children}
+    </LibraryPublicDocsProviderInner>
+  );
+};
+
 export const usePublicDocsCxt = () => {
   const context = useContext(Cxt);
   if (context === undefined) {

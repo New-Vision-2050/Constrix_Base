@@ -23,11 +23,18 @@ export default function CreateNewDirDialogContent({
   const lang = useLocale();
   const isRtl = lang === "ar";
   // translate
-  const { editedDoc } = usePublicDocsCxt();
+  const { editedDoc, setEditedDoc } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewDirDialog");
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setEditedDoc(undefined);
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-md w-full" dir={isRtl ? "rtl" : "ltr"}>
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-semibold text-foreground">

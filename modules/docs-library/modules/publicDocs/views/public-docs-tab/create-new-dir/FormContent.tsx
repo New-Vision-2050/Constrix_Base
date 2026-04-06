@@ -13,6 +13,7 @@ export default function CreateNewDirForm({ onClose }: PropsType) {
     refetchDocs,
     editedDoc,
     parentId,
+    projectId,
     setEditedDoc,
     handleRefetchFoldersList,
   } = usePublicDocsCxt();
@@ -26,8 +27,9 @@ export default function CreateNewDirForm({ onClose }: PropsType) {
   };
 
   const _config = useMemo(
-    () => getCreateNewDirConfig(t, onSuccessFn, editedDoc, parentId),
-    [editedDoc, parentId]
+    () =>
+      getCreateNewDirConfig(t, onSuccessFn, editedDoc, parentId, projectId),
+    [editedDoc, parentId, projectId],
   );
 
   // form builder vars

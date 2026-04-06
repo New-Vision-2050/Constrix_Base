@@ -4,25 +4,34 @@ import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { getCreateNewFileFormConfig } from "./CreateNewFileFormConfig";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { useMemo } from "react";
-import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 type PropsT = {
   onClose: () => void;
 };
 export default function CreateNewFileFormContent({ onClose }: PropsT) {
-  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
-  const { refetchDocs, editedDoc, parentId } = usePublicDocsCxt();
+  const docsLibrary = useOptionalDocsLibraryCxt();
+  const { refetchDocs, editedDoc, parentId, projectId } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewFileDialog");
 
   const onSuccessFn = () => {
     onClose();
-    handleRefetchDocsWidgets();
+    if (!projectId) {
+      docsLibrary?.handleRefetchDocsWidgets();
+    }
     refetchDocs();
   };
 
   const _config = useMemo(
-    () => getCreateNewFileFormConfig(t, onSuccessFn, editedDoc, parentId),
-    [editedDoc, parentId]
+    () =>
+      getCreateNewFileFormConfig(
+        t,
+        onSuccessFn,
+        editedDoc,
+        parentId,
+        projectId,
+      ),
+    [editedDoc, parentId, projectId],
   );
 
   // form builder vars

@@ -13,8 +13,6 @@ export default function PublicDocsTabEntryPoint() {
     storeSelectedDocument,
     searchData,
     setSearchData,
-    docToView,
-    setDocToView,
   } = usePublicDocsCxt();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
