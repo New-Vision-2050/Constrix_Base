@@ -175,24 +175,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               },
             ],
           },
-          {
-            type: "text",
-            name: "swift_bic",
-            label: t("swiftBic"),
-            placeholder: t("swiftBicPlaceholder"),
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: t("swiftBicRequired"),
-              },
-              {
-                type: "pattern",
-                value: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-                message: t("swiftBicPattern"),
-              },
-            ],
-          },
+
         ],
         columns: 2,
       },
