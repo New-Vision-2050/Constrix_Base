@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Pagination as MuiPagination,
@@ -7,7 +8,7 @@ import {
   Stack,
   Grid,
 } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { TableState } from "../..";
 
 // ============================================================================
@@ -28,6 +29,8 @@ export function createPaginationComponent<TRow>() {
   }: PaginationProps<TRow>) => {
     const { pagination } = state;
     const t = useTranslations("Table");
+    const locale = useLocale();
+    console.log("Locale from table pagination component", locale);
 
     return (
       <Grid container spacing={2}>
@@ -38,6 +41,7 @@ export function createPaginationComponent<TRow>() {
           display="flex"
         >
           <MuiPagination
+            key={locale}
             count={pagination.totalPages}
             page={pagination.page}
             onChange={(_, page) => pagination.setPage(page)}

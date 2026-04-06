@@ -79,7 +79,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <NextTopLoader />
-        <MuiCacheProvider direction={direction}>
+        <MuiCacheProvider key={direction} direction={direction}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"

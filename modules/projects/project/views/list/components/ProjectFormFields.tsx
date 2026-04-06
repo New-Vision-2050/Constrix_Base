@@ -47,8 +47,6 @@ interface ProjectFormFieldsProps {
   companyUsersData?: OptionItem[];
   entityClientsData?: OptionItem[];
   individualClientsData?: OptionItem[];
-  // contractTypesData?: OptionItem[];
-  // projectClassificationsData?: OptionItem[];
   onSearchChange?: (fieldName: string, searchValue: string) => void;
 }
 
@@ -68,8 +66,6 @@ export function ProjectFormFields({
   companyUsersData,
   entityClientsData,
   individualClientsData,
-  // contractTypesData,
-  // projectClassificationsData,
   onSearchChange,
 }: ProjectFormFieldsProps) {
   const t = useTranslations();
@@ -107,25 +103,23 @@ export function ProjectFormFields({
             (type) => String(type.id) === field.value
           );
           return (
-            <FormControl fullWidth error={!!errors.project_type_id}>
-              <Autocomplete
-                options={projectTypesData || []}
-                getOptionLabel={(option) => option.name}
-                filterOptions={filterOptions}
-                value={selectedOption || null}
-                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
-                onInputChange={(_, value) => onSearchChange?.("project_type_id", value)}
-                size="small"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("project.projectType")}
-                    error={!!errors.project_type_id}
-                    helperText={errors.project_type_id && t("project.projectTypeRequired")}
-                  />
-                )}
-              />
-            </FormControl>
+            <Autocomplete
+              options={projectTypesData || []}
+              getOptionLabel={(option) => option.name}
+              filterOptions={filterOptions}
+              value={selectedOption || null}
+              onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+              onInputChange={(_, value) => onSearchChange?.("project_type_id", value)}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("project.projectType")}
+                  error={!!errors.project_type_id}
+                  helperText={errors.project_type_id && t("project.projectTypeRequired")}
+                />
+              )}
+            />
           );
         }}
       />
@@ -138,31 +132,25 @@ export function ProjectFormFields({
             (type) => String(type.id) === field.value
           );
           return (
-            <FormControl
-              fullWidth
-              error={!!errors.sub_project_type_id}
+            <Autocomplete
+              options={subProjectTypesData || []}
+              getOptionLabel={(option) => option.name}
+              filterOptions={filterOptions}
+              value={selectedOption || null}
+              onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+              onInputChange={(_, value) => onSearchChange?.("sub_project_type_id", value)}
               disabled={!watchProjectTypeId}
-            >
-              <Autocomplete
-                options={subProjectTypesData || []}
-                getOptionLabel={(option) => option.name}
-                filterOptions={filterOptions}
-                value={selectedOption || null}
-                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
-                onInputChange={(_, value) => onSearchChange?.("sub_project_type_id", value)}
-                disabled={!watchProjectTypeId}
-                size="small"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("project.subProjectType")}
-                    error={!!errors.sub_project_type_id}
-                    helperText={errors.sub_project_type_id && t("project.subProjectTypeRequired")}
-                    disabled={!watchProjectTypeId}
-                  />
-                )}
-              />
-            </FormControl>
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("project.subProjectType")}
+                  error={!!errors.sub_project_type_id}
+                  helperText={errors.sub_project_type_id && t("project.subProjectTypeRequired")}
+                  disabled={!watchProjectTypeId}
+                />
+              )}
+            />
           );
         }}
       />
@@ -175,25 +163,23 @@ export function ProjectFormFields({
             (type) => String(type.id) === field.value
           );
           return (
-            <FormControl fullWidth disabled={!watchSubProjectTypeId}>
-              <Autocomplete
-                options={subSubProjectTypesData || []}
-                getOptionLabel={(option) => option.name}
-                filterOptions={filterOptions}
-                value={selectedOption || null}
-                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
-                onInputChange={(_, value) => onSearchChange?.("sub_sub_project_type_id", value)}
-                disabled={!watchSubProjectTypeId}
-                size="small"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("project.subSubProjectType")}
-                    disabled={!watchSubProjectTypeId}
-                  />
-                )}
-              />
-            </FormControl>
+            <Autocomplete
+              options={subSubProjectTypesData || []}
+              getOptionLabel={(option) => option.name}
+              filterOptions={filterOptions}
+              value={selectedOption || null}
+              onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+              onInputChange={(_, value) => onSearchChange?.("sub_sub_project_type_id", value)}
+              disabled={!watchSubProjectTypeId}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("project.subSubProjectType")}
+                  disabled={!watchSubProjectTypeId}
+                />
+              )}
+            />
           );
         }}
       />
@@ -221,25 +207,23 @@ export function ProjectFormFields({
             (branch) => String(branch.id) === field.value
           );
           return (
-            <FormControl fullWidth error={!!errors.branch_id}>
-              <Autocomplete
-                options={branchesData || []}
-                getOptionLabel={(option) => option.name}
-                filterOptions={filterOptions}
-                value={selectedOption || null}
-                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
-                onInputChange={(_, value) => onSearchChange?.("branch_id", value)}
-                size="small"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("project.branch")}
-                    error={!!errors.branch_id}
-                    helperText={errors.branch_id && t("project.branchRequired")}
-                  />
-                )}
-              />
-            </FormControl>
+            <Autocomplete
+              options={branchesData || []}
+              getOptionLabel={(option) => option.name}
+              filterOptions={filterOptions}
+              value={selectedOption || null}
+              onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+              onInputChange={(_, value) => onSearchChange?.("branch_id", value)}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("project.branch")}
+                  error={!!errors.branch_id}
+                  helperText={errors.branch_id && t("project.branchRequired")}
+                />
+              )}
+            />
           );
         }}
       />
@@ -252,27 +236,25 @@ export function ProjectFormFields({
             (mgmt) => String(mgmt.id) === field.value
           );
           return (
-            <FormControl fullWidth error={!!errors.management_id} disabled={!watchBranchId}>
-              <Autocomplete
-                options={managementsData || []}
-                getOptionLabel={(option) => option.name}
-                filterOptions={filterOptions}
-                value={selectedOption || null}
-                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
-                onInputChange={(_, value) => onSearchChange?.("management_id", value)}
-                disabled={!watchBranchId}
-                size="small"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("project.management")}
-                    error={!!errors.management_id}
-                    helperText={errors.management_id && t("project.managementRequired")}
-                    disabled={!watchBranchId}
-                  />
-                )}
-              />
-            </FormControl>
+            <Autocomplete
+              options={managementsData || []}
+              getOptionLabel={(option) => option.name}
+              filterOptions={filterOptions}
+              value={selectedOption || null}
+              onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+              onInputChange={(_, value) => onSearchChange?.("management_id", value)}
+              disabled={!watchBranchId}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("project.management")}
+                  error={!!errors.management_id}
+                  helperText={errors.management_id && t("project.managementRequired")}
+                  disabled={!watchBranchId}
+                />
+              )}
+            />
           );
         }}
       />
@@ -303,24 +285,22 @@ export function ProjectFormFields({
             (user) => String(user.id) === field.value
           );
           return (
-            <FormControl fullWidth disabled={!watchManagementId}>
-              <Autocomplete
-                options={filteredCompanyUsers || []}
-                getOptionLabel={(option) => option.name}
-                filterOptions={filterOptions}
-                value={selectedOption || null}
-                onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
-                onInputChange={(_, value) => onSearchChange?.("manager_id", value)}
-                disabled={!watchManagementId}
-                size="small"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("project.projectManager")}
-                  />
-                )}
-              />
-            </FormControl>
+            <Autocomplete
+              options={filteredCompanyUsers || []}
+              getOptionLabel={(option) => option.name}
+              filterOptions={filterOptions}
+              value={selectedOption || null}
+              onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
+              onInputChange={(_, value) => onSearchChange?.("manager_id", value)}
+              disabled={!watchManagementId}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("project.projectManager")}
+                />
+              )}
+            />
           );
         }}
       />
@@ -361,60 +341,58 @@ export function ProjectFormFields({
               (client) => String(client.id) === field.value
             );
             return (
-              <FormControl fullWidth error={!!errors.project_owner_id}>
-                <Autocomplete
-                  options={entityClientsData || []}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) => option.id === value?.id}
-                  value={selectedOption || null}
-                  onChange={(_, option) => {
-                    if (option && 'isCreateButton' in option && option.isCreateButton) return;
-                    field.onChange(option ? String(option.id) : "");
-                  }}
-                  onInputChange={(_, value) => onSearchChange?.("entity_clients", value)}
-                  size="small"
-                  noOptionsText="لا يوجد عملاء"
-                  renderOption={(props, option) => {
-                    const { key, ...restProps } = props;
-                    if (option.isCreateButton) {
-                      return (
-                        <Box component="li" key={key} {...restProps}>
-                          <Button
-                            fullWidth
-                            variant="outlined"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleCreateClient();
-                            }}
-                            sx={{ justifyContent: 'flex-start' }}
-                          >
-                            إنشاء عميل جديد
-                          </Button>
-                        </Box>
-                      );
-                    }
-                    return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = options.filter((option) =>
-                      option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+              <Autocomplete
+                options={entityClientsData || []}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value?.id}
+                value={selectedOption || null}
+                onChange={(_, option) => {
+                  if (option && 'isCreateButton' in option && option.isCreateButton) return;
+                  field.onChange(option ? String(option.id) : "");
+                }}
+                onInputChange={(_, value) => onSearchChange?.("entity_clients", value)}
+                size="small"
+                noOptionsText="لا يوجد عملاء"
+                renderOption={(props, option) => {
+                  const { key, ...restProps } = props;
+                  if (option.isCreateButton) {
+                    return (
+                      <Box component="li" key={key} {...restProps}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCreateClient();
+                          }}
+                          sx={{ justifyContent: 'flex-start' }}
+                        >
+                          إنشاء عميل جديد
+                        </Button>
+                      </Box>
                     );
-                    if (params.inputValue !== '' && filtered.length === 0) {
-                      return [{ id: -1, name: 'إنشاء عميل جديد', isCreateButton: true }];
-                    }
-                    return filtered;
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t("project.selectClient")}
-                      error={!!errors.project_owner_id}
-                      helperText={errors.project_owner_id && t("project.clientRequired")}
-                    />
-                  )}
-                />
-              </FormControl>
+                  }
+                  return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                }}
+                filterOptions={(options, params) => {
+                  const filtered = options.filter((option) =>
+                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                  );
+                  if (params.inputValue !== '' && filtered.length === 0) {
+                    return [{ id: -1, name: 'إنشاء عميل جديد', isCreateButton: true }];
+                  }
+                  return filtered;
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.selectClient")}
+                    error={!!errors.project_owner_id}
+                    helperText={errors.project_owner_id && t("project.clientRequired")}
+                  />
+                )}
+              />
             );
           }}
         />
@@ -429,60 +407,58 @@ export function ProjectFormFields({
               (client) => String(client.id) === field.value
             );
             return (
-              <FormControl fullWidth error={!!errors.project_owner_id}>
-                <Autocomplete
-                  options={individualClientsData || []}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) => option.id === value?.id}
-                  value={selectedOption || null}
-                  onChange={(_, option) => {
-                    if (option && 'isCreateButton' in option && option.isCreateButton) return;
-                    field.onChange(option ? String(option.id) : "");
-                  }}
-                  onInputChange={(_, value) => onSearchChange?.("individual_clients", value)}
-                  size="small"
-                  noOptionsText="لا يوجد عملاء"
-                  renderOption={(props, option) => {
-                    const { key, ...restProps } = props;
-                    if (option.isCreateButton) {
-                      return (
-                        <Box component="li" key={key} {...restProps}>
-                          <Button
-                            fullWidth
-                            variant="outlined"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleCreateClient();
-                            }}
-                            sx={{ justifyContent: 'flex-start' }}
-                          >
-                            إنشاء عميل جديد
-                          </Button>
-                        </Box>
-                      );
-                    }
-                    return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = options.filter((option) =>
-                      option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+              <Autocomplete
+                options={individualClientsData || []}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value?.id}
+                value={selectedOption || null}
+                onChange={(_, option) => {
+                  if (option && 'isCreateButton' in option && option.isCreateButton) return;
+                  field.onChange(option ? String(option.id) : "");
+                }}
+                onInputChange={(_, value) => onSearchChange?.("individual_clients", value)}
+                size="small"
+                noOptionsText="لا يوجد عملاء"
+                renderOption={(props, option) => {
+                  const { key, ...restProps } = props;
+                  if (option.isCreateButton) {
+                    return (
+                      <Box component="li" key={key} {...restProps}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCreateClient();
+                          }}
+                          sx={{ justifyContent: 'flex-start' }}
+                        >
+                          إنشاء عميل جديد
+                        </Button>
+                      </Box>
                     );
-                    if (params.inputValue !== '' && filtered.length === 0) {
-                      return [{ id: -1, name: 'إنشاء عميل جديد', isCreateButton: true }];
-                    }
-                    return filtered;
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t("project.selectClient")}
-                      error={!!errors.project_owner_id}
-                      helperText={errors.project_owner_id && t("project.clientRequired")}
-                    />
-                  )}
-                />
-              </FormControl>
+                  }
+                  return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                }}
+                filterOptions={(options, params) => {
+                  const filtered = options.filter((option) =>
+                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                  );
+                  if (params.inputValue !== '' && filtered.length === 0) {
+                    return [{ id: -1, name: 'إنشاء عميل جديد', isCreateButton: true }];
+                  }
+                  return filtered;
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("project.selectClient")}
+                    error={!!errors.project_owner_id}
+                    helperText={errors.project_owner_id && t("project.clientRequired")}
+                  />
+                )}
+              />
             );
           }}
         />
