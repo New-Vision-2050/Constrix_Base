@@ -16,8 +16,16 @@ import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "@i18n/navigation";
 import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
-import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { setCookie } from "cookies-next";
+import { useQueryClient } from "@tanstack/react-query";
+import { CURRENT_BRANCH_CHANGED_EVENT } from "@/constants/branch-events";
 import CompanyIcon from "@/public/icons/company";
 import {
   DropdownMenuSub,
@@ -38,10 +46,13 @@ interface menuItem {
 
 const ProfileDrop = () => {
   const t = useTranslations("Header");
-  const cookieValue = getCookie("current-branch-obj");
-  const branchObj = cookieValue ? JSON.parse(cookieValue as string) : null;
-  const branchId = branchObj?.id;
-  const cookieBranchId = getCookie("current-branch-id");
+  const queryClient = useQueryClient();
+
+  /** Synced from cookies + updated on branch click so the UI reacts without a full reload. */
+  const [selectedBranch, setSelectedBranch] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -49,7 +60,64 @@ const ProfileDrop = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [branches, setBranches] = useState<menuItem[]>([]);
 
-  console.log("branchObj", branchObj);
+  useEffect(() => {
+    const id = getCookie("current-branch-id");
+    const raw = getCookie("current-branch-obj");
+    if (!id) {
+      setSelectedBranch(null);
+      return;
+    }
+    if (raw) {
+      try {
+        const o = JSON.parse(raw as string) as { id?: string; name?: string };
+        setSelectedBranch({
+          id: String(o.id ?? id),
+          name: String(o.name ?? ""),
+        });
+        return;
+      } catch {
+        /* fall through */
+      }
+    }
+    setSelectedBranch({ id: String(id), name: "" });
+  }, []);
+
+  const selectBranchFromMenu = useCallback(
+    (branch: { id: string; name: string }) => {
+      const currentId = getCookie("current-branch-id");
+      if (currentId != null && String(currentId) === String(branch.id)) {
+        deleteCookie("current-branch-id");
+        deleteCookie("current-branch-obj");
+        setSelectedBranch(null);
+      } else {
+        setCookie("current-branch-id", String(branch.id));
+        setCookie(
+          "current-branch-obj",
+          JSON.stringify({
+            id: branch.id ?? "",
+            name: branch.name ?? "",
+          })
+        );
+        setSelectedBranch({
+          id: String(branch.id),
+          name: String(branch.name ?? ""),
+        });
+      }
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(CURRENT_BRANCH_CHANGED_EVENT));
+      }
+      void queryClient.invalidateQueries({ queryKey: ["widgets-data"] });
+      void queryClient.invalidateQueries({ queryKey: ["company-employees"] });
+      void queryClient.invalidateQueries({
+        predicate: (q) =>
+          Array.isArray(q.queryKey) &&
+          typeof q.queryKey[0] === "string" &&
+          q.queryKey[0].startsWith("widgets-"),
+      });
+    },
+    [queryClient]
+  );
 
   // main items without branches and logout
   const mainMenuItems: menuItem[] = [
@@ -97,41 +165,25 @@ const ProfileDrop = () => {
     }
   };
 
-  useEffect(
-    () => {
-      if (isSuccess && data?.payload?.branches?.length) {
-        const _branches = data?.payload?.branches?.map((branch, index) => ({
-          id: branch.id,
-          label: branch?.name,
-          icon: <CompanyIcon />,
-          hasTopSeparator: index === 0,
-          hasBottomSeparator: data?.payload?.branches?.length
-            ? index === data?.payload?.branches?.length - 1
-            : undefined,
-          func: () => {
-            // get branch id from cookie if it exists
-            const branchId = getCookie("current-branch-id");
-            // if branch id exists and it is the same as the current branch id, delete it
-            if (branchId && branchId == branch.id) {
-              deleteCookie("current-branch-id");
-            } else {
-              setCookie("current-branch-id", branch.id);
-            }
-
-            setCookie(
-              "current-branch-obj",
-              JSON.stringify({
-                id: branch.id ?? "",
-                name: branch.name ?? "",
-              })
-            );
-          },
-        }));
-        setBranches(_branches);
-      }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSuccess]
-  );
+  useEffect(() => {
+    if (isSuccess && data?.payload?.branches?.length) {
+      const _branches = data?.payload?.branches?.map((branch, index) => ({
+        id: branch.id,
+        label: branch?.name,
+        icon: <CompanyIcon />,
+        hasTopSeparator: index === 0,
+        hasBottomSeparator: data?.payload?.branches?.length
+          ? index === data?.payload?.branches?.length - 1
+          : undefined,
+        func: () =>
+          selectBranchFromMenu({
+            id: String(branch.id),
+            name: branch.name ?? "",
+          }),
+      }));
+      setBranches(_branches);
+    }
+  }, [isSuccess, data?.payload?.branches, selectBranchFromMenu]);
 
   return (
     <div className="flex justify-center items-center">
@@ -146,9 +198,9 @@ const ProfileDrop = () => {
         <DropdownMenuTrigger asChild>
           <Button className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none">
             {user?.name}
-            {branchObj?.name && (
+            {selectedBranch?.name && (
               <span className="text-xs text-gray-500">
-                ({truncateString(branchObj.name, 12)})
+                ({truncateString(selectedBranch.name, 12)})
               </span>
             )}
             <ChevronDown />
@@ -160,7 +212,7 @@ const ProfileDrop = () => {
               {item.hasTopSeparator ? <DropdownMenuSeparator /> : ""}
               <DropdownMenuItem
                 onClick={() => handleClose(item.func)}
-                className={`${branchId === item.id && "bg-sidebar"}`}
+                className={`${selectedBranch?.id === item.id && "bg-sidebar"}`}
               >
                 {item.icon}
                 {item.label}
@@ -185,11 +237,13 @@ const ProfileDrop = () => {
                     <DropdownMenuItem
                       key={branch.id}
                       onClick={() => handleClose(branch.func)}
-                      className={`${branchId === branch.id && "bg-sidebar"}`}
+                      className={`${
+                        selectedBranch?.id === branch.id && "bg-sidebar"
+                      }`}
                     >
                       {branch.icon}
                       {branch.label}
-                      {cookieBranchId == branch.id && (
+                      {selectedBranch?.id == branch.id && (
                         <CheckIcon className="bg-green-600" />
                       )}
                     </DropdownMenuItem>

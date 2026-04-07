@@ -9,6 +9,7 @@ import {
 } from "@/utils/errorHandler";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { getCurrentHost } from "@/utils/get-current-host";
+import { addBranchFilterParam } from "@/config/axios/interceptors/add-branch-filter";
 
 export const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL +
@@ -45,6 +46,8 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+apiClient.interceptors.request.use(addBranchFilterParam);
 
 apiClient.interceptors.response.use(
   (response) => response,
