@@ -1,6 +1,12 @@
 import React from "react";
 
 import HomeOutlined from "@mui/icons-material/HomeOutlined";
+import PersonOutlineOutlined from "@mui/icons-material/PersonOutlineOutlined";
+import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
+import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
+import AlternateEmailOutlined from "@mui/icons-material/AlternateEmailOutlined";
+import NotificationsNoneOutlined from "@mui/icons-material/NotificationsNoneOutlined";
+import Inventory2Outlined from "@mui/icons-material/Inventory2Outlined";
 import BuildOutlined from "@mui/icons-material/BuildOutlined";
 import BusinessOutlined from "@mui/icons-material/BusinessOutlined";
 import AccountBalanceOutlined from "@mui/icons-material/AccountBalanceOutlined";
@@ -35,10 +41,52 @@ export interface AppIcon {
 
 export const APP_ICONS: AppIcon[] = [
   {
+    id: "person-outline",
+    name: "icons.personOutline",
+    component: ({ size = 24, color = "inherit" }) => (
+      <PersonOutlineOutlined sx={{ fontSize: size, color }} />
+    ),
+  },
+  {
+    id: "account-circle",
+    name: "icons.accountCircle",
+    component: ({ size = 24, color = "inherit" }) => (
+      <AccountCircleOutlined sx={{ fontSize: size, color }} />
+    ),
+  },
+  {
+    id: "settings",
+    name: "icons.settings",
+    component: ({ size = 24, color = "inherit" }) => (
+      <SettingsOutlined sx={{ fontSize: size, color }} />
+    ),
+  },
+  {
     id: "home",
     name: "icons.home",
     component: ({ size = 24, color = "inherit" }) => (
       <HomeOutlined sx={{ fontSize: size, color }} />
+    ),
+  },
+  {
+    id: "alternate-email",
+    name: "icons.alternateEmail",
+    component: ({ size = 24, color = "inherit" }) => (
+      <AlternateEmailOutlined sx={{ fontSize: size, color }} />
+    ),
+  },
+  {
+    id: "notifications",
+    name: "icons.notifications",
+    component: ({ size = 24, color = "inherit" }) => (
+      <NotificationsNoneOutlined sx={{ fontSize: size, color }} />
+    ),
+  },
+  {
+    id: "inventory",
+    name: "icons.inventory",
+    component: ({ size = 24, color = "inherit" }) => (
+      <Inventory2Outlined sx={{ fontSize: size, color }} />
     ),
   },
   {
