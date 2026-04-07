@@ -62,24 +62,24 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             validation: [],
           },
           {
-            name: "start_date",
+            name: "commencement_date",
             label: t("commencementDate"),
             type: "date",
             placeholder: t("commencementDate"),
-            maxDate: {
+            minDate: {
               formId: `user-contract-data-form-${contract?.id}`,
-              field: "commencement_date",
+              field: "start_date",
             },
             validation: [],
           },
           {
-            name: "commencement_date",
+            name: "start_date",
             label: t("contractStartDate"),
             type: "date",
             placeholder: t("contractStartDate"),
-            minDate: {
+            maxDate: {
               formId: `user-contract-data-form-${contract?.id}`,
-              field: "start_date",
+              field: "commencement_date",
             },
             validation: [],
           },
@@ -588,28 +588,39 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
       handleRefetchEmploymentContractData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      // Get date values from formData or fall back to contract initial values
-      const startDateValue = (formData?.start_date as string) || contract?.start_date;
-      const commencementDateValue = (formData?.commencement_date as string) || contract?.commencement_date;
-
       const body: Record<string, unknown> = {
         ...formData,
         user_id: userId,
       };
 
-      // Only format and include dates if they are valid
-      if (startDateValue && startDateValue !== "") {
-        const startDate = new Date(startDateValue);
+      // Use formData value if it is not undefined. 
+      // If it is undefined, it means the field wasn't in formData, so we fall back to contract.
+      // If it is "", it means the user explicitly cleared it.
+      const rawStartDate = formData.start_date !== undefined ? formData.start_date : contract?.start_date;
+      const rawCommencementDate = formData.commencement_date !== undefined ? formData.commencement_date : contract?.commencement_date;
+
+      // Format start_date if valid, otherwise set to empty string to clear it
+      if (rawStartDate && rawStartDate !== "") {
+        const startDate = new Date(rawStartDate as string);
         if (!isNaN(startDate.getTime())) {
           body.start_date = formatDateYYYYMMDD(startDate);
+        } else {
+          body.start_date = "";
         }
+      } else {
+        body.start_date = "";
       }
 
-      if (commencementDateValue && commencementDateValue !== "") {
-        const commencementDate = new Date(commencementDateValue);
+      // Format commencement_date if valid, otherwise set to empty string to clear it
+      if (rawCommencementDate && rawCommencementDate !== "") {
+        const commencementDate = new Date(rawCommencementDate as string);
         if (!isNaN(commencementDate.getTime())) {
           body.commencement_date = formatDateYYYYMMDD(commencementDate);
+        } else {
+          body.commencement_date = "";
         }
+      } else {
+        body.commencement_date = "";
       }
 
       return await defaultSubmitHandler(
