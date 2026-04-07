@@ -52,7 +52,6 @@ function AttendanceDeterminantsTabContent() {
     constraintsList,
     constraintsListLoading,
     constraintsListError,
-    refetchConstraintsList,
     handleNewDeterminantCreated,
   } = useAttendanceDeterminants();
 
