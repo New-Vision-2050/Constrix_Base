@@ -1,14 +1,15 @@
 "use client";
 import React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Pagination as MuiPagination,
   Select,
-  MenuItem,
-  Typography,
-  Stack,
-  Grid,
-} from "@mui/material";
-import { useLocale, useTranslations } from "next-intl";
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 import { TableState } from "../..";
 
 // ============================================================================
@@ -29,64 +30,146 @@ export function createPaginationComponent<TRow>() {
   }: PaginationProps<TRow>) => {
     const { pagination } = state;
     const t = useTranslations("Table");
-    const locale = useLocale();
-    console.log("Locale from table pagination component", locale);
+
+    const renderPageButtons = () => {
+      const pages: React.ReactNode[] = [];
+      const MAX_VISIBLE_PAGES = 5;
+      const effectiveTotalPages = Math.max(1, pagination.totalPages);
+
+      let startPage = Math.max(
+        1,
+        pagination.page - Math.floor(MAX_VISIBLE_PAGES / 2),
+      );
+      let endPage = Math.min(
+        effectiveTotalPages,
+        startPage + MAX_VISIBLE_PAGES - 1,
+      );
+
+      if (endPage - startPage + 1 < MAX_VISIBLE_PAGES) {
+        startPage = Math.max(1, endPage - MAX_VISIBLE_PAGES + 1);
+      }
+
+      // Previous button
+      pages.push(
+        <Button
+          key="prev"
+          variant="outline"
+          size="icon"
+          onClick={() => pagination.setPage(Math.max(1, pagination.page - 1))}
+          disabled={pagination.page === 1}
+          className="h-8 w-8"
+        >
+          <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+        </Button>,
+      );
+
+      if (startPage > 1) {
+        pages.push(
+          <Button
+            key="1"
+            variant={pagination.page === 1 ? "default" : "outline"}
+            size="sm"
+            onClick={() => pagination.setPage(1)}
+            className="h-8 w-8 px-0"
+          >
+            1
+          </Button>,
+        );
+        if (startPage > 2) {
+          pages.push(
+            <span key="ellipsis1" className="px-1">
+              ...
+            </span>,
+          );
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(
+          <Button
+            key={i}
+            variant={pagination.page === i ? "default" : "outline"}
+            size="sm"
+            onClick={() => pagination.setPage(i)}
+            className="h-8 w-8 px-0"
+          >
+            {i}
+          </Button>,
+        );
+      }
+
+      if (endPage < effectiveTotalPages) {
+        if (endPage < effectiveTotalPages - 1) {
+          pages.push(
+            <span key="ellipsis2" className="px-1">
+              ...
+            </span>,
+          );
+        }
+        pages.push(
+          <Button
+            key={effectiveTotalPages}
+            variant={
+              pagination.page === effectiveTotalPages ? "default" : "outline"
+            }
+            size="sm"
+            onClick={() => pagination.setPage(effectiveTotalPages)}
+            className="h-8 w-8 px-0"
+          >
+            {effectiveTotalPages}
+          </Button>,
+        );
+      }
+
+      // Next button
+      pages.push(
+        <Button
+          key="next"
+          variant="outline"
+          size="icon"
+          onClick={() =>
+            pagination.setPage(
+              Math.min(effectiveTotalPages, pagination.page + 1),
+            )
+          }
+          disabled={pagination.page === effectiveTotalPages}
+          className="h-8 w-8"
+        >
+          <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+        </Button>,
+      );
+
+      return pages;
+    };
 
     return (
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, lg: 4 }}></Grid>
-        <Grid
-          size={{ xs: 12, lg: 4 }}
-          justifyContent={{ xs: "start", lg: "center" }}
-          display="flex"
-        >
-          <MuiPagination
-            key={locale}
-            count={pagination.totalPages}
-            page={pagination.page}
-            onChange={(_, page) => pagination.setPage(page)}
-            color="primary"
-            shape="rounded"
-            variant="text"
-            sx={{
-              "& .MuiPaginationItem-text": {
-                bgcolor: "background.default",
-                borderStyle: "solid",
-                borderWidth: "1px",
-                borderColor: "divider",
-                minWidth: "30px",
-                height: "30px",
-              },
-              "& .MuiPaginationItem-root.Mui-selected": {
-                borderColor: "primary.main",
-                minWidth: "34px",
-                height: "34px",
-              },
-            }}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 4 }} justifyContent="end" display="flex">
-          {showPageSize && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="body2" color="text.secondary">
-                {t("RowsPerPage")}
-              </Typography>
-              <Select
-                value={pagination.limit}
-                onChange={(e) => pagination.setLimit(Number(e.target.value))}
-                size="small"
-                sx={{ minWidth: 70 }}
-              >
+      <div className="relative flex flex-col items-center gap-4 sm:flex-row">
+        <div className="flex grow items-center justify-center space-x-2 rtl:space-x-reverse">
+          {renderPageButtons()}
+        </div>
+        {showPageSize && (
+          <div className="flex items-center gap-2 sm:absolute sm:end-0">
+            <span className="text-sm text-muted-foreground">
+              {t("RowsPerPage")}
+            </span>
+            <Select
+              value={pagination.limit.toString()}
+              onValueChange={(value) => pagination.setLimit(Number(value))}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {pageSizeOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
+                  <SelectItem key={option} value={option.toString()}>
                     {option}
-                  </MenuItem>
+                  </SelectItem>
                 ))}
-              </Select>
-            </Stack>
-          )}
-        </Grid>
-      </Grid>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
     );
   };
 
