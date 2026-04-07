@@ -43,6 +43,7 @@ function AttendanceDeterminantsTabContent() {
     handleConstraintClick,
     branchesData,
     refetchConstraints,
+    refetchConstraintsList,
     handleLimitChange,
     handlePageChange,
     page,

@@ -21,11 +21,18 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
     name: unit.name,
   }));
 
+  const sanitizeNonNegative = (value: string) => {
+    if (value === "") return "";
+    const numericValue = Number(value);
+    if (Number.isNaN(numericValue)) return "";
+    return String(Math.max(0, numericValue));
+  };
+
   // Handle early period change
   const handleEarlyPeriodChange = (value: string) => {
     handleUpdateDayPeriod({
       ...period,
-      early_period: value,
+      early_period: sanitizeNonNegative(value),
     });
   };
 
@@ -41,7 +48,7 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
   const handleLatenessPeriodChange = (value: string) => {
     handleUpdateDayPeriod({
       ...period,
-      lateness_period: value,
+      lateness_period: sanitizeNonNegative(value),
     });
   };
 

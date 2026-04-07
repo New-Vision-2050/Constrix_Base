@@ -27,32 +27,39 @@ const SelectField: React.FC<SelectFieldProps> = ({
   const options = useMemo(() => field.options || [], [field.options]);
   
   return (
-    <Select
-      value={value || ''}
-      onValueChange={onChange}
-      onOpenChange={(open) => {
-        if (!open) onBlur();
-      }}
-      disabled={field.disabled}
-    >
-      <SelectTrigger 
-        id={field.name}
-        className={cn(
-          field.className,
-          error && touched ? 'border-destructive' : '',
-          field.width ? field.width : 'w-full'
-        )}
+    <div className="space-y-1">
+      <Select
+        value={value || ''}
+        onValueChange={onChange}
+        onOpenChange={(open) => {
+          if (!open) onBlur();
+        }}
+        disabled={field.disabled}
       >
-        <SelectValue placeholder={field.placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((option: DropdownOption) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        <SelectTrigger 
+          id={field.name}
+          className={cn(
+            field.className,
+            error && touched ? 'border-destructive' : '',
+            field.width ? field.width : 'w-full'
+          )}
+        >
+          <SelectValue placeholder={field.placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option: DropdownOption) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {!!error && touched && (
+        <div className="text-destructive text-sm">
+          {error}
+        </div>
+      )}
+    </div>
   );
 };
 
