@@ -47,6 +47,7 @@ interface ProjectFormFieldsProps {
   companyUsersData?: OptionItem[];
   entityClientsData?: OptionItem[];
   individualClientsData?: OptionItem[];
+  currentManager?: { id: number; name: string } | null;
   onSearchChange?: (fieldName: string, searchValue: string) => void;
 }
 
@@ -66,6 +67,7 @@ export function ProjectFormFields({
   companyUsersData,
   entityClientsData,
   individualClientsData,
+  currentManager,
   onSearchChange,
 }: ProjectFormFieldsProps) {
   const t = useTranslations();
@@ -80,11 +82,20 @@ export function ProjectFormFields({
     router.push("/create-client/clients?action=create");
   };
 
-  // Filter company users by management_id
+  // Filter company users by management_id and include currentManager if editing
   const filteredCompanyUsers = useMemo(() => {
-    if (!watchManagementId || !companyUsersData) return companyUsersData || [];
-    return companyUsersData;
-  }, [watchManagementId, companyUsersData]);
+    const users = companyUsersData || [];
+    
+    // If we have a currentManager from editing, ensure it's in the list
+    if (currentManager) {
+      const hasCurrentManager = users.some(u => u.id === currentManager.id);
+      if (!hasCurrentManager) {
+        return [currentManager, ...users];
+      }
+    }
+    
+    return users;
+  }, [companyUsersData, currentManager]);
 
   // Filter clients based on client type
   const filteredClients = useMemo(() => {
@@ -288,12 +299,24 @@ export function ProjectFormFields({
             <Autocomplete
               options={filteredCompanyUsers || []}
               getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               filterOptions={filterOptions}
               value={selectedOption || null}
               onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
               onInputChange={(_, value) => onSearchChange?.("manager_id", value)}
               disabled={!watchManagementId}
               size="small"
+              ListboxProps={{
+                style: { maxHeight: '300px' }
+              }}
+              renderOption={(props, option) => {
+                const { key, ...restProps } = props;
+                return (
+                  <Box component="li" key={`manager-${option.id}`} {...restProps}>
+                    {option.name}
+                  </Box>
+                );
+              }}
               renderInput={(params) => (
                 <TextField
                   {...params}
