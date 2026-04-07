@@ -97,6 +97,8 @@ function ProjectsList() {
       params.page,
       params.limit,
       params.search,
+      params.sortBy,
+      params.sortOrder,
       filterStatus,
       filterProjectTypeId,
     ],
@@ -105,6 +107,8 @@ function ProjectsList() {
         page: params.page,
         per_page: params.limit,
         ...(params.search ? { name: params.search } : {}),
+        ...(params.sortBy ? { sort_by: params.sortBy } : {}),
+        ...(params.sortOrder ? { sort_order: params.sortOrder } : {}),
         ...(filterStatus !== "" ? { status: filterStatus } : {}),
         ...(filterProjectTypeId
           ? { project_type_id: filterProjectTypeId }

@@ -13,11 +13,27 @@ import {
   FormControlLabel,
   Radio,
   Box,
-  IconButton,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import IconPicker from "@/components/shared/icon-picker";
 import { APP_ICONS } from "@/constants/icons";
+
+const PROCEDURE_DIALOG_ICON_IDS = [
+  "person-outline",
+  "account-circle",
+  "settings",
+  "home",
+  "alternate-email",
+  "notifications",
+  "inventory",
+] as const;
+
+const PROCEDURE_DIALOG_ICONS = APP_ICONS.filter((icon) =>
+  PROCEDURE_DIALOG_ICON_IDS.includes(
+    icon.id as (typeof PROCEDURE_DIALOG_ICON_IDS)[number],
+  ),
+);
 
 interface AddStageDialogProps {
   open: boolean;
@@ -111,27 +127,13 @@ export default function AddStageDialog({
 
           <FormControl>
             <FormLabel>{t("selectIcon")}</FormLabel>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-              {APP_ICONS.slice(0, 8).map((icon) => {
-                const IconComponent = icon.component;
-                return (
-                  <IconButton
-                    key={icon.id}
-                    onClick={() => setSelectedIcon(icon.id)}
-                    sx={{
-                      border:
-                        selectedIcon === icon.id
-                          ? "2px solid"
-                          : "1px solid transparent",
-                      borderColor:
-                        selectedIcon === icon.id ? "primary.main" : "divider",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <IconComponent size={20} />
-                  </IconButton>
-                );
-              })}
+            <Box sx={{ mt: 1 }}>
+              <IconPicker
+                value={selectedIcon || "settings"}
+                onChange={setSelectedIcon}
+                label=""
+                icons={PROCEDURE_DIALOG_ICONS}
+              />
             </Box>
           </FormControl>
 

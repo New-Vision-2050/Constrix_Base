@@ -4,6 +4,8 @@ export interface ProjectParams {
   name?: string;
   status?: string;
   project_type_id?: string;
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
 }
 
 export interface CreateProjectData {
