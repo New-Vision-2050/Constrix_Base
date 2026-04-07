@@ -77,10 +77,6 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             label: t("contractStartDate"),
             type: "date",
             placeholder: t("contractStartDate"),
-            maxDate: {
-              formId: `user-contract-data-form-${contract?.id}`,
-              field: "commencement_date",
-            },
             validation: [],
           },
           {
