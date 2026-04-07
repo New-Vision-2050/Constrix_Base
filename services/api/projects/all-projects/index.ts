@@ -49,7 +49,8 @@ export const AllProjectsApi = {
       { params }
     ),
 
-  getCompanyUsers: (params?: { name?: string }) => baseApi.get(`company-users/employees`, { params }),
+  getCompanyUsers: (params?: { name?: string }) => 
+    baseApi.get(`company-users/employees`, { params }),
 
   getEntityClients: (params?: ClientParams) =>
     baseApi.get<GetClientsResponse>("companies/clients", { params }),
