@@ -16,7 +16,7 @@ export const buildRequestUrl = (
   searchFields?: string[],
   columnSearchState?: ColumnSearchState,
   searchConfig?: SearchConfig,
-  apiParams?: Record<string, string>
+  apiParams?: Record<string, string>,
 ): URL => {
   // Fix URL handling: ensure URL is properly formatted
   let apiUrl: URL;
@@ -70,7 +70,7 @@ export const buildRequestUrl = (
     if (searchFields?.length && searchConfig?.fieldParamName) {
       newUrl.searchParams.set(
         searchConfig.fieldParamName,
-        searchFields.join(",")
+        searchFields.join(","),
       );
     }
   }
@@ -89,7 +89,7 @@ export const buildRequestUrl = (
           // For array values, join them with commas or add multiple parameters
           if (searchValue.length > 0) {
             // Use setParam instead of append to prevent double encoding
-            newUrl.searchParams.set(columnKey, searchValue.join(','));
+            newUrl.searchParams.set(columnKey, searchValue.join(","));
           }
         } else {
           // For string values, add as normal but prevent double encoding
@@ -98,6 +98,12 @@ export const buildRequestUrl = (
         }
       }
     });
+  }
+
+  // Append branch_id if the current-branch-id cookie holds a purely numeric value
+  const branchIdCookie = getCookie("current-branch-id");
+  if (branchIdCookie && /^\d+$/.test(String(branchIdCookie))) {
+    newUrl.searchParams.set("branch_id", String(branchIdCookie));
   }
 
   console.log("Built URL with parameters:", newUrl.toString());
@@ -120,7 +126,7 @@ export const useCreateFetchOptions = () => {
  * @deprecated Use useCreateFetchOptions hook instead for proper locale support
  */
 export const createFetchOptions = (
-  controller: AbortController
+  controller: AbortController,
 ): RequestInit => {
   const token = getCookie("new-vision-token");
   return {
@@ -143,7 +149,7 @@ export const createFetchOptions = (
 export const setupRequestTimeout = (
   controller: AbortController,
   onTimeout: () => void,
-  timeoutMs: number = 15000
+  timeoutMs: number = 15000,
 ): number => {
   return window.setTimeout(() => {
     if (controller && !controller.signal.aborted) {

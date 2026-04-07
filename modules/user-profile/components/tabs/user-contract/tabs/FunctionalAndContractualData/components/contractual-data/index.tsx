@@ -8,7 +8,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function ContractualDataTab() {
   const t = useTranslations("UserProfile.nestedTabs.contractData");
-  const { userJobOffersData } = useFunctionalContractualCxt();
+  const { userJobOffersData, userEmploymentContractData } = useFunctionalContractualCxt();
 
   return (
     <div className="p-4 flex-grow flex flex-col gap-12">

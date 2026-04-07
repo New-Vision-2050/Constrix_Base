@@ -11,6 +11,7 @@ import useUserJobOffersData from "../hooks/useUserJobOffersData";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import useUserContractData from "../hooks/useUserContractData";
+import useUserEmploymentContractData from "../hooks/useUserEmploymentContractData";
 import { Contract } from "@/modules/user-profile/types/Contract";
 import useProfessionalData from "../hooks/useUserProfessionalData";
 import { ProfessionalT } from "../api/get-professinal-data";
@@ -31,6 +32,10 @@ type FunctionalContractualCxtType = {
   userContractDataLoading: boolean;
   userContractData: Contract | undefined;
   handleRefetchContractData: () => void;
+  // user employment contract data
+  userEmploymentContractDataLoading: boolean;
+  userEmploymentContractData: Contract | undefined;
+  handleRefetchEmploymentContractData: () => void;
   // professional data
   professionalDataLoading: boolean;
   professionalData: ProfessionalT | undefined;
@@ -96,6 +101,13 @@ export const FunctionalContractualCxtProvider = ({
     refetch: refetchContractData,
   } = useUserContractData(userId ?? "");
 
+  // user employment contract data
+  const {
+    data: userEmploymentContractData,
+    isLoading: userEmploymentContractDataLoading,
+    refetch: refetchEmploymentContractData,
+  } = useUserEmploymentContractData(userId ?? "");
+
   const {
     data: professionalData,
     isLoading: professionalDataLoading,
@@ -110,6 +122,10 @@ export const FunctionalContractualCxtProvider = ({
   };
   const handleRefetchContractData = () => {
     refetchContractData();
+  };
+
+  const handleRefetchEmploymentContractData = () => {
+    refetchEmploymentContractData();
   };
 
   const handleRefetchJobOffer = () => {
@@ -135,6 +151,10 @@ export const FunctionalContractualCxtProvider = ({
         userContractData,
         userContractDataLoading,
         handleRefetchContractData,
+        // employment contract data
+        userEmploymentContractData,
+        userEmploymentContractDataLoading,
+        handleRefetchEmploymentContractData,
         // professional data
         professionalData,
         professionalDataLoading,

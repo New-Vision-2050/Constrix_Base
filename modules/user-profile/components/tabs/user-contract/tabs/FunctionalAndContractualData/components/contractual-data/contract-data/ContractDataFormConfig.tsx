@@ -43,7 +43,7 @@ const convertToDays = (
 export const ContractDataFormConfig = ({ contract }: PropsT) => {
   const { userId, handleRefetchDataStatus, handleRefetchWidgetData } =
     useUserProfileCxt();
-  const { handleRefetchContractData, timeUnits } =
+  const { handleRefetchEmploymentContractData, timeUnits } =
     useFunctionalContractualCxt();
 
   const t = useTranslations("UserProfile.nestedTabs.contractData");
@@ -585,18 +585,32 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
     onSuccess: () => {
       handleRefetchWidgetData();
       handleRefetchDataStatus();
-      handleRefetchContractData();
+      handleRefetchEmploymentContractData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      const startDate = new Date(formData?.start_date as string);
-      const commencementDate = new Date(formData?.commencement_date as string);
+      // Get date values from formData or fall back to contract initial values
+      const startDateValue = (formData?.start_date as string) || contract?.start_date;
+      const commencementDateValue = (formData?.commencement_date as string) || contract?.commencement_date;
 
-      const body = {
+      const body: Record<string, unknown> = {
         ...formData,
         user_id: userId,
-        start_date: formatDateYYYYMMDD(startDate),
-        commencement_date: formatDateYYYYMMDD(commencementDate),
       };
+
+      // Only format and include dates if they are valid
+      if (startDateValue && startDateValue !== "") {
+        const startDate = new Date(startDateValue);
+        if (!isNaN(startDate.getTime())) {
+          body.start_date = formatDateYYYYMMDD(startDate);
+        }
+      }
+
+      if (commencementDateValue && commencementDateValue !== "") {
+        const commencementDate = new Date(commencementDateValue);
+        if (!isNaN(commencementDate.getTime())) {
+          body.commencement_date = formatDateYYYYMMDD(commencementDate);
+        }
+      }
 
       return await defaultSubmitHandler(
         serialize(body),

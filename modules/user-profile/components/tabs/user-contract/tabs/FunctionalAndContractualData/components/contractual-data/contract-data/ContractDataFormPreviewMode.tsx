@@ -7,7 +7,7 @@ type PropsT = {
   contract?: Contract | undefined;
 };
 export default function ContractDataFormPreviewMode({ contract }: PropsT) {
-  const { handleRefetchContractData } = useFunctionalContractualCxt();
+  const { handleRefetchEmploymentContractData } = useFunctionalContractualCxt();
   const t = useTranslations("UserProfile.nestedTabs.contractData");
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -118,7 +118,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
             <PreviewTextField
               mediaId={media?.id}
               fireAfterDeleteMedia={() => {
-                handleRefetchContractData();
+                handleRefetchEmploymentContractData();
               }}
               valid={Boolean(media?.name)}
               label={t("attachOffer")}

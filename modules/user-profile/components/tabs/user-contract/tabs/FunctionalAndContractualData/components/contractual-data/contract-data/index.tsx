@@ -9,7 +9,7 @@ import Can from "@/lib/permissions/client/Can";
 
 export default function ContractDataForm() {
   // declare and define component state and vars
-  const { userContractData, userContractDataLoading } =
+  const { userEmploymentContractData, userEmploymentContractDataLoading } =
     useFunctionalContractualCxt();
   const { can } = usePermissions();
   const t = useTranslations("UserProfile.nestedTabs");
@@ -18,9 +18,9 @@ export default function ContractDataForm() {
     <Can check={[PERMISSIONS.profile.contractWork.view]}>
       <TabTemplate
         title={t("employmentContract")}
-        loading={userContractDataLoading}
-        reviewMode={<ContractDataFormPreviewMode contract={userContractData} />}
-        editMode={<ContractDataFormEditMode contract={userContractData} />}
+        loading={userEmploymentContractDataLoading}
+        reviewMode={<ContractDataFormPreviewMode contract={userEmploymentContractData} />}
+        editMode={<ContractDataFormEditMode contract={userEmploymentContractData} />}
         settingsBtn={{
           items: [
             { title: t("commonActions.myRequests"), onClick: () => {}, disabled: true },
