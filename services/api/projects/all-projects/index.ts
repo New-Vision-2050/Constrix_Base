@@ -49,7 +49,7 @@ export const AllProjectsApi = {
       { params }
     ),
 
-  getCompanyUsers: (params?: { name?: string }) => 
+  getCompanyUsers: (params?: { name?: string; per_page?: number }) => 
     baseApi.get(`company-users/employees`, { params }),
 
   getEntityClients: (params?: ClientParams) =>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Drawer,
   Box,
@@ -50,6 +50,7 @@ export function ProjectFormDrawer({
 }: ProjectFormDrawerProps) {
   const t = useTranslations();
   const queryClient = useQueryClient();
+  const [currentManager, setCurrentManager] = useState<{ id: number; name: string } | null>(null);
 
   const {
     control,
@@ -131,6 +132,11 @@ export function ProjectFormDrawer({
     if (editingProjectId) {
       AllProjectsApi.show(editingProjectId).then((response) => {
         const project = response.data.payload;
+        if (project.manager) {
+          setCurrentManager({ id: Number(project.manager.id), name: project.manager.name });
+        } else {
+          setCurrentManager(null);
+        }
         reset({
           project_type_id: project.project_type?.id
             ? String(project.project_type.id)
@@ -157,6 +163,8 @@ export function ProjectFormDrawer({
           status: project.status ?? 1,
         });
       });
+    } else {
+      setCurrentManager(null);
     }
   }, [editingProjectId, reset]);
 
@@ -241,6 +249,7 @@ export function ProjectFormDrawer({
           watchBranchId={watchBranchId}
           watchManagementId={watchManagementId}
           watchOwnerType={watchOwnerType}
+          currentManager={currentManager}
           {...formData}
         />
 

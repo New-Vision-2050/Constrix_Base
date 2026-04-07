@@ -65,9 +65,11 @@ export function useProjectFormData(
   const { data: companyUsersData } = useQuery({
     queryKey: ["company-users", searchParams.manager_id],
     queryFn: async () => {
-      const response = await AllProjectsApi.getCompanyUsers(
-        searchParams.manager_id ? { name: searchParams.manager_id } : {}
-      );
+      const params: { name?: string; per_page?: number } = { per_page: 100 };
+      if (searchParams.manager_id) {
+        params.name = searchParams.manager_id;
+      }
+      const response = await AllProjectsApi.getCompanyUsers(params);
       return response.data.payload ?? [];
     },
   });
