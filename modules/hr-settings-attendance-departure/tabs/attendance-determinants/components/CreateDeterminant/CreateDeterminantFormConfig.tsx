@@ -110,8 +110,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     attendanceDaysDialogTranslations,
     formTranslationsFn 
   } = props;
-  void _t;
-  
+
   // Translation functions (passed as parameters instead of hooks)
   const translations = attendanceDaysDialogTranslations || ((key: string) => key);
   
