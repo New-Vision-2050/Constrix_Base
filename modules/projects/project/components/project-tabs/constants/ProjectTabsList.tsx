@@ -11,6 +11,7 @@ import {
   ClipboardList,
   DollarSign,
   FileText,
+  Share2,
 } from "lucide-react";
 import ProjectDataTab from "../tabs/project-data";
 import WorkspaceTab from "../tabs/workspace";
@@ -21,6 +22,7 @@ import WorkOrdersTab from "../tabs/work-orders";
 import FinancialTab from "../tabs/financial";
 import ContractManagementTab from "../tabs/contract-management";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
+import ShareTab from "../tabs/share";
 
 const ALL_TABS: SystemTab[] = [
   {
@@ -58,6 +60,12 @@ const ALL_TABS: SystemTab[] = [
     title: "أوامر العمل",
     icon: <ClipboardList className="w-4 h-4" />,
     content: <WorkOrdersTab />,
+  },
+  {
+    id: "project-tab-share",
+    title: "مشاركة المشروع",
+    icon: <Share2 className="w-4 h-4" />,
+    content: <ShareTab />,
   },
   {
     id: "project-tab-financial",

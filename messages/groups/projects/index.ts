@@ -56,4 +56,90 @@ export const projectMessages = new MessagesGroup({
   columnBranchAffiliated: _m("Affiliated branch", "الفرع التابع"),
   columnSubSubClassification: _m("Sub-classification", "التصنيف الفرعي"),
   emptyCell: _m("—", "—"),
+  share: new MessagesGroup({
+    searchTypePlaceholder: _m("Type", "النوع"),
+    add: _m("Add", "إضافة"),
+    sort: _m("Sort", "ترتيب"),
+    companyName: _m("Company name", "اسم الشركة"),
+    email: _m("Email", "البريد الإلكتروني"),
+    mobile: _m("Mobile", "الجوال"),
+    companyRepresentative: _m("Company representative", "ممثل الشركة"),
+    requestStatus: _m("Request status", "حالة الطلب"),
+    columnActions: _m("Actions", "الإجراءات"),
+    actionMenu: _m("Action", "إجراء"),
+    edit: _m("Edit", "تعديل"),
+    statusPending: _m("In progress", "تحت الاجراء"),
+    dialogTitle: _m("Share", "مشاركة"),
+    dialogSearch: _m("Search", "بحث"),
+    dialogCompanySearchPlaceholder: _m(
+      "Company name",
+      "اسم الشركة"
+    ),
+    dialogSerialSearchPlaceholder: _m(
+      "Enter company serial number",
+      "أدخل الرقم التعريفي للشركة"
+    ),
+    schemasSectionTitle: _m(
+      "Sections to share",
+      "أقسام المشروع للمشاركة"
+    ),
+    noSchemasAvailable: _m(
+      "No shareable sections are configured for this project type.",
+      "لا توجد أقسام متاحة للمشاركة لهذا النوع من المشروع."
+    ),
+    projectTypeMissing: _m(
+      "Project classification is missing; cannot load sections.",
+      "تعذر تحميل الأقسام لأن تصنيف المشروع غير مكتمل."
+    ),
+    loadingSchemas: _m("Loading sections…", "جاري تحميل الأقسام…"),
+    dialogSelectedCompany: _m("Company name: {name}", "اسم الشركة: {name}"),
+    dialogShareSubmit: _m("Share", "مشاركة"),
+    tabProjectData: _m("Project data", "بيانات المشروع"),
+    tabWorkspace: _m("Workspace", "مساحة العمل"),
+    tabAttachments: _m("Attachments", "المرفقات"),
+    tabContractors: _m("Contractors", "المقاولين"),
+    tabStaff: _m("Staff", "الكادر"),
+    tabWorkOrders: _m("Work orders", "أوامر العمل"),
+    tabContractManagement: _m(
+      "Contract management",
+      "إدارات العقد"
+    ),
+    tabFinancial: _m("Financial", "المالية"),
+    companySerialNumber: _m("Company serial number", "الرقم التعريفي للشركة"),
+    notes: _m("Notes", "ملاحظات"),
+    notesPlaceholder: _m(
+      "Optional notes for the recipient",
+      "ملاحظات اختيارية للجهة المستلمة"
+    ),
+    confirmShareTitle: _m("Confirm sharing", "تأكيد المشاركة"),
+    confirmShareMessage: _m(
+      "The sharing request will be sent to the requested party.",
+      "سيتم إرسال طلب المشاركة إلى الجهة المطلوبة"
+    ),
+    confirmApprove: _m("Approve", "موافقة"),
+    shareSuccess: _m("Share request sent", "تم إرسال طلب المشاركة"),
+    shareError: _m("Could not send share request", "تعذر إرسال طلب المشاركة"),
+    alreadySharedWithCompany: _m(
+      "This project has already been shared with this company.",
+      "تم مشاركة هذا المشروع مع هذه الشركة مسبقاً."
+    ),
+    validation: new MessagesGroup({
+      selectCompanyFirst: _m(
+        "Search and select a company first",
+        "ابحث واختر شركة أولاً"
+      ),
+      selectSection: _m(
+        "Select at least one section to share",
+        "اختر قسماً واحداً على الأقل للمشاركة"
+      ),
+      companySerialRequired: _m(
+        "Company serial number is required",
+        "الرقم التعريفي للشركة مطلوب"
+      ),
+      companyLookupRequired: _m(
+        "Search for the company by serial number first",
+        "ابحث عن الشركة بالرقم التعريفي أولاً"
+      ),
+    }),
+  }),
 });
