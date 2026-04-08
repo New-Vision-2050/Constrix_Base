@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
+  Alert,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -17,6 +18,12 @@ import {
   Checkbox,
   Stack,
   CircularProgress,
+  Stepper,
+  Step,
+  StepLabel,
+  Paper,
+  Divider,
+  Chip,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
@@ -30,7 +37,6 @@ import {
   SCHEMA_IDS,
   useProjectSettingsTabs,
 } from "@/modules/projects/settings/constants/current-tabs";
-import ConfirmShareDialog from "./ConfirmShareDialog";
 import { CompanyData } from "@/services/api/projects/project-sharing/types/response";
 
 type ShareFormValues = {
@@ -56,10 +62,6 @@ const defaultForm: ShareFormValues = {
   serialSearch: "",
   notes: "",
 };
-
-/** Backend `message` may be a string or `{ description: string }`. */
-const API_DESCRIPTION_ALREADY_SHARED =
-  "Resource is already shared with this company";
 
 type ApiErrorBody = {
   status?: unknown;
@@ -94,6 +96,25 @@ function getApiErrorDescription(error: unknown): string | undefined {
   return getErrorDescriptionFromApiData(data);
 }
 
+/** Serial lookup: HTTP 404 or `{ code: 404, description: "Company not found" }`. */
+function isCompanyNotFoundError(error: unknown): boolean {
+  if (!axios.isAxiosError(error)) return false;
+  const status = error.response?.status;
+  if (status === 404) return true;
+  const data = error.response?.data;
+  if (!data || typeof data !== "object") return false;
+  const body = data as { code?: unknown; description?: unknown };
+  if (body.code === 404) return true;
+  if (typeof body.description === "string") {
+    const lower = body.description.toLowerCase();
+    return (
+      lower.includes("company") &&
+      (lower.includes("not found") || lower.includes("لم يتم"))
+    );
+  }
+  return false;
+}
+
 /** API often returns HTTP 200 with `{ status: "error", message: {...} }`. */
 function isApiPayloadBusinessError(data: unknown): boolean {
   if (!data || typeof data !== "object") return false;
@@ -104,13 +125,9 @@ function isApiPayloadBusinessError(data: unknown): boolean {
 function isAlreadySharedApiDescription(description: string | undefined) {
   if (!description) return false;
   const normalized = description.trim().replace(/\s+/g, " ");
-  if (normalized === API_DESCRIPTION_ALREADY_SHARED) return true;
   const lower = normalized.toLowerCase();
   return lower.includes("already shared") && lower.includes("company");
 }
-
-/** Wait for main dialog exit transition before opening confirm (MUI default leave ~225ms). */
-const CONFIRM_OPEN_AFTER_MS = 225;
 
 /** Same schema ids as `useProjectSettingsTabs()`; stable for memo keys (hook returns a new array each render). */
 const PROJECT_SETTINGS_TAB_SCHEMA_IDS = new Set<number>(
@@ -126,13 +143,9 @@ export default function ShareProjectDialog({
   const queryClient = useQueryClient();
   const allSettingsTabs = useProjectSettingsTabs();
 
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  /** Main share form dialog; set false before opening confirm so the first dialog closes first. */
-  const [formDialogOpen, setFormDialogOpen] = useState(true);
-  const confirmOpenTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [pendingPayload, setPendingPayload] =
-    useState<PendingSharePayload | null>(null);
+  const [activeStep, setActiveStep] = useState(0);
   const [company, setCompany] = useState<CompanyData | null>(null);
+  const [lookupError, setLookupError] = useState<string | null>(null);
   const [selectedSchemaIds, setSelectedSchemaIds] = useState<number[]>([]);
 
   const schemaParentId = projectData?.sub_project_type_id;
@@ -205,28 +218,14 @@ export default function ShareProjectDialog({
 
   useEffect(() => {
     if (!open) {
-      if (confirmOpenTimerRef.current) {
-        clearTimeout(confirmOpenTimerRef.current);
-        confirmOpenTimerRef.current = null;
-      }
-      setFormDialogOpen(true);
+      setActiveStep(0);
       setCompany(null);
+      setLookupError(null);
       setSelectedSchemaIds([]);
-      setPendingPayload(null);
-      setConfirmOpen(false);
       reset(defaultForm);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `reset` from RHF can change identity every render
   }, [open]);
-
-  useEffect(
-    () => () => {
-      if (confirmOpenTimerRef.current) {
-        clearTimeout(confirmOpenTimerRef.current);
-      }
-    },
-    [],
-  );
 
   const lookupMutation = useMutation({
     mutationFn: (serial: string) =>
@@ -234,11 +233,21 @@ export default function ShareProjectDialog({
     onSuccess: (res) => {
       const payload = res.data?.payload;
       if (payload) {
+        setLookupError(null);
         setCompany(payload);
+        setActiveStep(1);
+      } else {
+        setCompany(null);
+        setLookupError(t("companyNotFound"));
       }
     },
     onError: (error: unknown) => {
       setCompany(null);
+      if (isCompanyNotFoundError(error)) {
+        setLookupError(t("companyNotFound"));
+        return;
+      }
+      setLookupError(null);
       toast.error(getApiErrorDescription(error) ?? t("shareError"));
     },
   });
@@ -260,12 +269,11 @@ export default function ShareProjectDialog({
       const text = getErrorDescriptionFromApiData(res.data);
       toast.success(text?.trim() ? text : t("shareSuccess"));
       queryClient.invalidateQueries({ queryKey: ["project-details", projectId] });
-      setConfirmOpen(false);
-      setFormDialogOpen(true);
-      setPendingPayload(null);
+      queryClient.invalidateQueries({ queryKey: ["project-shares", projectId] });
       reset(defaultForm);
       setCompany(null);
       setSelectedSchemaIds([]);
+      setActiveStep(0);
       onClose();
     },
     onError: (error: unknown) => {
@@ -280,22 +288,18 @@ export default function ShareProjectDialog({
 
   const handleClose = () => {
     if (shareMutation.isPending || lookupMutation.isPending) return;
-    if (confirmOpenTimerRef.current) {
-      clearTimeout(confirmOpenTimerRef.current);
-      confirmOpenTimerRef.current = null;
-    }
-    setConfirmOpen(false);
-    setFormDialogOpen(true);
-    setPendingPayload(null);
     reset(defaultForm);
     setCompany(null);
+    setLookupError(null);
     setSelectedSchemaIds([]);
+    setActiveStep(0);
     onClose();
   };
 
   const onLookup = () => {
     const serial = getValues("serialSearch").trim();
     if (!serial) return;
+    setLookupError(null);
     lookupMutation.mutate(serial);
   };
 
@@ -307,6 +311,20 @@ export default function ShareProjectDialog({
     );
   };
 
+  const handleNext = () => {
+    if (activeStep === 2) {
+      if (selectedSchemaIds.length === 0) {
+        toast.error(t("validation.selectSection"));
+        return;
+      }
+    }
+    setActiveStep((prev) => prev + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prev) => prev - 1);
+  };
+
   const onValidSubmit = (data: ShareFormValues) => {
     if (!company) {
       toast.error(t("validation.companyLookupRequired"));
@@ -316,32 +334,11 @@ export default function ShareProjectDialog({
       toast.error(t("validation.selectSection"));
       return;
     }
-    if (confirmOpenTimerRef.current) {
-      clearTimeout(confirmOpenTimerRef.current);
-      confirmOpenTimerRef.current = null;
-    }
-    setPendingPayload({
+    shareMutation.mutate({
       company_serial_number: company.serial_no,
       schema_ids: selectedSchemaIds,
       notes: data.notes.trim() || undefined,
     });
-    setFormDialogOpen(false);
-    confirmOpenTimerRef.current = setTimeout(() => {
-      confirmOpenTimerRef.current = null;
-      setConfirmOpen(true);
-    }, CONFIRM_OPEN_AFTER_MS);
-  };
-
-  const handleConfirmShare = () => {
-    if (!pendingPayload) return;
-    shareMutation.mutate(pendingPayload);
-  };
-
-  const handleCancelConfirm = () => {
-    if (shareMutation.isPending) return;
-    setConfirmOpen(false);
-    setPendingPayload(null);
-    setFormDialogOpen(true);
   };
 
   const pending =
@@ -353,115 +350,149 @@ export default function ShareProjectDialog({
   const canShowSchemas =
     Boolean(schemaParentId && schemaParentId > 0) && !schemasLoading;
 
-  return (
-    <>
-      <Dialog
-        open={open && formDialogOpen}
-        onClose={() => {
-          if (shareMutation.isPending || lookupMutation.isPending) return;
-          handleClose();
-        }}
-        maxWidth="md"
-        fullWidth
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 1,
-            pt: 1,
-          }}
-        >
-          <IconButton
-            onClick={handleClose}
-            aria-label={t("dialogTitle")}
-            disabled={pending}
-          >
-            <Close />
-          </IconButton>
-          <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
-            {t("dialogTitle")}
-          </DialogTitle>
-        </Box>
+  const steps = [
+    "البحث عن شركة",
+    "معلومات الشركة",
+    "تحديد الصلاحيات",
+    "المراجعة والإرسال",
+  ];
 
-        <DialogContent sx={{ p: 3, pt: 1 }}>
-          {projectLoading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box
-              component="form"
-              onSubmit={handleSubmit(onValidSubmit)}
-              noValidate
-              sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-            >
-              {!schemaParentId || schemaParentId <= 0 ? (
-                <Typography color="warning.main" variant="body2">
-                  {t("projectTypeMissing")}
-                </Typography>
-              ) : null}
+  const renderStepContent = () => {
+    switch (activeStep) {
+      case 0:
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3, height: "100%" }}>
+            {!schemaParentId || schemaParentId <= 0 ? (
+              <Typography color="warning.main" variant="body2">
+                {t("projectTypeMissing")}
+              </Typography>
+            ) : null}
 
-              <Stack direction="row" spacing={1} alignItems="flex-start">
-                <Controller
-                  name="serialSearch"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      label={t("companySerialNumber")}
-                      placeholder={t("dialogSerialSearchPlaceholder")}
-                      error={!!errors.serialSearch}
-                      helperText={errors.serialSearch?.message}
-                      disabled={pending}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          onLookup();
-                        }
-                      }}
-                    />
-                  )}
-                />
-                <Button
-                  type="button"
-                  variant="contained"
-                  color="primary"
-                  onClick={onLookup}
+            <Controller
+              name="serialSearch"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  size="small"
+                  label={t("companySerialNumber")}
+                  placeholder={t("dialogSerialSearchPlaceholder")}
+                  error={!!errors.serialSearch}
+                  helperText={errors.serialSearch?.message}
                   disabled={pending}
-                  sx={{ flexShrink: 0, minWidth: 88 }}
-                >
-                  {lookupMutation.isPending ? (
-                    <CircularProgress size={22} color="inherit" />
-                  ) : (
-                    t("dialogSearch")
-                  )}
-                </Button>
-              </Stack>
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      onLookup();
+                    }
+                  }}
+                />
+              )}
+            />
 
-              {company ? (
+            <Alert severity="info" variant="outlined" sx={{ py: 1 }}>
+              لن تظهر بيانات الشركة إلا بعد البحث
+            </Alert>
+
+            {lookupError ? (
+              <Alert severity="warning" variant="outlined" sx={{ py: 0.75 }}>
+                {lookupError}
+              </Alert>
+            ) : null}
+
+            {company ? (
+              <Paper variant="outlined" sx={{ p: 2, bgcolor: "success.light", borderColor: "success.main" }}>
                 <Typography variant="body1" color="text.primary" sx={{ fontWeight: 700 }}>
                   {t("dialogSelectedCompany", { name: company.name })}
                 </Typography>
-              ) : null}
+              </Paper>
+            ) : null}
+          </Box>
+        );
 
-              {schemasLoading ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <CircularProgress size={24} />
-                  <Typography variant="body2">{t("loadingSchemas")}</Typography>
-                </Box>
-              ) : null}
-
-              {canShowSchemas && filteredTabs.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
-                  {t("noSchemasAvailable")}
+      case 1:
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {company ? (
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2.5,
+                  bgcolor: "action.hover",
+                  borderColor: "primary.main",
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 2, fontWeight: 600, color: "primary.main" }}
+                >
+                  معلومات الشركة
                 </Typography>
-              ) : null}
+                <Stack spacing={1.5}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                      اسم الشركة:
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {company.name}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                      {t("companySerialNumber") || "Serial Number"}:
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {company.serial_no}
+                    </Typography>
+                  </Stack>
+                  {company.email && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                        البريد الإلكتروني:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={600}>
+                        {company.email}
+                      </Typography>
+                    </Stack>
+                  )}
+                  {company.representative_name && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                        ممثل الشركة:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={600}>
+                        {company.representative_name}
+                      </Typography>
+                    </Stack>
+                  )}
+                </Stack>
+              </Paper>
+            ) : null}
+          </Box>
+        );
 
-              {canShowSchemas && filteredTabs.length > 0 ? (
+      case 2:
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {schemasLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={24} />
+                <Typography variant="body2">{t("loadingSchemas")}</Typography>
+              </Box>
+            ) : null}
+
+            {canShowSchemas && filteredTabs.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                {t("noSchemasAvailable")}
+              </Typography>
+            ) : null}
+
+            {canShowSchemas && filteredTabs.length > 0 ? (
+              <Box>
+                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                  حدد الصلاحيات للمشاركة
+                </Typography>
                 <Box
                   sx={{
                     display: "flex",
@@ -480,7 +511,7 @@ export default function ShareProjectDialog({
                           <Checkbox
                             checked={checked}
                             onChange={() => toggleSchemaId(id)}
-                            disabled={pending || !company}
+                            disabled={pending}
                           />
                         }
                         label={tab.name}
@@ -488,53 +519,217 @@ export default function ShareProjectDialog({
                     );
                   })}
                 </Box>
-              ) : null}
-
-              <Controller
-                name="notes"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    size="small"
-                    multiline
-                    minRows={2}
-                    label={t("notes")}
-                    placeholder={t("notesPlaceholder")}
-                    disabled={pending}
-                  />
-                )}
-              />
-
-              <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  disabled={
-                    pending ||
-                    !canShowSchemas ||
-                    filteredTabs.length === 0 ||
-                    !company
-                  }
-                >
-                  {t("dialogShareSubmit")}
-                </Button>
               </Box>
-            </Box>
-          )}
-        </DialogContent>
-      </Dialog>
+            ) : null}
+          </Box>
+        );
 
-      <ConfirmShareDialog
-        open={confirmOpen}
-        onClose={handleCancelConfirm}
-        onConfirm={handleConfirmShare}
-        isSubmitting={shareMutation.isPending}
-      />
-    </>
+      case 3:
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <Paper variant="outlined" sx={{ p: 2.5, bgcolor: "action.hover" }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                معلومات الشركة
+              </Typography>
+              <Typography variant="body1">{company?.name || "—"}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {company?.serial_no || "—"}
+              </Typography>
+            </Paper>
+
+            <Paper variant="outlined" sx={{ p: 2.5, bgcolor: "action.hover" }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                الصلاحيات المختارة
+              </Typography>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gap: 1.5,
+                }}
+              >
+                {filteredTabs
+                  .filter((tab) => selectedSchemaIds.includes(tab.schema_id!))
+                  .map((tab) => (
+                    <Stack
+                      key={tab.value}
+                      direction="row"
+                      spacing={1}
+                      alignItems="center"
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 1,
+                        bgcolor: "background.paper",
+                        border: 1,
+                        borderColor: "primary.main",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "50%",
+                          bgcolor: "primary.main",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Typography variant="body2" fontWeight={500}>
+                        {tab.name}
+                      </Typography>
+                    </Stack>
+                  ))}
+              </Box>
+            </Paper>
+
+            <Controller
+              name="notes"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  size="small"
+                  multiline
+                  minRows={3}
+                  label={t("notes")}
+                  placeholder={t("notesPlaceholder")}
+                  disabled={pending}
+                />
+              )}
+            />
+          </Box>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={() => {
+        if (shareMutation.isPending || lookupMutation.isPending) return;
+        handleClose();
+      }}
+      maxWidth="md"
+      fullWidth
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 1,
+          pt: 1,
+        }}
+      >
+        <IconButton
+          onClick={handleClose}
+          aria-label={t("dialogTitle")}
+          disabled={pending}
+        >
+          <Close />
+        </IconButton>
+        <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
+          {t("dialogTitle")}
+        </DialogTitle>
+      </Box>
+
+      <DialogContent sx={{ p: 3, pt: 2 }}>
+        {projectLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Box
+            component="form"
+            onSubmit={handleSubmit(onValidSubmit)}
+            noValidate
+          >
+            <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            <Box sx={{ minHeight: 200 }}>{renderStepContent()}</Box>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              {activeStep === 0 ? (
+                <>
+                  <Button
+                    variant="outlined"
+                    onClick={handleClose}
+                    disabled={pending}
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    onClick={onLookup}
+                    disabled={pending}
+                    sx={{ minWidth: 120 }}
+                  >
+                    {lookupMutation.isPending ? (
+                      <CircularProgress size={22} color="inherit" />
+                    ) : (
+                      "بحث"
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    disabled={pending}
+                    onClick={handleBack}
+                    variant="outlined"
+                  >
+                    رجوع
+                  </Button>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    {activeStep === steps.length - 1 ? (
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        disabled={
+                          pending ||
+                          !canShowSchemas ||
+                          filteredTabs.length === 0 ||
+                          !company ||
+                          selectedSchemaIds.length === 0
+                        }
+                      >
+                        {shareMutation.isPending ? (
+                          <CircularProgress size={22} color="inherit" />
+                        ) : (
+                          t("dialogShareSubmit")
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        onClick={handleNext}
+                        disabled={pending}
+                      >
+                        التالي
+                      </Button>
+                    )}
+                  </Box>
+                </>
+              )}
+            </Box>
+          </Box>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Box, Paper, Tab, Tabs } from "@mui/material";
+import { Box, Paper, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material";
 import { useProjectTabsList } from "./constants/ProjectTabsList";
 
 export default function ProjectTabs() {
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const tabsList = useProjectTabsList();
   const [activeTab, setActiveTab] = useState<string>("");
 
@@ -48,23 +50,22 @@ export default function ProjectTabs() {
           <Tabs
             value={value}
             onChange={(_, v: string) => setActiveTab(v)}
-            variant="scrollable"
-            scrollButtons="auto"
+            variant={isMdUp ? "fullWidth" : "scrollable"}
+            scrollButtons={isMdUp ? false : "auto"}
             allowScrollButtonsMobile
             sx={{
               flex: 1,
               minWidth: 0,
+              width: "100%",
               maxWidth: "100%",
-              "& .MuiTabScrollButton-root": {
-                flexShrink: 0,
-              },
-              "& .MuiTabs-scroller": {
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-                "&::-webkit-scrollbar": {
-                  display: "none",
+              ...(!isMdUp && {
+                "& .MuiTabScrollButton-root": { flexShrink: 0 },
+                "& .MuiTabs-scroller": {
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                  "&::-webkit-scrollbar": { display: "none" },
                 },
-              },
+              }),
             }}
           >
             {tabsList.map((tab) => (

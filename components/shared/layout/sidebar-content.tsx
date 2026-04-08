@@ -7,6 +7,7 @@ import {
   UserIcon,
   Settings,
   FolderClosed,
+  Inbox,
   LibraryBig,
   FileText,
 } from "lucide-react";
@@ -209,6 +210,7 @@ export function SidebarContentWrapper({
           ROUTER.WORK_PANEL_SETTINGS,
           ROUTER.PROJECTS_SETTINGS,
           ROUTER.ALL_PROJECTS,
+          ROUTER.PROJECTS_INBOX,
         ],
         icon: LayoutDashboardIcon,
         isActive:
@@ -232,7 +234,15 @@ export function SidebarContentWrapper({
             icon: FolderClosed, // Using FolderClosed as it's already imported
             isActive:
               fullPath.startsWith("/projects") &&
-              !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
+              !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS) &&
+              !fullPath.startsWith(ROUTER.PROJECTS_INBOX),
+            show: !isCentralCompany,
+          },
+          {
+            name: t("Sidebar.Inbox"),
+            url: ROUTER.PROJECTS_INBOX,
+            icon: Inbox,
+            isActive: fullPath.startsWith(ROUTER.PROJECTS_INBOX),
             show: !isCentralCompany,
           },
         ],

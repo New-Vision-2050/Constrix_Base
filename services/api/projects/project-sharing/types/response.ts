@@ -80,3 +80,96 @@ export type CompanyLookupResponse = {
   message?: string | null;
   payload: CompanyData;
 };
+
+/** Company the project is shared with (list payload). */
+export type ProjectShareWithCompany = {
+  id: string;
+  name: string;
+  serial_number: string | null;
+  email?: string;
+  phone?: string;
+};
+
+export type ProjectShareActor = {
+  id: string;
+  name: string;
+};
+
+/**
+ * Row from `projects/sharing/list` (and related) list endpoints.
+ * Nested objects may be omitted on some rows — map with optional chaining in UI.
+ */
+export type ProjectShareAssignment = {
+  id: string;
+  created_at: string;
+  updated_at?: string;
+  notes?: string | null;
+  status: string;
+  schema_ids?: number[];
+  shareable_id?: string;
+  shareable_type?: string;
+  responded_at?: string | null;
+  responded_by?: ProjectShareActor | null;
+  owner_company?: { id: string; name: string; serial_number?: string | null } | null;
+  shared_by?: ProjectShareActor | null;
+  shared_with_company?: ProjectShareWithCompany | null;
+  /** Legacy/alternate shape from older API versions */
+  user?: { id: string; name: string; email?: string } | null;
+  assigned_at?: string;
+  assigned_by?: { id: string; name: string } | null;
+};
+
+export type ListProjectSharesResponse = {
+  code: string;
+  message?: string | null;
+  payload: ProjectShareAssignment[];
+};
+
+/** Nested project on a pending share invitation (fields vary by API). */
+export type PendingInvitationProject = {
+  id?: string | number;
+  serial_number?: string;
+  ref_number?: string;
+  name?: string;
+  contract_number?: string;
+  start_date?: string;
+  end_date?: string;
+  completion_percentage?: number;
+  delay_percentage?: number;
+  status?: number;
+  project_view?: string;
+  project_type_name?: string;
+  sub_project_type?: string;
+  sub_project_type_name?: string;
+  sub_sub_project_type_name?: string;
+  branch_name?: string;
+  management_name?: string;
+  manager_name?: string;
+  project_owner_name?: string;
+  client_name?: string;
+  responsible_employee?: { id?: number; name?: string };
+  responsible_employee_name?: string;
+  client?: { name?: string };
+  [key: string]: unknown;
+};
+
+export type PendingShareInvitation = {
+  id: string;
+  status: string;
+  notes?: string | null;
+  created_at?: string;
+  shareable_id?: string;
+  shareable_type?: string;
+  /** Shared section IDs (same as project share / schema_ids). */
+  schema_ids?: number[];
+  /** Company that initiated the share (when present on the API). */
+  owner_company?: { id?: string; name?: string } | null;
+  shared_by?: { id?: string; name?: string } | null;
+  project?: PendingInvitationProject | null;
+};
+
+export type PendingInvitationsResponse = {
+  code: string;
+  message?: string | null;
+  payload: PendingShareInvitation[];
+};
