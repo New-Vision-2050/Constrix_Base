@@ -11,7 +11,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { useTranslations } from "next-intl";
 
 export default function ConfirmShareDialog({
   open,
@@ -19,9 +18,6 @@ export default function ConfirmShareDialog({
   onConfirm,
   isSubmitting,
 }: ConfirmShareDialogProps) {
-  const t = useTranslations("project.share");
-  const tProject = useTranslations("project");
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <Box
@@ -31,20 +27,20 @@ export default function ConfirmShareDialog({
       >
         <IconButton
           onClick={onClose}
-          aria-label={tProject("cancel")}
+          aria-label="إلغاء"
           disabled={isSubmitting}
           sx={{ position: "absolute", top: 8, insetInlineEnd: 8 }}
         >
           <Close />
         </IconButton>
         <DialogTitle sx={{ textAlign: "center", pr: 5, pb: 1 }}>
-          {t("confirmShareTitle")}
+          تأكيد المشاركة
         </DialogTitle>
       </Box>
 
       <DialogContent sx={{ py: 3, px: 3 }}>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 , display: "flex", justifyContent: "center" }}>
-          {t("confirmShareMessage")}
+          هل أنت متأكد من مشاركة هذا المشروع؟
         </Typography>
 
         <Box
@@ -66,7 +62,7 @@ export default function ConfirmShareDialog({
               ) : undefined
             }
           >
-            {t("confirmApprove")}
+            تأكيد
           </Button>
           <Button
             variant="outlined"
@@ -74,7 +70,7 @@ export default function ConfirmShareDialog({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            {tProject("cancel")}
+            إلغاء
           </Button>
         </Box>
       </DialogContent>
