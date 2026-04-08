@@ -31,7 +31,7 @@ import CancelButton from "@/components/shared/buttons/cancel";
 import FormDatePicker from "@/components/shared/FormDatePicker";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
-import { outgoingAttachmentsQueryKey } from "@/modules/projects/project/query/useOutgoingAttachments";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 
 interface AddFileDialogProps {
   open: boolean;
@@ -84,6 +84,16 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
   const watchTypeId = watch("attachment_type_id");
   const watchSubTypeId = watch("attachment_sub_type_id");
 
+  /* ── Shared companies (receiver dropdown) ───────────────────────────── */
+  const { data: sharedCompanies = [], isLoading: loadingCompanies } = useQuery({
+    queryKey: ["shared-companies", projectId],
+    queryFn: async () => {
+      const res = await ProjectSharingApi.getSharedCompanies(projectId);
+      return res.data.payload ?? [];
+    },
+    enabled: !!projectId,
+  });
+
   /* ── Cascading folder queries — all use the same endpoint ──────────── */
   //  Level 1: parent_id = projectId  (root folders for this project)
   //  Level 2: parent_id = attachment_type_id
@@ -93,7 +103,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
     queryKey: ["attachment-folders", "root", projectId],
     queryFn: async () => {
       const res = await AttachmentRequestsApi.getFolderChildren(projectId);
-      return res.data.data ?? [];
+      return res.data.payload ?? [];
     },
     enabled: !!projectId,
   });
@@ -102,7 +112,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
     queryKey: ["attachment-folders", "sub", watchTypeId],
     queryFn: async () => {
       const res = await AttachmentRequestsApi.getFolderChildren(watchTypeId!);
-      return res.data.data ?? [];
+      return res.data.payload ?? [];
     },
     enabled: !!watchTypeId,
   });
@@ -110,8 +120,10 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
   const { data: subSubTypes = [], isLoading: loadingSubSubs } = useQuery({
     queryKey: ["attachment-folders", "sub-sub", watchSubTypeId],
     queryFn: async () => {
-      const res = await AttachmentRequestsApi.getFolderChildren(watchSubTypeId!);
-      return res.data.data ?? [];
+      const res = await AttachmentRequestsApi.getFolderChildren(
+        watchSubTypeId!,
+      );
+      return res.data.payload ?? [];
     },
     enabled: !!watchSubTypeId,
   });
@@ -153,13 +165,9 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
         typeof msg === "string" && msg.trim() ? msg : t("addSuccess"),
       );
       queryClient.invalidateQueries({
-        queryKey: outgoingAttachmentsQueryKey({
-          projectId,
-          page: 1,
-          perPage: 10,
-        }),
+        queryKey: ["outgoing-attachment-requests"],
       });
-      handleClose();
+      onClose();
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
       toast.error(err?.response?.data?.message ?? t("addError"));
@@ -244,9 +252,14 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
           <FormControl
             fullWidth
             error={!!errors.receiver_company_id}
-            disabled={isPending}
+            disabled={isPending || loadingCompanies}
           >
-            <InputLabel>{t("selectCompany")}</InputLabel>
+            <InputLabel>
+              {loadingCompanies ? (
+                <CircularProgress size={14} sx={{ mr: 1 }} />
+              ) : null}
+              {t("selectCompany")}
+            </InputLabel>
             <Select
               label={t("selectCompany")}
               value={watch("receiver_company_id")}
@@ -257,6 +270,11 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
               }
             >
               <MenuItem value="">—</MenuItem>
+              {sharedCompanies.map((company) => (
+                <MenuItem key={company.id} value={String(company.id)}>
+                  {company.name}
+                </MenuItem>
+              ))}
             </Select>
             {errors.receiver_company_id && (
               <FormHelperText error>

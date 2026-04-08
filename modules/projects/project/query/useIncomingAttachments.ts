@@ -11,11 +11,11 @@ import type {
 
 function mapStatus(apiStatus: AttachmentRequestStatus): DocumentStatus {
   switch (apiStatus) {
-    case "approved":     return "approved";
-    case "rejected":     return "rejected";
+    case "approved":      return "approved";
+    case "rejected":      return "rejected";
     case "semi-approved": return "semi_approved";
     case "pending":
-    default:             return "pending";
+    default:              return "pending";
   }
 }
 
@@ -40,17 +40,15 @@ function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
   };
 }
 
-function attachmentRequestsListFromBody(
-  body: {
-    data?: AttachmentRequest[];
-    payload?: AttachmentRequest[];
-  },
-): AttachmentRequest[] {
+function attachmentRequestsListFromBody(body: {
+  data?: AttachmentRequest[];
+  payload?: AttachmentRequest[];
+}): AttachmentRequest[] {
   const raw = body.payload ?? body.data;
   return Array.isArray(raw) ? raw : [];
 }
 
-export interface UseOutgoingAttachmentsParams {
+export interface UseIncomingAttachmentsParams {
   projectId: string | undefined;
   page: number;
   perPage: number;
@@ -59,29 +57,29 @@ export interface UseOutgoingAttachmentsParams {
   endDate?: string;
 }
 
-export const outgoingAttachmentsQueryKey = (
-  params: UseOutgoingAttachmentsParams,
-) => ["outgoing-attachment-requests", params] as const;
+export const incomingAttachmentsQueryKey = (
+  params: UseIncomingAttachmentsParams,
+) => ["incoming-attachment-requests", params] as const;
 
-export interface OutgoingAttachmentsResult {
+export interface IncomingAttachmentsResult {
   data: DocumentRow[];
   totalPages: number;
   totalItems: number;
 }
 
-export function useOutgoingAttachments(params: UseOutgoingAttachmentsParams) {
+export function useIncomingAttachments(params: UseIncomingAttachmentsParams) {
   const { projectId, page, perPage, documentType, type, endDate } = params;
 
   return useQuery({
-    queryKey: outgoingAttachmentsQueryKey(params),
-    queryFn: async (): Promise<OutgoingAttachmentsResult> => {
-      const res = await AttachmentRequestsApi.getOutgoing({
+    queryKey: incomingAttachmentsQueryKey(params),
+    queryFn: async (): Promise<IncomingAttachmentsResult> => {
+      const res = await AttachmentRequestsApi.getIncoming({
         project_id: projectId!,
         page,
         per_page: perPage,
         ...(documentType ? { document_type: documentType } : {}),
-        ...(type        ? { type }                          : {}),
-        ...(endDate     ? { end_date: endDate }             : {}),
+        ...(type         ? { type }                        : {}),
+        ...(endDate      ? { end_date: endDate }           : {}),
       });
 
       const body = res.data;

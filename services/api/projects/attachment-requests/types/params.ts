@@ -1,3 +1,12 @@
+export interface IncomingAttachmentRequestsParams {
+  project_id: string;
+  page?: number;
+  per_page?: number;
+  document_type?: string;
+  type?: string;
+  end_date?: string;
+}
+
 export interface OutgoingAttachmentRequestsParams {
   project_id: string;
   page?: number;

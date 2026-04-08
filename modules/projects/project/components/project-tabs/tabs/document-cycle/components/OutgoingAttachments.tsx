@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Stack, TextField, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -19,13 +19,21 @@ const filterSx = {
   "& .MuiOutlinedInput-root": { borderRadius: "8px" },
 };
 
-export default function OutgoingAttachments() {
+interface OutgoingAttachmentsProps {
+  onTotalItemsChange?: (count: number) => void;
+}
+
+export default function OutgoingAttachments({
+  onTotalItemsChange,
+}: OutgoingAttachmentsProps) {
   const t = useTranslations("project.documentCycle");
   const { projectId } = useProject();
 
   const [addFileOpen, setAddFileOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<DocumentRow | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentRow | null>(
+    null,
+  );
 
   const [filterDocType, setFilterDocType] = useState("");
   const [filterType, setFilterType] = useState("");
@@ -48,6 +56,10 @@ export default function OutgoingAttachments() {
   const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
   const totalPages = queryResult?.totalPages ?? 1;
   const totalItems = queryResult?.totalItems ?? 0;
+
+  useEffect(() => {
+    onTotalItemsChange?.(totalItems);
+  }, [totalItems, onTotalItemsChange]);
 
   const handleView = (row: DocumentRow) => {
     setSelectedDocument(row);
@@ -83,11 +95,10 @@ export default function OutgoingAttachments() {
         key: "lastActivity",
         name: t("lastActivity"),
         sortable: false,
-        render: (row: DocumentRow) => (
-          <span>
-            {t("byUser")} {row.lastActivityUser}
-          </span>
-        ),
+        render: (row: DocumentRow) => {
+          const dateStr = row.lastActivityDate?.trim();
+          return <span>{dateStr || "—"}</span>;
+        },
       },
       {
         key: "status",
@@ -102,7 +113,12 @@ export default function OutgoingAttachments() {
         render: (row: DocumentRow) => (
           <CustomMenu
             renderAnchor={({ onClick }) => (
-              <Button size="small" variant="contained" color="info" onClick={onClick}>
+              <Button
+                size="small"
+                variant="contained"
+                color="info"
+                onClick={onClick}
+              >
                 {t("action")}
               </Button>
             )}
@@ -146,7 +162,10 @@ export default function OutgoingAttachments() {
                   size="small"
                   label={t("documentType")}
                   value={filterDocType}
-                  onChange={(e) => { setFilterDocType(e.target.value); params.setPage(1); }}
+                  onChange={(e) => {
+                    setFilterDocType(e.target.value);
+                    params.setPage(1);
+                  }}
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
@@ -158,7 +177,10 @@ export default function OutgoingAttachments() {
                   size="small"
                   label={t("type")}
                   value={filterType}
-                  onChange={(e) => { setFilterType(e.target.value); params.setPage(1); }}
+                  onChange={(e) => {
+                    setFilterType(e.target.value);
+                    params.setPage(1);
+                  }}
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
@@ -172,7 +194,10 @@ export default function OutgoingAttachments() {
                   label={t("endDate")}
                   type="date"
                   value={filterEndDate}
-                  onChange={(e) => { setFilterEndDate(e.target.value); params.setPage(1); }}
+                  onChange={(e) => {
+                    setFilterEndDate(e.target.value);
+                    params.setPage(1);
+                  }}
                   InputLabelProps={{ shrink: true }}
                   sx={filterSx}
                 />
@@ -181,7 +206,10 @@ export default function OutgoingAttachments() {
               <OutgoingTableLayout.TopActions
                 state={state}
                 customActions={
-                  <Button variant="contained" onClick={() => setAddFileOpen(true)}>
+                  <Button
+                    variant="contained"
+                    onClick={() => setAddFileOpen(true)}
+                  >
                     {t("addFile")}
                   </Button>
                 }
@@ -189,7 +217,10 @@ export default function OutgoingAttachments() {
             </Stack>
           }
           table={
-            <OutgoingTableLayout.Table state={state} loadingOptions={{ rows: 5 }} />
+            <OutgoingTableLayout.Table
+              state={state}
+              loadingOptions={{ rows: 5 }}
+            />
           }
           pagination={<OutgoingTableLayout.Pagination state={state} />}
         />

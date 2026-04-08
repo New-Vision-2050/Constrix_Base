@@ -1,19 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Stack, TextField, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { DocumentRow } from "../types";
-import { MOCK_INCOMING_DOCUMENTS } from "../constants/mock-data";
 import StatusBadge from "./StatusBadge";
 import AttachmentDetailDialog from "./AttachmentDetailDialog";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useIncomingAttachments } from "@/modules/projects/project/query/useIncomingAttachments";
 
 const IncomingTableLayout = HeadlessTableLayout<DocumentRow>("incoming-docs");
 
-export default function IncomingAttachments() {
+interface IncomingAttachmentsProps {
+  onTotalItemsChange?: (count: number) => void;
+}
+
+export default function IncomingAttachments({ onTotalItemsChange }: IncomingAttachmentsProps) {
   const t = useTranslations("project.documentCycle");
+  const { projectId } = useProject();
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentRow | null>(null);
   const [filterDocType, setFilterDocType] = useState("");
@@ -54,11 +60,21 @@ export default function IncomingAttachments() {
         key: "lastActivity",
         name: t("lastActivity"),
         sortable: false,
-        render: (row: DocumentRow) => (
-          <span>
-            {t("byUser")} {row.lastActivityUser}
-          </span>
-        ),
+        render: (row: DocumentRow) => {
+          const dateStr = row.lastActivityDate?.trim();
+          const userStr = row.lastActivityUser?.trim();
+          return (
+            <span>
+              {dateStr || "—"}
+              {userStr && userStr !== "—" ? (
+                <>
+                  {" "}
+                  · {t("byUser")} {userStr}
+                </>
+              ) : null}
+            </span>
+          );
+        },
       },
       {
         key: "status",
@@ -75,9 +91,22 @@ export default function IncomingAttachments() {
     initialLimit: 10,
   });
 
-  const data = useMemo(() => MOCK_INCOMING_DOCUMENTS, []);
-  const totalPages = 3;
-  const totalItems = 13;
+  const { data: queryResult, isLoading } = useIncomingAttachments({
+    projectId,
+    page: params.page,
+    perPage: params.limit,
+    documentType: filterDocType || undefined,
+    type: filterType || undefined,
+    endDate: filterEndDate || undefined,
+  });
+
+  const data = queryResult?.data ?? [];
+  const totalPages = queryResult?.totalPages ?? 1;
+  const totalItems = queryResult?.totalItems ?? 0;
+
+  useEffect(() => {
+    onTotalItemsChange?.(totalItems);
+  }, [totalItems, onTotalItemsChange]);
 
   const columns = useMemo(
     () => [
@@ -121,7 +150,7 @@ export default function IncomingAttachments() {
     params,
     selectable: true,
     getRowId: (row: DocumentRow) => row.id,
-    loading: false,
+    loading: isLoading,
     searchable: true,
     onExport: async () => {},
   });
