@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import {
   Box,
   Button,
-  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -18,8 +17,6 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
@@ -72,93 +69,6 @@ const cardSx = {
   borderColor: "divider",
 } as const;
 
-function InboxDetailsDialogSidebar({
-  commentsText,
-  noCommentsLabel,
-  tInbox,
-}: {
-  commentsText: string | null;
-  noCommentsLabel: string;
-  tInbox: (key: string) => string;
-}) {
-  return (
-    <Stack spacing={2} sx={{ height: "100%" }}>
-      <Box>
-        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-            {tInbox("detailsApprovalPath")}
-          </Typography>
-          <Stepper activeStep={1} orientation="vertical">
-            <Step completed>
-              <StepLabel
-                optional={
-                  <Typography variant="caption" color="text.secondary">
-                    {tInbox("detailsStepMetaSample")}
-                  </Typography>
-                }
-              >
-                {tInbox("detailsStepSubmission")}
-              </StepLabel>
-            </Step>
-            <Step>
-              <StepLabel
-                optional={
-                  <Typography variant="caption" color="text.secondary">
-                    {tInbox("detailsStepMetaSample2")}
-                  </Typography>
-                }
-              >
-                {tInbox("detailsStepInitialReview")}
-              </StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>{tInbox("detailsStepTechnical")}</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>{tInbox("detailsStepCommercial")}</StepLabel>
-            </Step>
-          </Stepper>
-        </Paper>
-      </Box>
-
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-          {tInbox("detailsComments")}
-        </Typography>
-        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
-          <Stack direction="row" spacing={1.5} alignItems="flex-start">
-            <Box
-              sx={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                bgcolor: "primary.dark",
-                flexShrink: 0,
-              }}
-            />
-            <Box sx={{ minWidth: 0 }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-              >
-                {tInbox("detailsCommentSampleAuthor")}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 0.5 }}
-              >
-                {commentsText ?? noCommentsLabel}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      </Box>
-    </Stack>
-  );
-}
-
 function InboxDetailsDialogMain({
   row,
   sentLabel,
@@ -168,7 +78,7 @@ function InboxDetailsDialogMain({
   schemaLabels,
   tInbox,
   onApprove,
-  onReject
+  onReject,
 }: {
   row: ProjectInboxRow;
   sentLabel: string;
@@ -187,42 +97,45 @@ function InboxDetailsDialogMain({
       <Grid container spacing={1.5}>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Paper variant="outlined" sx={cardSx}>
-            <Typography
-              variant="caption"
-              color="text.primary"
-              display="block"
-            >
+            <Typography variant="caption" color="text.primary" display="block">
               {tInbox("detailsFieldType")}
             </Typography>
-            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ mt: 0.5 }}
+            >
               {typeLabel}
             </Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Paper variant="outlined" sx={cardSx}>
-            <Typography
-              variant="caption"
-              color="text.primary"
-              display="block"
-            >
+            <Typography variant="caption" color="text.primary" display="block">
               {tInbox("detailsFieldCurrentApproval")}
             </Typography>
-            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ mt: 0.5 }}
+            >
               {statusLabel}
             </Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Paper variant="outlined" sx={cardSx}>
-            <Typography
-              variant="caption"
-              color="text.primary"
-              display="block"
-            >
+            <Typography variant="caption" color="text.primary" display="block">
               {tInbox("detailsFieldSubmissionDate")}
             </Typography>
-            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ mt: 0.5 }}
+            >
               {sentLabel}
             </Typography>
           </Paper>
@@ -245,56 +158,37 @@ function InboxDetailsDialogMain({
           <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
             {tInbox("detailsSelectedSections")}
           </Typography>
-          <Stack direction="row" flexWrap="wrap" gap={1.5}>
-            <Button
-              variant="outlined"
-              startIcon={<GroupsOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              بيانات المشاريع
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<SearchOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              مساحة العمل
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<FolderOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              المرفقات
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<AssignmentOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              أوامر العمل
-            </Button>
-          </Stack>
+          {schemaLabels.length > 0 ? (
+            <Stack direction="row" flexWrap="wrap" gap={1.5}>
+              {schemaLabels.map((label, index) => {
+                const icons = [
+                  <GroupsOutlinedIcon key="icon" />,
+                  <SearchOutlinedIcon key="icon" />,
+                  <FolderOutlinedIcon key="icon" />,
+                  <AssignmentOutlinedIcon key="icon" />,
+                ];
+                return (
+                  <Button
+                    key={label}
+                    variant="outlined"
+                    startIcon={icons[index % icons.length]}
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: "none",
+                      px: 2,
+                      py: 1,
+                    }}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+            </Stack>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              {tInbox("detailsNoSections")}
+            </Typography>
+          )}
         </Paper>
       </Box>
 
@@ -313,24 +207,103 @@ function InboxDetailsDialogMain({
         justifyContent="flex-start"
         sx={{ pt: 1, gap: 1 }}
       >
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={onApprove}
-        >
+        <Button variant="contained" color="secondary" onClick={onApprove}>
           {tInbox("accept")}
+        </Button>
+        <Button variant="outlined" color="error" onClick={onReject}>
+          {tInbox("reject")}
         </Button>
         <Button variant="outlined" color="secondary" disabled>
           {tInbox("detailsRequestModification")}
         </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          onClick={onReject}
-        >
-          {tInbox("reject")}
-        </Button>
       </Stack>
+    </Stack>
+  );
+}
+
+function InboxDetailsDialogSidebar({
+  commentsText,
+  noCommentsLabel,
+  sharedByName,
+  ownerCompanyName,
+  sharedWithCompanyName,
+  createdAt,
+  tInbox,
+}: {
+  commentsText: string | null;
+  noCommentsLabel: string;
+  sharedByName: string | null;
+  ownerCompanyName: string | null;
+  sharedWithCompanyName: string | null;
+  createdAt: string | null;
+  tInbox: (key: string) => string;
+}) {
+  return (
+    <Stack spacing={3} sx={{ height: "100%" }}>
+      <Box>
+        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+            {tInbox("detailsApprovalPath")}
+          </Typography>
+          <Stepper activeStep={1} orientation="vertical">
+            <Step completed>
+              <StepLabel
+                optional={
+                  <Typography variant="caption" color="text.secondary">
+                    {sharedByName || "—"}
+                  </Typography>
+                }
+              >
+                {tInbox("detailsStepSubmission")}
+              </StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>{tInbox("detailsStepInitialReview")}</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>{tInbox("detailsStepTechnical")}</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>{tInbox("detailsStepCommercial")}</StepLabel>
+            </Step>
+          </Stepper>
+        </Paper>
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+          {tInbox("detailsComments")}
+        </Typography>
+        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
+          <Stack direction="row" spacing={1.5} alignItems="flex-start">
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                bgcolor: "primary.dark",
+                flexShrink: 0,
+              }}
+            />
+            <Box sx={{ minWidth: 0 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+              >
+                {sharedByName || "—"}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
+                {commentsText || noCommentsLabel}
+              </Typography>
+            </Box>
+          </Stack>
+        </Paper>
+      </Box>
     </Stack>
   );
 }
@@ -382,6 +355,8 @@ export default function InboxDetailsDialog({
     ? shareStatusLabelForDialog(row.invitation_status, tShare)
     : "—";
 
+  console.log(row);
+
   return (
     <Dialog
       open={open && !!row}
@@ -428,7 +403,7 @@ export default function InboxDetailsDialog({
 
           <DialogContent dividers sx={{ pt: 2 }}>
             <Grid container spacing={3}>
-              <Grid size={{ xs: 12, md: 8 }}>
+              <Grid size={{ xs: 12, md: 8.5 }}>
                 <InboxDetailsDialogMain
                   row={row}
                   sentLabel={sentLabel}
@@ -443,10 +418,16 @@ export default function InboxDetailsDialog({
                   canRespond={canRespond}
                 />
               </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid size={{ xs: 12, md: 3.5 }}>
                 <InboxDetailsDialogSidebar
                   commentsText={commentsText}
                   noCommentsLabel={tInbox("detailsNoComments")}
+                  sharedByName={invitation?.shared_by?.name ?? null}
+                  ownerCompanyName={invitation?.owner_company?.name ?? null}
+                  sharedWithCompanyName={
+                    invitation?.shared_with_company?.name ?? null
+                  }
+                  createdAt={invitation?.created_at ?? null}
                   tInbox={tInbox}
                 />
               </Grid>

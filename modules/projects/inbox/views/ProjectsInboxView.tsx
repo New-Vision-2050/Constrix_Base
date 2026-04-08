@@ -26,10 +26,6 @@ import InboxStatsWidgets from "@/modules/projects/inbox/components/InboxStatsWid
 import InboxFiltersBar, {
   type InboxSortPreset,
 } from "@/modules/projects/inbox/components/InboxFiltersBar";
-import {
-  getMockPendingInvitations,
-  inboxUsesMockData,
-} from "@/modules/projects/inbox/mock-pending-invitations";
 import axios from "axios";
 
 const INBOX_QUERY_KEY = "project-inbox-pending";
@@ -108,14 +104,9 @@ function ProjectsInboxView() {
     initialSortDirection: "desc",
   });
 
-  const useMock = inboxUsesMockData();
-
   const invitationsQuery = useQuery({
-    queryKey: [INBOX_QUERY_KEY, useMock],
+    queryKey: [INBOX_QUERY_KEY],
     queryFn: async () => {
-      if (useMock) {
-        return getMockPendingInvitations();
-      }
       const res = await ProjectSharingApi.getPendingInvitations();
       return res.data?.payload ?? [];
     },
@@ -321,12 +312,6 @@ function ProjectsInboxView() {
       <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
         {tInbox("title")}
       </Typography>
-
-      {useMock ? (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          {tInbox("mockDataBanner")}
-        </Alert>
-      ) : null}
 
       {invitationsQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>

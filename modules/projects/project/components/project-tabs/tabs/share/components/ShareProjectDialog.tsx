@@ -23,7 +23,6 @@ import {
   StepLabel,
   Paper,
   Divider,
-  Chip,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
@@ -456,13 +455,13 @@ export default function ShareProjectDialog({
                       </Typography>
                     </Stack>
                   )}
-                  {company.representative_name && (
+                  {company.owner_name && (
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
                         ممثل الشركة:
                       </Typography>
                       <Typography variant="body2" fontWeight={600}>
-                        {company.representative_name}
+                        {company.owner_name}
                       </Typography>
                     </Stack>
                   )}
