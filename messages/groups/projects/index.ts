@@ -56,4 +56,46 @@ export const projectMessages = new MessagesGroup({
   columnBranchAffiliated: _m("Affiliated branch", "الفرع التابع"),
   columnSubSubClassification: _m("Sub-classification", "التصنيف الفرعي"),
   emptyCell: _m("—", "—"),
+  staff: new MessagesGroup({
+    title: _m("Staff", "الكادر"),
+    addStaff: _m("Add new staff", "إضافة كادر جديد"),
+    addStaffButton: _m("Add staff", "إضافة كادر"),
+    name: _m("Name", "الاسم"),
+    phone: _m("Phone", "الهاتف"),
+    email: _m("Email", "البريد الإلكتروني"),
+    branch: _m("Branch", "الفرع"),
+    employeeName: _m("Employee name", "اسم الموظف"),
+    jobTitle: _m("Job title", "المسمى الوظيفي"),
+    mobileNumber: _m("Mobile number", "رقم الجوال"),
+    department: _m("Department", "الإدارة"),
+    departmentDefault: _m("General", "عامة"),
+    columnActions: _m("Actions", "الإجراء"),
+    actionMenu: _m("Action", "إجراء"),
+    edit: _m("Edit", "تعديل"),
+    selectEmployees: _m("Select employees", "اختر الموظفين"),
+    assignSuccess: _m(
+      "Employees assigned to the project",
+      "تم تعيين الموظفين على المشروع"
+    ),
+    assignError: _m(
+      "Could not assign employees",
+      "تعذر تعيين الموظفين"
+    ),
+    validation: new MessagesGroup({
+      employeesRequired: _m(
+        "Select at least one employee",
+        "اختر موظفاً واحداً على الأقل"
+      ),
+      employeeNameRequired: _m(
+        "Employee name is required",
+        "اسم الموظف مطلوب"
+      ),
+      emailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
+      emailInvalid: _m("Enter a valid email", "أدخل بريداً إلكترونياً صالحاً"),
+      jobTitleRequired: _m("Job title is required", "المسمى الوظيفي مطلوب"),
+      mobileRequired: _m("Mobile number is required", "رقم الجوال مطلوب"),
+      departmentRequired: _m("Department is required", "الإدارة مطلوبة"),
+      branchRequired: _m("Branch is required", "الفرع مطلوب"),
+    }),
+  }),
 });

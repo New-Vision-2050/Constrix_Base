@@ -60,4 +60,12 @@ export const AllProjectsApi = {
 
   getProjectDetails: (projectId: string) =>
     baseApi.get<ShowProjectResponse>(`projects/${projectId}`),
+
+  assignEmployeesToProject: (data: {
+    project_id: string;
+    user_ids: string[];
+  }) => baseApi.post<{ code: string; message?: string | null }>(
+    "projects/employees/assign",
+    data,
+  ),
 };
