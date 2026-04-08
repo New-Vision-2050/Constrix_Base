@@ -5,10 +5,13 @@ import { Search } from "lucide-react";
 import ProjectInfoSection from "./project-info";
 import ProjectDetailsSection from "./project-details";
 import ProjectStatusSection from "./project-status";
+import ProjectStatsBar from "../../../stats-bar";
 
 export default function ProjectDataTab() {
   return (
     <div className="space-y-6">
+      {/* Stats Bar */}
+      <ProjectStatsBar />
       {/* Search Bar */}
       <div className="relative">
         <input
