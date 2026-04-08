@@ -11,6 +11,7 @@ import {
   ClipboardList,
   DollarSign,
   FileText,
+  FolderSync,
 } from "lucide-react";
 import ProjectDataTab from "../tabs/project-data";
 import WorkspaceTab from "../tabs/workspace";
@@ -20,6 +21,7 @@ import StaffTab from "../tabs/staff";
 import WorkOrdersTab from "../tabs/work-orders";
 import FinancialTab from "../tabs/financial";
 import ContractManagementTab from "../tabs/contract-management";
+import DocumentCycleTab from "../tabs/document-cycle";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 
 const ALL_TABS: SystemTab[] = [
@@ -70,6 +72,12 @@ const ALL_TABS: SystemTab[] = [
     title: "ادارات العقد",
     icon: <FileText className="w-4 h-4" />,
     content: <ContractManagementTab />,
+  },
+  {
+    id: "project-tab-document-cycle",
+    title: "دورة الوثائق",
+    icon: <FolderSync className="w-4 h-4" />,
+    content: <DocumentCycleTab />,
   },
 ];
 
