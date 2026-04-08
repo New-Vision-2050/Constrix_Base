@@ -12,6 +12,14 @@ export const FunctionalContractualList = (): UserProfileNestedTab[] => {
   const { can } = usePermissions();
   const tabs: (UserProfileNestedTab & { show: boolean })[] = [
     {
+      id: "functional-tab-contractual-job-data",
+      title: t("jobData.title"),
+      type: "user_professional_data",
+      icon: <GraduationCapIcon />,
+      content: <JobInformation />,
+      show: can([PERMISSIONS.profile.employmentInfo.view]),
+    },
+    {
       id: "functional-tab-contractual-contract-data",
       title: t("contractData.title"),
       icon: <GraduationCapIcon />,
@@ -21,14 +29,6 @@ export const FunctionalContractualList = (): UserProfileNestedTab[] => {
         PERMISSIONS.profile.contractWork.view,
         PERMISSIONS.profile.jobOffer.view,
       ]),
-    },
-    {
-      id: "functional-tab-contractual-job-data",
-      title: t("jobData.title"),
-      type: "user_professional_data",
-      icon: <GraduationCapIcon />,
-      content: <JobInformation />,
-      show: can([PERMISSIONS.profile.employmentInfo.view]),
     },
   ];
 
