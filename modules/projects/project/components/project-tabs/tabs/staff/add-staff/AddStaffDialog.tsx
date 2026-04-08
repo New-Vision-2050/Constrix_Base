@@ -21,33 +21,30 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { projectEmployeesQueryKey } from "@/modules/projects/project/query/useProjectEmployees";
 import { useCompanyEmployees } from "@/modules/company-profile/query/useCompanyEmployees";
 
-type EmployeeOption = { id: string; name: string };
 
 const createAddStaffSchema = (t: (key: string) => string) =>
   z.object({
     user_ids: z
       .array(z.string())
-      .min(1, t("validation.employeesRequired")),
+      .min(1, t("staff.validation.employeesRequired")),
   });
 
 type AddStaffFormValues = z.infer<ReturnType<typeof createAddStaffSchema>>;
 
 export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
-  const t = useTranslations("project.staff");
   const tProject = useTranslations("project");
   const { projectId } = useProject();
   const queryClient = useQueryClient();
-  const { data: employeesRaw, isLoading: isLoadingEmployees } =
+  
+  const { data: companyEmployeesRaw, isLoading: isLoadingCompanyEmployees } =
     useCompanyEmployees();
 
-  const employees: EmployeeOption[] = useMemo(
-    () => employeesRaw ?? [],
-    [employeesRaw],
-  );
+     
 
-  const schema = useMemo(() => createAddStaffSchema(t), [t]);
+  const schema = useMemo(() => createAddStaffSchema(tProject), [tProject]);
 
   const {
     control,
@@ -76,15 +73,17 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
     onSuccess: (res) => {
       const msg = res.data?.message;
       toast.success(
-        typeof msg === "string" && msg.trim() ? msg : t("assignSuccess"),
+        typeof msg === "string" && msg.trim() ? msg : tProject("staff.assignSuccess"),
       );
-      queryClient.invalidateQueries({ queryKey: ["company-employees"] });
       queryClient.invalidateQueries({ queryKey: ["project-details", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: projectEmployeesQueryKey(projectId),
+      });
       reset();
       setOpen(false);
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(error?.response?.data?.message ?? t("assignError"));
+      toast.error(error?.response?.data?.message ?? tProject("staff.assignError"));
     },
   });
 
@@ -106,7 +105,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6 }}>
-          {t("addStaff")}
+          {tProject("staff.addStaff")}
         </DialogTitle>
       </div>
 
@@ -121,14 +120,14 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
             name="user_ids"
             control={control}
             render={({ field }) => {
-              const selected = employees.filter((e) =>
+              const selected = companyEmployeesRaw?.filter((e) =>
                 field.value.includes(e.id),
               );
               return (
                 <Autocomplete
                   multiple
-                  loading={isLoadingEmployees}
-                  options={employees}
+                  loading={isLoadingCompanyEmployees}
+                  options={companyEmployeesRaw ?? []}
                   getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(a, b) => a.id === b.id}
                   value={selected}
@@ -139,14 +138,14 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label={t("selectEmployees")}
+                      label={tProject("staff.selectEmployees")}
                       error={!!errors.user_ids}
                       helperText={errors.user_ids?.message}
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
                           <>
-                            {isLoadingEmployees ? (
+                            {isLoadingCompanyEmployees ? (
                               <CircularProgress color="inherit" size={20} />
                             ) : null}
                             {params.InputProps.endAdornment}

@@ -11,6 +11,7 @@ import {
   GetBranchesResponse,
   GetClientsResponse,
   GetManagementsResponse,
+  GetProjectEmployeesResponse,
   GetProjectTypesResponse,
   ListProjectsResponse,
   ShowProjectResponse,
@@ -60,6 +61,11 @@ export const AllProjectsApi = {
 
   getProjectDetails: (projectId: string) =>
     baseApi.get<ShowProjectResponse>(`projects/${projectId}`),
+
+  getProjectEmployees: (projectId: string) =>
+    baseApi.get<GetProjectEmployeesResponse>(
+      `projects/employees/project/${projectId}`,
+    ),
 
   assignEmployeesToProject: (data: {
     project_id: string;

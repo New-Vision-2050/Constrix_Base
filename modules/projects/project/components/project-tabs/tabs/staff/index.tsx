@@ -1,93 +1,63 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Box, Button, MenuItem } from "@mui/material";
 import { EditIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
-import { useCompanyEmployees } from "@/modules/company-profile/query/useCompanyEmployees";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useProjectEmployees } from "@/modules/projects/project/query/useProjectEmployees";
 import { Employee } from "./types";
 import AddStaffDialog from "./add-staff/AddStaffDialog";
-
-// const MOCK_STAFF: StaffMember[] = [
-//   {
-//     id: "1",
-//     name: "عبدالرحمن اسامة",
-//     phone: "+996 57387211",
-//     email: "ahmedk@gmail.com",
-//     branch: "جدة",
-//     jobTitle: "مدير مشروعات",
-//     department: "عامة",
-//   },
-//   {
-//     id: "2",
-//     name: "خالد سعيد",
-//     phone: "+996 57382092",
-//     email: "khalemedk@gmail.com",
-//     branch: "مكة",
-//     jobTitle: "مساح",
-//     department: "IT",
-//   },
-//   {
-//     id: "3",
-//     name: "محمد عبدالرحمن",
-//     phone: "+996 57387211",
-//     email: "susanna.Lind57@gmail.com",
-//     branch: "جدة",
-//     jobTitle: "مدير مشروعات",
-//     department: "عامة",
-//   },
-// ];
-
-// ============================================================================
-// Table Instance
-// ============================================================================
 
 const StaffTableLayout = HeadlessTableLayout<Employee>("staff");
 
 export default function StaffTab() {
-  const t = useTranslations("project.staff");
+  const t = useTranslations("project");
+  const { projectId } = useProject();
   const [openStaff, setAddStaffOpen] = useState(false);
 
   const staffColumns = useMemo(
     () => [
       {
         key: "name",
-        name: t("employeeName"),
+        name: t("staff.employeeName"),
         sortable: false,
         render: (row: Employee) => <span>{row.name}</span>,
       },
       {
         key: "phone",
-        name: t("mobileNumber"),
+        name: t("staff.mobileNumber"),
         sortable: false,
         render: (row: Employee) => <span>{row.phone}</span>,
       },
       {
         key: "email",
-        name: t("email"),
+        name: t("staff.email"),
         sortable: false,
         render: (row: Employee) => <span>{row.email}</span>,
       },
       {
         key: "branch",
-        name: t("branch"),
+        name: t("staff.branch"),
         sortable: false,
-        render: (row: Employee) => <span>{row.branch.name}</span>,
+        render: (row: Employee) => (
+          <span>{row.branch?.name ?? "—"}</span>
+        ),
       },
       {
         key: "jobTitle",
-        name: t("jobTitle"),
+        name: t("staff.jobTitle"),
         sortable: false,
         render: (row: Employee) => <span>{row.jobTitle || "-"}</span>,
       },
       {
         key: "department",
-        name: t("department"),
+        name: t("staff.department"),
         sortable: false,
         render: (row: Employee) => (
-          <span>{row.department || t("departmentDefault")}</span>
+          <span>{row.department || t("staff.departmentDefault")}</span>
         ),
       },
     ],
@@ -101,21 +71,18 @@ export default function StaffTab() {
   });
 
 
-  const { data: employeesData, isLoading: isLoadingEmployees } = useCompanyEmployees();
-  const data = employeesData || [];
+  const { data: employeesData, isLoading: isLoadingEmployees } =
+    useProjectEmployees(projectId);
+  const data = employeesData ?? [];
   const totalPages = 1;
-  const totalItems = employeesData?.length || 0;
-
-  useEffect(() => {
-    console.log("employeesData", employeesData);
-  }, [employeesData]);
+  const totalItems = data.length;
 
   const columns = useMemo(
     () => [
       ...staffColumns,
       {
         key: "actions",
-        name: t("columnActions"),
+        name: t("staff.columnActions"),
         sortable: false,
         render: () => (
           <CustomMenu
@@ -126,13 +93,13 @@ export default function StaffTab() {
                 color="info"
                 onClick={onClick}
               >
-                {t("actionMenu")}
+                {t("staff.actionMenu")}
               </Button>
             )}
           >
             <MenuItem onClick={() => {}}>
               <EditIcon className="w-4 h-4 ml-2" />
-              {t("edit")}
+              {t("staff.edit")}
             </MenuItem>
           </CustomMenu>
         ),
@@ -166,7 +133,7 @@ export default function StaffTab() {
             state={state}
             customActions={
               <Button variant="contained" onClick={() => setAddStaffOpen(true)}>
-                {t("addStaffButton")}
+                {t("staff.addStaffButton")}
               </Button>
             }
           >
