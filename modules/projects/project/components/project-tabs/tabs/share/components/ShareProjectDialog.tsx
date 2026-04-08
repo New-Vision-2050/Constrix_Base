@@ -25,7 +25,10 @@ import {
   Divider,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { useTranslations } from "next-intl";
+import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
@@ -49,11 +52,11 @@ type PendingSharePayload = {
   notes?: string;
 };
 
-const createShareFormSchema = (t: (key: string) => string) =>
+const createShareFormSchema = () =>
   z.object({
     serialSearch: z
       .string()
-      .min(1, t("validation.companySerialRequired")),
+      .min(1, "الرقم التسلسلي للشركة مطلوب"),
     notes: z.string(),
   });
 
@@ -137,7 +140,6 @@ export default function ShareProjectDialog({
   open,
   onClose,
 }: ShareProjectDialogProps) {
-  const t = useTranslations("project.share");
   const { projectId, projectData, isLoading: projectLoading } = useProject();
   const queryClient = useQueryClient();
   const allSettingsTabs = useProjectSettingsTabs();
@@ -202,7 +204,7 @@ export default function ShareProjectDialog({
     });
   }, [allowedSchemaIdsKey]);
 
-  const schema = useMemo(() => createShareFormSchema(t), [t]);
+  const schema = useMemo(() => createShareFormSchema(), []);
 
   const {
     control,
@@ -237,17 +239,17 @@ export default function ShareProjectDialog({
         setActiveStep(1);
       } else {
         setCompany(null);
-        setLookupError(t("companyNotFound"));
+        setLookupError("الشركة غير موجودة");
       }
     },
     onError: (error: unknown) => {
       setCompany(null);
       if (isCompanyNotFoundError(error)) {
-        setLookupError(t("companyNotFound"));
+        setLookupError("الشركة غير موجودة");
         return;
       }
       setLookupError(null);
-      toast.error(getApiErrorDescription(error) ?? t("shareError"));
+      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء المشاركة");
     },
   });
 
@@ -266,7 +268,7 @@ export default function ShareProjectDialog({
     },
     onSuccess: (res) => {
       const text = getErrorDescriptionFromApiData(res.data);
-      toast.success(text?.trim() ? text : t("shareSuccess"));
+      toast.success(text?.trim() ? text : "تمت المشاركة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["project-details", projectId] });
       queryClient.invalidateQueries({ queryKey: ["project-shares", projectId] });
       reset(defaultForm);
@@ -278,10 +280,10 @@ export default function ShareProjectDialog({
     onError: (error: unknown) => {
       const description = getApiErrorDescription(error);
       if (isAlreadySharedApiDescription(description)) {
-        toast.error(t("alreadySharedWithCompany"));
+        toast.error("تمت المشاركة مع هذه الشركة مسبقاً");
         return;
       }
-      toast.error(description ?? t("shareError"));
+      toast.error(description ?? "حدث خطأ أثناء المشاركة");
     },
   });
 
@@ -313,7 +315,7 @@ export default function ShareProjectDialog({
   const handleNext = () => {
     if (activeStep === 2) {
       if (selectedSchemaIds.length === 0) {
-        toast.error(t("validation.selectSection"));
+        toast.error("يرجى اختيار قسم واحد على الأقل");
         return;
       }
     }
@@ -326,11 +328,11 @@ export default function ShareProjectDialog({
 
   const onValidSubmit = (data: ShareFormValues) => {
     if (!company) {
-      toast.error(t("validation.companyLookupRequired"));
+      toast.error("يرجى البحث عن الشركة أولاً");
       return;
     }
     if (selectedSchemaIds.length === 0) {
-      toast.error(t("validation.selectSection"));
+      toast.error("يرجى اختيار قسم واحد على الأقل");
       return;
     }
     shareMutation.mutate({
@@ -351,7 +353,7 @@ export default function ShareProjectDialog({
 
   const steps = [
     "البحث عن شركة",
-    "معلومات الشركة",
+    "تأكيد الشركة",
     "تحديد الصلاحيات",
     "المراجعة والإرسال",
   ];
@@ -363,7 +365,7 @@ export default function ShareProjectDialog({
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, height: "100%" }}>
             {!schemaParentId || schemaParentId <= 0 ? (
               <Typography color="warning.main" variant="body2">
-                {t("projectTypeMissing")}
+                نوع المشروع مفقود
               </Typography>
             ) : null}
 
@@ -375,8 +377,8 @@ export default function ShareProjectDialog({
                   {...field}
                   fullWidth
                   size="small"
-                  label={t("companySerialNumber")}
-                  placeholder={t("dialogSerialSearchPlaceholder")}
+                  label="الرقم التسلسلي للشركة"
+                  placeholder="أدخل الرقم التسلسلي للبحث"
                   error={!!errors.serialSearch}
                   helperText={errors.serialSearch?.message}
                   disabled={pending}
@@ -403,7 +405,7 @@ export default function ShareProjectDialog({
             {company ? (
               <Paper variant="outlined" sx={{ p: 2, bgcolor: "success.light", borderColor: "success.main" }}>
                 <Typography variant="body1" color="text.primary" sx={{ fontWeight: 700 }}>
-                  {t("dialogSelectedCompany", { name: company.name })}
+                  الشركة المختارة: {company.name}
                 </Typography>
               </Paper>
             ) : null}
@@ -412,62 +414,117 @@ export default function ShareProjectDialog({
 
       case 1:
         return (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {company ? (
-              <Paper
-                variant="outlined"
-                sx={{
-                  p: 2.5,
-                  bgcolor: "action.hover",
-                  borderColor: "primary.main",
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mb: 2, fontWeight: 600, color: "primary.main" }}
+              <>
+                <Stack
+                  direction="row"
+                  alignItems="flex-start"
+                  justifyContent="space-between"
+                  sx={{ gap: 2, flexWrap: "wrap" }}
                 >
-                  معلومات الشركة
-                </Typography>
-                <Stack spacing={1.5}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                      اسم الشركة:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {company.name}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                      {t("companySerialNumber") || "Serial Number"}:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {company.serial_no}
-                    </Typography>
-                  </Stack>
-                  {company.email && (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                        البريد الإلكتروني:
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {company.email}
-                      </Typography>
-                    </Stack>
-                  )}
-                  {company.owner_name && (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                        ممثل الشركة:
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {company.owner_name}
-                      </Typography>
-                    </Stack>
-                  )}
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                    تفاصيل الشركة التي تم العثور عليها
+                  </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "secondary.main" }}
+                  >
+                    تأكيد البيانات
+                  </Typography>
                 </Stack>
-              </Paper>
-            ) : null}
+
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 0,
+                    overflow: "hidden",
+                    bgcolor: "action.hover",
+                    borderColor: "divider",
+                  }}
+                >
+                  {(
+                    [
+                      {
+                        icon: (
+                          <BusinessOutlinedIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "اسم الشركة",
+                        value: company.name?.trim() || "—",
+                      },
+                      {
+                        icon: (
+                          <BadgeOutlinedIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "الرقم التسلسلي",
+                        value: company.serial_no?.trim() || "—",
+                      },
+                      {
+                        icon: (
+                          <EmailOutlinedIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "البريد الإلكتروني",
+                        value: company.email?.trim() || "—",
+                      },
+                      {
+                        icon: (
+                          <PersonOutlineIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "مالك الشركة",
+                        value: company.owner_name?.trim() || "—",
+                      },
+                    ] as const
+                  ).map((row, index, arr) => (
+                    <Stack
+                      key={row.label}
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      spacing={2}
+                      sx={{
+                        px: 2,
+                        py: 1.75,
+                        borderBottom:
+                          index < arr.length - 1 ? 1 : 0,
+                        borderColor: "divider",
+                      }}
+                    >
+                      {/* RTL: first item aligns to inline-start (right) — label + icon */}
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ flexShrink: 0 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          {row.label}
+                        </Typography>
+                        {row.icon}
+                      </Stack>
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        sx={{ textAlign: "end", minWidth: 0, flex: 1 }}
+                      >
+                        {row.value}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Paper>
+              </>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                لا توجد بيانات شركة. ارجع للخطوة السابقة وأكمل البحث.
+              </Typography>
+            )}
           </Box>
         );
 
@@ -477,13 +534,13 @@ export default function ShareProjectDialog({
             {schemasLoading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} />
-                <Typography variant="body2">{t("loadingSchemas")}</Typography>
+                <Typography variant="body2">جاري تحميل الأقسام...</Typography>
               </Box>
             ) : null}
 
             {canShowSchemas && filteredTabs.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
-                {t("noSchemasAvailable")}
+                لا توجد أقسام متاحة
               </Typography>
             ) : null}
 
@@ -590,8 +647,8 @@ export default function ShareProjectDialog({
                   size="small"
                   multiline
                   minRows={3}
-                  label={t("notes")}
-                  placeholder={t("notesPlaceholder")}
+                  label="ملاحظات"
+                  placeholder="أضف ملاحظات إضافية (اختياري)"
                   disabled={pending}
                 />
               )}
@@ -625,13 +682,13 @@ export default function ShareProjectDialog({
       >
         <IconButton
           onClick={handleClose}
-          aria-label={t("dialogTitle")}
+          aria-label="مشاركة المشروع"
           disabled={pending}
         >
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
-          {t("dialogTitle")}
+          مشاركة المشروع
         </DialogTitle>
       </Box>
 
@@ -709,7 +766,7 @@ export default function ShareProjectDialog({
                         {shareMutation.isPending ? (
                           <CircularProgress size={22} color="inherit" />
                         ) : (
-                          t("dialogShareSubmit")
+                          "إرسال"
                         )}
                       </Button>
                     ) : (

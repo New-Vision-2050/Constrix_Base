@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Box, Button, MenuItem, Stack, Typography } from "@mui/material";
 import { ArrowDownUp, EditIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
@@ -39,27 +38,23 @@ function formatSentDate(iso: string): string {
   return `${y}/${m}/${day}`;
 }
 
-function shareStatusLabel(
-  status: string,
-  t: (key: string) => string,
-  empty: string,
-): string {
+function shareStatusLabel(status: string): string {
   const key = status.trim().toLowerCase();
   switch (key) {
     case "pending":
-      return t("statusPending");
+      return "بانتظار الرد";
     case "sent":
-      return t("statusSent");
+      return "تم الإرسال";
     case "draft":
     case "under_construction":
-      return t("statusDraft");
+      return "تحت الإنشاء";
     case "accepted":
     case "approved":
-      return t("statusAccepted");
+      return "مقبول";
     case "rejected":
-      return t("statusRejected");
+      return "مرفوض";
     default:
-      return status || empty;
+      return status || "—";
   }
 }
 
@@ -105,8 +100,6 @@ function compareShareRows(
 const ShareTableLayout = HeadlessTableLayout<ProjectShareRow>("project-share");
 
 export default function ShareTab() {
-  const t = useTranslations("project.share");
-  const tProject = useTranslations("project");
   const { projectId } = useProject();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
@@ -145,14 +138,14 @@ export default function ShareTab() {
         row.mobile,
         row.representative,
         row.status,
-        shareStatusLabel(row.status, t, ""),
+        shareStatusLabel(row.status),
         formatSentDate(row.sentAt),
       ]
         .join(" ")
         .toLowerCase()
         .includes(q),
     );
-  }, [allRows, params.search, t]);
+  }, [allRows, params.search]);
 
   const sortedRows = useMemo(() => {
     const key = params.sortBy ?? "companyName";
@@ -175,65 +168,61 @@ export default function ShareTab() {
     () => [
       {
         key: "companyName",
-        name: t("companyName"),
+        name: "اسم الشركة",
         sortable: true,
         render: (row: ProjectShareRow) => (
           <span>
-            {row.companyName.trim() ? row.companyName : tProject("emptyCell")}
+            {row.companyName.trim() ? row.companyName : "—"}
           </span>
         ),
       },
       {
         key: "email",
-        name: t("email"),
+        name: "البريد الإلكتروني",
         sortable: true,
         render: (row: ProjectShareRow) => (
-          <span>{row.email.trim() ? row.email : tProject("emptyCell")}</span>
+          <span>{row.email.trim() ? row.email : "—"}</span>
         ),
       },
       {
         key: "mobile",
-        name: t("mobile"),
+        name: "رقم الجوال",
         sortable: true,
         render: (row: ProjectShareRow) => (
-          <span>{row.mobile.trim() ? row.mobile : tProject("emptyCell")}</span>
+          <span>{row.mobile.trim() ? row.mobile : "—"}</span>
         ),
       },
       {
         key: "representative",
-        name: t("companyRepresentative"),
+        name: "ممثل الشركة",
         sortable: true,
         render: (row: ProjectShareRow) => (
           <span>
             {row.representative.trim()
               ? row.representative
-              : tProject("emptyCell")}
+              : "—"}
           </span>
         ),
       },
       {
         key: "sentAt",
-        name: t("sentDate"),
+        name: "تاريخ الإرسال",
         sortable: true,
         render: (row: ProjectShareRow) => {
           const formatted = formatSentDate(row.sentAt);
           return (
             <span>
-              {formatted.trim() ? formatted : tProject("emptyCell")}
+              {formatted.trim() ? formatted : "—"}
             </span>
           );
         },
       },
       {
         key: "status",
-        name: t("requestStatus"),
+        name: "حالة الطلب",
         sortable: true,
         render: (row: ProjectShareRow) => {
-          const label = shareStatusLabel(
-            row.status,
-            t,
-            tProject("emptyCell"),
-          );
+          const label = shareStatusLabel(row.status);
           return (
             <Typography
               component="span"
@@ -250,7 +239,7 @@ export default function ShareTab() {
       },
       {
         key: "actions",
-        name: t("columnActions"),
+        name: "الإجراءات",
         sortable: false,
         render: () => (
           <CustomMenu
@@ -261,19 +250,19 @@ export default function ShareTab() {
                 color="info"
                 onClick={onClick}
               >
-                {t("actionMenu")}
+                إجراء
               </Button>
             )}
           >
             <MenuItem onClick={() => {}}>
               <EditIcon className="w-4 h-4 ml-2" />
-              {t("edit")}
+              تعديل
             </MenuItem>
           </CustomMenu>
         ),
       },
     ],
-    [t, tProject],
+    [],
   );
 
   const state = ShareTableLayout.useTableState({
@@ -294,20 +283,20 @@ export default function ShareTab() {
 
   const widgetLabels = useMemo(
     () => ({
-      awaiting: t("widgetAwaiting"),
-      rejected: t("widgetRejected"),
-      accepted: t("widgetAccepted"),
-      inProgress: t("widgetInProgress"),
-      total: t("widgetTotal"),
+      awaiting: "بانتظار الرد",
+      rejected: "مرفوض",
+      accepted: "مقبول",
+      inProgress: "قيد المعالجة",
+      total: "الإجمالي",
     }),
-    [t],
+    [],
   );
 
   return (
     <Box sx={{ p: 3 }}>
       {sharesQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {t("loadSharesError")}
+          حدث خطأ أثناء تحميل البيانات
         </Alert>
       ) : null}
 
@@ -321,7 +310,7 @@ export default function ShareTab() {
               state.table.searchable ? (
                 <ShareTableLayout.Search
                   search={state.search}
-                  placeholder={t("searchTypePlaceholder")}
+                  placeholder="البحث في المشاركات"
                 />
               ) : undefined
             }
@@ -333,13 +322,13 @@ export default function ShareTab() {
                   startIcon={<ArrowDownUp className="h-4 w-4" />}
                   onClick={() => params.handleSort("companyName")}
                 >
-                  {t("sort")}
+                  ترتيب
                 </Button>
                 <Button
                   variant="contained"
                   onClick={() => setShareDialogOpen(true)}
                 >
-                  {t("inviteCompany")}
+                  دعوة شركة
                 </Button>
               </Stack>
             }

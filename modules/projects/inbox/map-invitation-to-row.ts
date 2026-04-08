@@ -15,8 +15,6 @@ export type ProjectInboxRow = ProjectRow & {
   representative_name: string;
 };
 
-type InboxTypeTranslator = (key: string) => string;
-
 export function mapShareableTypeKey(
   shareableType: string | undefined,
 ): InboxTypeKey {
@@ -39,26 +37,23 @@ export function mapShareableTypeKey(
   return "project";
 }
 
-function mapShareableTypeLabel(
-  shareableType: string | undefined,
-  t: InboxTypeTranslator,
-): string {
+
+function mapShareableTypeLabel(shareableType: string | undefined): string {
   const key = mapShareableTypeKey(shareableType);
   switch (key) {
     case "attachment":
-      return t("typeAttachment");
+      return "مرفق";
     case "quote":
-      return t("typeQuote");
+      return "عرض سعر";
     case "request":
-      return t("typeRequest");
+      return "طلب";
     default:
-      return t("typeProject");
+      return "مشروع";
   }
 }
 
 export function mapPendingInvitationToRow(
   inv: PendingShareInvitation,
-  tInbox: InboxTypeTranslator,
 ): ProjectInboxRow {
   const p = inv.project;
   const id = (p?.id ?? inv.shareable_id ?? inv.id) as string | number;
@@ -68,15 +63,6 @@ export function mapPendingInvitationToRow(
     p.client !== null &&
     "name" in p.client
       ? String((p.client as { name?: string }).name ?? "")
-      : "";
-  const respEmp =
-    p &&
-    typeof p.responsible_employee === "object" &&
-    p.responsible_employee !== null &&
-    "name" in p.responsible_employee
-      ? String(
-          (p.responsible_employee as { name?: string }).name ?? "",
-        )
       : "";
 
   const refPart =
@@ -90,11 +76,7 @@ export function mapPendingInvitationToRow(
       (p?.client_name as string | undefined)?.trim() ||
       "") as string;
 
-  const representative =
-    (p?.responsible_employee_name as string | undefined)?.trim() ||
-    respEmp ||
-    (p?.manager_name as string | undefined)?.trim() ||
-    "";
+  const representative = inv.shared_by?.name?.trim() || "";
 
   const base: ProjectInboxRow = {
     invitationId: inv.id,
@@ -127,11 +109,11 @@ export function mapPendingInvitationToRow(
     status: (p?.status as number | undefined) ?? undefined,
     project_view: (p?.project_view as string | undefined) ?? undefined,
     responsible_employee_name:
-      (p?.responsible_employee_name as string | undefined) || respEmp || undefined,
+      (p?.responsible_employee_name as string | undefined) ?? undefined,
     sent_at_raw: inv.created_at ?? "",
     sender_company_name: sender,
     inbox_type_key: mapShareableTypeKey(inv.shareable_type),
-    inbox_type_label: mapShareableTypeLabel(inv.shareable_type, tInbox),
+    inbox_type_label: mapShareableTypeLabel(inv.shareable_type),
     invitation_status: (inv.status ?? "").trim(),
     reference_display: refPart,
     representative_name: representative,

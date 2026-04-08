@@ -3,7 +3,6 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Box, Typography } from "@mui/material";
-import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import withPermissions from "@/lib/permissions/client/withPermissions";
@@ -84,9 +83,6 @@ function applyInboxSort(
 }
 
 function ProjectsInboxView() {
-  const tProject = useTranslations("project");
-  const tInbox = useTranslations("project.inbox");
-  const tShare = useTranslations("project.share");
   const queryClient = useQueryClient();
 
   const [documentType, setDocumentType] = useState<"all" | InboxTypeKey>("all");
@@ -126,8 +122,8 @@ function ProjectsInboxView() {
   }, [rawInvitations]);
 
   const allRows = useMemo(() => {
-    return rawInvitations.map((inv) => mapPendingInvitationToRow(inv, tInbox));
-  }, [rawInvitations, tInbox]);
+    return rawInvitations.map((inv) => mapPendingInvitationToRow(inv));
+  }, [rawInvitations]);
 
   const segmentCounts = useMemo(() => countInboxSegments(allRows), [allRows]);
 
@@ -192,11 +188,11 @@ function ProjectsInboxView() {
     mutationFn: (invitationId: string) =>
       ProjectSharingApi.acceptInvitation(invitationId),
     onSuccess: () => {
-      toast.success(tInbox("acceptSuccess"));
+      toast.success("تم قبول الدعوة بنجاح");
       invalidate();
     },
     onError: (error: unknown) => {
-      toast.error(getApiErrorDescription(error) ?? tInbox("mutationError"));
+      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء العملية");
     },
   });
 
@@ -204,11 +200,11 @@ function ProjectsInboxView() {
     mutationFn: (invitationId: string) =>
       ProjectSharingApi.rejectInvitation(invitationId),
     onSuccess: () => {
-      toast.success(tInbox("rejectSuccess"));
+      toast.success("تم رفض الدعوة بنجاح");
       invalidate();
     },
     onError: (error: unknown) => {
-      toast.error(getApiErrorDescription(error) ?? tInbox("mutationError"));
+      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء العملية");
     },
   });
 
@@ -235,18 +231,12 @@ function ProjectsInboxView() {
   const columns = useMemo(
     () =>
       getInboxColumns({
-        tProject,
-        tInbox,
-        tShare,
         pendingMutation,
         onAccept: (id) => acceptMutation.mutate(id),
         onReject: (id) => rejectMutation.mutate(id),
         onView: openDetails,
       }),
     [
-      tProject,
-      tInbox,
-      tShare,
       acceptMutation,
       rejectMutation,
       pendingMutation,
@@ -275,47 +265,47 @@ function ProjectsInboxView() {
 
   const filterLabels = useMemo(
     () => ({
-      documentType: tInbox("filterDocumentType"),
-      status: tInbox("filterStatus"),
-      sortBy: tInbox("filterSortBy"),
-      all: tInbox("filterAll"),
-      typeProject: tInbox("typeProject"),
-      typeAttachment: tInbox("typeAttachment"),
-      typeRequest: tInbox("typeRequest"),
-      typeQuote: tInbox("typeQuote"),
-      statusAll: tInbox("filterStatusAll"),
-      statusAwaiting: tInbox("filterStatusAwaiting"),
-      statusInProgress: tInbox("filterStatusInProgress"),
-      statusAccepted: tInbox("filterStatusAccepted"),
-      statusRejected: tInbox("filterStatusRejected"),
-      sortDateNewest: tInbox("sortDateNewest"),
-      sortDateOldest: tInbox("sortDateOldest"),
-      sortNameAsc: tInbox("sortNameAsc"),
-      sortNameDesc: tInbox("sortNameDesc"),
+      documentType: "نوع المستند",
+      status: "الحالة",
+      sortBy: "ترتيب حسب",
+      all: "الكل",
+      typeProject: "مشروع",
+      typeAttachment: "مرفق",
+      typeRequest: "طلب",
+      typeQuote: "عرض سعر",
+      statusAll: "الكل",
+      statusAwaiting: "بانتظار الرد",
+      statusInProgress: "قيد المعالجة",
+      statusAccepted: "مقبول",
+      statusRejected: "مرفوض",
+      sortDateNewest: "الأحدث أولاً",
+      sortDateOldest: "الأقدم أولاً",
+      sortNameAsc: "الاسم (أ-ي)",
+      sortNameDesc: "الاسم (ي-أ)",
     }),
-    [tInbox],
+    [],
   );
 
   const widgetLabels = useMemo(
     () => ({
-      awaiting: tInbox("widgetAwaiting"),
-      rejected: tInbox("widgetRejected"),
-      accepted: tInbox("widgetAccepted"),
-      inProgress: tInbox("widgetInProgress"),
-      total: tInbox("widgetTotal"),
+      awaiting: "بانتظار الرد",
+      rejected: "مرفوض",
+      accepted: "مقبول",
+      inProgress: "قيد المعالجة",
+      total: "الإجمالي",
     }),
-    [tInbox],
+    [],
   );
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-        {tInbox("title")}
+        Inbox
       </Typography>
 
       {invitationsQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {tInbox("loadError")}
+          حدث خطأ أثناء تحميل البيانات
         </Alert>
       ) : null}
 
@@ -333,7 +323,7 @@ function ProjectsInboxView() {
           state.table.searchable ? (
             <InboxTableLayout.Search
               search={state.search}
-              placeholder={tInbox("searchInInbox")}
+              placeholder="البحث في Inbox"
             />
           ) : undefined
         }
