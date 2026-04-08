@@ -185,3 +185,31 @@ export type GetBranchesResponse = ApiResponse<Branch[]>;
 export type GetManagementsResponse = ApiResponse<Management[]>;
 export type GetCompanyUsersResponse = ApiResponse<Manager[]>;
 export type GetClientsResponse = ApiResponse<Client[]>;
+
+/** Row from GET /projects/employees/project/:projectId */
+export interface ProjectEmployeeUser {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  mobile?: string;
+  branch?: Branch | null;
+  job_title?: string;
+  jobTitle?: string;
+  department?: string | null;
+  department_name?: string | null;
+}
+
+export interface ProjectEmployee {
+  id: string;
+  project_id: string;
+  user: ProjectEmployeeUser;
+  assigned_at?: string;
+  created_at?: string;
+  assigned_by?: {
+    id: string;
+    name: string;
+  };
+}
+
+export type GetProjectEmployeesResponse = ApiResponse<ProjectEmployee[]>;
