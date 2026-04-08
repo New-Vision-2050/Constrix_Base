@@ -55,6 +55,7 @@ export const sidebarMessages = new MessagesGroup({
   WorkPanel: _m("Work Panel", "لوحه العمل"),
   WorkPanelSettings: _m("Work Panel Settings", "الاعدادات"),
   Projects: _m("Projects", "المشاريع"),
+  Inbox: _m("Inbox", "صندوق الوارد"),
   PackagesAndPrograms: _m("Packages and Programs", "الباقات والبرامج"),
   CRM: _m("CRM", "علاقات العملاء"),
   clients: _m("Clients", "العملاء"),
