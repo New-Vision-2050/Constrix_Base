@@ -10,6 +10,7 @@ import uploadCompanyImage from "@/modules/company-profile/service/upload-company
 import { deleteCookie } from "cookies-next";
 import { useParams } from "@i18n/navigation";
 import ImageUploadWithCrop from "@/components/shared/image-upload-with-crop";
+import { useTranslations } from "next-intl";
 
 interface IChangeLogo {
   handleClose: () => void;
@@ -21,22 +22,21 @@ interface ValidationRule {
   status: number;
   validate: string;
 }
-
-const getInitialRules = (): ValidationRule[] => [
+const getInitialRules = (t: any): ValidationRule[] => [
   {
-    sentence: "حجم الصورة يجب أن لا يتعدى 5 ميجابايت",
+    sentence: t("rules.rule1"),
     sub_title: null,
     status: 0,
     validate: "required",
   },
   {
-    sentence: "أبعاد الصورة غير صحيحة. يجب أن تكون الأبعاد بين  1920*1080",
+    sentence: t("rules.rule2"),
     sub_title: null,
     status: 0,
     validate: "required",
   },
   {
-    sentence: "تأكد ان الخلفية بيضاء",
+    sentence: t("rules.rule3"),
     sub_title: null,
     status: 0,
     validate: "required",
@@ -45,10 +45,11 @@ const getInitialRules = (): ValidationRule[] => [
 
 const ChangeLogo = ({ handleClose }: IChangeLogo) => {
   const { company_id }: { company_id: string | undefined } = useParams();
+  const t = useTranslations("companyProfile.changeLogo");
 
   const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [rules, setRules] = useState<ValidationRule[]>(getInitialRules());
+  const [rules, setRules] = useState<ValidationRule[]>(getInitialRules(t));
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [croppedImageBase64, setCroppedImageBase64] = useState<string | null>(
     null,
@@ -76,7 +77,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
     setCroppedImageBase64(base64);
     // Reset validation when new image is selected
     setValid(false);
-    setRules(getInitialRules());
+    setRules(getInitialRules(t));
   };
 
   // Validate image
@@ -162,7 +163,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
             disabled={false}
             cropOptions={{
               minWidth: 100,
-              aspect: 16 / 9,
+              aspect: 9 / 16,
             }}
           />
         </div>
@@ -180,7 +181,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
             isUploadPending
           }
         >
-          {valid ? "حفظ" : "تحقق من الصوره"}
+          {valid ? t("actions.saveLabel") : t("actions.checkLabel")}
         </Button>
         <Button
           type="button"
@@ -188,7 +189,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
           className="w-32"
           onClick={handleClose}
         >
-          الغاء
+          {t("actions.cancelLabel")}
         </Button>
       </div>
     </div>
