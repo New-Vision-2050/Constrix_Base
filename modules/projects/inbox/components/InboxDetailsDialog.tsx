@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
   Step,
   StepLabel,
   Stepper,
+  TextField,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -31,8 +32,9 @@ export type InboxDetailsDialogProps = {
   onClose: () => void;
   row: ProjectInboxRow | null;
   invitation: PendingShareInvitation | null;
-  onApprove: () => void;
-  onReject: () => void;
+  /** Optional comment from the sidebar field (sent when API supports it). */
+  onApprove: (comment?: string) => void;
+  onReject: (comment?: string) => void;
   actionPending: boolean;
   canRespond: boolean;
 };
@@ -66,7 +68,6 @@ const cardSx = {
 } as const;
 
 function InboxDetailsDialogMain({
-  row,
   sentLabel,
   typeLabel,
   statusLabel,
@@ -77,7 +78,6 @@ function InboxDetailsDialogMain({
   actionPending,
   canRespond,
 }: {
-  row: ProjectInboxRow;
   sentLabel: string;
   typeLabel: string;
   statusLabel: string;
@@ -88,6 +88,7 @@ function InboxDetailsDialogMain({
   actionPending: boolean;
   canRespond: boolean;
 }) {
+  const respondDisabled = actionPending || !canRespond;
   return (
     <Stack spacing={2.5} sx={{ minWidth: 0 }}>
       <Grid container spacing={1.5}>
@@ -203,10 +204,20 @@ function InboxDetailsDialogMain({
         justifyContent="flex-start"
         sx={{ pt: 1, gap: 1 }}
       >
-        <Button variant="contained" color="secondary" onClick={onApprove}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={onApprove}
+          disabled={respondDisabled}
+        >
           قبول
         </Button>
-        <Button variant="outlined" color="error" onClick={onReject}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={onReject}
+          disabled={respondDisabled}
+        >
           رفض
         </Button>
         <Button variant="outlined" color="secondary" disabled>
@@ -219,18 +230,16 @@ function InboxDetailsDialogMain({
 
 function InboxDetailsDialogSidebar({
   commentsText,
-  noCommentsLabel,
+  commentDraft,
+  onCommentChange,
   sharedByName,
-  ownerCompanyName,
-  sharedWithCompanyName,
-  createdAt,
+  actionPending,
 }: {
   commentsText: string | null;
-  noCommentsLabel: string;
+  commentDraft: string;
+  onCommentChange: (value: string) => void;
   sharedByName: string | null;
-  ownerCompanyName: string | null;
-  sharedWithCompanyName: string | null;
-  createdAt: string | null;
+  actionPending: boolean;
 }) {
   return (
     <Stack spacing={3} sx={{ height: "100%" }}>
@@ -279,21 +288,27 @@ function InboxDetailsDialogSidebar({
                 flexShrink: 0,
               }}
             />
-            <Box sx={{ minWidth: 0 }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-              >
-                {sharedByName || "—"}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 0.5 }}
-              >
-                {commentsText || noCommentsLabel}
-              </Typography>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              {commentsText ? (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1.5, whiteSpace: "pre-wrap" }}
+                >
+                  {commentsText}
+                </Typography>
+              ) : null}
+              <TextField
+                fullWidth
+                multiline
+                minRows={3}
+                maxRows={8}
+                size="small"
+                placeholder="اكتب تعليقك هنا…"
+                value={commentDraft}
+                onChange={(e) => onCommentChange(e.target.value)}
+                disabled={actionPending}
+              />
             </Box>
           </Stack>
         </Paper>
@@ -312,7 +327,18 @@ export default function InboxDetailsDialog({
   actionPending,
   canRespond,
 }: InboxDetailsDialogProps) {
+  const [commentDraft, setCommentDraft] = useState("");
   const settingsTabs = useProjectSettingsTabs();
+
+  const submitComment = () => commentDraft.trim() || undefined;
+  const handleApprove = () => onApprove(submitComment());
+  const handleReject = () => onReject(submitComment());
+
+  useEffect(() => {
+    if (open) {
+      setCommentDraft("");
+    }
+  }, [open, invitation?.id]);
 
   const schemaIds = invitation?.schema_ids ?? [];
   const schemaLabelById = useMemo(() => {
@@ -395,14 +421,13 @@ export default function InboxDetailsDialog({
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 8.5 }}>
                 <InboxDetailsDialogMain
-                  row={row}
                   sentLabel={sentLabel}
                   typeLabel={typeLabel}
                   statusLabel={statusLabel}
                   descriptionBody={descriptionBody}
                   schemaLabels={schemaLabels}
-                  onApprove={onApprove}
-                  onReject={onReject}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
                   actionPending={actionPending}
                   canRespond={canRespond}
                 />
@@ -410,13 +435,10 @@ export default function InboxDetailsDialog({
               <Grid size={{ xs: 12, md: 3.5 }}>
                 <InboxDetailsDialogSidebar
                   commentsText={commentsText}
-                  noCommentsLabel="لا توجد تعليقات"
+                  commentDraft={commentDraft}
+                  onCommentChange={setCommentDraft}
                   sharedByName={invitation?.shared_by?.name ?? null}
-                  ownerCompanyName={invitation?.owner_company?.name ?? null}
-                  sharedWithCompanyName={
-                    invitation?.shared_with_company?.name ?? null
-                  }
-                  createdAt={invitation?.created_at ?? null}
+                  actionPending={actionPending}
                 />
               </Grid>
             </Grid>

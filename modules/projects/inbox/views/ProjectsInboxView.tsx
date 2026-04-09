@@ -184,11 +184,24 @@ function ProjectsInboxView() {
     queryClient.invalidateQueries({ queryKey: [INBOX_QUERY_KEY] });
   }, [queryClient]);
 
-  const acceptMutation = useMutation({
-    mutationFn: (invitationId: string) =>
-      ProjectSharingApi.acceptInvitation(invitationId),
-    onSuccess: () => {
-      toast.success("تم قبول الدعوة بنجاح");
+  /** Single POST `invitations/respond` — same as Postman (action: accept | reject). */
+  const respondToShareMutation = useMutation({
+    mutationFn: (vars: {
+      shareId: string;
+      action: "accept" | "reject";
+      comment?: string;
+    }) =>
+      ProjectSharingApi.respondToShareInvitation({
+        share_id: vars.shareId,
+        action: vars.action,
+        comment: vars.comment,
+      }),
+    onSuccess: (_data, vars) => {
+      toast.success(
+        vars.action === "accept"
+          ? "تم قبول الدعوة بنجاح"
+          : "تم رفض الدعوة بنجاح",
+      );
       invalidate();
     },
     onError: (error: unknown) => {
@@ -196,20 +209,7 @@ function ProjectsInboxView() {
     },
   });
 
-  const rejectMutation = useMutation({
-    mutationFn: (invitationId: string) =>
-      ProjectSharingApi.rejectInvitation(invitationId),
-    onSuccess: () => {
-      toast.success("تم رفض الدعوة بنجاح");
-      invalidate();
-    },
-    onError: (error: unknown) => {
-      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء العملية");
-    },
-  });
-
-  const pendingMutation =
-    acceptMutation.isPending || rejectMutation.isPending;
+  const pendingMutation = respondToShareMutation.isPending;
 
   const openDetails = useCallback((row: ProjectInboxRow) => {
     setDetailsRow(row);
@@ -232,16 +232,13 @@ function ProjectsInboxView() {
     () =>
       getInboxColumns({
         pendingMutation,
-        onAccept: (id) => acceptMutation.mutate(id),
-        onReject: (id) => rejectMutation.mutate(id),
+        onAccept: (id) =>
+          respondToShareMutation.mutate({ shareId: id, action: "accept" }),
+        onReject: (id) =>
+          respondToShareMutation.mutate({ shareId: id, action: "reject" }),
         onView: openDetails,
       }),
-    [
-      acceptMutation,
-      rejectMutation,
-      pendingMutation,
-      openDetails,
-    ],
+    [respondToShareMutation, pendingMutation, openDetails],
   );
 
   const isFiltered =
@@ -346,15 +343,27 @@ function ProjectsInboxView() {
         invitation={detailsInvitation}
         canRespond={detailsCanRespond}
         actionPending={pendingMutation}
-        onApprove={() => {
+        onApprove={(comment) => {
           if (!detailsRow) return;
-          acceptMutation.mutate(detailsRow.invitationId);
-          closeDetails();
+          respondToShareMutation.mutate(
+            {
+              shareId: detailsRow.invitationId,
+              action: "accept",
+              comment,
+            },
+            { onSuccess: () => closeDetails() },
+          );
         }}
-        onReject={() => {
+        onReject={(comment) => {
           if (!detailsRow) return;
-          rejectMutation.mutate(detailsRow.invitationId);
-          closeDetails();
+          respondToShareMutation.mutate(
+            {
+              shareId: detailsRow.invitationId,
+              action: "reject",
+              comment,
+            },
+            { onSuccess: () => closeDetails() },
+          );
         }}
       />
     </Box>
