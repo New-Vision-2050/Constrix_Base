@@ -13,23 +13,26 @@ export function formatInboxSentDate(iso: string): string {
   return `${y}/${m}/${day}`;
 }
 
-function inboxShareStatusLabel(status: string): string {
+function inboxShareStatusLabel(
+  status: string,
+  t: (key: string) => string,
+): string {
   const key = status.trim().toLowerCase();
   switch (key) {
     case "pending":
-      return "بانتظار الرد";
+      return t("statusPending");
     case "sent":
-      return "تم الإرسال";
+      return t("statusSent");
     case "draft":
     case "under_construction":
-      return "تحت الإنشاء";
+      return t("statusDraft");
     case "accepted":
     case "approved":
-      return "مقبول";
+      return t("statusAccepted");
     case "rejected":
-      return "مرفوض";
+      return t("statusRejected");
     default:
-      return status || "—";
+      return status || t("emptyDash");
   }
 }
 
@@ -54,6 +57,7 @@ function inboxShareStatusColor(status: string): "primary" | "warning" | "success
 }
 
 export type GetInboxColumnsOptions = {
+  t: (key: string) => string;
   pendingMutation: boolean;
   onAccept: (invitationId: string) => void;
   onReject: (invitationId: string) => void;
@@ -61,77 +65,81 @@ export type GetInboxColumnsOptions = {
 };
 
 export function getInboxColumns({
+  t,
   pendingMutation,
+  onAccept,
+  onReject,
   onView,
 }: GetInboxColumnsOptions) {
+  const dash = () => t("emptyDash");
   return [
     {
       key: "inbox_type_label",
-      name: "النوع",
+      name: t("fieldType"),
       sortable: false,
       render: (row: ProjectInboxRow) => (
-        <span>{row.inbox_type_label || "—"}</span>
+        <span>{row.inbox_type_label || dash()}</span>
       ),
     },
     {
       key: "name",
-      name: "العنوان",
+      name: t("columnName"),
       sortable: false,
       render: (row: ProjectInboxRow) => (
-        <span className="font-medium">{row.name || "—"}</span>
+        <span className="font-medium">{row.name || dash()}</span>
       ),
     },
     {
       key: "sender_company_name",
-      name: "الجهة المراسلة",
+      name: t("columnSenderCompany"),
       sortable: false,
       render: (row: ProjectInboxRow) => (
         <span>
           {row.sender_company_name?.trim()
             ? row.sender_company_name
-            : "—"}
+            : dash()}
         </span>
       ),
     },
     {
       key: "reference_display",
-      name: "المرجع",
+      name: t("columnReference"),
       sortable: false,
       render: (row: ProjectInboxRow) => (
-        <span>{row.reference_display || "—"}</span>
+        <span>{row.reference_display || dash()}</span>
       ),
     },
     {
       key: "representative_name",
-      name: "الممثل",
+      name: t("columnRepresentative"),
       sortable: false,
       render: (row: ProjectInboxRow) => (
         <span>
           {row.representative_name?.trim()
             ? row.representative_name
-            : "—"}
+            : dash()}
         </span>
       ),
     },
     {
       key: "sent_at_raw",
-      name: "تاريخ الإرسال",
+      name: t("columnSentDate"),
       sortable: false,
       render: (row: ProjectInboxRow) => {
         const formatted = formatInboxSentDate(row.sent_at_raw);
         return (
           <span>
-            {formatted.trim() ? formatted : "—"}
+            {formatted.trim() ? formatted : dash()}
           </span>
         );
       },
     },
     {
       key: "invitation_status",
-      name: "الحالة",
+      name: t("columnStatus"),
       sortable: false,
       render: (row: ProjectInboxRow) => {
-        const label = inboxShareStatusLabel(row.invitation_status);
+        const label = inboxShareStatusLabel(row.invitation_status, t);
         return (
           <Chip
             label={label}
@@ -144,9 +152,11 @@ export function getInboxColumns({
     },
     {
       key: "actions",
-      name: "الإجراءات",
+      name: t("columnActions"),
       sortable: false,
       render: (row: ProjectInboxRow) => {
+        const canRespond =
+          (row.invitation_status ?? "").trim().toLowerCase() === "pending";
         return (
           <CustomMenu
             renderAnchor={({ onClick }) => (
@@ -159,7 +169,7 @@ export function getInboxColumns({
                 disabled={pendingMutation}
                 sx={{ bgcolor: "#3f3f5a", color: "#fff", minWidth: 80 }}
               >
-                إجراء
+                {t("actionMenuButton")}
               </Button>
             )}
           >
@@ -168,7 +178,19 @@ export function getInboxColumns({
               disabled={pendingMutation}
             >
               <EyeIcon className="w-4 h-4 ml-2" />
-              عرض 
+              {t("viewDetails")}
+            </MenuItem>
+            <MenuItem
+              onClick={() => onAccept(row.invitationId)}
+              disabled={pendingMutation || !canRespond}
+            >
+              {t("accept")}
+            </MenuItem>
+            <MenuItem
+              onClick={() => onReject(row.invitationId)}
+              disabled={pendingMutation || !canRespond}
+            >
+              {t("reject")}
             </MenuItem>
           </CustomMenu>
         );

@@ -4,6 +4,7 @@ import { useMemo, useCallback, useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Box, Typography } from "@mui/material";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
@@ -83,6 +84,7 @@ function applyInboxSort(
 }
 
 function ProjectsInboxView() {
+  const t = useTranslations("project.inbox");
   const queryClient = useQueryClient();
 
   const [documentType, setDocumentType] = useState<"all" | InboxTypeKey>("all");
@@ -199,13 +201,15 @@ function ProjectsInboxView() {
     onSuccess: (_data, vars) => {
       toast.success(
         vars.action === "accept"
-          ? "تم قبول الدعوة بنجاح"
-          : "تم رفض الدعوة بنجاح",
+          ? t("toastAcceptSuccess")
+          : t("toastRejectSuccess"),
       );
       invalidate();
     },
     onError: (error: unknown) => {
-      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء العملية");
+      toast.error(
+        getApiErrorDescription(error) ?? t("toastOperationError"),
+      );
     },
   });
 
@@ -231,6 +235,7 @@ function ProjectsInboxView() {
   const columns = useMemo(
     () =>
       getInboxColumns({
+        t,
         pendingMutation,
         onAccept: (id) =>
           respondToShareMutation.mutate({ shareId: id, action: "accept" }),
@@ -238,7 +243,7 @@ function ProjectsInboxView() {
           respondToShareMutation.mutate({ shareId: id, action: "reject" }),
         onView: openDetails,
       }),
-    [respondToShareMutation, pendingMutation, openDetails],
+    [t, respondToShareMutation, pendingMutation, openDetails],
   );
 
   const isFiltered =
@@ -262,47 +267,47 @@ function ProjectsInboxView() {
 
   const filterLabels = useMemo(
     () => ({
-      documentType: "نوع المستند",
-      status: "الحالة",
-      sortBy: "ترتيب حسب",
-      all: "الكل",
-      typeProject: "مشروع",
-      typeAttachment: "مرفق",
-      typeRequest: "طلب",
-      typeQuote: "عرض سعر",
-      statusAll: "الكل",
-      statusAwaiting: "بانتظار الرد",
-      statusInProgress: "قيد المعالجة",
-      statusAccepted: "مقبول",
-      statusRejected: "مرفوض",
-      sortDateNewest: "الأحدث أولاً",
-      sortDateOldest: "الأقدم أولاً",
-      sortNameAsc: "الاسم (أ-ي)",
-      sortNameDesc: "الاسم (ي-أ)",
+      documentType: t("filterDocumentType"),
+      status: t("filterStatus"),
+      sortBy: t("filterSortBy"),
+      all: t("filterAll"),
+      typeProject: t("typeProject"),
+      typeAttachment: t("typeAttachment"),
+      typeRequest: t("typeRequest"),
+      typeQuote: t("typeQuote"),
+      statusAll: t("filterStatusAll"),
+      statusAwaiting: t("filterStatusAwaiting"),
+      statusInProgress: t("filterStatusInProgress"),
+      statusAccepted: t("filterStatusAccepted"),
+      statusRejected: t("filterStatusRejected"),
+      sortDateNewest: t("sortDateNewest"),
+      sortDateOldest: t("sortDateOldest"),
+      sortNameAsc: t("sortNameAsc"),
+      sortNameDesc: t("sortNameDesc"),
     }),
-    [],
+    [t],
   );
 
   const widgetLabels = useMemo(
     () => ({
-      awaiting: "بانتظار الرد",
-      rejected: "مرفوض",
-      accepted: "مقبول",
-      inProgress: "قيد المعالجة",
-      total: "الإجمالي",
+      awaiting: t("widgetAwaiting"),
+      rejected: t("widgetRejected"),
+      accepted: t("widgetAccepted"),
+      inProgress: t("widgetInProgress"),
+      total: t("widgetTotal"),
     }),
-    [],
+    [t],
   );
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-        Inbox
+        {t("listTitle")}
       </Typography>
 
       {invitationsQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
-          حدث خطأ أثناء تحميل البيانات
+          {t("listLoadError")}
         </Alert>
       ) : null}
 
@@ -320,7 +325,7 @@ function ProjectsInboxView() {
           state.table.searchable ? (
             <InboxTableLayout.Search
               search={state.search}
-              placeholder="البحث في Inbox"
+              placeholder={t("searchPlaceholder")}
             />
           ) : undefined
         }
