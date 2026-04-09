@@ -178,3 +178,17 @@ export type PendingInvitationsResponse = {
   message?: string | null;
   payload: PendingShareInvitation[];
 };
+
+export type SharedCompany = {
+  id: string;
+  name: string;
+  serial_number?: string | null;
+  email?: string;
+  phone?: string;
+};
+
+export type GetSharedCompaniesResponse = {
+  code: string;
+  message?: string | null;
+  payload: SharedCompany[];
+};
