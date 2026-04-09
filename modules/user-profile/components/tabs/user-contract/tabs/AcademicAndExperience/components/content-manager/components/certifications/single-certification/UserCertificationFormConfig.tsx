@@ -69,10 +69,22 @@ export const UserCertificationFormConfig = ({
             validation: [],
           },
           {
-            name: "accreditation_degree",
+            type: "select",
+            name: "professional_degree_id",
             label: t('accreditationDegree'),
-            type: "text",
             placeholder: t('accreditationDegreePlaceholder'),
+            dynamicOptions: {
+              url: `${baseURL}/professional_certificates/professional-degrees`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              setFirstAsDefault: true,
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [],
           },
           {
@@ -120,7 +132,7 @@ export const UserCertificationFormConfig = ({
       professional_bodie_id: IsEditing ? certification?.professional_bodie_id : "",
       accreditation_name: IsEditing ? certification?.accreditation_name : "",
       accreditation_number: IsEditing ? certification?.accreditation_number : "",
-      accreditation_degree: IsEditing ? certification?.accreditation_degree : "",
+      professional_degree_id: IsEditing ? certification?.professional_degree_id : "",
       date_obtain: IsEditing ? certification?.date_obtain : "",
       date_end: IsEditing ? certification?.date_end : "",
       // Initialize file field empty if editing existing certification

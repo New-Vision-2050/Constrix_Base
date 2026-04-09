@@ -38,8 +38,8 @@ export default function UserCertificationPreview({ certification }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label={t("accreditationDegree")}
-          value={certification?.accreditation_degree ?? ""}
-          valid={Boolean(certification?.accreditation_degree)}
+          value={certification?.professional_degree_name ?? ""}
+          valid={Boolean(certification?.professional_degree_name)}
         />
       </div>
 
