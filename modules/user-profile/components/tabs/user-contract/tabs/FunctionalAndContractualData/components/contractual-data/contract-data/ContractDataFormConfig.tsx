@@ -7,6 +7,7 @@ import { useFunctionalContractualCxt } from "../../../context";
 import { Contract } from "@/modules/user-profile/types/Contract";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import PickupMap from "@/components/shared/pickup-map";
 
 type PropsT = {
   contract?: Contract;
@@ -499,22 +500,28 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
-            type: "select",
-            name: "state_id",
+            name: "latitude",
+            label: "latitude",
+            type: "hiddenObject",
+          },
+          {
+            name: "longitude",
+            label: "longitude",
+            type: "hiddenObject",
+          },
+          {
             label: t("workPlace"),
-            placeholder: t("workPlace"),
-            dynamicOptions: {
-              url: `${baseURL}/countries/get-states-by-branch`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
-            },
-            validation: [],
+            name: "map",
+            type: "text",
+            render: () => (
+              <PickupMap
+                formId={`user-contract-data-form-${contract?.id}`}
+                keysToUpdate={["latitude", "longitude"]}
+                inGeneral={true}
+                lat={contract?.latitude?.toString()}
+                long={contract?.longitude?.toString()}
+              />
+            ),
           },
           {
             name: "right_terminate_id",
@@ -560,7 +567,8 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
       nature_work_id: contract?.nature_work?.id,
       type_working_hour_id: contract?.type_working_hour?.id,
       working_hours: contract?.working_hours,
-      state_id: contract?.state_id,
+      latitude: contract?.latitude,
+      longitude: contract?.longitude,
       right_terminate_id: contract?.right_terminate?.id,
       notice_period_unit:
         contract?.notice_period_unit?.id || timeUnits?.[0]?.id,

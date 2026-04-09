@@ -18,6 +18,8 @@ export type Contract = {
   probation_period: number;
   start_date: string;
   type_working_hours: { id: string; name: string };
+  latitude?: string;
+  longitude?: string;
   working_hours: number;
   contract_duration_unit: { id: string; name: string };
 
