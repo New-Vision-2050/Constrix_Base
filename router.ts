@@ -47,6 +47,8 @@ export const ROUTER = {
   TERMS_CONDITIONS: "/stores/terms",
   PROJECTS_SETTINGS: "/projects/settings",
   ALL_PROJECTS: "/projects",
+  /** Pending share invitations (inbox). */
+  PROJECTS_INBOX: "/projects/inbox",
   PROJECT_DETAILS: (id: string) => `/projects/${id}`,
   CMS: {
     CATEGORIES: "/content-management-system/categories",

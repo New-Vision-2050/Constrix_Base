@@ -33,10 +33,12 @@ const DialogContent = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     withCrossButton?: boolean;
+    /** Merged into the overlay (e.g. higher z-index when stacking over MUI modals). */
+    overlayClassName?: string;
   }
->(({ className, children, withCrossButton = false, ...props }, ref) => (
+>(({ className, children, withCrossButton = false, overlayClassName, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
+    <DialogOverlay className={overlayClassName} />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
