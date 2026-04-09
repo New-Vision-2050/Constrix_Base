@@ -118,7 +118,7 @@ export default function UploadProfileImageDialog({
             disabled={false}
             cropOptions={{
               minWidth: 100,
-              aspect: 16 / 9,
+              aspect: 9 / 16,
             }}
           />
         </div>
