@@ -1,6 +1,7 @@
 import { baseApi } from "@/config/axios/instances/base";
 import {
   CompanyLookupResponse,
+  GetSharedCompaniesResponse,
   ListProjectSharesResponse,
   PendingInvitationsResponse,
   ShareProjectResponse,
@@ -53,17 +54,19 @@ export const ProjectSharingApi = {
     );
   },
 
+  rejectInvitation: (invitationId: string) =>
+    baseApi.post<ShareProjectResponse>(
+      `projects/sharing/invitations/${invitationId}/reject`,
+    ),
+
+  getSharedCompanies: (projectId: string) =>
+    baseApi.get<GetSharedCompaniesResponse>(
+      `projects/sharing/projects/${projectId}/shared-companies`,
+    ),
   acceptInvitation: (shareId: string, options?: { comment?: string }) =>
     ProjectSharingApi.respondToShareInvitation({
       share_id: shareId,
       action: "accept",
-      comment: options?.comment,
-    }),
-
-  rejectInvitation: (shareId: string, options?: { comment?: string }) =>
-    ProjectSharingApi.respondToShareInvitation({
-      share_id: shareId,
-      action: "reject",
       comment: options?.comment,
     }),
 };

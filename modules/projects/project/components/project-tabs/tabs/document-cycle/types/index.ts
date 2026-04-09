@@ -4,7 +4,7 @@ export type DocumentStatus =
   | "approved"
   | "semi_approved"
   | "partially_approved"
-  | "rejected";
+  | "declined";
 
 export interface DocumentAttachment {
   id: string;

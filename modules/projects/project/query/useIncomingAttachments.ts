@@ -13,11 +13,17 @@ import { mapAttachmentRequestHistory } from "@/modules/projects/project/componen
 
 function mapStatus(apiStatus: AttachmentRequestStatus): DocumentStatus {
   switch (apiStatus) {
-    case "approved":      return "approved";
-    case "rejected":      return "rejected";
-    case "semi-approved": return "semi_approved";
+    case "approved":
+      return "approved";
+    case "rejected":
+    case "declined":
+      return "declined";
+    case "semi-approved":
+      return "semi_approved";
     case "pending":
-    default:              return "pending";
+      return "pending";
+    default:
+      return "pending";
   }
 }
 

@@ -2,7 +2,8 @@ export type AttachmentRequestStatus =
   | "pending"
   | "approved"
   | "semi-approved"
-  | "rejected";
+  | "rejected"
+  | "declined";
 
 export interface AttachmentRequestItem {
   id: string;

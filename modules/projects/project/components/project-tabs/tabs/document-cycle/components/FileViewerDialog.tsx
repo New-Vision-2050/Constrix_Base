@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Box, Typography, IconButton, Avatar, TextField } from "@mui/material";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Avatar,
+  TextField,
+  CircularProgress,
+} from "@mui/material";
 import {
   X,
   Download,
@@ -13,11 +20,17 @@ import {
   List,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
+import type { RespondAttachmentItemPayload } from "@/services/api/projects/attachment-requests/types/params";
 import { DocumentRow, DocumentAttachment } from "../types";
 import {
+  createAuthenticatedPreviewUrl,
   downloadAttachmentFile,
   getFilePreviewKind,
 } from "../attachmentActions";
@@ -38,8 +51,26 @@ export default function FileViewerDialog({
   isIncoming,
 }: FileViewerDialogProps) {
   const t = useTranslations("project.documentCycle");
+  const queryClient = useQueryClient();
   const [zoom, setZoom] = useState(100);
   const [note, setNote] = useState("");
+
+  const respondMutation = useMutation({
+    mutationFn: (body: RespondAttachmentItemPayload) =>
+      AttachmentRequestsApi.respondToItem(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["incoming-attachment-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["outgoing-attachment-requests"] });
+      toast.success(t("itemRespondSuccess"));
+      onClose();
+    },
+    onError: (error: unknown) => {
+      const msg = isAxiosError(error)
+        ? (error.response?.data as { message?: string } | undefined)?.message
+        : undefined;
+      toast.error(msg?.trim() ? msg : t("itemRespondError"));
+    },
+  });
 
   const previewKind = useMemo(
     () => (activeFile ? getFilePreviewKind(activeFile) : "other"),
@@ -50,6 +81,75 @@ export default function FileViewerDialog({
     if (activeFile?.id) setZoom(100);
   }, [activeFile?.id]);
 
+  useEffect(() => {
+    if (open) setNote("");
+  }, [open, activeFile?.id]);
+
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
+  const previewBlobRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!open || !activeFile?.url) {
+      if (previewBlobRef.current) {
+        URL.revokeObjectURL(previewBlobRef.current);
+        previewBlobRef.current = null;
+      }
+      setPreviewSrc(null);
+      setPreviewLoading(false);
+      setPreviewError(false);
+      return;
+    }
+
+    const kind = getFilePreviewKind(activeFile);
+    if (kind !== "pdf" && kind !== "image") {
+      if (previewBlobRef.current) {
+        URL.revokeObjectURL(previewBlobRef.current);
+        previewBlobRef.current = null;
+      }
+      setPreviewSrc(null);
+      setPreviewLoading(false);
+      setPreviewError(false);
+      return;
+    }
+
+    let cancelled = false;
+    setPreviewLoading(true);
+    setPreviewError(false);
+
+    createAuthenticatedPreviewUrl(activeFile.url)
+      .then((url) => {
+        if (cancelled) {
+          if (url.startsWith("blob:")) URL.revokeObjectURL(url);
+          return;
+        }
+        if (previewBlobRef.current) {
+          URL.revokeObjectURL(previewBlobRef.current);
+          previewBlobRef.current = null;
+        }
+        if (url.startsWith("blob:")) previewBlobRef.current = url;
+        setPreviewSrc(url);
+      })
+      .catch(() => {
+        if (!cancelled) setPreviewError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setPreviewLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      if (previewBlobRef.current) {
+        URL.revokeObjectURL(previewBlobRef.current);
+        previewBlobRef.current = null;
+      }
+      setPreviewSrc(null);
+    };
+    // Intentionally key off id/url/type/name — not `activeFile` reference — to avoid refetch when parent re-renders with a new object.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, activeFile?.id, activeFile?.url, activeFile?.type, activeFile?.name]);
+
   if (!document || !activeFile) return null;
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 25, 200));
@@ -58,17 +158,30 @@ export default function FileViewerDialog({
     downloadAttachmentFile({ url: activeFile.url, name: activeFile.name });
   const handlePrint = () => window.print();
 
+  const notesPayload = note.trim() || undefined;
+
   const handleApprove = () => {
-    onClose();
+    respondMutation.mutate({
+      item_id: activeFile.id,
+      action: "approve",
+      notes: notesPayload,
+    });
   };
 
   const handleReject = () => {
-    onClose();
+    respondMutation.mutate({
+      item_id: activeFile.id,
+      action: "decline",
+      notes: notesPayload,
+    });
   };
 
+  /** No API yet — close only. */
   const handleRequestModification = () => {
     onClose();
   };
+
+  const respondPending = respondMutation.isPending;
 
   /** Above MUI theme zIndex.modal (1300) so this opens on top of OutgoingDetailDialog. */
   const stackedDialogClass = "z-[1600]";
@@ -259,6 +372,7 @@ export default function FileViewerDialog({
                     onChange={(e) => setNote(e.target.value)}
                     variant="outlined"
                     size="small"
+                    disabled={respondPending}
                   />
                 </Box>
               )}
@@ -274,20 +388,23 @@ export default function FileViewerDialog({
                   }}
                 >
                   <Button
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
                     onClick={handleApprove}
+                    disabled={respondPending}
                   >
                     ✓ {t("approve")}
                   </Button>
                   <Button
-                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                    className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
                     onClick={handleRequestModification}
+                    disabled={respondPending}
                   >
                     ✎ {t("requestModification")}
                   </Button>
                   <Button
-                    className="bg-red-600 hover:bg-red-700 text-white"
+                    className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
                     onClick={handleReject}
+                    disabled={respondPending}
                   >
                     ✕ {t("reject")}
                   </Button>
@@ -378,33 +495,115 @@ export default function FileViewerDialog({
                     }}
                   >
                     {previewKind === "pdf" && activeFile.url ? (
-                      <Box
-                        component="iframe"
-                        src={activeFile.url}
-                        title={activeFile.name}
-                        sx={{
-                          width: "100%",
-                          height: "min(70vh, 720px)",
-                          minHeight: 400,
-                          border: 0,
-                          display: "block",
-                        }}
-                      />
+                      <>
+                        {previewLoading ? (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minHeight: 400,
+                              width: "100%",
+                            }}
+                          >
+                            <CircularProgress />
+                          </Box>
+                        ) : null}
+                        {previewError && !previewLoading ? (
+                          <Box sx={{ p: 4, textAlign: "center" }}>
+                            <Typography
+                              variant="body2"
+                              color="error"
+                              sx={{ mb: 2 }}
+                            >
+                              {t("previewLoadError")}
+                            </Typography>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                window.open(
+                                  activeFile.url,
+                                  "_blank",
+                                  "noopener,noreferrer",
+                                )
+                              }
+                            >
+                              {t("openInNewTab")}
+                            </Button>
+                          </Box>
+                        ) : null}
+                        {!previewLoading && !previewError && previewSrc ? (
+                          <Box
+                            component="iframe"
+                            src={previewSrc}
+                            title={activeFile.name}
+                            sx={{
+                              width: "100%",
+                              height: "min(70vh, 720px)",
+                              minHeight: 400,
+                              border: 0,
+                              display: "block",
+                            }}
+                          />
+                        ) : null}
+                      </>
                     ) : null}
                     {previewKind === "image" && activeFile.url ? (
-                      <Box
-                        component="img"
-                        src={activeFile.url}
-                        alt={activeFile.name}
-                        sx={{
-                          maxWidth: "100%",
-                          maxHeight: "70vh",
-                          width: "auto",
-                          height: "auto",
-                          objectFit: "contain",
-                          display: "block",
-                        }}
-                      />
+                      <>
+                        {previewLoading ? (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minHeight: 280,
+                              width: "100%",
+                            }}
+                          >
+                            <CircularProgress />
+                          </Box>
+                        ) : null}
+                        {previewError && !previewLoading ? (
+                          <Box sx={{ p: 4, textAlign: "center" }}>
+                            <Typography
+                              variant="body2"
+                              color="error"
+                              sx={{ mb: 2 }}
+                            >
+                              {t("previewLoadError")}
+                            </Typography>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                window.open(
+                                  activeFile.url,
+                                  "_blank",
+                                  "noopener,noreferrer",
+                                )
+                              }
+                            >
+                              {t("openInNewTab")}
+                            </Button>
+                          </Box>
+                        ) : null}
+                        {!previewLoading && !previewError && previewSrc ? (
+                          <Box
+                            component="img"
+                            src={previewSrc}
+                            alt={activeFile.name}
+                            sx={{
+                              maxWidth: "100%",
+                              maxHeight: "70vh",
+                              width: "auto",
+                              height: "auto",
+                              objectFit: "contain",
+                              display: "block",
+                            }}
+                          />
+                        ) : null}
+                      </>
                     ) : null}
                     {previewKind === "other" ? (
                       <Box sx={{ p: 4, textAlign: "center" }}>

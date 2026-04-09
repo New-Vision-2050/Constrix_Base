@@ -3,6 +3,7 @@ import {
   CreateAttachmentRequestData,
   IncomingAttachmentRequestsParams,
   OutgoingAttachmentRequestsParams,
+  RespondAttachmentItemPayload,
 } from "./types/params";
 import {
   GetFolderChildrenResponse,
@@ -29,7 +30,13 @@ export const AttachmentRequestsApi = {
       { params },
     ),
 
-  create: (data: CreateAttachmentRequestData) => {
+  create: (
+    data: CreateAttachmentRequestData,
+    options?: {
+      /** 0–100 while the multipart body is uploading */
+      onUploadProgress?: (percent: number) => void;
+    },
+  ) => {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("date", data.date);
@@ -52,7 +59,35 @@ export const AttachmentRequestsApi = {
     return baseApi.post<{ code: string; message: string | null }>(
       "projects/attachment-requests",
       formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (e) => {
+          const total = e.total;
+          if (total && options?.onUploadProgress) {
+            options.onUploadProgress(
+              Math.min(100, Math.round((e.loaded * 100) / total)),
+            );
+          }
+        },
+      },
     );
   },
+
+  respondToItem: (body: RespondAttachmentItemPayload) =>
+    baseApi.post<{ code?: string; message?: string | null }>(
+      "projects/attachment-requests/items/respond",
+      body,
+    ),
+
+  /** POST `projects/attachment-requests/:id/approve` */
+  approveRequest: (requestId: string) =>
+    baseApi.post<{ code?: string; message?: string | null }>(
+      `projects/attachment-requests/${requestId}/approve`,
+    ),
+
+  /** POST `projects/attachment-requests/:id/decline` */
+  declineRequest: (requestId: string) =>
+    baseApi.post<{ code?: string; message?: string | null }>(
+      `projects/attachment-requests/${requestId}/decline`,
+    ),
 };

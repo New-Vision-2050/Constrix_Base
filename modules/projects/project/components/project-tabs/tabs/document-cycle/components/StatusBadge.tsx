@@ -8,12 +8,12 @@ const STATUS_CONFIG: Record<
   DocumentStatus,
   { labelKey: string; color: "default" | "success" | "warning" | "error" }
 > = {
-  draft:              { labelKey: "draft",             color: "default"  },
-  pending:            { labelKey: "pending",            color: "default"  },
-  approved:           { labelKey: "approved",           color: "success"  },
-  semi_approved:      { labelKey: "partiallyApproved",  color: "warning"  },
-  partially_approved: { labelKey: "partiallyApproved",  color: "warning"  },
-  rejected:           { labelKey: "rejected",           color: "error"    },
+  draft: { labelKey: "draft", color: "default" },
+  pending: { labelKey: "pending", color: "default" },
+  approved: { labelKey: "approved", color: "success" },
+  semi_approved: { labelKey: "partiallyApproved", color: "warning" },
+  partially_approved: { labelKey: "partiallyApproved", color: "warning" },
+  declined: { labelKey: "declined", color: "error" },
 };
 
 interface StatusBadgeProps {
@@ -22,7 +22,7 @@ interface StatusBadgeProps {
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
   const t = useTranslations("project.documentCycle");
-  const config = STATUS_CONFIG[status];
+  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.pending;
 
   return (
     <Chip

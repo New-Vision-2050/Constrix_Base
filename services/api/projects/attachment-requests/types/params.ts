@@ -27,3 +27,9 @@ export interface CreateAttachmentRequestData {
   attachments: File[];
   notes?: string;
 }
+
+export interface RespondAttachmentItemPayload {
+  item_id: string;
+  action: "approve" | "decline";
+  notes?: string;
+}

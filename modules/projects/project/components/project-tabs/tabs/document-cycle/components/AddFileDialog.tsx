@@ -16,6 +16,7 @@ import {
   FormHelperText,
   Typography,
   CircularProgress,
+  LinearProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -143,22 +144,35 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
 
   /* ── File state ─────────────────────────────────────────────────────── */
   const [files, setFiles] = React.useState<File[]>([]);
+  /** Multipart upload progress 0–100, or null when idle */
+  const [uploadPercent, setUploadPercent] = React.useState<number | null>(null);
+
+  useEffect(() => {
+    if (!open) setUploadPercent(null);
+  }, [open]);
 
   /* ── Mutation ───────────────────────────────────────────────────────── */
   const mutation = useMutation({
-    mutationFn: (data: FormValues) =>
-      AttachmentRequestsApi.create({
-        name: data.name,
-        date: data.date,
-        project_id: projectId,
-        receiver_company_id: data.receiver_company_id,
-        attachment_type_id: data.attachment_type_id || undefined,
-        attachment_sub_type_id: data.attachment_sub_type_id || undefined,
-        attachment_sub_sub_type_id:
-          data.attachment_sub_sub_type_id || undefined,
-        attachments: files,
-        notes: data.notes || undefined,
-      }),
+    mutationFn: async (data: FormValues) => {
+      setUploadPercent(0);
+      return AttachmentRequestsApi.create(
+        {
+          name: data.name,
+          date: data.date,
+          project_id: projectId,
+          receiver_company_id: data.receiver_company_id,
+          attachment_type_id: data.attachment_type_id || undefined,
+          attachment_sub_type_id: data.attachment_sub_type_id || undefined,
+          attachment_sub_sub_type_id:
+            data.attachment_sub_sub_type_id || undefined,
+          attachments: files,
+          notes: data.notes || undefined,
+        },
+        {
+          onUploadProgress: (percent) => setUploadPercent(percent),
+        },
+      );
+    },
     onSuccess: (res) => {
       const msg = res.data?.message;
       toast.success(
@@ -171,6 +185,9 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
       toast.error(err?.response?.data?.message ?? t("addError"));
+    },
+    onSettled: () => {
+      setUploadPercent(null);
     },
   });
 
@@ -269,7 +286,6 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
                 })
               }
             >
-              <MenuItem value="">—</MenuItem>
               {sharedCompanies.map((company) => (
                 <MenuItem key={company.id} value={String(company.id)}>
                   {company.name}
@@ -461,6 +477,26 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
             </Box>
           </Box>
         </DialogContent>
+
+        {isPending ? (
+          <Box sx={{ px: 3, pt: 0, pb: 1, width: "100%" }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+              sx={{ mb: 0.75 }}
+            >
+              {t("uploadProgressPercent", {
+                percent: uploadPercent ?? 0,
+              })}
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={uploadPercent ?? 0}
+              sx={{ height: 8, borderRadius: 1 }}
+            />
+          </Box>
+        ) : null}
 
         <DialogActions sx={{ px: 3, pb: 2, justifyContent: "center", gap: 4 }}>
           <SaveButton type="submit" disabled={isPending} loading={isPending} />

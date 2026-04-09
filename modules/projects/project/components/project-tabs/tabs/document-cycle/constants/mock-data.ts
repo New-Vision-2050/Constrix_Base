@@ -35,7 +35,7 @@ export const MOCK_OUTGOING_DOCUMENTS: DocumentRow[] = [
     documentCount: 3,
     lastActivityUser: "احمد محمد",
     lastActivityDate: "2023",
-    status: "rejected",
+    status: "declined",
   },
   {
     id: "5",

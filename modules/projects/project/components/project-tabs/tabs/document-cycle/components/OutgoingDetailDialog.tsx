@@ -19,7 +19,7 @@ export default function OutgoingDetailDialog({
       open={open}
       onClose={onClose}
       document={document}
-      variant="incoming"
+      variant="outgoing"
     />
   );
 }

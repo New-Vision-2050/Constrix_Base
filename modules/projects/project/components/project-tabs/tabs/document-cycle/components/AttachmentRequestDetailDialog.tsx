@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 import {
   Box,
   Button,
@@ -13,9 +16,6 @@ import {
   MenuItem,
   Paper,
   Stack,
-  Step,
-  StepLabel,
-  Stepper,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -25,11 +25,11 @@ import CustomMenu from "@/components/headless/custom-menu";
 import {
   DocumentRow,
   DocumentAttachment,
-  ApprovalStep,
   DocumentHistoryEntry,
 } from "../types";
 import { downloadAttachmentFile } from "../attachmentActions";
 import FileViewerDialog from "./FileViewerDialog";
+import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
 
 const cardSx = {
   p: 1.5,
@@ -205,6 +205,8 @@ function approvalStatusLabel(
       return t("approved");
     case "rejected":
       return t("rejected");
+    case "declined":
+      return t("declined");
     case "semi-approved":
       return t("partiallyApproved");
     default:
@@ -401,8 +403,6 @@ function DetailSidebar({
   document: DocumentRow;
   t: (key: string) => string;
 }) {
-  const creator = document.lastActivityUser?.trim();
-  const hasPath = document.approvalPath && document.approvalPath.length > 0;
   const hasHistory = document.history && document.history.length > 0;
 
   return (
@@ -414,31 +414,10 @@ function DetailSidebar({
           </Typography>
           {hasHistory ? (
             <HistoryApprovalStepper history={document.history!} t={t} />
-          ) : hasPath ? (
-            <ApprovalTimeline steps={document.approvalPath!} />
           ) : (
-            <Stepper activeStep={0} orientation="vertical">
-              <Step completed>
-                <StepLabel
-                  optional={
-                    <Typography variant="caption" color="text.secondary">
-                      {creator && creator !== "—" ? creator : "—"}
-                    </Typography>
-                  }
-                >
-                  {t("submission")}
-                </StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>{t("initialReview")}</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>{t("technicalApproval")}</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>{t("commercialApproval")}</StepLabel>
-              </Step>
-            </Stepper>
+            <Typography variant="body2" color="text.secondary">
+              —
+            </Typography>
           )}
         </Paper>
       </Box>
@@ -497,17 +476,75 @@ export default function AttachmentRequestDetailDialog({
   onClose,
   document,
   variant,
-  onApprove,
-  onReject,
+  onApprove: onApproveProp,
+  onReject: onRejectProp,
   onRequestModification,
-  actionPending = false,
+  actionPending: actionPendingProp = false,
 }: AttachmentRequestDetailDialogProps) {
   const t = useTranslations("project.documentCycle");
   const locale = useLocale();
   const isRTL = locale === "ar";
+  const queryClient = useQueryClient();
 
   const [fileViewerOpen, setFileViewerOpen] = useState(false);
   const [activeFile, setActiveFile] = useState<DocumentAttachment | null>(null);
+
+  const approveMutation = useMutation({
+    mutationFn: (requestId: string) =>
+      AttachmentRequestsApi.approveRequest(requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["incoming-attachment-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["outgoing-attachment-requests"] });
+      toast.success(t("requestApproveSuccess"));
+      onClose();
+    },
+    onError: (error: unknown) => {
+      const msg = isAxiosError(error)
+        ? (error.response?.data as { message?: string } | undefined)?.message
+        : undefined;
+      toast.error(msg?.trim() ? msg : t("requestApproveError"));
+    },
+  });
+
+  const declineMutation = useMutation({
+    mutationFn: (requestId: string) =>
+      AttachmentRequestsApi.declineRequest(requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["incoming-attachment-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["outgoing-attachment-requests"] });
+      toast.success(t("requestDeclineSuccess"));
+      onClose();
+    },
+    onError: (error: unknown) => {
+      const msg = isAxiosError(error)
+        ? (error.response?.data as { message?: string } | undefined)?.message
+        : undefined;
+      toast.error(msg?.trim() ? msg : t("requestDeclineError"));
+    },
+  });
+
+  const handleApprove = () => {
+    if (onApproveProp) {
+      onApproveProp();
+      return;
+    }
+    if (!document || variant !== "incoming") return;
+    approveMutation.mutate(document.id);
+  };
+
+  const handleReject = () => {
+    if (onRejectProp) {
+      onRejectProp();
+      return;
+    }
+    if (!document || variant !== "incoming") return;
+    declineMutation.mutate(document.id);
+  };
+
+  const actionPending =
+    actionPendingProp ||
+    approveMutation.isPending ||
+    declineMutation.isPending;
 
   if (!document) return null;
 
@@ -578,8 +615,8 @@ export default function AttachmentRequestDetailDialog({
                 onClose={onClose}
                 variant={variant}
                 actionPending={actionPending}
-                onApprove={onApprove}
-                onReject={onReject}
+                onApprove={handleApprove}
+                onReject={handleReject}
                 onRequestModification={onRequestModification}
               />
             </Grid>
@@ -711,109 +748,5 @@ function AttachmentCard({
         </CustomMenu>
       </Box>
     </Paper>
-  );
-}
-
-function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
-      {steps.map((step, index) => (
-        <Box
-          key={step.id}
-          sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              flexShrink: 0,
-            }}
-          >
-            <Box
-              sx={{
-                width: 22,
-                height: 22,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                bgcolor:
-                  step.status === "completed"
-                    ? "success.main"
-                    : step.status === "current"
-                      ? "primary.main"
-                      : "action.disabledBackground",
-                flexShrink: 0,
-              }}
-            >
-              {step.status === "completed" ? (
-                <Check className="w-3 h-3" color="#fff" />
-              ) : (
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    bgcolor:
-                      step.status === "current"
-                        ? "common.white"
-                        : "text.disabled",
-                  }}
-                />
-              )}
-            </Box>
-            {index < steps.length - 1 && (
-              <Box
-                sx={{
-                  width: 2,
-                  flex: 1,
-                  minHeight: 28,
-                  bgcolor:
-                    step.status === "completed" ? "success.light" : "divider",
-                  my: 0.5,
-                }}
-              />
-            )}
-          </Box>
-
-          <Box
-            sx={{ pb: index < steps.length - 1 ? 1.5 : 0, textAlign: "start" }}
-          >
-            <Typography
-              variant="body2"
-              fontWeight={step.status === "current" ? 700 : 500}
-              color={
-                step.status === "current" ? "text.primary" : "text.secondary"
-              }
-            >
-              {step.title}
-            </Typography>
-            {(step.user || step.date) && (
-              <>
-                {step.user && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    display="block"
-                  >
-                    {step.user}
-                  </Typography>
-                )}
-                {step.date && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    display="block"
-                  >
-                    {step.date}
-                  </Typography>
-                )}
-              </>
-            )}
-          </Box>
-        </Box>
-      ))}
-    </Box>
   );
 }

@@ -17,11 +17,15 @@ interface IncomingAttachmentsProps {
   onTotalItemsChange?: (count: number) => void;
 }
 
-export default function IncomingAttachments({ onTotalItemsChange }: IncomingAttachmentsProps) {
+export default function IncomingAttachments({
+  onTotalItemsChange,
+}: IncomingAttachmentsProps) {
   const t = useTranslations("project.documentCycle");
   const { projectId } = useProject();
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<DocumentRow | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentRow | null>(
+    null,
+  );
   const [filterDocType, setFilterDocType] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterEndDate, setFilterEndDate] = useState("");
@@ -62,18 +66,7 @@ export default function IncomingAttachments({ onTotalItemsChange }: IncomingAtta
         sortable: false,
         render: (row: DocumentRow) => {
           const dateStr = row.lastActivityDate?.trim();
-          const userStr = row.lastActivityUser?.trim();
-          return (
-            <span>
-              {dateStr || "—"}
-              {userStr && userStr !== "—" ? (
-                <>
-                  {" "}
-                  · {t("byUser")} {userStr}
-                </>
-              ) : null}
-            </span>
-          );
+          return <span>{dateStr || "—"}</span>;
         },
       },
       {
@@ -175,7 +168,10 @@ export default function IncomingAttachments({ onTotalItemsChange }: IncomingAtta
                   size="small"
                   label={t("documentType")}
                   value={filterDocType}
-                  onChange={(e) => { setFilterDocType(e.target.value); params.setPage(1); }}
+                  onChange={(e) => {
+                    setFilterDocType(e.target.value);
+                    params.setPage(1);
+                  }}
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
@@ -187,7 +183,10 @@ export default function IncomingAttachments({ onTotalItemsChange }: IncomingAtta
                   size="small"
                   label={t("type")}
                   value={filterType}
-                  onChange={(e) => { setFilterType(e.target.value); params.setPage(1); }}
+                  onChange={(e) => {
+                    setFilterType(e.target.value);
+                    params.setPage(1);
+                  }}
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
@@ -201,7 +200,10 @@ export default function IncomingAttachments({ onTotalItemsChange }: IncomingAtta
                   label={t("endDate")}
                   type="date"
                   value={filterEndDate}
-                  onChange={(e) => { setFilterEndDate(e.target.value); params.setPage(1); }}
+                  onChange={(e) => {
+                    setFilterEndDate(e.target.value);
+                    params.setPage(1);
+                  }}
                   InputLabelProps={{ shrink: true }}
                   sx={filterSx}
                 />
