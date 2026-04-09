@@ -100,8 +100,12 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label={t("workPlace")}
-          value={contract?.state_name ?? ""}
-          valid={Boolean(contract?.state_name)}
+          value={
+            contract?.latitude && contract?.longitude
+              ? `${contract.latitude.toString()}, ${contract.longitude.toString()}`
+              : contract?.state_name ?? ""
+          }
+          valid={Boolean(contract?.latitude) || Boolean(contract?.state_name)}
         />
       </div>
 
