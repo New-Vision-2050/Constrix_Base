@@ -15,6 +15,7 @@ import {
 import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { DocumentRow, DocumentAttachment } from "../types";
 import {
   downloadAttachmentFile,
@@ -69,9 +70,18 @@ export default function FileViewerDialog({
     onClose();
   };
 
+  /** Above MUI theme zIndex.modal (1300) so this opens on top of OutgoingDetailDialog. */
+  const stackedDialogClass = "z-[1600]";
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[95vw] w-[1200px] max-h-[95vh] p-0 overflow-hidden">
+      <DialogContent
+        overlayClassName={stackedDialogClass}
+        className={cn(
+          "max-w-[95vw] w-[1200px] max-h-[95vh] p-0 overflow-hidden",
+          stackedDialogClass,
+        )}
+      >
         <DialogTitle className="sr-only">
           {[document.name, activeFile.name].filter(Boolean).join(" — ")}
         </DialogTitle>
@@ -103,149 +113,6 @@ export default function FileViewerDialog({
 
           {/* Body */}
           <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
-            {/* Left: File Preview */}
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                borderInlineEnd: 1,
-                borderColor: "divider",
-              }}
-            >
-              {/* Toolbar */}
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  px: 2,
-                  py: 1,
-                  borderBottom: 1,
-                  borderColor: "divider",
-                }}
-              >
-                {previewKind !== "pdf" && (
-                  <>
-                    <Box sx={{ display: "flex", gap: 1 }}>
-                      <Button variant="outline" size="sm" onClick={handlePrint}>
-                        <Printer className="w-4 h-4 me-1" />
-                        {t("print")}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleDownload}
-                      >
-                        <Download className="w-4 h-4 me-1" />
-                        {t("download")}
-                      </Button>
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <IconButton size="small" onClick={handleZoomOut}>
-                        <ZoomOut className="w-4 h-4" />
-                      </IconButton>
-                      <Typography variant="body2">{zoom}%</Typography>
-                      <IconButton size="small" onClick={handleZoomIn}>
-                        <ZoomIn className="w-4 h-4" />
-                      </IconButton>
-                    </Box>
-                  </>
-                )}
-              </Box>
-
-              {/* Preview Area */}
-              <Box
-                sx={{
-                  flex: 1,
-                  display: "flex",
-                  overflow: "auto",
-                }}
-              >
-                {/* Main preview */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    minWidth: 0,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: `${zoom}%`,
-                      maxWidth: "100%",
-                      minHeight: 360,
-                      bgcolor: "background.paper",
-                      borderRadius: 1,
-                      boxShadow: 2,
-                      transition: "width 0.2s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {previewKind === "pdf" && activeFile.url ? (
-                      <Box
-                        component="iframe"
-                        src={activeFile.url}
-                        title={activeFile.name}
-                        sx={{
-                          width: "100%",
-                          height: "min(70vh, 720px)",
-                          minHeight: 400,
-                          border: 0,
-                          display: "block",
-                        }}
-                      />
-                    ) : null}
-                    {previewKind === "image" && activeFile.url ? (
-                      <Box
-                        component="img"
-                        src={activeFile.url}
-                        alt={activeFile.name}
-                        sx={{
-                          maxWidth: "100%",
-                          maxHeight: "70vh",
-                          width: "auto",
-                          height: "auto",
-                          objectFit: "contain",
-                          display: "block",
-                        }}
-                      />
-                    ) : null}
-                    {previewKind === "other" ? (
-                      <Box sx={{ p: 4, textAlign: "center" }}>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 2 }}
-                        >
-                          {t("filePreview")}: {activeFile.name}
-                        </Typography>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            window.open(
-                              activeFile.url,
-                              "_blank",
-                              "noopener,noreferrer",
-                            )
-                          }
-                        >
-                          {t("download")}
-                        </Button>
-                      </Box>
-                    ) : null}
-                  </Box>
-                </Box>
-
-                {/* Thumbnails sidebar */}
-              </Box>
-            </Box>
-
             {/* Right: Document Info Panel */}
             <Box
               sx={{
@@ -426,6 +293,148 @@ export default function FileViewerDialog({
                   </Button>
                 </Box>
               )}
+            </Box>
+            {/* Left: File Preview */}
+            <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                borderInlineEnd: 1,
+                borderColor: "divider",
+              }}
+            >
+              {/* Toolbar */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  px: 2,
+                  py: 1,
+                  borderBottom: 1,
+                  borderColor: "divider",
+                }}
+              >
+                {previewKind !== "pdf" && (
+                  <>
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Button variant="outline" size="sm" onClick={handlePrint}>
+                        <Printer className="w-4 h-4 me-1" />
+                        {t("print")}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownload}
+                      >
+                        <Download className="w-4 h-4 me-1" />
+                        {t("download")}
+                      </Button>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <IconButton size="small" onClick={handleZoomOut}>
+                        <ZoomOut className="w-4 h-4" />
+                      </IconButton>
+                      <Typography variant="body2">{zoom}%</Typography>
+                      <IconButton size="small" onClick={handleZoomIn}>
+                        <ZoomIn className="w-4 h-4" />
+                      </IconButton>
+                    </Box>
+                  </>
+                )}
+              </Box>
+
+              {/* Preview Area */}
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  overflow: "auto",
+                }}
+              >
+                {/* Main preview */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: 0,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: `${zoom}%`,
+                      maxWidth: "100%",
+                      minHeight: 360,
+                      bgcolor: "background.paper",
+                      borderRadius: 1,
+                      boxShadow: 2,
+                      transition: "width 0.2s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {previewKind === "pdf" && activeFile.url ? (
+                      <Box
+                        component="iframe"
+                        src={activeFile.url}
+                        title={activeFile.name}
+                        sx={{
+                          width: "100%",
+                          height: "min(70vh, 720px)",
+                          minHeight: 400,
+                          border: 0,
+                          display: "block",
+                        }}
+                      />
+                    ) : null}
+                    {previewKind === "image" && activeFile.url ? (
+                      <Box
+                        component="img"
+                        src={activeFile.url}
+                        alt={activeFile.name}
+                        sx={{
+                          maxWidth: "100%",
+                          maxHeight: "70vh",
+                          width: "auto",
+                          height: "auto",
+                          objectFit: "contain",
+                          display: "block",
+                        }}
+                      />
+                    ) : null}
+                    {previewKind === "other" ? (
+                      <Box sx={{ p: 4, textAlign: "center" }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 2 }}
+                        >
+                          {t("filePreview")}: {activeFile.name}
+                        </Typography>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            window.open(
+                              activeFile.url,
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
+                        >
+                          {t("download")}
+                        </Button>
+                      </Box>
+                    ) : null}
+                  </Box>
+                </Box>
+
+                {/* Thumbnails sidebar */}
+              </Box>
             </Box>
           </Box>
         </Box>

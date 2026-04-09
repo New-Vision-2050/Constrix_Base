@@ -1,7 +1,6 @@
 import { baseApi } from "@/config/axios/instances/base";
 import {
   CompanyLookupResponse,
-  GetSharedCompaniesResponse,
   ListProjectSharesResponse,
   PendingInvitationsResponse,
   ShareProjectResponse,

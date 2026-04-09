@@ -121,6 +121,10 @@ export const projectMessages = new MessagesGroup({
     all: _m("All", "الكل"),
     addSuccess: _m("Request created successfully", "تم إنشاء الطلب بنجاح"),
     addError: _m("Failed to create request", "فشل في إنشاء الطلب"),
+    historyActionRequestCreated: _m("Request created", "تم إنشاء الطلب"),
+    historyActionRequestApproved: _m("Request approved", "تم اعتماد الطلب"),
+    historyActionRequestDeclined: _m("Request declined", "تم رفض الطلب"),
+    historyActionRequestUpdate: _m("Request updated", "تم تحديث الطلب"),
   }),
   staff: new MessagesGroup({
     title: _m("Staff", "الكادر"),

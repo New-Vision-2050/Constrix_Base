@@ -9,6 +9,7 @@ import type {
   DocumentStatus,
 } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/types";
 import { mapAttachmentRequestFilesToDocumentAttachments } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapAttachmentFiles";
+import { mapAttachmentRequestHistory } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapRequestHistory";
 
 function mapStatus(apiStatus: AttachmentRequestStatus): DocumentStatus {
   switch (apiStatus) {
@@ -35,6 +36,7 @@ function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
 
   return {
     id: item.id,
+    serialNumber: item.serial_number,
     name: item.name,
     fileSize: firstFile?.file_size_formatted ?? "—",
     documentCount: docCount,
@@ -52,6 +54,7 @@ function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
       : undefined,
     description: item.notes?.trim() ? item.notes : undefined,
     attachments,
+    history: mapAttachmentRequestHistory(item),
   };
 }
 

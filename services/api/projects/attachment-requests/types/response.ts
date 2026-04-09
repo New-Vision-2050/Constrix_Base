@@ -46,6 +46,15 @@ export interface AttachmentRequestStatistics {
   update_requested_items: number;
 }
 
+export interface AttachmentRequestHistoryEntry {
+  id: string;
+  action: string;
+  description: string;
+  user?: AttachmentRequestActor | null;
+  timestamp: string;
+  metadata?: Record<string, unknown> | null;
+}
+
 export interface AttachmentRequest {
   id: string;
   serial_number: string;
@@ -67,6 +76,7 @@ export interface AttachmentRequest {
   items?: AttachmentRequestItem[];
   attachments_preview?: AttachmentRequestItem[];
   statistics?: AttachmentRequestStatistics | null;
+  history?: AttachmentRequestHistoryEntry[];
 }
 
 export interface AttachmentFolder {

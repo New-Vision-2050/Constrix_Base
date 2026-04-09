@@ -31,6 +31,15 @@ export interface DocumentComment {
   content: string;
 }
 
+/** Normalized attachment-request `history` entries for UI steppers. */
+export interface DocumentHistoryEntry {
+  id: string;
+  action: string;
+  description: string;
+  userName: string;
+  timestamp: string;
+}
+
 export interface DocumentRowProject {
   id: string;
   name: string;
@@ -39,6 +48,8 @@ export interface DocumentRowProject {
 
 export interface DocumentRow {
   id: string;
+  /** Request reference from API (`serial_number`). */
+  serialNumber?: string;
   name: string;
   fileSize: string;
   documentCount: number;
@@ -53,5 +64,7 @@ export interface DocumentRow {
   description?: string;
   attachments?: DocumentAttachment[];
   approvalPath?: ApprovalStep[];
+  /** From API `history` on attachment requests (chronological). */
+  history?: DocumentHistoryEntry[];
   comments?: DocumentComment[];
 }
