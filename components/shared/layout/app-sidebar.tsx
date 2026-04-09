@@ -17,12 +17,14 @@ import { SidebarContentWrapper } from "./sidebar-content";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name?: string;
+  serialNumber?: string;
   mainLogo?: string;
   userTypes: UserRoleType[];
 }
 
 export function AppSidebar({
   name,
+  serialNumber,
   mainLogo,
   userTypes,
   ...props
@@ -43,7 +45,7 @@ export function AppSidebar({
     >
       <SidebarHeader className=" pt-10 ">
         <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />
-        <SidebarHeaderContent name={name} mainLogo={mainLogo} />
+        <SidebarHeaderContent name={name} serialNumber={serialNumber} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
         {(isLoading || !Boolean(data)) && (
@@ -52,6 +54,7 @@ export function AppSidebar({
         {!isLoading && Boolean(data) && (
           <SidebarContentWrapper
             name={name}
+            serialNumber={serialNumber}
             mainLogo={mainLogo}
             userTypes={userTypes}
             showHeader={false}

@@ -11,6 +11,7 @@ interface MobileDrawerProps {
   open: boolean;
   onClose: () => void;
   name?: string;
+  serialNumber?: string;
   mainLogo?: string;
   userTypes: UserRoleType[];
 }
@@ -19,6 +20,7 @@ export function MobileDrawer({
   open,
   onClose,
   name,
+  serialNumber,
   mainLogo,
   userTypes,
 }: MobileDrawerProps) {
@@ -63,6 +65,7 @@ export function MobileDrawer({
         <SidebarProvider defaultOpen={true}>
           <SidebarContentWrapper
             name={name}
+            serialNumber={serialNumber}
             mainLogo={mainLogo}
             userTypes={userTypes}
             showHeader={true}

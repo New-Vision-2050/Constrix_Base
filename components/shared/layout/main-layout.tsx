@@ -15,12 +15,14 @@ export default function MainLayout({
   children,
   mainLogo,
   name,
+  serialNumber,
   userTypes,
 }: Readonly<{
   children: React.ReactNode;
   isCentral: boolean;
   mainLogo?: string;
   name?: string;
+  serialNumber?: string;
   userTypes: UserRoleType[];
 }>) {
   const locale = useLocale();
@@ -69,10 +71,11 @@ export default function MainLayout({
         onClose={handleMobileDrawerClose}
         userTypes={userTypes}
         name={name}
+        serialNumber={serialNumber}
         mainLogo={mainLogo}
       />
       <SidebarProvider>
-        <AppSidebar userTypes={userTypes} name={name} mainLogo={mainLogo} />
+        <AppSidebar userTypes={userTypes} name={name} serialNumber={serialNumber} mainLogo={mainLogo} />
         <SidebarInset className="bg-transparent md:overflow-hidden border-none">
           <Header onMobileMenuClick={handleMobileDrawerToggle} />
           {children}
