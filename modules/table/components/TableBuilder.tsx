@@ -1,5 +1,7 @@
 "use client";
 import React, { memo, useEffect } from "react";
+import { CURRENT_BRANCH_CHANGED_EVENT } from "@/constants/branch-events";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { TableConfig } from "@/modules/table/utils/configs/tableConfig";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
@@ -65,6 +67,16 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // Use the reset hook to clear table state on route changes
   // This prevents stale data when navigating between pages
   useResetTableOnRouteChange(tableId);
+
+  // Refetch when header branch filter (cookie) changes — same URL, new branch_id via interceptor
+  useEffect(() => {
+    const onBranchChanged = () => {
+      useTableStore.getState().reloadTable(tableId);
+    };
+    window.addEventListener(CURRENT_BRANCH_CHANGED_EVENT, onBranchChanged);
+    return () =>
+      window.removeEventListener(CURRENT_BRANCH_CHANGED_EVENT, onBranchChanged);
+  }, [tableId]);
 
   // Use URL from config if direct URL not provided
   const dataUrl = url || (config ? config.url : "");
