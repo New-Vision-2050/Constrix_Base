@@ -41,6 +41,27 @@ export const companyProfileMessages = new MessagesGroup({
       }),
     }),
   }),
+  changeLogo: new MessagesGroup({
+    rules: new MessagesGroup({
+      rule1: _m(
+        "Image size must not exceed 5 MB.",
+        "حجم الصورة لا يتعدى 5 ميجابايت.",
+      ),
+      rule2: _m(
+        "Choose an appropriate image size (e.g., 1920x1080 pixels).",
+        "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
+      ),
+      rule3: _m(
+        "Make sure the background is white.",
+        "تأكد من أن الخلفية بيضاء.",
+      ),
+    }),
+    actions: new MessagesGroup({
+      saveLabel: _m("Save", "حفظ"),
+      checkLabel: _m("Check Image", "التحقق من الصورة"),
+      cancelLabel: _m("Cancel", "إلغاء"),
+    }),
+  }),
   tabs: new MessagesGroup({
     profile: _m("Profile", "الملف الشخصي"),
     contract: _m("Employment Contract", "عقد العمل"),
