@@ -1,6 +1,7 @@
 import { Button, Chip, MenuItem } from "@mui/material";
 import type { ProjectInboxRow } from "@/modules/projects/inbox/map-invitation-to-row";
 import CustomMenu from "@/components/headless/custom-menu";
+import { EyeIcon } from "lucide-react";
 
 export function formatInboxSentDate(iso: string): string {
   if (!iso?.trim()) return "";
@@ -61,8 +62,6 @@ export type GetInboxColumnsOptions = {
 
 export function getInboxColumns({
   pendingMutation,
-  onAccept,
-  onReject,
   onView,
 }: GetInboxColumnsOptions) {
   return [
@@ -148,8 +147,6 @@ export function getInboxColumns({
       name: "الإجراءات",
       sortable: false,
       render: (row: ProjectInboxRow) => {
-        const canRespond =
-          (row.invitation_status ?? "").trim().toLowerCase() === "pending";
         return (
           <CustomMenu
             renderAnchor={({ onClick }) => (
@@ -170,19 +167,8 @@ export function getInboxColumns({
               onClick={() => onView(row)}
               disabled={pendingMutation}
             >
-              عرض التفاصيل
-            </MenuItem>
-            <MenuItem
-              onClick={() => onAccept(row.invitationId)}
-              disabled={pendingMutation || !canRespond}
-            >
-              قبول
-            </MenuItem>
-            <MenuItem
-              onClick={() => onReject(row.invitationId)}
-              disabled={pendingMutation || !canRespond}
-            >
-              رفض
+              <EyeIcon className="w-4 h-4 ml-2" />
+              عرض 
             </MenuItem>
           </CustomMenu>
         );
