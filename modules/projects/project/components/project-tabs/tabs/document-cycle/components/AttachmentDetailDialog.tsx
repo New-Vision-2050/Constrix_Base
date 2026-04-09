@@ -1,18 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Chip,
-} from "@mui/material";
+import { Box, Typography, IconButton, Chip } from "@mui/material";
 import { X, FileText } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { DocumentRow, DocumentAttachment } from "../types";
 import ApprovalTimeline from "./ApprovalTimeline";
@@ -64,7 +56,13 @@ export default function AttachmentDetailDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-        <DialogContent className="max-w-[800px] max-h-[90vh] p-0 overflow-hidden" dir={dir}>
+        <DialogContent
+          className="max-w-[800px] max-h-[90vh] p-0 overflow-hidden"
+          dir={dir}
+        >
+          <DialogTitle className="sr-only">
+            {document.name || t("documentReview")}
+          </DialogTitle>
           <Box sx={{ p: 3, display: "flex", flexDirection: "column", gap: 3 }}>
             {/* Header */}
             <Box
@@ -150,12 +148,22 @@ export default function AttachmentDetailDialog({
               So: content column first (→ right/start), sidebar second (→ left/end).
             */}
             <Box sx={{ display: "flex", gap: 3 }}>
-
               {/* Content column — Description, Attachments, Actions */}
-              <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
                 {/* Description */}
                 <Box>
-                  <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1, textAlign: "start" }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    sx={{ mb: 1, textAlign: "start" }}
+                  >
                     {t("description")}
                   </Typography>
                   <Box sx={{ bgcolor: "grey.100", borderRadius: 1, p: 2 }}>
@@ -167,7 +175,11 @@ export default function AttachmentDetailDialog({
 
                 {/* Attachments */}
                 <Box>
-                  <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1, textAlign: "start" }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    sx={{ mb: 1, textAlign: "start" }}
+                  >
                     {t("attachments")}
                   </Typography>
                   <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -178,25 +190,48 @@ export default function AttachmentDetailDialog({
                         label={file.name}
                         variant="outlined"
                         onClick={() => handleFileClick(file)}
-                        sx={{ cursor: "pointer", "&:hover": { bgcolor: "action.hover" } }}
+                        sx={{
+                          cursor: "pointer",
+                          "&:hover": { bgcolor: "action.hover" },
+                        }}
                       />
                     ))}
-                    {(!document.attachments || document.attachments.length === 0) && (
-                      <Typography variant="body2" color="text.secondary">—</Typography>
+                    {(!document.attachments ||
+                      document.attachments.length === 0) && (
+                      <Typography variant="body2" color="text.secondary">
+                        —
+                      </Typography>
                     )}
                   </Box>
                 </Box>
 
                 {/* Action Buttons — incoming only */}
                 {!readOnly && (
-                  <Box sx={{ display: "flex", gap: 1.5, justifyContent: "center", pt: 2, mt: "auto" }}>
-                    <Button className="bg-green-600 hover:bg-green-700 text-white px-6" onClick={handleApprove}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 1.5,
+                      justifyContent: "center",
+                      pt: 2,
+                      mt: "auto",
+                    }}
+                  >
+                    <Button
+                      className="bg-green-600 hover:bg-green-700 text-white px-6"
+                      onClick={handleApprove}
+                    >
                       {t("approve")}
                     </Button>
-                    <Button className="bg-amber-600 hover:bg-amber-700 text-white px-6" onClick={handleRequestModification}>
+                    <Button
+                      className="bg-amber-600 hover:bg-amber-700 text-white px-6"
+                      onClick={handleRequestModification}
+                    >
                       {t("requestModification")}
                     </Button>
-                    <Button className="bg-red-600 hover:bg-red-700 text-white px-6" onClick={handleReject}>
+                    <Button
+                      className="bg-red-600 hover:bg-red-700 text-white px-6"
+                      onClick={handleReject}
+                    >
                       {t("reject")}
                     </Button>
                   </Box>
@@ -211,11 +246,23 @@ export default function AttachmentDetailDialog({
 
                 {document.comments && document.comments.length > 0 && (
                   <Box sx={{ mt: 3 }}>
-                    <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1, textAlign: "start" }}>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={600}
+                      sx={{ mb: 1, textAlign: "start" }}
+                    >
                       {t("comments")}
                     </Typography>
                     {document.comments.map((comment) => (
-                      <Box key={comment.id} sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 1.5 }}>
+                      <Box
+                        key={comment.id}
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: 1,
+                          mb: 1.5,
+                        }}
+                      >
                         <Box
                           sx={{
                             width: 32,
@@ -233,12 +280,36 @@ export default function AttachmentDetailDialog({
                           {comment.user.charAt(0)}
                         </Box>
                         <Box>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Typography variant="body2" fontWeight={600}>{comment.user}</Typography>
-                            <Typography variant="caption" color="text.secondary">{comment.date}</Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Typography variant="body2" fontWeight={600}>
+                              {comment.user}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {comment.date}
+                            </Typography>
                           </Box>
-                          <Box sx={{ bgcolor: "primary.main", color: "white", borderRadius: 2, px: 2, py: 1, mt: 0.5 }}>
-                            <Typography variant="body2">{comment.content}</Typography>
+                          <Box
+                            sx={{
+                              bgcolor: "primary.main",
+                              color: "white",
+                              borderRadius: 2,
+                              px: 2,
+                              py: 1,
+                              mt: 0.5,
+                            }}
+                          >
+                            <Typography variant="body2">
+                              {comment.content}
+                            </Typography>
                           </Box>
                         </Box>
                       </Box>
@@ -257,7 +328,6 @@ export default function AttachmentDetailDialog({
         onClose={handleFileViewerClose}
         document={document}
         activeFile={activeFile}
-        onFileSelect={setActiveFile}
         isIncoming={!readOnly}
       />
     </>

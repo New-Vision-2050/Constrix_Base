@@ -8,6 +8,7 @@ import type {
   DocumentRow,
   DocumentStatus,
 } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/types";
+import { mapAttachmentRequestFilesToDocumentAttachments } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapAttachmentFiles";
 
 function mapStatus(apiStatus: AttachmentRequestStatus): DocumentStatus {
   switch (apiStatus) {
@@ -27,6 +28,11 @@ function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
       ? preview.length
       : (item.statistics?.total_items ?? 0);
 
+  const attachments =
+    preview.length > 0
+      ? mapAttachmentRequestFilesToDocumentAttachments(preview)
+      : undefined;
+
   return {
     id: item.id,
     name: item.name,
@@ -37,6 +43,15 @@ function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
     status: mapStatus(item.status),
     submissionDate: item.date,
     approvalStatus: item.status,
+    project: item.project
+      ? {
+          id: item.project.id,
+          name: item.project.name,
+          serial_number: item.project.serial_number,
+        }
+      : undefined,
+    description: item.notes?.trim() ? item.notes : undefined,
+    attachments,
   };
 }
 

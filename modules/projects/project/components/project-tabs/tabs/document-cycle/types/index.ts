@@ -31,6 +31,12 @@ export interface DocumentComment {
   content: string;
 }
 
+export interface DocumentRowProject {
+  id: string;
+  name: string;
+  serial_number?: string;
+}
+
 export interface DocumentRow {
   id: string;
   name: string;
@@ -39,6 +45,8 @@ export interface DocumentRow {
   lastActivityUser: string;
   lastActivityDate: string;
   status: DocumentStatus;
+  /** Present when the attachment-requests API embeds `project`. */
+  project?: DocumentRowProject | null;
   documentType?: string;
   approvalStatus?: string;
   submissionDate?: string;

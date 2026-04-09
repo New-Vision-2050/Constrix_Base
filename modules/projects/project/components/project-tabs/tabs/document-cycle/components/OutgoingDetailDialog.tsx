@@ -5,10 +5,11 @@ import { Box, Typography, IconButton, MenuItem } from "@mui/material";
 import { X, Settings, Download, FileText, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import CustomMenu from "@/components/headless/custom-menu";
 import { DocumentRow, DocumentAttachment, ApprovalStep } from "../types";
+import { downloadAttachmentFile } from "../attachmentActions";
 import FileViewerDialog from "./FileViewerDialog";
 
 /* ─── colour tokens (dark-purple theme) ─────────────────────────────── */
@@ -66,32 +67,58 @@ export default function OutgoingDetailDialog({
           }}
           dir={dir}
         >
+          <DialogTitle sx={{ textAlign: "center" }}>
+            {document.project?.name || document.name}
+          </DialogTitle>
           {/* scroll wrapper */}
-          <Box sx={{ overflowY: "auto", maxHeight: "90vh", p: 3, display: "flex", flexDirection: "column", gap: 3 }}>
-
+          <Box
+            sx={{
+              overflowY: "auto",
+              maxHeight: "90vh",
+              p: 3,
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+            }}
+          >
             {/* ── Header ─────────────────────────────────────────────── */}
-            <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-              {/* title is at "start" (right in RTL) */}
-              <Box sx={{ textAlign: "start" }}>
-                <Typography variant="h6" fontWeight={700} sx={{ color: TEXT_PRIMARY }}>
-                  {t("projectName")} 1
-                </Typography>
-                <Typography variant="body2" sx={{ color: TEXT_SECONDARY }}>
-                  {t("detailedDocumentName")}
-                </Typography>
-              </Box>
-
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+              }}
+            >
               {/* close is at "end" (left in RTL) */}
-              <IconButton onClick={onClose} size="small" sx={{ color: TEXT_SECONDARY, "&:hover": { color: TEXT_PRIMARY } }}>
+              <IconButton
+                onClick={onClose}
+                size="small"
+                sx={{
+                  color: TEXT_SECONDARY,
+                  "&:hover": { color: TEXT_PRIMARY },
+                }}
+              >
                 <X className="w-4 h-4" />
               </IconButton>
             </Box>
 
             {/* ── Info cards ─────────────────────────────────────────── */}
-            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
-              <InfoCard label={t("type")}           value={document.documentType   || "مراجعة العالية"} />
-              <InfoCard label={t("approvalStatus")} value={document.approvalStatus || "الحالة الحالية"} />
-              <InfoCard label={t("submissionDate")} value={document.submissionDate || "22/000/2023"}   />
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+              }}
+            >
+              <InfoCard label={t("type")} value={"مرفق"} />
+              <InfoCard
+                label={t("approvalStatus")}
+                value={document.approvalStatus || "الحالة الحالية"}
+              />
+              <InfoCard
+                label={t("submissionDate")}
+                value={document.submissionDate || "22/000/2023"}
+              />
             </Box>
 
             {/* ── Body: content (start) + sidebar (end) ─────────────── */}
@@ -100,10 +127,15 @@ export default function OutgoingDetailDialog({
                 The sidebar should appear on the LEFT (= "end" in RTL), so it comes second in DOM
             */}
             <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
-
               {/* ── Content column ───────────────────────────────────── */}
-              <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2.5 }}>
-
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2.5,
+                }}
+              >
                 {/* Description */}
                 <Box>
                   <SectionHeading>{t("description")}</SectionHeading>
@@ -116,30 +148,50 @@ export default function OutgoingDetailDialog({
                       minHeight: 80,
                     }}
                   >
-                    <Typography variant="body2" sx={{ color: TEXT_SECONDARY, lineHeight: 1.8 }}>
-                      {document.description || "—"}
+                    <Typography
+                      variant="body2"
+                      sx={{ color: TEXT_SECONDARY, lineHeight: 1.8 }}
+                    >
+                      {document.description?.trim() || document.name || "—"}
                     </Typography>
                   </Box>
                 </Box>
 
-                {/* Attachments */}
+                {/* Attachments — 3 cards per row on md+ */}
                 <Box>
                   <SectionHeading>{t("attachments")}</SectionHeading>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                    {document.attachments && document.attachments.length > 0
-                      ? document.attachments.map((file) => (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(2, minmax(0, 1fr))",
+                        md: "repeat(3, minmax(0, 1fr))",
+                      },
+                      gap: 1.5,
+                    }}
+                  >
+                    {document.attachments && document.attachments.length > 0 ? (
+                      document.attachments.map((file) => (
+                        <Box key={file.id} sx={{ minWidth: 0 }}>
                           <AttachmentCard
-                            key={file.id}
                             file={file}
                             isRTL={isRTL}
                             onView={() => handleFileClick(file)}
                             editLabel={t("edit")}
                             deleteLabel={t("delete")}
+                            downloadLabel={t("download")}
                           />
-                        ))
-                      : (
-                          <Typography variant="body2" sx={{ color: TEXT_SECONDARY }}>—</Typography>
-                        )}
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        sx={{ color: TEXT_SECONDARY }}
+                      >
+                        —
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
 
@@ -187,11 +239,24 @@ export default function OutgoingDetailDialog({
                 {document.comments && document.comments.length > 0 && (
                   <Box>
                     <SectionHeading>{t("comments")}</SectionHeading>
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1.5,
+                      }}
+                    >
                       {document.comments.map((comment) => (
                         <Box key={comment.id}>
                           {/* Avatar + name row */}
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.75 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              mb: 0.75,
+                            }}
+                          >
                             <Box
                               sx={{
                                 width: 36,
@@ -210,10 +275,17 @@ export default function OutgoingDetailDialog({
                               {comment.user.charAt(0)}
                             </Box>
                             <Box>
-                              <Typography variant="body2" fontWeight={600} sx={{ color: TEXT_PRIMARY }}>
+                              <Typography
+                                variant="body2"
+                                fontWeight={600}
+                                sx={{ color: TEXT_PRIMARY }}
+                              >
                                 {comment.user}
                               </Typography>
-                              <Typography variant="caption" sx={{ color: TEXT_SECONDARY }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: TEXT_SECONDARY }}
+                              >
                                 {comment.date}
                               </Typography>
                             </Box>
@@ -228,7 +300,10 @@ export default function OutgoingDetailDialog({
                               py: 1.25,
                             }}
                           >
-                            <Typography variant="body2" sx={{ color: "#fff", lineHeight: 1.7 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ color: "#fff", lineHeight: 1.7 }}
+                            >
                               {comment.content}
                             </Typography>
                           </Box>
@@ -245,10 +320,12 @@ export default function OutgoingDetailDialog({
 
       <FileViewerDialog
         open={fileViewerOpen}
-        onClose={() => { setFileViewerOpen(false); setActiveFile(null); }}
+        onClose={() => {
+          setFileViewerOpen(false);
+          setActiveFile(null);
+        }}
         document={document}
         activeFile={activeFile}
-        onFileSelect={setActiveFile}
         isIncoming={false}
       />
     </>
@@ -283,7 +360,10 @@ function InfoCard({ label, value }: { label: string; value: string }) {
         textAlign: "center",
       }}
     >
-      <Typography variant="caption" sx={{ color: TEXT_SECONDARY, display: "block", mb: 0.5 }}>
+      <Typography
+        variant="caption"
+        sx={{ color: TEXT_SECONDARY, display: "block", mb: 0.5 }}
+      >
         {label}
       </Typography>
       <Typography variant="body1" fontWeight={700} sx={{ color: TEXT_PRIMARY }}>
@@ -300,12 +380,14 @@ function AttachmentCard({
   onView,
   editLabel,
   deleteLabel,
+  downloadLabel,
 }: {
   file: DocumentAttachment;
   isRTL: boolean;
   onView: () => void;
   editLabel: string;
   deleteLabel: string;
+  downloadLabel: string;
 }) {
   return (
     <Box
@@ -326,8 +408,8 @@ function AttachmentCard({
       <Box
         onClick={onView}
         sx={{
-          width: 52,
-          height: 60,
+          width: 40,
+          height: 40,
           borderRadius: 1.5,
           background: "rgba(255,255,255,0.08)",
           border: `1px solid ${BORDER}`,
@@ -342,20 +424,49 @@ function AttachmentCard({
       </Box>
 
       {/* File info (center) */}
-      <Box sx={{ flex: 1, textAlign: "start" }} onClick={onView} style={{ cursor: "pointer" }}>
-        <Typography variant="body2" fontWeight={700} sx={{ color: TEXT_PRIMARY }}>
+      <Box
+        sx={{ flex: 1, textAlign: "start" }}
+        onClick={onView}
+        style={{ cursor: "pointer" }}
+      >
+        <Typography
+          variant="body2"
+          fontWeight={500}
+          sx={{ color: TEXT_PRIMARY }}
+        >
           {file.name}
         </Typography>
         <Typography variant="caption" sx={{ color: TEXT_SECONDARY }}>
-          {file.type || "تحاويل"}
+          {file.size || file.type || "—"}
         </Typography>
       </Box>
 
       {/* Action icons (at "end" = left in RTL) */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 0.5,
+          alignItems: "center",
+        }}
+      >
+        <IconButton
+          size="small"
+          sx={{ color: TEXT_SECONDARY, p: 0.5 }}
+          aria-label={downloadLabel}
+          onClick={(e) => {
+            e.stopPropagation();
+            downloadAttachmentFile({ url: file.url, name: file.name });
+          }}
+        >
+          <Download className="w-4 h-4" />
+        </IconButton>
         <CustomMenu
           renderAnchor={({ onClick }) => (
-            <IconButton size="small" onClick={onClick} sx={{ color: TEXT_SECONDARY, p: 0.5 }}>
+            <IconButton
+              size="small"
+              onClick={onClick}
+              sx={{ color: TEXT_SECONDARY, p: 0.5 }}
+            >
               <Settings className="w-4 h-4" />
             </IconButton>
           )}
@@ -363,10 +474,6 @@ function AttachmentCard({
           <MenuItem onClick={() => {}}>{editLabel}</MenuItem>
           <MenuItem onClick={() => {}}>{deleteLabel}</MenuItem>
         </CustomMenu>
-
-        <IconButton size="small" sx={{ color: TEXT_SECONDARY, p: 0.5 }} onClick={() => {}}>
-          <Download className="w-4 h-4" />
-        </IconButton>
       </Box>
     </Box>
   );
@@ -377,9 +484,19 @@ function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       {steps.map((step, index) => (
-        <Box key={step.id} sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}>
+        <Box
+          key={step.id}
+          sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}
+        >
           {/* indicator column */}
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              flexShrink: 0,
+            }}
+          >
             <Box
               sx={{
                 width: 22,
@@ -392,8 +509,8 @@ function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
                   step.status === "completed"
                     ? COLOR_SUCCESS
                     : step.status === "current"
-                    ? COLOR_CURRENT
-                    : "rgba(255,255,255,0.15)",
+                      ? COLOR_CURRENT
+                      : "rgba(255,255,255,0.15)",
                 flexShrink: 0,
               }}
             >
@@ -405,7 +522,10 @@ function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    background: step.status === "current" ? "#fff" : "rgba(255,255,255,0.4)",
+                    background:
+                      step.status === "current"
+                        ? "#fff"
+                        : "rgba(255,255,255,0.4)",
                   }}
                 />
               )}
@@ -427,23 +547,34 @@ function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
           </Box>
 
           {/* text */}
-          <Box sx={{ pb: index < steps.length - 1 ? 1.5 : 0, textAlign: "start" }}>
+          <Box
+            sx={{ pb: index < steps.length - 1 ? 1.5 : 0, textAlign: "start" }}
+          >
             <Typography
               variant="body2"
               fontWeight={step.status === "current" ? 700 : 500}
-              sx={{ color: step.status === "current" ? TEXT_PRIMARY : TEXT_SECONDARY }}
+              sx={{
+                color:
+                  step.status === "current" ? TEXT_PRIMARY : TEXT_SECONDARY,
+              }}
             >
               {step.title}
             </Typography>
             {(step.user || step.date) && (
               <>
                 {step.user && (
-                  <Typography variant="caption" sx={{ color: TEXT_SECONDARY, display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: TEXT_SECONDARY, display: "block" }}
+                  >
                     {step.user}
                   </Typography>
                 )}
                 {step.date && (
-                  <Typography variant="caption" sx={{ color: TEXT_SECONDARY, display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: TEXT_SECONDARY, display: "block" }}
+                  >
                     {step.date}
                   </Typography>
                 )}

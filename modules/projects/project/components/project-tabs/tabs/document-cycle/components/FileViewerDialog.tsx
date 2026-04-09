@@ -1,39 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Avatar,
-  TextField,
-} from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { Box, Typography, IconButton, Avatar, TextField } from "@mui/material";
 import {
   X,
   Download,
   Printer,
   ZoomIn,
   ZoomOut,
-  ChevronUp,
-  ChevronDown,
   Bold,
   Italic,
   List,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { DocumentRow, DocumentAttachment } from "../types";
+import {
+  downloadAttachmentFile,
+  getFilePreviewKind,
+} from "../attachmentActions";
 
 interface FileViewerDialogProps {
   open: boolean;
   onClose: () => void;
   document: DocumentRow | null;
   activeFile: DocumentAttachment | null;
-  onFileSelect: (file: DocumentAttachment) => void;
   isIncoming: boolean;
 }
 
@@ -42,18 +34,27 @@ export default function FileViewerDialog({
   onClose,
   document,
   activeFile,
-  onFileSelect,
   isIncoming,
 }: FileViewerDialogProps) {
   const t = useTranslations("project.documentCycle");
   const [zoom, setZoom] = useState(100);
   const [note, setNote] = useState("");
 
+  const previewKind = useMemo(
+    () => (activeFile ? getFilePreviewKind(activeFile) : "other"),
+    [activeFile],
+  );
+
+  useEffect(() => {
+    if (activeFile?.id) setZoom(100);
+  }, [activeFile?.id]);
+
   if (!document || !activeFile) return null;
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 25, 200));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 25, 25));
-  const handleDownload = () => window.open(activeFile.url, "_blank");
+  const handleDownload = () =>
+    downloadAttachmentFile({ url: activeFile.url, name: activeFile.name });
   const handlePrint = () => window.print();
 
   const handleApprove = () => {
@@ -68,20 +69,12 @@ export default function FileViewerDialog({
     onClose();
   };
 
-  const attachments = document.attachments ?? [];
-  const currentFileIndex = attachments.findIndex((f) => f.id === activeFile.id);
-
-  const navigateFile = (direction: "up" | "down") => {
-    const newIndex =
-      direction === "up" ? currentFileIndex - 1 : currentFileIndex + 1;
-    if (newIndex >= 0 && newIndex < attachments.length) {
-      onFileSelect(attachments[newIndex]);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-[95vw] w-[1200px] max-h-[95vh] p-0 overflow-hidden">
+        <DialogTitle className="sr-only">
+          {[document.name, activeFile.name].filter(Boolean).join(" — ")}
+        </DialogTitle>
         <Box sx={{ display: "flex", flexDirection: "column", height: "90vh" }}>
           {/* Header */}
           <Box
@@ -96,11 +89,11 @@ export default function FileViewerDialog({
             }}
           >
             <Typography variant="h6" fontWeight={600}>
-              {t("projectName")} 1
+              {document.project?.name ?? document.name}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                {document.name}
+              <Typography variant="body2" color="text.secondary" noWrap>
+                {activeFile.name}
               </Typography>
               <IconButton size="small" onClick={onClose}>
                 <X className="w-4 h-4" />
@@ -132,25 +125,33 @@ export default function FileViewerDialog({
                   borderColor: "divider",
                 }}
               >
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Button variant="outline" size="sm" onClick={handlePrint}>
-                    <Printer className="w-4 h-4 me-1" />
-                    {t("print")}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleDownload}>
-                    <Download className="w-4 h-4 me-1" />
-                    {t("download")}
-                  </Button>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <IconButton size="small" onClick={handleZoomOut}>
-                    <ZoomOut className="w-4 h-4" />
-                  </IconButton>
-                  <Typography variant="body2">{zoom}%</Typography>
-                  <IconButton size="small" onClick={handleZoomIn}>
-                    <ZoomIn className="w-4 h-4" />
-                  </IconButton>
-                </Box>
+                {previewKind !== "pdf" && (
+                  <>
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Button variant="outline" size="sm" onClick={handlePrint}>
+                        <Printer className="w-4 h-4 me-1" />
+                        {t("print")}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownload}
+                      >
+                        <Download className="w-4 h-4 me-1" />
+                        {t("download")}
+                      </Button>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <IconButton size="small" onClick={handleZoomOut}>
+                        <ZoomOut className="w-4 h-4" />
+                      </IconButton>
+                      <Typography variant="body2">{zoom}%</Typography>
+                      <IconButton size="small" onClick={handleZoomIn}>
+                        <ZoomIn className="w-4 h-4" />
+                      </IconButton>
+                    </Box>
+                  </>
+                )}
               </Box>
 
               {/* Preview Area */}
@@ -159,7 +160,6 @@ export default function FileViewerDialog({
                   flex: 1,
                   display: "flex",
                   overflow: "auto",
-                  bgcolor: "grey.100",
                 }}
               >
                 {/* Main preview */}
@@ -169,83 +169,80 @@ export default function FileViewerDialog({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    p: 3,
+                    minWidth: 0,
                   }}
                 >
                   <Box
                     sx={{
                       width: `${zoom}%`,
-                      maxWidth: 800,
-                      bgcolor: "white",
+                      maxWidth: "100%",
+                      minHeight: 360,
+                      bgcolor: "background.paper",
                       borderRadius: 1,
                       boxShadow: 2,
-                      p: 4,
-                      minHeight: 400,
                       transition: "width 0.2s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    <Typography variant="body2" color="text.secondary">
-                      {t("filePreview")}: {activeFile.name}
-                    </Typography>
+                    {previewKind === "pdf" && activeFile.url ? (
+                      <Box
+                        component="iframe"
+                        src={activeFile.url}
+                        title={activeFile.name}
+                        sx={{
+                          width: "100%",
+                          height: "min(70vh, 720px)",
+                          minHeight: 400,
+                          border: 0,
+                          display: "block",
+                        }}
+                      />
+                    ) : null}
+                    {previewKind === "image" && activeFile.url ? (
+                      <Box
+                        component="img"
+                        src={activeFile.url}
+                        alt={activeFile.name}
+                        sx={{
+                          maxWidth: "100%",
+                          maxHeight: "70vh",
+                          width: "auto",
+                          height: "auto",
+                          objectFit: "contain",
+                          display: "block",
+                        }}
+                      />
+                    ) : null}
+                    {previewKind === "other" ? (
+                      <Box sx={{ p: 4, textAlign: "center" }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 2 }}
+                        >
+                          {t("filePreview")}: {activeFile.name}
+                        </Typography>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            window.open(
+                              activeFile.url,
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
+                        >
+                          {t("download")}
+                        </Button>
+                      </Box>
+                    ) : null}
                   </Box>
                 </Box>
 
                 {/* Thumbnails sidebar */}
-                <Box
-                  sx={{
-                    width: 100,
-                    borderInlineStart: 1,
-                    borderColor: "divider",
-                    overflowY: "auto",
-                    p: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                    alignItems: "center",
-                  }}
-                >
-                  <IconButton
-                    size="small"
-                    disabled={currentFileIndex === 0}
-                    onClick={() => navigateFile("up")}
-                  >
-                    <ChevronUp className="w-4 h-4" />
-                  </IconButton>
-                  {attachments.map((file, idx) => (
-                    <Box
-                      key={file.id}
-                      onClick={() => onFileSelect(file)}
-                      sx={{
-                        width: 70,
-                        height: 90,
-                        bgcolor:
-                          file.id === activeFile.id
-                            ? "primary.main"
-                            : "grey.300",
-                        borderRadius: 1,
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color:
-                          file.id === activeFile.id ? "white" : "text.primary",
-                        border: file.id === activeFile.id ? 2 : 0,
-                        borderColor: "primary.main",
-                        transition: "all 0.2s",
-                        "&:hover": { opacity: 0.8 },
-                      }}
-                    >
-                      <Typography variant="caption">{idx + 1}</Typography>
-                    </Box>
-                  ))}
-                  <IconButton
-                    size="small"
-                    disabled={currentFileIndex === attachments.length - 1}
-                    onClick={() => navigateFile("down")}
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </IconButton>
-                </Box>
               </Box>
             </Box>
 
