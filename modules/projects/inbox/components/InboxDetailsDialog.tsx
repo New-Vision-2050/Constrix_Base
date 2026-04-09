@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
-  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -15,16 +14,14 @@ import {
   Step,
   StepLabel,
   Stepper,
+  TextField,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
-import { useTranslations } from "next-intl";
 import type { PendingShareInvitation } from "@/services/api/projects/project-sharing/types/response";
 import type { ProjectInboxRow } from "@/modules/projects/inbox/map-invitation-to-row";
 import { formatInboxSentDate } from "@/modules/projects/inbox/inbox-columns";
@@ -35,30 +32,28 @@ export type InboxDetailsDialogProps = {
   onClose: () => void;
   row: ProjectInboxRow | null;
   invitation: PendingShareInvitation | null;
-  onApprove: () => void;
-  onReject: () => void;
+  /** Optional comment from the sidebar field (sent when API supports it). */
+  onApprove: (comment?: string) => void;
+  onReject: (comment?: string) => void;
   actionPending: boolean;
   canRespond: boolean;
 };
 
-function shareStatusLabelForDialog(
-  status: string,
-  tShare: (key: string) => string,
-): string {
+function shareStatusLabelForDialog(status: string): string {
   const key = status.trim().toLowerCase();
   switch (key) {
     case "pending":
-      return tShare("statusPending");
+      return "بانتظار الرد";
     case "sent":
-      return tShare("statusSent");
+      return "تم الإرسال";
     case "draft":
     case "under_construction":
-      return tShare("statusDraft");
+      return "تحت الإنشاء";
     case "accepted":
     case "approved":
-      return tShare("statusAccepted");
+      return "مقبول";
     case "rejected":
-      return tShare("statusRejected");
+      return "مرفوض";
     default:
       return status || "—";
   }
@@ -72,157 +67,72 @@ const cardSx = {
   borderColor: "divider",
 } as const;
 
-function InboxDetailsDialogSidebar({
-  commentsText,
-  noCommentsLabel,
-  tInbox,
-}: {
-  commentsText: string | null;
-  noCommentsLabel: string;
-  tInbox: (key: string) => string;
-}) {
-  return (
-    <Stack spacing={2} sx={{ height: "100%" }}>
-      <Box>
-        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-            {tInbox("detailsApprovalPath")}
-          </Typography>
-          <Stepper activeStep={1} orientation="vertical">
-            <Step completed>
-              <StepLabel
-                optional={
-                  <Typography variant="caption" color="text.secondary">
-                    {tInbox("detailsStepMetaSample")}
-                  </Typography>
-                }
-              >
-                {tInbox("detailsStepSubmission")}
-              </StepLabel>
-            </Step>
-            <Step>
-              <StepLabel
-                optional={
-                  <Typography variant="caption" color="text.secondary">
-                    {tInbox("detailsStepMetaSample2")}
-                  </Typography>
-                }
-              >
-                {tInbox("detailsStepInitialReview")}
-              </StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>{tInbox("detailsStepTechnical")}</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>{tInbox("detailsStepCommercial")}</StepLabel>
-            </Step>
-          </Stepper>
-        </Paper>
-      </Box>
-
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-          {tInbox("detailsComments")}
-        </Typography>
-        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
-          <Stack direction="row" spacing={1.5} alignItems="flex-start">
-            <Box
-              sx={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                bgcolor: "primary.dark",
-                flexShrink: 0,
-              }}
-            />
-            <Box sx={{ minWidth: 0 }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-              >
-                {tInbox("detailsCommentSampleAuthor")}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 0.5 }}
-              >
-                {commentsText ?? noCommentsLabel}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      </Box>
-    </Stack>
-  );
-}
-
 function InboxDetailsDialogMain({
-  row,
   sentLabel,
   typeLabel,
   statusLabel,
   descriptionBody,
   schemaLabels,
-  tInbox,
   onApprove,
-  onReject
+  onReject,
+  actionPending,
+  canRespond,
 }: {
-  row: ProjectInboxRow;
   sentLabel: string;
   typeLabel: string;
   statusLabel: string;
   descriptionBody: string;
   schemaLabels: string[];
-  tInbox: (key: string) => string;
   onApprove: () => void;
   onReject: () => void;
   actionPending: boolean;
   canRespond: boolean;
 }) {
+  const respondDisabled = actionPending || !canRespond;
   return (
     <Stack spacing={2.5} sx={{ minWidth: 0 }}>
       <Grid container spacing={1.5}>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Paper variant="outlined" sx={cardSx}>
-            <Typography
-              variant="caption"
-              color="text.primary"
-              display="block"
-            >
-              {tInbox("detailsFieldType")}
+            <Typography variant="caption" color="text.primary" display="block">
+              النوع
             </Typography>
-            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ mt: 0.5 }}
+            >
               {typeLabel}
             </Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Paper variant="outlined" sx={cardSx}>
-            <Typography
-              variant="caption"
-              color="text.primary"
-              display="block"
-            >
-              {tInbox("detailsFieldCurrentApproval")}
+            <Typography variant="caption" color="text.primary" display="block">
+              حالة الاعتماد الحالية
             </Typography>
-            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ mt: 0.5 }}
+            >
               {statusLabel}
             </Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Paper variant="outlined" sx={cardSx}>
-            <Typography
-              variant="caption"
-              color="text.primary"
-              display="block"
-            >
-              {tInbox("detailsFieldSubmissionDate")}
+            <Typography variant="caption" color="text.primary" display="block">
+              تاريخ التقديم
             </Typography>
-            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ mt: 0.5 }}
+            >
               {sentLabel}
             </Typography>
           </Paper>
@@ -232,7 +142,7 @@ function InboxDetailsDialogMain({
       <Box>
         <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            {tInbox("detailsDescription")}
+            الوصف
           </Typography>
           <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
             {descriptionBody}
@@ -243,65 +153,46 @@ function InboxDetailsDialogMain({
       <Box>
         <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
           <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-            {tInbox("detailsSelectedSections")}
+            الصلاحيات المختارة
           </Typography>
-          <Stack direction="row" flexWrap="wrap" gap={1.5}>
-            <Button
-              variant="outlined"
-              startIcon={<GroupsOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              بيانات المشاريع
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<SearchOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              مساحة العمل
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<FolderOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              المرفقات
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<AssignmentOutlinedIcon />}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                px: 2,
-                py: 1,
-              }}
-            >
-              أوامر العمل
-            </Button>
-          </Stack>
+          {schemaLabels.length > 0 ? (
+            <Stack direction="row" flexWrap="wrap" gap={1.5}>
+              {schemaLabels.map((label, index) => {
+                const icons = [
+                  <GroupsOutlinedIcon key="icon" />,
+                  <SearchOutlinedIcon key="icon" />,
+                  <FolderOutlinedIcon key="icon" />,
+                  <AssignmentOutlinedIcon key="icon" />,
+                ];
+                return (
+                  <Button
+                    key={label}
+                    variant="outlined"
+                    startIcon={icons[index % icons.length]}
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: "none",
+                      px: 2,
+                      py: 1,
+                    }}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+            </Stack>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              لا توجد أقسام محددة
+            </Typography>
+          )}
         </Paper>
       </Box>
 
       <Box>
         <Grid container spacing={1.5}>
           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            {tInbox("detailsAttachments")}
+            المرفقات
           </Typography>
         </Grid>
       </Box>
@@ -317,20 +208,111 @@ function InboxDetailsDialogMain({
           variant="contained"
           color="secondary"
           onClick={onApprove}
+          disabled={respondDisabled}
         >
-          {tInbox("accept")}
-        </Button>
-        <Button variant="outlined" color="secondary" disabled>
-          {tInbox("detailsRequestModification")}
+          قبول
         </Button>
         <Button
           variant="outlined"
           color="error"
           onClick={onReject}
+          disabled={respondDisabled}
         >
-          {tInbox("reject")}
+          رفض
+        </Button>
+        <Button variant="outlined" color="secondary" disabled>
+          طلب تعديل
         </Button>
       </Stack>
+    </Stack>
+  );
+}
+
+function InboxDetailsDialogSidebar({
+  commentsText,
+  commentDraft,
+  onCommentChange,
+  sharedByName,
+  actionPending,
+}: {
+  commentsText: string | null;
+  commentDraft: string;
+  onCommentChange: (value: string) => void;
+  sharedByName: string | null;
+  actionPending: boolean;
+}) {
+  return (
+    <Stack spacing={3} sx={{ height: "100%" }}>
+      <Box>
+        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+            مسار الاعتماد
+          </Typography>
+          <Stepper activeStep={1} orientation="vertical">
+            <Step completed>
+              <StepLabel
+                optional={
+                  <Typography variant="caption" color="text.secondary">
+                    {sharedByName || "—"}
+                  </Typography>
+                }
+              >
+                التقديم
+              </StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>المراجعة الأولية</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>المراجعة الفنية</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>المراجعة التجارية</StepLabel>
+            </Step>
+          </Stepper>
+        </Paper>
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+          التعليقات
+        </Typography>
+        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
+          <Stack direction="row" spacing={1.5} alignItems="flex-start">
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                bgcolor: "primary.dark",
+                flexShrink: 0,
+              }}
+            />
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              {commentsText ? (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1.5, whiteSpace: "pre-wrap" }}
+                >
+                  {commentsText}
+                </Typography>
+              ) : null}
+              <TextField
+                fullWidth
+                multiline
+                minRows={3}
+                maxRows={8}
+                size="small"
+                placeholder="اكتب تعليقك هنا…"
+                value={commentDraft}
+                onChange={(e) => onCommentChange(e.target.value)}
+                disabled={actionPending}
+              />
+            </Box>
+          </Stack>
+        </Paper>
+      </Box>
     </Stack>
   );
 }
@@ -345,9 +327,18 @@ export default function InboxDetailsDialog({
   actionPending,
   canRespond,
 }: InboxDetailsDialogProps) {
-  const tInbox = useTranslations("project.inbox");
-  const tShare = useTranslations("project.share");
+  const [commentDraft, setCommentDraft] = useState("");
   const settingsTabs = useProjectSettingsTabs();
+
+  const submitComment = () => commentDraft.trim() || undefined;
+  const handleApprove = () => onApprove(submitComment());
+  const handleReject = () => onReject(submitComment());
+
+  useEffect(() => {
+    if (open) {
+      setCommentDraft("");
+    }
+  }, [open, invitation?.id]);
 
   const schemaIds = invitation?.schema_ids ?? [];
   const schemaLabelById = useMemo(() => {
@@ -379,7 +370,7 @@ export default function InboxDetailsDialog({
 
   const typeLabel = row?.inbox_type_label || "—";
   const statusLabel = row
-    ? shareStatusLabelForDialog(row.invitation_status, tShare)
+    ? shareStatusLabelForDialog(row.invitation_status)
     : "—";
 
   return (
@@ -411,14 +402,14 @@ export default function InboxDetailsDialog({
           >
             <Box>
               <Typography variant="h6" component="span" fontWeight={700}>
-                {tInbox("detailsTitle")}
+                تفاصيل الطلب
               </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
                 sx={{ mt: 0.5 }}
               >
-                {tInbox("detailsSubtitle")}
+                مراجعة وإدارة طلبات المشاركة
               </Typography>
             </Box>
             <IconButton aria-label="close" onClick={onClose} size="small">
@@ -428,26 +419,26 @@ export default function InboxDetailsDialog({
 
           <DialogContent dividers sx={{ pt: 2 }}>
             <Grid container spacing={3}>
-              <Grid size={{ xs: 12, md: 8 }}>
+              <Grid size={{ xs: 12, md: 8.5 }}>
                 <InboxDetailsDialogMain
-                  row={row}
                   sentLabel={sentLabel}
                   typeLabel={typeLabel}
                   statusLabel={statusLabel}
                   descriptionBody={descriptionBody}
                   schemaLabels={schemaLabels}
-                  tInbox={tInbox}
-                  onApprove={onApprove}
-                  onReject={onReject}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
                   actionPending={actionPending}
                   canRespond={canRespond}
                 />
               </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid size={{ xs: 12, md: 3.5 }}>
                 <InboxDetailsDialogSidebar
                   commentsText={commentsText}
-                  noCommentsLabel={tInbox("detailsNoComments")}
-                  tInbox={tInbox}
+                  commentDraft={commentDraft}
+                  onCommentChange={setCommentDraft}
+                  sharedByName={invitation?.shared_by?.name ?? null}
+                  actionPending={actionPending}
                 />
               </Grid>
             </Grid>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -14,7 +14,6 @@ import {
   Button,
   Box,
   Typography,
-  FormControlLabel,
   Checkbox,
   Stack,
   CircularProgress,
@@ -25,8 +24,15 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
-import { Close } from "@mui/icons-material";
-import { useTranslations } from "next-intl";
+import { Close, InfoOutlined, Send as SendIcon } from "@mui/icons-material";
+import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
@@ -41,26 +47,22 @@ import { CompanyData } from "@/services/api/projects/project-sharing/types/respo
 
 type ShareFormValues = {
   serialSearch: string;
-  notes: string;
 };
 
 type PendingSharePayload = {
   company_serial_number: string;
   schema_ids: number[];
-  notes?: string;
 };
 
-const createShareFormSchema = (t: (key: string) => string) =>
+const createShareFormSchema = () =>
   z.object({
     serialSearch: z
       .string()
-      .min(1, t("validation.companySerialRequired")),
-    notes: z.string(),
+      .min(1, "الرقم التسلسلي للشركة مطلوب"),
   });
 
 const defaultForm: ShareFormValues = {
   serialSearch: "",
-  notes: "",
 };
 
 type ApiErrorBody = {
@@ -129,6 +131,16 @@ function isAlreadySharedApiDescription(description: string | undefined) {
   return lower.includes("already shared") && lower.includes("company");
 }
 
+/** Backend: `Cannot share project with your own company` (400, status/message error). */
+function isOwnCompanyShareError(description: string | undefined) {
+  if (!description) return false;
+  const lower = description.trim().toLowerCase();
+  return (
+    lower.includes("own company") ||
+    lower.includes("cannot share project with your own")
+  );
+}
+
 /** Same schema ids as `useProjectSettingsTabs()`; stable for memo keys (hook returns a new array each render). */
 const PROJECT_SETTINGS_TAB_SCHEMA_IDS = new Set<number>(
   Object.values(SCHEMA_IDS),
@@ -138,7 +150,6 @@ export default function ShareProjectDialog({
   open,
   onClose,
 }: ShareProjectDialogProps) {
-  const t = useTranslations("project.share");
   const { projectId, projectData, isLoading: projectLoading } = useProject();
   const queryClient = useQueryClient();
   const allSettingsTabs = useProjectSettingsTabs();
@@ -203,7 +214,7 @@ export default function ShareProjectDialog({
     });
   }, [allowedSchemaIdsKey]);
 
-  const schema = useMemo(() => createShareFormSchema(t), [t]);
+  const schema = useMemo(() => createShareFormSchema(), []);
 
   const {
     control,
@@ -238,17 +249,17 @@ export default function ShareProjectDialog({
         setActiveStep(1);
       } else {
         setCompany(null);
-        setLookupError(t("companyNotFound"));
+        setLookupError("الشركة غير موجودة");
       }
     },
     onError: (error: unknown) => {
       setCompany(null);
       if (isCompanyNotFoundError(error)) {
-        setLookupError(t("companyNotFound"));
+        setLookupError("الشركة غير موجودة");
         return;
       }
       setLookupError(null);
-      toast.error(getApiErrorDescription(error) ?? t("shareError"));
+      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء المشاركة");
     },
   });
 
@@ -258,7 +269,6 @@ export default function ShareProjectDialog({
         project_id: projectId,
         company_serial_number: body.company_serial_number,
         schema_ids: [...body.schema_ids].sort((a, b) => a - b),
-        notes: body.notes,
       });
       if (isApiPayloadBusinessError(res.data)) {
         return Promise.reject({ response: { data: res.data } });
@@ -267,7 +277,7 @@ export default function ShareProjectDialog({
     },
     onSuccess: (res) => {
       const text = getErrorDescriptionFromApiData(res.data);
-      toast.success(text?.trim() ? text : t("shareSuccess"));
+      toast.success(text?.trim() ? text : "تمت المشاركة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["project-details", projectId] });
       queryClient.invalidateQueries({ queryKey: ["project-shares", projectId] });
       reset(defaultForm);
@@ -278,11 +288,15 @@ export default function ShareProjectDialog({
     },
     onError: (error: unknown) => {
       const description = getApiErrorDescription(error);
-      if (isAlreadySharedApiDescription(description)) {
-        toast.error(t("alreadySharedWithCompany"));
+      if (isOwnCompanyShareError(description)) {
+        toast.error("لا يمكن مشاركة المشروع مع شركتك");
         return;
       }
-      toast.error(description ?? t("shareError"));
+      if (isAlreadySharedApiDescription(description)) {
+        toast.error("تمت المشاركة مع هذه الشركة مسبقاً");
+        return;
+      }
+      toast.error(description ?? "حدث خطأ أثناء المشاركة");
     },
   });
 
@@ -314,7 +328,7 @@ export default function ShareProjectDialog({
   const handleNext = () => {
     if (activeStep === 2) {
       if (selectedSchemaIds.length === 0) {
-        toast.error(t("validation.selectSection"));
+        toast.error("يرجى اختيار قسم واحد على الأقل");
         return;
       }
     }
@@ -325,19 +339,22 @@ export default function ShareProjectDialog({
     setActiveStep((prev) => prev - 1);
   };
 
-  const onValidSubmit = (data: ShareFormValues) => {
+  const onValidSubmit: SubmitHandler<ShareFormValues> = () => {
+    /** Share API runs only from step 4 (review) submit — not from earlier steps. */
+    if (activeStep !== 3) {
+      return;
+    }
     if (!company) {
-      toast.error(t("validation.companyLookupRequired"));
+      toast.error("يرجى البحث عن الشركة أولاً");
       return;
     }
     if (selectedSchemaIds.length === 0) {
-      toast.error(t("validation.selectSection"));
+      toast.error("يرجى اختيار قسم واحد على الأقل");
       return;
     }
     shareMutation.mutate({
       company_serial_number: company.serial_no,
       schema_ids: selectedSchemaIds,
-      notes: data.notes.trim() || undefined,
     });
   };
 
@@ -352,7 +369,7 @@ export default function ShareProjectDialog({
 
   const steps = [
     "البحث عن شركة",
-    "معلومات الشركة",
+    "تأكيد الشركة",
     "تحديد الصلاحيات",
     "المراجعة والإرسال",
   ];
@@ -364,7 +381,7 @@ export default function ShareProjectDialog({
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, height: "100%" }}>
             {!schemaParentId || schemaParentId <= 0 ? (
               <Typography color="warning.main" variant="body2">
-                {t("projectTypeMissing")}
+                نوع المشروع مفقود
               </Typography>
             ) : null}
 
@@ -376,8 +393,8 @@ export default function ShareProjectDialog({
                   {...field}
                   fullWidth
                   size="small"
-                  label={t("companySerialNumber")}
-                  placeholder={t("dialogSerialSearchPlaceholder")}
+                  label="الرقم التسلسلي للشركة"
+                  placeholder="أدخل الرقم التسلسلي للبحث"
                   error={!!errors.serialSearch}
                   helperText={errors.serialSearch?.message}
                   disabled={pending}
@@ -404,7 +421,7 @@ export default function ShareProjectDialog({
             {company ? (
               <Paper variant="outlined" sx={{ p: 2, bgcolor: "success.light", borderColor: "success.main" }}>
                 <Typography variant="body1" color="text.primary" sx={{ fontWeight: 700 }}>
-                  {t("dialogSelectedCompany", { name: company.name })}
+                  الشركة المختارة: {company.name}
                 </Typography>
               </Paper>
             ) : null}
@@ -413,109 +430,216 @@ export default function ShareProjectDialog({
 
       case 1:
         return (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {company ? (
-              <Paper
-                variant="outlined"
-                sx={{
-                  p: 2.5,
-                  bgcolor: "action.hover",
-                  borderColor: "primary.main",
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mb: 2, fontWeight: 600, color: "primary.main" }}
+              <>
+                <Stack
+                  direction="row"
+                  alignItems="flex-start"
+                  justifyContent="space-between"
+                  sx={{ gap: 2, flexWrap: "wrap" }}
                 >
-                  معلومات الشركة
-                </Typography>
-                <Stack spacing={1.5}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                      اسم الشركة:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {company.name}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                      {t("companySerialNumber") || "Serial Number"}:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {company.serial_no}
-                    </Typography>
-                  </Stack>
-                  {company.email && (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                        البريد الإلكتروني:
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {company.email}
-                      </Typography>
-                    </Stack>
-                  )}
-                  {company.representative_name && (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                        ممثل الشركة:
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {company.representative_name}
-                      </Typography>
-                    </Stack>
-                  )}
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                    تفاصيل الشركة التي تم العثور عليها
+                  </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "secondary.main" }}
+                  >
+                    تأكيد البيانات
+                  </Typography>
                 </Stack>
-              </Paper>
-            ) : null}
+
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 0,
+                    overflow: "hidden",
+                    bgcolor: "action.hover",
+                    borderColor: "divider",
+                  }}
+                >
+                  {(
+                    [
+                      {
+                        icon: (
+                          <BusinessOutlinedIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "اسم الشركة",
+                        value: company.name?.trim() || "—",
+                      },
+                      {
+                        icon: (
+                          <BadgeOutlinedIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "الرقم التسلسلي",
+                        value: company.serial_no?.trim() || "—",
+                      },
+                      {
+                        icon: (
+                          <EmailOutlinedIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "البريد الإلكتروني",
+                        value: company.email?.trim() || "—",
+                      },
+                      {
+                        icon: (
+                          <PersonOutlineIcon
+                            sx={{ fontSize: 22, color: "text.secondary" }}
+                          />
+                        ),
+                        label: "مالك الشركة",
+                        value: company.owner_name?.trim() || "—",
+                      },
+                    ] as const
+                  ).map((row, index, arr) => (
+                    <Stack
+                      key={row.label}
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      spacing={2}
+                      sx={{
+                        px: 2,
+                        py: 1.75,
+                        borderBottom:
+                          index < arr.length - 1 ? 1 : 0,
+                        borderColor: "divider",
+                      }}
+                    >
+                      {/* RTL: first item aligns to inline-start (right) — label + icon */}
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ flexShrink: 0 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          {row.label}
+                        </Typography>
+                        {row.icon}
+                      </Stack>
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        sx={{ textAlign: "end", minWidth: 0, flex: 1 }}
+                      >
+                        {row.value}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Paper>
+              </>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                لا توجد بيانات شركة. ارجع للخطوة السابقة وأكمل البحث.
+              </Typography>
+            )}
           </Box>
         );
 
       case 2:
         return (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
             {schemasLoading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} />
-                <Typography variant="body2">{t("loadingSchemas")}</Typography>
+                <Typography variant="body2">جاري تحميل الأقسام...</Typography>
               </Box>
             ) : null}
 
             {canShowSchemas && filteredTabs.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
-                {t("noSchemasAvailable")}
+                لا توجد أقسام متاحة
               </Typography>
             ) : null}
 
             {canShowSchemas && filteredTabs.length > 0 ? (
               <Box>
-                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                  حدد الصلاحيات للمشاركة
+                <Typography
+                  variant="subtitle1"
+                  sx={{ mb: 2.5, fontWeight: 700 }}
+                >
+                  حدد الصلاحيات الممنوحة
                 </Typography>
                 <Box
                   sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "repeat(2, minmax(0, 1fr))",
+                    },
                     gap: 2,
-                    justifyContent: "flex-start",
                   }}
                 >
                   {filteredTabs.map((tab) => {
                     const id = tab.schema_id!;
                     const checked = selectedSchemaIds.includes(id);
                     return (
-                      <FormControlLabel
+                      <Paper
                         key={tab.value}
-                        control={
+                        variant="outlined"
+                        sx={{
+                          p: 1.75,
+                          borderRadius: 2,
+                          bgcolor: "action.hover",
+                          borderColor: "divider",
+                          transition: (theme) =>
+                            theme.transitions.create(
+                              ["border-color", "box-shadow", "background-color"],
+                              { duration: theme.transitions.duration.shorter },
+                            ),
+                          ...(checked && {
+                            borderColor: "primary.main",
+                            bgcolor: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "rgba(144, 202, 249, 0.08)"
+                                : "rgba(25, 118, 210, 0.06)",
+                            boxShadow: (theme) =>
+                              `inset 0 0 0 1px ${theme.palette.primary.main}`,
+                          }),
+                        }}
+                      >
+                        <Box
+                          dir="rtl"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: 1.5,
+                            width: "100%",
+                          }}
+                        >
                           <Checkbox
                             checked={checked}
                             onChange={() => toggleSchemaId(id)}
                             disabled={pending}
+                            size="medium"
+                            sx={{ p: 0.5, flexShrink: 0 }}
+                            inputProps={{
+                              "aria-label": tab.name,
+                            }}
                           />
-                        }
-                        label={tab.name}
-                      />
+                          <Typography
+                            variant="body2"
+                            fontWeight={600}
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              textAlign: "right",
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {tab.name}
+                          </Typography>
+                        </Box>
+                      </Paper>
                     );
                   })}
                 </Box>
@@ -524,81 +648,156 @@ export default function ShareProjectDialog({
           </Box>
         );
 
-      case 3:
+      case 3: {
+        const schemaChipIcons = [
+          GroupsOutlinedIcon,
+          SearchOutlinedIcon,
+          FolderOutlinedIcon,
+          AssignmentOutlinedIcon,
+        ];
+        const selectedTabs = filteredTabs.filter((tab) =>
+          selectedSchemaIds.includes(tab.schema_id!),
+        );
+        const companyRows = company
+          ? (
+              [
+                {
+                  icon: (
+                    <BusinessOutlinedIcon
+                      sx={{ fontSize: 22, color: "text.secondary" }}
+                    />
+                  ),
+                  label: "اسم الشركة",
+                  value: company.name?.trim() || "—",
+                },
+                {
+                  icon: (
+                    <BadgeOutlinedIcon
+                      sx={{ fontSize: 22, color: "text.secondary" }}
+                    />
+                  ),
+                  label: "الرقم التسلسلي",
+                  value: company.serial_no?.trim() || "—",
+                },
+                {
+                  icon: (
+                    <EmailOutlinedIcon
+                      sx={{ fontSize: 22, color: "text.secondary" }}
+                    />
+                  ),
+                  label: "البريد الإلكتروني",
+                  value: company.email?.trim() || "—",
+                },
+                {
+                  icon: (
+                    <PersonOutlineIcon
+                      sx={{ fontSize: 22, color: "text.secondary" }}
+                    />
+                  ),
+                  label: "ممثل الشركة",
+                  value: company.owner_name?.trim() || "—",
+                },
+              ] as const
+            )
+          : [];
+
         return (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            <Paper variant="outlined" sx={{ p: 2.5, bgcolor: "action.hover" }}>
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 2.5,
+                bgcolor: "action.hover",
+                borderColor: "divider",
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
                 معلومات الشركة
               </Typography>
-              <Typography variant="body1">{company?.name || "—"}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {company?.serial_no || "—"}
-              </Typography>
-            </Paper>
-
-            <Paper variant="outlined" sx={{ p: 2.5, bgcolor: "action.hover" }}>
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                الصلاحيات المختارة
-              </Typography>
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: 1.5,
-                }}
-              >
-                {filteredTabs
-                  .filter((tab) => selectedSchemaIds.includes(tab.schema_id!))
-                  .map((tab) => (
+              {companyRows.length > 0 ? (
+                <Stack
+                  spacing={0}
+                  divider={
+                    <Divider flexItem sx={{ borderColor: "divider" }} />
+                  }
+                >
+                  {companyRows.map((row) => (
                     <Stack
-                      key={tab.value}
+                      key={row.label}
                       direction="row"
-                      spacing={1}
                       alignItems="center"
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 1,
-                        bgcolor: "background.paper",
-                        border: 1,
-                        borderColor: "primary.main",
-                      }}
+                      justifyContent="space-between"
+                      spacing={2}
+                      sx={{ py: 1.75 }}
                     >
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          bgcolor: "primary.main",
-                          flexShrink: 0,
-                        }}
-                      />
-                      <Typography variant="body2" fontWeight={500}>
-                        {tab.name}
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ flexShrink: 0 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          {row.label}
+                        </Typography>
+                        {row.icon}
+                      </Stack>
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        sx={{ textAlign: "end", minWidth: 0, flex: 1 }}
+                      >
+                        {row.value}
                       </Typography>
                     </Stack>
                   ))}
-              </Box>
+                </Stack>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  —
+                </Typography>
+              )}
+
+              <Divider sx={{ my: 2.5 }} />
+
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
+                الصلاحيات المختارة
+              </Typography>
+              {selectedTabs.length > 0 ? (
+                <Stack direction="row" flexWrap="wrap" gap={1.5}>
+                  {selectedTabs.map((tab, index) => {
+                    const IconComp = schemaChipIcons[index % schemaChipIcons.length];
+                    return (
+                      <Chip
+                        key={tab.value}
+                        icon={
+                          <IconComp sx={{ fontSize: "1.125rem !important" }} />
+                        }
+                        label={tab.name}
+                        variant="outlined"
+                        sx={{
+                          fontWeight: 600,
+                          py: 2,
+                          borderColor: "primary.main",
+                          bgcolor: "background.paper",
+                        }}
+                      />
+                    );
+                  })}
+                </Stack>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  —
+                </Typography>
+              )}
             </Paper>
 
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  size="small"
-                  multiline
-                  minRows={3}
-                  label={t("notes")}
-                  placeholder={t("notesPlaceholder")}
-                  disabled={pending}
-                />
-              )}
-            />
+            <Alert severity="info" icon={<InfoOutlined fontSize="inherit" />} variant="outlined">
+              يرجى مراجعة البيانات والصلاحيات قبل إرسال الدعوة
+            </Alert>
           </Box>
         );
+      }
 
       default:
         return null;
@@ -626,13 +825,13 @@ export default function ShareProjectDialog({
       >
         <IconButton
           onClick={handleClose}
-          aria-label={t("dialogTitle")}
+          aria-label="مشاركة المشروع"
           disabled={pending}
         >
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
-          {t("dialogTitle")}
+          مشاركة المشروع
         </DialogTitle>
       </Box>
 
@@ -644,8 +843,12 @@ export default function ShareProjectDialog({
         ) : (
           <Box
             component="form"
-            onSubmit={handleSubmit(onValidSubmit)}
             noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (activeStep !== 3) return;
+              void handleSubmit(onValidSubmit)(e);
+            }}
           >
             <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
               {steps.map((label) => (
@@ -659,10 +862,11 @@ export default function ShareProjectDialog({
 
             <Divider sx={{ my: 3 }} />
 
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
               {activeStep === 0 ? (
                 <>
                   <Button
+                    type="button"
                     variant="outlined"
                     onClick={handleClose}
                     disabled={pending}
@@ -684,45 +888,66 @@ export default function ShareProjectDialog({
                     )}
                   </Button>
                 </>
+              ) : activeStep === 3 ? (
+                <>
+                  <Button
+                    type="button"
+                    disabled={pending}
+                    onClick={handleBack}
+                    variant="outlined"
+                    color="inherit"
+                  >
+                    تراجع
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    color="inherit"
+                    onClick={handleClose}
+                    disabled={pending}
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                    disabled={
+                      pending ||
+                      !canShowSchemas ||
+                      filteredTabs.length === 0 ||
+                      !company ||
+                      selectedSchemaIds.length === 0
+                    }
+                    startIcon={
+                      shareMutation.isPending ? (
+                        <CircularProgress size={18} color="inherit" />
+                      ) : (
+                        <SendIcon sx={{ fontSize: 20 }} />
+                      )
+                    }
+                  >
+                    {shareMutation.isPending ? "جاري الإرسال…" : "أرسال الدعوة"}
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button
+                    type="button"
                     disabled={pending}
                     onClick={handleBack}
                     variant="outlined"
                   >
                     رجوع
                   </Button>
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    {activeStep === steps.length - 1 ? (
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        disabled={
-                          pending ||
-                          !canShowSchemas ||
-                          filteredTabs.length === 0 ||
-                          !company ||
-                          selectedSchemaIds.length === 0
-                        }
-                      >
-                        {shareMutation.isPending ? (
-                          <CircularProgress size={22} color="inherit" />
-                        ) : (
-                          t("dialogShareSubmit")
-                        )}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        onClick={handleNext}
-                        disabled={pending}
-                      >
-                        التالي
-                      </Button>
-                    )}
-                  </Box>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handleNext}
+                    disabled={pending}
+                  >
+                    التالي
+                  </Button>
                 </>
               )}
             </Box>

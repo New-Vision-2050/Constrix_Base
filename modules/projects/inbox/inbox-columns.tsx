@@ -1,9 +1,7 @@
-import { Button, Chip, MenuItem, Typography } from "@mui/material";
+import { Button, Chip, MenuItem } from "@mui/material";
 import type { ProjectInboxRow } from "@/modules/projects/inbox/map-invitation-to-row";
 import CustomMenu from "@/components/headless/custom-menu";
-import type { ProjectColumnTranslator } from "@/modules/projects/project/views/list/columns";
-
-type InboxTranslator = (key: string) => string;
+import { EyeIcon } from "lucide-react";
 
 export function formatInboxSentDate(iso: string): string {
   if (!iso?.trim()) return "";
@@ -15,27 +13,23 @@ export function formatInboxSentDate(iso: string): string {
   return `${y}/${m}/${day}`;
 }
 
-function inboxShareStatusLabel(
-  status: string,
-  tShare: InboxTranslator,
-  empty: string,
-): string {
+function inboxShareStatusLabel(status: string): string {
   const key = status.trim().toLowerCase();
   switch (key) {
     case "pending":
-      return tShare("statusPending");
+      return "بانتظار الرد";
     case "sent":
-      return tShare("statusSent");
+      return "تم الإرسال";
     case "draft":
     case "under_construction":
-      return tShare("statusDraft");
+      return "تحت الإنشاء";
     case "accepted":
     case "approved":
-      return tShare("statusAccepted");
+      return "مقبول";
     case "rejected":
-      return tShare("statusRejected");
+      return "مرفوض";
     default:
-      return status || empty;
+      return status || "—";
   }
 }
 
@@ -60,9 +54,6 @@ function inboxShareStatusColor(status: string): "primary" | "warning" | "success
 }
 
 export type GetInboxColumnsOptions = {
-  tProject: ProjectColumnTranslator;
-  tInbox: InboxTranslator;
-  tShare: InboxTranslator;
   pendingMutation: boolean;
   onAccept: (invitationId: string) => void;
   onReject: (invitationId: string) => void;
@@ -70,86 +61,77 @@ export type GetInboxColumnsOptions = {
 };
 
 export function getInboxColumns({
-  tProject,
-  tInbox,
-  tShare,
   pendingMutation,
-  onAccept,
-  onReject,
   onView,
 }: GetInboxColumnsOptions) {
   return [
     {
       key: "inbox_type_label",
-      name: tInbox("columnType"),
+      name: "النوع",
       sortable: false,
       render: (row: ProjectInboxRow) => (
-        <span>{row.inbox_type_label || tProject("emptyCell")}</span>
+        <span>{row.inbox_type_label || "—"}</span>
       ),
     },
     {
       key: "name",
-      name: tInbox("columnName"),
+      name: "العنوان",
       sortable: false,
       render: (row: ProjectInboxRow) => (
-        <span className="font-medium">{row.name || tProject("emptyCell")}</span>
+        <span className="font-medium">{row.name || "—"}</span>
       ),
     },
     {
       key: "sender_company_name",
-      name: tInbox("columnSenderCompany"),
+      name: "الجهة المراسلة",
       sortable: false,
       render: (row: ProjectInboxRow) => (
         <span>
           {row.sender_company_name?.trim()
             ? row.sender_company_name
-            : tProject("emptyCell")}
+            : "—"}
         </span>
       ),
     },
     {
       key: "reference_display",
-      name: tInbox("columnReference"),
+      name: "المرجع",
       sortable: false,
       render: (row: ProjectInboxRow) => (
-        <span>{row.reference_display || tProject("emptyCell")}</span>
+        <span>{row.reference_display || "—"}</span>
       ),
     },
     {
       key: "representative_name",
-      name: tInbox("columnRepresentative"),
+      name: "الممثل",
       sortable: false,
       render: (row: ProjectInboxRow) => (
         <span>
           {row.representative_name?.trim()
             ? row.representative_name
-            : tProject("emptyCell")}
+            : "—"}
         </span>
       ),
     },
     {
       key: "sent_at_raw",
-      name: tInbox("columnDateSent"),
+      name: "تاريخ الإرسال",
       sortable: false,
       render: (row: ProjectInboxRow) => {
         const formatted = formatInboxSentDate(row.sent_at_raw);
         return (
           <span>
-            {formatted.trim() ? formatted : tProject("emptyCell")}
+            {formatted.trim() ? formatted : "—"}
           </span>
         );
       },
     },
     {
       key: "invitation_status",
-      name: tInbox("columnStatus"),
+      name: "الحالة",
       sortable: false,
       render: (row: ProjectInboxRow) => {
-        const label = inboxShareStatusLabel(
-          row.invitation_status,
-          tShare,
-          tProject("emptyCell"),
-        );
+        const label = inboxShareStatusLabel(row.invitation_status);
         return (
           <Chip
             label={label}
@@ -162,11 +144,9 @@ export function getInboxColumns({
     },
     {
       key: "actions",
-      name: tProject("tableActions"),
+      name: "الإجراءات",
       sortable: false,
       render: (row: ProjectInboxRow) => {
-        const canRespond =
-          (row.invitation_status ?? "").trim().toLowerCase() === "pending";
         return (
           <CustomMenu
             renderAnchor={({ onClick }) => (
@@ -179,7 +159,7 @@ export function getInboxColumns({
                 disabled={pendingMutation}
                 sx={{ bgcolor: "#3f3f5a", color: "#fff", minWidth: 80 }}
               >
-                {tInbox("actionMenu")}
+                إجراء
               </Button>
             )}
           >
@@ -187,19 +167,8 @@ export function getInboxColumns({
               onClick={() => onView(row)}
               disabled={pendingMutation}
             >
-              {tInbox("viewDetails")}
-            </MenuItem>
-            <MenuItem
-              onClick={() => onAccept(row.invitationId)}
-              disabled={pendingMutation || !canRespond}
-            >
-              {tInbox("accept")}
-            </MenuItem>
-            <MenuItem
-              onClick={() => onReject(row.invitationId)}
-              disabled={pendingMutation || !canRespond}
-            >
-              {tInbox("reject")}
+              <EyeIcon className="w-4 h-4 ml-2" />
+              عرض 
             </MenuItem>
           </CustomMenu>
         );

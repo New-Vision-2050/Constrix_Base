@@ -158,13 +158,18 @@ export type PendingShareInvitation = {
   status: string;
   notes?: string | null;
   created_at?: string;
+  updated_at?: string;
   shareable_id?: string;
   shareable_type?: string;
   /** Shared section IDs (same as project share / schema_ids). */
   schema_ids?: number[];
   /** Company that initiated the share (when present on the API). */
-  owner_company?: { id?: string; name?: string } | null;
+  owner_company?: { id?: string; name?: string; serial_number?: string | null } | null;
+  /** Company that the project is shared with. */
+  shared_with_company?: { id?: string; name?: string; serial_number?: string | null } | null;
   shared_by?: { id?: string; name?: string } | null;
+  responded_by?: { id?: string; name?: string } | null;
+  responded_at?: string | null;
   project?: PendingInvitationProject | null;
 };
 

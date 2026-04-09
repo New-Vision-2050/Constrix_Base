@@ -3,7 +3,6 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Box, Typography } from "@mui/material";
-import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import withPermissions from "@/lib/permissions/client/withPermissions";
@@ -26,10 +25,6 @@ import InboxStatsWidgets from "@/modules/projects/inbox/components/InboxStatsWid
 import InboxFiltersBar, {
   type InboxSortPreset,
 } from "@/modules/projects/inbox/components/InboxFiltersBar";
-import {
-  getMockPendingInvitations,
-  inboxUsesMockData,
-} from "@/modules/projects/inbox/mock-pending-invitations";
 import axios from "axios";
 
 const INBOX_QUERY_KEY = "project-inbox-pending";
@@ -88,9 +83,6 @@ function applyInboxSort(
 }
 
 function ProjectsInboxView() {
-  const tProject = useTranslations("project");
-  const tInbox = useTranslations("project.inbox");
-  const tShare = useTranslations("project.share");
   const queryClient = useQueryClient();
 
   const [documentType, setDocumentType] = useState<"all" | InboxTypeKey>("all");
@@ -108,14 +100,9 @@ function ProjectsInboxView() {
     initialSortDirection: "desc",
   });
 
-  const useMock = inboxUsesMockData();
-
   const invitationsQuery = useQuery({
-    queryKey: [INBOX_QUERY_KEY, useMock],
+    queryKey: [INBOX_QUERY_KEY],
     queryFn: async () => {
-      if (useMock) {
-        return getMockPendingInvitations();
-      }
       const res = await ProjectSharingApi.getPendingInvitations();
       return res.data?.payload ?? [];
     },
@@ -135,8 +122,8 @@ function ProjectsInboxView() {
   }, [rawInvitations]);
 
   const allRows = useMemo(() => {
-    return rawInvitations.map((inv) => mapPendingInvitationToRow(inv, tInbox));
-  }, [rawInvitations, tInbox]);
+    return rawInvitations.map((inv) => mapPendingInvitationToRow(inv));
+  }, [rawInvitations]);
 
   const segmentCounts = useMemo(() => countInboxSegments(allRows), [allRows]);
 
@@ -197,32 +184,32 @@ function ProjectsInboxView() {
     queryClient.invalidateQueries({ queryKey: [INBOX_QUERY_KEY] });
   }, [queryClient]);
 
-  const acceptMutation = useMutation({
-    mutationFn: (invitationId: string) =>
-      ProjectSharingApi.acceptInvitation(invitationId),
-    onSuccess: () => {
-      toast.success(tInbox("acceptSuccess"));
+  /** Single POST `invitations/respond` — same as Postman (action: accept | reject). */
+  const respondToShareMutation = useMutation({
+    mutationFn: (vars: {
+      shareId: string;
+      action: "accept" | "reject";
+      comment?: string;
+    }) =>
+      ProjectSharingApi.respondToShareInvitation({
+        share_id: vars.shareId,
+        action: vars.action,
+        comment: vars.comment,
+      }),
+    onSuccess: (_data, vars) => {
+      toast.success(
+        vars.action === "accept"
+          ? "تم قبول الدعوة بنجاح"
+          : "تم رفض الدعوة بنجاح",
+      );
       invalidate();
     },
     onError: (error: unknown) => {
-      toast.error(getApiErrorDescription(error) ?? tInbox("mutationError"));
+      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء العملية");
     },
   });
 
-  const rejectMutation = useMutation({
-    mutationFn: (invitationId: string) =>
-      ProjectSharingApi.rejectInvitation(invitationId),
-    onSuccess: () => {
-      toast.success(tInbox("rejectSuccess"));
-      invalidate();
-    },
-    onError: (error: unknown) => {
-      toast.error(getApiErrorDescription(error) ?? tInbox("mutationError"));
-    },
-  });
-
-  const pendingMutation =
-    acceptMutation.isPending || rejectMutation.isPending;
+  const pendingMutation = respondToShareMutation.isPending;
 
   const openDetails = useCallback((row: ProjectInboxRow) => {
     setDetailsRow(row);
@@ -244,23 +231,14 @@ function ProjectsInboxView() {
   const columns = useMemo(
     () =>
       getInboxColumns({
-        tProject,
-        tInbox,
-        tShare,
         pendingMutation,
-        onAccept: (id) => acceptMutation.mutate(id),
-        onReject: (id) => rejectMutation.mutate(id),
+        onAccept: (id) =>
+          respondToShareMutation.mutate({ shareId: id, action: "accept" }),
+        onReject: (id) =>
+          respondToShareMutation.mutate({ shareId: id, action: "reject" }),
         onView: openDetails,
       }),
-    [
-      tProject,
-      tInbox,
-      tShare,
-      acceptMutation,
-      rejectMutation,
-      pendingMutation,
-      openDetails,
-    ],
+    [respondToShareMutation, pendingMutation, openDetails],
   );
 
   const isFiltered =
@@ -284,53 +262,47 @@ function ProjectsInboxView() {
 
   const filterLabels = useMemo(
     () => ({
-      documentType: tInbox("filterDocumentType"),
-      status: tInbox("filterStatus"),
-      sortBy: tInbox("filterSortBy"),
-      all: tInbox("filterAll"),
-      typeProject: tInbox("typeProject"),
-      typeAttachment: tInbox("typeAttachment"),
-      typeRequest: tInbox("typeRequest"),
-      typeQuote: tInbox("typeQuote"),
-      statusAll: tInbox("filterStatusAll"),
-      statusAwaiting: tInbox("filterStatusAwaiting"),
-      statusInProgress: tInbox("filterStatusInProgress"),
-      statusAccepted: tInbox("filterStatusAccepted"),
-      statusRejected: tInbox("filterStatusRejected"),
-      sortDateNewest: tInbox("sortDateNewest"),
-      sortDateOldest: tInbox("sortDateOldest"),
-      sortNameAsc: tInbox("sortNameAsc"),
-      sortNameDesc: tInbox("sortNameDesc"),
+      documentType: "نوع المستند",
+      status: "الحالة",
+      sortBy: "ترتيب حسب",
+      all: "الكل",
+      typeProject: "مشروع",
+      typeAttachment: "مرفق",
+      typeRequest: "طلب",
+      typeQuote: "عرض سعر",
+      statusAll: "الكل",
+      statusAwaiting: "بانتظار الرد",
+      statusInProgress: "قيد المعالجة",
+      statusAccepted: "مقبول",
+      statusRejected: "مرفوض",
+      sortDateNewest: "الأحدث أولاً",
+      sortDateOldest: "الأقدم أولاً",
+      sortNameAsc: "الاسم (أ-ي)",
+      sortNameDesc: "الاسم (ي-أ)",
     }),
-    [tInbox],
+    [],
   );
 
   const widgetLabels = useMemo(
     () => ({
-      awaiting: tInbox("widgetAwaiting"),
-      rejected: tInbox("widgetRejected"),
-      accepted: tInbox("widgetAccepted"),
-      inProgress: tInbox("widgetInProgress"),
-      total: tInbox("widgetTotal"),
+      awaiting: "بانتظار الرد",
+      rejected: "مرفوض",
+      accepted: "مقبول",
+      inProgress: "قيد المعالجة",
+      total: "الإجمالي",
     }),
-    [tInbox],
+    [],
   );
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-        {tInbox("title")}
+        Inbox
       </Typography>
-
-      {useMock ? (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          {tInbox("mockDataBanner")}
-        </Alert>
-      ) : null}
 
       {invitationsQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {tInbox("loadError")}
+          حدث خطأ أثناء تحميل البيانات
         </Alert>
       ) : null}
 
@@ -348,7 +320,7 @@ function ProjectsInboxView() {
           state.table.searchable ? (
             <InboxTableLayout.Search
               search={state.search}
-              placeholder={tInbox("searchInInbox")}
+              placeholder="البحث في Inbox"
             />
           ) : undefined
         }
@@ -371,15 +343,27 @@ function ProjectsInboxView() {
         invitation={detailsInvitation}
         canRespond={detailsCanRespond}
         actionPending={pendingMutation}
-        onApprove={() => {
+        onApprove={(comment) => {
           if (!detailsRow) return;
-          acceptMutation.mutate(detailsRow.invitationId);
-          closeDetails();
+          respondToShareMutation.mutate(
+            {
+              shareId: detailsRow.invitationId,
+              action: "accept",
+              comment,
+            },
+            { onSuccess: () => closeDetails() },
+          );
         }}
-        onReject={() => {
+        onReject={(comment) => {
           if (!detailsRow) return;
-          rejectMutation.mutate(detailsRow.invitationId);
-          closeDetails();
+          respondToShareMutation.mutate(
+            {
+              shareId: detailsRow.invitationId,
+              action: "reject",
+              comment,
+            },
+            { onSuccess: () => closeDetails() },
+          );
         }}
       />
     </Box>
