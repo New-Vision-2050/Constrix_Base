@@ -32,9 +32,11 @@ import { AvatarGroup } from "../avatar-group";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
+import useCurrentAuthCompany from "@/hooks/use-auth-company";
 
 interface SidebarContentWrapperProps {
   name?: string;
+  serialNumber?: string;
   mainLogo?: string;
   userTypes: UserRoleType[];
   showHeader?: boolean;
@@ -43,6 +45,7 @@ interface SidebarContentWrapperProps {
 
 export function SidebarContentWrapper({
   name,
+  serialNumber,
   mainLogo,
   userTypes,
   showHeader = true,
@@ -55,6 +58,10 @@ export function SidebarContentWrapper({
   const p = usePermissions(),
     { can, isCentralCompany, isSuperAdmin } = p;
   const user = useAuthStore((state) => state.user);
+
+  const { data: companyRes } = useCurrentAuthCompany();
+  const company = companyRes?.payload;
+  const displaySerialNumber = serialNumber || company?.serial_no;
 
   // Helper to get pathname without locale prefix
   const getPathnameWithoutLocale = React.useCallback((pathname: string) => {
@@ -830,6 +837,11 @@ export function SidebarContentWrapper({
             <p className="font-bold truncate">
               {name || t("Sidebar.CompanyName")}
             </p>
+            {displaySerialNumber && (
+              <p className="text-xs opacity-70 truncate font-semibold mt-1">
+                {displaySerialNumber}
+              </p>
+            )}
           </div>
           <div className="flex gap-5 my-5 pr-5">
             <AvatarGroup

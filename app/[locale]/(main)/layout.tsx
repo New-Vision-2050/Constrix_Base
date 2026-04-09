@@ -32,12 +32,14 @@ async function RootLayout({
 
   const companyCookie = cookieStore.get("company-data")?.value;
   const company = companyCookie ? JSON.parse(companyCookie) : null;
+  console.log("COMPANY DATA:", company);
 
   return (
     <Providers>
       <MainLayout
         mainLogo={company?.logo}
         name={company?.name}
+        serialNumber={company?.serial_no}
         userTypes={userTypes}
         isCentral={!!company?.is_central_company}
       >
