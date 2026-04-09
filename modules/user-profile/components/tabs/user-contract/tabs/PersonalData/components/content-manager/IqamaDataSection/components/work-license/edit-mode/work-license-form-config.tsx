@@ -30,15 +30,10 @@ export const WorkLicenseFormConfig = () => {
             type: "text",
             required:true,
             placeholder: t("licenseNumber"),
-             validation: [
+            validation: [
               {
                 type: "required",
                 message: t("licenseNumberRequired"),
-              },
-              {
-                type: "pattern",
-                value: "^[0-9]{10}$",
-                message: t("licenseNumberPattern"),
               },
             ],
           },
