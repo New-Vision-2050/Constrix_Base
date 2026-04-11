@@ -62,6 +62,16 @@ export default function CustomThemeProvider({
         h6: { fontWeight: 700 },
       },
       components: {
+        MuiButtonBase: {
+          defaultProps: {
+            suppressHydrationWarning: true,
+          } as any,
+        },
+        MuiInputBase: {
+          defaultProps: {
+            suppressHydrationWarning: true,
+          } as any,
+        },
         MuiButton: {
           defaultProps: {
             disableElevation: true,

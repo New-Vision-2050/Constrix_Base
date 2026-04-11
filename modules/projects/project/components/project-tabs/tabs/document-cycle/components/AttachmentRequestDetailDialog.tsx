@@ -49,7 +49,14 @@ function formatDisplayDate(value?: string): string {
 }
 
 function normalizeHistoryAction(action: string): string {
-  return action.trim().toLowerCase().replace(/-/g, "_");
+  const norm = action.trim().toLowerCase().replace(/-/g, "_");
+  if (norm === "attachment request created" || norm === "attachment_request_created") {
+    return "request_created";
+  }
+  if (norm.includes("request fully approved")) {
+    return "request_fully_approved";
+  }
+  return norm;
 }
 
 function historyActionLabel(
@@ -60,6 +67,7 @@ function historyActionLabel(
     case "request_created":
       return t("historyActionRequestCreated");
     case "request_approved":
+    case "request_fully_approved":
       return t("historyActionRequestApproved");
     case "request_declined":
       return t("historyActionRequestDeclined");
@@ -75,6 +83,7 @@ function historyActionChipColor(
 ): "primary" | "success" | "error" | "warning" | "default" {
   switch (normalizeHistoryAction(action)) {
     case "request_approved":
+    case "request_fully_approved":
       return "success";
     case "request_declined":
       return "error";
@@ -84,6 +93,27 @@ function historyActionChipColor(
       return "warning";
     default:
       return "default";
+  }
+}
+
+function historyDescriptionLabel(
+  description: string,
+  t: (key: string) => string,
+): string {
+  const norm = normalizeHistoryAction(description);
+  switch (norm) {
+    case "request_created":
+      return t("historyActionRequestCreated");
+    case "request_approved":
+      return t("historyActionRequestApproved");
+    case "request_fully_approved":
+      return t("historyActionRequestFullyApproved");
+    case "request_declined":
+      return t("historyActionRequestDeclined");
+    case "request_update":
+      return t("historyActionRequestUpdate");
+    default:
+      return description;
   }
 }
 
@@ -97,6 +127,7 @@ function historyStepIconPaletteKey(
   | "grey.500" {
   switch (normalizeHistoryAction(action)) {
     case "request_approved":
+    case "request_fully_approved":
       return "success.main";
     case "request_declined":
       return "error.main";
@@ -168,7 +199,7 @@ function HistoryApprovalStepper({
               }}
             >
               <Typography variant="body2" fontWeight={600} color="text.primary">
-                {entry.description}
+                {historyDescriptionLabel(entry.description, t)}
               </Typography>
               <Chip
                 size="small"
@@ -241,7 +272,7 @@ function DetailMain({
   const submissionDisplay = formatDisplayDate(document.submissionDate);
   const descriptionBody = document.description?.trim() || document.name || "—";
   const typeDisplay =
-    document.documentType?.trim() || (variant === "outgoing" ? "مرفق" : "—");
+    document.documentType?.trim() || t("requestTypeAttachment");
 
   const runApprove = () => (onApprove ?? onClose)();
   const runReject = () => (onReject ?? onClose)();
@@ -372,7 +403,7 @@ function DetailMain({
             <Button
               variant="contained"
               color="secondary"
-              disabled={actionPending}
+              disabled={true}
               onClick={runModification}
             >
               {t("requestModification")}
@@ -493,8 +524,7 @@ export default function AttachmentRequestDetailDialog({
     mutationFn: (requestId: string) =>
       AttachmentRequestsApi.approveRequest(requestId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["incoming-attachment-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["outgoing-attachment-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["attachment-requests"] });
       toast.success(t("requestApproveSuccess"));
       onClose();
     },
@@ -510,8 +540,7 @@ export default function AttachmentRequestDetailDialog({
     mutationFn: (requestId: string) =>
       AttachmentRequestsApi.declineRequest(requestId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["incoming-attachment-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["outgoing-attachment-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["attachment-requests"] });
       toast.success(t("requestDeclineSuccess"));
       onClose();
     },

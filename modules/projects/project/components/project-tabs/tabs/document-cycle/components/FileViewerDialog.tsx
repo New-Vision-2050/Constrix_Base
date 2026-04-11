@@ -59,8 +59,7 @@ export default function FileViewerDialog({
     mutationFn: (body: RespondAttachmentItemPayload) =>
       AttachmentRequestsApi.respondToItem(body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["incoming-attachment-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["outgoing-attachment-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["attachment-requests"] });
       toast.success(t("itemRespondSuccess"));
       onClose();
     },
@@ -183,7 +182,7 @@ export default function FileViewerDialog({
 
   const respondPending = respondMutation.isPending;
 
-  /** Above MUI theme zIndex.modal (1300) so this opens on top of OutgoingDetailDialog. */
+  /** Above MUI theme zIndex.modal (1300) so this opens on top of the request detail dialog. */
   const stackedDialogClass = "z-[1600]";
 
   return (

@@ -179,7 +179,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
         typeof msg === "string" && msg.trim() ? msg : t("addSuccess"),
       );
       queryClient.invalidateQueries({
-        queryKey: ["outgoing-attachment-requests"],
+        queryKey: ["attachment-requests"],
       });
       onClose();
     },

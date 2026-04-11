@@ -15,6 +15,7 @@ export default function ProjectDataTab() {
       {/* Search Bar */}
       <div className="relative">
         <input
+          suppressHydrationWarning
           type="text"
           placeholder="بحث"
           className="w-full bg-sidebar border border-gray-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 transition"

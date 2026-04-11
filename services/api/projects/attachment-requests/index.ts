@@ -1,11 +1,13 @@
 import { baseApi } from "@/config/axios/instances/base";
 import {
+  AttachmentRequestsListParams,
   CreateAttachmentRequestData,
   IncomingAttachmentRequestsParams,
   OutgoingAttachmentRequestsParams,
   RespondAttachmentItemPayload,
 } from "./types/params";
 import {
+  GetAttachmentRequestsListResponse,
   GetFolderChildrenResponse,
   GetIncomingAttachmentRequestsResponse,
   GetOutgoingAttachmentRequestsResponse,
@@ -27,6 +29,13 @@ export const AttachmentRequestsApi = {
   getIncoming: (params: IncomingAttachmentRequestsParams) =>
     baseApi.get<GetIncomingAttachmentRequestsResponse>(
       "projects/attachment-requests/incoming",
+      { params },
+    ),
+
+  /** GET `projects/attachment-requests` — combined incoming + outgoing (use row `direction` / `type`) */
+  getList: (params: AttachmentRequestsListParams) =>
+    baseApi.get<GetAttachmentRequestsListResponse>(
+      "projects/attachment-requests",
       { params },
     ),
 

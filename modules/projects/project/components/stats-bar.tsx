@@ -268,7 +268,7 @@ export default function ProjectStatsBar() {
             mb: 0.5,
           }}
         >
-          <IconButton size="small" sx={{ color: "grey.400" }}>
+          <IconButton size="small" sx={{ color: "grey.400" }} suppressHydrationWarning>
             <ZoomIn size={16} />
           </IconButton>
           <Typography sx={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>
