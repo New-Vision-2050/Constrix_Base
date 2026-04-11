@@ -136,6 +136,7 @@ export const projectMessages = new MessagesGroup({
     historyActionRequestCreated: _m("Request created", "تم إنشاء الطلب"),
     historyActionRequestApproved: _m("Request approved", "تم اعتماد الطلب"),
     historyActionRequestFullyApproved: _m("Request fully approved - All attachments approved", "تم اعتماد الطلب بالكامل - تمت الموافقة على جميع المرفقات"),
+    historyActionAttachmentApproved: _m("Attachment approved", "تم اعتماد المرفق"),
     historyActionRequestDeclined: _m("Request declined", "تم رفض الطلب"),
     historyActionRequestUpdate: _m("Request updated", "تم تحديث الطلب"),
     itemRespondSuccess: _m("Response submitted", "تم إرسال الرد"),

@@ -56,6 +56,9 @@ function normalizeHistoryAction(action: string): string {
   if (norm.includes("request fully approved")) {
     return "request_fully_approved";
   }
+  if (norm.includes("attachment approved") || norm.includes("attachment_approved")) {
+    return "attachment_approved";
+  }
   return norm;
 }
 
@@ -68,6 +71,7 @@ function historyActionLabel(
       return t("historyActionRequestCreated");
     case "request_approved":
     case "request_fully_approved":
+    case "attachment_approved":
       return t("historyActionRequestApproved");
     case "request_declined":
       return t("historyActionRequestDeclined");
@@ -84,6 +88,7 @@ function historyActionChipColor(
   switch (normalizeHistoryAction(action)) {
     case "request_approved":
     case "request_fully_approved":
+    case "attachment_approved":
       return "success";
     case "request_declined":
       return "error";
@@ -108,6 +113,8 @@ function historyDescriptionLabel(
       return t("historyActionRequestApproved");
     case "request_fully_approved":
       return t("historyActionRequestFullyApproved");
+    case "attachment_approved":
+      return t("historyActionAttachmentApproved");
     case "request_declined":
       return t("historyActionRequestDeclined");
     case "request_update":
@@ -128,6 +135,7 @@ function historyStepIconPaletteKey(
   switch (normalizeHistoryAction(action)) {
     case "request_approved":
     case "request_fully_approved":
+    case "attachment_approved":
       return "success.main";
     case "request_declined":
       return "error.main";
