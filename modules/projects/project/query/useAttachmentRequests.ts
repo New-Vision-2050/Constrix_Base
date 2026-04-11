@@ -11,8 +11,12 @@ import type {
 import { mapAttachmentRequestFilesToDocumentAttachments } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapAttachmentFiles";
 import { mapAttachmentRequestHistory } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapRequestHistory";
 
+export const ATTACHMENT_REQUESTS_QUERY_KEY = "attachment-requests" as const;
+
 function mapStatus(apiStatus: AttachmentRequestStatus): DocumentStatus {
   switch (apiStatus) {
+    case "draft":
+      return "draft";
     case "approved":
       return "approved";
     case "rejected":
@@ -27,7 +31,30 @@ function mapStatus(apiStatus: AttachmentRequestStatus): DocumentStatus {
   }
 }
 
-function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
+/** API may expose flow as `direction` or as `type` (incoming | outgoing). */
+type AttachmentRequestWithFlow = AttachmentRequest & { type?: string };
+
+function resolveFlow(item: AttachmentRequestWithFlow): "incoming" | "outgoing" {
+  const d = item.direction;
+  if (d === "incoming" || d === "outgoing") return d;
+  const t = item.type?.toLowerCase();
+  if (t === "incoming" || t === "outgoing") return t;
+  return "outgoing";
+}
+
+function resolveSenderName(item: AttachmentRequest): string {
+  return (
+    item.sender_company?.name?.trim() ||
+    item.created_by?.name?.trim() ||
+    "—"
+  );
+}
+
+function resolveReceiverName(item: AttachmentRequest): string {
+  return item.receiver_company?.name?.trim() || "—";
+}
+
+function mapToDocumentRow(item: AttachmentRequestWithFlow): DocumentRow {
   const preview = item.attachments_preview ?? item.items ?? [];
   const firstFile = preview[0];
   const docCount =
@@ -40,6 +67,8 @@ function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
       ? mapAttachmentRequestFilesToDocumentAttachments(preview)
       : undefined;
 
+  const flow = resolveFlow(item);
+
   return {
     id: item.id,
     serialNumber: item.serial_number,
@@ -51,6 +80,9 @@ function mapToDocumentRow(item: AttachmentRequest): DocumentRow {
     status: mapStatus(item.status),
     submissionDate: item.date,
     approvalStatus: item.status,
+    flow,
+    senderName: resolveSenderName(item),
+    receiverName: resolveReceiverName(item),
     project: item.project
       ? {
           id: item.project.id,
@@ -72,45 +104,56 @@ function attachmentRequestsListFromBody(body: {
   return Array.isArray(raw) ? raw : [];
 }
 
-export interface UseIncomingAttachmentsParams {
+export interface UseAttachmentRequestsParams {
   projectId: string | undefined;
   page: number;
   perPage: number;
   documentType?: string;
   type?: string;
   endDate?: string;
+  direction?: "" | "incoming" | "outgoing";
 }
 
-export const incomingAttachmentsQueryKey = (
-  params: UseIncomingAttachmentsParams,
-) => ["incoming-attachment-requests", params] as const;
+export const attachmentRequestsQueryKey = (params: UseAttachmentRequestsParams) =>
+  [ATTACHMENT_REQUESTS_QUERY_KEY, params] as const;
 
-export interface IncomingAttachmentsResult {
+export interface AttachmentRequestsResult {
   data: DocumentRow[];
   totalPages: number;
   totalItems: number;
 }
 
-export function useIncomingAttachments(params: UseIncomingAttachmentsParams) {
-  const { projectId, page, perPage, documentType, type, endDate } = params;
+export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
+  const {
+    projectId,
+    page,
+    perPage,
+    documentType,
+    type,
+    endDate,
+    direction,
+  } = params;
 
   return useQuery({
-    queryKey: incomingAttachmentsQueryKey(params),
-    queryFn: async (): Promise<IncomingAttachmentsResult> => {
-      const res = await AttachmentRequestsApi.getIncoming({
+    queryKey: attachmentRequestsQueryKey(params),
+    queryFn: async (): Promise<AttachmentRequestsResult> => {
+      const res = await AttachmentRequestsApi.getList({
         project_id: projectId!,
         page,
         per_page: perPage,
         ...(documentType ? { document_type: documentType } : {}),
-        ...(type         ? { type }                        : {}),
-        ...(endDate      ? { end_date: endDate }           : {}),
+        ...(type ? { type } : {}),
+        ...(endDate ? { end_date: endDate } : {}),
+        ...(direction === "incoming" || direction === "outgoing"
+          ? { direction }
+          : {}),
       });
 
       const body = res.data;
       const rows = attachmentRequestsListFromBody(body);
 
       return {
-        data: rows.map(mapToDocumentRow),
+        data: rows.map((r) => mapToDocumentRow(r as AttachmentRequestWithFlow)),
         totalPages: body.pagination?.last_page ?? 1,
         totalItems: body.pagination?.result_count ?? rows.length,
       };

@@ -64,6 +64,8 @@ export const ProjectAttachmentsApi = {
     }
     if (sort) params.sort = sort;
 
+    params.withoutTenancy = 1;
+
     const res = await apiClient.get<FolderContentsResponse>(`/folders/contents`, {
       params,
     });

@@ -3,7 +3,8 @@ export type AttachmentRequestStatus =
   | "approved"
   | "semi-approved"
   | "rejected"
-  | "declined";
+  | "declined"
+  | "draft";
 
 export interface AttachmentRequestItem {
   id: string;
@@ -63,6 +64,11 @@ export interface AttachmentRequest {
   date: string;
   project_id: string;
   status: AttachmentRequestStatus;
+  /**
+   * Unified list: incoming vs outgoing. Laravel may send `type` instead of `direction`.
+   */
+  direction?: "incoming" | "outgoing";
+  type?: "incoming" | "outgoing";
   attachment_type_id: string | null;
   attachment_sub_type_id: string | null;
   attachment_sub_sub_type_id: string | null;
@@ -103,6 +109,18 @@ export interface GetOutgoingAttachmentRequestsResponse {
 }
 
 export interface GetIncomingAttachmentRequestsResponse {
+  data?: AttachmentRequest[];
+  payload?: AttachmentRequest[];
+  pagination?: {
+    page: number;
+    next_page: number;
+    last_page: number;
+    result_count: number;
+  };
+}
+
+/** GET `projects/attachment-requests` — same envelope as incoming/outgoing lists */
+export interface GetAttachmentRequestsListResponse {
   data?: AttachmentRequest[];
   payload?: AttachmentRequest[];
   pagination?: {

@@ -6,14 +6,44 @@ import { DocumentStatus } from "../types";
 
 const STATUS_CONFIG: Record<
   DocumentStatus,
-  { labelKey: string; color: "default" | "success" | "warning" | "error" }
+  { labelKey: string; color: string; borderColor: string; bgColor: string }
 > = {
-  draft: { labelKey: "draft", color: "default" },
-  pending: { labelKey: "pending", color: "default" },
-  approved: { labelKey: "approved", color: "success" },
-  semi_approved: { labelKey: "partiallyApproved", color: "warning" },
-  partially_approved: { labelKey: "partiallyApproved", color: "warning" },
-  declined: { labelKey: "declined", color: "error" },
+  draft: {
+    labelKey: "draft",
+    color: "#9CA3AF", // Gray
+    borderColor: "rgba(156, 163, 175, 0.3)",
+    bgColor: "rgba(156, 163, 175, 0.1)",
+  },
+  pending: {
+    labelKey: "pending",
+    color: "#F59E0B", // Yellow/Warning
+    borderColor: "rgba(245, 158, 11, 0.3)",
+    bgColor: "rgba(245, 158, 11, 0.1)",
+  },
+  approved: {
+    labelKey: "approved",
+    color: "#10B981", // Green/Success
+    borderColor: "rgba(16, 185, 129, 0.3)",
+    bgColor: "rgba(16, 185, 129, 0.1)",
+  },
+  semi_approved: {
+    labelKey: "partiallyApproved",
+    color: "#3B82F6", // Blue/Info
+    borderColor: "rgba(59, 130, 246, 0.3)",
+    bgColor: "rgba(59, 130, 246, 0.1)",
+  },
+  partially_approved: {
+    labelKey: "partiallyApproved",
+    color: "#3B82F6", // Blue/Info
+    borderColor: "rgba(59, 130, 246, 0.3)",
+    bgColor: "rgba(59, 130, 246, 0.1)",
+  },
+  declined: {
+    labelKey: "declined",
+    color: "#EF4444", // Red/Danger
+    borderColor: "rgba(239, 68, 68, 0.3)",
+    bgColor: "rgba(239, 68, 68, 0.1)",
+  },
 };
 
 interface StatusBadgeProps {
@@ -28,9 +58,20 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     <Chip
       label={t(config.labelKey)}
       size="small"
-      color={config.color}
       variant="outlined"
-      sx={{ minWidth: 80, py: 2 }}
+      sx={{
+        minWidth: 80,
+        py: 1.5,
+        borderRadius: "16px",
+        fontWeight: 500,
+        borderWidth: 1,
+        color: config.color,
+        borderColor: config.borderColor,
+        backgroundColor: config.bgColor,
+        "& .MuiChip-label": {
+          px: 2,
+        },
+      }}
     />
   );
 }

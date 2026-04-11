@@ -1,34 +1,103 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Box, Button, Stack, TextField, MenuItem } from "@mui/material";
+import { useMemo, useState } from "react";
+import { Box, Button, Stack, TextField, MenuItem, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useAttachmentRequests } from "@/modules/projects/project/query/useAttachmentRequests";
 import { DocumentRow } from "../types";
 import StatusBadge from "./StatusBadge";
-import AttachmentDetailDialog from "./AttachmentDetailDialog";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
-import { useIncomingAttachments } from "@/modules/projects/project/query/useIncomingAttachments";
+import AddFileDialog from "./AddFileDialog";
+import AttachmentRequestDetailDialog from "./AttachmentRequestDetailDialog";
 
-const IncomingTableLayout = HeadlessTableLayout<DocumentRow>("incoming-docs");
+const TableLayout = HeadlessTableLayout<DocumentRow>("attachment-requests-table");
 
-interface IncomingAttachmentsProps {
-  onTotalItemsChange?: (count: number) => void;
+const filterSx = {
+  flex: 1,
+  "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+} as const;
+
+function RequestFlowCell({ row, t }: { row: DocumentRow; t: (key: string) => string }) {
+  if (row.status === "draft") {
+    return (
+      <Box
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          px: 1.5,
+          py: 0.5,
+          borderRadius: "6px",
+          bgcolor: "warning.main",
+          color: "warning.contrastText",
+          fontWeight: 600,
+          fontSize: "0.8rem",
+          minWidth: 50,
+        }}
+      >
+        {t("draft")}
+      </Box>
+    );
+  }
+  const incoming = row.flow === "incoming";
+  return (
+    <Box
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        px: 1.5,
+        py: 0.5,
+        borderRadius: "6px",
+        bgcolor: incoming ? "#1E40AF" : "success.main",
+        color: "#fff",
+        fontWeight: 600,
+        fontSize: "0.8rem",
+        minWidth: 50,
+      }}
+    >
+      {incoming ? t("requestTypeIncoming") : t("requestTypeOutgoing")}
+    </Box>
+  );
 }
 
-export default function IncomingAttachments({
-  onTotalItemsChange,
-}: IncomingAttachmentsProps) {
+export default function AttachmentRequestsTable() {
   const t = useTranslations("project.documentCycle");
   const { projectId } = useProject();
+
+  const [addFileOpen, setAddFileOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentRow | null>(
     null,
   );
+
   const [filterDocType, setFilterDocType] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterEndDate, setFilterEndDate] = useState("");
+  const [filterDirection, setFilterDirection] = useState<
+    "" | "incoming" | "outgoing"
+  >("");
+
+  const params = TableLayout.useTableParams({
+    initialPage: 1,
+    initialLimit: 10,
+  });
+
+  const { data: queryResult, isLoading } = useAttachmentRequests({
+    projectId,
+    page: params.page,
+    perPage: params.limit,
+    documentType: filterDocType || undefined,
+    type: filterType || undefined,
+    endDate: filterEndDate || undefined,
+    direction: filterDirection,
+  });
+
+  const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
+  const totalPages = queryResult?.totalPages ?? 1;
+  const totalItems = queryResult?.totalItems ?? 0;
 
   const handleView = (row: DocumentRow) => {
     setSelectedDocument(row);
@@ -40,8 +109,32 @@ export default function IncomingAttachments({
     setSelectedDocument(null);
   };
 
-  const baseColumns = useMemo(
+  const columns = useMemo(
     () => [
+      {
+        key: "requestFlow",
+        name: t("requestFlowColumn"),
+        sortable: false,
+        render: (row: DocumentRow) => (
+          <RequestFlowCell row={row} t={t} />
+        ),
+      },
+      {
+        key: "sender",
+        name: t("sender"),
+        sortable: false,
+        render: (row: DocumentRow) => (
+          <span>{row.senderName?.trim() || "—"}</span>
+        ),
+      },
+      {
+        key: "receiver",
+        name: t("counterpartyColumn"),
+        sortable: false,
+        render: (row: DocumentRow) => (
+          <span>{row.receiverName?.trim() || "—"}</span>
+        ),
+      },
       {
         key: "name",
         name: t("documentName"),
@@ -75,35 +168,6 @@ export default function IncomingAttachments({
         sortable: false,
         render: (row: DocumentRow) => <StatusBadge status={row.status} />,
       },
-    ],
-    [t],
-  );
-
-  const params = IncomingTableLayout.useTableParams({
-    initialPage: 1,
-    initialLimit: 10,
-  });
-
-  const { data: queryResult, isLoading } = useIncomingAttachments({
-    projectId,
-    page: params.page,
-    perPage: params.limit,
-    documentType: filterDocType || undefined,
-    type: filterType || undefined,
-    endDate: filterEndDate || undefined,
-  });
-
-  const data = queryResult?.data ?? [];
-  const totalPages = queryResult?.totalPages ?? 1;
-  const totalItems = queryResult?.totalItems ?? 0;
-
-  useEffect(() => {
-    onTotalItemsChange?.(totalItems);
-  }, [totalItems, onTotalItemsChange]);
-
-  const columns = useMemo(
-    () => [
-      ...baseColumns,
       {
         key: "actions",
         name: t("actions"),
@@ -132,10 +196,10 @@ export default function IncomingAttachments({
         ),
       },
     ],
-    [baseColumns, t],
+    [t],
   );
 
-  const state = IncomingTableLayout.useTableState({
+  const state = TableLayout.useTableState({
     data,
     columns,
     totalPages,
@@ -148,21 +212,16 @@ export default function IncomingAttachments({
     onExport: async () => {},
   });
 
-  const filterSx = {
-    flex: 1,
-    "& .MuiOutlinedInput-root": {
-      borderRadius: "8px",
-    },
-  };
+  const detailVariant =
+    selectedDocument?.flow === "incoming" ? "incoming" : "outgoing";
 
   return (
     <>
       <Box>
-        <IncomingTableLayout
+        <TableLayout
           filters={
             <Stack spacing={2}>
-              {/* Filter row */}
-              <Stack direction="row" spacing={2}>
+              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
                 <TextField
                   select
                   size="small"
@@ -196,6 +255,24 @@ export default function IncomingAttachments({
                 </TextField>
 
                 <TextField
+                  select
+                  size="small"
+                  label={t("requestDirectionFilter")}
+                  value={filterDirection}
+                  onChange={(e) => {
+                    setFilterDirection(
+                      e.target.value as "" | "incoming" | "outgoing",
+                    );
+                    params.setPage(1);
+                  }}
+                  sx={filterSx}
+                >
+                  <MenuItem value="">{t("all")}</MenuItem>
+                  <MenuItem value="outgoing">{t("requestTypeOutgoing")}</MenuItem>
+                  <MenuItem value="incoming">{t("requestTypeIncoming")}</MenuItem>
+                </TextField>
+
+                <TextField
                   size="small"
                   label={t("endDate")}
                   type="date"
@@ -209,24 +286,36 @@ export default function IncomingAttachments({
                 />
               </Stack>
 
-              {/* TopActions bar */}
-              <IncomingTableLayout.TopActions state={state} />
+              <TableLayout.TopActions
+                state={state}
+                customActions={
+                  <Button
+                    variant="contained"
+                    onClick={() => setAddFileOpen(true)}
+                  >
+                    {t("addFile")}
+                  </Button>
+                }
+              />
             </Stack>
           }
           table={
-            <IncomingTableLayout.Table
+            <TableLayout.Table
               state={state}
               loadingOptions={{ rows: 5 }}
             />
           }
-          pagination={<IncomingTableLayout.Pagination state={state} />}
+          pagination={<TableLayout.Pagination state={state} />}
         />
       </Box>
 
-      <AttachmentDetailDialog
+      <AddFileDialog open={addFileOpen} onClose={() => setAddFileOpen(false)} />
+
+      <AttachmentRequestDetailDialog
         open={detailDialogOpen}
         onClose={handleCloseDetail}
         document={selectedDocument}
+        variant={detailVariant}
       />
     </>
   );

@@ -41,6 +41,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("group relative", containerClassName)}>
         <input
+          suppressHydrationWarning
           type={inputType}
           id={label}
           placeholder=" "

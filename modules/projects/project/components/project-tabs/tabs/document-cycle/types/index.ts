@@ -56,6 +56,15 @@ export interface DocumentRow {
   lastActivityUser: string;
   lastActivityDate: string;
   status: DocumentStatus;
+  /**
+   * Unified `projects/attachment-requests` list: incoming vs outgoing.
+   * Omitted for legacy rows (e.g. mocks).
+   */
+  flow?: "incoming" | "outgoing";
+  /** `sender_company.name` (fallback: created user name). */
+  senderName?: string;
+  /** `receiver_company.name` — shown under الجهة. */
+  receiverName?: string;
   /** Present when the attachment-requests API embeds `project`. */
   project?: DocumentRowProject | null;
   documentType?: string;
