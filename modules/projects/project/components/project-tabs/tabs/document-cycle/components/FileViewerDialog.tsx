@@ -85,30 +85,27 @@ export default function FileViewerDialog({
   }, [open, activeFile?.id]);
 
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState(false);
 
   useEffect(() => {
     if (!open || !activeFile?.url) {
       setPreviewSrc(null);
-      setPreviewLoading(false);
-      setPreviewError(false);
       return;
     }
 
     const kind = getFilePreviewKind(activeFile);
     if (kind !== "pdf" && kind !== "image") {
       setPreviewSrc(null);
-      setPreviewLoading(false);
-      setPreviewError(false);
       return;
     }
 
-    // The user's system works fine when embedding the URL directly (as seen in publicDocs DocViewDialog).
-    // Bypassing XHR blob fetch avoids CORS/Interceptor issues that cause "1 error".
-    setPreviewSrc(activeFile.url);
-    setPreviewLoading(false);
-    setPreviewError(false);
+    // If we are on HTTPS, ensure the URL is also HTTPS to avoid Mixed Content errors in production.
+    let finalUrl = activeFile.url;
+    if (typeof window !== "undefined" && window.location.protocol === "https:") {
+      finalUrl = finalUrl.replace(/^http:\/\//i, "https://");
+    }
+
+    // Embed URL directly to bypass issues and simplify logic.
+    setPreviewSrc(finalUrl);
 
     return () => {
       setPreviewSrc(null);
@@ -463,113 +460,35 @@ export default function FileViewerDialog({
                   >
                     {previewKind === "pdf" && activeFile.url ? (
                       <>
-                        {previewLoading ? (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              minHeight: 400,
-                              width: "100%",
-                            }}
-                          >
-                            <CircularProgress />
-                          </Box>
-                        ) : null}
-                        {previewError && !previewLoading ? (
-                          <Box sx={{ p: 4, textAlign: "center" }}>
-                            <Typography
-                              variant="body2"
-                              color="error"
-                              sx={{ mb: 2 }}
-                            >
-                              {t("previewLoadError")}
-                            </Typography>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                window.open(
-                                  activeFile.url,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                )
-                              }
-                            >
-                              {t("openInNewTab")}
-                            </Button>
-                          </Box>
-                        ) : null}
-                        {!previewLoading && !previewError && previewSrc ? (
-                          <Box
-                            component="iframe"
-                            src={previewSrc}
-                            title={activeFile.name}
-                            sx={{
-                              width: "100%",
-                              height: "min(70vh, 720px)",
-                              minHeight: 400,
-                              border: 0,
-                              display: "block",
-                            }}
-                          />
-                        ) : null}
+                        <Box
+                          component="iframe"
+                          src={previewSrc || activeFile.url}
+                          title={activeFile.name}
+                          sx={{
+                            width: "100%",
+                            height: "min(70vh, 720px)",
+                            minHeight: 400,
+                            border: 0,
+                            display: "block",
+                          }}
+                        />
                       </>
                     ) : null}
                     {previewKind === "image" && activeFile.url ? (
                       <>
-                        {previewLoading ? (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              minHeight: 280,
-                              width: "100%",
-                            }}
-                          >
-                            <CircularProgress />
-                          </Box>
-                        ) : null}
-                        {previewError && !previewLoading ? (
-                          <Box sx={{ p: 4, textAlign: "center" }}>
-                            <Typography
-                              variant="body2"
-                              color="error"
-                              sx={{ mb: 2 }}
-                            >
-                              {t("previewLoadError")}
-                            </Typography>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                window.open(
-                                  activeFile.url,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                )
-                              }
-                            >
-                              {t("openInNewTab")}
-                            </Button>
-                          </Box>
-                        ) : null}
-                        {!previewLoading && !previewError && previewSrc ? (
-                          <Box
-                            component="img"
-                            src={previewSrc}
-                            alt={activeFile.name}
-                            sx={{
-                              maxWidth: "100%",
-                              maxHeight: "70vh",
-                              width: "auto",
-                              height: "auto",
-                              objectFit: "contain",
-                              display: "block",
-                            }}
-                          />
-                        ) : null}
+                        <Box
+                          component="img"
+                          src={previewSrc || activeFile.url}
+                          alt={activeFile.name}
+                          sx={{
+                            maxWidth: "100%",
+                            maxHeight: "70vh",
+                            width: "auto",
+                            height: "auto",
+                            objectFit: "contain",
+                            display: "block",
+                          }}
+                        />
                       </>
                     ) : null}
                     {previewKind === "other" ? (
