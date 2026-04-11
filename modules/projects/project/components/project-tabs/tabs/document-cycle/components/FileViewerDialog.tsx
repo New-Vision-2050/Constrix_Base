@@ -87,14 +87,9 @@ export default function FileViewerDialog({
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState(false);
-  const previewBlobRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!open || !activeFile?.url) {
-      if (previewBlobRef.current) {
-        URL.revokeObjectURL(previewBlobRef.current);
-        previewBlobRef.current = null;
-      }
       setPreviewSrc(null);
       setPreviewLoading(false);
       setPreviewError(false);
@@ -103,46 +98,19 @@ export default function FileViewerDialog({
 
     const kind = getFilePreviewKind(activeFile);
     if (kind !== "pdf" && kind !== "image") {
-      if (previewBlobRef.current) {
-        URL.revokeObjectURL(previewBlobRef.current);
-        previewBlobRef.current = null;
-      }
       setPreviewSrc(null);
       setPreviewLoading(false);
       setPreviewError(false);
       return;
     }
 
-    let cancelled = false;
-    setPreviewLoading(true);
+    // The user's system works fine when embedding the URL directly (as seen in publicDocs DocViewDialog).
+    // Bypassing XHR blob fetch avoids CORS/Interceptor issues that cause "1 error".
+    setPreviewSrc(activeFile.url);
+    setPreviewLoading(false);
     setPreviewError(false);
 
-    createAuthenticatedPreviewUrl(activeFile.url)
-      .then((url) => {
-        if (cancelled) {
-          if (url.startsWith("blob:")) URL.revokeObjectURL(url);
-          return;
-        }
-        if (previewBlobRef.current) {
-          URL.revokeObjectURL(previewBlobRef.current);
-          previewBlobRef.current = null;
-        }
-        if (url.startsWith("blob:")) previewBlobRef.current = url;
-        setPreviewSrc(url);
-      })
-      .catch(() => {
-        if (!cancelled) setPreviewError(true);
-      })
-      .finally(() => {
-        if (!cancelled) setPreviewLoading(false);
-      });
-
     return () => {
-      cancelled = true;
-      if (previewBlobRef.current) {
-        URL.revokeObjectURL(previewBlobRef.current);
-        previewBlobRef.current = null;
-      }
       setPreviewSrc(null);
     };
     // Intentionally key off id/url/type/name — not `activeFile` reference — to avoid refetch when parent re-renders with a new object.
@@ -377,7 +345,7 @@ export default function FileViewerDialog({
               )}
 
               {/* Action Buttons for Incoming */}
-              {isIncoming && (
+              {isIncoming && document?.approvalStatus !== "approved" && (
                 <Box
                   sx={{
                     display: "flex",
@@ -396,7 +364,7 @@ export default function FileViewerDialog({
                   <Button
                     className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
                     onClick={handleRequestModification}
-                    disabled={respondPending}
+                    disabled={true}
                   >
                     ✎ {t("requestModification")}
                   </Button>
