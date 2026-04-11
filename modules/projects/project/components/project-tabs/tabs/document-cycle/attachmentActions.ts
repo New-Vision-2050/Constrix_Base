@@ -26,8 +26,11 @@ export async function createAuthenticatedPreviewUrl(rawUrl: string): Promise<str
 
 /** Opens the file URL for download (new tab / save). Cross-origin URLs may open in-browser instead of forcing download. */
 export function downloadAttachmentFile(file: { url: string; name: string }): void {
-  const url = file.url?.trim();
+  let url = file.url?.trim();
   if (!url) return;
+  if (typeof window !== "undefined" && window.location.protocol === "https:") {
+    url = url.replace(/^http:\/\//i, "https://");
+  }
   const a = document.createElement("a");
   a.href = url;
   a.setAttribute("download", file.name || "attachment");
