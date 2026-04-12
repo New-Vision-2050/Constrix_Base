@@ -35,7 +35,7 @@ async function RootLayout({
   console.log("COMPANY DATA:", company);
 
   return (
-    <Providers>
+    <Providers companyId={company?.id}>
       <MainLayout
         mainLogo={company?.logo}
         name={company?.name}

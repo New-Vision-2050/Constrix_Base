@@ -33,6 +33,7 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
+import InboxIconWithCount from "@/components/icons/inbox";
 
 interface SidebarContentWrapperProps {
   name?: string;
@@ -248,7 +249,7 @@ export function SidebarContentWrapper({
           {
             name: t("Sidebar.Inbox"),
             url: ROUTER.PROJECTS_INBOX,
-            icon: Inbox,
+            icon: InboxIconWithCount,
             isActive: fullPath.startsWith(ROUTER.PROJECTS_INBOX),
             show: !isCentralCompany,
           },
@@ -382,9 +383,8 @@ export function SidebarContentWrapper({
             icon: FileText,
             isActive: fullPath === ROUTER.CRM.pricesOffers,
             show: can([PERMISSIONS.crm.pricesOffers.list]),
-          }
+          },
         ],
-        
       },
       {
         name: t("Sidebar.docs-library"),
