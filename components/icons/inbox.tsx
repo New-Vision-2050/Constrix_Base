@@ -19,11 +19,11 @@ function InboxIconWithCount() {
   useEffect(() => {
     echo?.listen(
       companyChannelName,
-      "resource.shared",
+      ".resource.shared",
       pendingSharesCountQuery.refetch,
     );
     return () => {
-      echo?.stopListening(companyChannelName, "resource.shared");
+      echo?.stopListening(companyChannelName, ".resource.shared");
     };
   }, [echo, companyChannelName]);
 

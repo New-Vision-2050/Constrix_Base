@@ -104,7 +104,7 @@ export function EchoProvider({
       .listenToAll((eventName: string, data: unknown) => {
         console.log(`[Echo] 📡 [${companyChannel}]`, eventName, data);
       })
-      .listen("resource.shared", (e: ResourceSharedPayload) => {
+      .listen(".resource.shared", (e: ResourceSharedPayload) => {
         toast.info(`${e.shared_by.name} shared "${e.resource_name}" with you`, {
           description: [
             e.owner_company_name,
