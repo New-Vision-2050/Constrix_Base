@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Box, Button, Stack, TextField, MenuItem, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
@@ -11,6 +11,7 @@ import { DocumentRow } from "../types";
 import StatusBadge from "./StatusBadge";
 import AddFileDialog from "./AddFileDialog";
 import AttachmentRequestDetailDialog from "./AttachmentRequestDetailDialog";
+import { EyeIcon } from "lucide-react";
 
 const TableLayout = HeadlessTableLayout<DocumentRow>("attachment-requests-table");
 
@@ -191,6 +192,7 @@ export default function AttachmentRequestsTable() {
               onClick={() => handleView(row)}
             >
               {t("view")}
+              <EyeIcon className="h-4 w-4 ms-2" />
             </Button>
           </CustomMenu>
         ),
