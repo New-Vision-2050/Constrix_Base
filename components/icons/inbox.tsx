@@ -22,6 +22,9 @@ function InboxIconWithCount() {
       "resource.shared",
       pendingSharesCountQuery.refetch,
     );
+    return () => {
+      echo?.stopListening(companyChannelName, "resource.shared");
+    };
   }, [echo, companyChannelName]);
 
   return (
