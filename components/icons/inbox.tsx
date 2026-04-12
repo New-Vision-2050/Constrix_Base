@@ -17,15 +17,18 @@ function InboxIconWithCount() {
   const { echo, companyChannelName } = useEcho();
 
   useEffect(() => {
-    echo?.listen(
-      companyChannelName,
-      ".resource.shared",
-      pendingSharesCountQuery.refetch,
-    );
+    if (!echo) return;
+
+    echo
+      .channel(companyChannelName)
+      .listen(".resource.shared", pendingSharesCountQuery.refetch);
+
     return () => {
-      echo?.stopListening(companyChannelName, ".resource.shared");
+      echo
+        .channel(companyChannelName)
+        .stopListening(".resource.shared", pendingSharesCountQuery.refetch);
     };
-  }, [echo, companyChannelName]);
+  }, [echo, companyChannelName, pendingSharesCountQuery.refetch]);
 
   return (
     <Badge

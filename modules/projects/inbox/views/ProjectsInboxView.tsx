@@ -184,6 +184,7 @@ function ProjectsInboxView() {
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: [INBOX_QUERY_KEY] });
+    queryClient.invalidateQueries({ queryKey: ["pendingSharesCount"] });
   }, [queryClient]);
 
   /** Single POST `invitations/respond` — same as Postman (action: accept | reject). */
