@@ -3,6 +3,7 @@ import { CompanyData } from "@/modules/company-profile/types/company";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { OrgChartNode } from "@/types/organization";
+import { buildCloneDepartmentPayload } from "./clone-department-payload";
 
 type PropsT = {
   isEdit?: boolean;
@@ -17,12 +18,9 @@ type PropsT = {
 export function CloneManagement(props: PropsT): FormConfig {
   const {
     isEdit = false,
-    isUserCompanyOwner,
-    companyOwnerId,
     selectedNode,
     branchId,
     onClose,
-    companyData,
   } = props;
 
   const _config: FormConfig = {
@@ -85,9 +83,8 @@ export function CloneManagement(props: PropsT): FormConfig {
             label: "الشخص المرجعي",
             type: "select",
             placeholder: "الشخص المرجعي",
-            disabled: isUserCompanyOwner,
             dynamicOptions: {
-              url: `${baseURL}/users`,
+              url: `${baseURL}/company-users/employees`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -100,16 +97,13 @@ export function CloneManagement(props: PropsT): FormConfig {
             label: "اسم المدير",
             type: "select",
             placeholder: "اسم المدير",
-            disabled: isUserCompanyOwner,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/user-lower-levels`,
+              url: `${baseURL}/company-users/employees`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
-              dependsOn: "reference_user_id",
-              filterParam: "user_id",
             },
           },
           {
@@ -118,14 +112,15 @@ export function CloneManagement(props: PropsT): FormConfig {
             type: "select",
             placeholder: "نائب المدير",
             isMulti: true,
-            disabled: isUserCompanyOwner,
             dynamicOptions: {
-              url: `${baseURL}/users`,
+              url: `${baseURL}/management_hierarchies/user-lower-levels`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
+              dependsOn: "manager_id",
+              filterParam: "user_id",
             },
           },
           // {
@@ -153,12 +148,7 @@ export function CloneManagement(props: PropsT): FormConfig {
     },
     onSubmit: async (formData) => {
       const method = "POST";
-      const reqBody = {
-        source_department_id: formData.source_department_id,
-        target_parent_id: formData.target_parent_id,
-        clone_sub_departments: false,
-        clone_managers: false,
-      };
+      const reqBody = buildCloneDepartmentPayload(formData);
 
       return await defaultSubmitHandler(reqBody, _config, {
         method: method,

@@ -2,6 +2,7 @@ import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { OrgChartNode } from "@/types/organization";
+import { buildCloneDepartmentPayload } from "./clone-department-payload";
 
 type PropsT = {
   isEdit?: boolean;
@@ -152,12 +153,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
     },
     onSubmit: async (formData) => {
       const method = "POST";
-      const reqBody = {
-        source_department_id: formData.source_department_id,
-        target_parent_id: formData.target_parent_id,
-        clone_sub_departments: false,
-        clone_managers: false,
-      };
+      const reqBody = buildCloneDepartmentPayload(formData);
 
       return await defaultSubmitHandler(reqBody, _config, {
         method: method,
