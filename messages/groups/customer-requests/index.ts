@@ -90,6 +90,27 @@ export const clientRequestsMessages = new MessagesGroup({
     attachmentsDone: _m("Done", "تم"),
     attachmentsCancel: _m("Cancel", "إلغاء"),
   }),
+  inbox: new MessagesGroup({
+    dialogSubtitle: _m(
+      "Review and manage client requests",
+      "مراجعة وإدارة طلبات العملاء",
+    ),
+    toastAcceptSuccess: _m(
+      "Request accepted successfully",
+      "تم قبول الطلب بنجاح",
+    ),
+    toastRejectSuccess: _m(
+      "Request rejected successfully",
+      "تم رفض الطلب بنجاح",
+    ),
+    toastOperationError: _m(
+      "An error occurred during the operation",
+      "حدث خطأ أثناء العملية",
+    ),
+    viewDetails: _m("View details", "عرض التفاصيل"),
+    servicesSelected: _m("Selected services", "الخدمات المختارة"),
+    closeDialog: _m("Close", "إغلاق"),
+  }),
   dialog: new MessagesGroup({
     sendAs: _m("Send As", "أرسال ك"),
     send: _m("Send", "ارسال"),

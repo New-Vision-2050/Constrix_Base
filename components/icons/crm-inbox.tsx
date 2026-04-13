@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { ClientRequestsApi } from "@/services/api/client-requests";
 import { useEcho } from "@/hooks/use-echo";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
+import {
+  CLIENT_REQUEST_INBOX_ECHO_EVENTS,
+  getClientRequestUserChannelName,
+} from "@/modules/crm-settings/inbox/client-request-inbox-realtime";
 import { Badge, Box } from "@mui/material";
 import { keyframes } from "@mui/material/styles";
 import { useQuery } from "@tanstack/react-query";
@@ -29,11 +33,6 @@ export const CRM_INBOX_PENDING_COUNT_QUERY_KEY = [
   "crm-inbox-pending-count",
 ] as const;
 
-export const CRM_CLIENT_REQUEST_INBOX_EVENTS = [
-  ".client-request.created",
-  ".client-request.status-changed",
-] as const;
-
 function CrmInboxIconWithCount() {
   const userId = useAuthStore((s) => s.user?.id);
   const { echo } = useEcho();
@@ -54,18 +53,18 @@ function CrmInboxIconWithCount() {
   useEffect(() => {
     if (!echo || !userId) return;
 
-    const channelName = `client-request.${userId}`;
+    const channelName = getClientRequestUserChannelName(userId);
     const refetch = () => {
       void pendingCountQuery.refetch();
     };
 
     const channel = echo.private(channelName);
-    for (const event of CRM_CLIENT_REQUEST_INBOX_EVENTS) {
+    for (const event of CLIENT_REQUEST_INBOX_ECHO_EVENTS) {
       channel.listen(event, refetch);
     }
 
     return () => {
-      for (const event of CRM_CLIENT_REQUEST_INBOX_EVENTS) {
+      for (const event of CLIENT_REQUEST_INBOX_ECHO_EVENTS) {
         channel.stopListening(event, refetch);
       }
       echo.leave(channelName);

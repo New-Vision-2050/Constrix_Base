@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -10,13 +10,16 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-import { Trash2 } from "lucide-react";
+import { EyeIcon, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
 import Can from "@/lib/permissions/client/Can";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
@@ -26,20 +29,37 @@ import { RequestFormDrawer } from "./components/RequestFormDrawer";
 import { ClientRequestsApi } from "@/services/api/client-requests";
 import { CRM_INBOX_PENDING_COUNT_QUERY_KEY } from "@/components/icons/crm-inbox";
 import { CRM_INBOX_LIST_QUERY_KEY } from "@/modules/crm-settings/query-keys";
+import CrmInboxDetailsDialog from "@/modules/crm-settings/inbox/components/CrmInboxDetailsDialog";
 
 const CLIENT_REQUESTS_QUERY_KEY = "client-requests-list";
 
 const ClientRequestsTableLayout = HeadlessTableLayout<ClientRequestRow>("crl");
 
+function getApiErrorDescription(error: unknown): string | undefined {
+  const data = axios.isAxiosError(error)
+    ? error.response?.data
+    : (error as { response?: { data?: unknown } })?.response?.data;
+  if (!data || typeof data !== "object") return undefined;
+  const body = data as { description?: string; message?: unknown };
+  if (typeof body.description === "string" && body.description.trim())
+    return body.description.trim();
+  if (typeof body.message === "string") return body.message;
+  return undefined;
+}
+
 function ClientRequestsList() {
   const t = useTranslations();
   const queryClient = useQueryClient();
+  const { can } = usePermissions();
+  const canUpdateClientRequest = can(PERMISSIONS.clientRequest.update);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deletingRequestId, setDeletingRequestId] = useState<string | null>(
     null,
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsRow, setDetailsRow] = useState<ClientRequestRow | null>(null);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterClientName, setFilterClientName] = useState("");
   const [filterRequestType, setFilterRequestType] = useState("");
@@ -106,35 +126,100 @@ function ClientRequestsList() {
     setDrawerOpen(false);
   };
 
-  const columns = [
-    ...getClientRequestsColumns(t),
-    {
-      key: "actions",
-      name: t("clientRequests.table.actions"),
-      sortable: false,
-      render: (row: ClientRequestRow) => (
-        <CustomMenu
-          renderAnchor={({ onClick }) => (
-            <Button onClick={onClick}>
-              {t("clientRequests.table.actions")}
-            </Button>
-          )}
-        >
-          <Can check={[PERMISSIONS.clientRequest.delete]}>
-            <MenuItem
-              onClick={() => {
-                setDeletingRequestId(row.id);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              <Trash2 className="w-4 h-4 ml-2" />
-              {t("labels.delete")}
-            </MenuItem>
-          </Can>
-        </CustomMenu>
-      ),
+  const invalidateClientRequestsList = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: [CLIENT_REQUESTS_QUERY_KEY] });
+    queryClient.invalidateQueries({
+      queryKey: CRM_INBOX_PENDING_COUNT_QUERY_KEY,
+    });
+    queryClient.invalidateQueries({ queryKey: [CRM_INBOX_LIST_QUERY_KEY] });
+  }, [queryClient]);
+
+  const statusMutation = useMutation({
+    mutationFn: (vars: {
+      id: string;
+      status: "accepted" | "rejected";
+      reject_cause?: string;
+    }) =>
+      vars.status === "accepted"
+        ? ClientRequestsApi.updateStatus(vars.id, {
+            status_client_request: "accepted",
+          })
+        : ClientRequestsApi.updateStatus(vars.id, {
+            status_client_request: "rejected",
+            reject_cause: vars.reject_cause ?? "",
+          }),
+    onSuccess: (_data, vars) => {
+      toast.success(
+        vars.status === "accepted"
+          ? t("clientRequests.inbox.toastAcceptSuccess")
+          : t("clientRequests.inbox.toastRejectSuccess"),
+      );
+      invalidateClientRequestsList();
     },
-  ];
+    onError: (error: unknown) => {
+      toast.error(
+        getApiErrorDescription(error) ??
+          t("clientRequests.inbox.toastOperationError"),
+      );
+    },
+  });
+
+  const pendingStatusAction = statusMutation.isPending;
+
+  const openDetails = useCallback((row: ClientRequestRow) => {
+    setDetailsRow(row);
+    setDetailsOpen(true);
+  }, []);
+
+  const closeDetails = useCallback(() => {
+    setDetailsOpen(false);
+    setDetailsRow(null);
+  }, []);
+
+  const detailsCanRespond =
+    String(detailsRow?.status_client_request ?? "")
+      .trim()
+      .toLowerCase() === "pending";
+
+  const columns = useMemo(
+    () => [
+      ...getClientRequestsColumns(t),
+      {
+        key: "actions",
+        name: t("clientRequests.table.actions"),
+        sortable: false,
+        render: (row: ClientRequestRow) => (
+          <CustomMenu
+            renderAnchor={({ onClick }) => (
+              <Button onClick={onClick} disabled={pendingStatusAction}>
+                {t("clientRequests.table.actions")}
+              </Button>
+            )}
+          >
+            <MenuItem
+              onClick={() => openDetails(row)}
+              disabled={pendingStatusAction}
+            >
+              <EyeIcon className="w-4 h-4 ml-2" />
+              {t("clientRequests.inbox.viewDetails")}
+            </MenuItem>
+            <Can check={[PERMISSIONS.clientRequest.delete]}>
+              <MenuItem
+                onClick={() => {
+                  setDeletingRequestId(row.id);
+                  setDeleteDialogOpen(true);
+                }}
+              >
+                <Trash2 className="w-4 h-4 ml-2" />
+                {t("labels.delete")}
+              </MenuItem>
+            </Can>
+          </CustomMenu>
+        ),
+      },
+    ],
+    [openDetails, pendingStatusAction, t],
+  );
 
   const state = ClientRequestsTableLayout.useTableState({
     data,
@@ -265,15 +350,7 @@ function ClientRequestsList() {
             onDelete={async () => {
               if (!deletingRequestId) return;
               await ClientRequestsApi.delete(deletingRequestId);
-              queryClient.invalidateQueries({
-                queryKey: [CLIENT_REQUESTS_QUERY_KEY],
-              });
-              queryClient.invalidateQueries({
-                queryKey: CRM_INBOX_PENDING_COUNT_QUERY_KEY,
-              });
-              queryClient.invalidateQueries({
-                queryKey: [CRM_INBOX_LIST_QUERY_KEY],
-              });
+              invalidateClientRequestsList();
               setDeleteDialogOpen(false);
               setDeletingRequestId(null);
             }}
@@ -291,6 +368,33 @@ function ClientRequestsList() {
           open={drawerOpen}
           onClose={handleCloseDrawer}
           queryKey={CLIENT_REQUESTS_QUERY_KEY}
+        />
+
+        <CrmInboxDetailsDialog
+          open={detailsOpen}
+          onClose={closeDetails}
+          row={detailsRow}
+          canRespond={detailsCanRespond}
+          canUpdateStatus={canUpdateClientRequest}
+          actionPending={pendingStatusAction}
+          onAccept={() => {
+            if (!detailsRow) return;
+            statusMutation.mutate(
+              { id: detailsRow.id, status: "accepted" },
+              { onSuccess: () => closeDetails() },
+            );
+          }}
+          onReject={(rejectCause) => {
+            if (!detailsRow) return;
+            statusMutation.mutate(
+              {
+                id: detailsRow.id,
+                status: "rejected",
+                reject_cause: rejectCause,
+              },
+              { onSuccess: () => closeDetails() },
+            );
+          }}
         />
       </Box>
     </>

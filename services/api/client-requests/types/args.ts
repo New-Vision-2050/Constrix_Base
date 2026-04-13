@@ -18,7 +18,6 @@ export interface CreateClientRequestArgs {
   receiver_phone?: string;
   receiver_email?: string;
   receiver_employee_id?: string;
-  /** Sent as one multipart field: JSON array of strings, e.g. `["uuid",…]` */
   receiver_employee_ids?: string[];
   receiver_broker_id?: string;
   receiver_broker_type?: "individual" | "company";
@@ -36,4 +35,11 @@ export interface ClientRequestListParams {
   client_request_receiver_from_id?: string | number;
   client_type?: string;
   client_id?: string;
+}
+
+export type ClientRequestStatusAction = "pending" | "accepted" | "rejected";
+
+export interface UpdateClientRequestStatusBody {
+  status_client_request: ClientRequestStatusAction;
+  reject_cause?: string | null;
 }
