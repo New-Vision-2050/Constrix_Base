@@ -52,7 +52,7 @@ export function EchoProvider({
       wsHost,
       wsPort: Number(process.env.NEXT_PUBLIC_REVERB_PORT ?? 80),
       wssPort: Number(process.env.NEXT_PUBLIC_REVERB_WSS_PORT ?? 443),
-      forceTLS: process.env.NEXT_PUBLIC_REVERB_FORCE_TLS !== "false",
+      forceTLS: true,
       disableStats: true,
     });
 
