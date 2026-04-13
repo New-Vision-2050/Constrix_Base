@@ -408,3 +408,24 @@ html {
 :is(.green-light, .green-dark) header .breadcrumbs-container * {
   color: hsl(var(--primary-foreground));
 }
+
+/* Green theme sidebar */
+:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"] {
+  background-color: hsl(var(--sidebar-primary));
+  color: hsl(var(--sidebar-primary-foreground));
+}
+
+:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"] svg {
+  color: hsl(var(--sidebar-primary-foreground));
+}
+
+:is(.green-light, .green-dark) [data-sidebar="menu-button"]:hover {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-accent-foreground));
+}
+
+:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"]:hover {
+  background-color: hsl(var(--sidebar-primary));
+  color: hsl(var(--sidebar-primary-foreground));
+  opacity: 0.9;
+}
