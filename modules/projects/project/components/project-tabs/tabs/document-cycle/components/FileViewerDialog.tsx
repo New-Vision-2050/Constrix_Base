@@ -204,23 +204,26 @@ export default function FileViewerDialog({
               {/* Document Review Section */}
               <Box>
                 <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-                  {t("documentReview")}
+                  {}
                 </Typography>
                 <Box
                   sx={{
-                    bgcolor: "grey.100",
+                    bgcolor: "background.card",
                     borderRadius: 1,
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
                     gap: 1,
+                    border: 1,
+                    borderColor: "divider",
+                    boxShadow: 1,
                   }}
                 >
                   <Typography variant="body2" fontWeight={600}>
-                    الخطة الاستراتيجية السنوية 2024
+                      {document.lastActivityUser || 'N/A'})
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    تم الإرسال: 20 كانون 2023
+                      {document.name || activeFile.name}
                   </Typography>
                   <Box
                     sx={{
@@ -231,14 +234,14 @@ export default function FileViewerDialog({
                     }}
                   >
                     <Avatar sx={{ width: 28, height: 28, fontSize: 12 }}>
-                      أ
+                        {document.lastActivityUser || 'N/A'})
                     </Avatar>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        أحمد علي
+                          {t("type")}: {document.documentType ||t("requestTypeAttachment")}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        مدير قسم الاستراتيجية
+                       {t("approvalStatus")}: {document.approvalStatus || 'N/A'}
                       </Typography>
                     </Box>
                   </Box>
@@ -449,8 +452,10 @@ export default function FileViewerDialog({
                       width: `${zoom}%`,
                       maxWidth: "100%",
                       minHeight: 360,
-                      bgcolor: "background.paper",
+                      bgcolor: "background.card",
                       borderRadius: 1,
+                      border: 1,
+                      borderColor: "divider",
                       boxShadow: 2,
                       transition: "width 0.2s ease",
                       display: "flex",

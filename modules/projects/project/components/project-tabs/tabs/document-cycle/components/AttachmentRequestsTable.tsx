@@ -127,6 +127,14 @@ export default function AttachmentRequestsTable() {
         ),
       },
       {
+        key: "serialNumber",
+        name: t("serialNumber"),
+        sortable: false,
+        render: (row: DocumentRow) => (
+          <span>{row.serialNumber || row.id}</span>
+        ),
+      },
+      {
         key: "sender",
         name: t("sender"),
         sortable: false,
