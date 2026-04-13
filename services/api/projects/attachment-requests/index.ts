@@ -51,6 +51,8 @@ export const AttachmentRequestsApi = {
     formData.append("date", data.date);
     formData.append("project_id", data.project_id);
     formData.append("receiver_company_id", data.receiver_company_id);
+    if (data.serial_number)
+      formData.append("serial_number", data.serial_number);
     if (data.attachment_type_id)
       formData.append("attachment_type_id", data.attachment_type_id);
     if (data.attachment_sub_type_id)

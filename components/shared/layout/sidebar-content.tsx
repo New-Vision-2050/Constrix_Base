@@ -34,6 +34,7 @@ import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import InboxIconWithCount from "@/components/icons/inbox";
+import CrmInboxIconWithCount from "@/components/icons/crm-inbox";
 
 interface SidebarContentWrapperProps {
   name?: string;
@@ -161,6 +162,17 @@ export function SidebarContentWrapper({
             show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
           };
 
+          const crmInbox = {
+            name: t("Sidebar.Inbox"),
+            url: ROUTER.CRM.inbox,
+            icon: CrmInboxIconWithCount,
+            isActive:
+              fullPath === ROUTER.CRM.inbox ||
+              fullPath.startsWith(`${ROUTER.CRM.inbox}/`),
+            show:
+              !isCentralCompany && can([PERMISSIONS.clientRequest.list]),
+          };
+
           return {
             ...project,
             ...restMenuProps,
@@ -169,6 +181,7 @@ export function SidebarContentWrapper({
               clientRequests,
               priceOffers,
               crmSettings,
+              crmInbox,
             ],
           };
         }
@@ -367,6 +380,7 @@ export function SidebarContentWrapper({
           ROUTER.CRM.settings,
           ROUTER.CRM.pricesOffers,
           ROUTER.CRM.clientRequests,
+          ROUTER.CRM.inbox,
         ],
         isActive: [
           ROUTER.CRM.clients,
@@ -374,6 +388,7 @@ export function SidebarContentWrapper({
           ROUTER.CRM.settings,
           ROUTER.CRM.pricesOffers,
           ROUTER.CRM.clientRequests,
+          ROUTER.CRM.inbox,
         ].some((route) => path === route || path.endsWith(route)),
         show: !isCentralCompany,
         sub_entities: [

@@ -59,7 +59,9 @@ export const projectMessages = new MessagesGroup({
   columnSubSubClassification: _m("Sub-classification", "التصنيف الفرعي"),
   emptyCell: _m("—", "—"),
   documentCycle: new MessagesGroup({
+    fileType: _m("Type", "النوع "),
     title: _m("Document Cycle", "دورة الوثائق"),
+    serialNumber: _m("Serial Number", "رقم التسلسل"),
     outgoingAttachments: _m("Outgoing Attachments", "مرفقات صادرة"),
     incomingAttachments: _m("Incoming Attachments", "مرفقات واردة"),
     requestTypeOutgoing: _m("Outgoing", "صادر"),

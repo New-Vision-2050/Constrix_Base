@@ -52,6 +52,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
         name: z.string().min(1, t("fileName")),
         date: z.string().min(1, t("creationDate")),
         receiver_company_id: z.string().min(1, t("selectCompany")),
+        serial_number: z.string().optional(),
         attachment_type_id: z.string().optional(),
         attachment_sub_type_id: z.string().optional(),
         attachment_sub_sub_type_id: z.string().optional(),
@@ -75,6 +76,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
       name: "",
       date: "",
       receiver_company_id: "",
+      serial_number: "",
       attachment_type_id: "",
       attachment_sub_type_id: "",
       attachment_sub_sub_type_id: "",
@@ -161,6 +163,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
           date: data.date,
           project_id: projectId,
           receiver_company_id: data.receiver_company_id,
+          serial_number: data.serial_number || undefined,
           attachment_type_id: data.attachment_type_id || undefined,
           attachment_sub_type_id: data.attachment_sub_type_id || undefined,
           attachment_sub_sub_type_id:
@@ -252,6 +255,17 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
             placeholder={t("fileName")}
             error={!!errors.name}
             helperText={errors.name?.message}
+            disabled={isPending}
+            fullWidth
+          />
+
+          {/* serial_number */}
+          <TextField
+            {...register("serial_number")}
+            label={t("referenceNumber")}
+            placeholder={t("referenceNumber")}
+            error={!!errors.serial_number}
+            helperText={errors.serial_number?.message}
             disabled={isPending}
             fullWidth
           />

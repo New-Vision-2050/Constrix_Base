@@ -19,6 +19,7 @@ declare module "@mui/material/styles" {
   interface TypeBackground {
     medTransparent?: string;
     darkest: string;
+    card?: string;
   }
 }
 

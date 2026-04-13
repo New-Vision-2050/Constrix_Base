@@ -34,6 +34,7 @@ export interface CreateAttachmentRequestData {
   date: string;
   project_id: string;
   receiver_company_id: string;
+  serial_number?: string;
   attachment_type_id?: string;
   attachment_sub_type_id?: string;
   attachment_sub_sub_type_id?: string;
