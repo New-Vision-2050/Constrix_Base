@@ -1,5 +1,5 @@
-import ClientRequestsList from "@/modules/crm-settings/client-requests/views/list";
+import CrmInboxView from "@/modules/crm-settings/inbox/views/CrmInboxView";
 
 export default function CrmInboxPage() {
-  return <ClientRequestsList initialStatusFilter="pending" />;
+  return <CrmInboxView />;
 }

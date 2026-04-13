@@ -36,6 +36,7 @@ import {
   CreateClientRequestArgs,
 } from "@/services/api/client-requests";
 import { CRM_INBOX_PENDING_COUNT_QUERY_KEY } from "@/components/icons/crm-inbox";
+import { CRM_INBOX_LIST_QUERY_KEY } from "@/modules/crm-settings/query-keys";
 
 interface RequestFormDrawerProps {
   open: boolean;
@@ -226,6 +227,7 @@ export function RequestFormDrawer({
     await ClientRequestsApi.create(apiData, requestConfig);
     queryClient.invalidateQueries({ queryKey: [queryKey] });
     queryClient.invalidateQueries({ queryKey: CRM_INBOX_PENDING_COUNT_QUERY_KEY });
+    queryClient.invalidateQueries({ queryKey: [CRM_INBOX_LIST_QUERY_KEY] });
   };
 
   const submitToApi = async (data: ClientRequestFormValues, status: string) => {

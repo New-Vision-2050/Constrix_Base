@@ -25,18 +25,13 @@ import { statisticsConfig } from "./components/statistics-config";
 import { RequestFormDrawer } from "./components/RequestFormDrawer";
 import { ClientRequestsApi } from "@/services/api/client-requests";
 import { CRM_INBOX_PENDING_COUNT_QUERY_KEY } from "@/components/icons/crm-inbox";
+import { CRM_INBOX_LIST_QUERY_KEY } from "@/modules/crm-settings/query-keys";
+
 const CLIENT_REQUESTS_QUERY_KEY = "client-requests-list";
 
 const ClientRequestsTableLayout = HeadlessTableLayout<ClientRequestRow>("crl");
 
-export type ClientRequestsListProps = {
-  /** Pre-select status filter (e.g. `pending` for CRM inbox). */
-  initialStatusFilter?: string;
-};
-
-function ClientRequestsList({
-  initialStatusFilter = "",
-}: ClientRequestsListProps) {
+function ClientRequestsList() {
   const t = useTranslations();
   const queryClient = useQueryClient();
 
@@ -45,23 +40,14 @@ function ClientRequestsList({
     null,
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState(initialStatusFilter);
+  const [filterStatus, setFilterStatus] = useState("");
   const [filterClientName, setFilterClientName] = useState("");
   const [filterRequestType, setFilterRequestType] = useState("");
-  const [filterEmployee, setFilterEmployee] = useState("");
 
-  // Filter data queries
   const { data: requestTypesData } = useQuery({
     queryKey: ["client-request-types"],
     queryFn: () =>
       ClientRequestsApi.getRequestTypes().then((r) => r.data.payload ?? []),
-    staleTime: Infinity,
-  });
-
-  const { data: sourcesData } = useQuery({
-    queryKey: ["client-request-sources"],
-    queryFn: () =>
-      ClientRequestsApi.getSources().then((r) => r.data.payload ?? []),
     staleTime: Infinity,
   });
 
@@ -72,13 +58,11 @@ function ClientRequestsList({
     staleTime: Infinity,
   });
 
-  // ✅ STEP 1: useTableParams (BEFORE query)
   const params = ClientRequestsTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
 
-  // ✅ STEP 2: Fetch data using useQuery
   const { data: queryData, isLoading } = useQuery({
     queryKey: [
       CLIENT_REQUESTS_QUERY_KEY,
@@ -87,7 +71,6 @@ function ClientRequestsList({
       params.search,
       filterStatus,
       filterRequestType,
-      filterEmployee,
       filterClientName,
     ],
     queryFn: async () => {
@@ -98,9 +81,6 @@ function ClientRequestsList({
         ...(filterStatus ? { status_client_request: filterStatus } : {}),
         ...(filterRequestType
           ? { client_request_type_id: filterRequestType }
-          : {}),
-        ...(filterEmployee
-          ? { client_request_receiver_from_id: filterEmployee }
           : {}),
         ...(filterClientName ? { client_id: filterClientName } : {}),
       });
@@ -126,7 +106,6 @@ function ClientRequestsList({
     setDrawerOpen(false);
   };
 
-  // Define columns
   const columns = [
     ...getClientRequestsColumns(t),
     {
@@ -157,7 +136,6 @@ function ClientRequestsList({
     },
   ];
 
-  // ✅ STEP 3: useTableState (AFTER query)
   const state = ClientRequestsTableLayout.useTableState({
     data,
     columns,
@@ -175,7 +153,6 @@ function ClientRequestsList({
     <>
       <StatisticsStoreRow config={statisticsConfig} />
       <Box sx={{ p: 3 }}>
-        {/* Filter Section */}
         <Box
           sx={{
             mb: 3,
@@ -195,24 +172,6 @@ function ClientRequestsList({
               gap: 2,
             }}
           >
-            {/* <FormControl size="small" fullWidth>
-              <InputLabel>
-                {t("clientRequests.filter.responsibleEmployee")}
-              </InputLabel>
-              <Select
-                value={filterEmployee}
-                label={t("clientRequests.filter.responsibleEmployee")}
-                onChange={(e) => setFilterEmployee(e.target.value)}
-              >
-                <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
-                {sourcesData?.map((source) => (
-                  <MenuItem key={source.id} value={String(source.id)}>
-                    {source.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl> */}
-
             <FormControl size="small" fullWidth>
               <InputLabel>
                 {t("clientRequests.filter.requestStatus")}
@@ -239,7 +198,9 @@ function ClientRequestsList({
             </FormControl>
 
             <FormControl size="small" fullWidth>
-              <InputLabel>{t("clientRequests.filter.customerName")}</InputLabel>
+              <InputLabel>
+                {t("clientRequests.filter.customerName")}
+              </InputLabel>
               <Select
                 value={filterClientName}
                 label={t("clientRequests.filter.customerName")}
@@ -255,24 +216,27 @@ function ClientRequestsList({
             </FormControl>
 
             <FormControl size="small" fullWidth>
-              <InputLabel>{t("clientRequests.filter.requestType")}</InputLabel>
+              <InputLabel>
+                {t("clientRequests.filter.requestType")}
+              </InputLabel>
               <Select
                 value={filterRequestType}
                 label={t("clientRequests.filter.requestType")}
                 onChange={(e) => setFilterRequestType(e.target.value)}
               >
                 <MenuItem value="">{t("clientRequests.filter.all")}</MenuItem>
-                {requestTypesData?.map((type) => (
-                  <MenuItem key={type.id} value={String(type.id)}>
-                    {type.name}
-                  </MenuItem>
-                ))}
+                {requestTypesData?.map(
+                  (type: { id: string | number; name: string }) => (
+                    <MenuItem key={type.id} value={String(type.id)}>
+                      {type.name}
+                    </MenuItem>
+                  ),
+                )}
               </Select>
             </FormControl>
           </Box>
         </Box>
 
-        {/* Table */}
         <ClientRequestsTableLayout
           filters={
             <ClientRequestsTableLayout.TopActions
@@ -295,33 +259,34 @@ function ClientRequestsList({
           pagination={<ClientRequestsTableLayout.Pagination state={state} />}
         />
 
-        {/* Delete Confirmation Dialog */}
         <Can check={[PERMISSIONS.clientRequest.delete]}>
-        <DeleteButton
-          message={t("clientRequests.deleteConfirm")}
-          onDelete={async () => {
-            if (!deletingRequestId) return;
-            await ClientRequestsApi.delete(deletingRequestId);
-            queryClient.invalidateQueries({
-              queryKey: [CLIENT_REQUESTS_QUERY_KEY],
-            });
-            queryClient.invalidateQueries({
-              queryKey: CRM_INBOX_PENDING_COUNT_QUERY_KEY,
-            });
-            setDeleteDialogOpen(false);
-            setDeletingRequestId(null);
-          }}
-          open={deleteDialogOpen}
-          setOpen={setDeleteDialogOpen}
-          translations={{
-            deleteSuccess: t("labels.deleteSuccess"),
-            deleteError: t("labels.deleteError"),
-            deleteCancelled: t("labels.deleteCancelled"),
-          }}
-        />
+          <DeleteButton
+            message={t("clientRequests.deleteConfirm")}
+            onDelete={async () => {
+              if (!deletingRequestId) return;
+              await ClientRequestsApi.delete(deletingRequestId);
+              queryClient.invalidateQueries({
+                queryKey: [CLIENT_REQUESTS_QUERY_KEY],
+              });
+              queryClient.invalidateQueries({
+                queryKey: CRM_INBOX_PENDING_COUNT_QUERY_KEY,
+              });
+              queryClient.invalidateQueries({
+                queryKey: [CRM_INBOX_LIST_QUERY_KEY],
+              });
+              setDeleteDialogOpen(false);
+              setDeletingRequestId(null);
+            }}
+            open={deleteDialogOpen}
+            setOpen={setDeleteDialogOpen}
+            translations={{
+              deleteSuccess: t("labels.deleteSuccess"),
+              deleteError: t("labels.deleteError"),
+              deleteCancelled: t("labels.deleteCancelled"),
+            }}
+          />
         </Can>
 
-        {/* Add/Edit Drawer */}
         <RequestFormDrawer
           open={drawerOpen}
           onClose={handleCloseDrawer}
