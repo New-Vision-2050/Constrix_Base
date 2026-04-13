@@ -64,7 +64,7 @@ export default function MainLayout({
         background={
           isGreen
             ? isLight
-              ? "#ffffff"
+              ? "#dcddde2f"
               : "#092A1E"
             : isLight
               ? "#ffffff"
@@ -93,7 +93,12 @@ export default function MainLayout({
         mainLogo={mainLogo}
       />
       <SidebarProvider>
-        <AppSidebar userTypes={userTypes} name={name} serialNumber={serialNumber} mainLogo={mainLogo} />
+        <AppSidebar
+          userTypes={userTypes}
+          name={name}
+          serialNumber={serialNumber}
+          mainLogo={mainLogo}
+        />
         <SidebarInset className="bg-transparent md:overflow-hidden border-none">
           <Header onMobileMenuClick={handleMobileDrawerToggle} />
           {children}

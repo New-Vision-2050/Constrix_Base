@@ -161,7 +161,7 @@
 
     --list-sub-node-background: #b8eacb;
 
-    --background: 0 0% 100%;
+    --background: 220 14% 96%;
 
     --foreground: 218 39% 11%;
 
@@ -386,4 +386,25 @@ html {
 :is(.green-light, .green-dark) thead [role="checkbox"][data-state="checked"] {
   background-color: hsl(var(--primary-foreground));
   color: hsl(var(--primary));
+}
+
+/* Green theme navbar */
+:is(.green-light, .green-dark) header {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+:is(.green-light, .green-dark) header button,
+:is(.green-light, .green-dark) header a,
+:is(.green-light, .green-dark) header svg {
+  color: hsl(var(--primary-foreground));
+}
+
+:is(.green-light, .green-dark) header nav,
+:is(.green-light, .green-dark) header nav a,
+:is(.green-light, .green-dark) header nav li,
+:is(.green-light, .green-dark) header nav span,
+:is(.green-light, .green-dark) header .breadcrumbs-container,
+:is(.green-light, .green-dark) header .breadcrumbs-container * {
+  color: hsl(var(--primary-foreground));
 }
