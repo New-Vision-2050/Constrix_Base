@@ -42,12 +42,9 @@ export function EchoProvider({
     // window.Pusher must be set before Echo initialization (required by laravel-echo internals)
     (window as unknown as { Pusher: typeof Pusher }).Pusher = Pusher;
 
-    // Strip any protocol prefix (e.g. "https://") to get a bare hostname
-    const rawHost =
-      process.env.NEXT_PUBLIC_REVERB_HOST ||
-      process.env.NEXT_PUBLIC_API_BASE_URL ||
-      window.location.hostname;
-    const wsHost = rawHost.replace(/^https?:\/\//, "");
+    const wsHost = process.env.NEXT_PUBLIC_API_BASE_URL
+      ? new URL(process.env.NEXT_PUBLIC_API_BASE_URL).hostname
+      : window.location.hostname;
 
     const instance = new Echo({
       broadcaster: "reverb",
@@ -104,7 +101,7 @@ export function EchoProvider({
       .listenToAll((eventName: string, data: unknown) => {
         console.log(`[Echo] 📡 [${companyChannel}]`, eventName, data);
       })
-      .listen("resource.shared", (e: ResourceSharedPayload) => {
+      .listen(".resource.shared", (e: ResourceSharedPayload) => {
         toast.info(`${e.shared_by.name} shared "${e.resource_name}" with you`, {
           description: e.owner_company_name,
         });
@@ -124,7 +121,7 @@ export function EchoProvider({
       value={{
         echo: echoInstance,
         companyId,
-        companyChannelName: `connection-test`,
+        companyChannelName: `company.${companyId}`,
       }}
     >
       {children}
