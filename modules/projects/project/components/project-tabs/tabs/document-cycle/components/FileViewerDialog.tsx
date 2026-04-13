@@ -208,12 +208,15 @@ export default function FileViewerDialog({
                 </Typography>
                 <Box
                   sx={{
-                    bgcolor: "grey.100",
+                    bgcolor: "background.card",
                     borderRadius: 1,
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
                     gap: 1,
+                    border: 1,
+                    borderColor: "divider",
+                    boxShadow: 1,
                   }}
                 >
                   <Typography variant="body2" fontWeight={600}>
@@ -449,8 +452,10 @@ export default function FileViewerDialog({
                       width: `${zoom}%`,
                       maxWidth: "100%",
                       minHeight: 360,
-                      bgcolor: "background.paper",
+                      bgcolor: "background.card",
                       borderRadius: 1,
+                      border: 1,
+                      borderColor: "divider",
                       boxShadow: 2,
                       transition: "width 0.2s ease",
                       display: "flex",

@@ -16,6 +16,7 @@ export const DarkPalette: PaletteOptions = {
     darkest: "#000000",
     paper: "#140f34",
     medTransparent: "rgba(30, 41, 59, 0.5)",
+    card: "#2B2749",
   },
   success: {
     main: green.A400,

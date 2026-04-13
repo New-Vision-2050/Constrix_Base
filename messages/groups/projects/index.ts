@@ -60,6 +60,7 @@ export const projectMessages = new MessagesGroup({
   emptyCell: _m("—", "—"),
   documentCycle: new MessagesGroup({
     title: _m("Document Cycle", "دورة الوثائق"),
+    serialNumber: _m("Serial Number", "رقم التسلسل"),
     outgoingAttachments: _m("Outgoing Attachments", "مرفقات صادرة"),
     incomingAttachments: _m("Incoming Attachments", "مرفقات واردة"),
     requestTypeOutgoing: _m("Outgoing", "صادر"),
