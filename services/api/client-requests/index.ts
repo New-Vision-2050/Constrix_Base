@@ -3,6 +3,7 @@ import { baseApi } from "@/config/axios/instances/base";
 import {
   CreateClientRequestArgs,
   UpdateClientRequestArgs,
+  UpdateClientRequestStatusBody,
   ClientRequestListParams,
   ListClientRequestsResponse,
   ShowClientRequestResponse,
@@ -47,6 +48,23 @@ function toFormData(
   return form;
 }
 
+/**
+ * Laravel expects `receiver_employee_ids` as an array. Sending a JSON string
+ * fails validation ("must be an array"). Use repeated `receiver_employee_ids[]`
+ * keys in multipart form data.
+ */
+function appendReceiverEmployeeIdsToForm(
+  form: FormData,
+  ids: string[] | undefined,
+) {
+  if (ids === undefined || ids.length === 0) return;
+  for (const id of ids) {
+    if (id !== undefined && id !== null && String(id).trim() !== "") {
+      form.append("receiver_employee_ids[]", String(id));
+    }
+  }
+}
+
 export const ClientRequestsApi = {
   list: (params?: ClientRequestListParams) =>
     baseApi.get<ListClientRequestsResponse>("client-requests", { params }),
@@ -74,7 +92,9 @@ export const ClientRequestsApi = {
       receiver_employee_id: args.receiver_employee_id,
       receiver_broker_id: args.receiver_broker_id,
       receiver_broker_type: args.receiver_broker_type,
+      reject_cause: args.reject_cause,
     });
+    appendReceiverEmployeeIdsToForm(form, args.receiver_employee_ids);
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
         `term_setting_ids[${i}][term_service_id]`,
@@ -107,7 +127,9 @@ export const ClientRequestsApi = {
       receiver_employee_id: args.receiver_employee_id,
       receiver_broker_id: args.receiver_broker_id,
       receiver_broker_type: args.receiver_broker_type,
+      reject_cause: args.reject_cause,
     });
+    appendReceiverEmployeeIdsToForm(form, args.receiver_employee_ids);
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
         `term_setting_id[${i}][term_service_id]`,
@@ -125,6 +147,14 @@ export const ClientRequestsApi = {
   },
 
   delete: (id: string) => baseApi.delete(`client-requests/${id}`),
+
+  updateStatus: (id: string, body: UpdateClientRequestStatusBody) =>
+    baseApi.patch<ShowClientRequestResponse>(`client-requests/${id}/status`, {
+      status_client_request: body.status_client_request,
+      ...(body.status_client_request === "rejected"
+        ? { reject_cause: body.reject_cause ?? "" }
+        : {}),
+    }),
 
   getRequestTypes: (searchText?: string) =>
     baseApi.get(searchText ? `client-requests/client-request-types?name=${searchText}` : "client-requests/client-request-types"),

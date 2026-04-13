@@ -13,11 +13,15 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Autocomplete,
+  TextField,
+  FormLabel,
 } from "@mui/material";
 import type { AxiosRequestConfig } from "axios";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/config/axios-config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
@@ -31,6 +35,8 @@ import {
   ClientRequestsApi,
   CreateClientRequestArgs,
 } from "@/services/api/client-requests";
+import { CRM_INBOX_PENDING_COUNT_QUERY_KEY } from "@/components/icons/crm-inbox";
+import { CRM_INBOX_LIST_QUERY_KEY } from "@/modules/crm-settings/query-keys";
 
 interface RequestFormDrawerProps {
   open: boolean;
@@ -38,7 +44,45 @@ interface RequestFormDrawerProps {
   queryKey: string;
 }
 
+type SendDialogEmployeeOption = {
+  id: string | number;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+};
+
 const EMPTY_ATTACHMENTS: File[] = [];
+const EMPTY_SEND_DIALOG_EMPLOYEES: SendDialogEmployeeOption[] = [];
+
+/** API may return a bare array, Laravel pagination `{ data: [] }`, or nested payload. */
+function normalizeEmployeesList(raw: unknown): SendDialogEmployeeOption[] {
+  if (raw == null) return [];
+  if (Array.isArray(raw)) {
+    return raw.map(coerceEmployeeRow).filter(Boolean) as SendDialogEmployeeOption[];
+  }
+  if (typeof raw === "object") {
+    const o = raw as Record<string, unknown>;
+    if (Array.isArray(o.data)) {
+      return o.data
+        .map(coerceEmployeeRow)
+        .filter(Boolean) as SendDialogEmployeeOption[];
+    }
+  }
+  return [];
+}
+
+function coerceEmployeeRow(row: unknown): SendDialogEmployeeOption | null {
+  if (row == null || typeof row !== "object") return null;
+  const r = row as Record<string, unknown>;
+  const id = r.id ?? r.user_id;
+  if (id == null || id === "") return null;
+  return {
+    id: id as string | number,
+    name: (r.name as string | undefined) ?? undefined,
+    first_name: (r.first_name as string | undefined) ?? undefined,
+    last_name: (r.last_name as string | undefined) ?? undefined,
+  };
+}
 
 export function RequestFormDrawer({
   open,
@@ -69,8 +113,21 @@ export function RequestFormDrawer({
       service_ids: [],
       term_setting_id: [],
       attachments: [],
+      receiver_employee_ids: [],
+      reject_cause: "",
     },
   });
+
+  const { data: sendDialogEmployees, isPending: sendDialogEmployeesPending } =
+    useQuery<SendDialogEmployeeOption[]>({
+      queryKey: ["company-users-employees-send-dialog"],
+      queryFn: async () => {
+        const response = await apiClient.get("/company-users/employees");
+        const raw = response.data?.payload ?? response.data;
+        return normalizeEmployeesList(raw);
+      },
+      enabled: confirmDialogOpen && selectedStatus === "pending",
+    });
 
   // Reset form to defaults when opening
   useEffect(() => {
@@ -87,6 +144,8 @@ export function RequestFormDrawer({
         branch_id: null,
         management_id: null,
         attachments: [],
+        receiver_employee_ids: [],
+        reject_cause: "",
       });
       setSelectedStatus("pending");
       setUploadProgress(0);
@@ -149,6 +208,14 @@ export function RequestFormDrawer({
       data.receiver_broker_type === "" || data.receiver_broker_type == null
         ? undefined
         : data.receiver_broker_type,
+    receiver_employee_ids:
+      status === "pending"
+        ? (data.receiver_employee_ids ?? []).map(String)
+        : undefined,
+    reject_cause:
+      status === "rejected"
+        ? data.reject_cause?.trim() || undefined
+        : undefined,
   });
 
   const performCreate = async (
@@ -159,6 +226,8 @@ export function RequestFormDrawer({
     const apiData = buildCreateArgs(data, status);
     await ClientRequestsApi.create(apiData, requestConfig);
     queryClient.invalidateQueries({ queryKey: [queryKey] });
+    queryClient.invalidateQueries({ queryKey: CRM_INBOX_PENDING_COUNT_QUERY_KEY });
+    queryClient.invalidateQueries({ queryKey: [CRM_INBOX_LIST_QUERY_KEY] });
   };
 
   const submitToApi = async (data: ClientRequestFormValues, status: string) => {
@@ -197,6 +266,8 @@ export function RequestFormDrawer({
   const handleSendClick = () => {
     selectedStatusRef.current = "pending";
     setSelectedStatus("pending");
+    setValue("receiver_employee_ids", []);
+    setValue("reject_cause", "");
     setConfirmDialogOpen(true);
   };
 
@@ -204,8 +275,13 @@ export function RequestFormDrawer({
   // onError closes dialog so form validation errors become visible
   const handleConfirmSave = handleSubmit(
     async (data) => {
+      const status = selectedStatusRef.current;
+      if (status === "rejected" && !data.reject_cause?.trim()) {
+        toast.error(t("clientRequests.dialog.rejectCauseRequired"));
+        return;
+      }
       try {
-        await submitToApi(data, selectedStatusRef.current);
+        await submitToApi(data, status);
         setConfirmDialogOpen(false);
       } catch {
         // keep dialog open so user can see and retry after  error
@@ -313,46 +389,173 @@ export function RequestFormDrawer({
       <Dialog
         open={confirmDialogOpen}
         onClose={() => setConfirmDialogOpen(false)}
+        disableEnforceFocus
         PaperProps={{
           sx: {
-            color: "#fff",
-            minWidth: 350,
+            minWidth: { xs: "min(100%, 380px)", sm: 420 },
+            maxWidth: "100%",
             borderRadius: 2,
+            overflow: "visible",
           },
         }}
       >
-        <DialogContent sx={{ textAlign: "center", pt: 4 }}>
-          <Typography variant="h6" sx={{ mb: 3 }}>
+        <DialogContent
+          sx={{
+            textAlign: "center",
+            pt: 3,
+            px: 2,
+            overflow: "visible",
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2 }}>
             {t("clientRequests.dialog.sendAs")}
           </Typography>
           <RadioGroup
             row
             value={selectedStatus}
             onChange={(e) => {
-              setSelectedStatus(e.target.value);
-              selectedStatusRef.current = e.target.value;
+              const next = e.target.value;
+              setSelectedStatus(next);
+              selectedStatusRef.current = next;
+              if (next !== "pending") {
+                setValue("receiver_employee_ids", []);
+              }
+              if (next !== "rejected") {
+                setValue("reject_cause", "");
+              }
             }}
-            sx={{ justifyContent: "center", gap: 2 }}
+            sx={{
+              justifyContent: "center",
+              gap: 1,
+              flexWrap: "wrap",
+            }}
           >
             <FormControlLabel
               value="pending"
-              control={<Radio sx={{ color: "#fff" }} />}
+              control={<Radio />}
               label={t("clientRequests.dialog.send")}
-              sx={{ color: "#fff" }}
             />
             <FormControlLabel
               value="accepted"
-              control={<Radio sx={{ color: "#fff" }} />}
+              control={<Radio />}
               label={t("clientRequests.dialog.sendWithAccept")}
-              sx={{ color: "#fff" }}
             />
             <FormControlLabel
               value="rejected"
-              control={<Radio sx={{ color: "#fff" }} />}
+              control={<Radio />}
               label={t("clientRequests.dialog.sendWithReject")}
-              sx={{ color: "#fff" }}
             />
           </RadioGroup>
+          {selectedStatus === "pending" && (
+            <Box sx={{ mt: 2, textAlign: "start" }}>
+              <Controller
+                control={control}
+                name="receiver_employee_ids"
+                render={({ field }) => {
+                  const options =
+                    sendDialogEmployees ?? EMPTY_SEND_DIALOG_EMPLOYEES;
+                  const idSet = new Set(
+                    (field.value ?? []).map((id) => String(id)),
+                  );
+                  const selectedOptions = options.filter((opt) =>
+                    idSet.has(String(opt.id)),
+                  );
+                  return (
+                    <Box>
+                      <FormLabel
+                        sx={{ mb: 1, display: "block", fontWeight: 600 }}
+                      >
+                        {t("clientRequests.dialog.selectEmployees")}
+                      </FormLabel>
+                      <Autocomplete
+                        multiple
+                        fullWidth
+                        loading={sendDialogEmployeesPending}
+                        options={options}
+                        value={selectedOptions}
+                        onChange={(_, newValue) => {
+                          field.onChange(newValue.map((emp) => String(emp.id)));
+                        }}
+                        onBlur={field.onBlur}
+                        getOptionLabel={(option) =>
+                          option.name ||
+                          `${option.first_name ?? ""} ${option.last_name ?? ""}`.trim() ||
+                          String(option.id)
+                        }
+                        isOptionEqualToValue={(a, b) =>
+                          String(a.id) === String(b.id)
+                        }
+                        filterSelectedOptions
+                        disableCloseOnSelect
+                        renderOption={(props, option) => {
+                          const { key, ...liProps } = props;
+                          return (
+                            <li
+                              key={key}
+                              {...liProps}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                              }}
+                            >
+                              {option.name ||
+                                `${option.first_name ?? ""} ${option.last_name ?? ""}`.trim() ||
+                                String(option.id)}
+                            </li>
+                          );
+                        }}
+                        slotProps={{
+                          popper: {
+                            disablePortal: true,
+                            placement: "bottom-start",
+                            sx: {
+                              zIndex: (theme) => theme.zIndex.modal + 2,
+                            },
+                          },
+                        }}
+                        ListboxProps={{
+                          sx: { maxHeight: 280 },
+                        }}
+                        noOptionsText={
+                          sendDialogEmployeesPending
+                            ? t("labels.loading")
+                            : t("labels.noData")
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t(
+                              "clientRequests.form.selectEmployee",
+                            )}
+                          />
+                        )}
+                      />
+                    </Box>
+                  );
+                }}
+              />
+            </Box>
+          )}
+          {selectedStatus === "rejected" && (
+            <Box sx={{ mt: 2, textAlign: "start" }}>
+              <Controller
+                control={control}
+                name="reject_cause"
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    value={field.value ?? ""}
+                    label={t("clientRequests.dialog.rejectCause")}
+                    placeholder={t("clientRequests.dialog.rejectCausePlaceholder")}
+                    fullWidth
+                    multiline
+                    minRows={3}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+            </Box>
+          )}
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
           <Button
