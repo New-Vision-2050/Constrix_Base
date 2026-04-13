@@ -204,7 +204,7 @@ export default function FileViewerDialog({
               {/* Document Review Section */}
               <Box>
                 <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-                  {t("documentReview")}
+                  {}
                 </Typography>
                 <Box
                   sx={{
@@ -220,10 +220,10 @@ export default function FileViewerDialog({
                   }}
                 >
                   <Typography variant="body2" fontWeight={600}>
-                    الخطة الاستراتيجية السنوية 2024
+                      {document.lastActivityUser || 'N/A'})
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    تم الإرسال: 20 كانون 2023
+                      {document.name || activeFile.name}
                   </Typography>
                   <Box
                     sx={{
@@ -234,14 +234,14 @@ export default function FileViewerDialog({
                     }}
                   >
                     <Avatar sx={{ width: 28, height: 28, fontSize: 12 }}>
-                      أ
+                        {document.lastActivityUser || 'N/A'})
                     </Avatar>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        أحمد علي
+                          {t("type")}: {document.documentType ||t("requestTypeAttachment")}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        مدير قسم الاستراتيجية
+                       {t("approvalStatus")}: {document.approvalStatus || 'N/A'}
                       </Typography>
                     </Box>
                   </Box>
