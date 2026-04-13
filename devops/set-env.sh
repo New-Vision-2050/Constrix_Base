@@ -6,6 +6,9 @@
 : "${DEPLOYMENT_ID:=stage}"
 : "${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:=AIzaSyD}"
 : "${ISLOCAL:=true}"
+: "${NEXT_PUBLIC_REVERB_KEY:=}"
+: "${NEXT_PUBLIC_REVERB_PORT:=}"
+: "${NEXT_PUBLIC_REVERB_WSS_PORT:=}"
 
 export NEXT_PUBLIC_API_BASE_URL
 export NEXT_PUBLIC_API_PATH
@@ -15,5 +18,8 @@ export NEXT_PUBLIC_CACHE_BUST
 export DEPLOYMENT_ID
 export NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 export ISLOCAL
+export NEXT_PUBLIC_REVERB_KEY
+export NEXT_PUBLIC_REVERB_PORT
+export NEXT_PUBLIC_REVERB_WSS_PORT
 
 echo "Environment variables have been set (if not already present)."

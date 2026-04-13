@@ -30,6 +30,7 @@ import {
 import { downloadAttachmentFile } from "../attachmentActions";
 import FileViewerDialog from "./FileViewerDialog";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
+import { ATTACHMENT_REQUESTS_QUERY_KEY } from "@/modules/projects/project/query/useAttachmentRequests";
 
 const cardSx = {
   p: 1.5,
@@ -50,13 +51,19 @@ function formatDisplayDate(value?: string): string {
 
 function normalizeHistoryAction(action: string): string {
   const norm = action.trim().toLowerCase().replace(/-/g, "_");
-  if (norm === "attachment request created" || norm === "attachment_request_created") {
+  if (
+    norm === "attachment request created" ||
+    norm === "attachment_request_created"
+  ) {
     return "request_created";
   }
   if (norm.includes("request fully approved")) {
     return "request_fully_approved";
   }
-  if (norm.includes("attachment approved") || norm.includes("attachment_approved")) {
+  if (
+    norm.includes("attachment approved") ||
+    norm.includes("attachment_approved")
+  ) {
     return "attachment_approved";
   }
   return norm;
@@ -232,6 +239,12 @@ function HistoryApprovalStepper({
   );
 }
 
+/** After approve/decline the list refetches; hide action buttons for finished states. */
+function isTerminalApprovalStatus(raw?: string): boolean {
+  const k = (raw ?? "").trim().toLowerCase().replace(/-/g, "_");
+  return k === "approved" || k === "rejected" || k === "declined";
+}
+
 function approvalStatusLabel(
   raw: string | undefined,
   t: (key: string) => string,
@@ -282,9 +295,9 @@ function DetailMain({
   const typeDisplay =
     document.documentType?.trim() || t("requestTypeAttachment");
 
-  const runApprove = () => (onApprove ?? onClose)();
-  const runReject = () => (onReject ?? onClose)();
-  const runModification = () => (onRequestModification ?? onClose)();
+  const runApprove = () => onApprove?.();
+  const runReject = () => onReject?.();
+  const runModification = () => onRequestModification?.();
 
   return (
     <Stack spacing={2.5} sx={{ minWidth: 0 }}>
@@ -398,7 +411,8 @@ function DetailMain({
         justifyContent="flex-start"
         sx={{ pt: 1, gap: 1 }}
       >
-        {variant === "incoming" && document.approvalStatus !== "approved" ? (
+        {variant === "outgoing" &&
+        !isTerminalApprovalStatus(document.approvalStatus) ? (
           <>
             <Button
               variant="contained"
@@ -443,11 +457,17 @@ function DetailSidebar({
   t: (key: string) => string;
 }) {
   const hasHistory = document.history && document.history.length > 0;
+  const historyKey =
+    document.history?.map((h) => h.id).join("-") ?? `${document.id}-history`;
 
   return (
     <Stack spacing={3} sx={{ height: "100%" }}>
       <Box>
-        <Paper variant="outlined" sx={{ ...cardSx, p: 2 }}>
+        <Paper
+          key={historyKey}
+          variant="outlined"
+          sx={{ ...cardSx, p: 2 }}
+        >
           <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
             {t("approvalPath")}
           </Typography>
@@ -531,10 +551,11 @@ export default function AttachmentRequestDetailDialog({
   const approveMutation = useMutation({
     mutationFn: (requestId: string) =>
       AttachmentRequestsApi.approveRequest(requestId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attachment-requests"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY],
+      });
       toast.success(t("requestApproveSuccess"));
-      onClose();
     },
     onError: (error: unknown) => {
       const msg = isAxiosError(error)
@@ -547,10 +568,11 @@ export default function AttachmentRequestDetailDialog({
   const declineMutation = useMutation({
     mutationFn: (requestId: string) =>
       AttachmentRequestsApi.declineRequest(requestId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attachment-requests"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY],
+      });
       toast.success(t("requestDeclineSuccess"));
-      onClose();
     },
     onError: (error: unknown) => {
       const msg = isAxiosError(error)
@@ -565,7 +587,7 @@ export default function AttachmentRequestDetailDialog({
       onApproveProp();
       return;
     }
-    if (!document || variant !== "incoming") return;
+    if (!document) return;
     approveMutation.mutate(document.id);
   };
 
@@ -574,14 +596,12 @@ export default function AttachmentRequestDetailDialog({
       onRejectProp();
       return;
     }
-    if (!document || variant !== "incoming") return;
+    if (!document) return;
     declineMutation.mutate(document.id);
   };
 
   const actionPending =
-    actionPendingProp ||
-    approveMutation.isPending ||
-    declineMutation.isPending;
+    actionPendingProp || approveMutation.isPending || declineMutation.isPending;
 
   if (!document) return null;
 

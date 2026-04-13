@@ -63,7 +63,7 @@ export function EchoProvider({
       forceTLS: instance.connector.pusher.config.forceTLS,
 
       companyId,
-      companyChannelName: `connection-test`,
+      companyChannelName: `company.${companyId}`,
     });
 
     instance.connector.pusher.connection.bind("connected", () => {
@@ -103,7 +103,12 @@ export function EchoProvider({
       })
       .listen(".resource.shared", (e: ResourceSharedPayload) => {
         toast.info(`${e.shared_by.name} shared "${e.resource_name}" with you`, {
-          description: e.owner_company_name,
+          description: [
+            e.owner_company_name,
+            e.notes ? `Note: ${e.notes}` : null,
+          ]
+            .filter(Boolean)
+            .join(" · "),
         });
       });
 
