@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Stack, TextField, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -99,6 +99,12 @@ export default function AttachmentRequestsTable() {
   const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
   const totalPages = queryResult?.totalPages ?? 1;
   const totalItems = queryResult?.totalItems ?? 0;
+
+  useEffect(() => {
+    if (!selectedDocument) return;
+    const row = data.find((r) => r.id === selectedDocument.id);
+    if (row) setSelectedDocument(row);
+  }, [data, selectedDocument?.id]);
 
   const handleView = (row: DocumentRow) => {
     setSelectedDocument(row);
