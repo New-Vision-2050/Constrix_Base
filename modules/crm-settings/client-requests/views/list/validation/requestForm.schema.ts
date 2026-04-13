@@ -22,8 +22,12 @@ export const ClientRequestschema = z.object({
   receiver_phone: z.string().optional(),
   receiver_email: z.union([z.string().email(), z.literal("")]).optional(),
   receiver_employee_id: z.string().optional(),
+  /** Stored as string to match API ids (numeric or UUID); sent in multipart as-is */
+  receiver_employee_ids: z.array(z.string()).optional(),
   receiver_broker_id: z.string().optional(),
   receiver_broker_type: z.union([z.enum(["individual", "company"]), z.literal("")]).optional(),
+  /** Shown when sending with reject; validated on submit in the drawer */
+  reject_cause: z.string().optional(),
 });
 
 export type ClientRequestFormValues = z.infer<typeof ClientRequestschema>;

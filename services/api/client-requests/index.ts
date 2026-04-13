@@ -47,6 +47,14 @@ function toFormData(
   return form;
 }
 
+function appendReceiverEmployeeIdsJson(
+  form: FormData,
+  ids: string[] | undefined,
+) {
+  if (ids === undefined) return;
+  form.append("receiver_employee_ids", JSON.stringify(ids.map(String)));
+}
+
 export const ClientRequestsApi = {
   list: (params?: ClientRequestListParams) =>
     baseApi.get<ListClientRequestsResponse>("client-requests", { params }),
@@ -74,7 +82,9 @@ export const ClientRequestsApi = {
       receiver_employee_id: args.receiver_employee_id,
       receiver_broker_id: args.receiver_broker_id,
       receiver_broker_type: args.receiver_broker_type,
+      reject_cause: args.reject_cause,
     });
+    appendReceiverEmployeeIdsJson(form, args.receiver_employee_ids);
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
         `term_setting_ids[${i}][term_service_id]`,
@@ -107,7 +117,9 @@ export const ClientRequestsApi = {
       receiver_employee_id: args.receiver_employee_id,
       receiver_broker_id: args.receiver_broker_id,
       receiver_broker_type: args.receiver_broker_type,
+      reject_cause: args.reject_cause,
     });
+    appendReceiverEmployeeIdsJson(form, args.receiver_employee_ids);
     args.term_setting_id?.forEach((entry, i) => {
       form.append(
         `term_setting_id[${i}][term_service_id]`,

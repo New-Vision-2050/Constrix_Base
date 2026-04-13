@@ -18,8 +18,11 @@ export interface CreateClientRequestArgs {
   receiver_phone?: string;
   receiver_email?: string;
   receiver_employee_id?: string;
+  /** Sent as one multipart field: JSON array of strings, e.g. `["uuid",…]` */
+  receiver_employee_ids?: string[];
   receiver_broker_id?: string;
   receiver_broker_type?: "individual" | "company";
+  reject_cause?: string;
 }
 
 export interface UpdateClientRequestArgs extends Partial<CreateClientRequestArgs> {}

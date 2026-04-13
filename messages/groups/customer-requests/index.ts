@@ -96,5 +96,18 @@ export const clientRequestsMessages = new MessagesGroup({
     sendWithAccept: _m("Send with Accept", "ارسال مع قبول"),
     sendWithReject: _m("Send with Reject", "ارسال مع رفض"),
     save: _m("Save", "حفظ"),
+    selectEmployees: _m(
+      "Recipients (employees)",
+      "المستلمون (الموظفون)",
+    ),
+    rejectCause: _m("Rejection reason", "سبب الرفض"),
+    rejectCausePlaceholder: _m(
+      "Describe why this request is rejected",
+      "اكتب سبب رفض الطلب",
+    ),
+    rejectCauseRequired: _m(
+      "Rejection reason is required",
+      "سبب الرفض مطلوب",
+    ),
   }),
 });
