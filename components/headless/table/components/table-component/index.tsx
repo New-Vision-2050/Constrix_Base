@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { InboxOutlined, SearchOff } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 import { TableProps } from "./types";
 
 // ============================================================================
@@ -23,6 +24,9 @@ import { TableProps } from "./types";
 export function createTableComponent<TRow>() {
   const TableComponent = (props: TableProps<TRow>) => {
     const t = useTranslations("Table");
+    const { theme: currentTheme } = useTheme();
+    const isGreenTheme =
+      currentTheme === "green-light" || currentTheme === "green-dark";
 
     // Extract props based on whether state is provided
     const isUsingState = "state" in props && props.state !== undefined;
@@ -221,7 +225,12 @@ export function createTableComponent<TRow>() {
               sx={{
                 ".MuiTableCell-root": {
                   fontWeight: 600,
-                  backgroundColor: "background.default",
+                  backgroundColor: isGreenTheme
+                    ? "primary.main"
+                    : "background.default",
+                  color: isGreenTheme
+                    ? "primary.contrastText"
+                    : "text.primary",
                 },
               }}
             >
@@ -232,6 +241,19 @@ export function createTableComponent<TRow>() {
                     checked={isAllSelected}
                     onChange={handleSelectAll}
                     disabled={loading || data.length === 0}
+                    sx={
+                      isGreenTheme
+                        ? {
+                            color: "primary.contrastText",
+                            "&.Mui-checked": {
+                              color: "primary.contrastText",
+                            },
+                            "&.MuiCheckbox-indeterminate": {
+                              color: "primary.contrastText",
+                            },
+                          }
+                        : {}
+                    }
                   />
                 </TableCell>
               )}
@@ -243,6 +265,19 @@ export function createTableComponent<TRow>() {
                       direction={sortBy === column.key ? sort || "asc" : "asc"}
                       onClick={() =>
                         handleColumnSort(column.key, column.sortable)
+                      }
+                      sx={
+                        isGreenTheme
+                          ? {
+                              color: "primary.contrastText !important",
+                              "&.Mui-active": {
+                                color: "primary.contrastText !important",
+                              },
+                              "& .MuiTableSortLabel-icon": {
+                                color: "primary.contrastText !important",
+                              },
+                            }
+                          : {}
                       }
                     >
                       {column.name}
@@ -270,6 +305,14 @@ export function createTableComponent<TRow>() {
                         selected={selected}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
+                          ...(isGreenTheme &&
+                            !selected &&
+                            index % 2 === 1 && {
+                              backgroundColor:
+                                currentTheme === "green-light"
+                                  ? "#F7FDF9"
+                                  : "#14573A",
+                            }),
                           ...(isSticky && {
                             backgroundColor: "action.hover",
                             borderLeft: "3px solid",

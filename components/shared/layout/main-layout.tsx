@@ -31,7 +31,9 @@ export default function MainLayout({
 
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
-  const isLight = currentTheme === "light";
+  const isLight = currentTheme === "light" || currentTheme === "green-light";
+  const isGreen =
+    currentTheme === "green-light" || currentTheme === "green-dark";
 
   // handle side effects - clear side-menu when page reload
   useEffect(() => {
@@ -59,12 +61,28 @@ export default function MainLayout({
     <main className="relative" dir={isRtl ? "rtl" : "ltr"}>
       <SparklesCore
         id="tsparticlesfullpage"
-        background={isLight ? "#ffffff" : "#18003A"}
+        background={
+          isGreen
+            ? isLight
+              ? "#ffffff"
+              : "#092A1E"
+            : isLight
+              ? "#ffffff"
+              : "#18003A"
+        }
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
         className="h-screen w-full fixed top-0 left-0 -z-20"
-        particleColor={isLight ? "#18003A" : "#ffffff"}
+        particleColor={
+          isGreen
+            ? isLight
+              ? "#25935F"
+              : "#88D8AD"
+            : isLight
+              ? "#18003A"
+              : "#ffffff"
+        }
       />{" "}
       <MobileDrawer
         open={mobileDrawerOpen}
