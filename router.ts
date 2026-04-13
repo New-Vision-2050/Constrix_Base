@@ -41,6 +41,7 @@ export const ROUTER = {
     settings: "/crm-settings",
     pricesOffers: "/client-relations/prices-offers",
     clientRequests: "/crm-settings/client-requests",
+    inbox: "/crm-settings/inbox",
   },
   DOCS_LIBRARY: "/docs-library",
   ACTIVITIES_LOGS: "/activities-logs",

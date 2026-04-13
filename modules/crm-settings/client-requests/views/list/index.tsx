@@ -24,11 +24,19 @@ import { ClientRequestRow, getClientRequestsColumns } from "./columns";
 import { statisticsConfig } from "./components/statistics-config";
 import { RequestFormDrawer } from "./components/RequestFormDrawer";
 import { ClientRequestsApi } from "@/services/api/client-requests";
+import { CRM_INBOX_PENDING_COUNT_QUERY_KEY } from "@/components/icons/crm-inbox";
 const CLIENT_REQUESTS_QUERY_KEY = "client-requests-list";
 
 const ClientRequestsTableLayout = HeadlessTableLayout<ClientRequestRow>("crl");
 
-function ClientRequestsList() {
+export type ClientRequestsListProps = {
+  /** Pre-select status filter (e.g. `pending` for CRM inbox). */
+  initialStatusFilter?: string;
+};
+
+function ClientRequestsList({
+  initialStatusFilter = "",
+}: ClientRequestsListProps) {
   const t = useTranslations();
   const queryClient = useQueryClient();
 
@@ -37,7 +45,7 @@ function ClientRequestsList() {
     null,
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState(initialStatusFilter);
   const [filterClientName, setFilterClientName] = useState("");
   const [filterRequestType, setFilterRequestType] = useState("");
   const [filterEmployee, setFilterEmployee] = useState("");
@@ -296,6 +304,9 @@ function ClientRequestsList() {
             await ClientRequestsApi.delete(deletingRequestId);
             queryClient.invalidateQueries({
               queryKey: [CLIENT_REQUESTS_QUERY_KEY],
+            });
+            queryClient.invalidateQueries({
+              queryKey: CRM_INBOX_PENDING_COUNT_QUERY_KEY,
             });
             setDeleteDialogOpen(false);
             setDeletingRequestId(null);
