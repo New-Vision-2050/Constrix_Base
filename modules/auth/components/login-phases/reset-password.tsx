@@ -16,6 +16,7 @@ import { useResetPassword } from "../../store/mutations";
 import { useTranslations } from "next-intl";
 import LoadingBackdrop from "@/components/shared/loading-backdrop";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { toast } from "sonner";
 
 const ResetPasswordPhase = ({
   handleSetStep,
@@ -32,6 +33,7 @@ const ResetPasswordPhase = ({
     register,
     getValues,
     reset,
+    trigger,
   } = useFormContext<LoginType>();
 
   const onSubmit = () => {
@@ -49,8 +51,27 @@ const ResetPasswordPhase = ({
           reset();
           handleSetStep(LOGIN_PHASES.IDENTIFIER);
         },
+        onError: (error: any) => {
+          // Extract backend error message - prioritize password error
+          if (error?.response?.data?.errors?.password) {
+            toast.error(error.response.data.errors.password[0]);
+          } else if (error?.response?.data?.message) {
+            toast.error(error.response.data.message);
+          } else {
+            toast.error(t("ResetPassword.GenericError"));
+          }
+        },
       },
     );
+  };
+
+  // Handle real-time validation without toast
+  const handlePasswordChange = () => {
+    trigger("newPassword");
+  };
+
+  const handleConfirmPasswordChange = () => {
+    trigger("confirmNewPassword");
   };
 
   return (
@@ -72,7 +93,9 @@ const ResetPasswordPhase = ({
           <TextField
             type="password"
             label={t("ResetPassword.NewPassword")}
-            {...register("newPassword")}
+            {...register("newPassword", {
+              onChange: () => handlePasswordChange(),
+            })}
             error={!!errors?.newPassword?.message}
             helperText={errors?.newPassword?.message}
             fullWidth
@@ -83,7 +106,9 @@ const ResetPasswordPhase = ({
           <TextField
             type="password"
             label={t("ResetPassword.ConfirmNewPassword")}
-            {...register("confirmNewPassword")}
+            {...register("confirmNewPassword", {
+              onChange: () => handleConfirmPasswordChange(),
+            })}
             error={!!errors?.confirmNewPassword?.message}
             helperText={errors?.confirmNewPassword?.message}
             fullWidth

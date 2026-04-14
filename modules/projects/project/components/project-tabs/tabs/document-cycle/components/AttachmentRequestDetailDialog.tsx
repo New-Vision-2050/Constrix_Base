@@ -216,6 +216,9 @@ function HistoryApprovalStepper({
               <Typography variant="body2" fontWeight={600} color="text.primary">
                 {historyDescriptionLabel(entry.description, t)}
               </Typography>
+              <Typography variant="body2" fontWeight={600} color="text.primary">
+                {formatDisplayDate(entry.timestamp)}
+              </Typography>
               <Chip
                 size="small"
                 label={historyActionLabel(entry.action, t)}

@@ -28,7 +28,20 @@ import { cn } from "@/lib/utils";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
 import type { RespondAttachmentItemPayload } from "@/services/api/projects/attachment-requests/types/params";
 import { DocumentRow, DocumentAttachment } from "../types";
-import { downloadAttachmentFile, getFilePreviewKind } from "../attachmentActions";
+
+const getInitials = (name: string | null | undefined) => {
+  if (!name) return "";
+  const parts = name.toUpperCase().trim().split(/\s+/);
+  if (parts.length > 1) {
+    return parts[0][0] + "\u200C" + parts[parts.length - 1][0];
+  }
+  return parts[0][0];
+};
+import {
+  createAuthenticatedPreviewUrl,
+  downloadAttachmentFile,
+  getFilePreviewKind,
+} from "../attachmentActions";
 
 interface FileViewerDialogProps {
   open: boolean;
@@ -229,7 +242,7 @@ export default function FileViewerDialog({
                     }}
                   >
                     <Avatar sx={{ width: 28, height: 28, fontSize: 12 }}>
-                      {(document.lastActivityUser || "?").charAt(0)}
+                        {getInitials(document.lastActivityUser || 'N/A')}
                     </Avatar>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
