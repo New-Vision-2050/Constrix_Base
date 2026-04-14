@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -25,15 +25,8 @@ export function createTableComponent<TRow>() {
   const TableComponent = (props: TableProps<TRow>) => {
     const t = useTranslations("Table");
     const { theme: currentTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-      setMounted(true);
-    }, []);
-
     const isGreenTheme =
-      mounted &&
-      (currentTheme === "green-light" || currentTheme === "green-dark");
+      currentTheme === "green-light" || currentTheme === "green-dark";
 
     // Extract props based on whether state is provided
     const isUsingState = "state" in props && props.state !== undefined;
