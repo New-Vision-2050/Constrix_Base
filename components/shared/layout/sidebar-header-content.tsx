@@ -32,19 +32,19 @@ const SidebarHeaderContent = ({
             <Image
                 src={mainLogo || LogoPlaceholder}
                 alt={name || "Company Logo"}
-                width={120}
-                height={120}
+                width={40}
+                height={40}
                 priority
-                className="w-[120px] h-[120px] rounded-full object-cover overflow-hidden"
+                className="w-[40px] h-[40px] rounded-full object-cover overflow-hidden"
             />
         ) : (
             <Image
                 src={mainLogo || LogoPlaceholder}
                 alt={name || "Company Logo"}
-                width={120}
-                height={120}
+                width={40}
+                height={40}
                 priority
-                className="w-[120px] h-[120px] rounded-full object-cover overflow-hidden"
+                className="w-[40px] h-[40px] rounded-full object-cover overflow-hidden"
             />
         )}
 
