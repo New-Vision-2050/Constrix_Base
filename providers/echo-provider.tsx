@@ -4,6 +4,7 @@ import React, { createContext, useEffect, useState } from "react";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 import { toast } from "sonner";
+import { ClientRequestInboxEchoSubscriber } from "@/modules/crm-settings/inbox/components/ClientRequestInboxEchoSubscriber";
 
 export interface EchoContextValue {
   echo: Echo<"reverb">;
@@ -131,6 +132,7 @@ export function EchoProvider({
         companyChannelName: `company.${companyId}`,
       }}
     >
+      <ClientRequestInboxEchoSubscriber />
       {children}
     </EchoContext.Provider>
   );

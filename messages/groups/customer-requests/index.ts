@@ -110,6 +110,14 @@ export const clientRequestsMessages = new MessagesGroup({
     viewDetails: _m("View details", "عرض التفاصيل"),
     servicesSelected: _m("Selected services", "الخدمات المختارة"),
     closeDialog: _m("Close", "إغلاق"),
+    toastRealtimeNewRequest: _m(
+      "New client request",
+      "طلب عميل جديد",
+    ),
+    toastRealtimeRequestUpdated: _m(
+      "Client request updated",
+      "تم تحديث طلب عميل",
+    ),
   }),
   dialog: new MessagesGroup({
     sendAs: _m("Send As", "أرسال ك"),

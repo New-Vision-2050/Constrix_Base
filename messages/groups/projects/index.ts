@@ -153,7 +153,7 @@ export const projectMessages = new MessagesGroup({
   staff: new MessagesGroup({
     title: _m("Staff", "الكادر"),
     addStaff: _m("Add new staff", "إضافة كادر جديد"),
-    addStaffButton: _m("Add staff", "إضافة كادر"),
+    add: _m("Add", "اضافة"),
     name: _m("Name", "الاسم"),
     phone: _m("Phone", "الهاتف"),
     email: _m("Email", "البريد الإلكتروني"),
@@ -163,9 +163,30 @@ export const projectMessages = new MessagesGroup({
     mobileNumber: _m("Mobile number", "رقم الجوال"),
     department: _m("Department", "الإدارة"),
     departmentDefault: _m("General", "عامة"),
+    company: _m("company", "الجهة"),
+    role: _m("Role", "الدور"),
+    rolePlaceholder: _m("—", "—"),
     columnActions: _m("Actions", "الإجراء"),
     actionMenu: _m("Action", "إجراء"),
     edit: _m("Edit", "تعديل"),
+    delete: _m("Remove", "إزالة"),
+    deleteConfirm: _m(
+      "Remove this employee from the project?",
+      "إزالة هذا الموظف من المشروع؟",
+    ),
+    deleteDialogTitle: _m("Remove from project", "إزالة من المشروع"),
+    deleteDialogBody: _m(
+      'Remove "{name}" from this project? This cannot be undone.',
+      'إزالة "{name}" من هذا المشروع؟ لا يمكن التراجع عن هذا الإجراء.',
+    ),
+    removeSuccess: _m(
+      "Employee removed from the project",
+      "تم إزالة الموظف من المشروع",
+    ),
+    removeError: _m(
+      "Could not remove employee",
+      "تعذر إزالة الموظف",
+    ),
     selectEmployees: _m("Select employees", "اختر الموظفين"),
     assignSuccess: _m(
       "Employees assigned to the project",
