@@ -49,7 +49,7 @@ export function EchoProvider({
     const instance = new Echo({
       broadcaster: "reverb",
       key: process.env.NEXT_PUBLIC_REVERB_KEY  ,//
-      wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || "core-be-dev.constrix-nv.com",
+      wsHost: wsHost|| "core-be-dev.constrix-nv.com",
       wsPort: process.env.NEXT_PUBLIC_REVERB_PORT ? Number(process.env.NEXT_PUBLIC_REVERB_PORT) : 80,
       wssPort: process.env.NEXT_PUBLIC_REVERB_WSS_PORT ? Number(process.env.NEXT_PUBLIC_REVERB_WSS_PORT) : 443,
       forceTLS: (process.env.NEXT_PUBLIC_REVERB_FORCE_TLS ?? "true") === "true",
