@@ -53,8 +53,8 @@ const SearchDateField: React.FC<SearchDateFieldProps> = ({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal bg-transparent border-gray-700 text-white",
-            !date && "text-gray-400",
+            "w-full justify-start text-left font-normal bg-transparent border-border text-foreground",
+            !date && "text-muted-foreground",
             className
           )}
           disabled={disabled}
@@ -63,7 +63,7 @@ const SearchDateField: React.FC<SearchDateFieldProps> = ({
           {date ? format(date, 'd/M/yyyy') : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 bg-gray-800 border-gray-700" align="start">
+      <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
         <DayPicker
           mode="single"
           selected={date}
@@ -74,22 +74,22 @@ const SearchDateField: React.FC<SearchDateFieldProps> = ({
           classNames={{
             months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
             month: "space-y-4",
-            caption: "flex justify-center pt-1 relative items-center text-white",
+            caption: "flex justify-center pt-1 relative items-center text-foreground",
             caption_label: "text-sm font-medium",
             nav: "space-x-1 flex items-center",
-            nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-white border border-gray-600 rounded",
+            nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-foreground border border-border rounded",
             nav_button_previous: "absolute left-1",
             nav_button_next: "absolute right-1",
             table: "w-full border-collapse space-y-1",
             head_row: "flex",
-            head_cell: "text-gray-400 rounded-md w-9 font-normal text-[0.8rem]",
+            head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
             row: "flex w-full mt-2",
-            cell: "h-9 w-9 text-center text-sm p-0 relative hover:bg-gray-700 rounded-md",
-            day: "h-9 w-9 p-0 font-normal text-white hover:bg-gray-700 rounded-md",
-            day_selected: "bg-blue-600 text-white hover:bg-blue-700 focus:bg-blue-600",
-            day_today: "bg-gray-700 text-white",
-            day_outside: "text-gray-500 opacity-50",
-            day_disabled: "text-gray-600 opacity-50",
+            cell: "h-9 w-9 text-center text-sm p-0 relative hover:bg-muted rounded-md",
+            day: "h-9 w-9 p-0 font-normal text-foreground hover:bg-muted rounded-md",
+            day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary",
+            day_today: "bg-muted text-foreground",
+            day_outside: "text-muted-foreground/50 opacity-50",
+            day_disabled: "text-muted-foreground/60 opacity-50",
             day_hidden: "invisible",
           }}
         />

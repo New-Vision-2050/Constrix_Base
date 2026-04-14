@@ -432,7 +432,15 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
                       borderRadius: 1,
                     }}
                   >
-                    <FileIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <Box
+                      sx={{
+                        color: "text.secondary",
+                        display: "flex",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <FileIcon className="w-5 h-5" />
+                    </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Typography variant="body2" noWrap title={file.name}>
                         {file.name}
@@ -475,7 +483,15 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
             >
               {files.length === 0 ? (
                 <>
-                  <Upload className="w-5 h-5 text-gray-400" />
+                  <Box
+                    component="span"
+                    sx={{
+                      color: "text.secondary",
+                      display: "inline-flex",
+                    }}
+                  >
+                    <Upload className="w-5 h-5" />
+                  </Box>
                   <Typography variant="body2" color="text.secondary">
                     {t("attachFile")}
                   </Typography>

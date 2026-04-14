@@ -34,15 +34,14 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
 
   return (
     <div className={cn("relative", className)}>
-      {/* Toggle Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
           "flex items-center gap-2 px-3 py-2 rounded-lg",
-          "bg-gray-700 border border-gray-600 text-white",
-          "hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500",
+          "bg-muted border border-border text-foreground",
+          "hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-primary",
           "transition-colors duration-200",
           disabled && "opacity-50 cursor-not-allowed"
         )}
@@ -51,16 +50,15 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
         {getCurrentIcon()}
       </button>
 
-      {/* Dropdown Menu */}
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-10">
+        <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-lg shadow-lg z-10">
           <button
             type="button"
             onClick={() => handleModeSelect('grid')}
             className={cn(
-              "flex items-center gap-2 w-full px-3 py-2 text-left text-white hover:bg-gray-700",
+              "flex items-center gap-2 w-full px-3 py-2 text-left text-foreground hover:bg-muted",
               "rounded-t-lg transition-colors duration-200",
-              viewMode === 'grid' && "bg-blue-600 hover:bg-blue-700"
+              viewMode === 'grid' && "bg-primary text-primary-foreground hover:bg-primary/90"
             )}
           >
             <Grid3X3 className="h-4 w-4" />
@@ -70,9 +68,9 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             type="button"
             onClick={() => handleModeSelect('list')}
             className={cn(
-              "flex items-center gap-2 w-full px-3 py-2 text-left text-white hover:bg-gray-700",
+              "flex items-center gap-2 w-full px-3 py-2 text-left text-foreground hover:bg-muted",
               "rounded-b-lg transition-colors duration-200",
-              viewMode === 'list' && "bg-blue-600 hover:bg-blue-700"
+              viewMode === 'list' && "bg-primary text-primary-foreground hover:bg-primary/90"
             )}
           >
             <List className="h-4 w-4" />

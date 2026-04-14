@@ -194,7 +194,7 @@ export default function DocViewDialog() {
                 onClick={handleFavorite}
               >
                 {isFavorite ? (
-                  <Star className="h-4 w-4 text-pink-600" />
+                  <Star className="h-4 w-4 text-primary" />
                 ) : (
                   <StarOff className="h-4 w-4" />
                 )}
