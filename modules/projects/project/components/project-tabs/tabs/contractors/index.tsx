@@ -75,23 +75,14 @@ function AttachmentIcons({ attachments }: { attachments: string[] }) {
         switch (type) {
           case "excel":
             return (
-              <FileSpreadsheet
-                key={idx}
-                className="w-5 h-5 text-green-500"
-              />
+              <FileSpreadsheet key={idx} className="w-5 h-5 text-green-500" />
             );
           case "pdf":
-            return (
-              <FileText key={idx} className="w-5 h-5 text-red-500" />
-            );
+            return <FileText key={idx} className="w-5 h-5 text-red-500" />;
           case "word":
-            return (
-              <FileIcon key={idx} className="w-5 h-5 text-blue-500" />
-            );
+            return <FileIcon key={idx} className="w-5 h-5 text-blue-500" />;
           default:
-            return (
-              <FileIcon key={idx} className="w-5 h-5 text-gray-400" />
-            );
+            return <FileIcon key={idx} className="w-5 h-5 text-gray-400" />;
         }
       })}
     </Box>
@@ -177,7 +168,7 @@ export default function ContractorsTab() {
             <Button
               size="small"
               variant="contained"
-              color="info"
+              color="primary"
               onClick={onClick}
             >
               اجراء
@@ -216,12 +207,11 @@ export default function ContractorsTab() {
           <ContractorsTableLayout.TopActions
             state={state}
             customActions={
-              <Button variant="contained"  onClick={() => {}}>
+              <Button variant="contained" onClick={() => {}}>
                 اضافة مشروع
               </Button>
             }
-          >
-          </ContractorsTableLayout.TopActions>
+          ></ContractorsTableLayout.TopActions>
         }
         table={
           <ContractorsTableLayout.Table

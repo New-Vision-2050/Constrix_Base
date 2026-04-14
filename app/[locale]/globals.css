@@ -155,6 +155,166 @@
 
     --purple: 248 44% 38%;
   }
+
+  .green-light {
+    --list-node-background: #dff6e7;
+
+    --list-sub-node-background: #b8eacb;
+
+    --background: 220 14% 96%;
+
+    --foreground: 218 39% 11%;
+
+    --lines: 152 60% 36%;
+
+    --text-hover: 153 66% 31%;
+
+    --card: 0 0% 100%;
+
+    --card-foreground: 218 39% 11%;
+
+    --popover: 0 0% 100%;
+
+    --popover-foreground: 218 39% 11%;
+
+    --primary: 152 60% 36%;
+
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 220 14% 96%;
+
+    --secondary-foreground: 218 39% 11%;
+
+    --muted: 220 14% 96%;
+
+    --muted-foreground: 218 8% 46%;
+
+    --accent: 140 64% 97%;
+
+    --accent-foreground: 218 39% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 13% 91%;
+
+    --input: 220 13% 91%;
+
+    --ring: 152 60% 36%;
+
+    --chart-1: 152 60% 36%;
+
+    --chart-2: 46 98% 48%;
+
+    --chart-3: 215 18% 27%;
+
+    --chart-4: 150 46% 54%;
+
+    --chart-5: 44 98% 43%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 100%;
+
+    --sidebar-foreground: 218 39% 11%;
+
+    --sidebar-primary: 152 60% 36%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 141 58% 92%;
+
+    --sidebar-accent-foreground: 218 39% 11%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 152 60% 36%;
+
+    --purple: 152 60% 36%;
+
+    --table-row-alt: #f7fdf9;
+  }
+
+  .green-dark {
+    --list-node-background: #104631;
+
+    --list-sub-node-background: #14573a;
+
+    --background: 158 65% 10%;
+
+    --foreground: 0 0% 98%;
+
+    --lines: 143 54% 82%;
+
+    --text-hover: 148 51% 69%;
+
+    --card: 157 63% 17%;
+
+    --card-foreground: 0 0% 98%;
+
+    --popover: 154 66% 25%;
+
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 150 46% 54%;
+
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 216 28% 17%;
+
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 216 28% 17%;
+
+    --muted-foreground: 215 10% 65%;
+
+    --accent: 154 63% 21%;
+
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 216 28% 17%;
+
+    --input: 216 28% 17%;
+
+    --ring: 148 51% 69%;
+
+    --chart-1: 150 46% 54%;
+
+    --chart-2: 46 98% 48%;
+
+    --chart-3: 44 98% 43%;
+
+    --chart-4: 143 54% 82%;
+
+    --chart-5: 42 92% 64%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 158 65% 10%;
+
+    --sidebar-foreground: 220 14% 98%;
+
+    --sidebar-primary: 150 46% 54%;
+
+    --sidebar-primary-foreground: 0 0% 100%;
+
+    --sidebar-accent: 157 63% 17%;
+
+    --sidebar-accent-foreground: 220 14% 98%;
+
+    --sidebar-border: 157 63% 17%;
+
+    --sidebar-ring: 152 60% 36%;
+
+    --purple: 152 60% 36%;
+
+    --table-row-alt: #14573a;
+  }
 }
 
 body[data-scroll-locked] .dashboard-sidebar,
@@ -195,4 +355,77 @@ html {
   100% {
     background-position: 200% 0;
   }
+}
+
+/* Green theme table overrides */
+:is(.green-light, .green-dark) thead tr {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+:is(.green-light, .green-dark) thead th {
+  color: hsl(var(--primary-foreground));
+}
+
+:is(.green-light, .green-dark) thead th button {
+  color: inherit;
+}
+
+:is(.green-light, .green-dark) thead th button:hover {
+  opacity: 0.8;
+}
+
+:is(.green-light, .green-dark) thead th svg {
+  color: hsl(var(--primary-foreground) / 0.7);
+}
+
+:is(.green-light, .green-dark) thead [role="checkbox"] {
+  border-color: hsl(var(--primary-foreground));
+}
+
+:is(.green-light, .green-dark) thead [role="checkbox"][data-state="checked"] {
+  background-color: hsl(var(--primary-foreground));
+  color: hsl(var(--primary));
+}
+
+/* Green theme navbar */
+:is(.green-light, .green-dark) header {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+:is(.green-light, .green-dark) header button,
+:is(.green-light, .green-dark) header a,
+:is(.green-light, .green-dark) header svg {
+  color: hsl(var(--primary-foreground));
+}
+
+:is(.green-light, .green-dark) header nav,
+:is(.green-light, .green-dark) header nav a,
+:is(.green-light, .green-dark) header nav li,
+:is(.green-light, .green-dark) header nav span,
+:is(.green-light, .green-dark) header .breadcrumbs-container,
+:is(.green-light, .green-dark) header .breadcrumbs-container * {
+  color: hsl(var(--primary-foreground));
+}
+
+/* Green theme sidebar */
+:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"] {
+  background-color: hsl(var(--sidebar-primary));
+  color: hsl(var(--sidebar-primary-foreground));
+}
+
+:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"] svg {
+  color: hsl(var(--sidebar-primary-foreground));
+}
+
+:is(.green-light, .green-dark) [data-sidebar="menu-button"]:hover {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-accent-foreground));
+}
+
+:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"]:hover {
+  background-color: hsl(var(--sidebar-primary));
+  color: hsl(var(--sidebar-primary-foreground));
+  opacity: 0.9;
 }

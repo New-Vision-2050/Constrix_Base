@@ -133,7 +133,7 @@ export default function TasksTable() {
       render: () => (
         <CustomMenu
           renderAnchor={({ onClick }) => (
-            <Button size="small" variant="contained" color="info" onClick={onClick}>الاجراءات</Button>
+            <Button size="small" variant="contained" color="primary" onClick={onClick}>الاجراءات</Button>
           )}
         >
           <MenuItem

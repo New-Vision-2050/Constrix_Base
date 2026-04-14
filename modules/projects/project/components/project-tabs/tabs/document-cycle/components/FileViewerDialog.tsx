@@ -292,7 +292,7 @@ export default function FileViewerDialog({
                       <Box
                         sx={{
                           bgcolor: "primary.main",
-                          color: "white",
+                          color: "primary.contrastText",
                           borderRadius: 2,
                           px: 2,
                           py: 1,

@@ -84,6 +84,7 @@ export default async function RootLayout({
             attribute="class"
             defaultTheme="dark"
             enableSystem
+            themes={["light", "dark", "system", "green-light", "green-dark"]}
             disableTransitionOnChange
           >
             <CustomThemeProvider direction={direction}>

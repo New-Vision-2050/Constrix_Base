@@ -26,7 +26,9 @@ export const MainProjectSelector = memo(function MainProjectSelector({
   const t = useTranslations();
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
-  const isDarkMode = currentTheme === "dark";
+  const isDarkMode = currentTheme === "dark" || currentTheme === "green-dark";
+  const isGreenTheme =
+    currentTheme === "green-light" || currentTheme === "green-dark";
 
   // Handle project selection from dropdown
   const handleProjectSelect = (project: Project) => {
@@ -53,7 +55,7 @@ export const MainProjectSelector = memo(function MainProjectSelector({
       <CustomMenu
         renderAnchor={({ onClick, open }) => (
           <Button
-            variant="outlined"
+            variant={isGreenTheme ? "contained" : "outlined"}
             endIcon={
               <ChevronDown
                 className={cn(
@@ -69,11 +71,27 @@ export const MainProjectSelector = memo(function MainProjectSelector({
               alignItems: "center",
               gap: 2,
               padding: 1,
-              color: "text.primary",
-              borderColor: "text.primary",
+              ...(isGreenTheme
+                ? {
+                    backgroundColor: "primary.main",
+                    color: "primary.contrastText",
+                    borderColor: "primary.main",
+                    "&:hover": {
+                      backgroundColor: "primary.main",
+                      opacity: 0.9,
+                    },
+                  }
+                : {
+                    color: "text.primary",
+                    borderColor: "text.primary",
+                  }),
             }}
           >
-            <Typography variant="subtitle1" fontWeight={600}>
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              color={isGreenTheme ? "primary.contrastText" : "text.primary"}
+            >
               {activeProject?.name}
             </Typography>
           </Button>

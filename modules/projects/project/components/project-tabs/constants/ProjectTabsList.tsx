@@ -8,14 +8,14 @@ import {
   Paperclip,
   // Users,
   UserCog,
-  // ClipboardList,
-  // DollarSign,
-  // FileText,
-  FolderSync,
+  ClipboardList,
+  DollarSign,
+  FileText,
   Share2,
 } from "lucide-react";
-// import ProjectDataTab from "../tabs/project-data";
-// import WorkspaceTab from "../tabs/workspace";
+import FolderSyncIconWithCount from "@/components/icons/folder-sync";
+import ProjectDataTab from "../tabs/project-data";
+import WorkspaceTab from "../tabs/workspace";
 import AttachmentsTab from "../tabs/attachments";
 // import ContractorsTab from "../tabs/contractors";
 import StaffTab from "../tabs/staff";
@@ -85,7 +85,7 @@ const ALL_TABS: SystemTab[] = [
   {
     id: "project-tab-document-cycle",
     title: "دورة الوثائق",
-    icon: <FolderSync className="w-4 h-4" />,
+    icon: <FolderSyncIconWithCount />,
     content: <DocumentCycleTab />,
   },
 ];

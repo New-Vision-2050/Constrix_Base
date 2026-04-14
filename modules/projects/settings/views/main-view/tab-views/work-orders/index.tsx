@@ -45,10 +45,10 @@ export default function WorkOrdersView() {
               <Card
                 sx={{
                   minWidth: 275,
-                  color: "white",
+                  color: "text.primary",
                   display: "flex",
                   justifyContent: "space-between",
-                  "&:hover": { backgroundColor: "#2d2d5a" },
+                  "&:hover": { backgroundColor: "action.hover" },
                 }}
               >
                 <CardContent>
@@ -66,10 +66,10 @@ export default function WorkOrdersView() {
               <Card
                 sx={{
                   minWidth: 275,
-                  color: "white",
+                  color: "text.primary",
                   display: "flex",
                   justifyContent: "space-between",
-                  "&:hover": { backgroundColor: "#2d2d5a" },
+                  "&:hover": { backgroundColor: "action.hover" },
                 }}
               >
                 <CardContent>
@@ -87,10 +87,10 @@ export default function WorkOrdersView() {
               <Card
                 sx={{
                   minWidth: 275,
-                  color: "white",
+                  color: "text.primary",
                   display: "flex",
                   justifyContent: "space-between",
-                  "&:hover": { backgroundColor: "#2d2d5a" },
+                  "&:hover": { backgroundColor: "action.hover" },
                 }}
               >
                 <CardContent>
@@ -108,10 +108,10 @@ export default function WorkOrdersView() {
               <Card
                 sx={{
                   minWidth: 275,
-                  color: "white",
+                  color: "text.primary",
                   display: "flex",
                   justifyContent: "space-between",
-                  "&:hover": { backgroundColor: "#2d2d5a" },
+                  "&:hover": { backgroundColor: "action.hover" },
                 }}
               >
                 <CardContent>
@@ -129,10 +129,10 @@ export default function WorkOrdersView() {
               <Card
                 sx={{
                   minWidth: 275,
-                  color: "white",
+                  color: "text.primary",
                   display: "flex",
                   justifyContent: "space-between",
-                  "&:hover": { backgroundColor: "#2d2d5a" },
+                  "&:hover": { backgroundColor: "action.hover" },
                 }}
               >
                 <CardContent>

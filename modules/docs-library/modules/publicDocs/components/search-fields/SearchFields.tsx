@@ -33,7 +33,7 @@ const SearchFields: React.FC<SearchFieldsProps> = ({
     <div className={`bg-sidebar rounded-lg p-4 ${className}`}>
       {/* Search filter header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-white text-lg font-medium">{t("search")}</h3>
+        <h3 className="text-foreground text-lg font-medium">{t("search")}</h3>
       </div>
 
       {/* Search fields grid */}

@@ -146,7 +146,7 @@ function ProjectsList() {
                 color="inherit"
                 endIcon={<span style={{ fontSize: 9 }}>▼</span>}
                 onClick={onClick}
-                sx={{ bgcolor: "#3f3f5a", color: "#fff", minWidth: 80 }}
+                sx={{ bgcolor: "primary.main", color: "primary.contrastText", minWidth: 80 }}
               >
                 {tProject("tableActions")}
               </Button>
@@ -231,7 +231,8 @@ function ProjectsList() {
           mb: 3,
           p: 2.5,
           borderRadius: 2,
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: 1,
+          borderColor: "divider",
         }}
       >
         <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>

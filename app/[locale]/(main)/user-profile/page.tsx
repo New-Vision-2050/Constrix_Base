@@ -5,11 +5,12 @@ import { getPermissions } from "@/lib/permissions/server/get-permissions";
 
 
 type UserProfilePageProps = {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default withServerPermissionsPage(
-  async function UserProfilePage({ searchParams }: UserProfilePageProps) {
+  async function UserProfilePage({ searchParams: searchParamsPromise }: UserProfilePageProps) {
+    const searchParams = await searchParamsPromise;
     const { user: data } = await getPermissions();
     const me = data ?? null;
     const meUserId = me?.id;

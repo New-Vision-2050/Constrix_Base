@@ -52,8 +52,8 @@ function RequestFlowCell({ row, t }: { row: DocumentRow; t: (key: string) => str
         px: 1.5,
         py: 0.5,
         borderRadius: "6px",
-        bgcolor: incoming ? "#1E40AF" : "success.main",
-        color: "#fff",
+        bgcolor: incoming ? "primary.main" : "success.main",
+        color: incoming ? "primary.contrastText" : "success.contrastText",
         fontWeight: 600,
         fontSize: "0.8rem",
         minWidth: 50,
@@ -193,7 +193,7 @@ export default function AttachmentRequestsTable() {
               <Button
                 size="small"
                 variant="contained"
-                color="info"
+                color="primary"
                 onClick={onClick}
               >
                 {t("action")}

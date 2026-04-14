@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Box, Button, Chip, MenuItem, Typography } from "@mui/material";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
-import {  EditIcon } from "lucide-react";
+import { EditIcon } from "lucide-react";
 
 export interface WorkOrder {
   id: string;
@@ -18,10 +18,10 @@ export interface WorkOrder {
 }
 
 const actionStatusColors: Record<string, { bg: string; color: string }> = {
-  تنفيذ: { bg: "#2e7d32", color: "#fff" },
-  "تغيير موعد": { bg: "#f9a825", color: "#fff" },
-  "طلب تحويل": { bg: "#2e7d32", color: "#fff" },
-  تأخير: { bg: "#c62828", color: "#fff" },
+  تنفيذ: { bg: "success.main", color: "common.white" },
+  "تغيير موعد": { bg: "warning.main", color: "common.white" },
+  "طلب تحويل": { bg: "success.main", color: "common.white" },
+  تأخير: { bg: "error.main", color: "common.white" },
 };
 
 const MOCK_WORK_ORDERS: WorkOrder[] = [
@@ -116,8 +116,8 @@ const getWorkOrderColumns = () => [
     sortable: false,
     render: (row: WorkOrder) => {
       const colors = actionStatusColors[row.actionTaken] || {
-        bg: "#757575",
-        color: "#fff",
+        bg: "text.disabled",
+        color: "common.white",
       };
       return (
         <Chip
@@ -158,14 +158,19 @@ export default function WorkOrdersTable() {
       name: "الاعدادات",
       sortable: false,
       render: () => (
-         <CustomMenu
+        <CustomMenu
           renderAnchor={({ onClick }) => (
-            <Button  size="small" variant="contained" color="info" onClick={onClick}>الاجراءات</Button>
+            <Button
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={onClick}
+            >
+              الاجراءات
+            </Button>
           )}
         >
-          <MenuItem
-            onClick={() => {}}
-          >
+          <MenuItem onClick={() => {}}>
             <EditIcon className="w-4 h-4 ml-2" />
             تعديل
           </MenuItem>
@@ -191,8 +196,9 @@ export default function WorkOrdersTable() {
       </Typography>
       <WorkOrdersTableLayout
         filters={
-          <WorkOrdersTableLayout.TopActions state={state} >
-          </WorkOrdersTableLayout.TopActions>
+          <WorkOrdersTableLayout.TopActions
+            state={state}
+          ></WorkOrdersTableLayout.TopActions>
         }
         table={
           <WorkOrdersTableLayout.Table
@@ -205,4 +211,3 @@ export default function WorkOrdersTable() {
     </Box>
   );
 }
-

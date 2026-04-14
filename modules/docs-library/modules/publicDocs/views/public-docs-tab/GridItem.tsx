@@ -174,12 +174,12 @@ export default function GridItem({
                 {isDocInDetails ? (
                   <EyeOff
                     onClick={handleViewDetails}
-                    className="w-5 h-5 text-blue-500 hover:text-blue-600 cursor-pointer transition-colors"
+                    className="w-5 h-5 text-primary hover:text-primary/80 cursor-pointer transition-colors"
                   />
                 ) : (
                   <Eye
                     onClick={handleViewDetails}
-                    className="w-5 h-5 text-blue-500 hover:text-blue-600 cursor-pointer transition-colors"
+                    className="w-5 h-5 text-primary hover:text-primary/80 cursor-pointer transition-colors"
                   />
                 )}
               </TooltipTrigger>
@@ -193,7 +193,7 @@ export default function GridItem({
                 <TooltipTrigger asChild>
                   <SquareMenu
                     onClick={() => setDocToView(document)}
-                    className="w-5 h-5 text-blue-500 hover:text-blue-600 cursor-pointer transition-colors"
+                    className="w-5 h-5 text-primary hover:text-primary/80 cursor-pointer transition-colors"
                   />
                 </TooltipTrigger>
                 <TooltipContent>

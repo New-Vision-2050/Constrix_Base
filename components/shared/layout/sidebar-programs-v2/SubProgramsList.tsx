@@ -16,6 +16,7 @@ import {
   useTheme,
   alpha,
 } from "@mui/material";
+import { useTheme as useNextTheme } from "next-themes";
 
 type SubProgramsListProps = {
   activeUrl: string;
@@ -37,6 +38,9 @@ export const SubProgramsList = memo(function SubProgramsList({
   const { open } = useSidebar();
   const t = useTranslations();
   const { palette } = useTheme();
+  const { theme: nextTheme } = useNextTheme();
+  const isGreenTheme =
+    nextTheme === "green-light" || nextTheme === "green-dark";
 
   const visibleSubEntities =
     activeProject?.sub_entities?.filter((item) => item.show) ?? [];
@@ -96,24 +100,34 @@ export const SubProgramsList = memo(function SubProgramsList({
                     mx: 0.5,
                     transition: "all 0.2s ease-in-out",
                     overflow: "hidden",
-                    "&.Mui-selected": {
-                      backgroundColor: alpha(palette.primary.main, 0.1),
-                      color: "primary.main",
-                      fontWeight: 600,
-                      "&:hover": {
-                        backgroundColor: alpha(palette.primary.main, 0.2),
-                      },
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: 4,
-                        backgroundColor: "primary.main",
-                        borderRadius: "0 4px 4px 0",
-                      },
-                    },
+                    "&.Mui-selected": isGreenTheme
+                      ? {
+                          backgroundColor: "primary.main",
+                          color: "primary.contrastText",
+                          fontWeight: 600,
+                          "&:hover": {
+                            backgroundColor: "primary.main",
+                            opacity: 0.9,
+                          },
+                        }
+                      : {
+                          backgroundColor: alpha(palette.primary.main, 0.1),
+                          color: "primary.main",
+                          fontWeight: 600,
+                          "&:hover": {
+                            backgroundColor: alpha(palette.primary.main, 0.2),
+                          },
+                          "&::before": {
+                            content: '""',
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: 4,
+                            backgroundColor: "primary.main",
+                            borderRadius: "0 4px 4px 0",
+                          },
+                        },
                     "&:hover": {
                       backgroundColor: "action.hover",
                       transform: "translateX(4px)",
@@ -126,7 +140,12 @@ export const SubProgramsList = memo(function SubProgramsList({
                     <ListItemIcon
                       sx={{
                         minWidth: 40,
-                        color: isActive ? "primary.main" : "text.primary",
+                        color:
+                          isActive && isGreenTheme
+                            ? "primary.contrastText"
+                            : isActive
+                              ? "primary.main"
+                              : "text.primary",
                         transition: "all 0.2s ease-in-out",
                         "& svg": {
                           fontSize: "1.25rem",
@@ -143,7 +162,12 @@ export const SubProgramsList = memo(function SubProgramsList({
                           style: {
                             width: "20px",
                             height: "20px",
-                            fill: isActive ? "currentColor" : palette.text.primary,
+                            fill:
+                          isActive && isGreenTheme
+                            ? "#ffffff"
+                            : isActive
+                              ? "currentColor"
+                              : palette.text.primary,
                           },
                         })
                       ) : (
@@ -172,7 +196,12 @@ export const SubProgramsList = memo(function SubProgramsList({
                       fontWeight: isActive ? 600 : 400,
                       noWrap: true,
                       sx: {
-                        color: isActive ? "primary.main" : "text.primary",
+                        color:
+                          isActive && isGreenTheme
+                            ? "primary.contrastText"
+                            : isActive
+                              ? "primary.main"
+                              : "text.primary",
                         transition: "color 0.2s ease-in-out",
                       },
                     }}
