@@ -1,11 +1,18 @@
 "use client";
 
 import React from "react";
-import { Box, Typography, Avatar, Stack, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Stack,
+  IconButton,
+  useTheme,
+  alpha,
+} from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { ZoomIn } from "lucide-react";
 
-// ─── Circular Ring Badge ────────────────────────────────────────────────
 function RingBadge({
   value,
   label,
@@ -17,7 +24,7 @@ function RingBadge({
 }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5 }}>
-      <Typography sx={{ fontSize: 10, color: "grey.500" }}>{label}</Typography>
+      <Typography sx={{ fontSize: 10, color: "text.secondary" }}>{label}</Typography>
       <Box
         sx={{
           width: 64,
@@ -30,16 +37,15 @@ function RingBadge({
           justifyContent: "center",
         }}
       >
-        <Typography sx={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>
+        <Typography sx={{ fontSize: 14, fontWeight: 700, color: "text.primary" }}>
           {value}
         </Typography>
-        <Typography sx={{ fontSize: 9, color: "grey.500" }}>ريال</Typography>
+        <Typography sx={{ fontSize: 9, color: "text.secondary" }}>ريال</Typography>
       </Box>
     </Box>
   );
 }
 
-// ─── Contractor Row ─────────────────────────────────────────────────────
 function ContractorRow({
   name,
   avatarSrc,
@@ -59,13 +65,12 @@ function ContractorRow({
           border: `2px solid ${ringColor}`,
         }}
       />
-      <Typography sx={{ fontSize: 11, color: "grey.400" }}>{name}</Typography>
+      <Typography sx={{ fontSize: 11, color: "text.secondary" }}>{name}</Typography>
     </Box>
   );
 }
 
-// ─── Wavy Line SVG (permits trend) ─────────────────────────────────────
-function WavyLineChart() {
+function WavyLineChart({ color }: { color: string }) {
   return (
     <svg
       width="180"
@@ -76,19 +81,19 @@ function WavyLineChart() {
     >
       <path
         d="M5 45 C20 45, 25 15, 40 20 S60 50, 75 35 S95 5, 110 15 S130 45, 145 30 S160 10, 175 20"
-        stroke="#E91E90"
+        stroke={color}
         strokeWidth="2.5"
         strokeLinecap="round"
         fill="none"
       />
       <path
         d="M5 45 C20 45, 25 15, 40 20 S60 50, 75 35 S95 5, 110 15 S130 45, 145 30 S160 10, 175 20 V60 H5 Z"
-        fill="url(#gradient)"
+        fill="url(#wavyGradient)"
         opacity="0.15"
       />
       <defs>
-        <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#E91E90" />
+        <linearGradient id="wavyGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} />
           <stop offset="100%" stopColor="transparent" />
         </linearGradient>
       </defs>
@@ -101,13 +106,14 @@ const barChartLabels = ["الاصايل", "الهاجدية", "الانوار"];
 const barSeries1 = [700, 450, 600]; // red/orange bars
 const barSeries2 = [500, 350, 500]; // yellow bars
 
-// ─── Main Stats Bar ─────────────────────────────────────────────────────
 export default function ProjectStatsBar() {
+  const { palette } = useTheme();
+
   return (
     <Box
       sx={{
         width: "100%",
-        bgcolor: "#1a1333",
+        bgcolor: "background.paper",
         borderRadius: 3,
         p: 2,
         display: "flex",
@@ -115,16 +121,14 @@ export default function ProjectStatsBar() {
         justifyContent: "space-between",
       }}
     >
-      {/* ──────── Section 1: قيمة المهام + القيمة المالية ──────── */}
       <Stack spacing={1.5} sx={{ minWidth: 170 }}>
-        {/* قيمة المهام */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Box
             sx={{
               width: 40,
               height: 40,
               borderRadius: 2,
-              bgcolor: "#2c2550",
+              bgcolor: alpha(palette.primary.main, 0.15),
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -133,33 +137,32 @@ export default function ProjectStatsBar() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"
-                fill="#7C6AE8"
+                fill={palette.primary.main}
               />
             </svg>
           </Box>
           <Box>
-            <Typography sx={{ fontSize: 10, color: "grey.500" }}>
+            <Typography sx={{ fontSize: 10, color: "text.secondary" }}>
               قيمة المهام
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
               <Typography
-                sx={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}
+                sx={{ fontSize: 22, fontWeight: 700, color: "text.primary", lineHeight: 1 }}
               >
                 100,000
               </Typography>
-              <Typography sx={{ fontSize: 11, color: "grey.500" }}>ريال</Typography>
+              <Typography sx={{ fontSize: 11, color: "text.secondary" }}>ريال</Typography>
             </Box>
           </Box>
         </Box>
 
-        {/* القيمة المالية */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Box
             sx={{
               width: 40,
               height: 40,
               borderRadius: 2,
-              bgcolor: "#1a2e2a",
+              bgcolor: alpha(palette.success.main, 0.15),
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -168,36 +171,32 @@ export default function ProjectStatsBar() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z"
-                fill="#4CAF50"
+                fill={palette.success.main}
               />
             </svg>
           </Box>
           <Box>
-            <Typography sx={{ fontSize: 10, color: "grey.500" }}>
+            <Typography sx={{ fontSize: 10, color: "text.secondary" }}>
               القيمة المالية
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
               <Typography
-                sx={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}
+                sx={{ fontSize: 22, fontWeight: 700, color: "text.primary", lineHeight: 1 }}
               >
                 15,000
               </Typography>
-              <Typography sx={{ fontSize: 11, color: "grey.500" }}>ريال</Typography>
+              <Typography sx={{ fontSize: 11, color: "text.secondary" }}>ريال</Typography>
             </Box>
           </Box>
         </Box>
       </Stack>
 
-
-      {/* ──────── Section 2: المفوتر / المسدد / المتبقي ──────── */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, minWidth: 220 }}>
-        <RingBadge value="500" label="المفوتر" ringColor="#555" />
-        <RingBadge value="1000" label="المسدد" ringColor="#D4A017" />
-        <RingBadge value="500" label="المتبقي" ringColor="#E91E90" />
+        <RingBadge value="500" label="المفوتر" ringColor={palette.text.secondary} />
+        <RingBadge value="1000" label="المسدد" ringColor={palette.warning.main} />
+        <RingBadge value="500" label="المتبقي" ringColor={palette.primary.main} />
       </Box>
 
-
-      {/* ──────── Section 3: المقاولين ──────── */}
       <Box sx={{ minWidth: 160 }}>
         <Box
           sx={{
@@ -207,10 +206,10 @@ export default function ProjectStatsBar() {
             mb: 1,
           }}
         >
-          <Typography sx={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, color: "text.primary" }}>
             المقاولين
           </Typography>
-          <Typography sx={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>
+          <Typography sx={{ fontSize: 18, fontWeight: 700, color: "text.primary" }}>
             4
           </Typography>
         </Box>
@@ -218,23 +217,21 @@ export default function ProjectStatsBar() {
           <ContractorRow
             name="الاصايل"
             avatarSrc="https://i.pravatar.cc/40?img=11"
-            ringColor="#D4A017"
+            ringColor={palette.warning.main}
           />
           <ContractorRow
             name="الهاجدية"
             avatarSrc="https://i.pravatar.cc/40?img=32"
-            ringColor="#9C27B0"
+            ringColor={palette.secondary.main}
           />
           <ContractorRow
             name="الانوار"
             avatarSrc="https://i.pravatar.cc/40?img=53"
-            ringColor="#555"
+            ringColor={palette.text.secondary}
           />
         </Stack>
       </Box>
 
-
-      {/* ──────── Section 4: عدد التصاريح ──────── */}
       <Box
         sx={{
           display: "flex",
@@ -243,22 +240,20 @@ export default function ProjectStatsBar() {
           minWidth: 200,
         }}
       >
-        <Typography sx={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>
+        <Typography sx={{ fontSize: 18, fontWeight: 700, color: "text.primary" }}>
           عدد التصاريح
         </Typography>
-        <Typography sx={{ fontSize: 10, color: "grey.500", mb: 0.5 }}>
+        <Typography sx={{ fontSize: 10, color: "text.secondary", mb: 0.5 }}>
           اجمالي عدد التصاريح للمشروع
         </Typography>
-        <WavyLineChart />
+        <WavyLineChart color={palette.primary.main} />
         <Typography
-          sx={{ fontSize: 32, fontWeight: 700, color: "#fff", lineHeight: 1, mt: -0.5 }}
+          sx={{ fontSize: 32, fontWeight: 700, color: "text.primary", lineHeight: 1, mt: -0.5 }}
         >
           900
         </Typography>
       </Box>
 
-
-      {/* ──────── Section 5: أوامر العمل ──────── */}
       <Box sx={{ minWidth: 220, display: "flex", flexDirection: "column" }}>
         <Box
           sx={{
@@ -268,10 +263,10 @@ export default function ProjectStatsBar() {
             mb: 0.5,
           }}
         >
-          <IconButton size="small" sx={{ color: "grey.400" }} suppressHydrationWarning>
+          <IconButton size="small" sx={{ color: "text.secondary" }} suppressHydrationWarning>
             <ZoomIn size={16} />
           </IconButton>
-          <Typography sx={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, color: "text.primary" }}>
             أوامر العمل
           </Typography>
         </Box>
@@ -281,17 +276,17 @@ export default function ProjectStatsBar() {
               {
                 scaleType: "band",
                 data: barChartLabels,
-                tickLabelStyle: { fontSize: 9, fill: "#888" },
+                tickLabelStyle: { fontSize: 9, fill: palette.text.secondary },
               },
             ]}
             yAxis={[
               {
-                tickLabelStyle: { fontSize: 9, fill: "#888" },
+                tickLabelStyle: { fontSize: 9, fill: palette.text.secondary },
               },
             ]}
             series={[
-              { data: barSeries1, color: "#E65100" },
-              { data: barSeries2, color: "#FDD835" },
+              { data: barSeries1, color: palette.error.main },
+              { data: barSeries2, color: palette.warning.main },
             ]}
             width={210}
             height={120}
@@ -300,8 +295,8 @@ export default function ProjectStatsBar() {
               legend: () => null,
             }}
             sx={{
-              "& .MuiChartsAxis-line": { stroke: "#333" },
-              "& .MuiChartsAxis-tick": { stroke: "#333" },
+              "& .MuiChartsAxis-line": { stroke: palette.divider },
+              "& .MuiChartsAxis-tick": { stroke: palette.divider },
             }}
           />
         </Box>

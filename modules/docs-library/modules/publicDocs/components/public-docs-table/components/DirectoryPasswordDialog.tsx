@@ -95,7 +95,7 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
           <DialogTitle asChild>
             <div>
               <button
-                className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-white"
+                className="absolute top-4 rtl:left-4 ltr:right-4 text-muted-foreground hover:text-foreground"
                 onClick={onClose}
               >
                 ✕

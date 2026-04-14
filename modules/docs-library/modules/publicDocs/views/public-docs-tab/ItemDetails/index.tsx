@@ -47,15 +47,15 @@ export default function ItemDetails() {
       <div className="flex-1 overflow-y-auto p-4">
         <div className="space-y-6 max-h-[360px] overflow-y-auto">
           {/* Activity Log Title */}
-          <p className="text-base font-medium text-dark dark:text-white mb-6">
+          <p className="text-base font-medium text-foreground mb-6">
             {t("title")}
           </p>
 
           {/* Handle loading state */}
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12 space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="text-muted-foreground text-sm">
                 {t("loading")}
               </p>
             </div>
@@ -78,7 +78,7 @@ export default function ItemDetails() {
                     <div className="flex gap-4">
                       {/* time */}
                       <div className="flex items-center gap-2">
-                        <ClockIcon className="w-4 h-4 text-pink-700" />
+                        <ClockIcon className="w-4 h-4 text-primary" />
                         <span>
                           {updatedTime.toLocaleDateString("en-GB") +
                             " " +
@@ -102,8 +102,8 @@ export default function ItemDetails() {
           ) : (
             /* Empty state */
             <div className="flex flex-col items-center justify-center py-12 space-y-4">
-              <ClockIcon className="w-16 h-16 text-gray-300 dark:text-gray-600" />
-              <p className="text-gray-500 dark:text-gray-400 text-center">
+              <ClockIcon className="w-16 h-16 text-muted-foreground/40" />
+              <p className="text-muted-foreground text-center">
                 {t("noActivities", {
                   defaultValue: "لا توجد أنشطة متاحة لهذا المستند",
                 })}

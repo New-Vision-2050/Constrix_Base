@@ -45,9 +45,10 @@ export default function EditTasksSettingsDialog({
       fullWidth
       PaperProps={{
         sx: {
-          color: "white",
+          color: "text.primary",
           borderRadius: "8px",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
+          border: 1,
+          borderColor: "divider",
         },
       }}
     >
@@ -69,7 +70,7 @@ export default function EditTasksSettingsDialog({
             position: "absolute",
             right: 16,
             top: 16,
-            color: "rgba(255,255,255,0.5)",
+            color: "text.secondary",
           }}
         >
           <CloseIcon />

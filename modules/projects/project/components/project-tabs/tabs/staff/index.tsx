@@ -90,7 +90,7 @@ export default function StaffTab() {
               <Button
                 size="small"
                 variant="contained"
-                color="info"
+                color="primary"
                 onClick={onClick}
               >
                 {t("staff.actionMenu")}

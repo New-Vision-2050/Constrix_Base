@@ -247,7 +247,7 @@ export default function ShareTab() {
               <Button
                 size="small"
                 variant="contained"
-                color="info"
+                color="primary"
                 onClick={onClick}
               >
                 إجراء
@@ -318,7 +318,7 @@ export default function ShareTab() {
               <Stack direction="row" spacing={1} alignItems="center">
                 <Button
                   variant="outlined"
-                  color="info"
+                  color="primary"
                   startIcon={<ArrowDownUp className="h-4 w-4" />}
                   onClick={() => params.handleSort("companyName")}
                 >
