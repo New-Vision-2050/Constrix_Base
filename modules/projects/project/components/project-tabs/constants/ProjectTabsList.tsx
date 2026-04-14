@@ -11,9 +11,9 @@ import {
   ClipboardList,
   DollarSign,
   FileText,
-  FolderSync,
   Share2,
 } from "lucide-react";
+import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import ProjectDataTab from "../tabs/project-data";
 import WorkspaceTab from "../tabs/workspace";
 import AttachmentsTab from "../tabs/attachments";
@@ -85,7 +85,7 @@ const ALL_TABS: SystemTab[] = [
   {
     id: "project-tab-document-cycle",
     title: "دورة الوثائق",
-    icon: <FolderSync className="w-4 h-4" />,
+    icon: <FolderSyncIconWithCount />,
     content: <DocumentCycleTab />,
   },
 ];

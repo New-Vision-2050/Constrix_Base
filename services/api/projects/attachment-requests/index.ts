@@ -12,6 +12,7 @@ import {
   GetIncomingAttachmentRequestsResponse,
   GetOutgoingAttachmentRequestsResponse,
 } from "./types/response";
+import { ApiBaseResponse } from "@/types/common/response/base";
 
 export const AttachmentRequestsApi = {
   getFolderChildren: (parentId: string) =>
@@ -31,6 +32,10 @@ export const AttachmentRequestsApi = {
       "projects/attachment-requests/incoming",
       { params },
     ),
+  getCount: (params: IncomingAttachmentRequestsParams) =>
+    baseApi.get<{ count: number }>("projects/attachment-requests/count", {
+      params,
+    }),
 
   /** GET `projects/attachment-requests` — combined incoming + outgoing (use row `direction` / `type`) */
   getList: (params: AttachmentRequestsListParams) =>
@@ -62,9 +67,7 @@ export const AttachmentRequestsApi = {
         "attachment_sub_sub_type_id",
         data.attachment_sub_sub_type_id,
       );
-    data.attachments.forEach((file) =>
-      formData.append("attachments[]", file),
-    );
+    data.attachments.forEach((file) => formData.append("attachments[]", file));
     if (data.notes) formData.append("notes", data.notes);
 
     return baseApi.post<{ code: string; message: string | null }>(
