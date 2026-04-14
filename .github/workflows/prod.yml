@@ -86,9 +86,12 @@ jobs:
           BE_URL: ${{ env.BE_URL }}
           NODE_ENV: ${{ env.NODE_ENV }}
           MAPAPIKEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          NEXT_PUBLIC_REVERB_KEY: ${{ secrets.NEXT_PUBLIC_REVERB_KEY }}
+          NEXT_PUBLIC_REVERB_PORT: ${{ secrets.NEXT_PUBLIC_REVERB_PORT }}
+          NEXT_PUBLIC_REVERB_WSS_PORT: ${{ secrets.NEXT_PUBLIC_REVERB_WSS_PORT }}
 
         with:
-          envs: MAPAPIKEY
+          envs: MAPAPIKEY,NEXT_PUBLIC_REVERB_KEY,NEXT_PUBLIC_REVERB_PORT,NEXT_PUBLIC_REVERB_WSS_PORT
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           port: ${{ secrets.DEPLOY_PORT }}
