@@ -29,22 +29,23 @@ const SidebarHeaderContent = ({
     <>
       <div className="flex items-center justify-center flex-col gap-1">
         {mainLogo ? (
-          <Image
-            src={mainLogo}
-            alt={name || "Company Logo"}
-            width={open ? 60 : 30}
-            height={47}
-            priority={true}
-            className="transition-[width] ease-linear duration-200"
-          />
+            <Image
+                src={mainLogo || LogoPlaceholder}
+                alt={name || "Company Logo"}
+                width={120}
+                height={120}
+                priority
+                className="w-[120px] h-[120px] rounded-full object-cover overflow-hidden"
+            />
         ) : (
-          <Image
-            src={LogoPlaceholder}
-            alt={"logo placeholder"}
-            width={open ? 80 : 40}
-            height={47}
-            className="transition-[width] ease-linear duration-200"
-          />
+            <Image
+                src={mainLogo || LogoPlaceholder}
+                alt={name || "Company Logo"}
+                width={120}
+                height={120}
+                priority
+                className="w-[120px] h-[120px] rounded-full object-cover overflow-hidden"
+            />
         )}
 
         <p
