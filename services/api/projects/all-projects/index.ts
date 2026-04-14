@@ -11,6 +11,7 @@ import {
   GetBranchesResponse,
   GetClientsResponse,
   GetManagementsResponse,
+  GetEmployeesNotInProjectResponse,
   GetProjectEmployeesResponse,
   GetProjectTypesResponse,
   ListProjectsResponse,
@@ -67,6 +68,11 @@ export const AllProjectsApi = {
       `projects/employees/project/${projectId}`,
     ),
 
+  getEmployeesNotInProject: (projectId: string) =>
+    baseApi.get<GetEmployeesNotInProjectResponse>(
+      `projects/employees/not-in-project/${projectId}`,
+    ),
+
   assignEmployeesToProject: (data: {
     project_id: string;
     user_ids: string[];
@@ -74,4 +80,10 @@ export const AllProjectsApi = {
     "projects/employees/assign",
     data,
   ),
+
+  /** Removes a project–employee assignment (`payload[].id` from project employees list). */
+  removeProjectEmployee: (assignmentId: string) =>
+    baseApi.delete<{ code: string; message?: string | null }>(
+      `projects/employees/${assignmentId}`,
+    ),
 };

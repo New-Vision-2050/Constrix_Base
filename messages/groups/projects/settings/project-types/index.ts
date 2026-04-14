@@ -70,4 +70,13 @@ export const projectTypesMessages = new MessagesGroup({
       responsibleEngineer: _m("Responsible Engineer", "المهندس المسؤول"),
     }),
   }),
+  attachments: new MessagesGroup({
+    sectionTitle: _m("Attachments", "المرفقات"),
+    showAllProjectAttachments: _m(
+      "Show all project attachments",
+      "إظهار جميع مرفقات المشروع",
+    ),
+    selectProjectType: _m("Please select a project type", "الرجاء اختيار نوع مشروع"),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
 });

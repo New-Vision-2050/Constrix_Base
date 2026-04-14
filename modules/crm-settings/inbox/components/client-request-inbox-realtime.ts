@@ -1,7 +1,3 @@
-/**
- * Private channel per user for client-request broadcasts.
- * Backend: `client-request.{user_id}`
- */
 export function getClientRequestUserChannelName(userId: string): string {
   return `client-request.${userId}`;
 }

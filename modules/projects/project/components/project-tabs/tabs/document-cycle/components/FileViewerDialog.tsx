@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Typography,
   IconButton,
   Avatar,
   TextField,
-  CircularProgress,
 } from "@mui/material";
 import {
   X,
@@ -213,7 +212,7 @@ export default function FileViewerDialog({
               {/* Document Review Section */}
               <Box>
                 <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-                  {}
+                  {t("documentReview")}
                 </Typography>
                 <Box
                   sx={{
@@ -229,10 +228,10 @@ export default function FileViewerDialog({
                   }}
                 >
                   <Typography variant="body2" fontWeight={600}>
-                      {document.lastActivityUser || 'N/A'})
+                    {document.lastActivityUser || "N/A"}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                      {document.name || activeFile.name}
+                    {document.name || activeFile.name}
                   </Typography>
                   <Box
                     sx={{

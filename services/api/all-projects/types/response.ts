@@ -186,7 +186,6 @@ export type GetManagementsResponse = ApiResponse<Management[]>;
 export type GetCompanyUsersResponse = ApiResponse<Manager[]>;
 export type GetClientsResponse = ApiResponse<Client[]>;
 
-/** Row from GET /projects/employees/project/:projectId */
 export interface ProjectEmployeeUser {
   id: string;
   name: string;
@@ -209,7 +208,19 @@ export interface ProjectEmployee {
   assigned_by?: {
     id: string;
     name: string;
-  };
+  } | null;
+  company?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 export type GetProjectEmployeesResponse = ApiResponse<ProjectEmployee[]>;
+
+/** Selectable employees not yet assigned to a project (`GET .../not-in-project/{id}`). */
+export interface EmployeeNotInProject {
+  id: string;
+  name: string;
+}
+
+export type GetEmployeesNotInProjectResponse = ApiResponse<EmployeeNotInProject[]>;
