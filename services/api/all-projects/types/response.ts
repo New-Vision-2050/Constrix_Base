@@ -102,6 +102,7 @@ export interface ProjectPermissions {
   contractor_contract_setting: ContractSetting | null;
   employee_contract_setting: ContractSetting | null;
   department_contract_setting: ContractSetting | null;
+  attachment_cycle_setting: ContractSetting | null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────

@@ -5,10 +5,12 @@ import type {
   UpdateContractorContractSettingsArgs,
   UpdateDataSettingsArgs,
   UpdateEmployeeContractSettingsArgs,
+  UpdateAttachmentCycleSettingsArgs,
 } from "@/services/api/projects/project-types/types/args";
 import type {
   AttachmentContractSettings,
   AttachmentTermsContractSettings,
+  AttachmentCycleSettings,
   ContractorContractSettings,
   DataSettings,
   EmployeeContractSettings,
@@ -19,6 +21,7 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
   "attachments",
   "contractors",
   "team",
+  "document-cycle",
 ]);
 
 const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
@@ -54,6 +57,7 @@ export function getTabBulkCheckboxState(
     attachmentTerms: AttachmentTermsContractSettings | null | undefined;
     contractor: ContractorContractSettings | null | undefined;
     employee: EmployeeContractSettings | null | undefined;
+    attachmentCycle: AttachmentCycleSettings | null | undefined;
   },
 ): { checked: boolean; indeterminate: boolean } | null {
   if (!BULK_TOGGLE_SUPPORTED_TABS.has(tabValue)) return null;
@@ -91,6 +95,15 @@ export function getTabBulkCheckboxState(
 
   if (tabValue === "team") {
     const v = data.employee?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "document-cycle") {
+    const v = data.attachmentCycle?.is_all_data_visible;
     if (v === undefined) return null;
     return {
       checked: isTruthySetting(v),
@@ -159,6 +172,16 @@ export async function bulkToggleTabSettings(
         is_all_data_visible: v,
       };
       await ProjectTypesApi.updateEmployeeContractSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "document-cycle": {
+      const payload: UpdateAttachmentCycleSettingsArgs = {
+        is_all_data_visible: v,
+      };
+      await ProjectTypesApi.updateAttachmentCycleSettings(
         projectTypeId,
         payload,
       );

@@ -120,6 +120,10 @@ export function useProjectTabsList(): SystemTab[] {
           return (
             permissions.employee_contract_setting?.is_all_data_visible === 1
           );
+        case "project-tab-document-cycle":
+          return (
+            permissions.attachment_cycle_setting?.is_all_data_visible === 1
+          );
         case "project-tab-contract-management":
           return (
             permissions.department_contract_setting?.is_all_data_visible === 1
