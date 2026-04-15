@@ -4,6 +4,7 @@ import {
   CreateAttachmentRequestData,
   IncomingAttachmentRequestsParams,
   OutgoingAttachmentRequestsParams,
+  ReplaceAttachmentItemMediaPayload,
   RespondAttachmentItemPayload,
 } from "./types/params";
 import {
@@ -92,6 +93,17 @@ export const AttachmentRequestsApi = {
       "projects/attachment-requests/items/respond",
       body,
     ),
+
+  /** POST multipart: `item_id`, `new_file` */
+  replaceItemMedia: (body: ReplaceAttachmentItemMediaPayload) => {
+    const formData = new FormData();
+    formData.append("item_id", body.item_id);
+    formData.append("new_file", body.new_file);
+    return baseApi.post<{ code?: string; message?: string | null }>(
+      "projects/attachment-requests/items/replace-media",
+      formData,
+    );
+  },
 
   /** POST `projects/attachment-requests/:id/approve` */
   approveRequest: (requestId: string) =>

@@ -47,3 +47,10 @@ export interface RespondAttachmentItemPayload {
   action: "approve" | "decline";
   notes?: string;
 }
+
+/** POST `projects/attachment-requests/items/replace-media` (multipart) */
+export interface ReplaceAttachmentItemMediaPayload {
+  item_id: string;
+  /** File field name expected by the API */
+  new_file: File;
+}

@@ -397,6 +397,7 @@ function DetailMain({
                   editLabel={t("edit")}
                   deleteLabel={t("delete")}
                   downloadLabel={t("download")}
+                  hideActionsMenu={variant === "outgoing"}
                 />
               </Box>
             ))
@@ -414,7 +415,7 @@ function DetailMain({
         justifyContent="flex-start"
         sx={{ pt: 1, gap: 1 }}
       >
-        {variant === "outgoing" &&
+        {variant === "incoming" &&
         !isTerminalApprovalStatus(document.approvalStatus) ? (
           <>
             <Button
@@ -708,6 +709,7 @@ function AttachmentCard({
   editLabel,
   deleteLabel,
   downloadLabel,
+  hideActionsMenu,
 }: {
   file: DocumentAttachment;
   isRTL: boolean;
@@ -715,6 +717,8 @@ function AttachmentCard({
   editLabel: string;
   deleteLabel: string;
   downloadLabel: string;
+  /** Outgoing (صادر): no edit/delete menu — view & download only */
+  hideActionsMenu?: boolean;
 }) {
   return (
     <Paper
@@ -790,22 +794,24 @@ function AttachmentCard({
         >
           <Download className="w-4 h-4" />
         </IconButton>
-        <CustomMenu
-          renderAnchor={({ onClick }) => (
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClick(e);
-              }}
-            >
-              <Settings className="w-4 h-4" />
-            </IconButton>
-          )}
-        >
-          <MenuItem onClick={() => {}}>{editLabel}</MenuItem>
-          <MenuItem onClick={() => {}}>{deleteLabel}</MenuItem>
-        </CustomMenu>
+        {!hideActionsMenu && (
+          <CustomMenu
+            renderAnchor={({ onClick }) => (
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClick(e);
+                }}
+              >
+                <Settings className="w-4 h-4" />
+              </IconButton>
+            )}
+          >
+            <MenuItem onClick={() => {}}>{editLabel}</MenuItem>
+            <MenuItem onClick={() => {}}>{deleteLabel}</MenuItem>
+          </CustomMenu>
+        )}
       </Box>
     </Paper>
   );

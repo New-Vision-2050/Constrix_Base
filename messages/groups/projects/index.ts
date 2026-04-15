@@ -130,6 +130,14 @@ export const projectMessages = new MessagesGroup({
     attachFile: _m("Attach File", "ارفاق ملف"),
     notes: _m("Notes", "ملاحظات"),
     save: _m("Save", "حفظ"),
+    saveViewerChangesSuccess: _m(
+      "Document changes saved",
+      "تم حفظ تغييرات المستند",
+    ),
+    saveViewerChangesError: _m(
+      "Could not save document changes",
+      "تعذر حفظ تغييرات المستند",
+    ),
     cancel: _m("Cancel", "الغاء"),
     all: _m("All", "الكل"),
     addSuccess: _m("Request created successfully", "تم إنشاء الطلب بنجاح"),
@@ -148,6 +156,18 @@ export const projectMessages = new MessagesGroup({
     requestDeclineSuccess: _m("Request declined", "تم رفض الطلب"),
     requestDeclineError: _m("Could not decline request", "تعذر رفض الطلب"),
     previewLoadError: _m("Could not load preview", "تعذر تحميل المعاينة"),
+    cadPreviewUnavailableTitle: _m(
+      "AutoCAD preview not available here",
+      "معاينة ملفات أوتوكاد غير متاحة هنا",
+    ),
+    cadPreviewUnavailableBody: _m(
+      "Your API returns the file URL and name correctly — the limitation is not missing data. Client-only Apryse WebViewer cannot render DWG/DXF/DWF in the browser; that requires WebViewer Server. Download the file to open it in AutoCAD or similar.",
+      "واجهة البرمجة تعيد رابط الملف والاسم بشكل صحيح — المشكلة ليست نقص بيانات. معاينة DWG/DXF/DWF في المتصفح تحتاج خادم WebViewer Server؛ نزّل الملف لفتحه في أوتوكاد أو ما شابه.",
+    ),
+    cadPreviewLearnMoreWvs: _m(
+      "About WebViewer Server",
+      "حول WebViewer Server",
+    ),
     openInNewTab: _m("Open in new tab", "فتح في تبويب جديد"),
   }),
   staff: new MessagesGroup({

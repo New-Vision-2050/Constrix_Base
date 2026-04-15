@@ -10,6 +10,11 @@ const intlMiddleware = createMiddleware(routing);
 const protectedCentralPages = ["/companies", "/users"];
 
 export async function middleware(req: NextRequest) {
+  // Apryse WebViewer
+  if (req.nextUrl.pathname.startsWith("/webviewer")) {
+    return NextResponse.next();
+  }
+
   const existingCompanyCookie = req.cookies.get("company-data")?.value;
 
   const nvToken = req.cookies.get("new-vision-token")?.value;
@@ -113,5 +118,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|webviewer).*)",
+  ],
 };
