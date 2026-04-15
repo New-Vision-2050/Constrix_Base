@@ -12,6 +12,7 @@ import {
   DollarSign,
   FileText,
   Share2,
+  Shield,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import ProjectDataTab from "../tabs/project-data";
@@ -23,6 +24,7 @@ import StaffTab from "../tabs/staff";
 // import FinancialTab from "../tabs/financial";
 // import ContractManagementTab from "../tabs/contract-management";
 import DocumentCycleTab from "../tabs/document-cycle";
+import RolesTab from "../tabs/roles";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import ShareTab from "../tabs/share";
@@ -87,6 +89,12 @@ const ALL_TABS: SystemTab[] = [
     title: "دورة الوثائق",
     icon: <FolderSyncIconWithCount />,
     content: <DocumentCycleTab />,
+  },
+  {
+    id: "project-tab-roles",
+    title: "الأدوار",
+    icon: <Shield className="w-4 h-4" />,
+    content: <RolesTab />,
   },
 ];
 
