@@ -39,3 +39,57 @@ export function hasAnyProjectPermissionKey(
   if (!flat?.length || !permissionKeys.length) return false;
   return permissionKeys.some((key) => hasProjectPermissionKey(flat, key));
 }
+
+function isArchiveLibraryPermission(p: ProjectMyPermissionFlatItem): boolean {
+  const k = p.permission_key ?? "";
+  if (k) {
+    return (
+      k.startsWith("PROJECT_ARCHIVE_") && !k.startsWith("PROJECT_ARCHIVE_CYCLE_")
+    );
+  }
+  return p.submodule === "archive-library";
+}
+
+/** True if the user has any project permission for the attachments (archive library) tab. */
+export function hasAnyAttachmentsTabPermission(
+  flat: ProjectMyPermissionFlatItem[] | undefined,
+): boolean {
+  if (!flat?.length) return false;
+  return flat.some((p) => isArchiveLibraryPermission(p));
+}
+
+/** True if the user has any project permission for the staff (employee) tab. */
+export function hasAnyStaffTabPermission(
+  flat: ProjectMyPermissionFlatItem[] | undefined,
+): boolean {
+  if (!flat?.length) return false;
+  return flat.some((p) => {
+    const k = p.permission_key ?? "";
+    if (k.startsWith("PROJECT_EMPLOYEE_")) return true;
+    return p.submodule === "employee";
+  });
+}
+
+/** True if the user has any project permission for the document cycle (archive cycle) tab. */
+export function hasAnyDocumentCycleTabPermission(
+  flat: ProjectMyPermissionFlatItem[] | undefined,
+): boolean {
+  if (!flat?.length) return false;
+  return flat.some((p) => {
+    const k = p.permission_key ?? "";
+    if (k.startsWith("PROJECT_ARCHIVE_CYCLE_")) return true;
+    return p.submodule === "archive-cycle";
+  });
+}
+
+/** True if the user has any project permission for the roles tab. */
+export function hasAnyRolesTabPermission(
+  flat: ProjectMyPermissionFlatItem[] | undefined,
+): boolean {
+  if (!flat?.length) return false;
+  return flat.some((p) => {
+    const k = p.permission_key ?? "";
+    if (k.startsWith("PROJECT_ROLE_")) return true;
+    return p.submodule === "role";
+  });
+}
