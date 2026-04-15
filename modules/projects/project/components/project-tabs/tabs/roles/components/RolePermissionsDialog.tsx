@@ -18,7 +18,7 @@ import {
   Chip,
 } from "@mui/material";
 import { ChevronDown, Shield } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useProjectRolesTranslations } from "../useProjectRolesTranslations";
 import { ProjectPermissionsData } from "@/services/api/projects/permissions/types/response";
 
 interface RolePermissionsDialogProps {
@@ -32,7 +32,7 @@ export default function RolePermissionsDialog({
   onClose,
   permissionsData,
 }: RolePermissionsDialogProps) {
-  const t = useTranslations("project.roles");
+  const t = useProjectRolesTranslations();
 
   const permissionGroups = useMemo(() => {
     if (!permissionsData?.permissions) return {};

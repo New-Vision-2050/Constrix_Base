@@ -10,7 +10,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useProjectRolesTranslations } from "../useProjectRolesTranslations";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { Switch } from "@/components/ui/switch";
@@ -18,6 +18,7 @@ import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectRoles } from "@/modules/projects/project/query/useProjectRoles";
 import type { ProjectRoleRow } from "../types";
 import type { ProjectRoleListItem } from "@/services/api/projects/project-roles/types/response";
+import { extractAllIds } from "./ProjectCreateRoleForm";
 
 const TableLayout = HeadlessTableLayout<ProjectRoleRow>("project-roles-table");
 
@@ -30,6 +31,7 @@ function mapRoleToRow(role: ProjectRoleListItem): ProjectRoleRow {
     is_active: role.is_active,
     is_default: role.is_default,
     permissions_count: role.permissions_count,
+    permissions: role.permissions,
     created_at: role.created_at,
   };
 }
@@ -96,7 +98,7 @@ export default function RolesTable({
   onEditRole,
   onDeleteRole,
 }: RolesTableProps) {
-  const t = useTranslations("project.roles");
+  const t = useProjectRolesTranslations();
   const { projectId } = useProject();
 
   const [filterRoleName, setFilterRoleName] = useState("");
@@ -190,7 +192,16 @@ export default function RolesTable({
             )}
           >
             <MenuItem
-              onClick={() => onEditRole({ id: row.id, name: row.name })}
+              onClick={() =>
+                onEditRole({
+                  id: row.id,
+                  name: row.name,
+                  permissionIds:
+                    row.permissions && !Array.isArray(row.permissions)
+                      ? extractAllIds(row.permissions)
+                      : [],
+                })
+              }
             >
               <EditIcon className="w-4 h-4 me-2" />
               {t("edit")}

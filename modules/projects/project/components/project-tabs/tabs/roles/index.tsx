@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useProjectRolesTranslations } from "./useProjectRolesTranslations";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { ProjectRolesApi } from "@/services/api/projects/project-roles";
 import { projectRolesQueryKey } from "@/modules/projects/project/query/useProjectRoles";
@@ -22,7 +22,7 @@ import ProjectRoleDrawer, {
 } from "./components/ProjectRoleDrawer";
 
 export default function RolesTab() {
-  const t = useTranslations("project.roles");
+  const t = useProjectRolesTranslations();
   const { projectId } = useProject();
   const queryClient = useQueryClient();
 

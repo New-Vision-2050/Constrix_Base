@@ -16,12 +16,14 @@ import type {
 } from "@/services/api/projects/project-roles/types/response";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useProjectRolesTranslations } from "../useProjectRolesTranslations";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const createRoleSchema = (t: (key: string) => string) =>
+const createRoleSchema = (
+  t: ReturnType<typeof useProjectRolesTranslations>,
+) =>
   z.object({
     roleName: z
       .string()
@@ -67,7 +69,7 @@ export default function ProjectCreateRoleForm({
   editMode,
   onSuccess,
 }: Props) {
-  const t = useTranslations("project.roles");
+  const t = useProjectRolesTranslations();
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(
     new Set(editMode?.permissionIds ?? []),
   );

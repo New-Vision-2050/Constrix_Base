@@ -21,12 +21,14 @@ export type ProjectPermissionsTreeResponse =
 
 export interface ProjectRoleListItem {
   id: string;
+  project_id: string;
   name: string;
   slug: string;
-  description: string;
+  description: string | null;
   is_active: boolean;
   is_default: boolean;
   permissions_count: number;
+  permissions: ProjectPermissionsTree | [];
   created_at: string;
 }
 
