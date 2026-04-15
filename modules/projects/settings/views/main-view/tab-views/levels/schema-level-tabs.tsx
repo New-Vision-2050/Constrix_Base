@@ -40,6 +40,7 @@ import ProjectTermsView from "../project-terms";
 import AttachmentsView from "../attachments";
 import ContractorsView from "../contractors";
 import TeamView from "../team";
+import DocumentCycleView from "../document-cycle";
 import WorkOrdersView from "../work-orders";
 import FinancialView from "../financial";
 import ContractManagementView from "../contract-management";
@@ -58,6 +59,8 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
       return <ContractorsView {...props} />;
     case "team":
       return <TeamView {...props} />;
+    case "document-cycle":
+      return <DocumentCycleView {...props} />;
     case "work-orders":
       return <WorkOrdersView />;
     case "financial":
@@ -258,6 +261,19 @@ export default function SchemaLevelTabs({
     enabled: thirdLevelId != null && filteredTabs.some((t) => t.value === "team"),
   });
 
+  const attachmentCycleSettingsQuery = useQuery({
+    queryKey: ["attachment-cycle-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getAttachmentCycleSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "document-cycle"),
+  });
+
   const bulkSettingsData = useMemo(
     () => ({
       dataSettings: dataSettingsQuery.data,
@@ -265,6 +281,7 @@ export default function SchemaLevelTabs({
       attachmentTerms: attachmentTermsQuery.data,
       contractor: contractorSettingsQuery.data,
       employee: employeeSettingsQuery.data,
+      attachmentCycle: attachmentCycleSettingsQuery.data,
     }),
     [
       dataSettingsQuery.data,
@@ -272,6 +289,7 @@ export default function SchemaLevelTabs({
       attachmentTermsQuery.data,
       contractorSettingsQuery.data,
       employeeSettingsQuery.data,
+      attachmentCycleSettingsQuery.data,
     ],
   );
 
@@ -287,6 +305,8 @@ export default function SchemaLevelTabs({
         return contractorSettingsQuery.isLoading;
       case "team":
         return employeeSettingsQuery.isLoading;
+      case "document-cycle":
+        return attachmentCycleSettingsQuery.isLoading;
       default:
         return false;
     }
@@ -322,6 +342,9 @@ export default function SchemaLevelTabs({
       });
       await queryClient.invalidateQueries({
         queryKey: ["employee-contract-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["attachment-cycle-settings", thirdLevelId],
       });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };

@@ -10,6 +10,7 @@ import {
     UpdateAttachmentTermsContractSettingsArgs,
     UpdateContractorContractSettingsArgs,
     UpdateEmployeeContractSettingsArgs,
+    UpdateAttachmentCycleSettingsArgs,
 } from "./types/args";
 import {
     CreateSecondLevelProjectTypeResponse,
@@ -29,6 +30,8 @@ import {
     UpdateContractorContractSettingsResponse,
     GetEmployeeContractSettingsResponse,
     UpdateEmployeeContractSettingsResponse,
+    GetAttachmentCycleSettingsResponse,
+    UpdateAttachmentCycleSettingsResponse,
 } from "./types/response";
 
 export const ProjectTypesApi = {
@@ -131,6 +134,18 @@ export const ProjectTypesApi = {
     ) =>
         baseApi.put<UpdateEmployeeContractSettingsResponse>(
             `project-types/${projectTypeId}/employee-contract-settings`,
+            args,
+        ),
+    getAttachmentCycleSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetAttachmentCycleSettingsResponse>(
+            `project-types/${projectTypeId}/attachment-cycle-settings`,
+        ),
+    updateAttachmentCycleSettings: (
+        projectTypeId: number | string,
+        args: UpdateAttachmentCycleSettingsArgs,
+    ) =>
+        baseApi.put<UpdateAttachmentCycleSettingsResponse>(
+            `project-types/${projectTypeId}/attachment-cycle-settings`,
             args,
         ),
 };

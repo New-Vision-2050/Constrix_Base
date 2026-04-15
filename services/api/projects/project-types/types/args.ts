@@ -77,3 +77,7 @@ export interface UpdateContractorContractSettingsArgs {
 export interface UpdateEmployeeContractSettingsArgs {
     is_all_data_visible?: 0 | 1;
 }
+
+export interface UpdateAttachmentCycleSettingsArgs {
+    is_all_data_visible?: 0 | 1;
+}

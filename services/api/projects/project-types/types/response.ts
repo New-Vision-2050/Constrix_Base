@@ -116,3 +116,17 @@ export interface GetEmployeeContractSettingsResponse extends ApiBaseResponse<Emp
 
 export interface UpdateEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {
 }
+
+export interface AttachmentCycleSettings {
+    id: number;
+    project_type_id: number;
+    is_all_data_visible: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetAttachmentCycleSettingsResponse extends ApiBaseResponse<AttachmentCycleSettings> {
+}
+
+export interface UpdateAttachmentCycleSettingsResponse extends ApiBaseResponse<AttachmentCycleSettings> {
+}

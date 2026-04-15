@@ -10,6 +10,7 @@ export const projectTypesMessages = new MessagesGroup({
     workOrders: _m("Work Orders", "اوامر العمل"),
     financial: _m("Financial", "المالية"),
     contractManagement: _m("Contract Management", "ادارة العقد"),
+    documentCycle: _m("Document Cycle", "دورة الوثائق"),
   }),
   add: _m("Add", "اضافة"),
   addProjectType: new MessagesGroup({
