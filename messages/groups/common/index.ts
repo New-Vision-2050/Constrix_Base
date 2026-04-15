@@ -17,6 +17,10 @@ export const commonMessages = new MessagesGroup({
   save: _m("Save", "حفظ"),
   confirm: _m("Confirm", "تاكيد"),
   noCountryCode: _m("No country code found", "لا يوجد رمز الدولة"),
+  noProjectTabPermission: _m(
+    "You don't have permission to view this section.",
+    "ليس لديك صلاحية لعرض هذا القسم.",
+  ),
   // Delete confirmation dialog messages
   deleteConfirmation: new MessagesGroup({
     defaultMessage: _m(

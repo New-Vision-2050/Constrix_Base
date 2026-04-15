@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from "react";
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -23,6 +25,18 @@ import {
   projectEmployeesQueryKey,
   useProjectEmployees,
 } from "@/modules/projects/project/query/useProjectEmployees";
+import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import {
+  PROJECT_EMPLOYEE_CREATE,
+  PROJECT_EMPLOYEE_DELETE,
+  PROJECT_EMPLOYEE_LIST,
+  PROJECT_EMPLOYEE_UPDATE,
+  PROJECT_EMPLOYEE_VIEW,
+} from "@/modules/projects/project/constants/projectPermissionKeys";
+import {
+  hasAnyProjectPermissionKey,
+  hasProjectPermissionKey,
+} from "@/modules/projects/project/utils/projectMyPermissions";
 import { Employee } from "./types";
 import AddStaffDialog, {
   employeesNotInProjectQueryKey,
@@ -33,11 +47,36 @@ const StaffTableLayout = HeadlessTableLayout<Employee>("staff");
 
 export default function StaffTab() {
   const t = useTranslations("project");
+  const tCommon = useTranslations("common");
   const { projectId } = useProject();
   const queryClient = useQueryClient();
   const [openStaff, setAddStaffOpen] = useState(false);
   const [employeeToRemove, setEmployeeToRemove] = useState<Employee | null>(
     null,
+  );
+
+  const { data: flatPerms, isLoading: isLoadingPerms } =
+    useProjectMyPermissionsFlat(projectId);
+
+  const canViewStaff = useMemo(
+    () =>
+      hasAnyProjectPermissionKey(flatPerms, [
+        PROJECT_EMPLOYEE_VIEW,
+        PROJECT_EMPLOYEE_LIST,
+      ]),
+    [flatPerms],
+  );
+  const canCreate = useMemo(
+    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_CREATE),
+    [flatPerms],
+  );
+  const canUpdate = useMemo(
+    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_UPDATE),
+    [flatPerms],
+  );
+  const canDelete = useMemo(
+    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_DELETE),
+    [flatPerms],
   );
 
   const deleteEmployeeMutation = useMutation({
@@ -103,14 +142,14 @@ export default function StaffTab() {
             projectId={projectId}
             assignmentId={row.id}
             projectRole={row.projectRole}
+            canChangeRole={canUpdate}
           />
         ),
       },
     ],
-    [t, projectId],
+    [t, projectId, canUpdate],
   );
 
-  // Table params
   const params = StaffTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
@@ -122,10 +161,10 @@ export default function StaffTab() {
   const totalPages = 1;
   const totalItems = data.length;
 
-  const columns = useMemo(
-    () => [
-      ...staffColumns,
-      {
+  const columns = useMemo(() => {
+    const base = [...staffColumns];
+    if (canUpdate || canDelete) {
+      base.push({
         key: "actions",
         name: t("staff.columnActions"),
         sortable: false,
@@ -142,29 +181,32 @@ export default function StaffTab() {
               </Button>
             )}
           >
-            <MenuItem onClick={() => {}}>
-              <EditIcon className="w-4 h-4 me-2" />
-              {t("staff.edit")}
-            </MenuItem>
-            <MenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                setEmployeeToRemove(row);
-              }}
-              disabled={deleteEmployeeMutation.isPending}
-              sx={{ color: "error.main" }}
-            >
-              <Trash2 className="w-4 h-4 me-2" />
-              {t("staff.delete")}
-            </MenuItem>
+            {canUpdate ? (
+              <MenuItem onClick={() => {}}>
+                <EditIcon className="w-4 h-4 me-2" />
+                {t("staff.edit")}
+              </MenuItem>
+            ) : null}
+            {canDelete ? (
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEmployeeToRemove(row);
+                }}
+                disabled={deleteEmployeeMutation.isPending}
+                sx={{ color: "error.main" }}
+              >
+                <Trash2 className="w-4 h-4 me-2" />
+                {t("staff.delete")}
+              </MenuItem>
+            ) : null}
           </CustomMenu>
         ),
-      },
-    ],
-    [staffColumns, t, deleteEmployeeMutation],
-  );
+      });
+    }
+    return base;
+  }, [staffColumns, t, canUpdate, canDelete, deleteEmployeeMutation.isPending]);
 
-  // Table state
   const state = StaffTableLayout.useTableState({
     data,
     columns,
@@ -180,6 +222,26 @@ export default function StaffTab() {
     },
   });
 
+  if (!projectId) {
+    return null;
+  }
+
+  if (isLoadingPerms) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  if (!canViewStaff) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning">{tCommon("noProjectTabPermission")}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <>
       <Box sx={{ p: 3 }}>
@@ -188,12 +250,14 @@ export default function StaffTab() {
             <StaffTableLayout.TopActions
               state={state}
               customActions={
-                <Button
-                  variant="contained"
-                  onClick={() => setAddStaffOpen(true)}
-                >
-                  {t("staff.add")}
-                </Button>
+                canCreate ? (
+                  <Button
+                    variant="contained"
+                    onClick={() => setAddStaffOpen(true)}
+                  >
+                    {t("staff.add")}
+                  </Button>
+                ) : undefined
               }
             ></StaffTableLayout.TopActions>
           }

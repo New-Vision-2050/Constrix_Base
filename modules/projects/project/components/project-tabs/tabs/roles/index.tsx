@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,11 +13,24 @@ import {
   Typography,
 } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useProjectRolesTranslations } from "./useProjectRolesTranslations";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { ProjectRolesApi } from "@/services/api/projects/project-roles";
 import { projectRolesQueryKey } from "@/modules/projects/project/query/useProjectRoles";
+import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import {
+  PROJECT_ROLE_CREATE,
+  PROJECT_ROLE_DELETE,
+  PROJECT_ROLE_LIST,
+  PROJECT_ROLE_UPDATE,
+  PROJECT_ROLE_VIEW,
+} from "@/modules/projects/project/constants/projectPermissionKeys";
+import {
+  hasAnyProjectPermissionKey,
+  hasProjectPermissionKey,
+} from "@/modules/projects/project/utils/projectMyPermissions";
 import RolesTable from "./components/RolesTable";
 import ProjectRoleDrawer, {
   type EditRoleData,
@@ -23,8 +38,25 @@ import ProjectRoleDrawer, {
 
 export default function RolesTab() {
   const t = useProjectRolesTranslations();
+  const tCommon = useTranslations("common");
   const { projectId } = useProject();
   const queryClient = useQueryClient();
+
+  const { data: flatPerms, isLoading: isLoadingPerms } =
+    useProjectMyPermissionsFlat(projectId);
+
+  const rolePermissions = useMemo(
+    () => ({
+      canList: hasAnyProjectPermissionKey(flatPerms, [
+        PROJECT_ROLE_VIEW,
+        PROJECT_ROLE_LIST,
+      ]),
+      canCreate: hasProjectPermissionKey(flatPerms, PROJECT_ROLE_CREATE),
+      canEdit: hasProjectPermissionKey(flatPerms, PROJECT_ROLE_UPDATE),
+      canDelete: hasProjectPermissionKey(flatPerms, PROJECT_ROLE_DELETE),
+    }),
+    [flatPerms],
+  );
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editRole, setEditRole] = useState<EditRoleData | undefined>();
@@ -67,12 +99,33 @@ export default function RolesTab() {
     });
   };
 
+  if (!projectId) {
+    return null;
+  }
+
+  if (isLoadingPerms) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  if (!rolePermissions.canList) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning">{tCommon("noProjectTabPermission")}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ p: 3 }}>
       <RolesTable
         onCreateRole={handleCreateRole}
         onEditRole={handleEditRole}
         onDeleteRole={(id) => setDeleteRoleId(id)}
+        permissions={rolePermissions}
       />
 
       <ProjectRoleDrawer

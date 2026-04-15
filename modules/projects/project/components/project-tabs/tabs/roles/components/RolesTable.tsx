@@ -87,16 +87,32 @@ function StatsCard({ title, value, icon, color }: StatsCardProps) {
 
 import type { EditRoleData } from "./ProjectRoleDrawer";
 
+export interface ProjectRolesTabPermissions {
+  canList: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
 interface RolesTableProps {
   onCreateRole: () => void;
   onEditRole: (role: EditRoleData) => void;
   onDeleteRole: (roleId: string) => void;
+  permissions?: ProjectRolesTabPermissions;
 }
+
+const defaultPermissions: ProjectRolesTabPermissions = {
+  canList: true,
+  canCreate: true,
+  canEdit: true,
+  canDelete: true,
+};
 
 export default function RolesTable({
   onCreateRole,
   onEditRole,
   onDeleteRole,
+  permissions = defaultPermissions,
 }: RolesTableProps) {
   const t = useProjectRolesTranslations();
   const { projectId } = useProject();
@@ -145,8 +161,8 @@ export default function RolesTable({
     return Array.from(names).sort();
   }, [allRows]);
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const cols = [
       {
         key: "name",
         name: t("roleName"),
@@ -174,7 +190,9 @@ export default function RolesTable({
           </div>
         ),
       },
-      {
+    ];
+    if (permissions.canEdit || permissions.canDelete) {
+      cols.push({
         key: "actions",
         name: t("actions"),
         sortable: false,
@@ -191,34 +209,38 @@ export default function RolesTable({
               </Button>
             )}
           >
-            <MenuItem
-              onClick={() =>
-                onEditRole({
-                  id: row.id,
-                  name: row.name,
-                  permissionIds:
-                    row.permissions && !Array.isArray(row.permissions)
-                      ? extractAllIds(row.permissions)
-                      : [],
-                })
-              }
-            >
-              <EditIcon className="w-4 h-4 me-2" />
-              {t("edit")}
-            </MenuItem>
-            <MenuItem
-              onClick={() => onDeleteRole(row.id)}
-              sx={{ color: "error.main" }}
-            >
-              <Trash2 className="w-4 h-4 me-2" />
-              {t("delete")}
-            </MenuItem>
+            {permissions.canEdit ? (
+              <MenuItem
+                onClick={() =>
+                  onEditRole({
+                    id: row.id,
+                    name: row.name,
+                    permissionIds:
+                      row.permissions && !Array.isArray(row.permissions)
+                        ? extractAllIds(row.permissions)
+                        : [],
+                  })
+                }
+              >
+                <EditIcon className="w-4 h-4 me-2" />
+                {t("edit")}
+              </MenuItem>
+            ) : null}
+            {permissions.canDelete ? (
+              <MenuItem
+                onClick={() => onDeleteRole(row.id)}
+                sx={{ color: "error.main" }}
+              >
+                <Trash2 className="w-4 h-4 me-2" />
+                {t("delete")}
+              </MenuItem>
+            ) : null}
           </CustomMenu>
         ),
-      },
-    ],
-    [t, onEditRole, onDeleteRole],
-  );
+      });
+    }
+    return cols;
+  }, [t, onEditRole, onDeleteRole, permissions]);
 
   const state = TableLayout.useTableState({
     data: paginatedData,
@@ -316,9 +338,11 @@ export default function RolesTable({
             <TableLayout.TopActions
               state={state}
               customActions={
-                <Button variant="contained" onClick={onCreateRole}>
-                  {t("createRole")}
-                </Button>
+                permissions.canCreate ? (
+                  <Button variant="contained" onClick={onCreateRole}>
+                    {t("createRole")}
+                  </Button>
+                ) : undefined
               }
             />
           </Stack>

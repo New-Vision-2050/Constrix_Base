@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
 import { useProjectRoles } from "@/modules/projects/project/query/useProjectRoles";
 import { projectEmployeesQueryKey } from "@/modules/projects/project/query/useProjectEmployees";
+import { projectMyPermissionsFlatQueryKey } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import type { ProjectEmployeeRoleSummary } from "./types";
 
 type Props = {
@@ -16,12 +17,15 @@ type Props = {
   assignmentId: string;
   /** Current role from employees list API (`project_role`) */
   projectRole?: ProjectEmployeeRoleSummary | null;
+  /** When false, role is shown read-only (`PROJECT_EMPLOYEE_UPDATE`). */
+  canChangeRole?: boolean;
 };
 
 export default function StaffRoleSelect({
   projectId,
   assignmentId,
   projectRole,
+  canChangeRole = true,
 }: Props) {
   const t = useTranslations("project");
   const queryClient = useQueryClient();
@@ -48,6 +52,9 @@ export default function StaffRoleSelect({
       if (projectId) {
         queryClient.invalidateQueries({
           queryKey: projectEmployeesQueryKey(projectId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: projectMyPermissionsFlatQueryKey(projectId),
         });
       }
     },
@@ -93,6 +100,7 @@ export default function StaffRoleSelect({
   };
 
   const handleChange = (next: string) => {
+    if (!canChangeRole) return;
     if (next === "") {
       setValue(serverRoleId);
       return;
@@ -154,7 +162,7 @@ export default function StaffRoleSelect({
       size="small"
       value={value}
       onChange={(e) => handleChange(e.target.value)}
-      disabled={pending}
+      disabled={pending || !canChangeRole}
       SelectProps={{
         displayEmpty: true,
         renderValue: (selected) =>
