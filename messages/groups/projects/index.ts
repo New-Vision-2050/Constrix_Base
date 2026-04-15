@@ -196,6 +196,14 @@ export const projectMessages = new MessagesGroup({
       "Could not assign employees",
       "تعذر تعيين الموظفين"
     ),
+    roleAssignSuccess: _m(
+      "Role updated",
+      "تم تحديث الدور",
+    ),
+    roleAssignError: _m(
+      "Could not update role",
+      "تعذر تحديث الدور",
+    ),
     validation: new MessagesGroup({
       employeesRequired: _m(
         "Select at least one employee",
