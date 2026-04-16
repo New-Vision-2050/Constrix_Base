@@ -1,15 +1,13 @@
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import type {
-  UpdateAttachmentContractSettingsArgs,
-  UpdateAttachmentTermsContractSettingsArgs,
+  UpdateArchiveLibrarySettingsArgs,
   UpdateContractorContractSettingsArgs,
   UpdateDataSettingsArgs,
   UpdateEmployeeContractSettingsArgs,
   UpdateAttachmentCycleSettingsArgs,
 } from "@/services/api/projects/project-types/types/args";
 import type {
-  AttachmentContractSettings,
-  AttachmentTermsContractSettings,
+  ArchiveLibrarySettings,
   AttachmentCycleSettings,
   ContractorContractSettings,
   DataSettings,
@@ -36,15 +34,6 @@ const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
   "is_responsible_engineer",
 ];
 
-const ATTACHMENT_KEYS: (keyof UpdateAttachmentContractSettingsArgs)[] = [
-  "is_name",
-  "is_type",
-  "is_size",
-  "is_creator",
-  "is_create_date",
-  "is_downloadable",
-];
-
 function isTruthySetting(v: unknown): boolean {
   return v === true || v === 1;
 }
@@ -53,8 +42,7 @@ export function getTabBulkCheckboxState(
   tabValue: string,
   data: {
     dataSettings: DataSettings | null | undefined;
-    attachment: AttachmentContractSettings | null | undefined;
-    attachmentTerms: AttachmentTermsContractSettings | null | undefined;
+    archiveLibrary: ArchiveLibrarySettings | null | undefined;
     contractor: ContractorContractSettings | null | undefined;
     employee: EmployeeContractSettings | null | undefined;
     attachmentCycle: AttachmentCycleSettings | null | undefined;
@@ -72,16 +60,12 @@ export function getTabBulkCheckboxState(
   }
 
   if (tabValue === "attachments") {
-    const aKeys = ATTACHMENT_KEYS;
-    const aVals = aKeys.map((k) => data.attachment?.[k]);
-    const bVals = aKeys.map((k) => data.attachmentTerms?.[k]);
-    const allVals = [...aVals, ...bVals];
-    if (allVals.some((v) => v === undefined)) return null;
-    const onCount = allVals.filter(isTruthySetting).length;
-    const total = allVals.length;
-    if (onCount === 0) return { checked: false, indeterminate: false };
-    if (onCount === total) return { checked: true, indeterminate: false };
-    return { checked: false, indeterminate: true };
+    const v = data.archiveLibrary?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
   }
 
   if (tabValue === "contractors") {
@@ -139,22 +123,13 @@ export async function bulkToggleTabSettings(
       return;
     }
     case "attachments": {
-      const payloadA = Object.fromEntries(
-        ATTACHMENT_KEYS.map((k) => [k, v]),
-      ) as UpdateAttachmentContractSettingsArgs;
-      const payloadB = Object.fromEntries(
-        ATTACHMENT_KEYS.map((k) => [k, v]),
-      ) as UpdateAttachmentTermsContractSettingsArgs;
-      await Promise.all([
-        ProjectTypesApi.updateAttachmentContractSettings(
-          projectTypeId,
-          payloadA,
-        ),
-        ProjectTypesApi.updateAttachmentTermsContractSettings(
-          projectTypeId,
-          payloadB,
-        ),
-      ]);
+      const payload: UpdateArchiveLibrarySettingsArgs = {
+        is_all_data_visible: v,
+      };
+      await ProjectTypesApi.updateArchiveLibrarySettings(
+        projectTypeId,
+        payload,
+      );
       return;
     }
     case "contractors": {

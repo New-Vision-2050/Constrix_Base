@@ -212,24 +212,12 @@ export default function SchemaLevelTabs({
       filteredTabs.some((t) => t.value === "project-details"),
   });
 
-  const attachmentContractQuery = useQuery({
-    queryKey: ["attachment-contract-settings", thirdLevelId],
+  const archiveLibrarySettingsQuery = useQuery({
+    queryKey: ["archive-library-settings", thirdLevelId],
     queryFn: async () => {
-      const response = await ProjectTypesApi.getAttachmentContractSettings(
+      const response = await ProjectTypesApi.getArchiveLibrarySettings(
         thirdLevelId!,
       );
-      return response.data.payload;
-    },
-    enabled:
-      thirdLevelId != null &&
-      filteredTabs.some((t) => t.value === "attachments"),
-  });
-
-  const attachmentTermsQuery = useQuery({
-    queryKey: ["attachment-terms-contract-settings", thirdLevelId],
-    queryFn: async () => {
-      const response =
-        await ProjectTypesApi.getAttachmentTermsContractSettings(thirdLevelId!);
       return response.data.payload;
     },
     enabled:
@@ -277,16 +265,14 @@ export default function SchemaLevelTabs({
   const bulkSettingsData = useMemo(
     () => ({
       dataSettings: dataSettingsQuery.data,
-      attachment: attachmentContractQuery.data,
-      attachmentTerms: attachmentTermsQuery.data,
+      archiveLibrary: archiveLibrarySettingsQuery.data,
       contractor: contractorSettingsQuery.data,
       employee: employeeSettingsQuery.data,
       attachmentCycle: attachmentCycleSettingsQuery.data,
     }),
     [
       dataSettingsQuery.data,
-      attachmentContractQuery.data,
-      attachmentTermsQuery.data,
+      archiveLibrarySettingsQuery.data,
       contractorSettingsQuery.data,
       employeeSettingsQuery.data,
       attachmentCycleSettingsQuery.data,
@@ -298,9 +284,7 @@ export default function SchemaLevelTabs({
       case "project-details":
         return dataSettingsQuery.isLoading;
       case "attachments":
-        return (
-          attachmentContractQuery.isLoading || attachmentTermsQuery.isLoading
-        );
+        return archiveLibrarySettingsQuery.isLoading;
       case "contractors":
         return contractorSettingsQuery.isLoading;
       case "team":
@@ -332,10 +316,7 @@ export default function SchemaLevelTabs({
         queryKey: ["project-type-data-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
-        queryKey: ["attachment-contract-settings", thirdLevelId],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: ["attachment-terms-contract-settings", thirdLevelId],
+        queryKey: ["archive-library-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
         queryKey: ["contractor-contract-settings", thirdLevelId],
