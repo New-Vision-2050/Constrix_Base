@@ -1,6 +1,5 @@
-import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
-import { SalaryFormConfig } from "./SalaryFormConfig";
+import SalaryForm from "./SalaryForm";
 
 export default function SalaryEditMode() {
-  return <FormContent config={SalaryFormConfig()} />;
+  return <SalaryForm readOnly={false} />;
 }

@@ -1,3 +1,5 @@
+import { useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
@@ -6,22 +8,6 @@ import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { SalaryTypes } from "./salary_type_enum";
 import useUserContractData from "../../../FunctionalAndContractualData/hooks/useUserContractData";
-
-// Helper to get period name from period ID
-const getPeriodName = async (periodId: string) => {
-  try {
-    const response = await apiClient.get(`${baseURL}/periods`);
-    const periods = response.data.payload;
-    const periodName = periods?.find(
-      (period: any) => period.id === periodId,
-    )?.name;
-    console.log("periodName", periodName);
-    return periodName;
-  } catch (error) {
-    console.error("Error fetching period name:", error);
-    return null;
-  }
-};
 
 // Helper function to calculate hourly rate based on payment period and salary
 // Using userContractData for weekly work hours
@@ -90,6 +76,45 @@ export const SalaryFormConfig = () => {
 
   const { data: userContractData } = useUserContractData(userId ?? "");
 
+  const { data: periodsData } = useQuery({
+    queryKey: ["periods"],
+    queryFn: async () => {
+      const response = await apiClient.get(`${baseURL}/periods`);
+      return response.data.payload as { id: string; name: string }[];
+    },
+  });
+
+  const periodNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    periodsData?.forEach((period) => map.set(period.id, period.name));
+    return map;
+  }, [periodsData]);
+
+  useEffect(() => {
+    const formStore = useFormStore.getState();
+    const values = formStore.getValues("salary-data-form");
+    if (
+      values?.salary_type_code !== SalaryTypes.constants ||
+      !values?.salary ||
+      !values?.period_id ||
+      !userContractData?.working_hours ||
+      !periodNameMap.size
+    )
+      return;
+
+    const periodName = periodNameMap.get(values.period_id);
+    if (!periodName) return;
+
+    const hourlyRate = calculateHourlyRate(
+      values.period_id,
+      values.salary,
+      userContractData.working_hours,
+      periodName,
+    );
+
+    formStore.setValues("salary-data-form", { hour_rate: hourlyRate });
+  }, [userContractData?.working_hours, periodNameMap]);
+
   const salaryFormConfig: FormConfig = {
     formId: "salary-data-form",
     apiUrl: `${baseURL}/user_salaries`,
@@ -120,46 +145,26 @@ export const SalaryFormConfig = () => {
                 message: tSalary("validation.basicSalaryRequired"),
               },
             ],
-            onChange: async (
-              newValue: any,
-              values: Record<string, any>,
-              formId?: string,
-            ) => {
+            onChange: (newValue: any, values: Record<string, any>) => {
               const formStore = useFormStore.getState();
 
-              // If type changed to constant and salary and period exist, calculate hour rate
               if (
                 newValue === SalaryTypes.constants &&
                 values.salary &&
                 values.period_id
               ) {
-                try {
-                  // Get period name
-                  const periodName = await getPeriodName(values.period_id);
-
-                  // Calculate hourly rate using weekly work hours from userContractData
-                  const hourlyRate = calculateHourlyRate(
-                    values.period_id,
-                    values.salary,
-                    userContractData?.working_hours,
-                    periodName,
-                  );
-
-                  // Update hour rate in the form
-                  formStore.setValues("salary-data-form", {
-                    hour_rate: hourlyRate,
-                  });
-                } catch (error) {
-                  console.error("Error calculating hourly rate:", error);
-                  formStore.setValues("salary-data-form", {
-                    hour_rate: "",
-                  });
-                }
-              } else if (newValue !== SalaryTypes.constants) {
-                // If type is not constant, clear hour rate
+                const periodName = periodNameMap.get(values.period_id);
+                const hourlyRate = calculateHourlyRate(
+                  values.period_id,
+                  values.salary,
+                  userContractData?.working_hours,
+                  periodName,
+                );
                 formStore.setValues("salary-data-form", {
-                  hour_rate: "",
+                  hour_rate: hourlyRate,
                 });
+              } else if (newValue !== SalaryTypes.constants) {
+                formStore.setValues("salary-data-form", { hour_rate: "" });
               }
             },
           },
@@ -206,33 +211,22 @@ export const SalaryFormConfig = () => {
             condition: (values) =>
               values.salary_type_code == SalaryTypes.constants,
             postfix: "ر.س",
-            onChange: async (
-              newValue: any,
-              values: Record<string, any>,
-              formId?: string,
-            ) => {
+            onChange: (newValue: any, values: Record<string, any>) => {
               const formStore = useFormStore.getState();
 
-              // If we have both salary and period_id, calculate hourly rate
               if (newValue && values.period_id) {
-                // Try to get the cached period name first
-                let periodName = await getPeriodName(values.period_id);
-
+                const periodName = periodNameMap.get(values.period_id);
                 const hourlyRate = calculateHourlyRate(
                   values.period_id,
                   newValue,
                   userContractData?.working_hours,
                   periodName,
                 );
-
                 formStore.setValues("salary-data-form", {
                   hour_rate: hourlyRate,
                 });
               } else {
-                // Reset the hour_rate if salary is cleared
-                formStore.setValues("salary-data-form", {
-                  hour_rate: "",
-                });
+                formStore.setValues("salary-data-form", { hour_rate: "" });
               }
             },
           },
@@ -259,41 +253,22 @@ export const SalaryFormConfig = () => {
                 message: tSalary("validation.paymentCycleRequired"),
               },
             ],
-            onChange: async (
-              newValue: any,
-              values: Record<string, any>,
-              formId?: string,
-            ) => {
+            onChange: (newValue: any, values: Record<string, any>) => {
               const formStore = useFormStore.getState();
-              console.log("values", values);
 
-              // If this is for constant salary type and we have a salary value, calculate the hourly rate
               if (values.salary) {
-                try {
-                  // Fetch the selected period's name
-                  const periodName = await getPeriodName(newValue);
-
-                  // Calculate with the period name and weekly work hours
-                  const hourlyRate = calculateHourlyRate(
-                    newValue,
-                    values.salary,
-                    userContractData?.working_hours,
-                    periodName,
-                  );
-
-                  formStore.setValues("salary-data-form", {
-                    hour_rate: hourlyRate,
-                  });
-                } catch (error) {
-                  formStore.setValues("salary-data-form", {
-                    hour_rate: "",
-                  });
-                }
-              } else {
-                // Reset the hour_rate when period changes and no calculation is possible
+                const periodName = periodNameMap.get(newValue);
+                const hourlyRate = calculateHourlyRate(
+                  newValue,
+                  values.salary,
+                  userContractData?.working_hours,
+                  periodName,
+                );
                 formStore.setValues("salary-data-form", {
-                  hour_rate: "",
+                  hour_rate: hourlyRate,
                 });
+              } else {
+                formStore.setValues("salary-data-form", { hour_rate: "" });
               }
             },
           },

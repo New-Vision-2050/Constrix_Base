@@ -1,7 +1,5 @@
 import { useTranslations } from "next-intl";
-import SalaryPreviewMode from "./SalaryPreviewMode";
-import SalaryEditMode from "./SalaryEditMode";
-import { Salary } from "@/modules/user-profile/types/Salary";
+import SalaryForm from "./SalaryForm";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
@@ -10,7 +8,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function Salaries() {
   const t = useTranslations("UserProfile.nestedTabs");
-  const { userSalary, userSalaryLoading } = useFinancialDataCxt();
+  const { userSalaryLoading } = useFinancialDataCxt();
   const { can } = usePermissions();
 
   return (
@@ -21,12 +19,20 @@ export default function Salaries() {
         <TabTemplate
           title={t("basicSalary")}
           loading={userSalaryLoading}
-          reviewMode={<SalaryPreviewMode salary={userSalary as Salary} />}
-          editMode={<SalaryEditMode />}
+          reviewMode={<SalaryForm readOnly={true} />}
+          editMode={<SalaryForm readOnly={false} />}
           settingsBtn={{
             items: [
-              { title: t("commonActions.myRequests"), onClick: () => {}, disabled: true },
-              { title: t("commonActions.createRequest"), onClick: () => {}, disabled: true },
+              {
+                title: t("commonActions.myRequests"),
+                onClick: () => {},
+                disabled: true,
+              },
+              {
+                title: t("commonActions.createRequest"),
+                onClick: () => {},
+                disabled: true,
+              },
             ],
             disabledEdit: !can([PERMISSIONS.profile.salaryInfo.update]),
           }}
