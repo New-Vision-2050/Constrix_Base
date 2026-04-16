@@ -70,6 +70,11 @@ export interface UpdateAttachmentTermsContractSettingsArgs {
     is_downloadable?: 0 | 1;
 }
 
+/** POST project-types/{id}/archive-library-settings */
+export interface UpdateArchiveLibrarySettingsArgs {
+    is_all_data_visible?: 0 | 1;
+}
+
 export interface UpdateContractorContractSettingsArgs {
     is_all_data_visible?: 0 | 1;
 }
