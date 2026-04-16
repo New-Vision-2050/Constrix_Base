@@ -1,25 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Box,
   Typography,
   IconButton,
   Avatar,
   TextField,
+  CircularProgress,
 } from "@mui/material";
-import {
-  X,
-  Download,
-  Printer,
-  ZoomIn,
-  ZoomOut,
-  Bold,
-  Italic,
-  List,
-} from "lucide-react";
+import { X, Download, Printer, Bold, Italic, List, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -27,28 +25,239 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
 import type { RespondAttachmentItemPayload } from "@/services/api/projects/attachment-requests/types/params";
+import { ATTACHMENT_REQUESTS_QUERY_KEY } from "@/modules/projects/project/query/useAttachmentRequests";
 import { DocumentRow, DocumentAttachment } from "../types";
+import {
+  downloadAttachmentFile,
+  fetchAuthenticatedFileBuffer,
+  requiresWebViewerServerForPreview,
+  resolveWebViewerExtension,
+} from "../attachmentActions";
+import {
+  ApryseWebViewer,
+  type ApryseWebViewerHandle,
+} from "./ApryseWebViewer";
 
-const getInitials = (name: string | null | undefined) => {
+export type SaveAnnotatedDocumentPayload = {
+  blob: Blob;
+  itemId: string;
+  fileName: string;
+};
+
+function fileNameForReplaceUpload(originalName: string, blob: Blob): string {
+  const trimmed = originalName.trim();
+  const base =
+    trimmed && trimmed.includes(".")
+      ? trimmed.replace(/\.[^/.]+$/, "")
+      : trimmed || "document";
+  if (
+    blob.type === "application/pdf" &&
+    !trimmed.toLowerCase().endsWith(".pdf")
+  ) {
+    return `${base}.pdf`;
+  }
+  if (!trimmed) {
+    return blob.type === "application/pdf" ? `${base}.pdf` : `${base}.bin`;
+  }
+  return trimmed;
+}
+
+function getInitials(name: string | null | undefined) {
   if (!name) return "";
   const parts = name.toUpperCase().trim().split(/\s+/);
   if (parts.length > 1) {
     return parts[0][0] + "\u200C" + parts[parts.length - 1][0];
   }
   return parts[0][0];
-};
-import {
-  createAuthenticatedPreviewUrl,
-  downloadAttachmentFile,
-  getFilePreviewKind,
-} from "../attachmentActions";
+}
 
-interface FileViewerDialogProps {
+function isApprovedStatus(approvalStatus: string | undefined): boolean {
+  return approvalStatus?.trim().toLowerCase() === "approved";
+}
+
+function axiosErrorMessage(error: unknown): string | undefined {
+  if (!isAxiosError(error)) return undefined;
+  return (error.response?.data as { message?: string } | undefined)?.message;
+}
+
+const STACKED_Z = "z-[1600]";
+
+/** Layout / look — unchanged from previous implementation */
+const layout = {
+  rootColumn: {
+    display: "flex",
+    flexDirection: "column",
+    height: "90vh",
+  },
+  headerRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    px: 3,
+    py: 1.5,
+    borderBottom: 1,
+    borderColor: "divider",
+  },
+  bodyRow: {
+    display: "flex",
+    flex: 1,
+    overflow: "hidden",
+  },
+  sidebar: {
+    width: 350,
+    overflowY: "auto",
+    p: 3,
+    display: "flex",
+    flexDirection: "column",
+    gap: 3,
+  },
+  reviewCard: {
+    bgcolor: "background.card",
+    borderRadius: 1,
+    p: 2,
+    display: "flex",
+    flexDirection: "column",
+    gap: 1,
+    border: 1,
+    borderColor: "divider",
+    boxShadow: 1,
+  },
+  previewColumn: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    borderInlineEnd: 1,
+    borderColor: "divider",
+    minHeight: 0,
+  },
+  previewToolbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    px: 2,
+    py: 1,
+    borderBottom: 1,
+    borderColor: "divider",
+    minHeight: 48,
+  },
+  previewStage: {
+    flex: 1,
+    display: "flex",
+    overflow: "hidden",
+    minHeight: 0,
+    position: "relative",
+  },
+  previewInner: {
+    flex: 1,
+    display: "flex",
+    alignItems: "stretch",
+    justifyContent: "center",
+    minWidth: 0,
+    minHeight: 0,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+  },
+  apryseHost: {
+    flex: 1,
+    minHeight: 0,
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+  },
+} as const;
+
+type FileViewerDialogProps = {
   open: boolean;
   onClose: () => void;
   document: DocumentRow | null;
   activeFile: DocumentAttachment | null;
   isIncoming: boolean;
+  onSaveAnnotatedDocument?: (
+    payload: SaveAnnotatedDocumentPayload,
+  ) => void | Promise<void>;
+};
+
+type ViewerBufferState = {
+  extension: string;
+  /** DWG/DXF/etc. — client WebViewer cannot preview; offer download only */
+  serverOnlyCad: boolean;
+  buffer: ArrayBuffer | null;
+  isBufferLoading: boolean;
+  fetchError: string | null;
+  canExport: boolean;
+  onViewerReady: () => void;
+  viewerInstanceKey: string;
+};
+
+/**
+ * Loads file bytes and tracks Apryse readiness. Single place for preview-related state.
+ */
+function useViewerBufferState(
+  open: boolean,
+  activeFile: DocumentAttachment | null,
+): ViewerBufferState {
+  const extension = useMemo(
+    () => (activeFile ? resolveWebViewerExtension(activeFile) : "pdf"),
+    [activeFile],
+  );
+
+  const serverOnlyCad = requiresWebViewerServerForPreview(extension);
+
+  const query = useQuery({
+    queryKey: ["file-viewer-buffer", activeFile?.id, activeFile?.url] as const,
+    queryFn: () => fetchAuthenticatedFileBuffer(activeFile!.url),
+    enabled: Boolean(open && activeFile?.url && !serverOnlyCad),
+    staleTime: 0,
+  });
+
+  const [apryseReady, setApryseReady] = useState(false);
+
+  useEffect(() => {
+    setApryseReady(false);
+  }, [query.data, activeFile?.id, extension]);
+
+  const buffer = query.data ?? null;
+  const fetchError = query.isError
+    ? query.error instanceof Error
+      ? query.error.message
+      : String(query.error)
+    : null;
+
+  const isBufferLoading = Boolean(
+    open && activeFile?.url && !serverOnlyCad && query.isPending,
+  );
+
+  const canExport = Boolean(
+    !serverOnlyCad &&
+      query.isSuccess &&
+      buffer &&
+      !query.isError &&
+      !query.isFetching &&
+      apryseReady,
+  );
+
+  const viewerInstanceKey = `${activeFile?.id ?? "none"}-${extension}`;
+
+  const onViewerReady = useCallback(() => {
+    setApryseReady(true);
+  }, []);
+
+  return {
+    extension,
+    serverOnlyCad,
+    buffer,
+    isBufferLoading,
+    fetchError,
+    canExport,
+    onViewerReady,
+    viewerInstanceKey,
+  };
 }
 
 export default function FileViewerDialog({
@@ -57,132 +266,139 @@ export default function FileViewerDialog({
   document,
   activeFile,
   isIncoming,
+  onSaveAnnotatedDocument,
 }: FileViewerDialogProps) {
   const t = useTranslations("project.documentCycle");
   const queryClient = useQueryClient();
-  const [zoom, setZoom] = useState(100);
   const [note, setNote] = useState("");
 
-  const respondMutation = useMutation({
-    mutationFn: (body: RespondAttachmentItemPayload) =>
-      AttachmentRequestsApi.respondToItem(body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attachment-requests"] });
-      toast.success(t("itemRespondSuccess"));
-      onClose();
-    },
-    onError: (error: unknown) => {
-      const msg = isAxiosError(error)
-        ? (error.response?.data as { message?: string } | undefined)?.message
-        : undefined;
-      toast.error(msg?.trim() ? msg : t("itemRespondError"));
-    },
-  });
+  const apryseRef = useRef<ApryseWebViewerHandle>(null);
+  const [savePending, setSavePending] = useState(false);
 
-  const previewKind = useMemo(
-    () => (activeFile ? getFilePreviewKind(activeFile) : "other"),
-    [activeFile],
-  );
-
-  useEffect(() => {
-    if (activeFile?.id) setZoom(100);
-  }, [activeFile?.id]);
+  const viewer = useViewerBufferState(open, activeFile);
 
   useEffect(() => {
     if (open) setNote("");
   }, [open, activeFile?.id]);
 
-  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const respondMutation = useMutation({
+    mutationFn: (body: RespondAttachmentItemPayload) =>
+      AttachmentRequestsApi.respondToItem(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY] });
+      toast.success(t("itemRespondSuccess"));
+      onClose();
+    },
+    onError: (error: unknown) => {
+      toast.error(
+        axiosErrorMessage(error)?.trim() || t("itemRespondError"),
+      );
+    },
+  });
 
-  useEffect(() => {
-    if (!open || !activeFile?.url) {
-      setPreviewSrc(null);
-      return;
-    }
+  const replaceMediaMutation = useMutation({
+    mutationFn: (body: { item_id: string; new_file: File }) =>
+      AttachmentRequestsApi.replaceItemMedia(body),
+  });
 
-    const kind = getFilePreviewKind(activeFile);
-    if (kind !== "pdf" && kind !== "image") {
-      setPreviewSrc(null);
-      return;
-    }
+  const respondBusy = respondMutation.isPending;
+  const replaceBusy = replaceMediaMutation.isPending;
+  const saveExportBusy =
+    savePending || replaceBusy;
 
-    // If we are on HTTPS, ensure the URL is also HTTPS to avoid Mixed Content errors in production.
-    let finalUrl = activeFile.url;
-    if (typeof window !== "undefined" && window.location.protocol === "https:") {
-      finalUrl = finalUrl.replace(/^http:\/\//i, "https://");
-    }
-
-    // Embed URL directly to bypass issues and simplify logic.
-    setPreviewSrc(finalUrl);
-
-    return () => {
-      setPreviewSrc(null);
-    };
-    // Intentionally key off id/url/type/name — not `activeFile` reference — to avoid refetch when parent re-renders with a new object.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, activeFile?.id, activeFile?.url, activeFile?.type, activeFile?.name]);
-
-  if (!document || !activeFile) return null;
-
-  const handleZoomIn = () => setZoom((prev) => Math.min(prev + 25, 200));
-  const handleZoomOut = () => setZoom((prev) => Math.max(prev - 25, 25));
-  const handleDownload = () =>
+  const handleDownload = useCallback(() => {
+    if (!activeFile) return;
     downloadAttachmentFile({ url: activeFile.url, name: activeFile.name });
-  const handlePrint = () => window.print();
+  }, [activeFile]);
+
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
 
   const notesPayload = note.trim() || undefined;
 
-  const handleApprove = () => {
+  const handleApprove = useCallback(() => {
+    if (!activeFile) return;
     respondMutation.mutate({
       item_id: activeFile.id,
       action: "approve",
       notes: notesPayload,
     });
-  };
+  }, [activeFile, notesPayload, respondMutation]);
 
-  const handleReject = () => {
+  const handleReject = useCallback(() => {
+    if (!activeFile) return;
     respondMutation.mutate({
       item_id: activeFile.id,
       action: "decline",
       notes: notesPayload,
     });
-  };
+  }, [activeFile, notesPayload, respondMutation]);
 
-  /** No API yet — close only. */
-  const handleRequestModification = () => {
-    onClose();
-  };
+  const handleSaveAnnotatedDocument = useCallback(async () => {
+    if (!activeFile || !viewer.canExport || !apryseRef.current) return;
+    setSavePending(true);
+    try {
+      const blob = await apryseRef.current.exportDocumentWithAnnotations();
+      const uploadName = fileNameForReplaceUpload(activeFile.name, blob);
+      const payload: SaveAnnotatedDocumentPayload = {
+        blob,
+        itemId: activeFile.id,
+        fileName: uploadName,
+      };
+      if (onSaveAnnotatedDocument) {
+        await onSaveAnnotatedDocument(payload);
+      } else {
+        const file = new File([blob], uploadName, { type: blob.type });
+        await replaceMediaMutation.mutateAsync({
+          item_id: activeFile.id,
+          new_file: file,
+        });
+        queryClient.invalidateQueries({
+          queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY],
+        });
+        toast.success(t("saveViewerChangesSuccess"));
+        onClose();
+      }
+    } catch (e: unknown) {
+      toast.error(
+        axiosErrorMessage(e)?.trim() ||
+          (e instanceof Error ? e.message : String(e)) ||
+          t("saveViewerChangesError"),
+      );
+    } finally {
+      setSavePending(false);
+    }
+  }, [
+    activeFile,
+    viewer.canExport,
+    onSaveAnnotatedDocument,
+    replaceMediaMutation,
+    queryClient,
+    t,
+    onClose,
+  ]);
 
-  const respondPending = respondMutation.isPending;
+  if (!document || !activeFile) return null;
 
-  /** Above MUI theme zIndex.modal (1300) so this opens on top of the request detail dialog. */
-  const stackedDialogClass = "z-[1600]";
+  const showWorkflow =
+    isIncoming && !isApprovedStatus(document.approvalStatus);
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
-        overlayClassName={stackedDialogClass}
+        overlayClassName={STACKED_Z}
         className={cn(
           "max-w-[95vw] w-[1200px] max-h-[95vh] p-0 overflow-hidden",
-          stackedDialogClass,
+          STACKED_Z,
         )}
       >
         <DialogTitle className="sr-only">
           {[document.name, activeFile.name].filter(Boolean).join(" — ")}
         </DialogTitle>
-        <Box sx={{ display: "flex", flexDirection: "column", height: "90vh" }}>
-          {/* Header */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              px: 3,
-              py: 1.5,
-              borderBottom: 1,
-              borderColor: "divider",
-            }}
-          >
+
+        <Box sx={layout.rootColumn}>
+          <Box sx={layout.headerRow}>
             <Typography variant="h6" fontWeight={600}>
               {document.project?.name ?? document.name}
             </Typography>
@@ -196,37 +412,13 @@ export default function FileViewerDialog({
             </Box>
           </Box>
 
-          {/* Body */}
-          <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
-            {/* Right: Document Info Panel */}
-            <Box
-              sx={{
-                width: 350,
-                overflowY: "auto",
-                p: 3,
-                display: "flex",
-                flexDirection: "column",
-                gap: 3,
-              }}
-            >
-              {/* Document Review Section */}
+          <Box sx={layout.bodyRow}>
+            <Box sx={layout.sidebar}>
               <Box>
                 <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
                   {t("documentReview")}
                 </Typography>
-                <Box
-                  sx={{
-                    bgcolor: "background.card",
-                    borderRadius: 1,
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                    border: 1,
-                    borderColor: "divider",
-                    boxShadow: 1,
-                  }}
-                >
+                <Box sx={layout.reviewCard}>
                   <Typography variant="body2" fontWeight={600}>
                     {document.lastActivityUser || "N/A"}
                   </Typography>
@@ -242,21 +434,22 @@ export default function FileViewerDialog({
                     }}
                   >
                     <Avatar sx={{ width: 28, height: 28, fontSize: 12 }}>
-                        {getInitials(document.lastActivityUser || 'N/A')}
+                      {getInitials(document.lastActivityUser || "N/A")}
                     </Avatar>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                          {t("type")}: {document.documentType ||t("requestTypeAttachment")}
+                        {t("type")}:{" "}
+                        {document.documentType || t("requestTypeAttachment")}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                       {t("approvalStatus")}: {document.approvalStatus || 'N/A'}
+                        {t("approvalStatus")}:{" "}
+                        {document.approvalStatus || "N/A"}
                       </Typography>
                     </Box>
                   </Box>
                 </Box>
               </Box>
-
-              {/* Previous Notes */}
+              
               <Box>
                 <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
                   {t("previousNotes")}
@@ -308,7 +501,6 @@ export default function FileViewerDialog({
                 ))}
               </Box>
 
-              {/* Add Note */}
               {isIncoming && (
                 <Box>
                   <Typography
@@ -347,74 +539,142 @@ export default function FileViewerDialog({
                     onChange={(e) => setNote(e.target.value)}
                     variant="outlined"
                     size="small"
-                    disabled={respondPending}
+                    disabled={respondBusy}
                   />
                 </Box>
               )}
-
-              {/* Action Buttons for Incoming */}
-              {isIncoming && document?.approvalStatus !== "approved" && (
+              {showWorkflow && (
                 <Box
                   sx={{
                     display: "flex",
+                    flexWrap: "wrap",
                     gap: 1,
                     justifyContent: "center",
-                    pt: 1,
+                    pt: 0,
                   }}
                 >
                   <Button
                     className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
                     onClick={handleApprove}
-                    disabled={respondPending}
+                    disabled={respondBusy}
                   >
                     ✓ {t("approve")}
                   </Button>
                   <Button
                     className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-                    onClick={handleRequestModification}
-                    disabled={true}
+                    onClick={handleSaveAnnotatedDocument}
+                    disabled={
+                      !viewer.canExport ||
+                      saveExportBusy ||
+                      respondBusy
+                    }
                   >
-                    ✎ {t("requestModification")}
+                    <Save className="w-4 h-4 me-1 inline" />
+                    {t("save")}
                   </Button>
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
                     onClick={handleReject}
-                    disabled={respondPending}
+                    disabled={respondBusy}
                   >
                     ✕ {t("reject")}
                   </Button>
                 </Box>
               )}
             </Box>
-            {/* Left: File Preview */}
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                borderInlineEnd: 1,
-                borderColor: "divider",
-              }}
-            >
-              {/* Toolbar */}
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  px: 2,
-                  py: 1,
-                  borderBottom: 1,
-                  borderColor: "divider",
-                }}
-              >
-                {previewKind !== "pdf" && (
-                  <>
-                    <Box sx={{ display: "flex", gap: 1 }}>
-                      <Button variant="outline" size="sm" onClick={handlePrint}>
-                        <Printer className="w-4 h-4 me-1" />
-                        {t("print")}
+
+            <Box sx={layout.previewColumn}>
+              <Box sx={layout.previewToolbar}>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePrint}
+                    disabled={viewer.serverOnlyCad}
+                  >
+                    <Printer className="w-4 h-4 me-1" />
+                    {t("print")}
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleDownload}>
+                    <Download className="w-4 h-4 me-1" />
+                    {t("download")}
+                  </Button>
+                </Box>
+              </Box>
+
+              <Box sx={layout.previewStage}>
+                <Box sx={layout.previewInner}>
+                  {viewer.serverOnlyCad && (
+                    <Box
+                      sx={{
+                        p: 4,
+                        textAlign: "center",
+                        alignSelf: "center",
+                        maxWidth: 520,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight={600}
+                        sx={{ mb: 1.5 }}
+                      >
+                        {t("cadPreviewUnavailableTitle")}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2 }}
+                      >
+                        {t("cadPreviewUnavailableBody")}
+                      </Typography>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownload}
+                      >
+                        <Download className="w-4 h-4 me-1" />
+                        {t("download")}
                       </Button>
+                      <Typography
+                        variant="caption"
+                        component="p"
+                        sx={{ mt: 2, display: "block" }}
+                      >
+                        <a
+                          href="https://docs.apryse.com/documentation/web/guides/wv-server-deployment"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary underline-offset-2 hover:underline"
+                        >
+                          {t("cadPreviewLearnMoreWvs")}
+                        </a>
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {viewer.isBufferLoading && !viewer.serverOnlyCad && (
+                    <Box sx={layout.loadingOverlay}>
+                      <CircularProgress />
+                    </Box>
+                  )}
+
+                  {viewer.fetchError &&
+                    !viewer.isBufferLoading &&
+                    !viewer.serverOnlyCad && (
+                    <Box
+                      sx={{
+                        p: 4,
+                        textAlign: "center",
+                        alignSelf: "center",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        color="error"
+                        sx={{ mb: 2 }}
+                      >
+                        {viewer.fetchError}
+                      </Typography>
                       <Button
                         variant="outline"
                         size="sm"
@@ -424,114 +684,23 @@ export default function FileViewerDialog({
                         {t("download")}
                       </Button>
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <IconButton size="small" onClick={handleZoomOut}>
-                        <ZoomOut className="w-4 h-4" />
-                      </IconButton>
-                      <Typography variant="body2">{zoom}%</Typography>
-                      <IconButton size="small" onClick={handleZoomIn}>
-                        <ZoomIn className="w-4 h-4" />
-                      </IconButton>
+                  )}
+
+                  {viewer.buffer &&
+                    !viewer.fetchError &&
+                    !viewer.serverOnlyCad && (
+                    <Box sx={layout.apryseHost}>
+                      <ApryseWebViewer
+                        ref={apryseRef}
+                        key={viewer.viewerInstanceKey}
+                        documentBuffer={viewer.buffer}
+                        extension={viewer.extension}
+                        fileName={activeFile.name}
+                        onViewerReady={viewer.onViewerReady}
+                      />
                     </Box>
-                  </>
-                )}
-              </Box>
-
-              {/* Preview Area */}
-              <Box
-                sx={{
-                  flex: 1,
-                  display: "flex",
-                  overflow: "auto",
-                }}
-              >
-                {/* Main preview */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    minWidth: 0,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: `${zoom}%`,
-                      maxWidth: "100%",
-                      minHeight: 360,
-                      bgcolor: "background.card",
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "divider",
-                      boxShadow: 2,
-                      transition: "width 0.2s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {previewKind === "pdf" && activeFile.url ? (
-                      <>
-                        <Box
-                          component="iframe"
-                          src={previewSrc || activeFile.url}
-                          title={activeFile.name}
-                          sx={{
-                            width: "100%",
-                            height: "min(70vh, 720px)",
-                            minHeight: 400,
-                            border: 0,
-                            display: "block",
-                          }}
-                        />
-                      </>
-                    ) : null}
-                    {previewKind === "image" && activeFile.url ? (
-                      <>
-                        <Box
-                          component="img"
-                          src={previewSrc || activeFile.url}
-                          alt={activeFile.name}
-                          sx={{
-                            maxWidth: "100%",
-                            maxHeight: "70vh",
-                            width: "auto",
-                            height: "auto",
-                            objectFit: "contain",
-                            display: "block",
-                          }}
-                        />
-                      </>
-                    ) : null}
-                    {previewKind === "other" ? (
-                      <Box sx={{ p: 4, textAlign: "center" }}>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 2 }}
-                        >
-                          {t("filePreview")}: {activeFile.name}
-                        </Typography>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            window.open(
-                              activeFile.url,
-                              "_blank",
-                              "noopener,noreferrer",
-                            )
-                          }
-                        >
-                          {t("download")}
-                        </Button>
-                      </Box>
-                    ) : null}
-                  </Box>
+                  )}
                 </Box>
-
-                {/* Thumbnails sidebar */}
               </Box>
             </Box>
           </Box>
