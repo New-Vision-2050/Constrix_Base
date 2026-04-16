@@ -91,6 +91,14 @@ export function useProjectTabsList(): SystemTab[] {
             return (
               permissions.department_contract_setting?.is_all_data_visible === 1
             );
+          case "project-tab-document-cycle":
+            return (
+              permissions.attachment_cycle_setting?.is_all_data_visible === 1
+            );
+          case "project-tab-attachments":
+            return (
+              permissions.archive_library_setting?.is_all_data_visible === 1
+            );
           default:
             return true;
         }
