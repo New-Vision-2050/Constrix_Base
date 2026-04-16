@@ -103,6 +103,7 @@ export interface ProjectPermissions {
   employee_contract_setting: ContractSetting | null;
   department_contract_setting: ContractSetting | null;
   attachment_cycle_setting: ContractSetting | null;
+  archive_library_setting: ContractSetting | null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
