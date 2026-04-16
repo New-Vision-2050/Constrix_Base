@@ -4,6 +4,8 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
+# postinstall runs copy-webviewer.js; it must exist before npm ci (Apryse assets).
+COPY scripts ./scripts
 RUN npm ci --legacy-peer-deps
 
 COPY . .
