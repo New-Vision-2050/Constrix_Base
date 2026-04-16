@@ -1,4 +1,5 @@
 export type Salary = {
+  id?: string;
   user_id: string;
   basic: string;
   salary: number;
