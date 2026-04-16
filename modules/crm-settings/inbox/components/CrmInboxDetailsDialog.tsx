@@ -5,6 +5,11 @@ import { Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type { ClientRequestRow } from "@/services/api/client-requests";
+import FileViewerDialog from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/components/FileViewerDialog";
+import type {
+  DocumentAttachment,
+  DocumentRow,
+} from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/types";
 import { formatInboxSentDate } from "@/modules/projects/inbox/inbox-columns";
 import {
   ApprovalTimeline,
@@ -16,7 +21,38 @@ import {
   InboxRequestApprovalPathCard,
   InboxRequestCommentsField,
   buildClientRequestApprovalTimelineEntries,
+  inboxAttachmentFileName,
+  type InboxRequestAttachmentLink,
 } from "@/modules/crm-settings/inbox/components/inbox-request-dialog";
+
+function mapClientRequestToDocumentRow(row: ClientRequestRow): DocumentRow {
+  const typeName = row.client_request_type?.name?.trim();
+  return {
+    id: row.id,
+    serialNumber: row.serial_number,
+    name: typeName || row.serial_number || "—",
+    fileSize: "—",
+    documentCount: row.attachments?.length ?? 0,
+    lastActivityUser: row.client?.name?.trim() || "—",
+    lastActivityDate: row.created_at,
+    status: "pending",
+    documentType: typeName,
+    approvalStatus: row.status_client_request,
+    comments: [],
+  };
+}
+
+function mapInboxLinkToDocumentAttachment(
+  link: InboxRequestAttachmentLink,
+): DocumentAttachment {
+  return {
+    id: String(link.id),
+    name: inboxAttachmentFileName(link.label, link.fileName) || "file",
+    url: link.href,
+    type: link.mimeType ?? "",
+    size: "",
+  };
+}
 
 function clientRequestStatusLabel(
   status: string,
@@ -69,12 +105,26 @@ export default function CrmInboxDetailsDialog({
   const tClient = useTranslations();
   const tDoc = useTranslations("project.documentCycle");
   const [commentDraft, setCommentDraft] = useState("");
+  const [viewerLink, setViewerLink] = useState<InboxRequestAttachmentLink | null>(
+    null,
+  );
 
   useEffect(() => {
     if (open) {
       setCommentDraft("");
+      setViewerLink(null);
     }
   }, [open, row?.id]);
+
+  const documentForViewer = useMemo(
+    () => (row ? mapClientRequestToDocumentRow(row) : null),
+    [row],
+  );
+
+  const activeFileForViewer = useMemo(
+    () => (viewerLink ? mapInboxLinkToDocumentAttachment(viewerLink) : null),
+    [viewerLink],
+  );
 
   const descriptionBody = useMemo(() => {
     if (!row?.content?.trim()) return t("emptyDash");
@@ -121,7 +171,15 @@ export default function CrmInboxDetailsDialog({
   }
 
   return (
-    <InboxRequestDetailDialog
+    <>
+      <FileViewerDialog
+        open={Boolean(viewerLink && documentForViewer && activeFileForViewer)}
+        onClose={() => setViewerLink(null)}
+        document={documentForViewer}
+        activeFile={activeFileForViewer}
+        isIncoming={false}
+      />
+      <InboxRequestDetailDialog
       open={open && !!row}
       onClose={onClose}
       title={t("dialogTitle")}
@@ -143,6 +201,8 @@ export default function CrmInboxDetailsDialog({
           <InboxRequestAttachmentsSection
             title={t("attachments")}
             emptyLabel={t("emptyDash")}
+            downloadLabel={tDoc("download")}
+            onViewAttachment={(link) => setViewerLink(link)}
             links={
               row.attachments?.length
                 ? row.attachments.map((a) => ({
@@ -205,5 +265,6 @@ export default function CrmInboxDetailsDialog({
         </Stack>
       }
     />
+    </>
   );
 }

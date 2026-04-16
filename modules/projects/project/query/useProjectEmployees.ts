@@ -5,18 +5,34 @@ import type { Employee } from "@/modules/projects/project/components/project-tab
 
 function mapDtoToEmployee(item: ProjectEmployee): Employee {
   const u = item.user;
-  const branch = u?.branch;
+  const company = item.company;
+  const pr = item.project_role;
   return {
-    id: String(u?.id ?? item.id),
-    name: u?.name ?? "—",
-    phone: u?.phone ?? u?.mobile ?? "",
-    email: u?.email ?? "",
-    branch: {
-      id: branch?.id ?? 0,
-      name: branch?.name ?? "—",
+    id: item.id,
+    projectId: item.project_id,
+    projectRole: pr
+      ? {
+          id: pr.id,
+          name: pr.name,
+          slug: pr.slug,
+          is_default: pr.is_default,
+        }
+      : null,
+    user: {
+      id: u.id,
+      name: u.name?.trim() ? u.name : "—",
+      email: u.email?.trim() ?? "",
+      phone: (u.phone ?? u.mobile ?? "").trim(),
     },
-    jobTitle: u?.job_title ?? u?.jobTitle ?? "",
-    department: u?.department ?? u?.department_name ?? "",
+    company: company
+      ? {
+          id: String(company.id),
+          name: company.name?.trim() ? company.name : "—",
+        }
+      : { id: "", name: "—" },
+    assignedAt: item.assigned_at?.trim() ?? "",
+    assignedBy: item.assigned_by ?? null,
+    createdAt: item.created_at?.trim() ?? "",
   };
 }
 

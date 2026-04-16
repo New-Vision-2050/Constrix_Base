@@ -17,6 +17,7 @@ export {
   InboxRequestDescriptionSection,
   InboxRequestAttachmentsSection,
   InboxRequestActionRow,
+  inboxAttachmentFileName,
 } from "./InboxRequestMainSections";
 export type {
   InboxRequestThreeStatCardsProps,

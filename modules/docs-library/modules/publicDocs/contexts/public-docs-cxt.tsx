@@ -65,6 +65,15 @@ interface CxtType {
   setDocToView: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
   /** Set when viewing project attachments — folder APIs are project-scoped. */
   projectId?: string;
+  /**
+   * When viewing project-scoped library (`projectId` set), gates destructive / create
+   * actions together with library permissions (`GET .../my-permissions/flat`).
+   */
+  projectArchiveGates?: {
+    canCreate: boolean;
+    canUpdate: boolean;
+    canDelete: boolean;
+  };
 }
 
 const Cxt = createContext<CxtType | undefined>(undefined);
@@ -192,6 +201,7 @@ function LibraryPublicDocsProviderInner({ children, fixedType }: LibraryProps) {
         usersList,
         handleRefetchUsersList: () => refetchUsersList(),
         projectId: undefined,
+        projectArchiveGates: undefined,
       }}
     >
       {children}
@@ -204,6 +214,7 @@ type ProjectProps = {
   fixedType?: string;
   projectId: string;
   initialParentId?: string;
+  projectArchiveGates?: CxtType["projectArchiveGates"];
 };
 
 function ProjectPublicDocsProviderInner({
@@ -211,6 +222,7 @@ function ProjectPublicDocsProviderInner({
   fixedType,
   projectId,
   initialParentId,
+  projectArchiveGates,
 }: ProjectProps) {
   const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
@@ -336,6 +348,7 @@ function ProjectPublicDocsProviderInner({
         usersList,
         handleRefetchUsersList: () => refetchUsersList(),
         projectId,
+        projectArchiveGates,
       }}
     >
       {children}
@@ -349,6 +362,8 @@ interface PropsT {
   projectId?: string;
   /** Initial folder scope when `projectId` is set (defaults to project root in API). */
   initialParentId?: string;
+  /** Project archive-library permission gates for `projectId` attachments tab. */
+  projectArchiveGates?: CxtType["projectArchiveGates"];
 }
 
 export const PublicDocsCxtProvider: React.FC<PropsT> = ({
@@ -356,6 +371,7 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
   fixedType,
   projectId,
   initialParentId,
+  projectArchiveGates,
 }) => {
   if (projectId) {
     return (
@@ -363,6 +379,7 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
         fixedType={fixedType}
         projectId={projectId}
         initialParentId={initialParentId}
+        projectArchiveGates={projectArchiveGates}
       >
         {children}
       </ProjectPublicDocsProviderInner>

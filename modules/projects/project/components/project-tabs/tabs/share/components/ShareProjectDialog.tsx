@@ -24,6 +24,7 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { Close, InfoOutlined, Send as SendIcon } from "@mui/icons-material";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
@@ -598,9 +599,10 @@ export default function ShareProjectDialog({
                           ...(checked && {
                             borderColor: "primary.main",
                             bgcolor: (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "rgba(144, 202, 249, 0.08)"
-                                : "rgba(25, 118, 210, 0.06)",
+                              alpha(
+                                theme.palette.primary.main,
+                                theme.palette.mode === "dark" ? 0.08 : 0.06,
+                              ),
                             boxShadow: (theme) =>
                               `inset 0 0 0 1px ${theme.palette.primary.main}`,
                           }),

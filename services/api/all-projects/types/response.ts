@@ -102,6 +102,8 @@ export interface ProjectPermissions {
   contractor_contract_setting: ContractSetting | null;
   employee_contract_setting: ContractSetting | null;
   department_contract_setting: ContractSetting | null;
+  attachment_cycle_setting: ContractSetting | null;
+  archive_library_setting: ContractSetting | null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -186,7 +188,6 @@ export type GetManagementsResponse = ApiResponse<Management[]>;
 export type GetCompanyUsersResponse = ApiResponse<Manager[]>;
 export type GetClientsResponse = ApiResponse<Client[]>;
 
-/** Row from GET /projects/employees/project/:projectId */
 export interface ProjectEmployeeUser {
   id: string;
   name: string;
@@ -200,6 +201,14 @@ export interface ProjectEmployeeUser {
   department_name?: string | null;
 }
 
+/** Embedded project role on a project–employee row (`GET .../employees/project/{id}`). */
+export interface ProjectEmployeeProjectRole {
+  id: string;
+  name: string;
+  slug: string;
+  is_default: boolean;
+}
+
 export interface ProjectEmployee {
   id: string;
   project_id: string;
@@ -209,7 +218,22 @@ export interface ProjectEmployee {
   assigned_by?: {
     id: string;
     name: string;
-  };
+  } | null;
+  company?: {
+    id: string;
+    name: string;
+  } | null;
+  /** When present, employee’s project role (`GET projects/{id}/roles`). */
+  project_role_id?: string | null;
+  project_role?: ProjectEmployeeProjectRole | null;
 }
 
 export type GetProjectEmployeesResponse = ApiResponse<ProjectEmployee[]>;
+
+/** Selectable employees not yet assigned to a project (`GET .../not-in-project/{id}`). */
+export interface EmployeeNotInProject {
+  id: string;
+  name: string;
+}
+
+export type GetEmployeesNotInProjectResponse = ApiResponse<EmployeeNotInProject[]>;

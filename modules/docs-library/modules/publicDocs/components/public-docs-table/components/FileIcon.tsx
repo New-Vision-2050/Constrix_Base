@@ -12,10 +12,9 @@ interface FileIconProps {
 export const FileIcon = ({ isFolder, fileName }: FileIconProps) => {
   const getFileIcon = () => {
     if (isFolder) {
-      return <Folder className="h-5 w-5 text-blue-500" />;
+      return <Folder className="h-5 w-5 text-primary" />;
     }
     
-    // Determine file type from extension
     const extension = fileName?.split('.').pop()?.toLowerCase();
     
     switch (extension) {
@@ -33,7 +32,7 @@ export const FileIcon = ({ isFolder, fileName }: FileIconProps) => {
       case 'gif':
         return <FileText className="h-5 w-5 text-purple-500" />;
       default:
-        return <FileText className="h-5 w-5 text-gray-500" />;
+        return <FileText className="h-5 w-5 text-muted-foreground" />;
     }
   };
 

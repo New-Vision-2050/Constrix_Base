@@ -10,6 +10,8 @@ import {
     UpdateAttachmentTermsContractSettingsArgs,
     UpdateContractorContractSettingsArgs,
     UpdateEmployeeContractSettingsArgs,
+    UpdateAttachmentCycleSettingsArgs,
+    UpdateArchiveLibrarySettingsArgs,
 } from "./types/args";
 import {
     CreateSecondLevelProjectTypeResponse,
@@ -29,6 +31,10 @@ import {
     UpdateContractorContractSettingsResponse,
     GetEmployeeContractSettingsResponse,
     UpdateEmployeeContractSettingsResponse,
+    GetAttachmentCycleSettingsResponse,
+    UpdateAttachmentCycleSettingsResponse,
+    GetArchiveLibrarySettingsResponse,
+    UpdateArchiveLibrarySettingsResponse,
 } from "./types/response";
 
 export const ProjectTypesApi = {
@@ -109,6 +115,18 @@ export const ProjectTypesApi = {
             `project-types/${projectTypeId}/attachment-terms-contract-settings`,
             args,
         ),
+    getArchiveLibrarySettings: (projectTypeId: number | string) =>
+        baseApi.get<GetArchiveLibrarySettingsResponse>(
+            `project-types/${projectTypeId}/archive-library-settings`,
+        ),
+    updateArchiveLibrarySettings: (
+        projectTypeId: number | string,
+        args: UpdateArchiveLibrarySettingsArgs,
+    ) =>
+        baseApi.put<UpdateArchiveLibrarySettingsResponse>(
+            `project-types/${projectTypeId}/archive-library-settings`,
+            args,
+        ),
     getContractorContractSettings: (projectTypeId: number | string) =>
         baseApi.get<GetContractorContractSettingsResponse>(
             `project-types/${projectTypeId}/contractor-contract-settings`,
@@ -131,6 +149,18 @@ export const ProjectTypesApi = {
     ) =>
         baseApi.put<UpdateEmployeeContractSettingsResponse>(
             `project-types/${projectTypeId}/employee-contract-settings`,
+            args,
+        ),
+    getAttachmentCycleSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetAttachmentCycleSettingsResponse>(
+            `project-types/${projectTypeId}/attachment-cycle-settings`,
+        ),
+    updateAttachmentCycleSettings: (
+        projectTypeId: number | string,
+        args: UpdateAttachmentCycleSettingsArgs,
+    ) =>
+        baseApi.put<UpdateAttachmentCycleSettingsResponse>(
+            `project-types/${projectTypeId}/attachment-cycle-settings`,
             args,
         ),
 };

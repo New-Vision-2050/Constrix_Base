@@ -17,12 +17,15 @@ import {
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { Close } from "@mui/icons-material";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { projectEmployeesQueryKey } from "@/modules/projects/project/query/useProjectEmployees";
-import { useCompanyEmployees } from "@/modules/company-profile/query/useCompanyEmployees";
+import type { EmployeeNotInProject } from "@/services/api/all-projects/types/response";
+
+export const employeesNotInProjectQueryKey = (projectId: string) =>
+  ["employees-not-in-project", projectId] as const;
 
 
 const createAddStaffSchema = (t: (key: string) => string) =>
@@ -38,11 +41,17 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
   const tProject = useTranslations("project");
   const { projectId } = useProject();
   const queryClient = useQueryClient();
-  
-  const { data: companyEmployeesRaw, isLoading: isLoadingCompanyEmployees } =
-    useCompanyEmployees();
 
-     
+  const { data: notInProjectRaw, isLoading: isLoadingEmployees } = useQuery({
+    queryKey:
+      projectId ? employeesNotInProjectQueryKey(projectId) : ["employees-not-in-project", ""],
+    queryFn: async () => {
+      const res = await AllProjectsApi.getEmployeesNotInProject(projectId!);
+      return res.data.payload ?? [];
+    },
+    enabled: open && !!projectId,
+    staleTime: 30_000,
+  });
 
   const schema = useMemo(() => createAddStaffSchema(tProject), [tProject]);
 
@@ -78,6 +87,9 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
       queryClient.invalidateQueries({ queryKey: ["project-details", projectId] });
       queryClient.invalidateQueries({
         queryKey: projectEmployeesQueryKey(projectId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: employeesNotInProjectQueryKey(projectId),
       });
       reset();
       setOpen(false);
@@ -120,21 +132,23 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
             name="user_ids"
             control={control}
             render={({ field }) => {
-              const selected = companyEmployeesRaw?.filter((e) =>
-                field.value.includes(e.id),
-              );
+              const pool = notInProjectRaw ?? [];
+              const selected: EmployeeNotInProject[] = field.value
+                .map((id) => pool.find((e) => e.id === id))
+                .filter((e): e is EmployeeNotInProject => e != null);
+              const options = pool.filter((e) => !field.value.includes(e.id));
               return (
                 <Autocomplete
                   multiple
-                  loading={isLoadingCompanyEmployees}
-                  options={companyEmployeesRaw ?? []}
+                  loading={isLoadingEmployees}
+                  options={options}
                   getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(a, b) => a.id === b.id}
                   value={selected}
                   onChange={(_, newValue) => {
                     field.onChange(newValue.map((x) => x.id));
                   }}
-                  disabled={pending}
+                  disabled={pending || !projectId}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -145,7 +159,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                         ...params.InputProps,
                         endAdornment: (
                           <>
-                            {isLoadingCompanyEmployees ? (
+                            {isLoadingEmployees ? (
                               <CircularProgress color="inherit" size={20} />
                             ) : null}
                             {params.InputProps.endAdornment}

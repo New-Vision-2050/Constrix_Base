@@ -77,7 +77,9 @@ const TableBody: React.FC<TableBodyProps> = ({
           <tr
             key={rowIndex}
             className={`border-b border-border last:border-0 transition-colors ${
-              isSelected ? "bg-muted/30" : ""
+              isSelected
+                ? "bg-muted/30"
+                : "even:bg-[var(--table-row-alt,transparent)]"
             }`}
           >
             {selectionEnabled && (

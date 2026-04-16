@@ -60,7 +60,8 @@ export function ProjectCard({
       sx={{
         p: 2.5,
         borderRadius: 2,
-        border: "1px solid rgba(255,255,255,0.08)",
+        border: 1,
+        borderColor: "divider",
         bgcolor: "background.paper",
       }}
     >
@@ -130,7 +131,7 @@ export function ProjectCard({
             size="small"
             sx={{
               backgroundColor: statusCfg.bg,
-              color: "#fff",
+              color: "common.white",
               fontWeight: "bold",
               fontSize: "0.7rem",
             }}
@@ -142,7 +143,7 @@ export function ProjectCard({
               sx={{
                 height: 5,
                 borderRadius: 3,
-                bgcolor: "rgba(255,255,255,0.1)",
+                bgcolor: "action.hover",
                 "& .MuiLinearProgress-bar": {
                   bgcolor: statusCfg.bg,
                   borderRadius: 3,

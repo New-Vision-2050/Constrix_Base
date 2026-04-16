@@ -24,7 +24,6 @@ import { ClientRequestsApi } from "@/services/api/client-requests";
 import { CRM_INBOX_PENDING_COUNT_QUERY_KEY } from "@/components/icons/crm-inbox";
 import { CRM_INBOX_LIST_QUERY_KEY } from "@/modules/crm-settings/query-keys";
 import CrmInboxDetailsDialog from "@/modules/crm-settings/inbox/components/CrmInboxDetailsDialog";
-import { useClientRequestInboxRealtime } from "@/modules/crm-settings/inbox/hooks/useClientRequestInboxRealtime";
 
 const CrmInboxTableLayout = HeadlessTableLayout<ClientRequestRow>("crm-inbox");
 
@@ -45,8 +44,6 @@ function CrmInboxView() {
   const { can } = usePermissions();
   const queryClient = useQueryClient();
   const canUpdateClientRequest = can(PERMISSIONS.clientRequest.update);
-
-  useClientRequestInboxRealtime();
 
   const [deletingRequestId, setDeletingRequestId] = useState<string | null>(
     null,

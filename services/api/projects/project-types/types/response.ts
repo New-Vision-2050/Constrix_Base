@@ -89,6 +89,20 @@ export interface GetAttachmentTermsContractSettingsResponse extends ApiBaseRespo
 export interface UpdateAttachmentTermsContractSettingsResponse extends ApiBaseResponse<AttachmentTermsContractSettings> {
 }
 
+export interface ArchiveLibrarySettings {
+    id: number;
+    project_type_id: number;
+    is_all_data_visible: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetArchiveLibrarySettingsResponse extends ApiBaseResponse<ArchiveLibrarySettings> {
+}
+
+export interface UpdateArchiveLibrarySettingsResponse extends ApiBaseResponse<ArchiveLibrarySettings> {
+}
+
 export interface ContractorContractSettings {
     id: number;
     project_type_id: number;
@@ -115,4 +129,18 @@ export interface GetEmployeeContractSettingsResponse extends ApiBaseResponse<Emp
 }
 
 export interface UpdateEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {
+}
+
+export interface AttachmentCycleSettings {
+    id: number;
+    project_type_id: number;
+    is_all_data_visible: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetAttachmentCycleSettingsResponse extends ApiBaseResponse<AttachmentCycleSettings> {
+}
+
+export interface UpdateAttachmentCycleSettingsResponse extends ApiBaseResponse<AttachmentCycleSettings> {
 }

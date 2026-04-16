@@ -11,6 +11,7 @@ import {
   GetBranchesResponse,
   GetClientsResponse,
   GetManagementsResponse,
+  GetEmployeesNotInProjectResponse,
   GetProjectEmployeesResponse,
   GetProjectTypesResponse,
   ListProjectsResponse,
@@ -42,15 +43,18 @@ export const AllProjectsApi = {
     ),
 
   getBranches: (params?: { name?: string }) =>
-    baseApi.get<GetBranchesResponse>("management_hierarchies/list?type=branch", { params }),
+    baseApi.get<GetBranchesResponse>(
+      "management_hierarchies/list?type=branch",
+      { params },
+    ),
 
   getManagements: (params?: { name?: string; branch_id?: number }) =>
     baseApi.get<GetManagementsResponse>(
       "management_hierarchies/list?type=management",
-      { params }
+      { params },
     ),
 
-  getCompanyUsers: (params?: { name?: string; per_page?: number }) => 
+  getCompanyUsers: (params?: { name?: string; per_page?: number }) =>
     baseApi.get(`company-users/employees`, { params }),
 
   getEntityClients: (params?: ClientParams) =>
@@ -67,11 +71,33 @@ export const AllProjectsApi = {
       `projects/employees/project/${projectId}`,
     ),
 
+  getEmployeesNotInProject: (projectId: string) =>
+    baseApi.get<GetEmployeesNotInProjectResponse>(
+      `projects/employees/not-in-project/${projectId}`,
+    ),
+
   assignEmployeesToProject: (data: {
     project_id: string;
     user_ids: string[];
-  }) => baseApi.post<{ code: string; message?: string | null }>(
-    "projects/employees/assign",
-    data,
-  ),
+  }) =>
+    baseApi.post<{ code: string; message?: string | null }>(
+      "projects/employees/assign",
+      data,
+    ),
+
+  /** Removes a project–employee assignment (`payload[].id` from project employees list). */
+  removeProjectEmployee: (assignmentId: string) =>
+    baseApi.delete<{ code: string; message?: string | null }>(
+      `projects/employees/${assignmentId}`,
+    ),
+
+  /** Assigns a project role to a project–employee row (`assignmentId` = row `id`). */
+  assignProjectEmployeeRole: (
+    assignmentId: string,
+    data: { project_role_id: string },
+  ) =>
+    baseApi.put<{ code: string; message?: string | null }>(
+      `projects/employees/${assignmentId}/assign-role`,
+      data,
+    ),
 };

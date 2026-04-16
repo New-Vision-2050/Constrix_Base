@@ -34,6 +34,20 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
+function allowProjectArchiveAction(
+  projectId: string | undefined,
+  gates:
+    | { canCreate: boolean; canUpdate: boolean; canDelete: boolean }
+    | undefined,
+  action: "create" | "update" | "delete",
+) {
+  if (!projectId) return true;
+  if (!gates) return true;
+  if (action === "create") return gates.canCreate;
+  if (action === "update") return gates.canUpdate;
+  return gates.canDelete;
+}
+
 /**
  * DocumentsHeader component for document management interface
  * Combines search bar, add button, and action buttons in a unified header
@@ -53,6 +67,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   const docsLibrary = useOptionalDocsLibraryCxt();
   const {
     projectId,
+    projectArchiveGates,
     sort,
     setSort,
     openDirDialog,
@@ -220,7 +235,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
             <DropdownButton
               triggerButton={<Button>{t("add")}</Button>}
               items={[
-                ...(can(PERMISSIONS.library.folder.create)
+                ...(can(PERMISSIONS.library.folder.create) &&
+                allowProjectArchiveAction(
+                  projectId,
+                  projectArchiveGates,
+                  "create",
+                )
                   ? [
                       {
                         text: t("dir"),
@@ -232,7 +252,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
                       },
                     ]
                   : []),
-                ...(can(PERMISSIONS.library.file.create)
+                ...(can(PERMISSIONS.library.file.create) &&
+                allowProjectArchiveAction(
+                  projectId,
+                  projectArchiveGates,
+                  "create",
+                )
                   ? [
                       {
                         text: t("file"),
@@ -358,7 +383,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               disabled={
                 selectedDocs?.length == 0 ||
                 selectedDocs?.filter((doc) => !doc.is_file).length > 0 ||
-                !can(PERMISSIONS.library.file.update)
+                !can(PERMISSIONS.library.file.update) ||
+                !allowProjectArchiveAction(
+                  projectId,
+                  projectArchiveGates,
+                  "update",
+                )
               }
             >
               <Copy className="mr-2 h-4 w-4" />
@@ -385,7 +415,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               disabled={
                 selectedDocs?.length != 1 ||
                 !Boolean(selectedDocs?.[0]?.can_delete) ||
-                !can(PERMISSIONS.library.file.delete)
+                !can(PERMISSIONS.library.file.delete) ||
+                !allowProjectArchiveAction(
+                  projectId,
+                  projectArchiveGates,
+                  "delete",
+                )
               }
             >
               <Trash className="mr-2 h-4 w-4" />
@@ -423,7 +458,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               disabled={
                 selectedDocs?.length == 0 ||
                 selectedDocs?.filter((doc) => !doc.is_file).length > 0 ||
-                !can(PERMISSIONS.library.file.update)
+                !can(PERMISSIONS.library.file.update) ||
+                !allowProjectArchiveAction(
+                  projectId,
+                  projectArchiveGates,
+                  "update",
+                )
               }
             >
               <MoveRight className="mr-2 h-4 w-4" />

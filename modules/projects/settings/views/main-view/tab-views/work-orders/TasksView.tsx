@@ -111,11 +111,11 @@ export default function TasksView({
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <IconButton
             onClick={() => setActiveCard("HIDE")}
-            sx={{ color: "white" }}
+            sx={{ color: "text.primary" }}
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h6" color="white">
+          <Typography variant="h6" color="text.primary">
             {t("title")}
           </Typography>
         </Box>
@@ -139,7 +139,7 @@ export default function TasksView({
         </Box>
       </Box>
 
-      <Box sx={{ color: "white" }}>
+      <Box sx={{ color: "text.primary" }}>
         <AddTasksTable
           table={
             <AddTasksTable.Table

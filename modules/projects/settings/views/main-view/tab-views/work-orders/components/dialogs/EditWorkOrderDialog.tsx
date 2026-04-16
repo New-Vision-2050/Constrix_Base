@@ -44,9 +44,10 @@ export default function EditWorkOrderDialog({
       fullWidth
       PaperProps={{
         sx: {
-          color: "white",
+          color: "text.primary",
           borderRadius: "8px",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
+          border: 1,
+          borderColor: "divider",
           bgcolor: "background.paper",
         },
       }}
@@ -61,7 +62,7 @@ export default function EditWorkOrderDialog({
             position: "absolute",
             right: 16,
             top: 16,
-            color: "rgba(255,255,255,0.5)",
+            color: "text.secondary",
           }}
         >
           <CloseIcon />
@@ -78,23 +79,23 @@ export default function EditWorkOrderDialog({
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: "divider",
                   },
                   "&:hover fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: "divider",
                   },
                   "&.Mui-focused fieldset": {
                     borderColor: "primary.main",
                   },
                 },
                 "& .MuiInputLabel-root": {
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: "text.secondary",
                   "&.Mui-focused": {
                     color: "primary.main",
                   },
                 },
                 "& .MuiInputBase-input": {
-                  color: "white",
+                  color: "text.primary",
                 },
               }}
             />
@@ -107,23 +108,23 @@ export default function EditWorkOrderDialog({
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: "divider",
                   },
                   "&:hover fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: "divider",
                   },
                   "&.Mui-focused fieldset": {
                     borderColor: "primary.main",
                   },
                 },
                 "& .MuiInputLabel-root": {
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: "text.secondary",
                   "&.Mui-focused": {
                     color: "primary.main",
                   },
                 },
                 "& .MuiInputBase-input": {
-                  color: "white",
+                  color: "text.primary",
                 },
               }}
             />
@@ -136,23 +137,23 @@ export default function EditWorkOrderDialog({
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: "divider",
                   },
                   "&:hover fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: "divider",
                   },
                   "&.Mui-focused fieldset": {
                     borderColor: "primary.main",
                   },
                 },
                 "& .MuiInputLabel-root": {
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: "text.secondary",
                   "&.Mui-focused": {
                     color: "primary.main",
                   },
                 },
                 "& .MuiInputBase-input": {
-                  color: "white",
+                  color: "text.primary",
                 },
               }}
             />
@@ -167,23 +168,23 @@ export default function EditWorkOrderDialog({
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      borderColor: "rgba(255, 255, 255, 0.23)",
+                      borderColor: "divider",
                     },
                     "&:hover fieldset": {
-                      borderColor: "rgba(255, 255, 255, 0.23)",
+                      borderColor: "divider",
                     },
                     "&.Mui-focused fieldset": {
                       borderColor: "primary.main",
                     },
                   },
                   "& .MuiInputLabel-root": {
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "text.secondary",
                     "&.Mui-focused": {
                       color: "primary.main",
                     },
                   },
                   "& .MuiInputBase-input": {
-                    color: "white",
+                    color: "text.primary",
                   },
                 }}
               >
@@ -201,23 +202,23 @@ export default function EditWorkOrderDialog({
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      borderColor: "rgba(255, 255, 255, 0.23)",
+                      borderColor: "divider",
                     },
                     "&:hover fieldset": {
-                      borderColor: "rgba(255, 255, 255, 0.23)",
+                      borderColor: "divider",
                     },
                     "&.Mui-focused fieldset": {
                       borderColor: "primary.main",
                     },
                   },
                   "& .MuiInputLabel-root": {
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "text.secondary",
                     "&.Mui-focused": {
                       color: "primary.main",
                     },
                   },
                   "& .MuiInputBase-input": {
-                    color: "white",
+                    color: "text.primary",
                   },
                 }}
               >

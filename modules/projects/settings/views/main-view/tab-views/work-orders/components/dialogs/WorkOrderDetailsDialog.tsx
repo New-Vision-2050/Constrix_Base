@@ -102,7 +102,7 @@ const WorkOrderDetailsDialog = ({
             </Typography>
             <Box
               sx={{
-                color: "white",
+                color: "text.primary",
               }}
             >
               <TasksTypeTable

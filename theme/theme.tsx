@@ -8,6 +8,8 @@ import { DarkPalette } from "./dark.palette";
 import { useMemo, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { LightPalette } from "./light.palette";
+import { GreenLightPalette } from "./green-light.palette";
+import { GreenDarkPalette } from "./green-dark.palette";
 import RtlProvider from "@mui/system/RtlProvider";
 
 // Extend the TypeBackground and PaletteColorOptions interfaces
@@ -36,19 +38,29 @@ export default function CustomThemeProvider({
     setMounted(true);
   }, []);
 
-  // Determine the effective theme
   const effectiveTheme = mounted
     ? currentTheme === "system"
       ? systemTheme
       : currentTheme
-    : "dark"; // Default to dark during SSR to match defaultTheme in layout
+    : "dark";
 
-  const isLight = effectiveTheme === "light";
+  const palette = useMemo(() => {
+    switch (effectiveTheme) {
+      case "green-light":
+        return GreenLightPalette;
+      case "green-dark":
+        return GreenDarkPalette;
+      case "light":
+        return LightPalette;
+      default:
+        return DarkPalette;
+    }
+  }, [effectiveTheme]);
 
   const theme = useMemo(() => {
     return createTheme({
       direction,
-      palette: isLight ? LightPalette : DarkPalette,
+      palette,
       shape: {
         borderRadius: 8,
       },
@@ -117,7 +129,7 @@ export default function CustomThemeProvider({
         },
       },
     });
-  }, [isLight, direction]);
+  }, [palette, direction]);
 
   const withResponsiveFontSizes = useMemo(
     () => ({ ...responsiveFontSizes(theme), direction }),

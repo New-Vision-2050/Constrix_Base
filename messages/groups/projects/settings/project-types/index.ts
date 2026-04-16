@@ -10,6 +10,7 @@ export const projectTypesMessages = new MessagesGroup({
     workOrders: _m("Work Orders", "اوامر العمل"),
     financial: _m("Financial", "المالية"),
     contractManagement: _m("Contract Management", "ادارة العقد"),
+    documentCycle: _m("Document Cycle", "دورة الوثائق"),
   }),
   add: _m("Add", "اضافة"),
   addProjectType: new MessagesGroup({
@@ -69,5 +70,14 @@ export const projectTypesMessages = new MessagesGroup({
       detailed: _m("Detailed", "المفصل"),
       responsibleEngineer: _m("Responsible Engineer", "المهندس المسؤول"),
     }),
+  }),
+  attachments: new MessagesGroup({
+    sectionTitle: _m("Attachments", "المرفقات"),
+    showAllProjectAttachments: _m(
+      "Show all project attachments",
+      "إظهار جميع مرفقات المشروع",
+    ),
+    selectProjectType: _m("Please select a project type", "الرجاء اختيار نوع مشروع"),
+    loading: _m("Loading...", "جاري التحميل..."),
   }),
 });

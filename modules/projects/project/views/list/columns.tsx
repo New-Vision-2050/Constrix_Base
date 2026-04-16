@@ -38,10 +38,10 @@ export const PROJECT_STATUS_MAP: Record<
   number,
   { labelKey: string; bg: string }
 > = {
-  1: { labelKey: "statusOngoing", bg: "#16a34a" },
-  0: { labelKey: "statusInProgress", bg: "#d97706" },
-  [-1]: { labelKey: "statusStopped", bg: "#b91c1c" },
-  2: { labelKey: "statusCompleted", bg: "#2563eb" },
+  1: { labelKey: "statusOngoing", bg: "success.main" },
+  0: { labelKey: "statusInProgress", bg: "warning.main" },
+  [-1]: { labelKey: "statusStopped", bg: "error.main" },
+  2: { labelKey: "statusCompleted", bg: "info.main" },
 };
 
 function StatusChip({
@@ -59,7 +59,7 @@ function StatusChip({
       size="small"
       sx={{
         backgroundColor: cfg.bg,
-        color: "#fff",
+        color: "common.white",
         fontWeight: "bold",
         fontSize: "0.72rem",
       }}
@@ -78,7 +78,7 @@ function ProgressBar({ value, color }: { value?: number; color: string }) {
         sx={{
           height: 5,
           borderRadius: 3,
-          bgcolor: "rgba(255,255,255,0.1)",
+          bgcolor: "action.hover",
           "& .MuiLinearProgress-bar": { bgcolor: color, borderRadius: 3 },
         }}
       />
@@ -205,7 +205,7 @@ export const getProjectsColumns = (t: ProjectColumnTranslator) => [
     name: t("columnTimeProgress"),
     sortable: false,
     render: (row: ProjectRow) => (
-      <ProgressBar value={row.completion_percentage} color="#16a34a" />
+      <ProgressBar value={row.completion_percentage} color="success.main" />
     ),
   },
   {
@@ -213,7 +213,7 @@ export const getProjectsColumns = (t: ProjectColumnTranslator) => [
     name: t("columnAchievement"),
     sortable: false,
     render: (row: ProjectRow) => (
-      <ProgressBar value={row.completion_percentage} color="#d97706" />
+      <ProgressBar value={row.completion_percentage} color="warning.main" />
     ),
   },
   {

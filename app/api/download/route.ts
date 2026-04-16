@@ -10,6 +10,11 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(url);
+    if (!response.ok) {
+      return new NextResponse(`Upstream returned ${response.status}`, {
+        status: 502,
+      });
+    }
     const blob = await response.blob();
 
     // Get the content type from the original response

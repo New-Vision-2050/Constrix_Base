@@ -167,7 +167,7 @@ export function getInboxColumns({
                 endIcon={<span style={{ fontSize: 9 }}>▼</span>}
                 onClick={onClick}
                 disabled={pendingMutation}
-                sx={{ bgcolor: "#3f3f5a", color: "#fff", minWidth: 80 }}
+                sx={{ bgcolor: "primary.main", color: "primary.contrastText", minWidth: 80 }}
               >
                 {t("actionMenuButton")}
               </Button>
