@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from "react";
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   MenuItem,
-  TextField,
   Typography,
 } from "@mui/material";
 import { EditIcon, Trash2 } from "lucide-react";
@@ -24,50 +25,58 @@ import {
   projectEmployeesQueryKey,
   useProjectEmployees,
 } from "@/modules/projects/project/query/useProjectEmployees";
+import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import {
+  PROJECT_EMPLOYEE_CREATE,
+  PROJECT_EMPLOYEE_DELETE,
+  PROJECT_EMPLOYEE_LIST,
+  PROJECT_EMPLOYEE_UPDATE,
+  PROJECT_EMPLOYEE_VIEW,
+} from "@/modules/projects/project/constants/projectPermissionKeys";
+import {
+  hasAnyProjectPermissionKey,
+  hasProjectPermissionKey,
+} from "@/modules/projects/project/utils/projectMyPermissions";
 import { Employee } from "./types";
 import AddStaffDialog, {
   employeesNotInProjectQueryKey,
 } from "./add-staff/AddStaffDialog";
+import StaffRoleSelect from "./StaffRoleSelect";
 
 const StaffTableLayout = HeadlessTableLayout<Employee>("staff");
 
-function StaffRoleSelect() {
-  const t = useTranslations("project");
-  const [value, setValue] = useState("");
-
-  return (
-    <TextField
-      select
-      size="small"
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      SelectProps={{
-        displayEmpty: true,
-      }}
-      sx={{
-        minWidth: 140,
-        maxWidth: 260,
-        "& .MuiOutlinedInput-notchedOutline": {
-          borderRadius: 2,
-        },
-      }}
-    >
-      <MenuItem value="">
-        <Box component="span" sx={{ color: "text.secondary" }}>
-          {t("staff.rolePlaceholder")}
-        </Box>
-      </MenuItem>
-    </TextField>
-  );
-}
-
 export default function StaffTab() {
   const t = useTranslations("project");
+  const tCommon = useTranslations("common");
   const { projectId } = useProject();
   const queryClient = useQueryClient();
   const [openStaff, setAddStaffOpen] = useState(false);
   const [employeeToRemove, setEmployeeToRemove] = useState<Employee | null>(
     null,
+  );
+
+  const { data: flatPerms, isLoading: isLoadingPerms } =
+    useProjectMyPermissionsFlat(projectId);
+
+  const canViewStaff = useMemo(
+    () =>
+      hasAnyProjectPermissionKey(flatPerms, [
+        PROJECT_EMPLOYEE_VIEW,
+        PROJECT_EMPLOYEE_LIST,
+      ]),
+    [flatPerms],
+  );
+  const canCreate = useMemo(
+    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_CREATE),
+    [flatPerms],
+  );
+  const canUpdate = useMemo(
+    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_UPDATE),
+    [flatPerms],
+  );
+  const canDelete = useMemo(
+    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_DELETE),
+    [flatPerms],
   );
 
   const deleteEmployeeMutation = useMutation({
@@ -89,9 +98,7 @@ export default function StaffTab() {
       }
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(
-        error?.response?.data?.message ?? t("staff.removeError"),
-      );
+      toast.error(error?.response?.data?.message ?? t("staff.removeError"));
     },
   });
 
@@ -129,18 +136,24 @@ export default function StaffTab() {
         key: "role",
         name: t("staff.role"),
         sortable: false,
-        render: (row: Employee) => <StaffRoleSelect key={row.id} />,
+        render: (row: Employee) => (
+          <StaffRoleSelect
+            key={row.id}
+            projectId={projectId}
+            assignmentId={row.id}
+            projectRole={row.projectRole}
+            canChangeRole={canUpdate}
+          />
+        ),
       },
     ],
-    [t],
+    [t, projectId, canUpdate],
   );
 
-  // Table params
   const params = StaffTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
-
 
   const { data: employeesData, isLoading: isLoadingEmployees } =
     useProjectEmployees(projectId);
@@ -148,10 +161,10 @@ export default function StaffTab() {
   const totalPages = 1;
   const totalItems = data.length;
 
-  const columns = useMemo(
-    () => [
-      ...staffColumns,
-      {
+  const columns = useMemo(() => {
+    const base = [...staffColumns];
+    if (canUpdate || canDelete) {
+      base.push({
         key: "actions",
         name: t("staff.columnActions"),
         sortable: false,
@@ -168,29 +181,32 @@ export default function StaffTab() {
               </Button>
             )}
           >
-            <MenuItem onClick={() => {}}>
-              <EditIcon className="w-4 h-4 ml-2" />
-              {t("staff.edit")}
-            </MenuItem>
-            <MenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                setEmployeeToRemove(row);
-              }}
-              disabled={deleteEmployeeMutation.isPending}
-              sx={{ color: "error.main" }}
-            >
-              <Trash2 className="w-4 h-4 ml-2" />
-              {t("staff.delete")}
-            </MenuItem>
+            {canUpdate ? (
+              <MenuItem onClick={() => {}}>
+                <EditIcon className="w-4 h-4 me-2" />
+                {t("staff.edit")}
+              </MenuItem>
+            ) : null}
+            {canDelete ? (
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEmployeeToRemove(row);
+                }}
+                disabled={deleteEmployeeMutation.isPending}
+                sx={{ color: "error.main" }}
+              >
+                <Trash2 className="w-4 h-4 me-2" />
+                {t("staff.delete")}
+              </MenuItem>
+            ) : null}
           </CustomMenu>
         ),
-      },
-    ],
-    [staffColumns, t, deleteEmployeeMutation],
-  );
+      });
+    }
+    return base;
+  }, [staffColumns, t, canUpdate, canDelete, deleteEmployeeMutation.isPending]);
 
-  // Table state
   const state = StaffTableLayout.useTableState({
     data,
     columns,
@@ -206,72 +222,96 @@ export default function StaffTab() {
     },
   });
 
+  if (!projectId) {
+    return null;
+  }
+
+  if (isLoadingPerms) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  if (!canViewStaff) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning">{tCommon("noProjectTabPermission")}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <>
-    <Box sx={{ p: 3 }}>
-      <StaffTableLayout
-        filters={
-          <StaffTableLayout.TopActions
-            state={state}
-            customActions={
-              <Button variant="contained" onClick={() => setAddStaffOpen(true)}>
-                {t("staff.add")}
-              </Button>
-            }
-          >
-          </StaffTableLayout.TopActions>
-        }
-        table={
-          <StaffTableLayout.Table
-            state={state}
-            loadingOptions={{ rows: 5 }}
-          />
-        }
-        pagination={<StaffTableLayout.Pagination state={state} />}
-      />
-    </Box>
-    <AddStaffDialog open={openStaff} setOpen={setAddStaffOpen} />
+      <Box sx={{ p: 3 }}>
+        <StaffTableLayout
+          filters={
+            <StaffTableLayout.TopActions
+              state={state}
+              customActions={
+                canCreate ? (
+                  <Button
+                    variant="contained"
+                    onClick={() => setAddStaffOpen(true)}
+                  >
+                    {t("staff.add")}
+                  </Button>
+                ) : undefined
+              }
+            ></StaffTableLayout.TopActions>
+          }
+          table={
+            <StaffTableLayout.Table
+              state={state}
+              loadingOptions={{ rows: 5 }}
+            />
+          }
+          pagination={<StaffTableLayout.Pagination state={state} />}
+        />
+      </Box>
+      <AddStaffDialog open={openStaff} setOpen={setAddStaffOpen} />
 
-    <Dialog
-      open={employeeToRemove !== null}
-      onClose={() => {
-        if (deleteEmployeeMutation.isPending) return;
-        setEmployeeToRemove(null);
-      }}
-      maxWidth="xs"
-      fullWidth
-    >
-      <DialogTitle>{t("staff.deleteDialogTitle")}</DialogTitle>
-      <DialogContent>
-        <Typography variant="body2" color="text.secondary">
-          {employeeToRemove
-            ? t("staff.deleteDialogBody", {
-                name: employeeToRemove.user.name,
-              })
-            : null}
-        </Typography>
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button
-          onClick={() => setEmployeeToRemove(null)}
-          disabled={deleteEmployeeMutation.isPending}
-        >
-          {t("cancel")}
-        </Button>
-        <Button
-          color="error"
-          variant="contained"
-          disabled={deleteEmployeeMutation.isPending}
-          onClick={() => {
-            if (employeeToRemove) {
-              deleteEmployeeMutation.mutate(employeeToRemove.id);
-            }
-          }}
-        >
-          {t("staff.delete")}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      <Dialog
+        open={employeeToRemove !== null}
+        onClose={() => {
+          if (deleteEmployeeMutation.isPending) return;
+          setEmployeeToRemove(null);
+        }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>{t("staff.deleteDialogTitle")}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {employeeToRemove
+              ? t("staff.deleteDialogBody", {
+                  name: employeeToRemove.user.name,
+                })
+              : null}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setEmployeeToRemove(null)}
+            disabled={deleteEmployeeMutation.isPending}
+          >
+            {t("cancel")}
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            disabled={deleteEmployeeMutation.isPending}
+            onClick={() => {
+              if (employeeToRemove) {
+                deleteEmployeeMutation.mutate(employeeToRemove.id);
+              }
+            }}
+          >
+            {t("staff.delete")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

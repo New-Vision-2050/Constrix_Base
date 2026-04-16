@@ -200,6 +200,14 @@ export interface ProjectEmployeeUser {
   department_name?: string | null;
 }
 
+/** Embedded project role on a project–employee row (`GET .../employees/project/{id}`). */
+export interface ProjectEmployeeProjectRole {
+  id: string;
+  name: string;
+  slug: string;
+  is_default: boolean;
+}
+
 export interface ProjectEmployee {
   id: string;
   project_id: string;
@@ -214,6 +222,9 @@ export interface ProjectEmployee {
     id: string;
     name: string;
   } | null;
+  /** When present, employee’s project role (`GET projects/{id}/roles`). */
+  project_role_id?: string | null;
+  project_role?: ProjectEmployeeProjectRole | null;
 }
 
 export type GetProjectEmployeesResponse = ApiResponse<ProjectEmployee[]>;

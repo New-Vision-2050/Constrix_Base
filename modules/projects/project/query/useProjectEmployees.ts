@@ -6,9 +6,18 @@ import type { Employee } from "@/modules/projects/project/components/project-tab
 function mapDtoToEmployee(item: ProjectEmployee): Employee {
   const u = item.user;
   const company = item.company;
+  const pr = item.project_role;
   return {
     id: item.id,
     projectId: item.project_id,
+    projectRole: pr
+      ? {
+          id: pr.id,
+          name: pr.name,
+          slug: pr.slug,
+          is_default: pr.is_default,
+        }
+      : null,
     user: {
       id: u.id,
       name: u.name?.trim() ? u.name : "—",

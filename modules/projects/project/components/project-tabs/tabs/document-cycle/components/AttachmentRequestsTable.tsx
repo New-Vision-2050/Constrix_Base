@@ -1,12 +1,30 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Box, Button, Stack, TextField, MenuItem } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  TextField,
+  MenuItem,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useAttachmentRequests } from "@/modules/projects/project/query/useAttachmentRequests";
+import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import {
+  PROJECT_ARCHIVE_CYCLE_CREATE,
+  PROJECT_ARCHIVE_CYCLE_LIST,
+  PROJECT_ARCHIVE_CYCLE_VIEW,
+} from "@/modules/projects/project/constants/projectPermissionKeys";
+import {
+  hasAnyProjectPermissionKey,
+  hasProjectPermissionKey,
+} from "@/modules/projects/project/utils/projectMyPermissions";
 import { DocumentRow } from "../types";
 import StatusBadge from "./StatusBadge";
 import AddFileDialog from "./AddFileDialog";
@@ -66,7 +84,32 @@ function RequestFlowCell({ row, t }: { row: DocumentRow; t: (key: string) => str
 
 export default function AttachmentRequestsTable() {
   const t = useTranslations("project.documentCycle");
+  const tCommon = useTranslations("common");
   const { projectId } = useProject();
+
+  const { data: flatPerms, isLoading: isLoadingPerms } =
+    useProjectMyPermissionsFlat(projectId);
+
+  const canViewCycle = useMemo(
+    () =>
+      hasAnyProjectPermissionKey(flatPerms, [
+        PROJECT_ARCHIVE_CYCLE_VIEW,
+        PROJECT_ARCHIVE_CYCLE_LIST,
+      ]),
+    [flatPerms],
+  );
+  const canCreateCycle = useMemo(
+    () => hasProjectPermissionKey(flatPerms, PROJECT_ARCHIVE_CYCLE_CREATE),
+    [flatPerms],
+  );
+  const canOpenDetail = useMemo(
+    () =>
+      hasAnyProjectPermissionKey(flatPerms, [
+        PROJECT_ARCHIVE_CYCLE_VIEW,
+        PROJECT_ARCHIVE_CYCLE_LIST,
+      ]),
+    [flatPerms],
+  );
 
   const [addFileOpen, setAddFileOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -204,6 +247,7 @@ export default function AttachmentRequestsTable() {
               size="small"
               sx={{ width: "100%", justifyContent: "flex-start", px: 2 }}
               onClick={() => handleView(row)}
+              disabled={!canOpenDetail}
             >
               {t("view")}
               <EyeIcon className="h-4 w-4 ms-2" />
@@ -212,7 +256,7 @@ export default function AttachmentRequestsTable() {
         ),
       },
     ],
-    [t],
+    [t, canOpenDetail],
   );
 
   const state = TableLayout.useTableState({
@@ -230,6 +274,26 @@ export default function AttachmentRequestsTable() {
 
   const detailVariant =
     selectedDocument?.flow === "incoming" ? "incoming" : "outgoing";
+
+  if (!projectId) {
+    return null;
+  }
+
+  if (isLoadingPerms) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  if (!canViewCycle) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning">{tCommon("noProjectTabPermission")}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -305,12 +369,14 @@ export default function AttachmentRequestsTable() {
               <TableLayout.TopActions
                 state={state}
                 customActions={
-                  <Button
-                    variant="contained"
-                    onClick={() => setAddFileOpen(true)}
-                  >
-                    {t("addFile")}
-                  </Button>
+                  canCreateCycle ? (
+                    <Button
+                      variant="contained"
+                      onClick={() => setAddFileOpen(true)}
+                    >
+                      {t("addFile")}
+                    </Button>
+                  ) : undefined
                 }
               />
             </Stack>
