@@ -76,9 +76,15 @@ export const AllProjectsApi = {
       `projects/employees/not-in-project/${projectId}`,
     ),
 
+  getEmployeesNotAssigned: (projectId: string, companyId: string) =>
+    baseApi.get<GetEmployeesNotInProjectResponse>(
+      `projects/employees/not-in-project/${projectId}?company_id=${companyId}`,
+    ),
+
   assignEmployeesToProject: (data: {
     project_id: string;
     user_ids: string[];
+    company_id?: string;
   }) =>
     baseApi.post<{ code: string; message?: string | null }>(
       "projects/employees/assign",
