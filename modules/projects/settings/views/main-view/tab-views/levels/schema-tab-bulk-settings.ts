@@ -22,6 +22,9 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
   "document-cycle",
 ]);
 
+/** Tabs grouped under «أصحاب المصلحة» in schema settings (not attachments / document-cycle). */
+export const STAKEHOLDER_GROUP_TAB_VALUES = ["team"] as const;
+
 const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
   "is_reference_number",
   "is_number_contract",
@@ -96,6 +99,30 @@ export function getTabBulkCheckboxState(
   }
 
   return null;
+}
+
+/** Aggregate checkbox state for the stakeholder parent tab (all children must be fully on for checked). */
+export function getStakeholderGroupBulkState(
+  data: Parameters<typeof getTabBulkCheckboxState>[1],
+): { checked: boolean; indeterminate: boolean } | null {
+  const states = STAKEHOLDER_GROUP_TAB_VALUES.map((tabValue) =>
+    getTabBulkCheckboxState(tabValue, data),
+  );
+  if (states.some((s) => s === null)) return null;
+  const nonNull = states as { checked: boolean; indeterminate: boolean }[];
+  const anyIndeterminate = nonNull.some((s) => s.indeterminate);
+  if (anyIndeterminate) return { checked: false, indeterminate: true };
+  const onCount = nonNull.filter((s) => s.checked && !s.indeterminate).length;
+  if (onCount === 0) return { checked: false, indeterminate: false };
+  if (onCount === nonNull.length) return { checked: true, indeterminate: false };
+  return { checked: false, indeterminate: true };
+}
+
+export function isStakeholderGroupFullyEnabled(
+  data: Parameters<typeof getTabBulkCheckboxState>[1],
+): boolean {
+  const state = getStakeholderGroupBulkState(data);
+  return state?.checked === true && state.indeterminate === false;
 }
 
 /** True if every toggle in this tab is on; used to decide select-all vs clear-all. */
