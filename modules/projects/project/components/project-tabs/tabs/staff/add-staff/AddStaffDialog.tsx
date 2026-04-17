@@ -78,7 +78,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
     enabled: open && !!projectId,
   });
 
-  const { data: employees = [], isLoading: loadingEmployees } = useQuery({
+  const { data: employeesRaw = [], isLoading: loadingEmployees } = useQuery({
     queryKey: ["employees-not-assigned", projectId, selectedCompany?.id],
     queryFn: async () => {
       const res = await AllProjectsApi.getEmployeesNotAssigned(
@@ -89,6 +89,15 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
     },
     enabled: open && !!projectId && !!selectedCompany?.id,
   });
+
+  /** Stable unique list: API may return duplicate names; React keys must use `id`. */
+  const employees = useMemo(() => {
+    const byId = new Map<string, EmployeeNotInProject>();
+    for (const e of employeesRaw) {
+      if (e?.id && !byId.has(e.id)) byId.set(e.id, e);
+    }
+    return [...byId.values()];
+  }, [employeesRaw]);
 
   const { data: roles, isLoading: loadingRoles } = useProjectRoles(
     open ? projectId : undefined,
@@ -263,6 +272,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               loading={loadingCompanies}
               options={sharedCompanies}
               getOptionLabel={(o) => o.name}
+              getOptionKey={(o) => o.id}
               isOptionEqualToValue={(a, b) => a.id === b.id}
               value={selectedCompany}
               onChange={(_, v) => setSelectedCompany(v)}
@@ -296,6 +306,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               loading={loadingEmployees}
               options={employees}
               getOptionLabel={(o) => o.name}
+              getOptionKey={(o) => o.id}
               isOptionEqualToValue={(a, b) => a.id === b.id}
               value={selectedEmployee}
               onChange={(_, v) => setSelectedEmployee(v)}
@@ -334,6 +345,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               <Autocomplete
                 options={activeRoles}
                 getOptionLabel={(o) => o.name}
+                getOptionKey={(o) => o.id}
                 isOptionEqualToValue={(a, b) => a.id === b.id}
                 value={selectedRole}
                 onChange={(_, v) => setSelectedRole(v)}
