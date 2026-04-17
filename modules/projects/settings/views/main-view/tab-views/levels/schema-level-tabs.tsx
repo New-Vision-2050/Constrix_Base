@@ -31,8 +31,11 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useProjectSettingsTabs } from "../../../../constants/current-tabs";
 import {
   BULK_TOGGLE_SUPPORTED_TABS,
+  STAKEHOLDER_GROUP_TAB_VALUES,
   bulkToggleTabSettings,
+  getStakeholderGroupBulkState,
   getTabBulkCheckboxState,
+  isStakeholderGroupFullyEnabled,
   isTabFullyEnabled,
 } from "./schema-tab-bulk-settings";
 import DetailsView from "../details";
@@ -45,7 +48,14 @@ import WorkOrdersView from "../work-orders";
 import FinancialView from "../financial";
 import ContractManagementView from "../contract-management";
 import { SettingsTabItemProps } from "../../types";
+import type { ProjectSettingsTab } from "../../../../constants/current-tabs";
 import { APP_ICONS } from "@/constants/icons";
+
+function isStakeholderSchemaTab(tab: ProjectSettingsTab): boolean {
+  return (STAKEHOLDER_GROUP_TAB_VALUES as readonly string[]).includes(
+    tab.value,
+  );
+}
 
 function renderTabContent(tab: string, props: SettingsTabItemProps) {
   switch (tab) {
@@ -116,6 +126,8 @@ function EditSubProjectTypeDialogTrigger({
     </Can>
   );
 }
+
+const STAKEHOLDERS_GROUP_ID = "stakeholders-group";
 
 const TabWithCheckbox = ({
   label,
@@ -212,24 +224,12 @@ export default function SchemaLevelTabs({
       filteredTabs.some((t) => t.value === "project-details"),
   });
 
-  const attachmentContractQuery = useQuery({
-    queryKey: ["attachment-contract-settings", thirdLevelId],
+  const archiveLibrarySettingsQuery = useQuery({
+    queryKey: ["archive-library-settings", thirdLevelId],
     queryFn: async () => {
-      const response = await ProjectTypesApi.getAttachmentContractSettings(
+      const response = await ProjectTypesApi.getArchiveLibrarySettings(
         thirdLevelId!,
       );
-      return response.data.payload;
-    },
-    enabled:
-      thirdLevelId != null &&
-      filteredTabs.some((t) => t.value === "attachments"),
-  });
-
-  const attachmentTermsQuery = useQuery({
-    queryKey: ["attachment-terms-contract-settings", thirdLevelId],
-    queryFn: async () => {
-      const response =
-        await ProjectTypesApi.getAttachmentTermsContractSettings(thirdLevelId!);
       return response.data.payload;
     },
     enabled:
@@ -258,7 +258,8 @@ export default function SchemaLevelTabs({
       );
       return response.data.payload;
     },
-    enabled: thirdLevelId != null && filteredTabs.some((t) => t.value === "team"),
+    enabled:
+      thirdLevelId != null && filteredTabs.some((t) => t.value === "team"),
   });
 
   const attachmentCycleSettingsQuery = useQuery({
@@ -277,16 +278,14 @@ export default function SchemaLevelTabs({
   const bulkSettingsData = useMemo(
     () => ({
       dataSettings: dataSettingsQuery.data,
-      attachment: attachmentContractQuery.data,
-      attachmentTerms: attachmentTermsQuery.data,
+      archiveLibrary: archiveLibrarySettingsQuery.data,
       contractor: contractorSettingsQuery.data,
       employee: employeeSettingsQuery.data,
       attachmentCycle: attachmentCycleSettingsQuery.data,
     }),
     [
       dataSettingsQuery.data,
-      attachmentContractQuery.data,
-      attachmentTermsQuery.data,
+      archiveLibrarySettingsQuery.data,
       contractorSettingsQuery.data,
       employeeSettingsQuery.data,
       attachmentCycleSettingsQuery.data,
@@ -298,9 +297,7 @@ export default function SchemaLevelTabs({
       case "project-details":
         return dataSettingsQuery.isLoading;
       case "attachments":
-        return (
-          attachmentContractQuery.isLoading || attachmentTermsQuery.isLoading
-        );
+        return archiveLibrarySettingsQuery.isLoading;
       case "contractors":
         return contractorSettingsQuery.isLoading;
       case "team":
@@ -332,10 +329,7 @@ export default function SchemaLevelTabs({
         queryKey: ["project-type-data-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
-        queryKey: ["attachment-contract-settings", thirdLevelId],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: ["attachment-terms-contract-settings", thirdLevelId],
+        queryKey: ["archive-library-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
         queryKey: ["contractor-contract-settings", thirdLevelId],
@@ -385,6 +379,105 @@ export default function SchemaLevelTabs({
       ? selectedTab
       : (filteredTabs[0]?.value ?? false);
   }, [selectedTab, filteredTabs]);
+
+  const stakeholderTabsInSchema = useMemo(
+    () => filteredTabs.filter(isStakeholderSchemaTab),
+    [filteredTabs],
+  );
+
+  const hasStakeholderGroup = stakeholderTabsInSchema.length > 0;
+
+  type MainRowItem =
+    | { kind: "group" }
+    | { kind: "leaf"; tab: ProjectSettingsTab };
+
+  const mainRowItems = useMemo((): MainRowItem[] => {
+    const items: MainRowItem[] = [];
+    let groupInserted = false;
+    for (const tab of filteredTabs) {
+      if (isStakeholderSchemaTab(tab)) {
+        if (!groupInserted) {
+          items.push({ kind: "group" });
+          groupInserted = true;
+        }
+      } else {
+        items.push({ kind: "leaf", tab });
+      }
+    }
+    return items;
+  }, [filteredTabs]);
+
+  const mainTabsValue = useMemo(() => {
+    if (
+      effectiveTabValue &&
+      typeof effectiveTabValue === "string" &&
+      (STAKEHOLDER_GROUP_TAB_VALUES as readonly string[]).includes(
+        effectiveTabValue,
+      )
+    ) {
+      return STAKEHOLDERS_GROUP_ID;
+    }
+    return effectiveTabValue;
+  }, [effectiveTabValue]);
+
+  const showStakeholderSubRow =
+    hasStakeholderGroup &&
+    typeof effectiveTabValue === "string" &&
+    (STAKEHOLDER_GROUP_TAB_VALUES as readonly string[]).includes(
+      effectiveTabValue,
+    );
+
+  const stakeholderGroupBulkState = getStakeholderGroupBulkState(
+    bulkSettingsData,
+  );
+  const stakeholderGroupLoading = stakeholderTabsInSchema.some((tab) =>
+    isBulkTabDataLoading(tab.value),
+  );
+  const stakeholderGroupCheckboxDisabled =
+    !canUpdateProjectType ||
+    bulkTogglesUpdating ||
+    stakeholderGroupLoading ||
+    stakeholderGroupBulkState === null;
+
+  const handleStakeholderGroupBulkCheckbox = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!canUpdateProjectType) return;
+    if (thirdLevelId == null || stakeholderTabsInSchema.length === 0) return;
+    if (stakeholderGroupLoading) return;
+    if (getStakeholderGroupBulkState(bulkSettingsData) === null) return;
+
+    const enableAll = !isStakeholderGroupFullyEnabled(bulkSettingsData);
+
+    setBulkTogglesUpdating(true);
+    try {
+      for (const tab of stakeholderTabsInSchema) {
+        if (!BULK_TOGGLE_SUPPORTED_TABS.has(tab.value)) continue;
+        await bulkToggleTabSettings(thirdLevelId, tab.value, enableAll);
+      }
+      await queryClient.invalidateQueries({
+        queryKey: ["project-type-data-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["archive-library-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["contractor-contract-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["employee-contract-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["attachment-cycle-settings", thirdLevelId],
+      });
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(
+        err?.response?.data?.message ?? "Failed to update tab settings",
+      );
+    } finally {
+      setBulkTogglesUpdating(false);
+    }
+  };
 
   return (
     <Can check={[PERMISSIONS.projectType.list]}>
@@ -470,8 +563,29 @@ export default function SchemaLevelTabs({
             {selectedSchema && !isLoading && effectiveTabValue && data && (
               <div className="space-y-4">
                 <Paper>
-                  <Tabs value={effectiveTabValue}>
-                    {filteredTabs.map((tab) => {
+                  <Tabs value={mainTabsValue}>
+                    {mainRowItems.map((item) => {
+                      if (item.kind === "group") {
+                        return (
+                          <TabWithCheckbox
+                            key={STAKEHOLDERS_GROUP_ID}
+                            onClick={() => {
+                              const first = stakeholderTabsInSchema[0];
+                              if (first) setSelectedTab(first.value);
+                            }}
+                            label={t("tabs.stakeholdersGroup")}
+                            value={STAKEHOLDERS_GROUP_ID}
+                            hideCheckbox={false}
+                            checked={stakeholderGroupBulkState?.checked ?? false}
+                            indeterminate={
+                              stakeholderGroupBulkState?.indeterminate ?? false
+                            }
+                            onCheckboxChange={handleStakeholderGroupBulkCheckbox}
+                            disabled={stakeholderGroupCheckboxDisabled}
+                          />
+                        );
+                      }
+                      const tab = item.tab;
                       const supportsBulk = BULK_TOGGLE_SUPPORTED_TABS.has(
                         tab.value,
                       );
@@ -498,14 +612,55 @@ export default function SchemaLevelTabs({
                           onCheckboxChange={(e) => {
                             handleTabBulkCheckbox(e, tab.value);
                           }}
-                        disabled={
-                          supportsBulk ? bulkCheckboxDisabled : false
-                        }
+                          disabled={supportsBulk ? bulkCheckboxDisabled : false}
                         />
                       );
                     })}
                   </Tabs>
                 </Paper>
+                {showStakeholderSubRow ? (
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      borderTop: 1,
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Tabs value={effectiveTabValue}>
+                      {stakeholderTabsInSchema.map((tab) => {
+                        const supportsBulk = BULK_TOGGLE_SUPPORTED_TABS.has(
+                          tab.value,
+                        );
+                        const bulkState = getTabBulkCheckboxState(
+                          tab.value,
+                          bulkSettingsData,
+                        );
+                        const loading = isBulkTabDataLoading(tab.value);
+                        const bulkCheckboxDisabled =
+                          !canUpdateProjectType ||
+                          bulkTogglesUpdating ||
+                          loading ||
+                          bulkState === null;
+
+                        return (
+                          <TabWithCheckbox
+                            key={tab.value}
+                            onClick={() => setSelectedTab(tab.value)}
+                            label={tab.name}
+                            value={tab.value}
+                            hideCheckbox={!supportsBulk}
+                            checked={bulkState?.checked ?? false}
+                            indeterminate={bulkState?.indeterminate ?? false}
+                            onCheckboxChange={(e) => {
+                              handleTabBulkCheckbox(e, tab.value);
+                            }}
+                            disabled={supportsBulk ? bulkCheckboxDisabled : false}
+                          />
+                        );
+                      })}
+                    </Tabs>
+                  </Paper>
+                ) : null}
                 <Paper className="p-4">
                   {renderTabContent(effectiveTabValue, {
                     firstLevelId,
