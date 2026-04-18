@@ -93,3 +93,15 @@ export function hasAnyRolesTabPermission(
     return p.submodule === "role";
   });
 }
+
+/** True if the user has any project permission for the share (project sharing) tab. */
+export function hasAnyShareTabPermission(
+  flat: ProjectMyPermissionFlatItem[] | undefined,
+): boolean {
+  if (!flat?.length) return false;
+  return flat.some((p) => {
+    const k = p.permission_key ?? "";
+    if (k.startsWith("PROJECT_SHARE_")) return true;
+    return p.submodule === "share";
+  });
+}

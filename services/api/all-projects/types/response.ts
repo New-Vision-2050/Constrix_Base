@@ -104,6 +104,8 @@ export interface ProjectPermissions {
   department_contract_setting: ContractSetting | null;
   attachment_cycle_setting: ContractSetting | null;
   archive_library_setting: ContractSetting | null;
+  roles_and_permissions_setting: ContractSetting | null;
+  project_sharing_setting: ContractSetting | null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
