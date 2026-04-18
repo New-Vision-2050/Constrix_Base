@@ -43,6 +43,8 @@ import ProjectTermsView from "../project-terms";
 import AttachmentsView from "../attachments";
 import ContractorsView from "../contractors";
 import TeamView from "../team";
+import RolesAndPermissionsView from "../roles-and-permissions";
+import ProjectSharingView from "../project-sharing";
 import DocumentCycleView from "../document-cycle";
 import WorkOrdersView from "../work-orders";
 import FinancialView from "../financial";
@@ -69,6 +71,10 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
       return <ContractorsView {...props} />;
     case "team":
       return <TeamView {...props} />;
+    case "roles-and-permissions":
+      return <RolesAndPermissionsView {...props} />;
+    case "project-sharing":
+      return <ProjectSharingView {...props} />;
     case "document-cycle":
       return <DocumentCycleView {...props} />;
     case "work-orders":
@@ -275,6 +281,44 @@ export default function SchemaLevelTabs({
       filteredTabs.some((t) => t.value === "document-cycle"),
   });
 
+  const rolesAndPermissionsSettingsQuery = useQuery({
+    queryKey: ["roles-and-permissions-settings", thirdLevelId],
+    queryFn: async () => {
+      try {
+        const response = await ProjectTypesApi.getRolesAndPermissionsSettings(
+          thirdLevelId!,
+        );
+        return response.data.payload;
+      } catch (error) {
+        console.error("Failed to fetch roles-and-permissions settings:", error);
+        return null;
+      }
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "roles-and-permissions"),
+    retry: false,
+  });
+
+  const projectSharingSettingsQuery = useQuery({
+    queryKey: ["project-sharing-settings", thirdLevelId],
+    queryFn: async () => {
+      try {
+        const response = await ProjectTypesApi.getProjectSharingSettings(
+          thirdLevelId!,
+        );
+        return response.data.payload;
+      } catch (error) {
+        console.error("Failed to fetch project-sharing settings:", error);
+        return null;
+      }
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "project-sharing"),
+    retry: false,
+  });
+
   const bulkSettingsData = useMemo(
     () => ({
       dataSettings: dataSettingsQuery.data,
@@ -282,6 +326,8 @@ export default function SchemaLevelTabs({
       contractor: contractorSettingsQuery.data,
       employee: employeeSettingsQuery.data,
       attachmentCycle: attachmentCycleSettingsQuery.data,
+      rolesAndPermissions: rolesAndPermissionsSettingsQuery.data,
+      projectSharing: projectSharingSettingsQuery.data,
     }),
     [
       dataSettingsQuery.data,
@@ -289,6 +335,8 @@ export default function SchemaLevelTabs({
       contractorSettingsQuery.data,
       employeeSettingsQuery.data,
       attachmentCycleSettingsQuery.data,
+      rolesAndPermissionsSettingsQuery.data,
+      projectSharingSettingsQuery.data,
     ],
   );
 
@@ -304,6 +352,10 @@ export default function SchemaLevelTabs({
         return employeeSettingsQuery.isLoading;
       case "document-cycle":
         return attachmentCycleSettingsQuery.isLoading;
+      case "roles-and-permissions":
+        return rolesAndPermissionsSettingsQuery.isLoading;
+      case "project-sharing":
+        return projectSharingSettingsQuery.isLoading;
       default:
         return false;
     }
@@ -339,6 +391,12 @@ export default function SchemaLevelTabs({
       });
       await queryClient.invalidateQueries({
         queryKey: ["attachment-cycle-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["roles-and-permissions-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["project-sharing-settings", thirdLevelId],
       });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -468,6 +526,12 @@ export default function SchemaLevelTabs({
       });
       await queryClient.invalidateQueries({
         queryKey: ["attachment-cycle-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["roles-and-permissions-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["project-sharing-settings", thirdLevelId],
       });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };

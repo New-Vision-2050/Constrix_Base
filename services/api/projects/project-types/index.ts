@@ -12,6 +12,8 @@ import {
     UpdateEmployeeContractSettingsArgs,
     UpdateAttachmentCycleSettingsArgs,
     UpdateArchiveLibrarySettingsArgs,
+    UpdateRolesAndPermissionsSettingsArgs,
+    UpdateProjectSharingSettingsArgs,
 } from "./types/args";
 import {
     CreateSecondLevelProjectTypeResponse,
@@ -35,6 +37,10 @@ import {
     UpdateAttachmentCycleSettingsResponse,
     GetArchiveLibrarySettingsResponse,
     UpdateArchiveLibrarySettingsResponse,
+    GetRolesAndPermissionsSettingsResponse,
+    UpdateRolesAndPermissionsSettingsResponse,
+    GetProjectSharingSettingsResponse,
+    UpdateProjectSharingSettingsResponse,
 } from "./types/response";
 
 export const ProjectTypesApi = {
@@ -161,6 +167,30 @@ export const ProjectTypesApi = {
     ) =>
         baseApi.put<UpdateAttachmentCycleSettingsResponse>(
             `project-types/${projectTypeId}/attachment-cycle-settings`,
+            args,
+        ),
+    getRolesAndPermissionsSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetRolesAndPermissionsSettingsResponse>(
+            `project-types/${projectTypeId}/roles-and-permissions-settings`,
+        ),
+    updateRolesAndPermissionsSettings: (
+        projectTypeId: number | string,
+        args: UpdateRolesAndPermissionsSettingsArgs,
+    ) =>
+        baseApi.put<UpdateRolesAndPermissionsSettingsResponse>(
+            `project-types/${projectTypeId}/roles-and-permissions-settings`,
+            args,
+        ),
+    getProjectSharingSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetProjectSharingSettingsResponse>(
+            `project-types/${projectTypeId}/project-sharing-settings`,
+        ),
+    updateProjectSharingSettings: (
+        projectTypeId: number | string,
+        args: UpdateProjectSharingSettingsArgs,
+    ) =>
+        baseApi.put<UpdateProjectSharingSettingsResponse>(
+            `project-types/${projectTypeId}/project-sharing-settings`,
             args,
         ),
 };
