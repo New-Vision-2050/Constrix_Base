@@ -17,6 +17,7 @@ import {
   hasAnyDocumentCycleTabPermission,
   hasAnyRolesTabPermission,
   hasAnyStaffTabPermission,
+  hasAnyShareTabPermission,
 } from "@/modules/projects/project/utils/projectMyPermissions";
 import ShareTab from "../tabs/share";
 
@@ -52,7 +53,7 @@ const STAKEHOLDER_SUB_TABS: SystemTab[] = [
   },
   {
     id: "project-tab-share",
-    title: "شركة المشروع",
+    title: "شركات المشروع",
     icon: <Share2 className="w-4 h-4" />,
     content: <ShareTab />,
   },
@@ -66,6 +67,10 @@ function passesProjectTypeVisibility(
   switch (tabId) {
     case "project-tab-staff":
       return permissions.employee_contract_setting?.is_all_data_visible === 1;
+    case "project-tab-roles":
+      return permissions.roles_and_permissions_setting?.is_all_data_visible === 1;
+    case "project-tab-share":
+      return permissions.project_sharing_setting?.is_all_data_visible === 1;
     case "project-tab-document-cycle":
       return permissions.attachment_cycle_setting?.is_all_data_visible === 1;
     case "project-tab-attachments":
@@ -91,6 +96,8 @@ function passesFlatPermission(
       return hasAnyDocumentCycleTabPermission(flatPerms);
     case "project-tab-roles":
       return hasAnyRolesTabPermission(flatPerms);
+    case "project-tab-share":
+      return hasAnyShareTabPermission(flatPerms);
     default:
       return true;
   }

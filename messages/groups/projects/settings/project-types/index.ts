@@ -7,6 +7,8 @@ export const projectTypesMessages = new MessagesGroup({
     attachments: _m("Attachments", "المرفقات"),
     contractors: _m("Contractors", "المقاولين"),
     team: _m("Stakeholders (concerned)", "المعنيين"),
+    rolesAndPermissions: _m("Roles and Permissions", "الصلاحيات والأدوار"),
+    projectSharing: _m("Project Sharing", "مشاركة المشروع"),
     stakeholdersGroup: _m("Stakeholders", "أصحاب المصلحة"),
     workOrders: _m("Work Orders", "اوامر العمل"),
     financial: _m("Financial", "المالية"),
