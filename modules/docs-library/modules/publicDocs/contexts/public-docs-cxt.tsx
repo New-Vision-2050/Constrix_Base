@@ -81,9 +81,10 @@ const Cxt = createContext<CxtType | undefined>(undefined);
 type LibraryProps = {
   children: ReactNode;
   fixedType?: string;
+  isProject?: boolean;
 };
 
-function LibraryPublicDocsProviderInner({ children, fixedType }: LibraryProps) {
+function LibraryPublicDocsProviderInner({ children, fixedType, isProject }: LibraryProps) {
   const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
   const [branchId, setBranchId] = useState("all");
@@ -122,6 +123,8 @@ function LibraryPublicDocsProviderInner({ children, fixedType }: LibraryProps) {
     searchData,
     sort,
     fixedType,
+    undefined,
+    isProject,
   );
 
   const {
@@ -364,6 +367,8 @@ interface PropsT {
   initialParentId?: string;
   /** Project archive-library permission gates for `projectId` attachments tab. */
   projectArchiveGates?: CxtType["projectArchiveGates"];
+  /** Set to true for project-only docs (adds is_project=1 param). */
+  isProject?: boolean;
 }
 
 export const PublicDocsCxtProvider: React.FC<PropsT> = ({
@@ -372,6 +377,7 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
   projectId,
   initialParentId,
   projectArchiveGates,
+  isProject,
 }) => {
   if (projectId) {
     return (
@@ -386,7 +392,7 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
     );
   }
   return (
-    <LibraryPublicDocsProviderInner fixedType={fixedType}>
+    <LibraryPublicDocsProviderInner fixedType={fixedType} isProject={isProject}>
       {children}
     </LibraryPublicDocsProviderInner>
   );
