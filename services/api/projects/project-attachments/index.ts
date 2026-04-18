@@ -65,6 +65,7 @@ export const ProjectAttachmentsApi = {
     if (sort) params.sort = sort;
 
     params.withoutTenancy = 1;
+    params.project_id = projectId;
 
     const res = await apiClient.get<FolderContentsResponse>(`/folders/contents`, {
       params,
