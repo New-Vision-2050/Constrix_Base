@@ -144,3 +144,31 @@ export interface GetAttachmentCycleSettingsResponse extends ApiBaseResponse<Atta
 
 export interface UpdateAttachmentCycleSettingsResponse extends ApiBaseResponse<AttachmentCycleSettings> {
 }
+
+export interface RolesAndPermissionsSettings {
+    id: number;
+    project_type_id: number;
+    is_all_data_visible: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetRolesAndPermissionsSettingsResponse extends ApiBaseResponse<RolesAndPermissionsSettings> {
+}
+
+export interface UpdateRolesAndPermissionsSettingsResponse extends ApiBaseResponse<RolesAndPermissionsSettings> {
+}
+
+export interface ProjectSharingSettings {
+    id: number;
+    project_type_id: number;
+    is_all_data_visible: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetProjectSharingSettingsResponse extends ApiBaseResponse<ProjectSharingSettings> {
+}
+
+export interface UpdateProjectSharingSettingsResponse extends ApiBaseResponse<ProjectSharingSettings> {
+}

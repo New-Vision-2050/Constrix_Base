@@ -86,3 +86,11 @@ export interface UpdateEmployeeContractSettingsArgs {
 export interface UpdateAttachmentCycleSettingsArgs {
     is_all_data_visible?: 0 | 1;
 }
+
+export interface UpdateRolesAndPermissionsSettingsArgs {
+    is_all_data_visible?: 0 | 1;
+}
+
+export interface UpdateProjectSharingSettingsArgs {
+    is_all_data_visible?: 0 | 1;
+}

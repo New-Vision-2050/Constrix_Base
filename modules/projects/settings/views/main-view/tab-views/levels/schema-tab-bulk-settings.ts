@@ -5,6 +5,8 @@ import type {
   UpdateDataSettingsArgs,
   UpdateEmployeeContractSettingsArgs,
   UpdateAttachmentCycleSettingsArgs,
+  UpdateRolesAndPermissionsSettingsArgs,
+  UpdateProjectSharingSettingsArgs,
 } from "@/services/api/projects/project-types/types/args";
 import type {
   ArchiveLibrarySettings,
@@ -12,6 +14,8 @@ import type {
   ContractorContractSettings,
   DataSettings,
   EmployeeContractSettings,
+  RolesAndPermissionsSettings,
+  ProjectSharingSettings,
 } from "@/services/api/projects/project-types/types/response";
 
 export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
@@ -19,11 +23,13 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
   "attachments",
   "contractors",
   "team",
+  "roles-and-permissions",
+  "project-sharing",
   "document-cycle",
 ]);
 
 /** Tabs grouped under «أصحاب المصلحة» in schema settings (not attachments / document-cycle). */
-export const STAKEHOLDER_GROUP_TAB_VALUES = ["team"] as const;
+export const STAKEHOLDER_GROUP_TAB_VALUES = ["team", "roles-and-permissions", "project-sharing"] as const;
 
 const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
   "is_reference_number",
@@ -49,6 +55,8 @@ export function getTabBulkCheckboxState(
     contractor: ContractorContractSettings | null | undefined;
     employee: EmployeeContractSettings | null | undefined;
     attachmentCycle: AttachmentCycleSettings | null | undefined;
+    rolesAndPermissions: RolesAndPermissionsSettings | null | undefined;
+    projectSharing: ProjectSharingSettings | null | undefined;
   },
 ): { checked: boolean; indeterminate: boolean } | null {
   if (!BULK_TOGGLE_SUPPORTED_TABS.has(tabValue)) return null;
@@ -91,6 +99,24 @@ export function getTabBulkCheckboxState(
 
   if (tabValue === "document-cycle") {
     const v = data.attachmentCycle?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "roles-and-permissions") {
+    const v = data.rolesAndPermissions?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "project-sharing") {
+    const v = data.projectSharing?.is_all_data_visible;
     if (v === undefined) return null;
     return {
       checked: isTruthySetting(v),
@@ -184,6 +210,26 @@ export async function bulkToggleTabSettings(
         is_all_data_visible: v,
       };
       await ProjectTypesApi.updateAttachmentCycleSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "roles-and-permissions": {
+      const payload: UpdateRolesAndPermissionsSettingsArgs = {
+        is_all_data_visible: v,
+      };
+      await ProjectTypesApi.updateRolesAndPermissionsSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "project-sharing": {
+      const payload: UpdateProjectSharingSettingsArgs = {
+        is_all_data_visible: v,
+      };
+      await ProjectTypesApi.updateProjectSharingSettings(
         projectTypeId,
         payload,
       );
