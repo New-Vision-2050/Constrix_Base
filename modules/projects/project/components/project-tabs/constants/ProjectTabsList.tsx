@@ -53,7 +53,7 @@ const STAKEHOLDER_SUB_TABS: SystemTab[] = [
   },
   {
     id: "project-tab-share",
-    title: "شركات المشروع",
+    title: "الجهات المشاركة",
     icon: <Share2 className="w-4 h-4" />,
     content: <ShareTab />,
   },

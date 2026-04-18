@@ -169,8 +169,8 @@ export default function DocViewDialog() {
         open={Boolean(docToView)}
         onOpenChange={() => setDocToView(undefined)}
       >
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader className="bg-sidebar flex flex-row items-center justify-between">
+        <DialogContent className="!fixed !inset-0 w-screen h-screen max-w-none !translate-x-0 !translate-y-0 m-0 p-0 rounded-none flex flex-col">
+          <DialogHeader className="bg-sidebar flex flex-row items-center justify-between p-4 shrink-0">
             {/* close button */}
             <Button variant="ghost" onClick={() => setDocToView(undefined)}>
               <X className="h-4 w-4" />
@@ -209,19 +209,17 @@ export default function DocViewDialog() {
               </Button>
             </div>
           </DialogHeader>
-          <div className="mt-4">
+          <div className="flex-1 overflow-auto bg-black flex items-center justify-center">
             {isImg ? (
               <img
                 src={docToView?.file?.url}
                 alt={docToView?.name}
-                width={"100%"}
-                height={"400px"}
+                className="max-w-full max-h-full object-contain"
               />
             ) : (
               <iframe
                 src={docToView?.file?.url}
-                width={"100%"}
-                height={"400px"}
+                className="w-full h-full"
               />
             )}
           </div>
