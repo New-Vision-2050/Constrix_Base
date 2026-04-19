@@ -169,12 +169,13 @@ export const createTableFetcher = () => {
         return;
       }
 
-      if (!totalCount && tableData.length > 0) {
+      // Fallback: if no total count was provided in headers or body, use array length
+      if (!totalCountHeader && !totalCountBody && tableData.length > 0) {
         // Always process the response, even if the component is unmounted
         setTotalItems(tableData.length);
         const calculatedTotalPages = Math.ceil(tableData.length / itemsPerPage);
         setPagination(currentPage, calculatedTotalPages, itemsPerPage);
-      } else if (!totalCount && tableData.length === 0) {
+      } else if (!totalCountHeader && !totalCountBody && tableData.length === 0) {
         // Always process the response, even if the component is unmounted
         // Update pagination to show 0 items with 1 empty page instead of showing an error
         setTotalItems(0);
