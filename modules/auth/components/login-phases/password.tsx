@@ -94,28 +94,7 @@ const PasswordPhase = ({
             });
 
             // handle redirect based on user type
-            if (userTypes.length > 0) {
-              const isEmployee = userTypes.some(
-                (userType) => userType.role == UsersRole.Employee,
-              );
-              const isBroker = userTypes.some(
-                (userType) => userType.role == UsersRole.Broker,
-              );
-              const isClient = userTypes.some(
-                (userType) => userType.role == UsersRole.Client,
-              );
-              if (isEmployee) {
-                router.push(ROUTER.USER_PROFILE);
-              } else if (isClient || isBroker) {
-                router.push(
-                  `${ROUTER.CLIENT_PROFILE}?role=${
-                    isClient ? UsersRole.Client : UsersRole.Broker
-                  }`,
-                );
-              }
-            } else {
-              router.push(`${ROUTER.CLIENT_PROFILE}?readonly=true`);
-            }
+            router.push(ROUTER.USER_PROFILE);
             return;
           }
           switch (nextStep) {
