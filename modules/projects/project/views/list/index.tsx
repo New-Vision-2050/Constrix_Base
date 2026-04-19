@@ -20,7 +20,6 @@ import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
 import Can from "@/lib/permissions/client/Can";
-import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useQuery } from "@tanstack/react-query";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
@@ -146,7 +145,11 @@ function ProjectsList() {
                 color="inherit"
                 endIcon={<span style={{ fontSize: 9 }}>▼</span>}
                 onClick={onClick}
-                sx={{ bgcolor: "primary.main", color: "primary.contrastText", minWidth: 80 }}
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  minWidth: 80,
+                }}
               >
                 {tProject("tableActions")}
               </Button>
@@ -371,6 +374,4 @@ function ProjectsList() {
   );
 }
 
-export default withPermissions(ProjectsList, [
-  PERMISSIONS.projectManagement.list,
-]);
+export default ProjectsList;
