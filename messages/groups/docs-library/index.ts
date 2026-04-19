@@ -30,7 +30,8 @@ export const docsLibraryMessages = new MessagesGroup({
     publicDocs: _m("Public Docs", "المستندات العامة"),
     empsDocs: _m("Employee Docs", "المستندات الموظفين"),
     privateDocs: _m("Private Docs", "المستندات الخاصة"),
-    inboxDocs: _m("Inbox Docs", "المستندات الواردة")
+    inboxDocs: _m("Inbox Docs", "المستندات الواردة"),
+    projectsDocs: _m("Projects Docs", "المشاريع")
   }),
   searchFields: new MessagesGroup({
     search: _m("Search Filters", "فلتر البحث"),

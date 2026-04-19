@@ -33,6 +33,7 @@ export default async function getDocs(
   searchData?: SearchFormData,
   sort?: string,
   fixedType?: string,
+  isProject?: boolean,
 ) {
   // Build params object with only defined values
   const params: Record<string, string | number> = {};
@@ -60,6 +61,10 @@ export default async function getDocs(
     params.search = searchData.search;
   }
   if (sort) params.sort = sort;
+
+  if (isProject) {
+    params.is_project = 1;
+  }
 
   const res = await apiClient.get<ResponseT>(`/folders/contents`, {
     params,
