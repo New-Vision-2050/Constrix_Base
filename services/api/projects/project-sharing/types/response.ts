@@ -192,3 +192,59 @@ export type GetSharedCompaniesResponse = {
   message?: string | null;
   payload: SharedCompany[];
 };
+
+/** Row from GET `resource-shares/project-share-types` (+ `/relations`, `/roles`). */
+export type ProjectShareTypeOption = {
+  id: number;
+  /** Plain text or JSON string: `{"ar":"…","en":"…"}`. */
+  name?: string;
+  title?: string;
+  label?: string;
+  level?: string;
+  translations?: unknown[];
+};
+
+export type ListProjectShareTypesResponse = {
+  code: string;
+  message?: string | null;
+  /** Flat list or nested once: `[[{ id, name, ... }, ...]]`. */
+  payload: ProjectShareTypeOption[] | ProjectShareTypeOption[][];
+};
+
+/** Normalizes `payload` to a flat list (handles `[[...]]` and `[...]`). */
+export function flattenProjectShareTypeListPayload(
+  payload: unknown,
+): ProjectShareTypeOption[] {
+  if (payload == null || !Array.isArray(payload)) return [];
+  if (payload.length === 0) return [];
+  const first = payload[0];
+  if (Array.isArray(first)) {
+    return (payload as ProjectShareTypeOption[][]).flat();
+  }
+  return payload as ProjectShareTypeOption[];
+}
+
+type ProjectShareTypeNameJson = { ar?: string; en?: string };
+
+/** Display label: prefers Arabic from JSON `name`, then English, then plain `name`. */
+export function formatProjectShareTypeOptionLabel(
+  o: ProjectShareTypeOption,
+): string {
+  const raw = o.name ?? o.title ?? o.label;
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (trimmed.startsWith("{")) {
+      try {
+        const parsed = JSON.parse(trimmed) as ProjectShareTypeNameJson;
+        const ar = parsed.ar?.trim();
+        const en = parsed.en?.trim();
+        if (ar) return ar;
+        if (en) return en;
+      } catch {
+        /* use trimmed fallback */
+      }
+    }
+    if (trimmed) return trimmed;
+  }
+  return String(o.id);
+}
