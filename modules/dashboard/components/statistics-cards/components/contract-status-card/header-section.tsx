@@ -8,8 +8,7 @@ type PropsT = {
 export default function ContractStatusHeader({ contractData }: PropsT) {
   // declare and define helper variables
   const t = useTranslations("UserProfile.header.statisticsCards");
-  const salary = +(contractData?.user_salary??"0");
-  const formattedSalary = (salary / 1000).toFixed(1) + "k ريال";
+  const formattedSalary = (contractData?.user_salary ?? "0") + " ريال";
 
   // return component ui
   return (
