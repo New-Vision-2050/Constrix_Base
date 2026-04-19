@@ -3,3 +3,4 @@
 export { default } from './Breadcrumbs';
 export { default as getRoutesMap } from './routes-map';
 export * from './types';
+export { BreadcrumbProvider, useBreadcrumb, useBreadcrumbOptional } from './BreadcrumbContext';
