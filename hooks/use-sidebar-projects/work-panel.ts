@@ -4,11 +4,13 @@ import InboxIconWithCount from "@/components/icons/inbox";
 import { ROUTER } from "@/router";
 import { Project } from "@/types/sidebar-menu";
 import { SidebarProjectProps } from "./types";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export function getWorkPanelProject({
   t,
   fullPath,
   isCentralCompany,
+  can,
 }: SidebarProjectProps): Project {
   return {
     name: t("Sidebar.WorkPanel"),
@@ -32,7 +34,7 @@ export function getWorkPanelProject({
         isActive:
           fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) ||
           fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
-        show: !isCentralCompany,
+        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
       },
       {
         name: t("Sidebar.Projects"),
@@ -42,14 +44,14 @@ export function getWorkPanelProject({
           fullPath.startsWith("/projects") &&
           !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS) &&
           !fullPath.startsWith(ROUTER.PROJECTS_INBOX),
-        show: !isCentralCompany,
+        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
       },
       {
         name: t("Sidebar.Inbox"),
         url: ROUTER.PROJECTS_INBOX,
         icon: InboxIconWithCount,
         isActive: fullPath.startsWith(ROUTER.PROJECTS_INBOX),
-        show: !isCentralCompany,
+        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
       },
     ],
   };
