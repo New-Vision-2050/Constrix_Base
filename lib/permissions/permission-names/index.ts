@@ -38,7 +38,6 @@ export const PERMISSIONS = {
     officialData: create("COMPANY_PROFILE_OFFICIAL_DATA"),
     supportData: create("COMPANY_PROFILE_SUPPORT_DATA"),
   },
-
   organization: {
     branch: create("ORGANIZATION_BRANCH"),
     department: create("ORGANIZATION_DEPARTMENT"),
@@ -47,13 +46,11 @@ export const PERMISSIONS = {
     management: create("ORGANIZATION_MANAGEMENT"),
     jobTitle: create("ORGANIZATION_JOB_TITLE"),
   },
-
   userProfile: {
     contact: create("USER_PROFILE_CONTACT"),
     identity: create("USER_PROFILE_IDENTITY"),
     data: create("USER_PROFILE_DATA"),
   },
-
   permission: create("PERMISSION"),
   city: create("CITY"),
   loginWay: create("LOGIN_WAY"),
@@ -63,18 +60,14 @@ export const PERMISSIONS = {
   driver: create("DRIVER"),
   identifier: create("IDENTIFIER"),
   subEntity: create("SUB_ENTITY"),
-
   activityLogs: create("LOG"),
-
-  // Attendance
   attendance: {
     settings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
     attendance_departure: {
       ...create("EMPLOYEE_ATTENDANCE"),
-      map: "EMPLOYEE_ATTENDANCE_MAP", // إضافة permission مخصص للخريطة
+      map: "EMPLOYEE_ATTENDANCE_MAP",
     },
   },
-  // vacations
   vacations: {
     settings: {
       leaveType: create("LEAVE_TYPE"),
@@ -82,229 +75,58 @@ export const PERMISSIONS = {
       publicHoliday: create("PUBLIC_HOLIDAY"),
     },
   },
-  // CRM
   crm: {
-    settings: create("CLIENT_SETTING",["UPDATE"]),
+    settings: create("CLIENT_SETTING"),
     broker: create("BROKER"),
-    clients: create("CLIENT", ["UPDATE"]),
-    pricesOffers: create("PRICE_OFFER", ["LIST"]),
-    serviceSettings: create("TERM_SERVICE_SETTING", ["LIST", "VIEW", "CREATE", "UPDATE", "DELETE"]),
-    termSettings: create("TERM_SETTING", ["LIST", "VIEW", "CREATE", "UPDATE", "DELETE"]),
+    clients: create("CLIENT"),
+    pricesOffers: create("PRICE_OFFER"),
+    serviceSettings: create("TERM_SERVICE_SETTING"),
+    termSettings: create("TERM_SETTING"),
   },
-
-  // docs library
   library: {
     folder: create("FOLDER"),
     file: create("FILE"),
   },
-  // Content Management System
   CMS: {
-    categories: create("CATEGORY_WEBSITE_CMS", [
-      "LIST",
-      "CREATE",
-      "UPDATE",
-      "DELETE",
-    ]), //LIST,CREATE,UPDATE,DELETE
-    projects: create("WEBSITE_PROJECT", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
-    projectsTypes: create("WEBSITE_PROJECT_SETTING", [
-      "LIST",
-      "CREATE",
-      "UPDATE",
-      "DELETE",
-    ]), //LIST,CREATE,UPDATE,DELETE
-    icons: create("WEBSITE_ICON", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
-    mainSettings: create("WEBSITE_HOME_PAGE_SETTING", ["VIEW", "UPDATE"]), // just view,update
-    aboutSetting: create("WEBSITE_ABOUT_US", ["VIEW", "UPDATE"]), // just view,update - renames to aboutSetting
-    termsConditions: create("WEBSITE_TERM_AND_CONDITION", ["VIEW", "UPDATE"]), // just view,update
-    news: create("WEBSITE_NEWS", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
-    founder: create("FOUNDER", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
-    services: create("WEBSITE_SERVICE", ["LIST", "UPDATE", "CREATE", "DELETE"]), // just view,update,create,delete
-    ourServices: create("WEBSITE_OUR_SERVICE", ["VIEW", "UPDATE"]), // just view,update,create,delete
-    // WEBSITE_SERVICE - LIST,CREATE,UPDATE,ACTIVATE,DELETE
+    categories: create("CATEGORY_WEBSITE_CMS"),
+    projects: create("WEBSITE_PROJECT"),
+    projectsTypes: create("WEBSITE_PROJECT_SETTING"),
+    icons: create("WEBSITE_ICON"),
+    mainSettings: create("WEBSITE_HOME_PAGE_SETTING"),
+    aboutSetting: create("WEBSITE_ABOUT_US"),
+    termsConditions: create("WEBSITE_TERM_AND_CONDITION"),
+    news: create("WEBSITE_NEWS"),
+    founder: create("FOUNDER"),
+    services: create("WEBSITE_SERVICE"),
+    ourServices: create("WEBSITE_OUR_SERVICE"),
     communicationSettings: {
-      contactData: create("WEBSITE_CONTACT_INFO", ["VIEW", "UPDATE"]), // just view,update
-      addresses: create("WEBSITE_ADDRESS", [
-        "LIST",
-        "CREATE",
-        "UPDATE",
-        "DELETE",
-      ]), //LIST,CREATE,UPDATE,DELETE
-      socialLinks: create("SOCIAL_MEDIA_LINK", [
-        "LIST",
-        "CREATE",
-        "UPDATE",
-        "DELETE",
-      ]), //LIST,CREATE,UPDATE,DELETE
+      contactData: create("WEBSITE_CONTACT_INFO"),
+      addresses: create("WEBSITE_ADDRESS"),
+      socialLinks: create("SOCIAL_MEDIA_LINK"),
     },
-    themeSetting: create("WEBSITE_THEME"), // just view,update
-    communicationContactMessages: create("WEBSITE_CONTACT_MESSAGE", [
-      "LIST",
-      "UPDATE",
-      "DELETE",
-    ]), //LIST,VIEW,REPLY=UPDATE,DELETE
-    //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
-    themes: create("WEBSITE_THEME_SETTING", ["LIST", "VIEW", "ACTIVATE"]), //LIST,SHOW,ACTIVATE
-    BookStore: create("WEBSITE_BOOK_STORE", [
-      "LIST",
-      "CREATE",
-      "UPDATE",
-      "DELETE",
-    ]),
+    themeSetting: create("WEBSITE_THEME"),
+    communicationContactMessages: create("WEBSITE_CONTACT_MESSAGE"),
+    themes: create("WEBSITE_THEME_SETTING"),
+    BookStore: create("WEBSITE_BOOK_STORE"),
   },
-  // Project Type Settings (work-panel.project-settings*project-type.*)
-  projectType: create("PROJECT_TYPE", [
-    "LIST",
-    "VIEW",
-    "CREATE",
-    "UPDATE",
-    "DELETE",
-    "EXPORT",
-  ]),
-
-  // Project Terms (بنود المشروع)
-  projectTerm: create("PROJECT_TERM", ["LIST", "CREATE", "UPDATE", "DELETE"]),
-
-  // Project Management
-  projectManagement: create("PROJECT_MANAGEMENT", [
-    "LIST",
-    "VIEW",
-    "CREATE",
-    "UPDATE",
-    "DELETE",
-  ]),
-
-  // Client Requests
-  clientRequest: create("CLIENT_REQUEST", [
-    "LIST",
-    "VIEW",
-    "CREATE",
-    "UPDATE",
-    "DELETE",
-  ]),
-
-  // ecommerce
+  projectType: create("PROJECT_TYPE"),
+  projectTerm: create("PROJECT_TERM"),
+  projectManagement: create("PROJECT_MANAGEMENT"),
+  clientRequest: create("CLIENT_REQUEST"),
   ecommerce: {
-    //Banner
-    banner: create("ECOMMERCE_BANNER", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Coupon
-    coupon: create("ECOMMERCE_COUPON", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Dashboard
-    dashboard: create("ECOMMERCE_DASHBOARD", ["VIEW"]), //'ORDERS_CHART','WAREHOUSES_TABLE'
-    //Deal Day
-    dealDay: create("ECOMMERCE_DEAL_DAY", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Brand
-    brand: create("ECOMMERCE_ECO_BRAND", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Category
-    category: create("ECOMMERCE_CATEGORY", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Product
-    product: create("ECOMMERCE_PRODUCT", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Feature Deal
-    featureDeal: create("ECOMMERCE_FEATURE_DEAL", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Flash Deal
-    flashDeal: create("ECOMMERCE_FLASH_DEAL", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Order
-    order: create("ECOMMERCE_ORDER", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Social Media
-    socialMedia: create("ECOMMERCE_SOCIAL_MEDIA", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    // Warehouse
-    warehouse: create("ECOMMERCE_WAREHOUSE", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "ACTIVATE",
-      "DELETE",
-      "EXPORT",
-    ]),
-    //Page
-    page: create("ECOMMERCE_PAGE", [
-      "LIST",
-      "VIEW",
-      "CREATE",
-      "UPDATE",
-      "DELETE",
-    ]),
-    //Payment Method
-    paymentMethod: create("ECOMMERCE_PAYMENT_METHOD", ["LIST", "ACTIVATE"]),
+    banner: create("ECOMMERCE_BANNER"),
+    coupon: create("ECOMMERCE_COUPON"),
+    dashboard: create("ECOMMERCE_DASHBOARD"),
+    dealDay: create("ECOMMERCE_DEAL_DAY"),
+    brand: create("ECOMMERCE_ECO_BRAND"),
+    category: create("ECOMMERCE_CATEGORY"),
+    product: create("ECOMMERCE_PRODUCT"),
+    featureDeal: create("ECOMMERCE_FEATURE_DEAL"),
+    flashDeal: create("ECOMMERCE_FLASH_DEAL"),
+    order: create("ECOMMERCE_ORDER"),
+    socialMedia: create("ECOMMERCE_SOCIAL_MEDIA"),
+    warehouse: create("ECOMMERCE_WAREHOUSE"),
+    page: create("ECOMMERCE_PAGE"),
+    paymentMethod: create("ECOMMERCE_PAYMENT_METHOD"),
   },
 };
