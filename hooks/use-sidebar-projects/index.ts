@@ -9,6 +9,7 @@ import { ROUTER } from "@/router";
 import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
 import { Project } from "@/types/sidebar-menu";
 import { SidebarProjectProps } from "./types";
+import { getPathnameWithoutLocale } from "./utils";
 import { getWorkPanelProject } from "./work-panel";
 import { getCompaniesProject } from "./companies";
 import { getUsersProject } from "./users";
@@ -26,14 +27,6 @@ export function useSidebarProjects(userTypes: UserRoleType[]): Project[] {
   const path = usePathname();
   const { can, isCentralCompany } = usePermissions();
   const pageName = "/" + path.split("/").at(-1);
-
-  const getPathnameWithoutLocale = React.useCallback((pathname: string) => {
-    const segments = pathname.split("/").filter(Boolean);
-    if (segments.length > 0 && segments[0].length === 2) {
-      return "/" + segments.slice(1).join("/");
-    }
-    return pathname;
-  }, []);
 
   const fullPath = getPathnameWithoutLocale(path);
 
