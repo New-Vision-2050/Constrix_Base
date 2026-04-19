@@ -23,6 +23,10 @@ import {
   Paper,
   Divider,
   Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { Close, InfoOutlined, Send as SendIcon } from "@mui/icons-material";
@@ -38,13 +42,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
-import { ProjectSharingApi} from "@/services/api/projects/project-sharing";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import {
   SCHEMA_IDS,
   useProjectSettingsTabs,
 } from "@/modules/projects/settings/constants/current-tabs";
-import { CompanyData } from "@/services/api/projects/project-sharing/types/response";
+import {
+  CompanyData,
+  flattenProjectShareTypeListPayload,
+  formatProjectShareTypeOptionLabel,
+} from "@/services/api/projects/project-sharing/types/response";
 
 type ShareFormValues = {
   serialSearch: string;
@@ -53,13 +61,20 @@ type ShareFormValues = {
 type PendingSharePayload = {
   company_serial_number: string;
   schema_ids: number[];
+  type_id?: number;
+  relation_id?: number;
+  role_id?: number;
 };
+
+function parseSelectNumberOrEmpty(value: unknown): number | "" {
+  if (value === "" || value === undefined || value === null) return "";
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n : "";
+}
 
 const createShareFormSchema = () =>
   z.object({
-    serialSearch: z
-      .string()
-      .min(1, "الرقم التسلسلي للشركة مطلوب"),
+    serialSearch: z.string().min(1, "الرقم التسلسلي للشركة مطلوب"),
   });
 
 const defaultForm: ShareFormValues = {
@@ -159,6 +174,9 @@ export default function ShareProjectDialog({
   const [company, setCompany] = useState<CompanyData | null>(null);
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [selectedSchemaIds, setSelectedSchemaIds] = useState<number[]>([]);
+  const [shareTypeId, setShareTypeId] = useState<number | "">("");
+  const [shareRelationId, setShareRelationId] = useState<number | "">("");
+  const [shareRoleId, setShareRoleId] = useState<number | "">("");
 
   const schemaParentId = projectData?.sub_project_type_id;
 
@@ -168,19 +186,57 @@ export default function ShareProjectDialog({
       const res = await ProjectTypesApi.getProjectTypeSchemas(schemaParentId!);
       return res.data.payload ?? [];
     },
-    enabled:
-      open &&
-      Boolean(schemaParentId && schemaParentId > 0),
+    enabled: open && Boolean(schemaParentId && schemaParentId > 0),
   });
 
   const schemas = useMemo(() => schemasPayload ?? [], [schemasPayload]);
+
+  const { data: shareTypesPayload, isLoading: shareTypesLoading } = useQuery({
+    queryKey: ["project-share-types"],
+    queryFn: async () => {
+      const res = await ProjectSharingApi.getProjectShareTypes();
+      return flattenProjectShareTypeListPayload(res.data.payload);
+    },
+    enabled: open,
+  });
+
+  const { data: shareRelationsPayload, isLoading: shareRelationsLoading } =
+    useQuery({
+      queryKey: ["project-share-type-relations"],
+      queryFn: async () => {
+        const res = await ProjectSharingApi.getProjectShareTypeRelations();
+        return flattenProjectShareTypeListPayload(res.data.payload);
+      },
+      enabled: open,
+    });
+
+  const { data: shareRolesPayload, isLoading: shareRolesLoading } = useQuery({
+    queryKey: ["project-share-type-roles"],
+    queryFn: async () => {
+      const res = await ProjectSharingApi.getProjectShareTypeRoles();
+      return flattenProjectShareTypeListPayload(res.data.payload);
+    },
+    enabled: open,
+  });
+
+  const shareTypes = useMemo(
+    () => shareTypesPayload ?? [],
+    [shareTypesPayload],
+  );
+  const shareRelations = useMemo(
+    () => shareRelationsPayload ?? [],
+    [shareRelationsPayload],
+  );
+  const shareRoles = useMemo(
+    () => shareRolesPayload ?? [],
+    [shareRolesPayload],
+  );
 
   const filteredTabs = useMemo(
     () =>
       allSettingsTabs.filter(
         (tab) =>
-          tab.schema_id != null &&
-          schemas.some((s) => s.id === tab.schema_id),
+          tab.schema_id != null && schemas.some((s) => s.id === tab.schema_id),
       ),
     [allSettingsTabs, schemas],
   );
@@ -234,9 +290,12 @@ export default function ShareProjectDialog({
       setCompany(null);
       setLookupError(null);
       setSelectedSchemaIds([]);
+      setShareTypeId("");
+      setShareRelationId("");
+      setShareRoleId("");
       reset(defaultForm);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- `reset` from RHF can change identity every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `reset` from RHF can change identity every render
   }, [open]);
 
   const lookupMutation = useMutation({
@@ -270,6 +329,9 @@ export default function ShareProjectDialog({
         project_id: projectId,
         company_serial_number: body.company_serial_number,
         schema_ids: [...body.schema_ids].sort((a, b) => a - b),
+        ...(body.type_id != null ? { type_id: body.type_id } : {}),
+        ...(body.relation_id != null ? { relation_id: body.relation_id } : {}),
+        ...(body.role_id != null ? { role_id: body.role_id } : {}),
       });
       if (isApiPayloadBusinessError(res.data)) {
         return Promise.reject({ response: { data: res.data } });
@@ -279,11 +341,18 @@ export default function ShareProjectDialog({
     onSuccess: (res) => {
       const text = getErrorDescriptionFromApiData(res.data);
       toast.success(text?.trim() ? text : "تمت المشاركة بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["project-details", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["project-shares", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["project-details", projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["project-shares", projectId],
+      });
       reset(defaultForm);
       setCompany(null);
       setSelectedSchemaIds([]);
+      setShareTypeId("");
+      setShareRelationId("");
+      setShareRoleId("");
       setActiveStep(0);
       onClose();
     },
@@ -307,6 +376,9 @@ export default function ShareProjectDialog({
     setCompany(null);
     setLookupError(null);
     setSelectedSchemaIds([]);
+    setShareTypeId("");
+    setShareRelationId("");
+    setShareRoleId("");
     setActiveStep(0);
     onClose();
   };
@@ -356,6 +428,9 @@ export default function ShareProjectDialog({
     shareMutation.mutate({
       company_serial_number: company.serial_no,
       schema_ids: selectedSchemaIds,
+      ...(shareTypeId !== "" ? { type_id: shareTypeId } : {}),
+      ...(shareRelationId !== "" ? { relation_id: shareRelationId } : {}),
+      ...(shareRoleId !== "" ? { role_id: shareRoleId } : {}),
     });
   };
 
@@ -379,7 +454,14 @@ export default function ShareProjectDialog({
     switch (activeStep) {
       case 0:
         return (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3, height: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              height: "100%",
+            }}
+          >
             {!schemaParentId || schemaParentId <= 0 ? (
               <Typography color="warning.main" variant="body2">
                 نوع المشروع مفقود
@@ -420,8 +502,19 @@ export default function ShareProjectDialog({
             ) : null}
 
             {company ? (
-              <Paper variant="outlined" sx={{ p: 2, bgcolor: "success.light", borderColor: "success.main" }}>
-                <Typography variant="body1" color="text.primary" sx={{ fontWeight: 700 }}>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  bgcolor: "success.light",
+                  borderColor: "success.main",
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  color="text.primary"
+                  sx={{ fontWeight: 700 }}
+                >
                   الشركة المختارة: {company.name}
                 </Typography>
               </Paper>
@@ -509,8 +602,7 @@ export default function ShareProjectDialog({
                       sx={{
                         px: 2,
                         py: 1.75,
-                        borderBottom:
-                          index < arr.length - 1 ? 1 : 0,
+                        borderBottom: index < arr.length - 1 ? 1 : 0,
                         borderColor: "divider",
                       }}
                     >
@@ -561,6 +653,92 @@ export default function ShareProjectDialog({
               </Typography>
             ) : null}
 
+            <Box sx={{ mb: 2.5 }}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(3, minmax(0, 1fr))",
+                  },
+                  gap: 2,
+                }}
+              >
+                <FormControl size="small" fullWidth disabled={pending}>
+                  <InputLabel id="share-project-type-label">النوع</InputLabel>
+                  <Select
+                    labelId="share-project-type-label"
+                    label="النوع"
+                    value={shareTypeId === "" ? "" : shareTypeId}
+                    onChange={(e) =>
+                      setShareTypeId(parseSelectNumberOrEmpty(e.target.value))
+                    }
+                    startAdornment={
+                      shareTypesLoading ? (
+                        <CircularProgress size={18} sx={{ ml: 1 }} />
+                      ) : undefined
+                    }
+                  >
+                    {shareTypes.map((opt) => (
+                      <MenuItem key={opt.id} value={opt.id}>
+                        {formatProjectShareTypeOptionLabel(opt)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl size="small" fullWidth disabled={pending}>
+                  <InputLabel id="share-project-relation-label">
+                    العلاقة
+                  </InputLabel>
+                  <Select
+                    labelId="share-project-relation-label"
+                    label="العلاقة"
+                    value={shareRelationId === "" ? "" : shareRelationId}
+                    onChange={(e) =>
+                      setShareRelationId(
+                        parseSelectNumberOrEmpty(e.target.value),
+                      )
+                    }
+                    startAdornment={
+                      shareRelationsLoading ? (
+                        <CircularProgress size={18} sx={{ ml: 1 }} />
+                      ) : undefined
+                    }
+                  >
+                    {shareRelations.map((opt) => (
+                      <MenuItem key={opt.id} value={opt.id}>
+                        {formatProjectShareTypeOptionLabel(opt)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl size="small" fullWidth disabled={pending}>
+                  <InputLabel id="share-project-role-label">الدور</InputLabel>
+                  <Select
+                    labelId="share-project-role-label"
+                    label="الدور"
+                    value={shareRoleId === "" ? "" : shareRoleId}
+                    onChange={(e) =>
+                      setShareRoleId(parseSelectNumberOrEmpty(e.target.value))
+                    }
+                    startAdornment={
+                      shareRolesLoading ? (
+                        <CircularProgress size={18} sx={{ ml: 1 }} />
+                      ) : undefined
+                    }
+                  >
+                    {shareRoles.map((opt) => (
+                      <MenuItem key={opt.id} value={opt.id}>
+                        {formatProjectShareTypeOptionLabel(opt)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Box>
+
             {canShowSchemas && filteredTabs.length > 0 ? (
               <Box>
                 <Typography
@@ -593,7 +771,11 @@ export default function ShareProjectDialog({
                           borderColor: "divider",
                           transition: (theme) =>
                             theme.transitions.create(
-                              ["border-color", "box-shadow", "background-color"],
+                              [
+                                "border-color",
+                                "box-shadow",
+                                "background-color",
+                              ],
                               { duration: theme.transitions.duration.shorter },
                             ),
                           ...(checked && {
@@ -661,46 +843,44 @@ export default function ShareProjectDialog({
           selectedSchemaIds.includes(tab.schema_id!),
         );
         const companyRows = company
-          ? (
-              [
-                {
-                  icon: (
-                    <BusinessOutlinedIcon
-                      sx={{ fontSize: 22, color: "text.secondary" }}
-                    />
-                  ),
-                  label: "اسم الشركة",
-                  value: company.name?.trim() || "—",
-                },
-                {
-                  icon: (
-                    <BadgeOutlinedIcon
-                      sx={{ fontSize: 22, color: "text.secondary" }}
-                    />
-                  ),
-                  label: "الرقم التسلسلي",
-                  value: company.serial_no?.trim() || "—",
-                },
-                {
-                  icon: (
-                    <EmailOutlinedIcon
-                      sx={{ fontSize: 22, color: "text.secondary" }}
-                    />
-                  ),
-                  label: "البريد الإلكتروني",
-                  value: company.email?.trim() || "—",
-                },
-                {
-                  icon: (
-                    <PersonOutlineIcon
-                      sx={{ fontSize: 22, color: "text.secondary" }}
-                    />
-                  ),
-                  label: "ممثل الشركة",
-                  value: company.owner_name?.trim() || "—",
-                },
-              ] as const
-            )
+          ? ([
+              {
+                icon: (
+                  <BusinessOutlinedIcon
+                    sx={{ fontSize: 22, color: "text.secondary" }}
+                  />
+                ),
+                label: "اسم الشركة",
+                value: company.name?.trim() || "—",
+              },
+              {
+                icon: (
+                  <BadgeOutlinedIcon
+                    sx={{ fontSize: 22, color: "text.secondary" }}
+                  />
+                ),
+                label: "الرقم التسلسلي",
+                value: company.serial_no?.trim() || "—",
+              },
+              {
+                icon: (
+                  <EmailOutlinedIcon
+                    sx={{ fontSize: 22, color: "text.secondary" }}
+                  />
+                ),
+                label: "البريد الإلكتروني",
+                value: company.email?.trim() || "—",
+              },
+              {
+                icon: (
+                  <PersonOutlineIcon
+                    sx={{ fontSize: 22, color: "text.secondary" }}
+                  />
+                ),
+                label: "ممثل الشركة",
+                value: company.owner_name?.trim() || "—",
+              },
+            ] as const)
           : [];
 
         return (
@@ -720,9 +900,7 @@ export default function ShareProjectDialog({
               {companyRows.length > 0 ? (
                 <Stack
                   spacing={0}
-                  divider={
-                    <Divider flexItem sx={{ borderColor: "divider" }} />
-                  }
+                  divider={<Divider flexItem sx={{ borderColor: "divider" }} />}
                 >
                   {companyRows.map((row) => (
                     <Stack
@@ -768,7 +946,8 @@ export default function ShareProjectDialog({
               {selectedTabs.length > 0 ? (
                 <Stack direction="row" flexWrap="wrap" gap={1.5}>
                   {selectedTabs.map((tab, index) => {
-                    const IconComp = schemaChipIcons[index % schemaChipIcons.length];
+                    const IconComp =
+                      schemaChipIcons[index % schemaChipIcons.length];
                     return (
                       <Chip
                         key={tab.value}
@@ -792,9 +971,59 @@ export default function ShareProjectDialog({
                   —
                 </Typography>
               )}
+
+              <Divider sx={{ my: 2.5 }} />
+
+              <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 700 }}>
+                نوع المشاركة والعلاقة والدور
+              </Typography>
+              <Stack spacing={1}>
+                <Typography variant="body2">
+                  <Box component="span" color="text.secondary">
+                    النوع:{" "}
+                  </Box>
+                  {shareTypeId === ""
+                    ? "—"
+                    : formatProjectShareTypeOptionLabel(
+                        shareTypes.find((o) => o.id === shareTypeId) ?? {
+                          id: shareTypeId,
+                        },
+                      )}
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" color="text.secondary">
+                    العلاقة:{" "}
+                  </Box>
+                  {shareRelationId === ""
+                    ? "—"
+                    : formatProjectShareTypeOptionLabel(
+                        shareRelations.find(
+                          (o) => o.id === shareRelationId,
+                        ) ?? {
+                          id: shareRelationId,
+                        },
+                      )}
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" color="text.secondary">
+                    الدور:{" "}
+                  </Box>
+                  {shareRoleId === ""
+                    ? "—"
+                    : formatProjectShareTypeOptionLabel(
+                        shareRoles.find((o) => o.id === shareRoleId) ?? {
+                          id: shareRoleId,
+                        },
+                      )}
+                </Typography>
+              </Stack>
             </Paper>
 
-            <Alert severity="info" icon={<InfoOutlined fontSize="inherit" />} variant="outlined">
+            <Alert
+              severity="info"
+              icon={<InfoOutlined fontSize="inherit" />}
+              variant="outlined"
+            >
               يرجى مراجعة البيانات والصلاحيات قبل إرسال الدعوة
             </Alert>
           </Box>
@@ -864,7 +1093,15 @@ export default function ShareProjectDialog({
 
             <Divider sx={{ my: 3 }} />
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 2,
+              }}
+            >
               {activeStep === 0 ? (
                 <>
                   <Button

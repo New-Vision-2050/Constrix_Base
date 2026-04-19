@@ -2,6 +2,7 @@ import { baseApi } from "@/config/axios/instances/base";
 import {
   CompanyLookupResponse,
   GetSharedCompaniesResponse,
+  ListProjectShareTypesResponse,
   ListProjectSharesResponse,
   PendingInvitationsResponse,
   ShareProjectResponse,
@@ -16,6 +17,21 @@ import {
 export const ProjectSharingApi = {
   share: (body: ShareProjectPayload) =>
     baseApi.post<ShareProjectResponse>("projects/sharing/share", body),
+
+  getProjectShareTypes: () =>
+    baseApi.get<ListProjectShareTypesResponse>(
+      "resource-shares/project-share-types",
+    ),
+
+  getProjectShareTypeRelations: () =>
+    baseApi.get<ListProjectShareTypesResponse>(
+      "resource-shares/project-share-types/relations",
+    ),
+
+  getProjectShareTypeRoles: () =>
+    baseApi.get<ListProjectShareTypesResponse>(
+      "resource-shares/project-share-types/roles",
+    ),
 
   /** List assignments for a project (backend: GET with `project_id`). */
   listForProject: (projectId: string) =>
