@@ -1,8 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AllProjectsApi, ProjectDetails } from "@/services/api/projects/all-projects";
+import { useBreadcrumb } from "@/components/shared/breadcrumbs";
 
 interface ProjectContextType {
   projectId: string;
@@ -19,6 +20,8 @@ interface ProjectProviderProps {
 }
 
 export function ProjectProvider({ projectId, children }: ProjectProviderProps) {
+  const { setPageTitle } = useBreadcrumb();
+  
   const { data: projectData, isLoading, isError } = useQuery({
     queryKey: ["project-details", projectId],
     queryFn: async () => {
@@ -27,6 +30,16 @@ export function ProjectProvider({ projectId, children }: ProjectProviderProps) {
     },
     enabled: !!projectId,
   });
+
+  // Set the project name as the breadcrumb title
+  useEffect(() => {
+    if (projectData?.name) {
+      setPageTitle(projectData.name);
+    }
+    return () => {
+      setPageTitle(null);
+    };
+  }, [projectData?.name, setPageTitle]);
 
   return (
     <ProjectContext.Provider

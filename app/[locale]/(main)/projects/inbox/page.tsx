@@ -1,5 +1,11 @@
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import ProjectsInboxView from "@/modules/projects/inbox/views/ProjectsInboxView";
 
-export default function ProjectsInboxPage() {
+function ProjectsInboxPage() {
   return <ProjectsInboxView />;
 }
+
+export default withServerPermissionsPage(ProjectsInboxPage, [
+  PERMISSIONS.projectManagement.list,
+]);

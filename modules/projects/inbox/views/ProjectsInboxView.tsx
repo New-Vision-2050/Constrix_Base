@@ -6,8 +6,6 @@ import { Alert, Box, Typography } from "@mui/material";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
-import withPermissions from "@/lib/permissions/client/withPermissions";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 import {
   mapPendingInvitationToRow,
@@ -140,8 +138,7 @@ function ProjectsInboxView() {
     if (statusFilter !== "all") {
       rows = rows.filter(
         (row) =>
-          inboxInvitationStatusSegment(row.invitation_status) ===
-          statusFilter,
+          inboxInvitationStatusSegment(row.invitation_status) === statusFilter,
       );
     }
 
@@ -208,9 +205,7 @@ function ProjectsInboxView() {
       invalidate();
     },
     onError: (error: unknown) => {
-      toast.error(
-        getApiErrorDescription(error) ?? t("toastOperationError"),
-      );
+      toast.error(getApiErrorDescription(error) ?? t("toastOperationError"));
     },
   });
 
@@ -227,7 +222,7 @@ function ProjectsInboxView() {
   }, []);
 
   const detailsInvitation = detailsRow
-    ? invitationsById.get(detailsRow.invitationId) ?? null
+    ? (invitationsById.get(detailsRow.invitationId) ?? null)
     : null;
 
   const detailsCanRespond =
@@ -334,10 +329,7 @@ function ProjectsInboxView() {
 
       <InboxTableLayout
         table={
-          <InboxTableLayout.Table
-            state={state}
-            loadingOptions={{ rows: 5 }}
-          />
+          <InboxTableLayout.Table state={state} loadingOptions={{ rows: 5 }} />
         }
         pagination={<InboxTableLayout.Pagination state={state} />}
       />
@@ -376,6 +368,4 @@ function ProjectsInboxView() {
   );
 }
 
-export default withPermissions(ProjectsInboxView, [
-  PERMISSIONS.projectManagement.list,
-]);
+export default ProjectsInboxView;

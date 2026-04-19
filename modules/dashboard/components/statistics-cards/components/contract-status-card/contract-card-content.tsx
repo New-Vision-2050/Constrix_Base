@@ -12,6 +12,7 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
   // declare and define helper state and variables
   const t = useTranslations("UserProfile.header.statisticsCards");
   const [passedPercentage, setPassedPercentage] = useState<number>();
+  const [remainingDays, setRemainingDays] = useState<number>();
 
   // handle side effects
   useEffect(() => {
@@ -20,22 +21,34 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
       const startDate = new Date(contractData?.start_date ?? "");
       const endDate = new Date(contractData?.end_date ?? "");
 
-      const now =
-        today < startDate ? startDate : today > endDate ? endDate : today;
-
       const totalDuration = endDate.getTime() - startDate.getTime();
-      const passedDuration = now.getTime() - startDate.getTime();
 
-      const _passedPercentage = Math.min(
-        100,
-        Math.max(0, (passedDuration / totalDuration) * 100)
-      );
+      if (totalDuration > 0) {
+        const now =
+          today < startDate ? startDate : today > endDate ? endDate : today;
 
-      setPassedPercentage(_passedPercentage);
+        const passedDuration = now.getTime() - startDate.getTime();
+
+        const _passedPercentage = Math.min(
+          100,
+          Math.max(0, (passedDuration / totalDuration) * 100)
+        );
+
+        setPassedPercentage(_passedPercentage);
+
+        const _remainingDays = Math.max(
+          0,
+          Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        );
+        setRemainingDays(_remainingDays);
+      } else {
+        setPassedPercentage(0);
+        setRemainingDays(0);
+      }
     }
   }, [contractData]);
 
-  const showPercentage = !isNaN(passedPercentage as number);
+  const showPercentage = passedPercentage !== undefined && !isNaN(passedPercentage);
   const startPercentage = showPercentage ? passedPercentage?.toFixed(1) : "-";
   const endPercentage = showPercentage
     ? (100 - (passedPercentage ?? 0))?.toFixed(1)
@@ -59,9 +72,9 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
           <span className="text-xs truncate">{contractData?.start_date}</span>
         </div>
 
-        {/* Divider */}
+        {/* Remaining Days */}
         <div className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-gray-700">
-          <span className="text-sm font-small">20</span>
+          <span className="text-sm font-small">{remainingDays ?? "-"}</span>
         </div>
 
         {/* End Date */}
