@@ -1,19 +1,21 @@
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import type {
-  UpdateAttachmentContractSettingsArgs,
-  UpdateAttachmentTermsContractSettingsArgs,
+  UpdateArchiveLibrarySettingsArgs,
   UpdateContractorContractSettingsArgs,
   UpdateDataSettingsArgs,
   UpdateEmployeeContractSettingsArgs,
   UpdateAttachmentCycleSettingsArgs,
+  UpdateRolesAndPermissionsSettingsArgs,
+  UpdateProjectSharingSettingsArgs,
 } from "@/services/api/projects/project-types/types/args";
 import type {
-  AttachmentContractSettings,
-  AttachmentTermsContractSettings,
+  ArchiveLibrarySettings,
   AttachmentCycleSettings,
   ContractorContractSettings,
   DataSettings,
   EmployeeContractSettings,
+  RolesAndPermissionsSettings,
+  ProjectSharingSettings,
 } from "@/services/api/projects/project-types/types/response";
 
 export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
@@ -21,8 +23,13 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
   "attachments",
   "contractors",
   "team",
+  "roles-and-permissions",
+  "project-sharing",
   "document-cycle",
 ]);
+
+/** Tabs grouped under «أصحاب المصلحة» in schema settings (not attachments / document-cycle). */
+export const STAKEHOLDER_GROUP_TAB_VALUES = ["team", "roles-and-permissions", "project-sharing"] as const;
 
 const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
   "is_reference_number",
@@ -36,15 +43,6 @@ const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
   "is_responsible_engineer",
 ];
 
-const ATTACHMENT_KEYS: (keyof UpdateAttachmentContractSettingsArgs)[] = [
-  "is_name",
-  "is_type",
-  "is_size",
-  "is_creator",
-  "is_create_date",
-  "is_downloadable",
-];
-
 function isTruthySetting(v: unknown): boolean {
   return v === true || v === 1;
 }
@@ -53,11 +51,12 @@ export function getTabBulkCheckboxState(
   tabValue: string,
   data: {
     dataSettings: DataSettings | null | undefined;
-    attachment: AttachmentContractSettings | null | undefined;
-    attachmentTerms: AttachmentTermsContractSettings | null | undefined;
+    archiveLibrary: ArchiveLibrarySettings | null | undefined;
     contractor: ContractorContractSettings | null | undefined;
     employee: EmployeeContractSettings | null | undefined;
     attachmentCycle: AttachmentCycleSettings | null | undefined;
+    rolesAndPermissions: RolesAndPermissionsSettings | null | undefined;
+    projectSharing: ProjectSharingSettings | null | undefined;
   },
 ): { checked: boolean; indeterminate: boolean } | null {
   if (!BULK_TOGGLE_SUPPORTED_TABS.has(tabValue)) return null;
@@ -72,16 +71,12 @@ export function getTabBulkCheckboxState(
   }
 
   if (tabValue === "attachments") {
-    const aKeys = ATTACHMENT_KEYS;
-    const aVals = aKeys.map((k) => data.attachment?.[k]);
-    const bVals = aKeys.map((k) => data.attachmentTerms?.[k]);
-    const allVals = [...aVals, ...bVals];
-    if (allVals.some((v) => v === undefined)) return null;
-    const onCount = allVals.filter(isTruthySetting).length;
-    const total = allVals.length;
-    if (onCount === 0) return { checked: false, indeterminate: false };
-    if (onCount === total) return { checked: true, indeterminate: false };
-    return { checked: false, indeterminate: true };
+    const v = data.archiveLibrary?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
   }
 
   if (tabValue === "contractors") {
@@ -111,7 +106,49 @@ export function getTabBulkCheckboxState(
     };
   }
 
+  if (tabValue === "roles-and-permissions") {
+    const v = data.rolesAndPermissions?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "project-sharing") {
+    const v = data.projectSharing?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
   return null;
+}
+
+/** Aggregate checkbox state for the stakeholder parent tab (all children must be fully on for checked). */
+export function getStakeholderGroupBulkState(
+  data: Parameters<typeof getTabBulkCheckboxState>[1],
+): { checked: boolean; indeterminate: boolean } | null {
+  const states = STAKEHOLDER_GROUP_TAB_VALUES.map((tabValue) =>
+    getTabBulkCheckboxState(tabValue, data),
+  );
+  if (states.some((s) => s === null)) return null;
+  const nonNull = states as { checked: boolean; indeterminate: boolean }[];
+  const anyIndeterminate = nonNull.some((s) => s.indeterminate);
+  if (anyIndeterminate) return { checked: false, indeterminate: true };
+  const onCount = nonNull.filter((s) => s.checked && !s.indeterminate).length;
+  if (onCount === 0) return { checked: false, indeterminate: false };
+  if (onCount === nonNull.length) return { checked: true, indeterminate: false };
+  return { checked: false, indeterminate: true };
+}
+
+export function isStakeholderGroupFullyEnabled(
+  data: Parameters<typeof getTabBulkCheckboxState>[1],
+): boolean {
+  const state = getStakeholderGroupBulkState(data);
+  return state?.checked === true && state.indeterminate === false;
 }
 
 /** True if every toggle in this tab is on; used to decide select-all vs clear-all. */
@@ -139,22 +176,13 @@ export async function bulkToggleTabSettings(
       return;
     }
     case "attachments": {
-      const payloadA = Object.fromEntries(
-        ATTACHMENT_KEYS.map((k) => [k, v]),
-      ) as UpdateAttachmentContractSettingsArgs;
-      const payloadB = Object.fromEntries(
-        ATTACHMENT_KEYS.map((k) => [k, v]),
-      ) as UpdateAttachmentTermsContractSettingsArgs;
-      await Promise.all([
-        ProjectTypesApi.updateAttachmentContractSettings(
-          projectTypeId,
-          payloadA,
-        ),
-        ProjectTypesApi.updateAttachmentTermsContractSettings(
-          projectTypeId,
-          payloadB,
-        ),
-      ]);
+      const payload: UpdateArchiveLibrarySettingsArgs = {
+        is_all_data_visible: v,
+      };
+      await ProjectTypesApi.updateArchiveLibrarySettings(
+        projectTypeId,
+        payload,
+      );
       return;
     }
     case "contractors": {
@@ -182,6 +210,26 @@ export async function bulkToggleTabSettings(
         is_all_data_visible: v,
       };
       await ProjectTypesApi.updateAttachmentCycleSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "roles-and-permissions": {
+      const payload: UpdateRolesAndPermissionsSettingsArgs = {
+        is_all_data_visible: v,
+      };
+      await ProjectTypesApi.updateRolesAndPermissionsSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "project-sharing": {
+      const payload: UpdateProjectSharingSettingsArgs = {
+        is_all_data_visible: v,
+      };
+      await ProjectTypesApi.updateProjectSharingSettings(
         projectTypeId,
         payload,
       );

@@ -11,7 +11,9 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import SecondLevelTabs from "./second-level-tabs";
 
 export default function RootLevelTabs() {
-  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(null);
+  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(
+    null,
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ["project-types", "roots"],
@@ -49,7 +51,10 @@ export default function RootLevelTabs() {
               </Tabs>
             </Paper>
             {selectedRoot && (
-              <SecondLevelTabs key={selectedRoot.id} parentId={selectedRoot.id} />
+              <SecondLevelTabs
+                key={selectedRoot.id}
+                parentId={selectedRoot.id}
+              />
             )}
           </>
         )}

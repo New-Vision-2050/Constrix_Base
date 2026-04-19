@@ -19,6 +19,7 @@ export default function useDocsData(
   sort?: string,
   fixedType?: string,
   projectId?: string,
+  isProject?: boolean,
 ) {
   return useQuery({
     queryKey: projectId
@@ -45,6 +46,7 @@ export default function useDocsData(
           searchData,
           sort,
           fixedType,
+          isProject,
         ],
     queryFn: () =>
       projectId
@@ -68,6 +70,7 @@ export default function useDocsData(
             searchData,
             sort,
             fixedType,
+            isProject,
           ),
     enabled: projectId ? Boolean(projectId) : true,
     refetchOnWindowFocus: false,
