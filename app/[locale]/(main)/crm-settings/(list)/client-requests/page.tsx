@@ -1,5 +1,10 @@
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import ClientRequestsList from "@/modules/crm-settings/client-requests";
 
-export default function ClientRequestsPage() {
+function ClientRequestsPage() {
   return <ClientRequestsList />;
 }
+export default withServerPermissionsPage(ClientRequestsPage, [
+  PERMISSIONS.clientRequest.list,
+]);
