@@ -9,6 +9,7 @@ import { getRoutesMap } from "./routes-map";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { isDisabledBreadcrumbSegment } from "./disabled-list";
 import { useSidebarMenu } from "@/hooks/useSidebarMenu";
+import { useBreadcrumbOptional } from "./BreadcrumbContext";
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   homeLabel,
@@ -19,6 +20,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   const locale = useLocale();
   const t = useTranslations("breadcrumbs");
   const { data } = useSidebarMenu();
+  const breadcrumbContext = useBreadcrumbOptional();
 
   const dynamicRoutes = useMemo(() => {
     return data?.map((item) => {
@@ -98,8 +100,13 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     );
   };
 
-  // Get label for ID segments from translation file
+  // Get label for ID segments from translation file or context
   const getIdSegmentLabel = (): string => {
+    // First check if we have a dynamic page title from context
+    if (breadcrumbContext?.pageTitle) {
+      return breadcrumbContext.pageTitle;
+    }
+
     // Get the translation key for "details" from the breadcrumbs namespace
     // We need to get this from the default routes map since it should be translated there
     if (routesMap["details"]) {
