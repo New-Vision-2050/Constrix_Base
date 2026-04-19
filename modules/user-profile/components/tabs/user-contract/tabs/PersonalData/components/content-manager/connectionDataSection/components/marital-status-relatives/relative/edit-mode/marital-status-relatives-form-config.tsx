@@ -6,7 +6,12 @@ import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
 import { MaritalStatusList } from "../../marital-status-enum";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+
+let maritalStatusOptionsCache: Array<{
+  id: string;
+  name: string;
+  type: string;
+}> = [];
 
 type PropsT = {
   relative?: Relative;
@@ -19,19 +24,20 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
   const formMode = !relative ? "Create" : "Edit";
   const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
-  const [maritalStatusOptions, setMaritalStatusOptions] = useState<Array<{
-    id: string;
-    name: string;
-    type: string;
-  }>>([]);
 
   const getMaritalStatusType = (id: string | undefined): string | undefined => {
     // Return undefined if id is not provided
     if (!id) return undefined;
     
-    // First try to find in loaded options
-    const foundType = maritalStatusOptions.find((item) => item.id === id)?.type;
+    // First try to find in loaded options (module-level cache)
+    const foundType = maritalStatusOptionsCache.find((item) => item.id === id)?.type;
     if (foundType) return foundType;
+
+    // Check if the value itself is a type string (from fallback MaritalStatusList)
+    const validTypes = ["married", "single", "not-married", "married-with-children"];
+    if (validTypes.includes(id)) {
+      return id; // The value is already a type
+    }
 
     // Fallback to relative's marital_status if in edit mode
     if (relative?.marital_status?.id === id) {
@@ -67,7 +73,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
                   name: string;
                   type: string;
                 }>;
-                setMaritalStatusOptions(items);
+                maritalStatusOptionsCache = items;
                 return items.map((item) => ({
                   value: item.id,
                   label: item.name,

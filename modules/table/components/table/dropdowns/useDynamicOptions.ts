@@ -98,6 +98,11 @@ export const useDynamicOptions = ({
         // Update the URL ref
         urlRef.current = url;
 
+        // If transformResponse is provided, use it to transform the data
+        if (dynamicConfig?.transformResponse) {
+          return dynamicConfig.transformResponse(data);
+        }
+
         return extractDropdownOptions(
           data,
           dynamicConfig?.valueField || "id",
