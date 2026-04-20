@@ -55,10 +55,16 @@ const ToggleTheme = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={isRtl ? "start" : "end"}>
-        <DropdownMenuItem onClick={() => handleTheme(isGreen ? (theme === "green-dark" ? "dark" : "light") : theme || "dark")}>
+        <DropdownMenuItem
+          className={!isGreen ? "bg-accent dark:bg-white/10" : ""}
+          onClick={() => handleTheme(isGreen ? (theme === "green-dark" ? "dark" : "light") : theme || "dark")}
+        >
           Default
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleTheme(isGreen ? theme : (theme === "dark" || theme === "system" ? "green-dark" : "green-light"))}>
+        <DropdownMenuItem
+          className={isGreen ? "bg-accent dark:bg-white/10" : ""}
+          onClick={() => handleTheme(isGreen ? theme : (theme === "dark" || theme === "system" ? "green-dark" : "green-light"))}
+        >
           <span className="flex items-center gap-1.5">
             <span
               className="inline-block h-2.5 w-2.5 rounded-full"
