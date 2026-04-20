@@ -1,14 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import LightIcon from "@/public/icons/light";
+import { Palette } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocale } from "next-intl";
@@ -45,11 +43,6 @@ const ToggleTheme = () => {
     setTheme(value);
   };
 
-  const handleGreenSystem = () => {
-    localStorage.setItem(GREEN_SYSTEM_KEY, "true");
-    resolveGreenSystem();
-  };
-
   const isGreen =
     theme === "green-light" ||
     theme === "green-dark";
@@ -58,22 +51,14 @@ const ToggleTheme = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size={"icon"} variant={"ghost"}>
-          <LightIcon />
+          <Palette className="h-7 w-7" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={isRtl ? "start" : "end"}>
-        <DropdownMenuLabel>Default</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => handleTheme("light")}>
-          Light
+        <DropdownMenuItem onClick={() => handleTheme(isGreen ? (theme === "green-dark" ? "dark" : "light") : theme || "dark")}>
+          Default
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleTheme("system")}>
-          System
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => handleTheme(isGreen ? theme : (theme === "dark" || theme === "system" ? "green-dark" : "green-light"))}>
           <span className="flex items-center gap-1.5">
             <span
               className="inline-block h-2.5 w-2.5 rounded-full"
@@ -81,15 +66,6 @@ const ToggleTheme = () => {
             />
             Green
           </span>
-        </DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => handleTheme("green-light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleTheme("green-dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleGreenSystem}>
-          System
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
