@@ -1,6 +1,7 @@
 import React from "react";
 import ToggleLang from "./toggle-lang";
 import ToggleTheme from "./toggle-them";
+import ToggleMode from "./toggle-mode";
 import Notification from "./notification";
 import ProfileDrop from "./profile-drop";
 import Breadcrumbs, { getRoutesMap } from "../breadcrumbs";
@@ -38,8 +39,9 @@ const Header = ({ onMobileMenuClick }: HeaderProps) => {
             routesMap={routesMap}
           />
         </div>
-        <div className="flex gap-6">
+        <div className="flex gap-6 items-center">
           <ToggleLang />
+          <ToggleMode />
           <ToggleTheme />
           <Notification />
           <ProfileDrop />
