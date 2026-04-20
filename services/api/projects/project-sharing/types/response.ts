@@ -108,11 +108,16 @@ export type ProjectShareAssignment = {
   schema_ids?: number[];
   shareable_id?: string;
   shareable_type?: string;
+  /** Nested share target (e.g. project) when present on list payload. */
+  shareable?: { id: string; name: string; serial_number: string | null } | null;
   responded_at?: string | null;
   responded_by?: ProjectShareActor | null;
   owner_company?: { id: string; name: string; serial_number?: string | null } | null;
   shared_by?: ProjectShareActor | null;
   shared_with_company?: ProjectShareWithCompany | null;
+  type?: string | null;
+  relation?: string | null;
+  role?: string | null;
   /** Legacy/alternate shape from older API versions */
   user?: { id: string; name: string; email?: string } | null;
   assigned_at?: string;
