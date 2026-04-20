@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { AvatarGroup } from "../avatar-group";
 import { SidebarProgramsListV2 } from "./sidebar-programs-v2";
 import SidebarFooterContent from "./sidebar-footer-content";
 import { useFinalSidebarProjects } from "@/hooks/use-sidebar-projects/use-all-sidebar-projects";
+import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
 
 interface SidebarContentWrapperProps {
   name?: string;
@@ -34,6 +35,8 @@ export function SidebarContentWrapper({
   const { data: companyRes } = useCurrentAuthCompany();
   const company = companyRes?.payload;
   const displaySerialNumber = serialNumber || company?.serial_no;
+  const { data: profileData } = useUserProfileData(user?.id);
+  const userImageUrl = profileData?.image_url || user?.image_url;
 
   const { projects, isLoading, hasData } = useFinalSidebarProjects(userTypes);
 
@@ -71,7 +74,7 @@ export function SidebarContentWrapper({
             <AvatarGroup
               fullName={user?.name ?? ""}
               alt={user?.name ?? ""}
-              src="https://github.com/shadcn.png"
+              src={userImageUrl}
             />
             <p className="truncate">
               {t("Sidebar.Welcome")} {user?.name}
