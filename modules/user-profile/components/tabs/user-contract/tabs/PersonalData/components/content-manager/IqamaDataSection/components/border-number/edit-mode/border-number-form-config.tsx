@@ -47,28 +47,7 @@ export const BorderNumberFormConfig = () => {
             label: t("borderNumberStartDate"),
             type: "date",
             placeholder: t("borderNumberStartDate"),
-            maxDate: {
-              formId: `ConnectionInformation-data-form`,
-              field: "border_number_end_date",
-            },
             validation: [],
-          },
-          {
-            name: "border_number_end_date",
-            label: t("borderNumberEndDate"),
-            type: "date",
-            placeholder: t("borderNumberEndDate"),
-            minDate: {
-              formId: `ConnectionInformation-data-form`,
-              field: "border_number_start_date",
-            },
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: t("borderNumberEndDateRequired"),
-              },
-            ],
           },
           {
             name: "file_border_number",
@@ -89,7 +68,6 @@ export const BorderNumberFormConfig = () => {
       },
     ],
     initialValues: {
-      border_number_end_date: userIdentityData?.border_number_end_date,
       border_number_start_date: userIdentityData?.border_number_start_date,
       border_number: userIdentityData?.border_number,
       file_border_number: userIdentityData?.file_border_number,
@@ -115,12 +93,10 @@ export const BorderNumberFormConfig = () => {
         return `${year}-${month}-${day}`;
       };
       const startDate = new Date(formData?.border_number_start_date as string);
-      const endDate = new Date(formData?.border_number_end_date as string);
 
       const body = {
         ...formData,
         border_number_start_date: formatDate(startDate),
-        border_number_end_date: formatDate(endDate),
       };
 
       return await defaultSubmitHandler(
