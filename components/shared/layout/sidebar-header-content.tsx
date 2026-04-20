@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
+import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
 
 const SidebarHeaderContent = ({
   name,
@@ -22,8 +23,10 @@ const SidebarHeaderContent = ({
   const t = useTranslations();
   const { data: companyRes } = useCurrentAuthCompany();
   const company = companyRes?.payload;
+  const { data: profileData } = useUserProfileData(user?.id);
   
   const displaySerialNumber = serialNumber || company?.serial_no;
+  const userImageUrl = profileData?.image_url || user?.image_url;
 
   return (
     <>
@@ -76,7 +79,7 @@ const SidebarHeaderContent = ({
         <AvatarGroup
           fullName={user?.name ?? ""}
           alt={user?.name ?? ""}
-          src="https://github.com/shad\cn.png"
+          src={userImageUrl}
         />
         <p
           className={cn(
