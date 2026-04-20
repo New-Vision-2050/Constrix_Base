@@ -78,6 +78,17 @@ export const companyStructureMessages = new MessagesGroup({
   }),
   ManagementStructure: new MessagesGroup({
     loading: _m("Loading Managements data...", "تحميل بيانات الإدارات..."),
-    confirmDelete: _m("Are you sure you want to delete this management?", "هل انت متأكد من حذف هذه الإدارة؟")
+    confirmDelete: _m("Are you sure you want to delete this management?", "هل انت متأكد من حذف هذه الإدارة؟"),
+    deleteError: _m("Could not delete this management.", "تعذر حذف هذه الإدارة."),
+    deleteSuccess: _m("Management deleted successfully.", "تم حذف الإدارة بنجاح."),
+    edit: _m("Edit", "تعديل"),
+    delete: _m("Delete", "حذف"),
+    addManagement: _m("Add management", "إضافة إدارة"),
+    deleteErrors: new MessagesGroup({
+      hasChildren: _m(
+        "Cannot delete a management that still has child units.",
+        "لا يمكن حذف إدارة ما زالت لديها وحدات فرعية."
+      )
+    })
   })
 });
