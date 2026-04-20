@@ -33,6 +33,7 @@ import {
   DropdownMenuSubTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { truncateString } from "@/utils/truncate-string";
+import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
 // import { useLogout } from '@/modules/auth/store/mutations'
 
 interface menuItem {
@@ -47,6 +48,9 @@ interface menuItem {
 const ProfileDrop = () => {
   const t = useTranslations("Header");
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+  const { data: profileData } = useUserProfileData(user?.id);
+  const userImageUrl = profileData?.image_url || user?.image_url;
 
   /** Synced from cookies + updated on branch click so the UI reacts without a full reload. */
   const [selectedBranch, setSelectedBranch] = useState<{
@@ -55,7 +59,6 @@ const ProfileDrop = () => {
   } | null>(null);
 
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
   const { data, isSuccess } = useCurrentCompany();
   const [open, setOpen] = useState<boolean>(false);
   const [branches, setBranches] = useState<menuItem[]>([]);
@@ -191,7 +194,7 @@ const ProfileDrop = () => {
         <AvatarGroup
           fullName={user?.name}
           alt={user?.name}
-          src="https://github.com/shad\cn.png"
+          src={userImageUrl}
         />
       )}
       <DropdownMenu dir="rtl" open={open} onOpenChange={setOpen}>

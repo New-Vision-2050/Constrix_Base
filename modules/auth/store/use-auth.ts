@@ -6,6 +6,7 @@ type User = {
   name: string;
   email: string;
   is_super_admin: number;
+  image_url?: string;
 };
 
 type AuthState = {
