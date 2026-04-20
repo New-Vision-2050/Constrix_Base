@@ -1,10 +1,12 @@
 import { MessagesGroup, _m } from "../../types";
 import { projectInboxMessages } from "./inbox";
+import { projectShareTabMessages } from "./share-tab";
 import { projectSettingsMessages } from "./settings";
 
 export const projectMessages = new MessagesGroup({
   Settings: projectSettingsMessages,
   inbox: projectInboxMessages,
+  shareTab: projectShareTabMessages,
   addProject: _m("Add Project", "إضافة مشروع"),
   editProject: _m("Edit Project", "تعديل مشروع"),
   save: _m("Save", "حفظ"),
