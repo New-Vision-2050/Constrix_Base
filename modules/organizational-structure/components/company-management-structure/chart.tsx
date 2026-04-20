@@ -9,6 +9,7 @@ import { CloneManagement } from "./clone-management";
 import { GetOrgStructureManagementFormConfig } from "./set-management-form";
 import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
 import { apiClient } from "@/config/axios-config";
+import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { useTranslations } from "next-intl";
@@ -23,6 +24,20 @@ type PropsT = {
   branchId: string | number;
   companyData?: CompanyData
   mainBranch?: {id:string ; name:string}
+};
+
+function normalizeManagementDeleteApiMessage(message: string): string {
+  return message
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/\.+$/g, "")
+    .toLowerCase();
+}
+
+/** Backend `message` values (normalized) → next-intl keys under `ManagementStructure`. */
+const MANAGEMENT_DELETE_ERROR_I18N_KEY: Record<string, string> = {
+  "cannot delete management hierarchy that has children":
+    "deleteErrors.hasChildren",
 };
 
 const BranchManagementsStructure = (props: PropsT) => {
@@ -94,14 +109,13 @@ const BranchManagementsStructure = (props: PropsT) => {
   const DropDownMenu = (node: OrgChartNode): DropdownItemT[] => {
     return [
       {
-        text: "تعديل",
+        text: t("edit"),
         onClick: () => {
           onEditBtnClick?.(node);
-          console.log("edit node");
         },
       },
       {
-        text: "حذف",
+        text: t("delete"),
         onClick: () => {
           handleDeleteManagement?.(node.id);
         },
@@ -112,7 +126,7 @@ const BranchManagementsStructure = (props: PropsT) => {
   const listModeDropDownMenu = (node: OrgChartNode): DropdownItemT[] => {
     return [
       {
-        text: "أضافة ادارة",
+        text: t("addManagement"),
         onClick: () => {
           onAddBtnClick?.(node);
         },
@@ -132,10 +146,23 @@ const BranchManagementsStructure = (props: PropsT) => {
       .then(() => {
         refreshOrgChart();
         setOpenDeleteDialog(false);
-        toast.success("management deleted successfully");
+        toast.success(t("deleteSuccess"));
       })
       .catch((err) => {
-        console.log("error in delete management", err);
+        const apiMessage = isAxiosError(err)
+          ? String(
+              (err.response?.data as { message?: string } | undefined)
+                ?.message ?? ""
+            ).trim()
+          : "";
+        const mappedKey =
+          MANAGEMENT_DELETE_ERROR_I18N_KEY[
+            normalizeManagementDeleteApiMessage(apiMessage)
+          ];
+        const message = mappedKey
+          ? t(mappedKey as "deleteErrors.hasChildren")
+          : apiMessage || t("deleteError");
+        toast.error(message);
       });
   };
 
@@ -179,7 +206,7 @@ const BranchManagementsStructure = (props: PropsT) => {
             listModeDropDownMenu={listModeDropDownMenu}
             listViewAdditionalActions={
               <Can check={[PERMISSIONS.organization.management.create]}>
-                <Button onClick={() => openAddSheet()}>اضافة ادارة</Button>
+                <Button onClick={() => openAddSheet()}>{t("addManagement")}</Button>
               </Can>
             }
           />

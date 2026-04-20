@@ -32,18 +32,6 @@ export default function UserIqamaBorderNumberPreviewMode() {
         />
       </div>
 
-      <div className="p-2">
-        <PreviewTextField
-          required
-          label={t("borderNumberEndDate")}
-          value={checkString(
-            userIdentityData?.border_number_end_date as string
-          )}
-          valid={Boolean(userIdentityData?.border_number_end_date)}
-          type="date"
-        />
-      </div>
-
       {Array.isArray(userIdentityData?.file_border_number) &&
       userIdentityData?.file_border_number?.length > 0 ? (
         userIdentityData?.file_border_number?.map((media) => (

@@ -16,8 +16,8 @@ export default function StatisticsCardsSection() {
     const startDate = employmentContract?.start_date || widgetData.contract.start_date;
     let endDate = widgetData.contract.end_date;
 
-    // If API returns same date for start and end, calculate end from start_date + contract_duration
-    if (endDate === startDate && employmentContract?.contract_duration) {
+    // Always recalculate end date from start_date + contract_duration when available
+    if (employmentContract?.contract_duration && startDate) {
       const start = new Date(startDate);
       if (!isNaN(start.getTime())) {
         const durationNum = Number(employmentContract.contract_duration);
