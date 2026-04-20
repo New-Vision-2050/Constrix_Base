@@ -28,13 +28,6 @@ export function getCrmProject({
     show: !isCentralCompany,
     sub_entities: [
       {
-        name: t("Sidebar.PricesOffers"),
-        url: ROUTER.CRM.pricesOffers,
-        icon: FileText,
-        isActive: fullPath === ROUTER.CRM.pricesOffers,
-        show: can([PERMISSIONS.crm.pricesOffers.list]),
-      },
-      {
         name: t("Sidebar.ClientRequests"),
         url: ROUTER.CRM.clientRequests,
         icon: FileText,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -24,9 +24,15 @@ import { TableProps } from "./types";
 export function createTableComponent<TRow>() {
   const TableComponent = (props: TableProps<TRow>) => {
     const t = useTranslations("Table");
+    /** Avoid hydration mismatch: next-themes is undefined on the server but may match localStorage on first client paint. */
+    const [themeReady, setThemeReady] = useState(false);
+    useEffect(() => {
+      setThemeReady(true);
+    }, []);
     const { theme: currentTheme } = useTheme();
     const isGreenTheme =
-      currentTheme === "green-light" || currentTheme === "green-dark";
+      themeReady &&
+      (currentTheme === "green-light" || currentTheme === "green-dark");
 
     // Extract props based on whether state is provided
     const isUsingState = "state" in props && props.state !== undefined;
