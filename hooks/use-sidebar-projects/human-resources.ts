@@ -25,7 +25,13 @@ export function getHumanResourcesProject({
         url: ROUTER.WORK_PANEL,
         icon: LayoutDashboardIcon,
         isActive: pageName === ROUTER.WORK_PANEL,
-        show: !isCentralCompany,
+        show:
+          !isCentralCompany &&
+          can([
+            PERMISSIONS.humanResources.charts.view,
+            PERMISSIONS.humanResources.procedures.view,
+            PERMISSIONS.humanResources.services.view,
+          ]),
       },
       {
         name: t("Sidebar.OrganizationalStructure"),

@@ -129,4 +129,9 @@ export const PERMISSIONS = {
     page: create("ECOMMERCE_PAGE"),
     paymentMethod: create("ECOMMERCE_PAYMENT_METHOD"),
   },
+  humanResources: {
+    charts: create("HUMAN_RESOURCES_CHARTS"),
+    procedures: create("HUMAN_RESOURCES_PROCEDURES"),
+    services: create("HUMAN_RESOURCES_SERVICES"),
+  },
 };
