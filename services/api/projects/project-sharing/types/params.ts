@@ -3,6 +3,10 @@ export type ShareProjectPayload = {
   company_serial_number: string;
   schema_ids: number[];
   notes?: string;
+  /** Optional — from `resource-shares/project-share-types` lists. */
+  type_id?: number;
+  relation_id?: number;
+  role_id?: number;
 };
 
 /** POST `projects/sharing/invitations/respond` — inbox accept / reject. */

@@ -283,9 +283,7 @@ function ClientRequestsList() {
             </FormControl>
 
             <FormControl size="small" fullWidth>
-              <InputLabel>
-                {t("clientRequests.filter.customerName")}
-              </InputLabel>
+              <InputLabel>{t("clientRequests.filter.customerName")}</InputLabel>
               <Select
                 value={filterClientName}
                 label={t("clientRequests.filter.customerName")}
@@ -301,9 +299,7 @@ function ClientRequestsList() {
             </FormControl>
 
             <FormControl size="small" fullWidth>
-              <InputLabel>
-                {t("clientRequests.filter.requestType")}
-              </InputLabel>
+              <InputLabel>{t("clientRequests.filter.requestType")}</InputLabel>
               <Select
                 value={filterRequestType}
                 label={t("clientRequests.filter.requestType")}
@@ -401,6 +397,4 @@ function ClientRequestsList() {
   );
 }
 
-export default withPermissions(ClientRequestsList, [
-  PERMISSIONS.clientRequest.list,
-]);
+export default ClientRequestsList;
