@@ -36,7 +36,7 @@ const ToggleMode = () => {
       className="relative flex items-center justify-between px-2 w-[60px] h-8 rounded-full bg-slate-700/90 backdrop-blur-sm border border-slate-600/40 shadow-inner cursor-pointer overflow-visible"
       aria-label="Toggle dark mode"
     >
-      {/* Sun icon - Left side, smaller */}
+      {/* Sun icon - Left side (for light mode) */}
       <Sun
         className={cn(
           "h-3.5 w-3.5 transition-all duration-700 ease-out z-20",
@@ -47,7 +47,7 @@ const ToggleMode = () => {
         strokeWidth={2}
       />
 
-      {/* Moon icon - Right side, smaller */}
+      {/* Moon icon - Right side (for dark mode) */}
       <Moon
         className={cn(
           "h-3.5 w-3.5 transition-all duration-700 ease-out z-20",
@@ -63,8 +63,8 @@ const ToggleMode = () => {
         className={cn(
           "absolute h-7 w-7 rounded-full bg-gradient-to-br from-white to-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-all duration-700 ease-out z-10",
           isDark 
-            ? "left-[calc(100%-30px)]" 
-            : "left-[2px]"
+            ? "left-[2px]" 
+            : "left-[calc(100%-30px)]"
         )}
       />
     </button>
