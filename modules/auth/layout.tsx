@@ -46,22 +46,24 @@ export default function AuthLayout({
           <h1 className="order-2 md:order-2 text-xl md:text-4xl text-center">
             {t("Login.Control_panel")}
           </h1>
-          <div className="w-24 h-24 order-1 md:order-3 mb-2 md:mb-0 scale-75 md:scale-100 rounded-full overflow-hidden">
+          <div className="order-1 md:order-3 mb-2 md:mb-0 rounded-full overflow-hidden w-[50px] h-[50px]">
             {mainLogo ? (
               <Image
                 src={mainLogo}
                 alt="logo"
-                width={96}
-                height={96}
-                className="w-full h-full object-cover rounded-full"
+                width={50}
+                height={50}
+                priority
+                className="w-[60px] h-[60px] rounded-full object-cover overflow-hidden"
               />
             ) : (
               <Image
                 src={LogoPlaceholder}
                 alt={"logo placeholder"}
-                width={76}
-                height={76}
-                className="w-full h-full object-cover rounded-full"
+                width={50}
+                height={50}
+                priority
+                className="w-[50px] h-[50px] rounded-full object-cover overflow-hidden"
               />
             )}
           </div>
