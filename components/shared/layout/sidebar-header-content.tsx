@@ -32,9 +32,8 @@ const SidebarHeaderContent = ({
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    const textToCopy = `${displayName}\n${displaySerialNumber}`;
     try {
-      await navigator.clipboard.writeText(textToCopy);
+      await navigator.clipboard.writeText(displaySerialNumber || "");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
