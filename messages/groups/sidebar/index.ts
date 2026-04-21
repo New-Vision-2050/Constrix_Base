@@ -25,6 +25,7 @@ export const sidebarMessages = new MessagesGroup({
   BranchesInformation: _m("Branches Information", "معلومات الفروع"),
   BranchName: _m("Branch Name", "اسم الفرع"),
   CompanyName: _m("Company Name", "اسم الشركة"),
+  CopyCompanyInfo: _m("Copy company info", "نسخ معلومات الشركة"),
   CompanyNameInEnglish: _m("Company Name in English", "اسم الشركة بالانجليزي"),
   CompanyEntity: _m("Company Entity", "كيان الشركة"),
   CompanyField: _m("Company Field", "مجال الشركة"),

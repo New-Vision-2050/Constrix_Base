@@ -1,6 +1,6 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useState } from "react";
 import { AvatarGroup } from "../avatar-group";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
+import { Copy, Check } from "lucide-react";
 
 const SidebarHeaderContent = ({
   name,
@@ -27,6 +28,18 @@ const SidebarHeaderContent = ({
   
   const displaySerialNumber = serialNumber || company?.serial_no;
   const userImageUrl = profileData?.image_url || user?.image_url;
+  const displayName = name || company?.name || t("Sidebar.CompanyName");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(displaySerialNumber || "");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   return (
     <>
@@ -60,14 +73,27 @@ const SidebarHeaderContent = ({
           {name || t("Sidebar.CompanyName")}
         </p>
         {displaySerialNumber && (
-          <p
+          <div
             className={cn(
-              "transition text-xs opacity-70 truncate font-semibold mt-1",
+              "transition flex items-center gap-1 mt-1 flex-row-reverse",
               open ? "opacity-100" : "opacity-0"
             )}
           >
-            {displaySerialNumber}
-          </p>
+            <p className="text-xs opacity-70 truncate font-semibold">
+              {displaySerialNumber}
+            </p>
+            <button
+              onClick={handleCopy}
+              className="p-1 rounded hover:bg-white/10 transition-colors"
+              title={t("Sidebar.CopyCompanyInfo")}
+            >
+              {copied ? (
+                <Check className="w-3 h-3 text-green-400" />
+              ) : (
+                <Copy className="w-3 h-3 opacity-70 hover:opacity-100" />
+              )}
+            </button>
+          </div>
         )}
       </div>
       <div
