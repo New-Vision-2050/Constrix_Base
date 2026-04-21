@@ -66,7 +66,8 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-
+  const cookiesStore = await cookies();
+  const storedTheme = cookiesStore.get("theme")?.value;
   if (!routing.locales.includes(locale as "ar" | "en")) {
     return notFound();
   }
@@ -82,12 +83,12 @@ export default async function RootLayout({
         <MuiCacheProvider key={direction} direction={direction}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme={storedTheme || "dark"}
             enableSystem
             themes={["light", "dark", "system", "green-light", "green-dark"]}
             disableTransitionOnChange
           >
-            <CustomThemeProvider direction={direction}>
+            <CustomThemeProvider direction={direction} theme={storedTheme}>
               <NextIntlClientProvider messages={messages}>
                 <NuqsAdapter>
                   <main>
