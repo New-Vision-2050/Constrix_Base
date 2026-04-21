@@ -20,8 +20,9 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
   // declare and define component state
   const t = useTranslations("UserProfile.header.uploadPhoto");
   const [openDialog, setOpenDialog] = useState(false);
-  const { user, isLoading, userPersonalData, handleUpdateImage } =
+  const { user, isLoading, userPersonalData, handleUpdateImage, userId: profileUserId } =
     useUserProfileCxt();
+  const photoUserId = profileUserId ?? userId;
   
   const { userContactData } = useConnectionDataCxt();
   const { userContractData } =
@@ -72,8 +73,8 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
           title={t("title")}
           open={openDialog}
           setOpen={setOpenDialog}
-          validateImageFn={validateProfileImage}
-          uploadImageFn={uploadProfileImage}
+          validateImageFn={(file) => validateProfileImage(file, photoUserId)}
+          uploadImageFn={(file) => uploadProfileImage(file, photoUserId)}
           onSuccess={(url: string) => {
             handleUpdateImage(url);
           }}

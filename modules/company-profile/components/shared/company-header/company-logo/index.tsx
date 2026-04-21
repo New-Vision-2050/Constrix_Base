@@ -13,9 +13,12 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CompanyLogo = ({
+  companyId,
   logo,
   isPending,
 }: {
+  /** Resolved from current company when URL has no `[company_id]` segment */
+  companyId?: string;
   logo: string | undefined;
   isPending: boolean;
 }) => {
@@ -62,7 +65,7 @@ const CompanyLogo = ({
               إضافة صورة
             </DialogTitle>
           </DialogHeader>
-          <ChangeLogo handleClose={handleClose} />
+          <ChangeLogo companyId={companyId} handleClose={handleClose} />
         </DialogContent>
       </Dialog>
     </>

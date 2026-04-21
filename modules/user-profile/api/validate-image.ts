@@ -11,7 +11,7 @@ type ResponseT = {
 export default async function validateProfileImage(image: File) {
   const res = await apiClient.post<ResponseT>(
     `/company-users/validate-photo`,
-    serialize({ image })
+    serialize({ image }),
   );
 
   return res.data.payload;

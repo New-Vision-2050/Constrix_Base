@@ -8,10 +8,10 @@ type ResponseT = {
   payload: ProfileImageMsg[];
 };
 
-export default async function validateProfileImage(image: File) {
+export default async function validateProfileImage(image: File, userId: string) {
   const res = await apiClient.post<ResponseT>(
-    `/company-users/validate-photo`,
-    serialize({ image })
+    `/company-users/validate-photo/${userId}`,
+    serialize({ image }),
   );
 
   return res.data.payload;

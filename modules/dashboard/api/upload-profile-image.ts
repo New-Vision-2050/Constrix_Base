@@ -7,10 +7,10 @@ type ResponseT = {
   payload: { image_url: string };
 };
 
-export default async function uploadProfileImage(image: File) {
+export default async function uploadProfileImage(image: File, userId: string) {
   const res = await apiClient.post<ResponseT>(
-    `/company-users/upload-photo`,
-    serialize({ image })
+    `/company-users/upload-photo/${userId}`,
+    serialize({ image}),
   );
 
   return res.data.payload;
