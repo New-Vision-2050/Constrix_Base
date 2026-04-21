@@ -115,9 +115,9 @@ export type ProjectShareAssignment = {
   owner_company?: { id: string; name: string; serial_number?: string | null } | null;
   shared_by?: ProjectShareActor | null;
   shared_with_company?: ProjectShareWithCompany | null;
-  type?: string | null;
-  relation?: string | null;
-  role?: string | null;
+  type?: string | { id: number; name: string } | null;
+  relation?: string | { id: number; name: string } | null;
+  role?: string | { id: number; name: string } | null;
   /** Legacy/alternate shape from older API versions */
   user?: { id: string; name: string; email?: string } | null;
   assigned_at?: string;

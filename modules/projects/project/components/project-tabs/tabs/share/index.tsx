@@ -26,6 +26,24 @@ function toEntityRef(
   };
 }
 
+function extractNameFromObject(value: any): string | null {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.name) {
+    const nameStr = value.name;
+    if (typeof nameStr === 'string' && nameStr.trim().startsWith('{')) {
+      try {
+        const parsed = JSON.parse(nameStr);
+        return parsed.ar || parsed.en || nameStr;
+      } catch {
+        return nameStr;
+      }
+    }
+    return nameStr;
+  }
+  return null;
+}
+
 function mapAssignmentToRow(a: ProjectShareAssignment): ProjectShareRow {
   const withCo = a.shared_with_company;
   return {
@@ -34,10 +52,10 @@ function mapAssignmentToRow(a: ProjectShareAssignment): ProjectShareRow {
     updated_at: a.updated_at ?? "",
     notes: a.notes ?? null,
     owner_company: toEntityRef(a.owner_company),
-    relation: a.relation ?? null,
+    relation: extractNameFromObject(a.relation),
     responded_at: a.responded_at ?? null,
     responded_by: a.responded_by ?? null,
-    role: a.role ?? null,
+    role: extractNameFromObject(a.role),
     schema_ids: a.schema_ids ?? [],
     shareable: a.shareable ? toEntityRef(a.shareable) : null,
     shareable_id: a.shareable_id ?? "",
@@ -51,7 +69,7 @@ function mapAssignmentToRow(a: ProjectShareAssignment): ProjectShareRow {
         }
       : null,
     status: (a.status ?? "").trim(),
-    type: a.type ?? null,
+    type: extractNameFromObject(a.type),
   };
 }
 
