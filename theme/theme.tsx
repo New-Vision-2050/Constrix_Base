@@ -5,7 +5,7 @@ import {
   responsiveFontSizes,
 } from "@mui/material/styles";
 import { DarkPalette } from "./dark.palette";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useTheme } from "next-themes";
 import { LightPalette } from "./light.palette";
 import { GreenLightPalette } from "./green-light.palette";
@@ -30,20 +30,12 @@ declare module "@mui/material/styles" {
 export default function CustomThemeProvider({
   children,
   direction,
+  theme: overrideTheme,
 }: CustomThemeProviderProps) {
   const { theme: currentTheme, systemTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const effectiveTheme = mounted
-    ? currentTheme === "system"
-      ? systemTheme
-      : currentTheme
-    : "dark";
-
+  const effectiveTheme =
+    overrideTheme || (currentTheme === "system" ? systemTheme : currentTheme);
   const palette = useMemo(() => {
     switch (effectiveTheme) {
       case "green-light":
@@ -129,7 +121,7 @@ export default function CustomThemeProvider({
         },
       },
     });
-  }, [palette, direction]);
+  }, [palette, direction, effectiveTheme]);
 
   const withResponsiveFontSizes = useMemo(
     () => ({ ...responsiveFontSizes(theme), direction }),
@@ -145,4 +137,5 @@ export default function CustomThemeProvider({
 type CustomThemeProviderProps = {
   children: React.ReactNode;
   direction: "rtl" | "ltr";
+  theme?: string;
 };
