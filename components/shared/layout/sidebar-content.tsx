@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
@@ -12,6 +13,7 @@ import { SidebarProgramsListV2 } from "./sidebar-programs-v2";
 import SidebarFooterContent from "./sidebar-footer-content";
 import { useFinalSidebarProjects } from "@/hooks/use-sidebar-projects/use-all-sidebar-projects";
 import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
+import { Copy, Check } from "lucide-react";
 
 interface SidebarContentWrapperProps {
   name?: string;
@@ -37,6 +39,19 @@ export function SidebarContentWrapper({
   const displaySerialNumber = serialNumber || company?.serial_no;
   const { data: profileData } = useUserProfileData(user?.id);
   const userImageUrl = profileData?.image_url || user?.image_url;
+  const displayName = name || company?.name || t("Sidebar.CompanyName");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    const textToCopy = `${displayName}\n${displaySerialNumber}`;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   const { projects, isLoading, hasData } = useFinalSidebarProjects(userTypes);
 
@@ -65,9 +80,22 @@ export function SidebarContentWrapper({
               {name || t("Sidebar.CompanyName")}
             </p>
             {displaySerialNumber && (
-              <p className="text-xs opacity-70 truncate font-semibold mt-1">
-                {displaySerialNumber}
-              </p>
+              <div className="flex items-center gap-1 mt-1 flex-row-reverse">
+                <p className="text-xs opacity-70 truncate font-semibold">
+                  {displaySerialNumber}
+                </p>
+                <button
+                  onClick={handleCopy}
+                  className="p-1 rounded hover:bg-white/10 transition-colors"
+                  title={t("Sidebar.CopyCompanyInfo")}
+                >
+                  {copied ? (
+                    <Check className="w-3 h-3 text-green-400" />
+                  ) : (
+                    <Copy className="w-3 h-3 opacity-70 hover:opacity-100" />
+                  )}
+                </button>
+              </div>
             )}
           </div>
           <div className="flex gap-5 my-5 pr-5">
