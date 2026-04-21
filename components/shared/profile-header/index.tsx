@@ -48,7 +48,6 @@ export default function UserProfileHeader(props: PropsT) {
     actionSlot,
   } = props;
   
-  console.log("imgSrc", imgSrc);
 
   return (
     <div className="bg-sidebar shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6">
