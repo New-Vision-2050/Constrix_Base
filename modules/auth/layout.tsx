@@ -22,7 +22,7 @@ export default function AuthLayout({
   const sparklesBg: Record<string, string> = {
     light: "#ffffff",
     dark: "#18003A",
-    "green-light": "#F3F4F8",
+    "green-light": "#54C08A",
     "green-dark": "#092A1E",
   };
   const sparklesParticle: Record<string, string> = {
@@ -36,7 +36,7 @@ export default function AuthLayout({
   const particleColor = sparklesParticle[currentTheme] ?? sparklesParticle.dark;
 
   return (
-    <main className="min-h-screen flex flex-col relative overflow-hidden ">
+    <main className="min-h-screen   flex flex-col relative overflow-hidden ">
       {/* Language switcher */}
       {/* <div className="fixed top-4 end-4 z-50">
         <RenderLocaleSwitch />
@@ -54,7 +54,10 @@ export default function AuthLayout({
       />
 
       {/* Header with logos */}
-      <header className="w-full  pt-8 pb-16 rounded-b-[50%] z-10">
+      <header
+        className="w-full pt-8 pb-16 rounded-b-[50%] z-10"
+        style={{ backgroundColor: bgColor }}
+      >
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="order-3 md:order-1 mt-2 md:mt-0 scale-75 md:scale-100">
             <ConstrixIcon />
@@ -94,7 +97,10 @@ export default function AuthLayout({
       </div>
 
       {/* Footer */}
-      <footer className="w-full bg-sidebar-primary pb-8 pt-16 rounded-t-[50%] z-10 ">
+      <footer
+        className="w-full pb-8 pt-16 rounded-t-[50%] z-10"
+        style={{ backgroundColor: bgColor }}
+      >
         <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 text-center sm:text-start">
           <p className="text-xs sm:text-sm">{t("Login.Copyright")}</p>
           <div className="scale-75 sm:scale-100">
