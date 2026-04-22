@@ -17,8 +17,24 @@ export default function AuthLayout({
   mainLogo?: string;
 }>) {
   const { theme } = useTheme();
-  const isLight = theme === "light";
   const t = useTranslations();
+
+  const sparklesBg: Record<string, string> = {
+    light: "#ffffff",
+    dark: "#18003A",
+    "green-light": "#F3F4F8",
+    "green-dark": "#092A1E",
+  };
+  const sparklesParticle: Record<string, string> = {
+    light: "#18003A",
+    dark: "#ffffff",
+    "green-light": "#111927",
+    "green-dark": "#ffffff",
+  };
+  const currentTheme = theme ?? "dark";
+  const bgColor = sparklesBg[currentTheme] ?? sparklesBg.dark;
+  const particleColor = sparklesParticle[currentTheme] ?? sparklesParticle.dark;
+
   return (
     <main className="min-h-screen flex flex-col bg-sidebar relative overflow-hidden ">
       {/* Language switcher */}
@@ -29,12 +45,12 @@ export default function AuthLayout({
       {/* Background particles */}
       <SparklesCore
         id="tsparticlesfullpage"
-        background={isLight ? "#ffffff" : "#18003A"}
+        background={bgColor}
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
         className="h-screen w-full fixed top-0 left-0 inset-0"
-        particleColor={isLight ? "#18003A" : "#ffffff"}
+        particleColor={particleColor}
       />
 
       {/* Header with logos */}
