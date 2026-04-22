@@ -130,7 +130,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   // Load Google Maps API
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey:  "AIzaSyCUlTmZo8cqfmOQgBqqiFbP3QyHYhHy_hQ",
     libraries,
   });
 
