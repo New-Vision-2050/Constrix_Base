@@ -91,7 +91,7 @@ jobs:
           NEXT_PUBLIC_REVERB_WSS_PORT: ${{ secrets.NEXT_PUBLIC_REVERB_WSS_PORT }}
 
         with:
-          envs: MAPAPIKEY,NEXT_PUBLIC_REVERB_KEY,NEXT_PUBLIC_REVERB_PORT,NEXT_PUBLIC_REVERB_WSS_PORT
+          envs: BE_URL,NODE_ENV,DEPLOYMENT_ID,MAPAPIKEY,NEXT_PUBLIC_REVERB_KEY,NEXT_PUBLIC_REVERB_PORT,NEXT_PUBLIC_REVERB_WSS_PORT
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           port: ${{ secrets.DEPLOY_PORT }}
@@ -101,6 +101,7 @@ jobs:
               set -e
               set -x
               export BE_URL=${{env.BE_URL}}
+              export NODE_ENV=${{env.NODE_ENV}}
               export DEPLOYMENT_ID=${{env.DEPLOYMENT_ID}}
               DEPLOY_DIR=/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}
               mkdir -p $DEPLOY_DIR
