@@ -37,6 +37,10 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
         addDay: _m("Add Day", "إضافة يوم"),
         removeDay: _m("Remove Day", "حذف يوم"),
         periods: _m("Periods", "الفترات"),
+        currentDayNotEditable: _m(
+          "Today's schedule cannot be changed while editing",
+          "لا يمكن تعديل أو حذف جدول اليوم الحالي أثناء التعديل",
+        ),
         timePeriodLabel: _m("Time Period", "الفترة الزمنية"),
         startTimeLabel: _m("Start Time", "البداية"),
         earlyPeriodLabel: _m("Early Period", "الفترة المبكرة"),

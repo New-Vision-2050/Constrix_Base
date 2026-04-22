@@ -29,13 +29,13 @@ const HRStatisticsCards: React.FC = () => {
   }
   
   // Show error state
-  if (attendanceSummaryError) {
-    return (
-      <div className="flex w-full min-h-[250px] items-center justify-center text-red-500">
-        <span>{t("error")}</span>
-      </div>
-    );
-  }
+  // if (attendanceSummaryError) {
+  //   return (
+  //     <div className="flex w-full min-h-[250px] items-center justify-center text-red-500">
+  //       <span>{t("error")}</span>
+  //     </div>
+  //   );
+  // }
   
   // Default values if data is not available
   const summary = attendanceSummary || {

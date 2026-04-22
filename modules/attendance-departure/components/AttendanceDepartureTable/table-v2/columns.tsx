@@ -3,6 +3,7 @@ import { AttendanceStatusRecord } from "@/modules/attendance-departure/types/att
 import AttendanceStatusBadge from "../AttendanceStatusBadge";
 import ApproverBadge from "../ApproverBadge";
 import { ColumnDef } from "@/components/headless/table";
+import { CleaningServices } from "@mui/icons-material";
 
 /**
  * Helper function to safely access nested properties

@@ -21,6 +21,8 @@ export type WeeklyScheduleDays = {
 type ScheduleDisplayProps = {
   t?: (key: string, defaultText: string) => string;
   weeklySchedule: WeeklyScheduleDays;
+  /** When true, edit/delete for the calendar "today" weekday is disabled */
+  isEditMode?: boolean;
 };
 
 /**
@@ -29,6 +31,7 @@ type ScheduleDisplayProps = {
 export const ScheduleDisplay: React.FC<ScheduleDisplayProps> = ({
   t,
   weeklySchedule,
+  isEditMode = false,
 }) => {
   // If there's no schedule or it's empty, show a message
   if (!weeklySchedule || Object.keys(weeklySchedule).length === 0) {
@@ -42,7 +45,11 @@ export const ScheduleDisplay: React.FC<ScheduleDisplayProps> = ({
   return (
     <div className="space-y-2">
       {Object.entries(weeklySchedule).map(([day, dayConfig], index) => (
-        <ScheduleDayItem key={`${day}-${index}`} dayConfig={dayConfig} />
+        <ScheduleDayItem
+          key={`${day}-${index}`}
+          dayConfig={dayConfig}
+          isEditMode={isEditMode}
+        />
       ))}
     </div>
   );
