@@ -14,6 +14,8 @@ import { useTranslations } from "next-intl";
 
 interface IChangeLogo {
   handleClose: () => void;
+  /** Prefer id from header query; falls back to `company_id` route param */
+  companyId?: string;
 }
 
 interface ValidationRule {
@@ -22,7 +24,7 @@ interface ValidationRule {
   status: number;
   validate: string;
 }
-const getInitialRules = (t: any): ValidationRule[] => [
+const getInitialRules = (t: (key: string) => string): ValidationRule[] => [
   {
     sentence: t("rules.rule1"),
     sub_title: null,
@@ -43,8 +45,12 @@ const getInitialRules = (t: any): ValidationRule[] => [
   },
 ];
 
-const ChangeLogo = ({ handleClose }: IChangeLogo) => {
-  const { company_id }: { company_id: string | undefined } = useParams();
+const ChangeLogo = ({ handleClose, companyId: companyIdFromData }: IChangeLogo) => {
+  const params = useParams();
+  const companyIdFromRoute =
+    typeof params.company_id === "string" ? params.company_id : undefined;
+  const companyId = companyIdFromData ?? companyIdFromRoute;
+
   const t = useTranslations("companyProfile.changeLogo");
 
   const [valid, setValid] = useState(false);
@@ -57,13 +63,21 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
 
   const { mutate: mutateValidation, isPending: isValidationPending } =
     useMutation({
-      mutationFn: async (file: File) =>
-        await validCompanyProfileImage(file, company_id),
+      mutationFn: async (file: File) => {
+        if (!companyId) {
+          throw new Error("Missing company_id");
+        }
+        return validCompanyProfileImage(file, companyId);
+      },
     });
 
   const { mutate: mutateUpload, isPending: isUploadPending } = useMutation({
-    mutationFn: async (file: File) =>
-      await uploadCompanyImage(file, company_id),
+    mutationFn: async (file: File) => {
+      if (!companyId) {
+        throw new Error("Missing company_id");
+      }
+      return uploadCompanyImage(file, companyId);
+    },
   });
 
   useEffect(() => {
@@ -82,7 +96,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
 
   // Validate image
   const handleValidateImage = async () => {
-    if (!uploadedFile) return;
+    if (!uploadedFile || !companyId) return;
 
     setLoading(true);
     mutateValidation(uploadedFile, {
@@ -117,7 +131,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
 
   // Upload image
   const handleSaveImage = async () => {
-    if (!uploadedFile) return;
+    if (!uploadedFile || !companyId) return;
 
     setLoading(true);
     mutateUpload(uploadedFile, {
@@ -162,8 +176,12 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
             previewImage={croppedImageBase64}
             disabled={false}
             cropOptions={{
-              minWidth: 100,
-              aspect: 9 / 16,
+              /** Landscape 1920×1080 (16:9), not portrait 1080×1920 */
+              aspect: 16 / 9,
+              minWidth: 320,
+              minHeight: 180,
+              maxWidth: 1920,
+              maxHeight: 1080,
             }}
           />
         </div>
@@ -176,6 +194,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
           loading={loading || isValidationPending || isUploadPending}
           disabled={
             !Boolean(uploadedFile) ||
+            !companyId ||
             loading ||
             isValidationPending ||
             isUploadPending

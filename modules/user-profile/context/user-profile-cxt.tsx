@@ -158,6 +158,7 @@ export const UserProfileCxtProvider = ({
 
   const handleUpdateImage = (imgUrl: string) => {
     if (user) setUser({ ...user, image_url: imgUrl });
+    void refetchProfileData();
   };
 
   // ** return component ui
