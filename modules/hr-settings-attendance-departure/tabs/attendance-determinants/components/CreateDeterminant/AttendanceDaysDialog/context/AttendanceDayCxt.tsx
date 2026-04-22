@@ -4,7 +4,14 @@ import { useFormStore } from "@/modules/form-builder";
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { InitialTimeHours, PeriodHour } from "../constants/time";
 import { DAYS_OF_WEEK } from "../constants/days";
 
@@ -282,7 +289,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     .getValue("create-determinant-form", "show_attendance_days_dialog");
 
   const usedDays: string[] = useMemo(() => {
-    if (_editedDay) {
+    if (_editedDay?.day) {
       // When editing, exclude the edited day from usedDays so it remains selectable
       return (
         _weekly_schedule
@@ -330,7 +337,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     }
   }, [selectedDay, _weekly_schedule]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // reset selected day and day periods when dialog is closed
     if (!_openDialog) {
       SetSelectedDay("");
@@ -342,9 +349,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         ?.getState()
         .setValue("create-determinant-form", "editedDay", null);
     } else {
-      if (_editedDay) {
+      if (_editedDay?.day) {
         setIsEdit(true);
-        const _newPeriods = _editedDay.periods.map(
+        const _newPeriods = (_editedDay.periods ?? []).map(
           (period: any, index: number) => {
             return {
               index: index + 1,
@@ -360,6 +367,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         );
         SetSelectedDay(_editedDay.day);
         SetDayPeriods(_newPeriods);
+      } else {
+        setIsEdit(false);
       }
     }
   }, [_openDialog, _editedDay]);
@@ -367,6 +376,13 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   // ** declare and define component helper methods
   const handleDayChange = useMemo(() => {
     return (day: string) => {
+      const edited = useFormStore
+        ?.getState()
+        .getValue("create-determinant-form", "editedDay") as
+        | { day?: string }
+        | null
+        | undefined;
+      if (edited?.day) return;
       SetSelectedDay(day);
     };
   }, []);

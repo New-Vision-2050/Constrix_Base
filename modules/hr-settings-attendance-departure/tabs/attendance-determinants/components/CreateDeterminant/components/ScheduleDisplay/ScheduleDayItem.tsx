@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTheme } from "next-themes";
 import { CalendarDays, Clock, PenIcon, Trash2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { WeeklyScheduleDayConfig } from ".";
 import { useFormStore } from "@/modules/form-builder";
+import { cn } from "@/lib/utils";
+
+/** Aligns with `Date.getDay()` (0 = Sunday … 6 = Saturday) and backend `day` keys */
+const JS_DATE_TO_DAY_KEY = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+] as const;
 
 // Types
 type PeriodType = {
@@ -15,6 +27,7 @@ type PeriodType = {
 
 type DayPeriodProps = {
   dayConfig: WeeklyScheduleDayConfig;
+  isEditMode?: boolean;
 };
 
 const dayNames = {
@@ -30,14 +43,28 @@ const dayNames = {
 /**
  * Component for displaying a single day with its periods in the weekly schedule
  */
-export const ScheduleDayItem: React.FC<DayPeriodProps> = ({ dayConfig }) => {
+export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
+  dayConfig,
+  isEditMode = false,
+}) => {
   const { resolvedTheme } = useTheme();
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog"
   );
 
+  const isCurrentCalendarDayLocked = useMemo(() => {
+    if (!isEditMode) return false;
+    const todayKey = JS_DATE_TO_DAY_KEY[new Date().getDay()];
+    return dayConfig.day === todayKey;
+  }, [isEditMode, dayConfig.day]);
+
+  const lockTitle = isCurrentCalendarDayLocked
+    ? t("currentDayNotEditable")
+    : undefined;
+
   // handle edit day periods
   const handleEditDayPeriods = () => {
+    if (isCurrentCalendarDayLocked) return;
     useFormStore
       ?.getState()
       .setValue("create-determinant-form", "editedDay", dayConfig);
@@ -48,6 +75,7 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({ dayConfig }) => {
 
   // handle delete day periods
   const handleDeleteDayPeriods = () => {
+    if (isCurrentCalendarDayLocked) return;
     // get weekly schedule
     const _weeklySchedule = useFormStore
       ?.getState()
@@ -94,12 +122,44 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({ dayConfig }) => {
         </div>
         <div className="flex items-center gap-2">
           <PenIcon
+            role="button"
+            tabIndex={isCurrentCalendarDayLocked ? -1 : 0}
+            title={lockTitle}
+            aria-disabled={isCurrentCalendarDayLocked}
             onClick={handleEditDayPeriods}
-            className="h-5 w-5 text-pink-500 cursor-pointer"
+            onKeyDown={(e) => {
+              if (isCurrentCalendarDayLocked) return;
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleEditDayPeriods();
+              }
+            }}
+            className={cn(
+              "h-5 w-5",
+              isCurrentCalendarDayLocked
+                ? "text-muted-foreground opacity-40 cursor-not-allowed"
+                : "text-pink-500 cursor-pointer",
+            )}
           />
           <Trash2Icon
+            role="button"
+            tabIndex={isCurrentCalendarDayLocked ? -1 : 0}
+            title={lockTitle}
+            aria-disabled={isCurrentCalendarDayLocked}
             onClick={handleDeleteDayPeriods}
-            className="h-5 w-5 text-red-500 cursor-pointer"
+            onKeyDown={(e) => {
+              if (isCurrentCalendarDayLocked) return;
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleDeleteDayPeriods();
+              }
+            }}
+            className={cn(
+              "h-5 w-5",
+              isCurrentCalendarDayLocked
+                ? "text-muted-foreground opacity-40 cursor-not-allowed"
+                : "text-red-500 cursor-pointer",
+            )}
           />
         </div>
       </div>

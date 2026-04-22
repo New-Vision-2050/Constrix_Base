@@ -7,7 +7,7 @@ export const loginMessages = new MessagesGroup({
   Next: _m("Next", "التالي"),
   Loading: _m("Loading...", "جاري التحميل ..."),
   Login: _m("Login", "دخول"),
-  LoginSuccess: _m("Login successful", "يتم تحويلك الى اللوحة التحكم ..."),
+  LoginSuccess: _m("Redirecting to the Dashboard...", "يتم تحويلك إلى لوحة التحكم..."),
   ForgotPassword: _m("Forgot your password?", "هل نسيت كلمة المرور؟"),
   Identifier: _m("Mobile number / Email / ID number", "رقم الجوال / البريد الالكتروني / رقم المعرف"),
   Password: _m("Password", "كلمة المرور"),
