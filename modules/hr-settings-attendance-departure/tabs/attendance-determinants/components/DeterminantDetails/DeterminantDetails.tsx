@@ -167,17 +167,17 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
           {daysOfWeek.map((day, index) => (
             <div
               key={index}
-              className={`flex flex-row-reverse items-center justify-between w-[88px] mx-1`}
+              className={`flex flex-row items-center gap-2 w-[88px] mx-1`}
             >
               {activeDays.includes(day) ? (
-                <div className="bg-pink-500 w-5 h-5 flex items-center justify-center rounded">
+                <div className="bg-pink-500 w-5 h-5 flex items-center justify-center rounded shrink-0">
                   <Check size={14} className="text-white" />
                 </div>
               ) : (
                 <div
                   className={`${
                     isDarkMode ? "bg-gray-500" : "bg-gray-300"
-                  } w-5 h-5 flex items-center justify-center rounded`}
+                  } w-5 h-5 flex items-center justify-center rounded shrink-0`}
                 />
               )}
               <div className="text-lg">{day}</div>

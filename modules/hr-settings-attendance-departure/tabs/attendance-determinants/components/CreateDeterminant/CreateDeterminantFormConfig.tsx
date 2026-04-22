@@ -459,6 +459,7 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                   <ScheduleDisplay
                     t={getFormTranslation}
                     weeklySchedule={_weekly_schedule as WeeklyScheduleDays}
+                    isEditMode={Boolean(editConstraint)}
                   />
                 </div>
               );

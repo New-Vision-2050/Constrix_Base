@@ -17,10 +17,26 @@ export default function AuthLayout({
   mainLogo?: string;
 }>) {
   const { theme } = useTheme();
-  const isLight = theme === "light";
   const t = useTranslations();
+
+  const sparklesBg: Record<string, string> = {
+    light: "#ffffff",
+    dark: "#18003A",
+    "green-light": "#54C08A",
+    "green-dark": "#092A1E",
+  };
+  const sparklesParticle: Record<string, string> = {
+    light: "#18003A",
+    dark: "#ffffff",
+    "green-light": "#111927",
+    "green-dark": "#ffffff",
+  };
+  const currentTheme = theme ?? "dark";
+  const bgColor = sparklesBg[currentTheme] ?? sparklesBg.dark;
+  const particleColor = sparklesParticle[currentTheme] ?? sparklesParticle.dark;
+
   return (
-    <main className="min-h-screen flex flex-col bg-sidebar relative overflow-hidden ">
+    <main className="min-h-screen   flex flex-col relative overflow-hidden ">
       {/* Language switcher */}
       {/* <div className="fixed top-4 end-4 z-50">
         <RenderLocaleSwitch />
@@ -29,16 +45,19 @@ export default function AuthLayout({
       {/* Background particles */}
       <SparklesCore
         id="tsparticlesfullpage"
-        background={isLight ? "#ffffff" : "#18003A"}
+        background={bgColor}
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
         className="h-screen w-full fixed top-0 left-0 inset-0"
-        particleColor={isLight ? "#18003A" : "#ffffff"}
+        particleColor={particleColor}
       />
 
       {/* Header with logos */}
-      <header className="w-full bg-sidebar pt-8 pb-16 rounded-b-[50%] z-10">
+      <header
+        className="w-full pt-8 pb-16 rounded-b-[50%] z-10"
+        style={{ backgroundColor: bgColor }}
+      >
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="order-3 md:order-1 mt-2 md:mt-0 scale-75 md:scale-100">
             <ConstrixIcon />
@@ -78,7 +97,10 @@ export default function AuthLayout({
       </div>
 
       {/* Footer */}
-      <footer className="w-full bg-sidebar pb-8 pt-16 rounded-t-[50%] z-10">
+      <footer
+        className="w-full pb-8 pt-16 rounded-t-[50%] z-10"
+        style={{ backgroundColor: bgColor }}
+      >
         <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 text-center sm:text-start">
           <p className="text-xs sm:text-sm">{t("Login.Copyright")}</p>
           <div className="scale-75 sm:scale-100">

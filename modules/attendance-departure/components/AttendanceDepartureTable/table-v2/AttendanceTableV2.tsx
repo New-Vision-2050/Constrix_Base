@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Box, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { AttendanceStatusRecord } from "@/modules/attendance-departure/types/attendance";
@@ -41,15 +41,26 @@ export const AttendanceTableV2: React.FC = () => {
   });
 
   // STEP 2: Fetch data with React Query
-  const { data: apiData, isLoading, refetch } = useQuery({
-    queryKey: ["attendance", params.page, params.limit, params.sortBy, params.sortDirection, filters],
+  const {
+    data: apiData,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "attendance",
+      params.page,
+      params.limit,
+      params.sortBy,
+      params.sortDirection,
+      filters,
+    ],
     queryFn: () =>
       fetchAttendanceData(
         params.page,
         params.limit,
         params.sortBy,
         params.sortDirection,
-        filters
+        filters,
       ),
   });
 
@@ -63,7 +74,7 @@ export const AttendanceTableV2: React.FC = () => {
   // Define columns with actions column
   const columns = useMemo<ColumnDef<AttendanceStatusRecord>[]>(() => {
     const baseColumns = getAttendanceColumns(t);
-    
+
     if (canDelete) {
       return [
         ...baseColumns,
@@ -72,16 +83,19 @@ export const AttendanceTableV2: React.FC = () => {
           name: t("columns.actions") || "Actions",
           sortable: false,
           render: (row) => (
-            <ActionsColumn
-              row={row}
-              onRefetch={refetch}
-              canDelete={canDelete}
-            />
+            // <ActionsColumn
+            //   row={row}
+            //   onRefetch={refetch}
+            //   canDelete={canDelete}
+            // />
+            <Button size="small" disabled>
+              {t("action")}
+            </Button>
           ),
         },
       ];
     }
-    
+
     return baseColumns;
   }, [t, canDelete, refetch]);
 
@@ -126,7 +140,9 @@ export const AttendanceTableV2: React.FC = () => {
             />
           </Stack>
         }
-        table={<AttendanceTable.Table state={state} loadingOptions={{ rows: 5 }} />}
+        table={
+          <AttendanceTable.Table state={state} loadingOptions={{ rows: 5 }} />
+        }
         pagination={<AttendanceTable.Pagination state={state} />}
       />
     </Box>

@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import {useLocale, useTranslations} from "next-intl";
+import React, { useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { DAYS_OF_WEEK } from "../constants/days";
 import { Option } from "@/components/shared/SearchableSelect";
@@ -18,7 +18,7 @@ const AttendanceDaysDialogDaySelector: React.FC<
   );
   const locale = useLocale();
   const isArabic = locale === "ar";
-  const { usedDays } = useAttendanceDayCxt();
+  const { usedDays, isEdit } = useAttendanceDayCxt();
 
   // Convert days to options format based on current locale
   const dayOptions: Option[] = useMemo(() => {
@@ -41,6 +41,7 @@ const AttendanceDaysDialogDaySelector: React.FC<
         placeholder={placeholder || t("selectDay")}
         searchPlaceholder={isArabic ? t("search") : t("search")}
         noResultsText={isArabic ? t("noResults") : t("noResults")}
+        disabled={isEdit}
       />
     </div>
   );

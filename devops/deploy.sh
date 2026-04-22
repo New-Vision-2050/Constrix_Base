@@ -83,8 +83,8 @@ fi
 
 # Start the containers and remove any orphaned containers
 echo "Starting Docker containers with cache bust: $CACHEBUST"
-docker compose -p $PROJECT_NAME build --no-cache
-docker compose -p $PROJECT_NAME up --force-recreate --remove-orphans -d
+docker compose --env-file $DEPLOY_DIR/.env -p $PROJECT_NAME build --no-cache
+docker compose --env-file $DEPLOY_DIR/.env -p $PROJECT_NAME up --force-recreate --remove-orphans -d
 
 # Verify the container is running
 echo "Verifying container is running..."
