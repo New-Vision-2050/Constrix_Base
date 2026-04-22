@@ -88,7 +88,10 @@ export default async function RootLayout({
             themes={["light", "dark", "system", "green-light", "green-dark"]}
             disableTransitionOnChange
           >
-            <CustomThemeProvider direction={direction} theme={storedTheme}>
+            <CustomThemeProvider
+              direction={direction}
+              preloadedTheme={storedTheme}
+            >
               <NextIntlClientProvider messages={messages}>
                 <NuqsAdapter>
                   <main>
