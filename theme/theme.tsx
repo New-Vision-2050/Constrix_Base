@@ -30,12 +30,12 @@ declare module "@mui/material/styles" {
 export default function CustomThemeProvider({
   children,
   direction,
-  theme: overrideTheme,
+  preloadedTheme,
 }: CustomThemeProviderProps) {
   const { theme: currentTheme, systemTheme } = useTheme();
 
   const effectiveTheme =
-    overrideTheme || (currentTheme === "system" ? systemTheme : currentTheme);
+    (currentTheme === "system" ? systemTheme : currentTheme) || preloadedTheme;
   const palette = useMemo(() => {
     switch (effectiveTheme) {
       case "green-light":
@@ -137,5 +137,5 @@ export default function CustomThemeProvider({
 type CustomThemeProviderProps = {
   children: React.ReactNode;
   direction: "rtl" | "ltr";
-  theme?: string;
+  preloadedTheme?: string;
 };
