@@ -39,7 +39,11 @@ const CompanyHeader = () => {
 
   return (
     <div className="bg-sidebar rounded-lg w-full flex items-center justify-between p-4">
-      <CompanyLogo logo={data?.payload?.logo || ""} isPending={isPending} />
+      <CompanyLogo
+        companyId={data?.payload?.id}
+        logo={data?.payload?.logo || ""}
+        isPending={isPending}
+      />
 
       <div className="flex flex-col  w-full pr-6">
         {isPending && <Skeleton className="h-6 w-[150px] mb-4" />}

@@ -9,16 +9,12 @@ type ResponseT = {
 
 export default async function uploadCompanyImage(
   image: File,
-  company_id: string | undefined
+  company_id: string,
 ) {
   const res = await apiClient.post<ResponseT>(
     `/companies/company-profile/assign-logo`,
-    serialize({ logo: image }),
-    {
-      params: {
-        ...(company_id && { company_id }),
-      },
-    }
+    serialize({ logo: image, company_id }),
+    { params: { company_id } },
   );
 
   return res.data.payload;
