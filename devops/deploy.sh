@@ -5,6 +5,8 @@ set -x
 
 
 echo "Validating required environment variables..."
+echo "DEBUG [deploy.sh] MAPAPIKEY length: ${#MAPAPIKEY}"
+echo "DEBUG [deploy.sh] MAPAPIKEY value: $MAPAPIKEY"
 
 REQUIRED_VARS=(
     "MAPAPIKEY"
@@ -49,7 +51,10 @@ NEXT_PUBLIC_REVERB_PORT=${NEXT_PUBLIC_REVERB_PORT}
 NEXT_PUBLIC_REVERB_WSS_PORT=${NEXT_PUBLIC_REVERB_WSS_PORT}
 EOF
 
+echo "DEBUG [deploy.sh] .env file contents:"
 cat .env
+echo "DEBUG [deploy.sh] NEXT_PUBLIC_GOOGLE_MAPS_API_KEY from .env:"
+grep GOOGLE .env || echo "NOT FOUND in .env"
 
 # Secure the .env file
 chmod 600 .env
@@ -82,6 +87,9 @@ fi
 #ENTRYPOINT ["devops/entrypoint.sh"]
 
 # Start the containers and remove any orphaned containers
+echo "DEBUG [deploy.sh] Current directory for docker compose: $(pwd)"
+echo "DEBUG [deploy.sh] .env file exists here: $(ls -la .env 2>/dev/null || echo 'NO .env in CWD')"
+echo "DEBUG [deploy.sh] .env at DEPLOY_DIR: $(ls -la $DEPLOY_DIR/.env 2>/dev/null || echo 'NO .env at DEPLOY_DIR')"
 echo "Starting Docker containers with cache bust: $CACHEBUST"
 docker compose -p $PROJECT_NAME build --no-cache
 docker compose -p $PROJECT_NAME up --force-recreate --remove-orphans -d
