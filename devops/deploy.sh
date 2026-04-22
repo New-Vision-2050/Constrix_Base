@@ -91,8 +91,8 @@ echo "DEBUG [deploy.sh] Current directory for docker compose: $(pwd)"
 echo "DEBUG [deploy.sh] .env file exists here: $(ls -la .env 2>/dev/null || echo 'NO .env in CWD')"
 echo "DEBUG [deploy.sh] .env at DEPLOY_DIR: $(ls -la $DEPLOY_DIR/.env 2>/dev/null || echo 'NO .env at DEPLOY_DIR')"
 echo "Starting Docker containers with cache bust: $CACHEBUST"
-docker compose -p $PROJECT_NAME build --no-cache
-docker compose -p $PROJECT_NAME up --force-recreate --remove-orphans -d
+docker compose --env-file $DEPLOY_DIR/.env -p $PROJECT_NAME build --no-cache
+docker compose --env-file $DEPLOY_DIR/.env -p $PROJECT_NAME up --force-recreate --remove-orphans -d
 
 # Verify the container is running
 echo "Verifying container is running..."
