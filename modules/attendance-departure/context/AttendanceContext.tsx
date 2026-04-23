@@ -61,6 +61,8 @@ interface AttendanceContextType {
   setSelectedDepartment: (department: string) => void;
   selectedBranch: string;
   setSelectedBranch: (branch: string) => void;
+  selectedAttendanceStatus: string;
+  setSelectedAttendanceStatus: (status: string) => void;
   
   // Branch data from API
   branches: ManagementHierarchyItem[]|undefined;
@@ -156,6 +158,8 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   const [selectedApprover, setSelectedApprover] = useState<string>("all");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   const [selectedBranch, setSelectedBranch] = useState<string>("all");
+  const [selectedAttendanceStatus, setSelectedAttendanceStatus] =
+    useState<string>("all");
   
   // Enhanced setters that also trigger refetch directly
   const updateSearchText = useCallback((text: string) => {
@@ -173,6 +177,10 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   const updateSelectedBranch = useCallback((value: string) => {
     setSelectedBranch(value);
   }, []);
+
+  const updateSelectedAttendanceStatus = useCallback((value: string) => {
+    setSelectedAttendanceStatus(value);
+  }, []);
   
   // Get team attendance data for map display with date and search filtering
   // Create parameters object without search_text initially
@@ -183,7 +191,11 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     // Search filters - don't send 'all' values to API
     approver: selectedApprover && selectedApprover !== 'all' ? selectedApprover : undefined,
     department: selectedDepartment && selectedDepartment !== 'all' ? selectedDepartment : undefined,
-    branch: selectedBranch && selectedBranch !== 'all' ? selectedBranch : undefined
+    branch: selectedBranch && selectedBranch !== 'all' ? selectedBranch : undefined,
+    attendance_status:
+      selectedAttendanceStatus && selectedAttendanceStatus !== 'all'
+        ? selectedAttendanceStatus
+        : undefined,
   };
   
   // Add search_text separately to ensure it's added even if empty
@@ -375,6 +387,8 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     setSelectedDepartment: updateSelectedDepartment,
     selectedBranch,
     setSelectedBranch: updateSelectedBranch,
+    selectedAttendanceStatus,
+    setSelectedAttendanceStatus: updateSelectedAttendanceStatus,
     
     // Employee dialog state
     isEmployeeDialogOpen,

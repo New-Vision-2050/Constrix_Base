@@ -13,6 +13,8 @@ export type Constraint = {
   id: string;
   name?:string;
   is_active: number;
+  max_over_time?: number;
+  maxOverTime?: number;
   notes: string;
   priority: number;
   start_date: string;

@@ -148,6 +148,7 @@ function AttendanceDeterminantsTabContent() {
         {/* Form for editing determinants */}
         {editingConstraint && (
           <SheetFormBuilder
+            key={`edit-constraint-${editingConstraint.id}`}
             config={formConfig}
             isOpen={isFormOpen}
             onOpenChange={(open) => {

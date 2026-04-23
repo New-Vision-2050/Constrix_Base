@@ -20,6 +20,16 @@ import {
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
 
+/** Resolves API value for max overtime (root field on constraint). */
+function getMaxOverTimeFromConstraint(editConstraint: unknown): number | "" {
+  if (editConstraint == null || typeof editConstraint !== "object") return "";
+  const c = editConstraint as Record<string, unknown>;
+  const raw = c.max_over_time ?? c.maxOverTime;
+  if (raw == null || raw === "") return "";
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : "";
+}
+
 // Day names mapping
 const dayNames = {
   sunday: "الأحد",
@@ -192,31 +202,37 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
       };
     });
 
+  const initialValues = {
+    constraint_name: editConstraint?.constraint_name || "",
+    constraint_type: editConstraint?.constraint_code || "",
+    branch_locations: editConstraint?.branch_locations || "[]",
+    is_active: Boolean(editConstraint?.is_active),
+    early_period: editConstraint?.config?.early_clock_in_rules?.early_period || "",
+    early_unit: editConstraint?.config?.early_clock_in_rules?.early_unit || "",
+    lateness_period: editConstraint?.config?.lateness_rules?.lateness_period || "",
+    lateness_unit: editConstraint?.config?.lateness_rules?.lateness_unit || "",
+    out_zone_rules_value:
+      editConstraint?.config?.radius_enforcement
+        ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
+    out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit || "minute",
+    type_attendance: _type_attendance.length > 0 ? _type_attendance : [],
+    branch_ids: _branch_ids.length > 0 ? _branch_ids : [],
+    location_type: _location_type,
+    weekly_schedule: _weekly_schedule,
+    show_location_dialog: false,
+    show_attendance_days_dialog: false,
+    max_over_time: getMaxOverTimeFromConstraint(editConstraint),
+  };
+
   // ------------- return form config -------------
   const formConfig: FormConfig = {
     formId: "create-determinant-form",
     title,
     apiUrl: `${baseURL}/attendance/constraints`,
-    initialValues: {
-      constraint_name: editConstraint?.constraint_name || "",
-      constraint_type: editConstraint?.constraint_code || "",
-      branch_locations: editConstraint?.branch_locations || "[]",
-      is_active: Boolean(editConstraint?.is_active),
-      early_period: editConstraint?.config?.early_clock_in_rules?.early_period || "",
-      early_unit: editConstraint?.config?.early_clock_in_rules?.early_unit || "",
-      lateness_period: editConstraint?.config?.lateness_rules?.lateness_period || "",
-      lateness_unit: editConstraint?.config?.lateness_rules?.lateness_unit || "",
-      out_zone_rules_value:
-        editConstraint?.config?.radius_enforcement
-          ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
-      out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit || "minute",
-      type_attendance: _type_attendance.length > 0 ? _type_attendance : [],
-      branch_ids: _branch_ids.length > 0 ? _branch_ids : [],
-      location_type: _location_type,
-      weekly_schedule: _weekly_schedule,
-      show_location_dialog: false,
-      show_attendance_days_dialog: false,
-    },
+    initialValues,
+    ...(editConstraint
+      ? { isEditMode: true, editValues: initialValues }
+      : {}),
     sections: [
       {
         title: formT("basicInfo"),
@@ -552,6 +568,28 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
                 type: "pattern",
                 value: "^[0-9]+$",
                 message: formT("outsideZoneNumbersOnly"),
+              },
+            ],
+          },
+          {
+            type: "number",
+            name: "max_over_time",
+            label: formT("maxOvertimeHours"),
+            placeholder: formT("maxOvertimeHours"),
+            defaultValue: (() => {
+              const v = getMaxOverTimeFromConstraint(editConstraint);
+              return v === "" ? undefined : v;
+            })(),
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: formT("maxOvertimeHoursRequired"),
+              },
+              {
+                type: "min",
+                value: 0,
+                message: formT("maxOvertimeHoursMin"),
               },
             ],
           },
@@ -927,6 +965,12 @@ const formT = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDet
               ) !== -1,
           },
         },
+        max_over_time: (() => {
+          const raw = formData.max_over_time;
+          const n =
+            raw === "" || raw == null ? NaN : Number(raw);
+          return Number.isFinite(n) ? n : 0;
+        })(),
       };
 
       const result = await defaultSubmitHandler(

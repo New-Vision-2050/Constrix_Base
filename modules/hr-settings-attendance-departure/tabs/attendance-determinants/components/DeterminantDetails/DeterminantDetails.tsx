@@ -158,6 +158,23 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
         </div>
       </div>
 
+      {/* Max overtime hours */}
+      <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
+        <div className={`${sectionTextLabel} text-[12px] mb-0.5`}>
+          {t("maxOvertimeHours")}
+        </div>
+        <div className={`${sectionTextContent} text-lg`}>
+          {(() => {
+            const raw =
+              constraint.max_over_time ?? constraint.maxOverTime;
+            if (raw == null) return 0;
+            const n = Number(raw);
+            return Number.isFinite(n) ? n : 0;
+          })()}{" "}
+          {t("hours", { default: "ساعات" })}
+        </div>
+      </div>
+
       {/* Work days */}
       <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
         <div className={`${sectionTextLabel} text-[12px] mb-0.5`}>

@@ -12,6 +12,7 @@ interface UseTeamAttendanceProps {
   approver?: string;
   department?: string;
   branch?: string;
+  attendance_status?: string;
 }
 
 /**
@@ -20,7 +21,15 @@ interface UseTeamAttendanceProps {
  * @returns Object containing team attendance data, loading state, and error state
  */
 export const useTeamAttendance = (props?: UseTeamAttendanceProps) => {
-  const { start_date, end_date, search_text, approver, department, branch } = props || {};
+  const {
+    start_date,
+    end_date,
+    search_text,
+    approver,
+    department,
+    branch,
+    attendance_status,
+  } = props || {};
 
   // Include all search params in queryKey to refetch when any of them changes
   const queryKey = [
@@ -31,7 +40,8 @@ export const useTeamAttendance = (props?: UseTeamAttendanceProps) => {
     // For select items, treat 'all' the same as undefined
     approver === 'all' ? undefined : approver, 
     department === 'all' ? undefined : department, 
-    branch === 'all' ? undefined : branch
+    branch === 'all' ? undefined : branch,
+    attendance_status === 'all' ? undefined : attendance_status,
   ];
 
 
@@ -45,7 +55,9 @@ export const useTeamAttendance = (props?: UseTeamAttendanceProps) => {
       search_text,
       approver: approver === 'all' ? undefined : approver,
       department: department === 'all' ? undefined : department,
-      branch: branch === 'all' ? undefined : branch
+      branch: branch === 'all' ? undefined : branch,
+      attendance_status:
+        attendance_status === 'all' ? undefined : attendance_status,
     }),
     refetchOnWindowFocus: false, // don't refetch on tab switch
     // refetchOnReconnect: false,   // don't refetch on network reconnect
