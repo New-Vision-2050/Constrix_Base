@@ -11,6 +11,7 @@ export interface GetMapLiveTrackingParams {
   approver?: string;
   department?: string;
   branch?: string;
+  attendance_status?: string;
 }
 
 /**
@@ -56,6 +57,10 @@ export const getMapLiveTracking = async (params?: GetMapLiveTrackingParams): Pro
     
     if (params.branch) {
       queryParams.append("branch_id", params.branch);
+    }
+
+    if (params.attendance_status) {
+      queryParams.append("attendance_status", params.attendance_status);
     }
     
     const queryString = queryParams.toString();

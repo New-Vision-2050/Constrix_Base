@@ -115,7 +115,12 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
     department: _m("Department", "الإدارة"),
     approver: _m("Approver", "المحدد المعتمد"),
     loadingApprovers: _m("Loading approvers...", "جاري تحميل المشرفين..."),
-    searchPlaceholder: _m("Name/Email", "الاسم/الأيميل")
+    searchPlaceholder: _m("Name/Email", "الاسم/الأيميل"),
+    attendanceStatus: _m("Attendance status", "حالة الحضور"),
+    statusHoliday: _m("Holiday", "في أجازة"),
+    statusAbsent: _m("Absent", "غائب"),
+    statusLate: _m("Late", "متأخر"),
+    statusPresent: _m("Present", "حاضر"),
   }),
   StatisticsCards: new MessagesGroup({
     totalAttendance: _m("Total Attendance", "إجمالي عدد الحضور"),
@@ -163,7 +168,13 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
       management: _m("Management", "الإدارة"),
       constraint: _m("Constraint", "المحدد"),
       startDate: _m("Start Date", "تاريخ البداية"),
-      endDate: _m("End Date", "تاريخ النهاية")
+      endDate: _m("End Date", "تاريخ النهاية"),
+      attendanceStatus: _m("Attendance status", "حالة الحضور"),
+      attendanceStatusAll: _m("All", "الكل"),
+      statusHoliday: _m("Holiday", "في أجازة"),
+      statusAbsent: _m("Absent", "غائب"),
+      statusLate: _m("Late", "متأخر"),
+      statusPresent: _m("Present", "حاضر"),
     }),
     deleteConfirm: _m("Confirm deletion of attendance record", "تأكيد حذف سجل الحضور والانصراف"),
     status: new MessagesGroup({
