@@ -25,6 +25,8 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
     setSelectedDepartment,
     selectedBranch,
     setSelectedBranch,
+    selectedAttendanceStatus,
+    setSelectedAttendanceStatus,
     refetchTeamAttendance,
     // Fetch branches and supervisors data from Context
     branches,
@@ -80,10 +82,20 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
     [setSelectedBranch, refetchTeamAttendance]
   );
 
+  const handleAttendanceStatusChange = useCallback(
+    (value: string) => {
+      setSelectedAttendanceStatus(value);
+      setTimeout(() => {
+        refetchTeamAttendance();
+      }, 0);
+    },
+    [setSelectedAttendanceStatus, refetchTeamAttendance]
+  );
+
   return (
     <div className="p-4 bg-white dark:bg-[#140F35] border border-gray-200 dark:border-gray-700 rounded-lg mb-4 shadow-sm">
       <h3 className="text-gray-900 dark:text-white mb-4 font-medium">{t("title")}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <div className="flex flex-col gap-1">
           <label 
             htmlFor="branch-select"
@@ -184,6 +196,34 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
                   </SelectItem>
                 ))
               )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor="attendance-status-select"
+            className="text-sm text-gray-700 dark:text-gray-300"
+          >
+            {t("attendanceStatus")}
+          </label>
+          <Select
+            dir="rtl"
+            value={selectedAttendanceStatus}
+            onValueChange={handleAttendanceStatusChange}
+          >
+            <SelectTrigger
+              id="attendance-status-select"
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800"
+            >
+              <SelectValue placeholder={t("attendanceStatus")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("all")}</SelectItem>
+              <SelectItem value="holiday">{t("statusHoliday")}</SelectItem>
+              <SelectItem value="absent">{t("statusAbsent")}</SelectItem>
+              <SelectItem value="late">{t("statusLate")}</SelectItem>
+              <SelectItem value="present">{t("statusPresent")}</SelectItem>
             </SelectContent>
           </Select>
         </div>

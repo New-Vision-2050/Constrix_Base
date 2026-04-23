@@ -1,6 +1,14 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import { Box, TextField, Button, Stack, Autocomplete, Typography } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Stack,
+  Autocomplete,
+  Typography,
+  MenuItem,
+} from "@mui/material";
 import { Search, Refresh, Map } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { AttendanceFiltersProps, DropdownOption } from "./types";
@@ -132,6 +140,28 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
               <TextField {...params} placeholder={t("constraintPlaceholder")} />
             )}
           />
+
+          {/* Attendance status */}
+          <TextField
+            fullWidth
+            select
+            size="small"
+            label={t("attendanceStatus")}
+            value={filters.attendance_status ?? ""}
+            onChange={(e) => {
+              const v = e.target.value;
+              onFilterChange({
+                ...filters,
+                attendance_status: v || undefined,
+              });
+            }}
+          >
+            <MenuItem value="">{t("attendanceStatusAll")}</MenuItem>
+            <MenuItem value="holiday">{t("statusHoliday")}</MenuItem>
+            <MenuItem value="absent">{t("statusAbsent")}</MenuItem>
+            <MenuItem value="late">{t("statusLate")}</MenuItem>
+            <MenuItem value="present">{t("statusPresent")}</MenuItem>
+          </TextField>
 
           {/* Start Date filter */}
           <TextField

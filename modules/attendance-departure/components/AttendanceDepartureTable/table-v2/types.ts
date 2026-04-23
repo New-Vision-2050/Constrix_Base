@@ -17,6 +17,7 @@ export interface AttendanceFilterParams {
   branch_id?: string;
   management_id?: string;
   constraint_id?: string;
+  attendance_status?: string;
   start_date?: string;
   end_date?: string;
 }
