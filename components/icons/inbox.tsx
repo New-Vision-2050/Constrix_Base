@@ -1,26 +1,23 @@
-import { EchoContext } from "@/providers/echo-provider";
+import { useEcho } from "@/hooks/use-echo";
 import { SharesApi } from "@/services/api/shares";
 import { Badge } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { Inbox } from "lucide-react";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 
 function InboxIconWithCount() {
-  const ctx = useContext(EchoContext);
-  const { echo, companyChannelName } = ctx ?? {};
-
   const pendingSharesCountQuery = useQuery({
     queryKey: ["pendingSharesCount"],
     queryFn: async () => {
       const res = await SharesApi.getPendingCount();
       return res.data.payload.count;
     },
-    enabled: !!ctx,
   });
 
+  const { echo, companyChannelName } = useEcho();
+
   useEffect(() => {
-    if (!echo || !companyChannelName) return;
-    echo.channel(companyChannelName).listen(".resource.shared", () => {
+    echo?.channel(companyChannelName).listen(".resource.shared", () => {
       pendingSharesCountQuery.refetch();
       console.log(
         "resource.shared event received, refetching pending shares count",
