@@ -1,7 +1,6 @@
 "use client";
 
 import ConstrixIcon from "@/public/icons/constrix";
-import NewVision from "@/public/icons/new-vision";
 import NewVisionWhite from "@/public/icons/new-vision-white";
 import { SparklesCore } from "./components/sparkles-core";
 import { useTranslations } from "next-intl";
