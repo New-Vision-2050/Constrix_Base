@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { useTheme } from "next-themes";
-import React from "react";
+import { useState, useEffect } from "react";
 
 export default function AuthLayout({
   children,
@@ -17,13 +17,15 @@ export default function AuthLayout({
   children: React.ReactNode;
   mainLogo?: string;
 }>) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const t = useTranslations();
 
   const sparklesBg: Record<string, string> = {
     light: "#ffffff",
     dark: "#18003A",
-    "green-light": "#54C08A",
+    "green-light": "#ffffff",
     "green-dark": "#092A1E",
   };
   const sparklesParticle: Record<string, string> = {
@@ -32,9 +34,17 @@ export default function AuthLayout({
     "green-light": "#111927",
     "green-dark": "#ffffff",
   };
-  const currentTheme = theme ?? "dark";
+  const currentTheme = mounted ? (resolvedTheme ?? "dark") : "dark";
   const bgColor = sparklesBg[currentTheme] ?? sparklesBg.dark;
   const particleColor = sparklesParticle[currentTheme] ?? sparklesParticle.dark;
+  const isGreenTheme =
+    currentTheme === "green-light" || currentTheme === "green-dark";
+  const greenStyle = isGreenTheme
+    ? {
+        backgroundColor: "hsl(var(--primary))",
+        color: "hsl(var(--primary-foreground))",
+      }
+    : undefined;
 
   return (
     <main className="min-h-screen   flex flex-col relative overflow-hidden ">
@@ -55,15 +65,10 @@ export default function AuthLayout({
       />
 
       {/* Header with logos */}
-      <header
-        className="w-full pt-8 pb-16 rounded-b-[50%] z-10"
-        style={{ backgroundColor: bgColor }}
-      >
+      <header className="w-full bg-sidebar pt-8 pb-16 rounded-b-[50%] z-10">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="order-3 md:order-1 mt-2 md:mt-0 scale-75 md:scale-100">
-            <ConstrixIcon
-              className=" animate-[sidebar-logo-breathe_4s_ease-in-out_infinite] will-change-transform"
-            />
+            <ConstrixIcon className=" animate-[sidebar-logo-breathe_4s_ease-in-out_infinite] will-change-transform" />
             <style jsx>{`
         @keyframes sidebar-logo-breathe {
           0%,
@@ -112,8 +117,8 @@ export default function AuthLayout({
 
       {/* Footer */}
       <footer
-        className="w-full pb-8 pt-16 rounded-t-[50%] z-10"
-        style={{ backgroundColor: bgColor }}
+        className="w-full bg-sidebar pb-8 pt-16 rounded-t-[50%] z-10"
+        style={greenStyle}
       >
         <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 text-center sm:text-start">
           <p className="text-xs sm:text-sm">{t("Login.Copyright")}</p>
