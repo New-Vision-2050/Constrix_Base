@@ -8,7 +8,6 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
 
 export default function AuthLayout({
   children,
@@ -18,36 +17,18 @@ export default function AuthLayout({
   mainLogo?: string;
 }>) {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
   const t = useTranslations();
 
-  const sparklesBg: Record<string, string> = {
-    light: "#ffffff",
-    dark: "#18003A",
-    "green-light": "#ffffff",
-    "green-dark": "#092A1E",
-  };
   const sparklesParticle: Record<string, string> = {
     light: "#18003A",
     dark: "#ffffff",
     "green-light": "#111927",
     "green-dark": "#ffffff",
   };
-  const currentTheme = mounted ? (resolvedTheme ?? "dark") : "dark";
-  const bgColor = sparklesBg[currentTheme] ?? sparklesBg.dark;
-  const particleColor = sparklesParticle[currentTheme] ?? sparklesParticle.dark;
-  const isGreenTheme =
-    currentTheme === "green-light" || currentTheme === "green-dark";
-  const greenStyle = isGreenTheme
-    ? {
-        backgroundColor: "hsl(var(--primary))",
-        color: "hsl(var(--primary-foreground))",
-      }
-    : undefined;
+  const particleColor = sparklesParticle[resolvedTheme ?? "dark"] ?? "#ffffff";
 
   return (
-    <main className="min-h-screen   flex flex-col relative overflow-hidden ">
+    <main className="min-h-screen flex flex-col relative overflow-hidden bg-background">
       {/* Language switcher */}
       {/* <div className="fixed top-4 end-4 z-50">
         <RenderLocaleSwitch />
@@ -56,7 +37,7 @@ export default function AuthLayout({
       {/* Background particles */}
       <SparklesCore
         id="tsparticlesfullpage"
-        background={bgColor}
+        background="transparent"
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
@@ -116,10 +97,7 @@ export default function AuthLayout({
       </div>
 
       {/* Footer */}
-      <footer
-        className="w-full bg-sidebar pb-8 pt-16 rounded-t-[50%] z-10"
-        style={greenStyle}
-      >
+      <footer className="w-full bg-sidebar auth-footer pb-8 pt-16 rounded-t-[50%] z-10">
         <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 text-center sm:text-start">
           <p className="text-xs sm:text-sm">{t("Login.Copyright")}</p>
           <div className="scale-75 sm:scale-100">
