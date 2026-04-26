@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { useTheme } from "next-themes";
+import React from "react";
 
 export default function AuthLayout({
   children,
@@ -60,29 +61,43 @@ export default function AuthLayout({
       >
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="order-3 md:order-1 mt-2 md:mt-0 scale-75 md:scale-100">
-            <ConstrixIcon />
+            <ConstrixIcon
+              className=" animate-[sidebar-logo-breathe_50s_ease-in-out_infinite] transition-[width] ease-linear duration-1000 will-change-transform"
+
+            />
+            <style jsx>{`
+        @keyframes sidebar-logo-breathe {
+          0%,
+          100% {
+            transform: scale(0.94);
+          }
+          50% {
+            transform: scale(1);
+          }
+        }
+      `}</style>
           </div>
           <h1 className="order-2 md:order-2 text-xl md:text-4xl text-center">
             {t("Login.Control_panel")}
           </h1>
-          <div className="order-1 md:order-3 mb-2 md:mb-0 rounded-full overflow-hidden w-[50px] h-[50px]">
+          <div className="order-1 md:order-3 mb-2 md:mb-0 rounded-full overflow-hidden w-[70px] h-[70px]">
             {mainLogo ? (
               <Image
                 src={mainLogo}
                 alt="logo"
-                width={50}
-                height={50}
+                width={70}
+                height={70}
                 priority
-                className="w-[60px] h-[60px] rounded-full object-cover overflow-hidden"
+                className="w-[70px] h-[70px] rounded-full object-cover overflow-hidden"
               />
             ) : (
               <Image
                 src={LogoPlaceholder}
                 alt={"logo placeholder"}
-                width={50}
-                height={50}
+                width={70}
+                height={70}
                 priority
-                className="w-[50px] h-[50px] rounded-full object-cover overflow-hidden"
+                className="w-[80px] h-[80px] rounded-full object-cover overflow-hidden"
               />
             )}
           </div>
