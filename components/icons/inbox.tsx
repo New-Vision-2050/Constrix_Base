@@ -14,16 +14,18 @@ function InboxIconWithCount() {
     },
   });
 
-  const { echo, companyChannelName } = useEcho();
+  const Echo = useEcho();
 
   useEffect(() => {
-    echo?.channel(companyChannelName).listen(".resource.shared", () => {
-      pendingSharesCountQuery.refetch();
-      console.log(
-        "resource.shared event received, refetching pending shares count",
-      );
-    });
-  }, [echo, companyChannelName]);
+    Echo?.echo
+      ?.channel(Echo?.companyChannelName)
+      .listen(".resource.shared", () => {
+        pendingSharesCountQuery.refetch();
+        console.log(
+          "resource.shared event received, refetching pending shares count",
+        );
+      });
+  }, [Echo?.echo, Echo?.companyChannelName]);
 
   return (
     <Badge
