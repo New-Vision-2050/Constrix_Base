@@ -73,7 +73,7 @@ export default function AuthLayout({
         @keyframes sidebar-logo-breathe {
           0%,
           100% {
-            transform: scale(0.54);
+            transform: scale(0.74);
           }
           50% {
             transform: scale(1);
