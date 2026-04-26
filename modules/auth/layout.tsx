@@ -62,14 +62,13 @@ export default function AuthLayout({
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="order-3 md:order-1 mt-2 md:mt-0 scale-75 md:scale-100">
             <ConstrixIcon
-              className=" animate-[sidebar-logo-breathe_50s_ease-in-out_infinite] transition-[width] ease-linear duration-1000 will-change-transform"
-
+              className=" animate-[sidebar-logo-breathe_4s_ease-in-out_infinite] will-change-transform"
             />
             <style jsx>{`
         @keyframes sidebar-logo-breathe {
           0%,
           100% {
-            transform: scale(0.94);
+            transform: scale(0.54);
           }
           50% {
             transform: scale(1);
