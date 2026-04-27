@@ -14,10 +14,9 @@ import {
 } from "@/modules/crm-settings/inbox/components/client-request-inbox-realtime";
 import { describeClientRequestBroadcast } from "@/modules/crm-settings/inbox/utils/describe-client-request-broadcast";
 
-
 export function ClientRequestInboxEchoSubscriber() {
   const userId = useAuthStore((s) => s.user?.id);
-  const { echo } = useEcho();
+  const echo = useEcho();
   const queryClient = useQueryClient();
   const t = useTranslations("clientRequests.inbox");
 
@@ -25,10 +24,12 @@ export function ClientRequestInboxEchoSubscriber() {
     if (!echo || !userId) return;
 
     const channelName = getClientRequestUserChannelName(userId);
-    const channel = echo.private(channelName);
+    const channel = echo?.echo.private(channelName);
 
     const invalidateInbox = () => {
-      void queryClient.invalidateQueries({ queryKey: [CRM_INBOX_LIST_QUERY_KEY] });
+      void queryClient.invalidateQueries({
+        queryKey: [CRM_INBOX_LIST_QUERY_KEY],
+      });
       void queryClient.invalidateQueries({
         queryKey: [...CRM_INBOX_PENDING_COUNT_QUERY_KEY],
       });
@@ -56,7 +57,7 @@ export function ClientRequestInboxEchoSubscriber() {
     return () => {
       channel.stopListening(createdEvent, onCreated);
       channel.stopListening(statusEvent, onStatusChanged);
-      echo.leave(channelName);
+      echo?.echo.leave(channelName);
     };
   }, [echo, userId, queryClient, t]);
 

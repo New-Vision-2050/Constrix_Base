@@ -6,6 +6,14 @@ import { useUserProfileCxt } from "../../context/user-profile-cxt";
 import useUserEmploymentContractData from "../tabs/user-contract/tabs/FunctionalAndContractualData/hooks/useUserEmploymentContractData";
 import { useMemo } from "react";
 
+function toDays(value: number, unitName: string): number {
+  const unit = unitName.toLowerCase();
+  if (unit.includes("شهر") || unit.includes("month")) return value * 30;
+  if (unit.includes("سنه") || unit.includes("سنة") || unit.includes("year")) return value * 365;
+  if (unit.includes("أسبوع") || unit.includes("week")) return value * 7;
+  return value;
+}
+
 export default function StatisticsCardsSection() {
   const { widgetData, userId } = useUserProfileCxt();
   const { data: employmentContract } = useUserEmploymentContractData(userId ?? "");
@@ -38,10 +46,22 @@ export default function StatisticsCardsSection() {
       }
     }
 
+    const trialDays =
+      employmentContract?.probation_period && employmentContract?.probation_period_unit
+        ? toDays(Number(employmentContract.probation_period), employmentContract.probation_period_unit.name ?? "")
+        : 0;
+
+    const noticeDays =
+      employmentContract?.notice_period && employmentContract?.notice_period_unit
+        ? toDays(Number(employmentContract.notice_period), employmentContract.notice_period_unit.name ?? "")
+        : 0;
+
     return {
       ...widgetData.contract,
       start_date: startDate,
       end_date: endDate,
+      trial_period_days: trialDays,
+      notice_period_days: noticeDays,
     };
   }, [widgetData?.contract, employmentContract]);
 
