@@ -18,18 +18,15 @@ function InboxIconWithCount() {
     enabled: !!ctx,
   });
 
-  const Echo = useEcho();
-
   useEffect(() => {
-    Echo?.echo
-      ?.channel(Echo?.companyChannelName)
-      .listen(".resource.shared", () => {
-        pendingSharesCountQuery.refetch();
-        console.log(
-          "resource.shared event received, refetching pending shares count",
-        );
-      });
-  }, [Echo?.echo, Echo?.companyChannelName]);
+    if (!echo || !companyChannelName) return;
+    echo.channel(companyChannelName).listen(".resource.shared", () => {
+      pendingSharesCountQuery.refetch();
+      console.log(
+        "resource.shared event received, refetching pending shares count",
+      );
+    });
+  }, [echo, companyChannelName]);
 
   return (
     <Badge
