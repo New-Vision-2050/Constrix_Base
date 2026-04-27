@@ -394,6 +394,12 @@ html {
   color: hsl(var(--primary-foreground));
 }
 
+/* Green theme auth footer */
+:is(.green-light, .green-dark) .auth-footer {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
 :is(.green-light, .green-dark) header button,
 :is(.green-light, .green-dark) header a,
 :is(.green-light, .green-dark) header svg {
@@ -410,12 +416,15 @@ html {
 }
 
 /* Green theme sidebar */
-:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"] {
+:is(.green-light, .green-dark)
+  [data-sidebar="menu-button"][data-active="true"] {
   background-color: hsl(var(--sidebar-primary));
   color: hsl(var(--sidebar-primary-foreground));
 }
 
-:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"] svg {
+:is(.green-light, .green-dark)
+  [data-sidebar="menu-button"][data-active="true"]
+  svg {
   color: hsl(var(--sidebar-primary-foreground));
 }
 
@@ -424,7 +433,8 @@ html {
   color: hsl(var(--sidebar-accent-foreground));
 }
 
-:is(.green-light, .green-dark) [data-sidebar="menu-button"][data-active="true"]:hover {
+:is(.green-light, .green-dark)
+  [data-sidebar="menu-button"][data-active="true"]:hover {
   background-color: hsl(var(--sidebar-primary));
   color: hsl(var(--sidebar-primary-foreground));
   opacity: 0.9;
