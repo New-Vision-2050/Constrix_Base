@@ -1,13 +1,12 @@
-import { EchoContext } from "@/providers/echo-provider";
+import { useEcho } from "@/hooks/use-echo";
 import { SharesApi } from "@/services/api/shares";
 import { Badge } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { Inbox } from "lucide-react";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 
 function InboxIconWithCount() {
-  const ctx = useContext(EchoContext);
-  const { echo, companyChannelName } = ctx ?? {};
+  const Echo = useEcho();
 
   const pendingSharesCountQuery = useQuery({
     queryKey: ["pendingSharesCount"],
@@ -15,10 +14,8 @@ function InboxIconWithCount() {
       const res = await SharesApi.getPendingCount();
       return res.data.payload.count;
     },
-    enabled: !!ctx,
+    enabled: !!Echo?.echo,
   });
-
-  const Echo = useEcho();
 
   useEffect(() => {
     Echo?.echo
