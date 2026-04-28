@@ -16,6 +16,8 @@ export const ProcedureSettingsApi = {
     baseApi.get<GetStepsResponse>(
       `procedure-settings/${procedureSettingId}/steps`,
     ),
+  getStep: (procedureSettingId: string, stepId: number) =>
+    baseApi.get(`procedure-settings/${procedureSettingId}/steps/${stepId}`),
   createStep: (procedureSettingId: string, args: CreateStepArgs) =>
     baseApi.post(`procedure-settings/${procedureSettingId}/steps`, args),
   updateStep: (
@@ -28,7 +30,5 @@ export const ProcedureSettingsApi = {
       args,
     ),
   deleteStep: (procedureSettingId: string, stepId: number) =>
-    baseApi.delete(
-      `procedure-settings/${procedureSettingId}/steps/${stepId}`,
-    ),
+    baseApi.delete(`procedure-settings/${procedureSettingId}/steps/${stepId}`),
 };

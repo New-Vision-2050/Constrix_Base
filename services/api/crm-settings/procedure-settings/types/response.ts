@@ -36,17 +36,27 @@ export type ProcedureStepForms =
 export interface ProcedureStep {
   id: number;
   procedure_setting_id: string;
-  employee_id: string;
+  name?: string | null;
+  branch_id?: number | null;
+  management_id?: number | null;
+  action_taker_user_ids?: string[];
+  concerned_user_ids?: string[];
   /** API may send boolean or 0/1 */
   is_accept: boolean | number;
   is_approve: boolean | number;
-  duration: number;
+  is_view_only?: boolean | number;
+  is_return_with_notes?: boolean | number;
+  requires_approval_within_period?: boolean | number;
   forms: ProcedureStepForms;
-  employee: Employee;
-  /** Step label when provided by API */
-  name?: string | null;
-  /** Selected management hierarchy id when persisted by API */
-  management_id?: string | number | null;
+  approval_within_days?: number;
+  approval_within_hours?: number;
+  escalation_user_id?: string | null;
+  notify_by_email?: boolean;
+  notify_by_whatsapp?: boolean;
+  /** Legacy fields */
+  employee_id?: string;
+  employee?: Employee;
+  duration?: number;
   management_name?: string | null;
 }
 

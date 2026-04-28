@@ -1,21 +1,23 @@
 "use client";
 
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
   Button,
-  Paper,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Checkbox,
-  Select,
+  Divider,
+  FormControlLabel,
+  Grid,
   MenuItem,
+  Select,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
 import { useState, useEffect, useCallback } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
@@ -39,103 +41,128 @@ interface EmployeeOption {
   email: string;
 }
 
-interface StepFormData {
-  stepName: string;
-  employee_id: string;
-  is_accept: boolean;
-  is_approve: boolean;
-  duration: number;
-  forms: string;
-  relevantDepartment: string;
-}
+// ─── Option constants ─────────────────────────────────────────────────────────
+const ORG_BASE_OPTIONS = [
+  { value: "approve", label: "موافقه" },
+  { value: "accept", label: "قبول" },
+  { value: "view_only", label: "اطلاع" },
+  { value: "return_with_notes", label: "اعاده بملاحظات" },
+  { value: "approve_timed", label: "موافقه اليه خلال ( مده )" },
+] as const;
 
-function mapFormsFromApi(step: ProcedureStep): string {
-  return formsKindToStepCardUi(parseProcedureStepFormsKind(step));
-}
+const ORG_TEMPLATE_OPTIONS = [
+  { value: "approve", label: "نموذج موافقه" },
+] as const;
 
-function formFromServerStep(step: ProcedureStep): StepFormData {
-  const deptId =
-    step.management_id != null && String(step.management_id).length > 0
-      ? String(step.management_id)
-      : "hr";
-  return {
-    stepName: step.name?.trim() ? String(step.name) : "",
-    employee_id: step.employee_id ?? "",
-    is_accept: coerceStepBoolean(step.is_accept),
-    is_approve: coerceStepBoolean(step.is_approve),
-    duration: step.duration,
-    forms: mapFormsFromApi(step),
-    relevantDepartment: deptId,
-  };
-}
+const NOTIFICATION_OPTIONS = [
+  { value: "email", label: "بريد" },
+  { value: "whatsapp", label: "واتساب" },
+] as const;
 
-const emptyForm = (): StepFormData => ({
-  stepName: "",
-  employee_id: "",
-  is_accept: false,
-  is_approve: false,
-  duration: 0,
-  forms: "approve",
-  relevantDepartment: "hr",
-});
+// TIME_UNITS removed - now using separate day/hour inputs
 
 interface StepCardProps {
   procedureSettingId: string;
   serverStep: ProcedureStep | null;
+  stepIndex?: number;
   onSaved: () => void;
   onDelete: () => void;
 }
 
+interface StepFormData {
+  stepName: string;
+  branchId: string;
+  managementId: string;
+  actionTakerId: string;
+  concernedUserId: string;
+  orgBase: string[];
+  orgTemplate: string;
+  notifications: string[];
+  deadlineDays: string;
+  deadlineHours: string;
+  escalationUserId: string;
+}
+
+const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
+  if (serverStep) {
+    const base: string[] = [];
+    if (coerceStepBoolean(serverStep.is_approve)) base.push("approve");
+    if (coerceStepBoolean(serverStep.is_accept)) base.push("accept");
+    if (coerceStepBoolean(serverStep.is_view_only)) base.push("view_only");
+    if (coerceStepBoolean(serverStep.is_return_with_notes))
+      base.push("return_with_notes");
+    if (coerceStepBoolean(serverStep.requires_approval_within_period))
+      base.push("approve_timed");
+
+    const notifications: string[] = [];
+    if (serverStep.notify_by_email) notifications.push("email");
+    if (serverStep.notify_by_whatsapp) notifications.push("whatsapp");
+
+    return {
+      stepName: serverStep.name?.trim() ?? "",
+      branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
+      managementId: serverStep.management_id
+        ? String(serverStep.management_id)
+        : "",
+      actionTakerId: serverStep.action_taker_user_ids?.[0] ?? "",
+      concernedUserId: serverStep.concerned_user_ids?.[0] ?? "",
+      orgBase: base.length ? base : ["approve"],
+      orgTemplate:
+        formsKindToStepCardUi(parseProcedureStepFormsKind(serverStep)) ===
+        "accept"
+          ? "accreditation_form"
+          : "approve",
+      notifications,
+      deadlineDays: String(serverStep.approval_within_days || 0),
+      deadlineHours: String(serverStep.approval_within_hours || 0),
+      escalationUserId: serverStep.escalation_user_id ?? "",
+    };
+  }
+  return {
+    stepName: "",
+    branchId: "",
+    managementId: "",
+    actionTakerId: "",
+    concernedUserId: "",
+    orgBase: ["approve"],
+    orgTemplate: "approve",
+    notifications: [],
+    deadlineDays: "0",
+    deadlineHours: "6",
+    escalationUserId: "",
+  };
+};
+
 export default function StepCard({
   procedureSettingId,
   serverStep,
+  stepIndex = 1,
   onSaved,
   onDelete,
 }: StepCardProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings");
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
-  /** Saved steps start locked until user clicks Edit; new drafts are always editable. */
   const [isEditing, setIsEditing] = useState(!serverStep);
+  const [isExpanded, setIsExpanded] = useState(!serverStep);
 
-  const [formData, setFormData] = useState<StepFormData>(emptyForm);
+  const { control, handleSubmit, reset, watch } = useForm<StepFormData>({
+    defaultValues: getDefaultValues(serverStep),
+  });
 
-  const syncFormFromServer = useCallback(() => {
-    if (serverStep) {
-      setFormData(formFromServerStep(serverStep));
-    } else {
-      setFormData(emptyForm());
-    }
-  }, [serverStep]);
+  const stepName = watch("stepName");
+  const branchId = watch("branchId");
+  const fieldsDisabled = !!serverStep && !isEditing;
+
+  const syncFromServer = useCallback(() => {
+    reset(getDefaultValues(serverStep));
+  }, [serverStep, reset]);
 
   useEffect(() => {
-    if (serverStep) {
-      setIsEditing(false);
-      setFormData(formFromServerStep(serverStep));
-    } else {
-      setIsEditing(true);
-      setFormData(emptyForm());
-    }
+    setIsEditing(!serverStep);
+    syncFromServer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serverStep]);
-
-  const isNewDraft = !serverStep;
-  const fieldsDisabled = !isNewDraft && !isEditing;
-
-  const handleChange = (
-    field: keyof StepFormData,
-    value: string | number | boolean,
-  ) => {
-    setFormData((prev) => {
-      const next =
-        field === "employee_id" ||
-        field === "forms" ||
-        field === "relevantDepartment" ||
-        field === "stepName"
-          ? { ...prev, [field]: typeof value === "string" ? value : "" }
-          : { ...prev, [field]: value };
-      return next;
-    });
-  };
 
   const { data: employeesData = [] } = useQuery<EmployeeOption[]>({
     queryKey: ["employees"],
@@ -146,15 +173,29 @@ export default function StepCard({
   });
 
   const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
-    queryKey: ["managements", "hierarchy", "management"],
+    queryKey: ["managements", "hierarchy", "management", branchId],
     queryFn: () =>
       fetchManagementHierarchyOptions(
-        `${baseURL}/management_hierarchies/list?type=management`,
+        `${baseURL}/management_hierarchies/list?type=management${branchId ? `&branch_id=${branchId}` : ""}`,
+      ),
+    enabled: !!branchId,
+  });
+
+  const { data: branches = [] } = useQuery<ManagementHierarchyOption[]>({
+    queryKey: ["branches"],
+    queryFn: () =>
+      fetchManagementHierarchyOptions(
+        `${baseURL}/management_hierarchies/list?type=branch`,
       ),
   });
 
-  const handleSave = async () => {
-    if (!formData.employee_id) {
+  const toggleArrayValue = (current: string[], val: string): string[] =>
+    current.includes(val)
+      ? current.filter((v) => v !== val)
+      : [...current, val];
+
+  const onSubmit = async (data: StepFormData) => {
+    if (!data.actionTakerId) {
       toast({
         title: t("actions.save"),
         description: t("steps.selectEmployee"),
@@ -163,24 +204,27 @@ export default function StepCard({
       return;
     }
 
-    const nameTrimmed = formData.stepName.trim();
-    const deptId = formData.relevantDepartment ?? "hr";
     const body: CreateStepArgs = {
-      employee_id: formData.employee_id,
-      is_accept: formData.is_accept,
-      is_approve: formData.is_approve,
-      duration: Number(formData.duration) || 0,
-      forms: formData.forms,
-      ...(nameTrimmed ? { name: nameTrimmed } : {}),
-      ...(deptId !== "hr"
-        ? (() => {
-            const m = managements.find((row) => row.id === deptId);
-            return {
-              management_id: deptId,
-              ...(m?.name ? { management_name: m.name } : {}),
-            };
-          })()
+      name: data.stepName.trim(),
+      action_taker_user_ids: data.actionTakerId ? [data.actionTakerId] : [],
+      concerned_user_ids: data.concernedUserId ? [data.concernedUserId] : [],
+      is_approve: data.orgBase.includes("approve"),
+      is_accept: data.orgBase.includes("accept"),
+      is_view_only: data.orgBase.includes("view_only"),
+      is_return_with_notes: data.orgBase.includes("return_with_notes"),
+      requires_approval_within_period: data.orgBase.includes("approve_timed"),
+      forms: data.orgTemplate === "accreditation_form" ? "accept" : "approve",
+      notify_by_email: data.notifications.includes("email"),
+      notify_by_whatsapp: data.notifications.includes("whatsapp"),
+      ...(data.branchId ? { branch_id: Number(data.branchId) } : {}),
+      ...(data.managementId
+        ? { management_id: Number(data.managementId) }
         : {}),
+      ...(data.escalationUserId
+        ? { escalation_user_id: data.escalationUserId }
+        : {}),
+      approval_within_days: Number(data.deadlineDays) || 0,
+      approval_within_hours: Number(data.deadlineHours) || 0,
     };
 
     setIsSaving(true);
@@ -194,6 +238,8 @@ export default function StepCard({
         setIsEditing(false);
       } else {
         await ProcedureSettingsApi.createStep(procedureSettingId, body);
+        setIsEditing(false); // Switch to view mode after add
+        setIsExpanded(false); // Collapse after add
       }
       toast({
         title: t("actions.save"),
@@ -215,191 +261,529 @@ export default function StepCard({
     }
   };
 
-  const handleCancelEdit = () => {
-    syncFormFromServer();
-    setIsEditing(false);
-  };
+  // ── layout helpers ──────────────────────────────────────────────────────────
+  const SectionLabel = ({ children }: { children: string }) => (
+    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+      {children}
+    </Typography>
+  );
 
-  const handleStartEdit = () => {
-    setIsEditing(true);
-  };
+  const CheckRow = ({
+    options,
+    selected,
+    onToggle,
+  }: {
+    options: readonly { value: string; label: string }[];
+    selected: string[];
+    onToggle: (val: string) => void;
+  }) => (
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 0.5,
+      }}
+    >
+      {options.map((opt) => (
+        <FormControlLabel
+          key={opt.value}
+          labelPlacement="end"
+          label={opt.label}
+          control={
+            <Checkbox
+              size="small"
+              checked={selected.includes(opt.value)}
+              onChange={() => onToggle(opt.value)}
+              disabled={fieldsDisabled}
+            />
+          }
+        />
+      ))}
+    </Box>
+  );
 
   return (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <div className="flex items-center justify-between mb-3">
-        <TextField
-          size="small"
-          placeholder={t("steps.enterStepName")}
-          value={formData.stepName}
-          onChange={(e) => handleChange("stepName", e.target.value)}
-          disabled={fieldsDisabled}
-          sx={{ minWidth: 250 }}
-        />
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outlined"
-            size="small"
-            color="error"
-            startIcon={<Delete />}
-            onClick={onDelete}
-          >
-            {t("actions.delete")}
-          </Button>
-          {serverStep ? (
-            isEditing ? (
-              <>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={handleCancelEdit}
-                  disabled={isSaving}
-                >
-                  {t("actions.cancel")}
-                </Button>
+    <Accordion
+      expanded={isExpanded}
+      onChange={(_, expanded) => setIsExpanded(expanded)}
+      disableGutters
+    >
+      <AccordionSummary
+        sx={{
+          flexDirection: "row-reverse",
+          px: 1.5,
+          py: 0.5,
+          "& .MuiAccordionSummary-content": {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            margin: 0,
+          },
+        }}
+      >
+        {/* Right side - Stage name with dropdown icon */}
+        <Box
+          sx={{
+            px: 2,
+            py: 1,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <KeyboardArrowDown
+            sx={{
+              transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s",
+            }}
+          />
+          <Typography variant="subtitle1" fontWeight={600}>
+            {stepName || `${t("steps.stage")} ${stepIndex}`}
+          </Typography>
+        </Box>
+        {/* Left side - Edit & Delete controls (NO BUTTONS) */}
+        <Box
+          sx={{ display: "flex", gap: 1 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {!isEditing ? (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mt: 2.5,
+                justifyContent: "flex-end",
+              }}
+            >
+              <Box
+                component="span"
+                role="button"
+                tabIndex={0}
+                aria-disabled={isEditing}
+                onClick={(e) => {
+                  if (isEditing) return;
+                  e.stopPropagation();
+                  setIsEditing(true);
+                  setIsExpanded(true);
+                }}
+                onKeyDown={(e) => {
+                  if ((e.key === "Enter" || e.key === " ") && !isEditing) {
+                    e.preventDefault();
+                    setIsEditing(true);
+                    setIsExpanded(true);
+                  }
+                }}
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: "divider",
+                  color: "text.primary",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  cursor: isEditing ? "not-allowed" : "pointer",
+                  opacity: isEditing ? 0.5 : 1,
+                  userSelect: "none",
+                  outline: "none",
+                  transition: "background 0.2s, border-color 0.2s",
+                  "&:hover, &:focus-visible": {
+                    borderColor: "primary.main",
+                    bgcolor: "action.hover",
+                  },
+                }}
+              >
+                <Edit fontSize="small" />
+                {t("actions.edit")}
+              </Box>
+            </Box>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  mt: 2.5,
+                  justifyContent: "flex-end",
+                }}
+              >
                 <Button
                   variant="contained"
                   size="small"
-                  onClick={handleSave}
+                  onClick={handleSubmit(onSubmit)}
                   disabled={isSaving}
                 >
                   {t("actions.save")}
                 </Button>
-              </>
-            ) : (
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<Edit />}
-                onClick={handleStartEdit}
-              >
-                {t("actions.edit")}
-              </Button>
-            )
-          ) : (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={handleSave}
-              disabled={isSaving}
-            >
-              {t("actions.save")}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <TableContainer>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t("procedures.employee")}</TableCell>
-              <TableCell>{t("procedures.approval")}</TableCell>
-              <TableCell>{t("procedures.accreditation")}</TableCell>
-              <TableCell>{t("procedures.exceedDuration")}</TableCell>
-              <TableCell>{t("procedures.template")}</TableCell>
-              <TableCell>{t("procedures.relevantDepartment")}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <Select
-                  size="small"
-                  value={formData.employee_id ?? ""}
-                  onChange={(e) =>
-                    handleChange("employee_id", e.target.value)
-                  }
-                  displayEmpty
-                  disabled={fieldsDisabled}
-                  sx={{ minWidth: 150 }}
-                >
-                  <MenuItem value="">{t("steps.selectEmployee")}</MenuItem>
-                  {employeesData.map((emp) => (
-                    <MenuItem key={emp.id} value={String(emp.id ?? "")}>
-                      {emp.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </TableCell>
-              <TableCell>
-                <Checkbox
-                  checked={formData.is_approve}
-                  onChange={(e) =>
-                    handleChange("is_approve", e.target.checked)
-                  }
-                  disabled={fieldsDisabled}
-                />
-              </TableCell>
-              <TableCell>
-                <Checkbox
-                  checked={formData.is_accept}
-                  onChange={(e) =>
-                    handleChange("is_accept", e.target.checked)
-                  }
-                  disabled={fieldsDisabled}
-                />
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <TextField
+                {/* Only show Cancel if editing an existing step */}
+                {serverStep && (
+                  <Button
+                    variant="outlined"
                     size="small"
-                    type="number"
-                    value={formData.duration}
-                    onChange={(e) =>
-                      handleChange(
-                        "duration",
-                        parseInt(e.target.value, 10) || 0,
-                      )
-                    }
+                    onClick={() => {
+                      syncFromServer();
+                      setIsEditing(false);
+                    }}
+                    disabled={isSaving}
+                  >
+                    {t("actions.cancel")}
+                  </Button>
+                )}
+              </Box>
+            </>
+          )}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              mt: 2.5,
+              justifyContent: "flex-end",
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="error"
+              tabIndex={0}
+              aria-disabled={isSaving}
+              onClick={(e) => {
+                if (isSaving) return;
+                e.stopPropagation();
+                onDelete();
+              }}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && !isSaving) {
+                  e.preventDefault();
+                  onDelete();
+                }
+              }}
+            >
+              <Delete fontSize="small" />
+              {t("actions.delete")}
+            </Button>
+          </Box>
+        </Box>
+      </AccordionSummary>
+
+      <AccordionDetails sx={{ p: 2.5 }}>
+        {/* Step name input */}
+        <Box sx={{ mb: 2.5 }}>
+          <Controller
+            name="stepName"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                size="small"
+                placeholder={t("steps.enterStepName")}
+                disabled={fieldsDisabled}
+                fullWidth
+              />
+            )}
+          />
+        </Box>
+
+        {/* ── الوحدة التنظيمية — 2-column grid of dropdowns ── */}
+        <Box sx={{ mb: 2.5 }}>
+          <SectionLabel>الوحدة التنظيمية</SectionLabel>
+          <Grid container spacing={2}>
+            {/* الفرع */}
+            <Grid size={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  gap: 1.5,
+                }}
+              >
+                <Controller
+                  name="branchId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">اختر الفرع</MenuItem>
+                      {branches.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </Box>
+            </Grid>
+
+            {/* الادارة */}
+            <Grid size={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  gap: 1.5,
+                }}
+              >
+                <Controller
+                  name="managementId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">اختر الادارة</MenuItem>
+                      {managements.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </Box>
+            </Grid>
+
+            {/* متخذي الاجراء */}
+            <Grid size={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  gap: 1.5,
+                }}
+              >
+                <Controller
+                  name="actionTakerId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">متخذي الاجراء</MenuItem>
+                      {employeesData.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </Box>
+            </Grid>
+
+            {/* المعنيين بالاجراء */}
+            <Grid size={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  gap: 1.5,
+                }}
+              >
+                <Controller
+                  name="concernedUserId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">المعنيين بالاجراء</MenuItem>
+                      {employeesData.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* ── القاعدة التنظيمية — checkboxes ── */}
+        <Box sx={{ mb: 2.5 }}>
+          <SectionLabel>القاعدة التنظيمية</SectionLabel>
+          <Controller
+            name="orgBase"
+            control={control}
+            render={({ field }) => (
+              <CheckRow
+                options={ORG_BASE_OPTIONS}
+                selected={field.value}
+                onToggle={(v) =>
+                  field.onChange(toggleArrayValue(field.value, v))
+                }
+              />
+            )}
+          />
+        </Box>
+
+        {/* ── النماذج التنظيمية — dropdown ── */}
+        <Box sx={{ mb: 2.5 }}>
+          <SectionLabel>النماذج التنظيمية</SectionLabel>
+          <Controller
+            name="orgTemplate"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                displayEmpty
+                size="small"
+                fullWidth
+                disabled={fieldsDisabled}
+              >
+                {ORG_TEMPLATE_OPTIONS.map((opt) => (
+                  <MenuItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          />
+        </Box>
+
+        {/* ── الاعلامات — checkboxes ── */}
+        <Box sx={{ mb: 2.5 }}>
+          <SectionLabel>الاعلامات</SectionLabel>
+          <Controller
+            name="notifications"
+            control={control}
+            render={({ field }) => (
+              <CheckRow
+                options={NOTIFICATION_OPTIONS}
+                selected={field.value}
+                onToggle={(v) =>
+                  field.onChange(toggleArrayValue(field.value, v))
+                }
+              />
+            )}
+          />
+        </Box>
+
+        {/* ── التصعيد — main section containing المهلة الزمنية ── */}
+        <Box
+          sx={{
+            p: 2,
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+            التصعيد
+          </Typography>
+
+          {/* المهلة الزمنية inside التصعيد */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+              المهلة الزمنية
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Controller
+                  name="deadlineDays"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      size="small"
+                      type="number"
+                      disabled={fieldsDisabled}
+                      sx={{ width: 80 }}
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    />
+                  )}
+                />
+                <Typography variant="body2">أيام</Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Controller
+                  name="deadlineHours"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      size="small"
+                      type="number"
+                      disabled={fieldsDisabled}
+                      sx={{ width: 80 }}
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    />
+                  )}
+                />
+                <Typography variant="body2">ساعات</Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          <Divider sx={{ my: 1.5 }} />
+
+          {/* الجهة المصعد إليها */}
+          <Box>
+            <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+              الجهة المصعد إليها
+            </Typography>
+            <Controller
+              name="escalationUserId"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <Select
+                    {...field}
+                    displayEmpty
+                    size="small"
+                    fullWidth
                     disabled={fieldsDisabled}
-                    sx={{ width: 80 }}
-                  />
-                  <span>{t("procedures.hour")}</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Select
-                  size="small"
-                  value={formData.forms ?? "approve"}
-                  onChange={(e) => handleChange("forms", e.target.value)}
-                  disabled={fieldsDisabled}
-                  sx={{ minWidth: 120 }}
-                >
-                  <MenuItem value="approve">
-                    {t("procedures.accreditationType.approval")}
-                  </MenuItem>
-                  <MenuItem value="financial">
-                    {t("procedures.accreditationType.financial")}
-                  </MenuItem>
-                  <MenuItem value="accept">
-                    {t("procedures.accreditationType.accreditation")}
-                  </MenuItem>
-                </Select>
-              </TableCell>
-              <TableCell>
-                <Select
-                  size="small"
-                  value={formData.relevantDepartment ?? "hr"}
-                  onChange={(e) =>
-                    handleChange("relevantDepartment", e.target.value)
-                  }
-                  disabled={fieldsDisabled}
-                  sx={{ minWidth: 150 }}
-                >
-                  <MenuItem value="hr">
-                    {t("procedures.humanResources")}
-                  </MenuItem>
-                  {managements.map((m) => (
-                    <MenuItem key={m.id} value={m.id}>
-                      {m.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
+                  >
+                    <MenuItem value="">اختر الجهة المصعد إليها</MenuItem>
+                    {employeesData.map((emp) => (
+                      <MenuItem key={emp.id} value={emp.id}>
+                        {emp.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {field.value && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 0.5, display: "block", textAlign: "end" }}
+                    >
+                      الجهة المصعد إليها محول الاعتماد
+                    </Typography>
+                  )}
+                </>
+              )}
+            />
+          </Box>
+        </Box>
+      </AccordionDetails>
+    </Accordion>
   );
 }
