@@ -361,15 +361,43 @@ export default function StepCard({
                 role="button"
                 tabIndex={0}
                 aria-disabled={isEditing}
-                onClick={(e) => {
+                onClick={async (e) => {
                   if (isEditing) return;
                   e.stopPropagation();
+                  if (serverStep) {
+                    try {
+                      const res = await ProcedureSettingsApi.getStep(procedureSettingId, serverStep.id);
+                      const stepData = res?.data?.payload || res?.data || res;
+                      // Map API response to form fields
+                      const mappedData: ProcedureStep = {
+                        ...stepData,
+                        action_taker_user_ids: stepData.action_takers?.map((at: { user: { id: string } }) => at.user.id) || [],
+                        concerned_user_ids: stepData.concerned_users?.map((cu: { user: { id: string } }) => cu.user.id) || [],
+                      };
+                      reset(getDefaultValues(mappedData));
+                    } catch (err) {
+                      // fallback: continue with existing data
+                    }
+                  }
                   setIsEditing(true);
                   setIsExpanded(true);
                 }}
-                onKeyDown={(e) => {
+                onKeyDown={async (e) => {
                   if ((e.key === "Enter" || e.key === " ") && !isEditing) {
                     e.preventDefault();
+                    if (serverStep) {
+                      try {
+                        const res = await ProcedureSettingsApi.getStep(procedureSettingId, serverStep.id);
+                        const stepData = res?.data?.payload || res?.data || res;
+                        // Map API response to form fields
+                        const mappedData: ProcedureStep = {
+                          ...stepData,
+                          action_taker_user_ids: stepData.action_takers?.map((at: { user: { id: string } }) => at.user.id) || [],
+                          concerned_user_ids: stepData.concerned_users?.map((cu: { user: { id: string } }) => cu.user.id) || [],
+                        };
+                        reset(getDefaultValues(mappedData));
+                      } catch (err) {}
+                    }
                     setIsEditing(true);
                     setIsExpanded(true);
                   }
@@ -714,7 +742,6 @@ export default function StepCard({
                     <TextField
                       {...field}
                       size="small"
-                      type="number"
                       disabled={fieldsDisabled}
                       sx={{ width: 80 }}
                       inputProps={{ min: 0, style: { textAlign: "center" } }}
@@ -731,7 +758,6 @@ export default function StepCard({
                     <TextField
                       {...field}
                       size="small"
-                      type="number"
                       disabled={fieldsDisabled}
                       sx={{ width: 80 }}
                       inputProps={{ min: 0, style: { textAlign: "center" } }}
