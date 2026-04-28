@@ -5,6 +5,9 @@ export interface Stage {
   execute_type: string;
   icon: string;
   percentage: number;
+  deadline_days?: number;
+  deadline_hours?: number;
+  escalation_user_id?: string;
 }
 
 export interface GetStagesResponse {

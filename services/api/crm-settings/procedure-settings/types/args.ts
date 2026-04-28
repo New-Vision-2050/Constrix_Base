@@ -4,6 +4,9 @@ export interface CreateStageArgs {
   execute_type: string;
   icon: string;
   percentage: number;
+  deadline_days: number;
+  deadline_hours: number;
+  escalation_user_id: string;
 }
 
 export interface UpdateStageArgs {
@@ -12,6 +15,9 @@ export interface UpdateStageArgs {
   execute_type?: string;
   icon?: string;
   percentage?: number;
+  deadline_days?: number;
+  deadline_hours?: number;
+  escalation_user_id?: string;
 }
 
 export interface CreateStepArgs {
