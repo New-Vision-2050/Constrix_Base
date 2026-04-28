@@ -119,6 +119,19 @@ export const clientRequestsMessages = new MessagesGroup({
       "تم تحديث طلب عميل",
     ),
   }),
+  details: new MessagesGroup({
+    tabs: new MessagesGroup({
+      details: _m("Request details", "تفاصيل الطلب"),
+      items: _m("Items", "البنود"),
+      actions: _m("Actions", "الاجراءات"),
+      attachments: _m("Attachments", "المرفقات"),
+    }),
+    loadError: _m(
+      "Could not load this request.",
+      "تعذر تحميل هذا الطلب.",
+    ),
+    backToList: _m("Back to requests", "العودة إلى الطلبات"),
+  }),
   dialog: new MessagesGroup({
     sendAs: _m("Send As", "أرسال ك"),
     send: _m("Send", "ارسال"),

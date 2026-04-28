@@ -41,6 +41,7 @@ export const ROUTER = {
     settings: "/crm-settings",
     pricesOffers: "/client-relations/prices-offers",
     clientRequests: "/crm-settings/client-requests",
+    clientRequestDetails: (id: string) => `/crm-settings/client-requests/${id}`,
     inbox: "/crm-settings/inbox",
   },
   DOCS_LIBRARY: "/docs-library",
