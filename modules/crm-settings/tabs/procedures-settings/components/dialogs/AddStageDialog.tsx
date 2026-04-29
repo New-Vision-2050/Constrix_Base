@@ -231,7 +231,7 @@ export default function AddStageDialog({
 
             {/* Icon picker */}
             <Box>
-              <FormLabel sx={{ display: "block", mb: 1, textAlign: "end" }}>
+              <FormLabel sx={{ display: "block", mb: 1 }}>
                 {t("selectIcon")} *
               </FormLabel>
               <IconPicker
@@ -262,7 +262,7 @@ export default function AddStageDialog({
             <Box>
               <FormLabel
                 error={!!errors.timeLimit}
-                sx={{ display: "block", mb: 1, textAlign: "end" }}
+                sx={{ display: "block", mb: 1 }}
               >
                 المهلة الزمنية *
               </FormLabel>
@@ -274,12 +274,11 @@ export default function AddStageDialog({
                     clearError("timeLimit");
                   }}
                   size="small"
-                  type="number"
-                  inputProps={{ min: 0, style: { textAlign: "end" } }}
+                  inputProps={{ min: 0 }}
                   error={!!errors.timeLimit}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
+                    endAdornment: (
+                      <InputAdornment position="end">
                         <Typography variant="caption">ساعات</Typography>
                       </InputAdornment>
                     ),
@@ -293,12 +292,11 @@ export default function AddStageDialog({
                     clearError("timeLimit");
                   }}
                   size="small"
-                  type="number"
-                  inputProps={{ min: 0, style: { textAlign: "end" } }}
+                  inputProps={{ min: 0 }}
                   error={!!errors.timeLimit}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
+                    endAdornment: (
+                      <InputAdornment position="end">
                         <Typography variant="caption">أيام</Typography>
                       </InputAdornment>
                     ),
