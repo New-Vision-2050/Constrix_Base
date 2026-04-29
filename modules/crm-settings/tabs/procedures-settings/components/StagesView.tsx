@@ -21,30 +21,35 @@ import {
 
 interface StagesViewProps {
   currentTabType?: string;
+  branchId?: number;
 }
 
 export default function StagesView({
   currentTabType = "client_request",
+  branchId,
 }: StagesViewProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: stagesResponse, refetch } = useQuery<GetStagesResponse>({
-    queryKey: ["procedure-settings", "stages"],
+    queryKey: ["procedure-settings", "stages", currentTabType, branchId],
     queryFn: async () => {
-      const response = await ProcedureSettingsApi.getStages();
+      const response = await ProcedureSettingsApi.getStages(
+        currentTabType,
+        branchId,
+      );
       return response.data;
     },
   });
 
-  const procedures = useMemo(
-    () =>
-      (stagesResponse?.payload || []).filter(
-        (s: Stage) => s.type === currentTabType,
-      ),
-    [stagesResponse, currentTabType],
-  );
+  // Extract work_flow_id and stages from the new response structure
+  const workFlowId = stagesResponse?.payload?.id ?? "";
+  const procedures = useMemo(() => {
+    const payload = stagesResponse?.payload;
+    const stages = payload?.["procedure-settings"];
+    return Array.isArray(stages) ? stages : [];
+  }, [stagesResponse]);
 
   const [selectedProcedureId, setSelectedProcedureId] = useState<string | null>(
     null,
@@ -79,7 +84,9 @@ export default function StagesView({
     enabled: !!selectedProcedureId,
   });
 
-  const serverSteps: ProcedureStep[] = stepsResponse?.payload ?? [];
+  const serverSteps: ProcedureStep[] = Array.isArray(stepsResponse?.payload)
+    ? stepsResponse.payload
+    : [];
 
   // --- Procedure CRUD ---
 
@@ -89,9 +96,23 @@ export default function StagesView({
     execute_type: string;
     icon: string;
     percentage: number;
+    deadline_days: number;
+    deadline_hours: number;
+    escalation_user_id: string;
   }) => {
+    if (!workFlowId) {
+      toast({
+        title: t("actions.add"),
+        description: t("messages.error"),
+        variant: "destructive",
+      });
+      return;
+    }
     try {
-      await ProcedureSettingsApi.createStage(payload);
+      await ProcedureSettingsApi.createStage({
+        ...payload,
+        work_flow_id: workFlowId,
+      });
       await refetch();
       toast({
         title: t("actions.add"),

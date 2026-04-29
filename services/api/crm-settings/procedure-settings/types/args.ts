@@ -7,6 +7,7 @@ export interface CreateStageArgs {
   deadline_days: number;
   deadline_hours: number;
   escalation_user_id: string;
+  work_flow_id: string;
 }
 
 export interface UpdateStageArgs {
@@ -18,6 +19,7 @@ export interface UpdateStageArgs {
   deadline_days?: number;
   deadline_hours?: number;
   escalation_user_id?: string;
+  work_flow_id?: string;
 }
 
 export interface CreateStepArgs {

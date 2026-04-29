@@ -5,7 +5,6 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Button,
   Checkbox,
   Divider,
   FormControlLabel,
@@ -168,7 +167,8 @@ export default function StepCard({
     queryKey: ["employees"],
     queryFn: async () => {
       const response = await apiClient.get("/company-users/employees");
-      return response.data.payload || response.data;
+      const payload = response.data?.payload ?? response.data;
+      return Array.isArray(payload) ? payload : [];
     },
   });
 
@@ -375,7 +375,7 @@ export default function StepCard({
                         concerned_user_ids: stepData.concerned_users?.map((cu: { user: { id: string } }) => cu.user.id) || [],
                       };
                       reset(getDefaultValues(mappedData));
-                    } catch (err) {
+                    } catch {
                       // fallback: continue with existing data
                     }
                   }
@@ -396,7 +396,7 @@ export default function StepCard({
                           concerned_user_ids: stepData.concerned_users?.map((cu: { user: { id: string } }) => cu.user.id) || [],
                         };
                         reset(getDefaultValues(mappedData));
-                      } catch (err) {}
+                      } catch {}
                     }
                     setIsEditing(true);
                     setIsExpanded(true);
@@ -439,27 +439,88 @@ export default function StepCard({
                   justifyContent: "flex-end",
                 }}
               >
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleSubmit(onSubmit)}
-                  disabled={isSaving}
+                <Box
+                  component="span"
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isSaving) handleSubmit(onSubmit)();
+                  }}
+                  onKeyDown={(e) => {
+                    if ((e.key === "Enter" || e.key === " ") && !isSaving) {
+                      e.preventDefault();
+                      handleSubmit(onSubmit)();
+                    }
+                  }}
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 1,
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    opacity: isSaving ? 0.5 : 1,
+                    userSelect: "none",
+                    outline: "none",
+                    transition: "background 0.2s",
+                    "&:hover, &:focus-visible": {
+                      bgcolor: "primary.dark",
+                    },
+                  }}
                 >
                   {t("actions.save")}
-                </Button>
+                </Box>
                 {/* Only show Cancel if editing an existing step */}
                 {serverStep && (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                      syncFromServer();
-                      setIsEditing(false);
+                  <Box
+                    component="span"
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isSaving) {
+                        syncFromServer();
+                        setIsEditing(false);
+                      }
                     }}
-                    disabled={isSaving}
+                    onKeyDown={(e) => {
+                      if ((e.key === "Enter" || e.key === " ") && !isSaving) {
+                        e.preventDefault();
+                        syncFromServer();
+                        setIsEditing(false);
+                      }
+                    }}
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 1,
+                      border: 1,
+                      borderColor: "divider",
+                      color: "text.primary",
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      cursor: isSaving ? "not-allowed" : "pointer",
+                      opacity: isSaving ? 0.5 : 1,
+                      userSelect: "none",
+                      outline: "none",
+                      transition: "background 0.2s, border-color 0.2s",
+                      "&:hover, &:focus-visible": {
+                        borderColor: "primary.main",
+                        bgcolor: "action.hover",
+                      },
+                    }}
                   >
                     {t("actions.cancel")}
-                  </Button>
+                  </Box>
                 )}
               </Box>
             </>
@@ -472,11 +533,10 @@ export default function StepCard({
               justifyContent: "flex-end",
             }}
           >
-            <Button
-              variant="outlined"
-              color="error"
+            <Box
+              component="span"
+              role="button"
               tabIndex={0}
-              aria-disabled={isSaving}
               onClick={(e) => {
                 if (isSaving) return;
                 e.stopPropagation();
@@ -488,10 +548,31 @@ export default function StepCard({
                   onDelete();
                 }
               }}
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                border: 1,
+                borderColor: "error.main",
+                color: "error.main",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                cursor: isSaving ? "not-allowed" : "pointer",
+                opacity: isSaving ? 0.5 : 1,
+                userSelect: "none",
+                outline: "none",
+                transition: "background 0.2s, border-color 0.2s",
+                "&:hover, &:focus-visible": {
+                  bgcolor: "error.lighter",
+                },
+              }}
             >
               <Delete fontSize="small" />
               {t("actions.delete")}
-            </Button>
+            </Box>
           </Box>
         </Box>
       </AccordionSummary>

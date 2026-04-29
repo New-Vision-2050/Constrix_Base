@@ -7,12 +7,10 @@ import {
   DialogActions,
   TextField,
   Button,
-  FormControl,
   FormLabel,
   Box,
   Switch,
   Typography,
-  Select,
   MenuItem,
   FormHelperText,
   InputAdornment,
@@ -83,7 +81,8 @@ export default function AddStageDialog({
     queryKey: ["employees"],
     queryFn: async () => {
       const response = await apiClient.get("/company-users/employees");
-      return response.data.payload || response.data;
+      const payload = response.data?.payload ?? response.data;
+      return Array.isArray(payload) ? payload : [];
     },
   });
   const [errors, setErrors] = useState<{
@@ -315,30 +314,22 @@ export default function AddStageDialog({
             </Box>
 
             {/* Escalation target */}
-            <Box>
-              <FormControl fullWidth size="small">
-                <Select
-                  value={escalationUserId}
-                  onChange={(e) => setEscalationUserId(e.target.value)}
-                  displayEmpty
-                  renderValue={(val) =>
-                    val
-                      ? (employees.find((e) => e.id === val)?.name ?? val)
-                      : "الجهة المصعد اليها"
-                  }
-                >
-                  <MenuItem value="">الجهة المصعد اليها</MenuItem>
-                  {employees.map((emp) => (
-                    <MenuItem key={emp.id} value={emp.id}>
-                      {emp.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
-                الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة
-              </FormHelperText>
-            </Box>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              value={escalationUserId}
+              onChange={(e) => setEscalationUserId(e.target.value)}
+              label="الجهة المصعد اليها"
+              helperText="الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة"
+            >
+              <MenuItem value="">الجهة المصعد اليها</MenuItem>
+              {employees.map((emp) => (
+                <MenuItem key={emp.id} value={emp.id}>
+                  {emp.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Box>
         </Box>
       </DialogContent>
