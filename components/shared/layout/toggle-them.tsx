@@ -1,16 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Palette } from "lucide-react";
 import { useTheme } from "next-themes";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useLocale } from "next-intl";
 import { useEffect, useCallback } from "react";
+import { IconButton, Menu, MenuItem, Stack, Box } from "@mui/material";
 
 const GREEN_SYSTEM_KEY = "green-system-mode";
 
@@ -18,6 +13,7 @@ const ToggleTheme = () => {
   const { setTheme, theme } = useTheme();
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const resolveGreenSystem = useCallback(() => {
     const prefersDark = window.matchMedia(
@@ -41,40 +37,94 @@ const ToggleTheme = () => {
   const handleTheme = (value: string) => {
     localStorage.setItem(GREEN_SYSTEM_KEY, "false");
     setTheme(value);
+    handleClose();
   };
 
-  const isGreen =
-    theme === "green-light" ||
-    theme === "green-dark";
+  const isGreen = theme === "green-light" || theme === "green-dark";
+
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size={"icon"} variant={"ghost"}>
-          <Palette className="h-7 w-7" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align={isRtl ? "start" : "end"}>
-        <DropdownMenuItem
-          className={!isGreen ? "bg-accent dark:bg-white/10" : ""}
-          onClick={() => handleTheme(isGreen ? (theme === "green-dark" ? "dark" : "light") : theme || "dark")}
+    <>
+      <IconButton onClick={handleOpen}>
+        <Palette />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: isRtl ? "right" : "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: isRtl ? "right" : "left",
+        }}
+      >
+        <MenuItem
+          onClick={() =>
+            handleTheme(
+              isGreen
+                ? theme === "green-dark"
+                  ? "dark"
+                  : "light"
+                : theme || "dark",
+            )
+          }
+          sx={{
+            backgroundColor: !isGreen
+              ? "rgba(159, 18, 57, 0.1)"
+              : "transparent",
+            "&:hover": {
+              backgroundColor: !isGreen
+                ? "rgba(159, 18, 57, 0.2)"
+                : "rgba(0, 0, 0, 0.04)",
+            },
+          }}
         >
           Default
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className={isGreen ? "bg-accent dark:bg-white/10" : ""}
-          onClick={() => handleTheme(isGreen ? theme : (theme === "dark" || theme === "system" ? "green-dark" : "green-light"))}
+        </MenuItem>
+        <MenuItem
+          onClick={() =>
+            handleTheme(
+              isGreen
+                ? theme
+                : theme === "dark" || theme === "system"
+                  ? "green-dark"
+                  : "green-light",
+            )
+          }
+          sx={{
+            backgroundColor: isGreen ? "rgba(159, 18, 57, 0.1)" : "transparent",
+            "&:hover": {
+              backgroundColor: isGreen
+                ? "rgba(159, 18, 57, 0.2)"
+                : "rgba(0, 0, 0, 0.04)",
+            },
+          }}
         >
-          <span className="flex items-center gap-1.5">
-            <span
-              className="inline-block h-2.5 w-2.5 rounded-full"
-              style={{ background: isGreen ? "#25935F" : "#88D8AD" }}
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box
+              sx={{
+                display: "inline-block",
+                height: "10px",
+                width: "10px",
+                borderRadius: "50%",
+                background: isGreen ? "#25935F" : "#88D8AD",
+              }}
             />
-            Green
-          </span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <span>Green</span>
+          </Stack>
+        </MenuItem>
+      </Menu>
+    </>
   );
 };
 

@@ -6,7 +6,7 @@ import Notification from "./notification";
 import ProfileDrop from "./profile-drop";
 import Breadcrumbs, { getRoutesMap } from "../breadcrumbs";
 import { useLocale, useTranslations } from "next-intl";
-import { IconButton } from "@mui/material";
+import { Box, Stack, IconButton, useTheme } from "@mui/material";
 import { Menu } from "lucide-react";
 
 interface HeaderProps {
@@ -15,14 +15,61 @@ interface HeaderProps {
 
 const Header = ({ onMobileMenuClick }: HeaderProps) => {
   const locale = useLocale();
+  const theme = useTheme();
+
   // Get the routes map based on the current language
   const t = useTranslations("breadcrumbs");
   const routesMap = getRoutesMap(locale, t);
 
+  // Get theme-aware colors for glass-morphism effect
+  const bgColor =
+    theme.palette.mode === "dark"
+      ? "rgba(30, 41, 59, 0.75)"
+      : "rgba(248, 250, 252, 0.75)";
+  const borderColor =
+    theme.palette.mode === "dark"
+      ? "rgba(148, 163, 184, 0.12)"
+      : "rgba(203, 213, 225, 0.4)";
+
   return (
-    <header className="flex h-16 m-7 mb-5 bg-sidebar shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 px-3">
-      <div className="w-full flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <Box
+      component="header"
+      sx={{
+        display: "flex",
+        height: "64px",
+        mx: 3.5,
+        mb: 2.5,
+        mt: 2,
+        backgroundColor: bgColor,
+        backdropFilter: "blur(15px)",
+        borderRadius: "12px",
+        border: `1px solid ${borderColor}`,
+        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
+        alignItems: "center",
+        gap: 2,
+        transition: "all 200ms ease-in-out",
+        px: 3,
+        "&:hover": {
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+        },
+      }}
+    >
+      <Stack
+        direction="row"
+        sx={{
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        {/* Left side - Menu button + Breadcrumbs */}
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <IconButton
             onClick={onMobileMenuClick}
             sx={{
@@ -33,21 +80,31 @@ const Header = ({ onMobileMenuClick }: HeaderProps) => {
           >
             <Menu size={20} />
           </IconButton>
-          <Breadcrumbs
-            homeLabel={t("home")}
-            className="breadcrumbs-container"
-            routesMap={routesMap}
-          />
-        </div>
-        <div className="flex gap-6 items-center">
+          <Box className="breadcrumbs-container">
+            <Breadcrumbs
+              homeLabel={t("home")}
+              className="breadcrumbs-container"
+              routesMap={routesMap}
+            />
+          </Box>
+        </Stack>
+
+        {/* Right side - Toggle buttons */}
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <ToggleLang />
           <ToggleMode />
           <ToggleTheme />
           <Notification />
           <ProfileDrop />
-        </div>
-      </div>
-    </header>
+        </Stack>
+      </Stack>
+    </Box>
   );
 };
 
