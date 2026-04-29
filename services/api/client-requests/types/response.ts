@@ -1,4 +1,5 @@
 import { Attachment } from "@/types/admin-request";
+import type { TermServiceSettingItem } from "@/services/api/crm-settings/term-service-settings/types/response";
 
 
 export interface Pagination {
@@ -100,4 +101,6 @@ export interface ClientRequestRow {
   management: { id: string; name: string } | null;
   financial_responsible: { id: string; name: string } | null;
   attachments: Attachment[];
+  /** Nested term/service tree from the API (`term_service_settings`). */
+  term_service_settings?: TermServiceSettingItem[];
 }
