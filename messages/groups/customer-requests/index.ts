@@ -109,6 +109,11 @@ export const clientRequestsMessages = new MessagesGroup({
     ),
     viewDetails: _m("View details", "عرض التفاصيل"),
     servicesSelected: _m("Selected services", "الخدمات المختارة"),
+    servicesSectionTitle: _m("Services", "الخدمات"),
+    servicesSectionHint: _m(
+      "Terms and services submitted with this client request.",
+      "البنود والخدمات المرتبطة بهذا الطلب.",
+    ),
     closeDialog: _m("Close", "إغلاق"),
     toastRealtimeNewRequest: _m(
       "New client request",

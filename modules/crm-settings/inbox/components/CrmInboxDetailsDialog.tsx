@@ -24,6 +24,7 @@ import {
   inboxAttachmentFileName,
   type InboxRequestAttachmentLink,
 } from "@/modules/crm-settings/inbox/components/inbox-request-dialog";
+import { ClientRequestTermServicesSection } from "@/modules/crm-settings/inbox/components/ClientRequestTermServicesSection";
 
 function mapClientRequestToDocumentRow(row: ClientRequestRow): DocumentRow {
   const typeName = row.client_request_type?.name?.trim();
@@ -149,6 +150,8 @@ export default function CrmInboxDetailsDialog({
     [row, tDoc, t],
   );
 
+  const termServiceSettings = row?.term_service_settings ?? [];
+
   const handleAccept = () => {
     onAccept();
   };
@@ -214,6 +217,10 @@ export default function CrmInboxDetailsDialog({
                   }))
                 : undefined
             }
+          />
+          <ClientRequestTermServicesSection
+            termServiceSettings={termServiceSettings}
+            emptyLabel={t("emptyDash")}
           />
           {showActions ? (
             <InboxRequestActionRow
