@@ -119,22 +119,25 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
     useEffect(() => {
       const payload = stepsData?.payload;
       if (Array.isArray(payload)) {
-        const apiProcedures: Procedure[] = payload.map((step: ProcedureStep) => {
-          const deptId =
-            step.management_id != null && String(step.management_id).length > 0
-              ? String(step.management_id)
-              : "hr";
-          return {
-            id: step.id,
-            stepName: step.name?.trim() ? String(step.name) : "",
-            employee_id: step.employee_id || "",
-            is_accept: coerceStepBoolean(step.is_accept),
-            is_approve: coerceStepBoolean(step.is_approve),
-            duration: step.duration || 0,
-            forms: mapFormsApiToUi(step),
-            relevantDepartment: deptId,
-          };
-        });
+        const apiProcedures: Procedure[] = payload.map(
+          (step: ProcedureStep) => {
+            const deptId =
+              step.management_id != null &&
+              String(step.management_id).length > 0
+                ? String(step.management_id)
+                : "hr";
+            return {
+              id: step.id,
+              stepName: step.name?.trim() ? String(step.name) : "",
+              employee_id: step.employee_id || "",
+              is_accept: coerceStepBoolean(step.is_accept),
+              is_approve: coerceStepBoolean(step.is_approve),
+              duration: step.duration || 0,
+              forms: mapFormsApiToUi(step),
+              relevantDepartment: deptId,
+            };
+          },
+        );
         setProcedures(apiProcedures);
       }
     }, [stepsData]);
@@ -158,7 +161,9 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
         const nameTrimmed = procedure.stepName?.trim() ?? "";
         const stepData: CreateStepArgs = {
           name: nameTrimmed,
-          action_taker_user_ids: procedure.employee_id ? [procedure.employee_id] : [],
+          action_taker_user_ids: procedure.employee_id
+            ? [procedure.employee_id]
+            : [],
           concerned_user_ids: [],
           is_accept: procedure.is_accept,
           is_approve: procedure.is_approve,
@@ -213,7 +218,9 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       const nameTrim = procedureData.stepName?.trim();
       const stepData: CreateStepArgs = {
         name: nameTrim ?? "",
-        action_taker_user_ids: procedureData.employee_id ? [procedureData.employee_id] : [],
+        action_taker_user_ids: procedureData.employee_id
+          ? [procedureData.employee_id]
+          : [],
         concerned_user_ids: [],
         is_accept: procedureData.is_accept,
         is_approve: procedureData.is_approve,

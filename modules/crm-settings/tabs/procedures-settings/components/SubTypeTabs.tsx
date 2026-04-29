@@ -58,9 +58,8 @@ export default function SubTypeTabs() {
         undefined,
       ],
       queryFn: async () => {
-        const response = await ProcedureSettingsApi.getStages(
-          getCurrentTabType(),
-        );
+        const response =
+          await ProcedureSettingsApi.getStages(getCurrentTabType());
         return response.data;
       },
     });
@@ -68,9 +67,7 @@ export default function SubTypeTabs() {
   // Derive checked state from API response branches list
   const branchUsesWorkPlan = useMemo(() => {
     const workflowBranches = workflowResponse?.payload?.branches ?? [];
-    const checkedBranchIds = new Set(
-      workflowBranches.map((b) => String(b.id)),
-    );
+    const checkedBranchIds = new Set(workflowBranches.map((b) => String(b.id)));
     return Object.fromEntries(
       branches.map((b) => [b.id, checkedBranchIds.has(String(b.id))]),
     );
