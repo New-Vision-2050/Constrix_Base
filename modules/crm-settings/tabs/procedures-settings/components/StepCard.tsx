@@ -313,6 +313,7 @@ export default function StepCard({
           flexDirection: "row-reverse",
           px: 1.5,
           py: 0.5,
+          mt: 2,
           "& .MuiAccordionSummary-content": {
             display: "flex",
             justifyContent: "space-between",
@@ -352,7 +353,7 @@ export default function StepCard({
               sx={{
                 display: "flex",
                 gap: 1,
-                mt: 2.5,
+
                 justifyContent: "flex-end",
               }}
             >
@@ -453,7 +454,7 @@ export default function StepCard({
                 sx={{
                   display: "flex",
                   gap: 1,
-                  mt: 2.5,
+
                   justifyContent: "flex-end",
                 }}
               >
@@ -547,7 +548,7 @@ export default function StepCard({
             sx={{
               display: "flex",
               gap: 1,
-              mt: 2.5,
+
               justifyContent: "flex-end",
             }}
           >
