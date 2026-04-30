@@ -11,7 +11,6 @@ import {
   Box,
   Switch,
   Typography,
-  MenuItem,
   FormHelperText,
   InputAdornment,
 } from "@mui/material";
@@ -21,6 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import IconPicker from "@/components/shared/icon-picker";
 import { APP_ICONS } from "@/constants/icons";
+import SearchableSelect from "@/components/shared/SearchableSelect";
 
 const PROCEDURE_DIALOG_ICON_IDS = [
   "person-outline",
@@ -70,7 +70,7 @@ export default function AddStageDialog({
 
   const [name, setName] = useState("");
   const [sequentialApproval, setSequentialApproval] = useState(true);
-  const [parallelApproval, setParallelApproval] = useState(true);
+  const [parallelApproval, setParallelApproval] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [durationPercentage, setDurationPercentage] = useState("");
   const [deadlineHours, setDeadlineHours] = useState("");
@@ -124,7 +124,7 @@ export default function AddStageDialog({
   const handleClose = () => {
     setName("");
     setSequentialApproval(true);
-    setParallelApproval(true);
+    setParallelApproval(false);
     setSelectedIcon(null);
     setDurationPercentage("");
     setDeadlineHours("");
@@ -137,7 +137,12 @@ export default function AddStageDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", pb: 1 }}>
-        اعداد أجراءات الاعتماد
+        {currentTabType === "contract" && "اعداد إجراءات العقود"}
+        {currentTabType === "meeting" && "اعداد إجراءات الاجتماعات"}
+        {currentTabType === "price" && "اعداد إجراءات الأسعار"}
+        {currentTabType === "employees" && "اعداد إجراءات الموظفين"}
+        {currentTabType === "client_request" && "اعداد إجراءات طلبات العملاء"}
+        {!["contract", "meeting", "price", "employees", "client_request"].includes(currentTabType) && "اعداد أجراءات الاعتماد"}
       </DialogTitle>
 
       <DialogContent>
@@ -166,9 +171,9 @@ export default function AddStageDialog({
               <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
                 <Switch
                   checked={sequentialApproval}
-                  onChange={(e) => {
-                    setSequentialApproval(e.target.checked);
-                    if (e.target.checked) setParallelApproval(false);
+                  onChange={() => {
+                    setSequentialApproval(true);
+                    setParallelApproval(false);
                   }}
                   color="secondary"
                 />
@@ -195,9 +200,9 @@ export default function AddStageDialog({
               <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
                 <Switch
                   checked={parallelApproval}
-                  onChange={(e) => {
-                    setParallelApproval(e.target.checked);
-                    if (e.target.checked) setSequentialApproval(false);
+                  onChange={() => {
+                    setParallelApproval(true);
+                    setSequentialApproval(false);
                   }}
                   color="primary"
                 />
@@ -312,22 +317,23 @@ export default function AddStageDialog({
             </Box>
 
             {/* Escalation target */}
-            <TextField
-              select
-              fullWidth
-              size="small"
-              value={escalationUserId}
-              onChange={(e) => setEscalationUserId(e.target.value)}
-              label="الجهة المصعد اليها"
-              helperText="الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة"
-            >
-              <MenuItem value="">الجهة المصعد اليها</MenuItem>
-              {employees.map((emp) => (
-                <MenuItem key={emp.id} value={emp.id}>
-                  {emp.name}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Box>
+              <SearchableSelect
+                options={employees.map((emp) => ({
+                  value: emp.id,
+                  label: emp.name,
+                }))}
+                value={escalationUserId}
+                onChange={(val) => setEscalationUserId(String(val))}
+                placeholder="الجهة المصعد اليها"
+                searchPlaceholder="البحث عن موظف..."
+                noResultsText="لا توجد نتائج"
+                label="الجهة المصعد اليها"
+              />
+              <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
+                الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة
+              </FormHelperText>
+            </Box>
           </Box>
         </Box>
       </DialogContent>
