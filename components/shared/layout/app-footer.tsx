@@ -16,7 +16,11 @@ function AppFooter() {
         <Typography variant="subtitle2">{t("footerMessage")}</Typography>
         <NewVisionWhite color={palette.text.primary} />
       </div>
-      <FooterWave color={color} className="absolute bottom-0 -z-10 w-full " />
+      <FooterWave
+        color={color}
+        className="absolute bottom-0 -z-10 "
+        width="100%"
+      />
     </div>
   );
 }
