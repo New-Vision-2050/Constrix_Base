@@ -62,7 +62,7 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 240, 73%, 97%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
 
@@ -137,7 +137,7 @@
 
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 265 100% 11%;
+    --sidebar-background: 248, 55%, 13%;
 
     --sidebar-foreground: 0 0% 95.9%;
 
@@ -215,7 +215,7 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 0, 0%, 95%;
 
     --sidebar-foreground: 218 39% 11%;
 
@@ -295,7 +295,7 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 158 65% 10%;
+    --sidebar-background: 157, 63%, 17%;
 
     --sidebar-foreground: 220 14% 98%;
 
