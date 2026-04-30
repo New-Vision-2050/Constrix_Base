@@ -40,7 +40,7 @@ const Header = ({ onMobileMenuClick }: HeaderProps) => {
         mx: 3.5,
         mb: 2.5,
         mt: 2,
-        backgroundColor: bgColor,
+        backgroundColor: "background.paper",
         backdropFilter: "blur(15px)",
         borderRadius: "12px",
         border: `1px solid ${borderColor}`,
