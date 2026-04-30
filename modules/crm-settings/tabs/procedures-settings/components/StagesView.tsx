@@ -248,7 +248,13 @@ export default function StagesView({
           {currentTabType === "price" && "اعداد إجراءات الأسعار"}
           {currentTabType === "employees" && "اعداد إجراءات الموظفين"}
           {currentTabType === "client_request" && "اعداد إجراءات طلبات العملاء"}
-          {!["contract", "meeting", "price", "employees", "client_request"].includes(currentTabType) && "اعداد إجراءات الطلبات"}
+          {![
+            "contract",
+            "meeting",
+            "price",
+            "employees",
+            "client_request",
+          ].includes(currentTabType) && "اعداد إجراءات الطلبات"}
         </Typography>
         <Button variant="contained" onClick={handleAddStep}>
           اضافة مرحلة

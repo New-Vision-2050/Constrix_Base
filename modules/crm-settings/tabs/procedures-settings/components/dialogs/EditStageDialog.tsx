@@ -211,7 +211,13 @@ export default function EditStageDialog({
         {currentTabType === "price" && "تعديل إجراءات الأسعار"}
         {currentTabType === "employees" && "تعديل إجراءات الموظفين"}
         {currentTabType === "client_request" && "تعديل إجراءات طلبات العملاء"}
-        {!["contract", "meeting", "price", "employees", "client_request"].includes(currentTabType) && t("editStage")}
+        {![
+          "contract",
+          "meeting",
+          "price",
+          "employees",
+          "client_request",
+        ].includes(currentTabType) && t("editStage")}
       </DialogTitle>
 
       <DialogContent>

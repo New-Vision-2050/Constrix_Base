@@ -142,7 +142,13 @@ export default function AddStageDialog({
         {currentTabType === "price" && "اعداد إجراءات الأسعار"}
         {currentTabType === "employees" && "اعداد إجراءات الموظفين"}
         {currentTabType === "client_request" && "اعداد إجراءات طلبات العملاء"}
-        {!["contract", "meeting", "price", "employees", "client_request"].includes(currentTabType) && "اعداد أجراءات الاعتماد"}
+        {![
+          "contract",
+          "meeting",
+          "price",
+          "employees",
+          "client_request",
+        ].includes(currentTabType) && "اعداد أجراءات الاعتماد"}
       </DialogTitle>
 
       <DialogContent>
