@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
 import { MobileDrawer } from "./mobile-drawer";
+import AppFooter from "./app-footer";
 
 export default function MainLayout({
   children,
@@ -101,7 +102,8 @@ export default function MainLayout({
         />
         <SidebarInset className="bg-transparent md:overflow-hidden border-none">
           <Header onMobileMenuClick={handleMobileDrawerToggle} />
-          {children}
+          <div className="px-4 w-full">{children}</div>
+          <AppFooter />
         </SidebarInset>
       </SidebarProvider>
     </main>

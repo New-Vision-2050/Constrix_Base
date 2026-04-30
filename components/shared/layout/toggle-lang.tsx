@@ -1,23 +1,19 @@
 "use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 import LangIcon from "@/public/icons/lang";
 import { usePathname } from "@i18n/navigation";
 import { SA, US } from "country-flag-icons/react/3x2";
-import { Button } from "@/components/ui/button";
 import { useLocale } from "next-intl";
-import { Check } from "lucide-react";
+import { Check, Languages } from "lucide-react";
+import { IconButton, Menu, MenuItem, Stack } from "@mui/material";
+import { LanguageSharp } from "@mui/icons-material";
 
 const ToggleLang = () => {
   const locale = useLocale();
   const isRtl = locale === "ar";
-
   const pathname = usePathname();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleLocaleChange = (newLocale: string) => {
     // Get the base path (e.g., /companies)
@@ -28,32 +24,59 @@ const ToggleLang = () => {
     window.location.href = newPathname;
   };
 
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSelectLocale = (newLocale: string) => {
+    handleClose();
+    handleLocaleChange(newLocale);
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size={"icon"} variant={"ghost"}>
-          <LangIcon />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align={isRtl ? "start" : "end"}>
-        <DropdownMenuItem onClick={() => handleLocaleChange("en")}>
-          <US
-            style={{ width: "20px", marginRight: "5px" }}
-            title="United States"
-          />
-          English
-          {locale == "en" && <Check className="w-4 h-4" />}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleLocaleChange("ar")}>
-          <SA
-            style={{ width: "20px", marginRight: "5px" }}
-            title="Saudi Arabia"
-          />
-          العربية
-          {locale == "ar" && <Check className="w-4 h-4" />}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <IconButton onClick={handleOpen}>
+        <Languages />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: isRtl ? "right" : "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: isRtl ? "right" : "left",
+        }}
+      >
+        <MenuItem
+          onClick={() => handleSelectLocale("en")}
+          selected={locale === "en"}
+        >
+          <Stack direction="row" spacing={1} alignItems="center">
+            <US style={{ width: "20px" }} title="United States" />
+            <span>English</span>
+            {locale === "en" && <Check size={16} />}
+          </Stack>
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleSelectLocale("ar")}
+          selected={locale === "ar"}
+        >
+          <Stack direction="row" spacing={1} alignItems="center">
+            <SA style={{ width: "20px" }} title="Saudi Arabia" />
+            <span>العربية</span>
+            {locale === "ar" && <Check size={16} />}
+          </Stack>
+        </MenuItem>
+      </Menu>
+    </>
   );
 };
 

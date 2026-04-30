@@ -308,16 +308,31 @@ export function ServiceItemAccordion({
         component="div"
         expandIcon={<ExpandMoreIcon />}
         sx={{
+          cursor: "pointer",
+          width: "100%",
           "& .MuiAccordionSummary-content": {
             alignItems: "center",
+            width: "100%",
+            margin: 0,
           },
         }}
       >
         <Box
-          sx={{ flex: 1, ms: 1, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 1 }}
+          sx={{
+            flex: 1,
+            ms: 1,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 1,
+            minWidth: 0,
+          }}
         >
-          <Box onClick={(e) => e.stopPropagation()} sx={{ display: "flex", flex: 1, minWidth: 0 }}>
-            {selectable ? (
+          {selectable ? (
+            <Box
+              onClick={(e) => e.stopPropagation()}
+              sx={{ display: "flex", flex: 1, minWidth: 0 }}
+            >
               <FormControlLabel
                 label={item.name}
                 control={
@@ -332,13 +347,16 @@ export function ServiceItemAccordion({
                   "& .MuiFormControlLabel-label": { flex: 1 },
                 }}
               />
-            ) : (
-              <Typography variant="body1" sx={{ flex: 1 }}>
-                {item.name}
-              </Typography>
-            )}
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            </Box>
+          ) : (
+            <Typography variant="body1" sx={{ flex: 1, minWidth: 0 }}>
+              {item.name}
+            </Typography>
+          )}
+          <Box
+            onClick={(e) => e.stopPropagation()}
+            sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}
+          >
             {selectable && (
               <span className="text-sm text-gray-500">({selectedCount}/{leafIds.length})</span>
             )}
