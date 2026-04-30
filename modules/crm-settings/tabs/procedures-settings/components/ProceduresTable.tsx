@@ -117,23 +117,27 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
 
     // Update procedures when API data is loaded
     useEffect(() => {
-      if (stepsData?.payload) {
-        const apiProcedures = stepsData.payload.map((step: ProcedureStep) => {
-          const deptId =
-            step.management_id != null && String(step.management_id).length > 0
-              ? String(step.management_id)
-              : "hr";
-          return {
-            id: step.id,
-            stepName: step.name?.trim() ? String(step.name) : "",
-            employee_id: step.employee_id,
-            is_accept: coerceStepBoolean(step.is_accept),
-            is_approve: coerceStepBoolean(step.is_approve),
-            duration: step.duration,
-            forms: mapFormsApiToUi(step),
-            relevantDepartment: deptId,
-          };
-        });
+      const payload = stepsData?.payload;
+      if (Array.isArray(payload)) {
+        const apiProcedures: Procedure[] = payload.map(
+          (step: ProcedureStep) => {
+            const deptId =
+              step.management_id != null &&
+              String(step.management_id).length > 0
+                ? String(step.management_id)
+                : "hr";
+            return {
+              id: step.id,
+              stepName: step.name?.trim() ? String(step.name) : "",
+              employee_id: step.employee_id || "",
+              is_accept: coerceStepBoolean(step.is_accept),
+              is_approve: coerceStepBoolean(step.is_approve),
+              duration: step.duration || 0,
+              forms: mapFormsApiToUi(step),
+              relevantDepartment: deptId,
+            };
+          },
+        );
         setProcedures(apiProcedures);
       }
     }, [stepsData]);
@@ -156,12 +160,19 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       for (const procedure of validProcedures) {
         const nameTrimmed = procedure.stepName?.trim() ?? "";
         const stepData: CreateStepArgs = {
-          employee_id: procedure.employee_id,
+          name: nameTrimmed,
+          action_taker_user_ids: procedure.employee_id
+            ? [procedure.employee_id]
+            : [],
+          concerned_user_ids: [],
           is_accept: procedure.is_accept,
           is_approve: procedure.is_approve,
-          duration: procedure.duration,
+          is_view_only: false,
+          is_return_with_notes: false,
+          requires_approval_within_period: false,
           forms: mapFormsUiToApi(procedure.forms),
-          ...(nameTrimmed ? { name: nameTrimmed } : {}),
+          notify_by_email: false,
+          notify_by_whatsapp: false,
         };
 
         try {
@@ -206,12 +217,19 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
 
       const nameTrim = procedureData.stepName?.trim();
       const stepData: CreateStepArgs = {
-        employee_id: procedureData.employee_id,
+        name: nameTrim ?? "",
+        action_taker_user_ids: procedureData.employee_id
+          ? [procedureData.employee_id]
+          : [],
+        concerned_user_ids: [],
         is_accept: procedureData.is_accept,
         is_approve: procedureData.is_approve,
-        duration: procedureData.duration,
+        is_view_only: false,
+        is_return_with_notes: false,
+        requires_approval_within_period: false,
         forms: mapFormsUiToApi(procedureData.forms),
-        ...(nameTrim ? { name: nameTrim } : {}),
+        notify_by_email: false,
+        notify_by_whatsapp: false,
       };
 
       try {
@@ -250,7 +268,8 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
         const response = await apiClient.get("/company-users/employees", {
           params: employeeSearchText ? { name: employeeSearchText } : undefined,
         });
-        return response.data.payload || response.data;
+        const payload = response.data?.payload ?? response.data;
+        return Array.isArray(payload) ? payload : [];
       },
     });
     // Fetch managements for dropdown

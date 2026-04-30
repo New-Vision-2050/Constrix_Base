@@ -3,7 +3,13 @@ import { CreateStageArgs, UpdateStageArgs, CreateStepArgs } from "./types/args";
 import { GetStagesResponse, GetStepsResponse } from "./types/response";
 
 export const ProcedureSettingsApi = {
-  getStages: () => baseApi.get<GetStagesResponse>("procedure-settings"),
+  getStages: (type: string, branchId?: number) => {
+    const params = new URLSearchParams({ type });
+    if (branchId != null) {
+      params.append("branch_id", String(branchId));
+    }
+    return baseApi.get<GetStagesResponse>(`procedure-settings?${params}`);
+  },
   createStage: (args: CreateStageArgs) =>
     baseApi.post<GetStagesResponse>("procedure-settings", args),
   updateStage: (stageId: string, args: UpdateStageArgs) =>
@@ -11,11 +17,22 @@ export const ProcedureSettingsApi = {
   deleteStage: (stageId: string) =>
     baseApi.delete(`procedure-settings/${stageId}`),
 
+  // Work flows API
+  getWorkFlows: () => baseApi.get("procedure-settings/work_flows"),
+  updateWorkFlow: (branchId: number, checked: boolean, type: string) =>
+    baseApi.post("procedure-settings/work_flows", {
+      branch_id: branchId,
+      checked,
+      type,
+    }),
+
   // Procedure steps API
   getSteps: (procedureSettingId: string) =>
     baseApi.get<GetStepsResponse>(
       `procedure-settings/${procedureSettingId}/steps`,
     ),
+  getStep: (procedureSettingId: string, stepId: number) =>
+    baseApi.get(`procedure-settings/${procedureSettingId}/steps/${stepId}`),
   createStep: (procedureSettingId: string, args: CreateStepArgs) =>
     baseApi.post(`procedure-settings/${procedureSettingId}/steps`, args),
   updateStep: (
@@ -28,7 +45,5 @@ export const ProcedureSettingsApi = {
       args,
     ),
   deleteStep: (procedureSettingId: string, stepId: number) =>
-    baseApi.delete(
-      `procedure-settings/${procedureSettingId}/steps/${stepId}`,
-    ),
+    baseApi.delete(`procedure-settings/${procedureSettingId}/steps/${stepId}`),
 };

@@ -21,30 +21,35 @@ import {
 
 interface StagesViewProps {
   currentTabType?: string;
+  branchId?: number;
 }
 
 export default function StagesView({
   currentTabType = "client_request",
+  branchId,
 }: StagesViewProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: stagesResponse, refetch } = useQuery<GetStagesResponse>({
-    queryKey: ["procedure-settings", "stages"],
+    queryKey: ["procedure-settings", "stages", currentTabType, branchId],
     queryFn: async () => {
-      const response = await ProcedureSettingsApi.getStages();
+      const response = await ProcedureSettingsApi.getStages(
+        currentTabType,
+        branchId,
+      );
       return response.data;
     },
   });
 
-  const procedures = useMemo(
-    () =>
-      (stagesResponse?.payload || []).filter(
-        (s: Stage) => s.type === currentTabType,
-      ),
-    [stagesResponse, currentTabType],
-  );
+  // Extract work_flow_id and stages from the new response structure
+  const workFlowId = stagesResponse?.payload?.id ?? "";
+  const procedures = useMemo(() => {
+    const payload = stagesResponse?.payload;
+    const stages = payload?.["procedure-settings"];
+    return Array.isArray(stages) ? stages : [];
+  }, [stagesResponse]);
 
   const [selectedProcedureId, setSelectedProcedureId] = useState<string | null>(
     null,
@@ -55,6 +60,7 @@ export default function StagesView({
   const [draftStepKeys, setDraftStepKeys] = useState<Record<string, string[]>>(
     {},
   );
+  const [pendingDraftKeys, setPendingDraftKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (!procedures.length) {
@@ -78,7 +84,9 @@ export default function StagesView({
     enabled: !!selectedProcedureId,
   });
 
-  const serverSteps: ProcedureStep[] = stepsResponse?.payload ?? [];
+  const serverSteps: ProcedureStep[] = Array.isArray(stepsResponse?.payload)
+    ? stepsResponse.payload
+    : [];
 
   // --- Procedure CRUD ---
 
@@ -88,9 +96,23 @@ export default function StagesView({
     execute_type: string;
     icon: string;
     percentage: number;
+    deadline_days: number;
+    deadline_hours: number;
+    escalation_user_id: string;
   }) => {
+    if (!workFlowId) {
+      toast({
+        title: t("actions.add"),
+        description: t("messages.error"),
+        variant: "destructive",
+      });
+      return;
+    }
     try {
-      await ProcedureSettingsApi.createStage(payload);
+      await ProcedureSettingsApi.createStage({
+        ...payload,
+        work_flow_id: workFlowId,
+      });
       await refetch();
       toast({
         title: t("actions.add"),
@@ -141,12 +163,15 @@ export default function StagesView({
   // --- Step management ---
 
   const handleAddStep = () => {
-    if (!selectedProcedureId) return;
     const key = crypto.randomUUID();
-    setDraftStepKeys((prev) => ({
-      ...prev,
-      [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
-    }));
+    if (selectedProcedureId) {
+      setDraftStepKeys((prev) => ({
+        ...prev,
+        [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
+      }));
+    } else {
+      setPendingDraftKeys((prev) => [...prev, key]);
+    }
   };
 
   const removeDraftStep = (procedureId: string, draftKey: string) => {
@@ -208,20 +233,26 @@ export default function StagesView({
     : [];
 
   return (
-    <div className="space-y-4">
+    <Box>
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography variant="h6" fontWeight={600}>
-          {t("title")}
+          اعداد إجراءات الطلبات العملاء
         </Typography>
-        <Button variant="contained" color="primary" onClick={handleAddStep}>
-          {t("stages.addStage")}
+        <Button variant="contained" onClick={handleAddStep}>
+          اضافة مرحلة
         </Button>
-      </div>
+      </Box>
       <Grid container spacing={2}>
         {/* Right sidebar - Procedures list */}
         <Grid size={3}>
-          <div className="space-y-2 bg-sidebar">
+          <Box>
             {procedures.map((procedure: Stage) => (
               <Box
                 key={procedure.id}
@@ -276,18 +307,42 @@ export default function StagesView({
             >
               {t("procedures.addProcedureName")}
             </Button>
-          </div>
+          </Box>
         </Grid>
 
         {/* Left content - Steps */}
         <Grid size={9}>
-          <div className="space-y-4">
+          <Box className="space-y-4">
+            {/* Pending draft steps (added before any procedure was selected) */}
+            {pendingDraftKeys.map((draftKey, index) => (
+              <StepCard
+                key={`pending-${draftKey}`}
+                procedureSettingId={selectedProcedureId ?? ""}
+                serverStep={null}
+                stepIndex={index + 1}
+                onSaved={() => {
+                  setPendingDraftKeys((prev) =>
+                    prev.filter((k) => k !== draftKey),
+                  );
+                  if (selectedProcedureId)
+                    queryClient.invalidateQueries({
+                      queryKey: ["procedure-steps", selectedProcedureId],
+                    });
+                }}
+                onDelete={() =>
+                  setPendingDraftKeys((prev) =>
+                    prev.filter((k) => k !== draftKey),
+                  )
+                }
+              />
+            ))}
             {/* Saved steps from server */}
-            {serverSteps.map((step) => (
+            {serverSteps.map((step, index) => (
               <StepCard
                 key={`server-${step.id}`}
                 procedureSettingId={selectedProcedureId!}
                 serverStep={step}
+                stepIndex={pendingDraftKeys.length + index + 1}
                 onSaved={() => handleStepSaved(selectedProcedureId!)}
                 onDelete={() =>
                   handleDeleteServerStep(selectedProcedureId!, step.id)
@@ -296,16 +351,19 @@ export default function StagesView({
             ))}
 
             {/* Draft (unsaved) steps */}
-            {currentDraftKeys.map((draftKey) => (
+            {currentDraftKeys.map((draftKey, index) => (
               <StepCard
                 key={`draft-${draftKey}`}
                 procedureSettingId={selectedProcedureId!}
                 serverStep={null}
+                stepIndex={
+                  pendingDraftKeys.length + serverSteps.length + index + 1
+                }
                 onSaved={() => handleStepSaved(selectedProcedureId!, draftKey)}
                 onDelete={() => removeDraftStep(selectedProcedureId!, draftKey)}
               />
             ))}
-          </div>
+          </Box>
         </Grid>
       </Grid>
       {/* Add Procedure Dialog */}
@@ -344,6 +402,6 @@ export default function StagesView({
           }
         }}
       />
-    </div>
+    </Box>
   );
 }

@@ -52,6 +52,8 @@ export const proceduresSettingsMessages = new MessagesGroup({
     }),
   }),
   steps: new MessagesGroup({
+    addStep: _m("Add Step", "اضافة إجراء"),
+    stage: _m("Stage", "المرحلة"),
     stepName: _m("Step Name", "اسم المرحلة"),
     enterStepName: _m("Enter step name", "ادخل اسم المرحلة"),
     selectEmployee: _m("Select employee", "اختر اسم الموظف"),
