@@ -2,11 +2,12 @@
 
 import { useMemo } from "react";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
-import { Paperclip, UserCog, Share2, Shield, Users } from "lucide-react";
+import { Paperclip, UserCog, Share2, Shield, Users, UsersRound } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
 import AttachmentsTab from "../tabs/attachments";
 import StaffTab from "../tabs/staff";
+import CadreTab from "../tabs/cadre";
 import DocumentCycleTab from "../tabs/document-cycle";
 import RolesTab from "../tabs/roles";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
@@ -46,6 +47,12 @@ const STAKEHOLDER_SUB_TABS: SystemTab[] = [
     content: <StaffTab />,
   },
   {
+    id: "project-tab-cadre",
+    title: "الكادر",
+    icon: <UsersRound className="w-4 h-4" />,
+    content: <CadreTab />,
+  },
+  {
     id: "project-tab-roles",
     title: "الأدوار والصلاحيات",
     icon: <Shield className="w-4 h-4" />,
@@ -66,6 +73,7 @@ function passesProjectTypeVisibility(
   if (!permissions) return true;
   switch (tabId) {
     case "project-tab-staff":
+    case "project-tab-cadre":
       return permissions.employee_contract_setting?.is_all_data_visible === 1;
     case "project-tab-roles":
       return permissions.roles_and_permissions_setting?.is_all_data_visible === 1;
@@ -91,6 +99,7 @@ function passesFlatPermission(
     case "project-tab-attachments":
       return hasAnyAttachmentsTabPermission(flatPerms);
     case "project-tab-staff":
+    case "project-tab-cadre":
       return hasAnyStaffTabPermission(flatPerms);
     case "project-tab-document-cycle":
       return hasAnyDocumentCycleTabPermission(flatPerms);
