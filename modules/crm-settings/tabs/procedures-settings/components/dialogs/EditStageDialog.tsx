@@ -246,9 +246,9 @@ export default function EditStageDialog({
               <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
                 <Switch
                   checked={sequentialApproval}
-                  onChange={() => {
-                    setSequentialApproval(true);
-                    setParallelApproval(false);
+                  onChange={(e) => {
+                    setSequentialApproval(e.target.checked);
+                    setParallelApproval(!e.target.checked);
                   }}
                   color="secondary"
                 />
@@ -275,9 +275,9 @@ export default function EditStageDialog({
               <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
                 <Switch
                   checked={parallelApproval}
-                  onChange={() => {
-                    setParallelApproval(true);
-                    setSequentialApproval(false);
+                  onChange={(e) => {
+                    setParallelApproval(e.target.checked);
+                    setSequentialApproval(!e.target.checked);
                   }}
                   color="primary"
                 />

@@ -256,7 +256,11 @@ export default function StagesView({
             "client_request",
           ].includes(currentTabType) && "اعداد إجراءات الطلبات"}
         </Typography>
-        <Button variant="contained" onClick={handleAddStep}>
+        <Button
+          variant="contained"
+          onClick={handleAddStep}
+          disabled={!selectedProcedureId}
+        >
           اضافة مرحلة
         </Button>
       </Box>
