@@ -11,7 +11,6 @@ import {
   Box,
   Switch,
   Typography,
-  MenuItem,
   FormHelperText,
   InputAdornment,
 } from "@mui/material";
@@ -24,6 +23,7 @@ import { apiClient } from "@/config/axios-config";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import { Stage } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import SearchableSelect from "@/components/shared/SearchableSelect";
 
 const PROCEDURE_DIALOG_ICON_IDS = [
   "person-outline",
@@ -200,10 +200,24 @@ export default function EditStageDialog({
     }
   };
 
+  // Get tab type from procedure
+  const currentTabType = procedure?.type || "client_request";
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", pb: 1 }}>
-        {t("editStage")}
+        {currentTabType === "contract" && "تعديل إجراءات العقود"}
+        {currentTabType === "meeting" && "تعديل إجراءات الاجتماعات"}
+        {currentTabType === "price" && "تعديل إجراءات الأسعار"}
+        {currentTabType === "employees" && "تعديل إجراءات الموظفين"}
+        {currentTabType === "client_request" && "تعديل إجراءات طلبات العملاء"}
+        {![
+          "contract",
+          "meeting",
+          "price",
+          "employees",
+          "client_request",
+        ].includes(currentTabType) && t("editStage")}
       </DialogTitle>
 
       <DialogContent>
@@ -234,7 +248,7 @@ export default function EditStageDialog({
                   checked={sequentialApproval}
                   onChange={(e) => {
                     setSequentialApproval(e.target.checked);
-                    if (e.target.checked) setParallelApproval(false);
+                    setParallelApproval(!e.target.checked);
                   }}
                   color="secondary"
                 />
@@ -263,7 +277,7 @@ export default function EditStageDialog({
                   checked={parallelApproval}
                   onChange={(e) => {
                     setParallelApproval(e.target.checked);
-                    if (e.target.checked) setSequentialApproval(false);
+                    setSequentialApproval(!e.target.checked);
                   }}
                   color="primary"
                 />
@@ -380,22 +394,23 @@ export default function EditStageDialog({
             </Box>
 
             {/* Escalation target */}
-            <TextField
-              select
-              fullWidth
-              size="small"
-              value={escalationUserId}
-              onChange={(e) => setEscalationUserId(e.target.value)}
-              label="الجهة المصعد اليها"
-              helperText="الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة"
-            >
-              <MenuItem value="">الجهة المصعد اليها</MenuItem>
-              {employees.map((emp) => (
-                <MenuItem key={emp.id} value={emp.id}>
-                  {emp.name}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Box>
+              <SearchableSelect
+                options={employees.map((emp) => ({
+                  value: emp.id,
+                  label: emp.name,
+                }))}
+                value={escalationUserId}
+                onChange={(val) => setEscalationUserId(String(val))}
+                placeholder="الجهة المصعد اليها"
+                searchPlaceholder="البحث عن موظف..."
+                noResultsText="لا توجد نتائج"
+                label="الجهة المصعد اليها"
+              />
+              <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
+                الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة
+              </FormHelperText>
+            </Box>
           </Box>
         </Box>
       </DialogContent>

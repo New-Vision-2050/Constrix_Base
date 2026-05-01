@@ -57,6 +57,7 @@ import { companyProfileLegalDataFormMessages } from "./groups/company-profile/le
 import { storesMessages } from "./groups/stores";
 import { imageUploadCropMessages } from "./groups/image-upload-crop";
 import { workPanelMessages } from "./groups/work-panel";
+import { hrReportsMessages } from "./groups/hr-reports";
 import { iconsMessages } from "./groups/icons";
 import { projectMessages } from "./groups/projects";
 import { projectSettingsMessages } from "./groups/projects/settings";
@@ -125,6 +126,7 @@ export const messagesStructure = new MessagesGroup({
   ClientProfile: clientProfileModuleMessages,
   ImageUploadCrop: imageUploadCropMessages,
   WorkPanel: workPanelMessages,
+  HRReports: hrReportsMessages,
   icons: iconsMessages,
   project: projectMessages,
   Projects: projectMessages,

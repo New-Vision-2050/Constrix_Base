@@ -45,6 +45,14 @@ export const getRoutesMap = (
       "إعدادات الحضور والانصراف"
     ),
     "attendance-departure": getText("attendance-departure", "الحضور والانصراف"),
+    "hr-reports": {
+      label: getText("hr-reports", "التقارير"),
+      href: `/${locale}/hr-reports`,
+    },
+    "hr-reports/attendance": getText(
+      "hr-reports/attendance",
+      "تقارير الحضور"
+    ),
 
     // User routes
     users: getText("users", "المستخدمين"),
