@@ -243,6 +243,8 @@ export const UsersConfigV2 = (options?: {
             userId={row.user_id}
             status={row.status}
             entityType={options?.registrationFormSlug ?? ""}
+            tableId={options?.tableId}
+            handleRefreshWidgetsData={options?.handleRefreshWidgetsData}
           />
         ),
       },

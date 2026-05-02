@@ -6,6 +6,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import ToggleControl from "@/modules/clients/components/ToggleControl";
 import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 const ENDPOINT_MAP: Record<string, string> = {
   [ModelsTypes.EMPLOYEE]: "company-users/employees",
@@ -18,6 +19,8 @@ interface SubEntityStatusSwitchProps {
   userId: string;
   status?: number | null;
   entityType: string;
+  tableId?: string;
+  handleRefreshWidgetsData?: () => void;
 }
 
 export default function SubEntityStatusSwitch({
@@ -25,6 +28,8 @@ export default function SubEntityStatusSwitch({
   userId,
   status,
   entityType,
+  tableId,
+  handleRefreshWidgetsData,
 }: SubEntityStatusSwitchProps) {
   const { can } = usePermissions();
   const [loading, setLoading] = useState(false);
@@ -39,6 +44,10 @@ export default function SubEntityStatusSwitch({
         status: checked ? 1 : 0,
       });
       toast.success("تم تغيير الحالة بنجاح");
+      handleRefreshWidgetsData?.();
+      if (tableId) {
+        useTableStore.getState().reloadTable(tableId);
+      }
     } catch {
       toast.error("حدث خطأ أثناء تغيير الحالة");
     } finally {

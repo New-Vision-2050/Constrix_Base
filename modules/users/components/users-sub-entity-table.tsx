@@ -161,6 +161,8 @@ const UsersSubEntityTable = ({
     tableId: TABLE_ID,
     allSearchedFields,
     enableExport: can(entityPermissions.export),
+    onEditSuccess: handleRefreshWidgetsData,
+    onDeleteSuccess: handleRefreshWidgetsData,
     formConfig: usersConfig.formConfig
       ? {
           ...usersConfig.formConfig,

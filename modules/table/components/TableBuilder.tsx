@@ -185,6 +185,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
               deleteConfirmMessage: config?.deleteConfirmMessage,
               deleteUrl: config?.deleteUrl,
               onDeleteSuccess: config?.onDeleteSuccess,
+              onEditSuccess: config?.onEditSuccess,
             });
           },
         });
