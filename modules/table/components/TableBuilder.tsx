@@ -193,10 +193,12 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       // Filter columns based on availableColumnKeys if provided
       let filteredColumns = [...columnsWithActions];
       if (config.availableColumnKeys && config.availableColumnKeys.length > 0) {
+        const alwaysVisible = config.alwaysVisibleColumnKeys ?? [];
         filteredColumns = filteredColumns.filter(
           (col) =>
             config.availableColumnKeys?.includes(col.key) ||
-            (col.key === "id" && shouldAddActionColumn), // Only include action column if it should be added
+            (col.key === "id" && shouldAddActionColumn) ||
+            alwaysVisible.includes(col.key),
         );
       }
 
@@ -207,10 +209,13 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         config.defaultVisibleColumnKeys &&
         config.defaultVisibleColumnKeys.length > 0
       ) {
-        // Only include action column in visible columns if it should be added
-        const visibleColumns = shouldAddActionColumn
-          ? [...config.defaultVisibleColumnKeys, "id"]
-          : config.defaultVisibleColumnKeys;
+        // Always include action column and alwaysVisibleColumnKeys
+        const alwaysVisible = config.alwaysVisibleColumnKeys ?? [];
+        const visibleColumns = [
+          ...config.defaultVisibleColumnKeys,
+          ...(shouldAddActionColumn ? ["id"] : []),
+          ...alwaysVisible,
+        ].filter((key, index, arr) => arr.indexOf(key) === index); // deduplicate
 
         setColumnVisibilityKeys(visibleColumns);
         setVisibleColumns(visibleColumns);
@@ -340,11 +345,15 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             // Never return an empty array of columns
             // If columnVisibility.visible is false, still show the columns but respect the keys
             columnVisibility?.keys?.length > 0 || visibleColumnKeys.length > 0
-              ? columns.filter((col: ColumnConfig) => {
+              ?           columns.filter((col: ColumnConfig) => {
                   // If columnVisibility.visible is false, don't filter by keys
                   if (columnVisibility?.visible === false) {
                     return true;
                   }
+
+                  // Always show alwaysVisibleColumnKeys and actions column
+                  const alwaysVisible = config?.alwaysVisibleColumnKeys ?? [];
+                  if (alwaysVisible.includes(col.key)) return true;
 
                   const keysToUse =
                     columnVisibility?.keys?.length > 0

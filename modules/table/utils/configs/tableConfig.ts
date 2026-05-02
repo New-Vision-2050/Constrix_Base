@@ -46,6 +46,7 @@ export interface TableConfig {
   columns?: ColumnConfig[];
   availableColumnKeys?: string[]; // New: Array of column keys that should be available, filtering out others
   defaultVisibleColumnKeys?: string[]; // New: Array of column keys that should be visible by default
+  alwaysVisibleColumnKeys?: string[]; // Columns that are always shown regardless of user selection (like Actions)
   defaultItemsPerPage?: number;
   defaultSortColumn?: string;
   defaultSortDirection?: "asc" | "desc" | null;
