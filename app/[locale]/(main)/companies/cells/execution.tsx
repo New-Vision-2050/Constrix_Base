@@ -72,6 +72,7 @@ const Execution = ({
   deleteConfirmMessage,
   deleteUrl,
   onDeleteSuccess,
+  onEditSuccess,
 }: {
   row: { id: string; [key: string]: unknown };
   executions?: (MenuItem | RenderFunctionType)[];
@@ -84,6 +85,7 @@ const Execution = ({
   deleteConfirmMessage?: string;
   deleteUrl?: string;
   onDeleteSuccess?: () => void;
+  onEditSuccess?: () => void;
 }) => {
   const t = useTranslations();
   const defaultMenuItems = useMemo((): MenuItem[] => {
@@ -139,7 +141,7 @@ const Execution = ({
         ? {
             ...formConfig,
             isEditMode: true,
-            editApiUrl: formConfig.apiUrl + "/:id",
+            editApiUrl: formConfig.editApiUrl ?? `${formConfig.apiUrl}/:id`,
           }
         : null,
     },
@@ -242,6 +244,7 @@ const Execution = ({
           }
           onSuccess={() => {
             reloadTable();
+            onEditSuccess?.();
           }}
           config={actionState.edit.config}
           isOpen={actionState.edit.open}

@@ -6,6 +6,7 @@ import { Broker } from "../../types/Broker";
 import { Branch } from "@/modules/company-profile/types/company";
 import BrokerTableStatus from "./BrokerTableStatus";
 import { getCreateIndividualBrokerFormConfig } from "../create-broker/individual/CreateIndividualBrokerFormConfig";
+import { AvatarGroup } from "@/components/shared/avatar-group";
 
 // Create a component that uses the translations
 export const getBrokerTableConfig = () => {
@@ -23,6 +24,11 @@ export const getBrokerTableConfig = () => {
         sortable: true,
         render: (_: unknown, row: Broker) => (
           <div className="flex items-center gap-2 flex-wrap">
+            <AvatarGroup
+              fullName={row.name}
+              alt={row.name}
+              src={row.photo || row.image_url || undefined}
+            />
             {row.name}
             <span
               className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 whitespace-nowrap"
