@@ -139,7 +139,7 @@ const Execution = ({
         ? {
             ...formConfig,
             isEditMode: true,
-            editApiUrl: formConfig.apiUrl + "/:id",
+            editApiUrl: formConfig.editApiUrl ?? `${formConfig.apiUrl}/:id`,
           }
         : null,
     },

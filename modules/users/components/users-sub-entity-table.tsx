@@ -34,6 +34,7 @@ import { Users, Building2 } from "lucide-react";
 import ClientCompaniesTable from "./client-companies-table";
 import BrokerCompaniesTable from "./broker-companies-table";
 import { ModelsTypes } from "./users-sub-entity-form/constants/ModelsTypes";
+import { UsersRole } from "@/constants/users-role.enum";
 
 type PropsT = {
   programName: `SuperEntitySlug`;
@@ -145,6 +146,13 @@ const UsersSubEntityTable = ({
       : optionalAttr?.includes(field.name || field.key),
   );
 
+  const userEditRoleParam =
+    registrationFormSlug === ModelsTypes.CLIENT
+      ? UsersRole.Client
+      : registrationFormSlug === ModelsTypes.BROKER
+        ? UsersRole.Broker
+        : UsersRole.Employee;
+
   const tableConfig: TableConfig = {
     ...usersConfig,
     url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
@@ -153,6 +161,12 @@ const UsersSubEntityTable = ({
     tableId: TABLE_ID,
     allSearchedFields,
     enableExport: can(entityPermissions.export),
+    formConfig: usersConfig.formConfig
+      ? {
+          ...usersConfig.formConfig,
+          editApiUrl: `${baseURL}/users/:id?role=${userEditRoleParam}`,
+        }
+      : usersConfig.formConfig,
   };
 
   if (!can(entityPermissions.list)) {
