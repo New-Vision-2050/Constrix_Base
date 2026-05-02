@@ -18,6 +18,7 @@ export function editIndividualClientFormConfig(
     formId,
     title: t("EditClientData"),
     apiUrl: `${baseURL}/users`,
+    editApiUrl: `${baseURL}/users/:id?role=2`,
     editIdField: 'user_id',
     isEditMode: true,
     laravelValidation: {
