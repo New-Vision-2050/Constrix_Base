@@ -18,6 +18,7 @@ export function editIndividualBrokerFormConfig(
     formId,
     title: t("EditBrokerData"),
     apiUrl: `${baseURL}/users`,
+    editApiUrl: `${baseURL}/users/:id?role=3`,
     editIdField: 'user_id',
     isEditMode: true,
     laravelValidation: {

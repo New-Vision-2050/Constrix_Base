@@ -8,7 +8,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 
 export function editIndividualEmployeeFormConfig(
   t: (key: string) => string,
-  handleCloseForm?: () => void
+  handleCloseForm?: () => void,
 ): FormConfig {
   const formId = "edit-individual-employee-form";
 
@@ -16,9 +16,9 @@ export function editIndividualEmployeeFormConfig(
     formId,
     title: t("EditEmployeeData"),
     apiUrl: `${baseURL}/users`,
-    editIdField: 'user_id',
+    editIdField: "user_id",
     isEditMode: true,
-    editApiUrl: `${baseURL}/users/:id`,
+    editApiUrl: `${baseURL}/users/:id?role=1`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -162,16 +162,19 @@ export function editIndividualEmployeeFormConfig(
       };
     },
     onSubmit: async (formData) => {
-        const body = {
-            branch_id: formData?.branch_id,
-            status: formData?.status,
-        };
-        await apiClient.post(`${baseURL}/company-users/employees/${formData.user_id}`, body);
-        return {
-            success: true,
-            message: 'Employee data edited successfully',
-            data: formData,
-        };
+      const body = {
+        branch_id: formData?.branch_id,
+        status: formData?.status,
+      };
+      await apiClient.post(
+        `${baseURL}/company-users/employees/${formData.user_id}?role=1`,
+        body,
+      );
+      return {
+        success: true,
+        message: "Employee data edited successfully",
+        data: formData,
+      };
     },
     onSuccess: handleCloseForm,
     submitButtonText: t("Save"),
@@ -180,8 +183,7 @@ export function editIndividualEmployeeFormConfig(
     resetButtonText: t("Reset"),
     showSubmitLoader: true,
     resetOnSuccess: false,
-    showCancelButton:false,
+    showCancelButton: false,
     showBackButton: false,
   };
 }
-
