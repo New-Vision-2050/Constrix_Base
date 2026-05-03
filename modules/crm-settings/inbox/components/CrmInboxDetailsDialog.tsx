@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 import type { ClientRequestRow } from "@/services/api/client-requests";
 import FileViewerDialog from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/components/FileViewerDialog";
 import type {
@@ -174,16 +171,10 @@ export default function CrmInboxDetailsDialog({
   }
 
   return (
-    <>
-      <FileViewerDialog
-        open={Boolean(viewerLink && documentForViewer && activeFileForViewer)}
-        onClose={() => setViewerLink(null)}
-        document={documentForViewer}
-        activeFile={activeFileForViewer}
-        isIncoming={false}
-      />
-      <InboxRequestDetailDialog
-      open={open && !!row}
+    <CrmClientRequestDetailsParts
+      row={row}
+      onAccept={onAccept}
+      onReject={onReject}
       onClose={onClose}
       title={t("dialogTitle")}
       subtitle={tClient("clientRequests.inbox.dialogSubtitle")}
@@ -269,9 +260,8 @@ export default function CrmInboxDetailsDialog({
             }
             disabled={actionPending || !canRespond || !canUpdateStatus}
           />
-        </Stack>
-      }
-    />
-    </>
+        </>
+      )}
+    </CrmClientRequestDetailsParts>
   );
 }
