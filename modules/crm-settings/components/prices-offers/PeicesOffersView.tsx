@@ -31,9 +31,11 @@ import PricesOffersWidgets from "./components/PricesOffersWidgets";
 import { ClientRequestsApi } from "@/services/api/client-requests";
 import type { ClientRequestRow, PriceOfferStatus } from "@/services/api/client-requests/types/response";
 import type { ClientRequestListParams } from "@/services/api/client-requests/types/params";
+import I18nLink from "@i18n/link";
 import Link from "next/link";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { ROUTER } from "@/router";
 
 const PricesOffersTable =
   HeadlessTableLayout<ClientRequestRow>("prices-offers");
@@ -147,9 +149,17 @@ export default function PricesOffersIndex() {
         key: "referenceNumber",
         name: tTable("referenceNumber"),
         sortable: false,
-        render: (row: ClientRequestRow) => (
-          <span className="p-2 text-sm">{row.serial_number}</span>
-        ),
+        render: (row: ClientRequestRow) =>
+          row.serial_number?.trim() ? (
+            <I18nLink
+              href={ROUTER.CRM.clientRequestDetails(row.id)}
+              className="p-2 text-sm text-primary hover:underline"
+            >
+              {row.serial_number}
+            </I18nLink>
+          ) : (
+            <span className="p-2 text-sm">—</span>
+          ),
       },
       {
         key: "offerName",

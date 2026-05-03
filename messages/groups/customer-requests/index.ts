@@ -121,7 +121,7 @@ export const clientRequestsMessages = new MessagesGroup({
   }),
   details: new MessagesGroup({
     tabs: new MessagesGroup({
-      details: _m("Request details", "تفاصيل الطلب"),
+      details: _m("Request details", "معلومات الطلب"),
       items: _m("Items", "البنود"),
       actions: _m("Actions", "الاجراءات"),
       attachments: _m("Attachments", "المرفقات"),
@@ -131,6 +131,23 @@ export const clientRequestsMessages = new MessagesGroup({
       "تعذر تحميل هذا الطلب.",
     ),
     backToList: _m("Back to requests", "العودة إلى الطلبات"),
+    lastUpdated: _m("Last updated", "آخر تحديث"),
+    cardStatusTitle: _m("Request status", "حالة الطلب"),
+    cardClientTitle: _m("Client", "العميل"),
+    cardCountsTitle: _m("Counts", "الإحصاءات"),
+    cardCountsServices: _m("Services", "الخدمات"),
+    cardCountsAttachments: _m("Attachments", "المرفقات"),
+    cardProgressTitle: _m("Completion", "نسبة الإنجاز"),
+    cardProgressDone: _m("Done", "المنفذ"),
+    cardProgressRemaining: _m("Remaining", "المتبقي"),
+    fieldFinancialResponsible: _m(
+      "Financial responsible",
+      "المسؤول المالي",
+    ),
+    fieldClientType: _m("Client type", "نوع العميل"),
+    fieldServicesCount: _m("Services count", "عدد الخدمات"),
+    fieldDescription: _m("Description", "الموضوع"),
+    descriptionEmpty: _m("No description", "لا يوجد وصف"),
   }),
   dialog: new MessagesGroup({
     sendAs: _m("Send As", "أرسال ك"),
