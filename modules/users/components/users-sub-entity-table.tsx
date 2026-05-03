@@ -157,7 +157,7 @@ const UsersSubEntityTable = ({
     ...usersConfig,
     url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
     defaultVisibleColumnKeys: defaultAttr,
-    availableColumnKeys: optionalAttr,
+    availableColumnKeys: [...new Set([...(defaultAttr ?? []), ...(optionalAttr ?? [])])],
     tableId: TABLE_ID,
     allSearchedFields,
     enableExport: can(entityPermissions.export),
