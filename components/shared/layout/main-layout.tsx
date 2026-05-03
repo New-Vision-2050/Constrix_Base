@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
 import { MobileDrawer } from "./mobile-drawer";
+import AppFooter from "./app-footer";
 
 export default function MainLayout({
   children,
@@ -73,7 +74,7 @@ export default function MainLayout({
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
-        className="h-screen w-full fixed top-0 left-0 -z-20"
+        className="h-screen w-full fixed top-0 left-0 -z-20 transition-all duration-500 ease-linear"
         particleColor={
           isGreen
             ? isLight
@@ -99,9 +100,12 @@ export default function MainLayout({
           serialNumber={serialNumber}
           mainLogo={mainLogo}
         />
-        <SidebarInset className="bg-transparent md:overflow-hidden border-none">
-          <Header onMobileMenuClick={handleMobileDrawerToggle} />
-          {children}
+        <SidebarInset className="bg-transparent md:overflow-hidden border-none min-h-svh relative flex flex-col justify-between">
+          <div>
+            <Header onMobileMenuClick={handleMobileDrawerToggle} />
+            <div className="px-4 w-full">{children}</div>
+          </div>
+          <AppFooter />
         </SidebarInset>
       </SidebarProvider>
     </main>

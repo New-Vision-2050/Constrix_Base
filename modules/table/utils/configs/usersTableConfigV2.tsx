@@ -19,6 +19,7 @@ import { editIndividualEmployeeFormConfig } from "@/modules/form-builder/configs
 import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
 import useUserData from "@/hooks/use-user-data";
 import { useRouter } from "@i18n/navigation";
+import SubEntityStatusSwitch from "@/modules/users/components/SubEntityStatusSwitch";
 // Define types for the company data
 interface CompanyData {
   id: string;
@@ -112,7 +113,12 @@ export const UsersConfigV2 = (options?: {
         searchable: true,
         render: (_: unknown, row: UserTableRow) => (
           <div className="flex items-center gap-2">
-            <AvatarGroup fullName={row.name} alt={row.name} /> {row.name}
+            <AvatarGroup
+              fullName={row.name}
+              alt={row.name}
+              src={row.photo || row.image_url || undefined}
+            />
+            {row.name}
           </div>
         ),
       },
@@ -228,6 +234,20 @@ export const UsersConfigV2 = (options?: {
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
+      {
+        key: "status",
+        label: "الحالة",
+        render: (_: unknown, row: UserTableRow) => (
+          <SubEntityStatusSwitch
+            id={row.id}
+            userId={row.user_id}
+            status={row.status}
+            entityType={options?.registrationFormSlug ?? ""}
+            tableId={options?.tableId}
+            handleRefreshWidgetsData={options?.handleRefreshWidgetsData}
+          />
+        ),
+      },
     ],
     allSearchedFields: [
       {
@@ -276,6 +296,7 @@ export const UsersConfigV2 = (options?: {
       "companies",
       "user-type",
       "data_status",
+      "status",
       "branch",
       "job_title",
       "residence",
@@ -283,6 +304,7 @@ export const UsersConfigV2 = (options?: {
       "number_of_projects",
       "end_date",
     ],
+    alwaysVisibleColumnKeys: ["status"],
     defaultVisibleColumnKeys: [
       "name",
       "email",

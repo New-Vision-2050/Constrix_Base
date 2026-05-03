@@ -14,4 +14,6 @@ export interface Broker {
   residence: string;
   type: number;
   broker: { id: string; name: string };
+  photo?: string | null;
+  image_url?: string | null;
 }

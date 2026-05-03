@@ -1,4 +1,4 @@
-import { LayoutDashboardIcon, UserIcon } from "lucide-react";
+import { BarChart3, LayoutDashboardIcon, UserIcon } from "lucide-react";
 import SettingsIcon from "@/public/icons/settings";
 import { ROUTER } from "@/router";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
@@ -9,13 +9,18 @@ import { SidebarProjectProps } from "./types";
 export function getHumanResourcesProject({
   t,
   pageName,
+  fullPath,
   can,
   isCentralCompany,
 }: SidebarProjectProps): Project {
   return {
     name: t("Sidebar.HumanResources"),
     icon: LayoutDashboardIcon,
-    urls: [ROUTER.Organizational_Structure, ROUTER.WORK_PANEL],
+    urls: [
+      ROUTER.Organizational_Structure,
+      ROUTER.WORK_PANEL,
+      ROUTER.HR_REPORTS,
+    ],
     isActive: pageName === ROUTER.Organizational_Structure,
     slug: SUPER_ENTITY_SLUG.HRM,
     show: !isCentralCompany,
@@ -57,6 +62,21 @@ export function getHumanResourcesProject({
         show:
           !isCentralCompany &&
           can([PERMISSIONS.attendance.attendance_departure.view]),
+      },
+      {
+        name: t("Sidebar.Reports"),
+        url: ROUTER.HR_REPORTS,
+        icon: BarChart3,
+        isActive:
+          pageName === ROUTER.HR_REPORTS ||
+          fullPath.startsWith(`${ROUTER.HR_REPORTS}/`),
+        show:
+          !isCentralCompany &&
+          can([
+            PERMISSIONS.humanResources.charts.view,
+            PERMISSIONS.humanResources.procedures.view,
+            PERMISSIONS.humanResources.services.view,
+          ]),
       },
       {
         name: t("Sidebar.HRSettings"),

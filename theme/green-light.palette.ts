@@ -12,7 +12,7 @@ export const GreenLightPalette: PaletteOptions = {
   },
   background: {
     default: "#F3F4F8",
-    paper: "#ffffff",
+    paper: "#f2f2f2",
   },
   success: {
     main: "#54C08A",

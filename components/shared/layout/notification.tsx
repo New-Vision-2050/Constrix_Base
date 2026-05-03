@@ -1,12 +1,13 @@
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@mui/material";
 import NotificationIcon from "@/public/icons/notification";
+import { Bell } from "lucide-react";
 
-const Notification = () => {
+const Notificatione = () => {
   return (
-    <Button size={"icon"} variant={"ghost"}>
-      <NotificationIcon />
-    </Button>
+    <IconButton>
+      <Bell />
+    </IconButton>
   );
 };
 
-export default Notification;
+export default Notificatione;
