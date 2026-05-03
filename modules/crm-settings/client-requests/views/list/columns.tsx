@@ -1,7 +1,12 @@
 import { ClientRequestRow } from "@/services/api/client-requests";
-import { Chip } from "@mui/material";
+import { Chip, Link as MuiLink } from "@mui/material";
 import React from "react";
 import { useTranslations } from "next-intl";
+import { Link as NavLink } from "@/i18n/navigation";
+
+export type GetClientRequestsColumnsOptions = {
+  detailsHref?: (row: ClientRequestRow) => string;
+};
 
 export type { ClientRequestRow };
 
@@ -44,20 +49,38 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export const getClientRequestsColumns = (t: (key: string) => string) => [
+export const getClientRequestsColumns = (
+  t: (key: string) => string,
+  options?: GetClientRequestsColumnsOptions,
+) => [
   {
     key: "id",
     name: t("clientRequests.table.serialNumber"),
     sortable: false,
-    render: (row: ClientRequestRow) => (
-      <span style={{ fontSize: 12, opacity: 0.7 }}>{row.serial_number}</span>
-    ),
+    render: (row: ClientRequestRow) => {
+      const href = options?.detailsHref?.(row);
+      if (href) {
+        return (
+          <MuiLink
+            component={NavLink}
+            href={href}
+            underline="hover"
+            sx={{ fontSize: 12, fontWeight: 500 }}
+          >
+            {row.serial_number}
+          </MuiLink>
+        );
+      }
+      return (
+        <span style={{ fontSize: 12, opacity: 0.7 }}>{row.serial_number}</span>
+      );
+    },
   },
   {
     key: "item_name",
     name: t("clientRequests.table.itemName"),
     sortable: false,
-    render: (row: ClientRequestRow) => <span>{"—"}</span>,
+    render: () => <span>{"—"}</span>,
   },
   {
     key: "client_request_receiver_from",
