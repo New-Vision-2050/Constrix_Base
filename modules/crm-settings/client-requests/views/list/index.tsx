@@ -30,6 +30,7 @@ import { ClientRequestsApi } from "@/services/api/client-requests";
 import { CRM_INBOX_PENDING_COUNT_QUERY_KEY } from "@/components/icons/crm-inbox";
 import { CRM_INBOX_LIST_QUERY_KEY } from "@/modules/crm-settings/query-keys";
 import CrmInboxDetailsDialog from "@/modules/crm-settings/inbox/components/CrmInboxDetailsDialog";
+import { ROUTER } from "@/router";
 
 const CLIENT_REQUESTS_QUERY_KEY = "client-requests-list";
 
@@ -183,7 +184,9 @@ function ClientRequestsList() {
 
   const columns = useMemo(
     () => [
-      ...getClientRequestsColumns(t),
+      ...getClientRequestsColumns(t, {
+        detailsHref: (row) => ROUTER.CRM.clientRequestDetails(row.id),
+      }),
       {
         key: "actions",
         name: t("clientRequests.table.actions"),
