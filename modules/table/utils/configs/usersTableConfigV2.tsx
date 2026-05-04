@@ -303,7 +303,7 @@ export const UsersConfigV2 = (options?: {
         key: "about-me",
         label: tSubTable("AboutMe"),
         render: (value: any) => value
-          ? <span className="max-w-[180px] line-clamp-2 block text-start">{value}</span>
+          ? <span title={value}>{value.length > 60 ? value.substring(0, 60) + '...' : value}</span>
           : "—",
       },
       {
@@ -338,7 +338,7 @@ export const UsersConfigV2 = (options?: {
         key: "courses",
         label: tSubTable("Courses"),
         render: (value: any) => value
-          ? <span className="max-w-[200px] line-clamp-2 block text-start">{value}</span>
+          ? <span title={value}>{value.length > 50 ? value.substring(0, 50) + '...' : value}</span>
           : "—",
       },
       {
