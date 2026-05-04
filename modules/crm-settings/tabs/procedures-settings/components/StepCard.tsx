@@ -20,6 +20,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { useAllEmployees } from "@/modules/crm-settings/tabs/procedures-settings/hooks/useAllEmployees";
 import {
   fetchManagementHierarchyOptions,
   type ManagementHierarchyOption,
@@ -33,12 +34,6 @@ import {
 } from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
 import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import { useToast } from "@/modules/table/hooks/use-toast";
-
-interface EmployeeOption {
-  id: string;
-  name: string;
-  email: string;
-}
 
 // ─── Option constants ─────────────────────────────────────────────────────────
 const ORG_BASE_OPTIONS = [
@@ -163,14 +158,7 @@ export default function StepCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serverStep]);
 
-  const { data: employeesData = [] } = useQuery<EmployeeOption[]>({
-    queryKey: ["employees"],
-    queryFn: async () => {
-      const response = await apiClient.get("/company-users/employees");
-      const payload = response.data?.payload ?? response.data;
-      return Array.isArray(payload) ? payload : [];
-    },
-  });
+  const { data: employeesData = [] } = useAllEmployees();
 
   const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
     queryKey: ["managements", "hierarchy", "management", branchId],
