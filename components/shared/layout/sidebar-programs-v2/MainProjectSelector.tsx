@@ -9,6 +9,7 @@ import { MenuItem, ListItemText, Box, Button, Typography } from "@mui/material";
 import { ChevronDown, Check } from "lucide-react";
 import { memo } from "react";
 import Link from "@i18n/link";
+import { getFirstVisibleSubEntity } from "@/hooks/use-sidebar-projects/utils";
 
 type MainProjectSelectorProps = {
   projects: Project[];
@@ -35,9 +36,9 @@ export const MainProjectSelector = memo(function MainProjectSelector({
     onProjectChange(project);
 
     // Update active URL state
-    const firstSubEntity = project?.sub_entities?.[0];
-    if (firstSubEntity?.url) {
-      onSubEntityClick(firstSubEntity.url);
+    const firstVisible = getFirstVisibleSubEntity(project);
+    if (firstVisible?.url) {
+      onSubEntityClick(firstVisible.url);
     }
   };
 
@@ -108,7 +109,8 @@ export const MainProjectSelector = memo(function MainProjectSelector({
         }}
       >
         {projects.map((project) => {
-          const firstSubEntityUrl = project?.sub_entities?.[0]?.url || "#";
+          const firstSubEntityUrl =
+            getFirstVisibleSubEntity(project)?.url || "#";
 
           return (
             <MenuItem

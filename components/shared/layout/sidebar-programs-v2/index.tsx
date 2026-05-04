@@ -8,6 +8,7 @@ import { usePathname } from "@i18n/navigation";
 import { useLocale } from "next-intl";
 import { MainProjectSelector } from "./MainProjectSelector";
 import { SubProgramsList } from "./SubProgramsList";
+import { getFirstVisibleSubEntity } from "@/hooks/use-sidebar-projects/utils";
 
 type PropsT = {
   projects: Project[];
@@ -61,7 +62,7 @@ export function SidebarProgramsListV2({ projects }: PropsT) {
     const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
     return pathname !== "/login"
       ? pathnameWithoutLocale
-      : projects?.[0]?.sub_entities?.[0]?.url ?? "";
+      : getFirstVisibleSubEntity(projects?.[0])?.url ?? "";
   });
 
   // Sync active project when pathname changes
