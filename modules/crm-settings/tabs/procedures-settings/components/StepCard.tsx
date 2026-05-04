@@ -78,6 +78,75 @@ interface StepFormData {
   escalationUserId: string;
 }
 
+function firstActionTakerUserId(step: ProcedureStep | null): string {
+  if (!step) return "";
+  const fromArr = step.action_taker_user_ids?.[0];
+  if (fromArr != null && String(fromArr).length > 0) return String(fromArr);
+  const nested = step.action_takers?.[0]?.user?.id;
+  if (nested != null) return String(nested);
+  if (step.employee_id != null && String(step.employee_id).length > 0) {
+    return String(step.employee_id);
+  }
+  return "";
+}
+
+function firstConcernedUserId(step: ProcedureStep | null): string {
+  if (!step) return "";
+  const fromArr = step.concerned_user_ids?.[0];
+  if (fromArr != null && String(fromArr).length > 0) return String(fromArr);
+  const nested = step.concerned_users?.[0]?.user?.id;
+  if (nested != null) return String(nested);
+  return "";
+}
+
+function resolveActionTakerName(
+  step: ProcedureStep | null,
+  userId: string,
+): string {
+  if (!step || !userId) return "";
+  const idStr = String(userId);
+  const hit = step.action_takers?.find(
+    (at) => at.user?.id != null && String(at.user.id) === idStr,
+  );
+  return (
+    hit?.user?.name?.trim() ||
+    (String(step.employee_id) === idStr ? step.employee?.name?.trim() : "") ||
+    ""
+  );
+}
+
+function resolveConcernedUserName(
+  step: ProcedureStep | null,
+  userId: string,
+): string {
+  if (!step || !userId) return "";
+  const idStr = String(userId);
+  const hit = step.concerned_users?.find(
+    (cu) => cu.user?.id != null && String(cu.user.id) === idStr,
+  );
+  return hit?.user?.name?.trim() || "";
+}
+
+function ensureSelectedEmployeeRow(
+  rows: { value: string; label: string }[],
+  id: string,
+  resolvedName: string,
+): { value: string; label: string }[] {
+  const sid = String(id);
+  if (!sid) return rows;
+  const idx = rows.findIndex((r) => String(r.value) === sid);
+  const label =
+    resolvedName.trim() ||
+    (idx >= 0 ? rows[idx].label : "") ||
+    sid;
+  if (idx >= 0) {
+    const next = [...rows];
+    next[idx] = { value: sid, label };
+    return next;
+  }
+  return [...rows, { value: sid, label }];
+}
+
 const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
   if (serverStep) {
     const base: string[] = [];
@@ -99,8 +168,8 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
         : "",
-      actionTakerId: serverStep.action_taker_user_ids?.[0] ?? "",
-      concernedUserId: serverStep.concerned_user_ids?.[0] ?? "",
+      actionTakerId: firstActionTakerUserId(serverStep),
+      concernedUserId: firstConcernedUserId(serverStep),
       orgBase: base.length ? base : ["approve"],
       orgTemplate:
         formsKindToStepCardUi(parseProcedureStepFormsKind(serverStep)) ===
@@ -147,6 +216,8 @@ export default function StepCard({
 
   const stepName = watch("stepName");
   const branchId = watch("branchId");
+  const actionTakerIdW = watch("actionTakerId");
+  const concernedUserIdW = watch("concernedUserId");
   const fieldsDisabled = !!serverStep && !isEditing;
 
   const syncFromServer = useCallback(() => {
@@ -202,15 +273,49 @@ export default function StepCard({
     [employeesData],
   );
 
-  const actionTakerSelectOptions = useMemo(
-    () => withEmptyOption(employeeRows, "متخذي الاجراء"),
-    [employeeRows],
-  );
+  const actionTakerSelectOptions = useMemo(() => {
+    let rows = [...employeeRows];
+    if (serverStep) {
+      const id = firstActionTakerUserId(serverStep);
+      const name = resolveActionTakerName(serverStep, id);
+      if (id) rows = ensureSelectedEmployeeRow(rows, id, name);
+    }
+    return withEmptyOption(rows, "متخذي الاجراء");
+  }, [employeeRows, serverStep]);
 
-  const concernedUserSelectOptions = useMemo(
-    () => withEmptyOption(employeeRows, "المعنيين بالاجراء"),
-    [employeeRows],
-  );
+  const concernedUserSelectOptions = useMemo(() => {
+    let rows = [...employeeRows];
+    if (serverStep) {
+      const id = firstConcernedUserId(serverStep);
+      const name = resolveConcernedUserName(serverStep, id);
+      if (id) rows = ensureSelectedEmployeeRow(rows, id, name);
+    }
+    return withEmptyOption(rows, "المعنيين بالاجراء");
+  }, [employeeRows, serverStep]);
+
+  const actionTakerDisplayLabel = useMemo(() => {
+    if (!fieldsDisabled || !actionTakerIdW) return undefined;
+    const id = String(actionTakerIdW);
+    const fromApi = serverStep
+      ? resolveActionTakerName(serverStep, id)
+      : "";
+    const fromList =
+      employeeRows.find((r) => String(r.value) === id)?.label ?? "";
+    const text = (fromApi || fromList).trim();
+    return text || id;
+  }, [fieldsDisabled, actionTakerIdW, serverStep, employeeRows]);
+
+  const concernedUserDisplayLabel = useMemo(() => {
+    if (!fieldsDisabled || !concernedUserIdW) return undefined;
+    const id = String(concernedUserIdW);
+    const fromApi = serverStep
+      ? resolveConcernedUserName(serverStep, id)
+      : "";
+    const fromList =
+      employeeRows.find((r) => String(r.value) === id)?.label ?? "";
+    const text = (fromApi || fromList).trim();
+    return text || id;
+  }, [fieldsDisabled, concernedUserIdW, serverStep, employeeRows]);
 
   const escalationUserSelectOptions = useMemo(
     () => withEmptyOption(employeeRows, "اختر الجهة المصعد إليها"),
@@ -738,6 +843,9 @@ export default function StepCard({
                         searchPlaceholder="البحث عن موظف..."
                         noResultsText="لا توجد نتائج"
                         disabled={fieldsDisabled}
+                        displayLabel={
+                          fieldsDisabled ? actionTakerDisplayLabel : undefined
+                        }
                       />
                     </Box>
                   )}
@@ -768,6 +876,9 @@ export default function StepCard({
                         searchPlaceholder="البحث عن موظف..."
                         noResultsText="لا توجد نتائج"
                         disabled={fieldsDisabled}
+                        displayLabel={
+                          fieldsDisabled ? concernedUserDisplayLabel : undefined
+                        }
                       />
                     </Box>
                   )}
