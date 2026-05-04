@@ -542,6 +542,12 @@ export function RequestFormFields({
                             onInputChange={(_, value, reason) => {
                                 if (reason === "input") setEmployeeSearchText(value);
                             }}
+                            filterOptions={(options, params) =>
+                                options.filter((option) => {
+                                    const label = option.name || `${option.first_name ?? ""} ${option.last_name ?? ""}`;
+                                    return label.toLowerCase().includes(params.inputValue.toLowerCase());
+                                })
+                            }
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
