@@ -103,13 +103,20 @@ const TableBody: React.FC<TableBodyProps> = ({
                 : "text-start";
               const isFirstCol = colIndex === 0;
 
+              const rendered = formatValue(value, column, row);
+              const isPlainString = typeof rendered === "string";
+
               return (
                 <td
                   key={`${rowIndex}-${column.key}`}
                   className={`p-2 md:p-3 text-sm table-cell-fade-in ${alignment} ${isMobileHidden} ${isFirstCol ? 'sticky start-0 z-10 bg-sidebar' : ''}`}
                   style={{ "--index": colIndex } as React.CSSProperties}
                 >
-                  {formatValue(value, column, row)}
+                  {isPlainString ? (
+                    <div className="line-clamp-3 max-w-[200px]">{rendered}</div>
+                  ) : (
+                    rendered
+                  )}
                 </td>
               );
             })}
