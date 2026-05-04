@@ -8,7 +8,7 @@ import BranchSelector from "./components/BranchSelector";
 import { useTheme } from "next-themes";
 import DefaultLocationCheckbox from "./components/DefaultLocationCheckbox";
 import CoordinatesInput from "./components/CoordinatesInput";
-import MapComponent from "./components/MapComponent";
+import { MapRangePicker } from "@/components/shared/map-range-picker";
 import SaveButton from "./components/SaveButton";
 import LoadingState from "./components/LoadingState";
 import NoDataState from "./components/NoDataState";
@@ -47,7 +47,9 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     if (value === "") return "";
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) return value;
-    return numericValue < 200 && numericValue > 0 ? "200" : String(numericValue);
+    return numericValue < 200 && numericValue > 0
+      ? "200"
+      : String(numericValue);
   };
 
   // Initialize selected branch when branches are available
@@ -152,7 +154,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
 
   const handleRadiusBlur = (value: string) => {
     if (!selectedBranch) return;
-    
+
     // If value is empty, keep it empty
     if (value === "") {
       updateBranchLocation(selectedBranch, { radius: "" });
@@ -162,7 +164,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
       });
       return;
     }
-    
+
     // For non-empty values, validate and normalize
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) {
@@ -189,12 +191,12 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     }
   };
 
-  // Handle map click
-  const handleMapClick = (latitude: string, longitude: string) => {
+  // Handle map click - MapRangePicker returns numeric coordinates
+  const handleMapClick = (lat: number, lng: number) => {
     if (selectedBranch) {
       const updateData = {
-        latitude,
-        longitude,
+        latitude: lat.toString(),
+        longitude: lng.toString(),
         isDefault: false, // Uncheck default when selecting from map
       };
 
@@ -321,13 +323,22 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
           </Button>
         </div>
 
-        <MapComponent
-          selectedBranch={selectedBranch || ""}
-          isDefaultLocation={!!currentBranchData.isDefault}
-          latitude={currentBranchData.latitude || ""}
-          longitude={currentBranchData.longitude || ""}
-          radius={currentBranchData.radius || "1000"}
-          onMapClick={handleMapClick}
+        <MapRangePicker
+          currentPin={
+            currentBranchData.latitude && currentBranchData.longitude
+              ? {
+                  lat: parseFloat(currentBranchData.latitude),
+                  lng: parseFloat(currentBranchData.longitude),
+                }
+              : undefined
+          }
+          radius={
+            currentBranchData.radius ? parseInt(currentBranchData.radius) : 1000
+          }
+          onSelect={(lat, lng) => handleMapClick(lat, lng)}
+          disabled={!!currentBranchData.isDefault}
+          height="450px"
+          width="100%"
         />
       </>
 
