@@ -9,17 +9,15 @@ import {
   Divider,
   FormControlLabel,
   Grid,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
 import { Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { useAllEmployees } from "@/modules/crm-settings/tabs/procedures-settings/hooks/useAllEmployees";
 import {
   fetchManagementHierarchyOptions,
@@ -34,6 +32,8 @@ import {
 } from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
 import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import SearchableSelect from "@/components/shared/SearchableSelect";
+import { withEmptyOption } from "@/modules/crm-settings/tabs/procedures-settings/utils/selectOptions";
 
 // ─── Option constants ─────────────────────────────────────────────────────────
 const ORG_BASE_OPTIONS = [
@@ -46,6 +46,7 @@ const ORG_BASE_OPTIONS = [
 
 const ORG_TEMPLATE_OPTIONS = [
   { value: "approve", label: "نموذج موافقه" },
+  { value: "accreditation_form", label: "نموذج قبول" },
 ] as const;
 
 const NOTIFICATION_OPTIONS = [
@@ -176,6 +177,54 @@ export default function StepCard({
         `${baseURL}/management_hierarchies/list?type=branch`,
       ),
   });
+
+  const branchSelectOptions = useMemo(
+    () =>
+      withEmptyOption(
+        branches.map((b) => ({ value: String(b.id), label: b.name })),
+        "اختر الفرع",
+      ),
+    [branches],
+  );
+
+  const managementSelectOptions = useMemo(
+    () =>
+      withEmptyOption(
+        managements.map((m) => ({ value: String(m.id), label: m.name })),
+        "اختر الادارة",
+      ),
+    [managements],
+  );
+
+  const employeeRows = useMemo(
+    () =>
+      employeesData.map((e) => ({ value: String(e.id), label: e.name })),
+    [employeesData],
+  );
+
+  const actionTakerSelectOptions = useMemo(
+    () => withEmptyOption(employeeRows, "متخذي الاجراء"),
+    [employeeRows],
+  );
+
+  const concernedUserSelectOptions = useMemo(
+    () => withEmptyOption(employeeRows, "المعنيين بالاجراء"),
+    [employeeRows],
+  );
+
+  const escalationUserSelectOptions = useMemo(
+    () => withEmptyOption(employeeRows, "اختر الجهة المصعد إليها"),
+    [employeeRows],
+  );
+
+  const orgTemplateSelectOptions = useMemo(
+    () =>
+      ORG_TEMPLATE_OPTIONS.map((o) => ({
+        value: o.value,
+        label: o.label,
+      })),
+    [],
+  );
 
   const toggleArrayValue = (current: string[], val: string): string[] =>
     current.includes(val)
@@ -620,20 +669,17 @@ export default function StepCard({
                   name="branchId"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      displayEmpty
-                      size="small"
-                      fullWidth
-                      disabled={fieldsDisabled}
-                    >
-                      <MenuItem value="">اختر الفرع</MenuItem>
-                      {branches.map((opt) => (
-                        <MenuItem key={opt.id} value={opt.id}>
-                          {opt.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={branchSelectOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => field.onChange(String(v))}
+                        placeholder="اختر الفرع"
+                        searchPlaceholder="البحث..."
+                        noResultsText="لا توجد نتائج"
+                        disabled={fieldsDisabled}
+                      />
+                    </Box>
                   )}
                 />
               </Box>
@@ -653,20 +699,17 @@ export default function StepCard({
                   name="managementId"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      displayEmpty
-                      size="small"
-                      fullWidth
-                      disabled={fieldsDisabled}
-                    >
-                      <MenuItem value="">اختر الادارة</MenuItem>
-                      {managements.map((opt) => (
-                        <MenuItem key={opt.id} value={opt.id}>
-                          {opt.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={managementSelectOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => field.onChange(String(v))}
+                        placeholder="اختر الادارة"
+                        searchPlaceholder="البحث..."
+                        noResultsText="لا توجد نتائج"
+                        disabled={fieldsDisabled || !branchId}
+                      />
+                    </Box>
                   )}
                 />
               </Box>
@@ -686,20 +729,17 @@ export default function StepCard({
                   name="actionTakerId"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      displayEmpty
-                      size="small"
-                      fullWidth
-                      disabled={fieldsDisabled}
-                    >
-                      <MenuItem value="">متخذي الاجراء</MenuItem>
-                      {employeesData.map((opt) => (
-                        <MenuItem key={opt.id} value={opt.id}>
-                          {opt.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={actionTakerSelectOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => field.onChange(String(v))}
+                        placeholder="متخذي الاجراء"
+                        searchPlaceholder="البحث عن موظف..."
+                        noResultsText="لا توجد نتائج"
+                        disabled={fieldsDisabled}
+                      />
+                    </Box>
                   )}
                 />
               </Box>
@@ -719,20 +759,17 @@ export default function StepCard({
                   name="concernedUserId"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      displayEmpty
-                      size="small"
-                      fullWidth
-                      disabled={fieldsDisabled}
-                    >
-                      <MenuItem value="">المعنيين بالاجراء</MenuItem>
-                      {employeesData.map((opt) => (
-                        <MenuItem key={opt.id} value={opt.id}>
-                          {opt.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={concernedUserSelectOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => field.onChange(String(v))}
+                        placeholder="المعنيين بالاجراء"
+                        searchPlaceholder="البحث عن موظف..."
+                        noResultsText="لا توجد نتائج"
+                        disabled={fieldsDisabled}
+                      />
+                    </Box>
                   )}
                 />
               </Box>
@@ -765,19 +802,17 @@ export default function StepCard({
             name="orgTemplate"
             control={control}
             render={({ field }) => (
-              <Select
-                {...field}
-                displayEmpty
-                size="small"
-                fullWidth
-                disabled={fieldsDisabled}
-              >
-                {ORG_TEMPLATE_OPTIONS.map((opt) => (
-                  <MenuItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </MenuItem>
-                ))}
-              </Select>
+              <Box sx={{ width: "100%" }}>
+                <SearchableSelect
+                  options={orgTemplateSelectOptions}
+                  value={field.value ?? "approve"}
+                  onChange={(v) => field.onChange(String(v))}
+                  placeholder="نموذج"
+                  searchPlaceholder="البحث..."
+                  noResultsText="لا توجد نتائج"
+                  disabled={fieldsDisabled}
+                />
+              </Box>
             )}
           />
         </Box>
@@ -869,20 +904,17 @@ export default function StepCard({
               control={control}
               render={({ field }) => (
                 <>
-                  <Select
-                    {...field}
-                    displayEmpty
-                    size="small"
-                    fullWidth
-                    disabled={fieldsDisabled}
-                  >
-                    <MenuItem value="">اختر الجهة المصعد إليها</MenuItem>
-                    {employeesData.map((emp) => (
-                      <MenuItem key={emp.id} value={emp.id}>
-                        {emp.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <Box sx={{ width: "100%" }}>
+                    <SearchableSelect
+                      options={escalationUserSelectOptions}
+                      value={field.value ?? ""}
+                      onChange={(v) => field.onChange(String(v))}
+                      placeholder="اختر الجهة المصعد إليها"
+                      searchPlaceholder="البحث عن موظف..."
+                      noResultsText="لا توجد نتائج"
+                      disabled={fieldsDisabled}
+                    />
+                  </Box>
                   {field.value && (
                     <Typography
                       variant="caption"
