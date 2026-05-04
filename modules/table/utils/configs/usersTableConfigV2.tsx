@@ -270,37 +270,39 @@ export const UsersConfigV2 = (options?: {
       {
         key: "bank-info",
         label: tSubTable("BankInfo"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "salary-info",
         label: tSubTable("SalaryInfo"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "employment-info",
         label: tSubTable("EmploymentInfo"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "contact-info",
         label: tSubTable("ContactInfo"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "social-media",
         label: tSubTable("SocialMedia"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "family-info",
         label: tSubTable("FamilyInfo"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "about-me",
         label: tSubTable("AboutMe"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value
+          ? <span className="max-w-[180px] line-clamp-2 block text-start">{value}</span>
+          : "—",
       },
       {
         key: "cv",
@@ -310,63 +312,69 @@ export const UsersConfigV2 = (options?: {
       {
         key: "certificates",
         label: tSubTable("Certificates"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "qualification",
         label: tSubTable("Qualification"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "experience",
         label: tSubTable("Experience"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "courses",
         label: tSubTable("Courses"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "work-license",
         label: tSubTable("WorkLicense"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "privileges",
         label: tSubTable("Privileges"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "official-data",
         label: tSubTable("OfficialData"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "job-offer",
         label: tSubTable("JobOffer"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "contract-work",
         label: tSubTable("ContractWork"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
+      { key: "contract_duration", label: tSubTable("ContractDuration"), render: (value: any) => value != null ? value : "—" },
       {
         key: "education",
         label: tSubTable("Education"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value != null ? value : "—",
       },
       {
         key: "passport-info",
         label: tSubTable("PassportInfo"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
       {
         key: "residence-info",
         label: tSubTable("ResidenceInfo"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value ?? "—",
       },
+      { key: "iban", label: tSubTable("IBAN") },
+      { key: "contract_number", label: tSubTable("ContractNumber") },
+      { key: "contract_start_date", label: tSubTable("ContractStartDate") },
+      { key: "notice_period", label: tSubTable("NoticePeriod") },
+      { key: "salary", label: tSubTable("Salary") },
       {
         key: "status",
         label: "الحالة",
