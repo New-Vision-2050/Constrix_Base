@@ -79,6 +79,8 @@ jobs:
         run: |
           echo "BE_URL: $BE_URL"
           echo "NODE_ENV: $NODE_ENV"
+          echo "PDFTRON key set: ${{ secrets.NEXT_PUBLIC_PDFTRON_LICENSE_KEY != '' }}"
+          echo "PDFTRON key length: ${#NEXT_PUBLIC_PDFTRON_LICENSE_KEY}"
 
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v0.1.10
@@ -105,6 +107,9 @@ jobs:
             export NODE_ENV=${{env.NODE_ENV}}
             export DEPLOYMENT_ID=${{env.DEPLOYMENT_ID}}
             export MAPAPIKEY=${{env.MAPAPIKEY}}
+            export NEXT_PUBLIC_PDFTRON_LICENSE_KEY=$NEXT_PUBLIC_PDFTRON_LICENSE_KEY
+            echo "[TRACE] PDFTRON key length on server: ${#NEXT_PUBLIC_PDFTRON_LICENSE_KEY}"
+            echo "[TRACE] PDFTRON key is empty: $( [ -z "$NEXT_PUBLIC_PDFTRON_LICENSE_KEY" ] && echo YES || echo NO )"
             DEPLOY_DIR=/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}
             mkdir -p $DEPLOY_DIR
             cd $DEPLOY_DIR
