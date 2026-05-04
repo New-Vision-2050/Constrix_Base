@@ -24,6 +24,8 @@ import {
   inboxAttachmentFileName,
   type InboxRequestAttachmentLink,
 } from "@/modules/crm-settings/inbox/components/inbox-request-dialog";
+import { ClientRequestTermServicesSection } from "@/modules/crm-settings/inbox/components/ClientRequestTermServicesSection";
+import type { TermServiceSettingItem } from "@/services/api/crm-settings/term-service-settings/types/response";
 
 function mapClientRequestToDocumentRow(row: ClientRequestRow): DocumentRow {
   const typeName = row.client_request_type?.name?.trim();
@@ -90,6 +92,7 @@ export type CrmClientRequestDetailsPartsProps = {
   actionPending: boolean;
   canRespond: boolean;
   canUpdateStatus: boolean;
+  termServiceSettings?: TermServiceSettingItem[];
   children: (parts: CrmClientRequestDetailsPartsRender) => ReactNode;
 };
 
@@ -104,6 +107,7 @@ export function CrmClientRequestDetailsParts({
   actionPending,
   canRespond,
   canUpdateStatus,
+  termServiceSettings,
   children,
 }: CrmClientRequestDetailsPartsProps) {
   const t = useTranslations("project.inbox");
@@ -209,6 +213,12 @@ export function CrmClientRequestDetailsParts({
             : undefined
         }
       />
+      {termServiceSettings && termServiceSettings.length > 0 ? (
+        <ClientRequestTermServicesSection
+          termServiceSettings={termServiceSettings}
+          emptyLabel={t("emptyDash")}
+        />
+      ) : null}
       {showActions ? (
         <InboxRequestActionRow
           actions={[
