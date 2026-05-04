@@ -34,7 +34,7 @@ export function getWorkPanelProject({
         isActive:
           fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) ||
           fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
-        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
+        show: !isCentralCompany && can(PERMISSIONS.projectType.list),
       },
       {
         name: t("Sidebar.Projects"),
