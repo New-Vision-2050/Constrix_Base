@@ -205,18 +205,16 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
 
       setColumns(filteredColumns);
 
-      // Set default visible columns if provided
-      if (
-        config.defaultVisibleColumnKeys &&
-        config.defaultVisibleColumnKeys.length > 0
-      ) {
-        // Always include action column and alwaysVisibleColumnKeys
+      // Set default visible columns only if useTableInitialization hasn't already set them
+      // (useTableInitialization handles localStorage restore + alwaysVisibleColumnKeys)
+      const alreadyInitialized = useTableStore.getState().tables[tableIdRef.current]?.columnVisibility?.keys?.length > 0;
+      if (!alreadyInitialized && config.defaultVisibleColumnKeys && config.defaultVisibleColumnKeys.length > 0) {
         const alwaysVisible = config.alwaysVisibleColumnKeys ?? [];
         const visibleColumns = [
           ...config.defaultVisibleColumnKeys,
           ...(shouldAddActionColumn ? ["id"] : []),
           ...alwaysVisible,
-        ].filter((key, index, arr) => arr.indexOf(key) === index); // deduplicate
+        ].filter((key, index, arr) => arr.indexOf(key) === index);
 
         setColumnVisibilityKeys(visibleColumns);
         setVisibleColumns(visibleColumns);
