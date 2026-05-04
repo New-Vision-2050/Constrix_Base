@@ -8,7 +8,7 @@ import { createTableFetcher } from "./useTableFetcher";
 import { useTableActions } from "./useTableActions";
 import { useTableInitialization } from "./useTableInitialization";
 import { useTableFetchEffect } from "./useTableFetchEffect";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 export const useTableData = (
   url: string,
@@ -91,8 +91,9 @@ export const useTableData = (
     executions: config?.executions,
     executionsConfig: config?.executionConfig, // Pass executionConfig as executionsConfig
     configColumns,
-    availableColumnKeys: config?.availableColumnKeys, // Pass the availableColumnKeys
-    defaultVisibleColumnKeys: config?.defaultVisibleColumnKeys, // Pass the defaultVisibleColumnKeys
+    availableColumnKeys: config?.availableColumnKeys,
+    defaultVisibleColumnKeys: config?.defaultVisibleColumnKeys,
+    alwaysVisibleColumnKeys: config?.alwaysVisibleColumnKeys,
     defaultItemsPerPage,
     defaultSortColumn,
     defaultSortDirection,
@@ -167,34 +168,42 @@ export const useTableData = (
     totalItems,
   });
 
+  // Persist column visibility keys to localStorage
+  const persistVisibility = useCallback((keys: string[]) => {
+    if (!tableId || tableId === "default" || keys.length === 0) return;
+    try {
+      localStorage.setItem(`cv-${tableId}`, JSON.stringify(keys));
+    } catch {}
+  }, [tableId]);
+
+  // Save to localStorage whenever columnVisibility.keys changes (after initialization)
+  useEffect(() => {
+    const keys = columnVisibility?.keys?.length > 0 ? columnVisibility.keys : visibleColumnKeys;
+    persistVisibility(keys);
+  }, [columnVisibility?.keys, visibleColumnKeys]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Handler for setting all columns visible
   const handleSetAllColumnsVisible = () => {
     const allColumnKeys = columns.map((col: ColumnConfig) => col.key);
-    // Update both the old and new APIs
     setVisibleColumns(allColumnKeys);
-
-    // Also update the columnVisibility state if it exists
     if (setColumnVisibility && setColumnVisibilityKeys) {
       setColumnVisibility(true);
       setColumnVisibilityKeys(allColumnKeys);
     }
+    persistVisibility(allColumnKeys);
   };
 
   // Handler for setting minimal columns visible (just the first few columns)
   const handleSetMinimalColumnsVisible = () => {
-    // Show only the first 2-3 columns as minimal view
     const minimalColumns = columns
       .slice(0, Math.min(3, columns.length))
       .map((col: ColumnConfig) => col.key);
-
-    // Update both the old and new APIs
     setVisibleColumns(minimalColumns);
-
-    // Also update the columnVisibility state if it exists
     if (setColumnVisibility && setColumnVisibilityKeys) {
       setColumnVisibility(true);
       setColumnVisibilityKeys(minimalColumns);
     }
+    persistVisibility(minimalColumns);
   };
 
   return {
