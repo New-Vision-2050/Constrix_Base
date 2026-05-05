@@ -31,7 +31,7 @@ export const AttendanceReportsApi = {
     const response = await baseApi.get(`reports/${reportId}/download`, {
       responseType: "blob",
     });
-    downloadFromResponse(response);
+    downloadFromResponse(response, `report-${reportId}`);
   },
 };
 
