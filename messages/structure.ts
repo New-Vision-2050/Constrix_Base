@@ -7,6 +7,7 @@ import { loginMessages } from "./groups/login";
 import { forgotPasswordMessages } from "./groups/forgot-password";
 import { resetPasswordMessages } from "./groups/reset-password";
 import { changeEmailMessages } from "./groups/change-email";
+import { changeMobileMessages } from "./groups/change-mobile";
 import { securityQuestionsMessages } from "./groups/security-questions";
 import { errorsMessages } from "./groups/errors";
 import { validationMessages } from "./groups/validation";
@@ -75,6 +76,7 @@ export const messagesStructure = new MessagesGroup({
   ForgotPassword: forgotPasswordMessages,
   ResetPassword: resetPasswordMessages,
   ChangeEmail: changeEmailMessages,
+  ChangeMobile: changeMobileMessages,
   SecurityQuestions: securityQuestionsMessages,
   Errors: errorsMessages,
   Validation: validationMessages,

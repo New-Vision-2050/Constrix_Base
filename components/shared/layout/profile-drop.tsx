@@ -10,7 +10,7 @@ import {
   ListItemText,
   Avatar,
 } from "@mui/material";
-import { CheckIcon, ChevronDown, UserIcon, Mail, Lock } from "lucide-react";
+import { CheckIcon, ChevronDown, UserIcon, Mail, Lock, Phone } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
@@ -233,7 +233,7 @@ const ProfileDrop = () => {
         {/* Change Email */}
         <MenuItem
           component={Link}
-          href="/user-profile?tab1=edit-mode-tabs-contract&tab2=user-contract-tab-personal-data"
+          href="/change-email"
           onClick={handleMenuClose}
         >
           <ListItemIcon sx={{ minWidth: 32 }}>
@@ -242,11 +242,22 @@ const ProfileDrop = () => {
           <ListItemText>{t("changeMail")}</ListItemText>
         </MenuItem>
 
-        {/* Change Password */}
-
+        {/* Change Mobile */}
         <MenuItem
           component={Link}
-          href="/user-profile?tab1=edit-mode-tabs-logs&tab2=user-actions-tabs-user-status&verticalSection=user-status-password"
+          href="/change-mobile"
+          onClick={handleMenuClose}
+        >
+          <ListItemIcon sx={{ minWidth: 32 }}>
+            <Phone size={18} />
+          </ListItemIcon>
+          <ListItemText>{t("changeMobile")}</ListItemText>
+        </MenuItem>
+
+        {/* Change Password */}
+        <MenuItem
+          component={Link}
+          href="/change-password"
           onClick={handleMenuClose}
         >
           <ListItemIcon sx={{ minWidth: 32 }}>
