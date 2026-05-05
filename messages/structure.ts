@@ -64,6 +64,7 @@ import { projectSettingsMessages } from "./groups/projects/settings";
 import { clientRequestsMessages } from "./groups/customer-requests";
 import { pricesOffersMessages } from "./groups/prices-offers";
 import { usersMessages } from "./groups/users";
+import { deleteEmailMessages } from "./groups/delete-email";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -134,4 +135,5 @@ export const messagesStructure = new MessagesGroup({
   clientRequests: clientRequestsMessages,
   pricesOffers: pricesOffersMessages,
   Users: usersMessages,
+  DeleteEmail: deleteEmailMessages,
 });
