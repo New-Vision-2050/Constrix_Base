@@ -1,12 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, forwardRef } from "react";
-import {
-  GoogleMap,
-  useJsApiLoader,
-  Marker,
-  Circle,
-} from "@react-google-maps/api";
+import React, { useEffect, useRef, forwardRef, useState } from "react";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import type { Libraries } from "@react-google-maps/api";
 import { MapEvents } from "./MapEvents";
 
@@ -78,7 +73,7 @@ const DEFAULT_CENTER = {
 const DEFAULT_RADIUS = 1000;
 
 // Default zoom level
-const DEFAULT_ZOOM = 12;
+const DEFAULT_ZOOM = 16;
 
 // Libraries to load with Google Maps
 const libraries: Libraries = ["places"];
@@ -125,6 +120,7 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
     const mapRef = useRef<google.maps.Map | null>(null);
     const markerRef = useRef<google.maps.Marker | null>(null);
     const circleRef = useRef<google.maps.Circle | null>(null);
+    const [mapType, setMapType] = useState<"roadmap" | "satellite">("roadmap");
 
     const { isLoaded } = useJsApiLoader({
       googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
@@ -194,9 +190,36 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
     return (
       <div
         ref={ref}
-        className={`map-range-picker-container ${className}`}
+        className={`map-range-picker-container relative ${className}`}
         style={{ width, height }}
       >
+        {/* Map Type Toggle Buttons */}
+        <div className="absolute bottom-4 left-4 z-10 flex gap-2 bg-white rounded-lg shadow-md p-1">
+          <button
+            onClick={() => setMapType("roadmap")}
+            className={`px-3 py-2 rounded font-medium text-sm transition-all ${
+              mapType === "roadmap"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+            title="Toggle to 2D view"
+            disabled={disabled}
+          >
+            2D
+          </button>
+          <button
+            onClick={() => setMapType("satellite")}
+            className={`px-3 py-2 rounded font-medium text-sm transition-all ${
+              mapType === "satellite"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+            title="Toggle to satellite view"
+            disabled={disabled}
+          >
+            Satellite
+          </button>
+        </div>
         <GoogleMap
           mapContainerStyle={createContainerStyle(width, height)}
           center={currentPin || center}
@@ -211,6 +234,7 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
             disableDefaultUI: disabled,
             zoomControl: !disabled,
             fullscreenControl: !disabled,
+            mapTypeId: mapType,
           }}
         >
           <MapEvents
