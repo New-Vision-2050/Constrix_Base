@@ -549,6 +549,8 @@ export const useFormStore = create<FormState>((set, get) => ({
               ? rule.message
               : "رقم الجوال غير صحيح";
 
+
+
           try {
             const number = phoneUtil.parseAndKeepRawInput(value);
             const splitValue = value.split(" ");
