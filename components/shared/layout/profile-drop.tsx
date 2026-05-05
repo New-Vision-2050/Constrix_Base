@@ -246,7 +246,7 @@ const ProfileDrop = () => {
 
         <MenuItem
           component={Link}
-          href="/user-profile?tab1=edit-mode-tabs-logs&tab2=user-actions-tabs-user-status&verticalSection=user-status-password"
+          href="/change-password"
           onClick={handleMenuClose}
         >
           <ListItemIcon sx={{ minWidth: 32 }}>

@@ -34,6 +34,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.default-router.rule=HostRegexp(`^([a-z0-9-]+\\.)*constrix-nv\\.com$`) && !HostRegexp(`^(core-|website-)[a-z0-9-]*\\.constrix-nv\\.com$`)"
+      - "traefik.http.routers.default-router.tls.domains[0].main=constrix-nv.com"
+      - "traefik.http.routers.default-router.tls.domains[0].sans=*.constrix-nv.com"
       - "traefik.http.routers.default-router.entrypoints=https"
       - "traefik.http.routers.default-router.tls.certresolver=letsencrypt"
       - "traefik.http.services.default-router.loadbalancer.server.port=3000"
