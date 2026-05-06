@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
+import { useTranslations } from "next-intl";
 
 interface AgeData {
     name: string;
@@ -10,18 +11,19 @@ interface AgeData {
 }
 
 export function AgeDistributionChart() {
+    const t = useTranslations("WorkPanel");
     const [ageData, setAgeData] = useState<AgeData[]>([
-        { name: 'مايو', value: 8 },
-        { name: 'يونيو', value: 12 },
-        { name: 'يوليو', value: 15 },
-        { name: 'أغسطس', value: 18 },
-        { name: 'سبتمبر', value: 22 },
-        { name: 'أكتوبر', value: 25 },
-        { name: 'نوفمبر', value: 28 },
-        { name: 'ديسمبر', value: 30 },
-        { name: 'يناير', value: 32 },
-        { name: 'فبراير', value: 28 },
-        { name: 'مارس', value: 32 }
+        { name: t("may"), value: 8 },
+        { name: t("june"), value: 12 },
+        { name: t("july"), value: 15 },
+        { name: t("august"), value: 18 },
+        { name: t("september"), value: 22 },
+        { name: t("october"), value: 25 },
+        { name: t("november"), value: 28 },
+        { name: t("december"), value: 30 },
+        { name: t("january"), value: 32 },
+        { name: t("february"), value: 28 },
+        { name: t("march"), value: 32 }
     ]);
     const { getAllChartsData } = useIndicatorsService();
 
@@ -48,7 +50,7 @@ export function AgeDistributionChart() {
 
   return (
     <div className="w-full h-64  rounded-lg p-4 flex flex-col">
-      <h3 className="text-white text-lg font-semibold mb-2 text-right">توزيع العمر</h3>
+      <h3 className="text-white text-lg font-semibold mb-2 text-right">{t("ageDistribution")}</h3>
       <div className="flex-1 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={ageData}>

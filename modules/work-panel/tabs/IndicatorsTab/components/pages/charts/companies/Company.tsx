@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
+import { useTranslations } from "next-intl";
 
 interface ContractExpirationData {
     name: string;
@@ -10,10 +11,11 @@ interface ContractExpirationData {
 }
 
 export function CompanyChart() {
+    const t = useTranslations("WorkPanel");
     const [contractData, setContractData] = React.useState<ContractExpirationData[]>([
-        { name: 'ديسمبر 2025', value: 1 },
-        { name: 'فبراير 2027', value: 1 },
-        { name: 'بدون عقد', value: 11 }
+        { name: t("decemberYear2025"), value: 1 },
+        { name: t("februaryYear2027"), value: 1 },
+        { name: t("noContract"), value: 11 }
     ]);
     const { getAllChartsData } = useIndicatorsService();
 
@@ -49,7 +51,7 @@ export function CompanyChart() {
                 </BarChart>
             </ResponsiveContainer>
             <div className="text-center mt-1">
-                <h3 className="text-lg font-semibold">انتهاء العقود شهرياً</h3>
+                <h3 className="text-lg font-semibold">{t("contractExpiryMonthly")}</h3>
             </div>
         </div>
     );

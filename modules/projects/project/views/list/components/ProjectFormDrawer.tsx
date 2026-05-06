@@ -40,6 +40,7 @@ interface ProjectFormDrawerProps {
   onClose: () => void;
   editingProjectId: number | null;
   queryKey: string;
+  onSaved?: () => void;
 }
 
 export function ProjectFormDrawer({
@@ -47,6 +48,7 @@ export function ProjectFormDrawer({
   onClose,
   editingProjectId,
   queryKey,
+  onSaved,
 }: ProjectFormDrawerProps) {
   const t = useTranslations();
   const queryClient = useQueryClient();
@@ -195,6 +197,7 @@ export function ProjectFormDrawer({
         await AllProjectsApi.create(apiData);
       }
       queryClient.invalidateQueries({ queryKey: [queryKey] });
+      onSaved?.();
       handleClose();
     } catch (error) {
       console.error("Error saving project:", error);

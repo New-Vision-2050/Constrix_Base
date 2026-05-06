@@ -2,14 +2,15 @@
 
 import * as React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-const data = [
-  { name: 'إجازات مرضية', value: 20, color: '#EF4444' },
-  { name: 'إجازات سنوية', value: 60, color: '#3B82F6' },
-  { name: 'إجازات خاصة', value: 20, color: '#10B981' }
-];
+import { useTranslations } from "next-intl";
 
 export function Holidays() {
+    const t = useTranslations("WorkPanel");
+    const data = [
+      { name: t("sickLeaves"), value: 20, color: '#EF4444' },
+      { name: t("annualLeaves"), value: 60, color: '#3B82F6' },
+      { name: t("specialLeaves"), value: 20, color: '#10B981' }
+    ];
     return (
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height={200}>
@@ -36,7 +37,7 @@ export function Holidays() {
                 </PieChart>
             </ResponsiveContainer>
             <div className="text-center mt-2">
-                <h3 className="text-lg font-semibold">إجازات الإجمالية</h3>
+                <h3 className="text-lg font-semibold">{t("totalHolidays")}</h3>
             </div>
         </div>
     );

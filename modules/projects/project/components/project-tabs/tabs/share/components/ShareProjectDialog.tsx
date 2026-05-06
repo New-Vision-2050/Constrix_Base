@@ -39,6 +39,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import axios from "axios";
 import { toast } from "sonner";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
@@ -74,7 +75,7 @@ function parseSelectNumberOrEmpty(value: unknown): number | "" {
 
 const createShareFormSchema = () =>
   z.object({
-    serialSearch: z.string().min(1, "الرقم التسلسلي للشركة مطلوب"),
+    serialSearch: z.string().min(1),
   });
 
 const defaultForm: ShareFormValues = {
@@ -167,6 +168,7 @@ export default function ShareProjectDialog({
   onClose,
 }: ShareProjectDialogProps) {
   const { projectId, projectData, isLoading: projectLoading } = useProject();
+  const tDialog = useTranslations("project.shareTab.dialog");
   const queryClient = useQueryClient();
   const allSettingsTabs = useProjectSettingsTabs();
 
@@ -309,17 +311,17 @@ export default function ShareProjectDialog({
         setActiveStep(1);
       } else {
         setCompany(null);
-        setLookupError("الشركة غير موجودة");
+        setLookupError(tDialog("errors.companyNotFound"));
       }
     },
     onError: (error: unknown) => {
       setCompany(null);
       if (isCompanyNotFoundError(error)) {
-        setLookupError("الشركة غير موجودة");
+        setLookupError(tDialog("errors.companyNotFound"));
         return;
       }
       setLookupError(null);
-      toast.error(getApiErrorDescription(error) ?? "حدث خطأ أثناء المشاركة");
+      toast.error(getApiErrorDescription(error) ?? tDialog("errors.shareFailed"));
     },
   });
 
@@ -340,7 +342,7 @@ export default function ShareProjectDialog({
     },
     onSuccess: (res) => {
       const text = getErrorDescriptionFromApiData(res.data);
-      toast.success(text?.trim() ? text : "تمت المشاركة بنجاح");
+      toast.success(text?.trim() ? text : tDialog("success.sharedSuccessfully"));
       queryClient.invalidateQueries({
         queryKey: ["project-details", projectId],
       });
@@ -359,14 +361,14 @@ export default function ShareProjectDialog({
     onError: (error: unknown) => {
       const description = getApiErrorDescription(error);
       if (isOwnCompanyShareError(description)) {
-        toast.error("لا يمكن مشاركة المشروع مع شركتك");
+        toast.error(tDialog("errors.ownCompanyShare"));
         return;
       }
       if (isAlreadySharedApiDescription(description)) {
-        toast.error("تمت المشاركة مع هذه الشركة مسبقاً");
+        toast.error(tDialog("errors.alreadyShared"));
         return;
       }
-      toast.error(description ?? "حدث خطأ أثناء المشاركة");
+      toast.error(description ?? tDialog("errors.shareFailed"));
     },
   });
 
@@ -401,7 +403,7 @@ export default function ShareProjectDialog({
   const handleNext = () => {
     if (activeStep === 2) {
       if (selectedSchemaIds.length === 0) {
-        toast.error("يرجى اختيار قسم واحد على الأقل");
+        toast.error(tDialog("validation.chooseAtLeastOneSection"));
         return;
       }
     }
@@ -418,11 +420,11 @@ export default function ShareProjectDialog({
       return;
     }
     if (!company) {
-      toast.error("يرجى البحث عن الشركة أولاً");
+      toast.error(tDialog("validation.searchCompanyFirst"));
       return;
     }
     if (selectedSchemaIds.length === 0) {
-      toast.error("يرجى اختيار قسم واحد على الأقل");
+      toast.error(tDialog("validation.chooseAtLeastOneSection"));
       return;
     }
     shareMutation.mutate({
@@ -444,10 +446,10 @@ export default function ShareProjectDialog({
     Boolean(schemaParentId && schemaParentId > 0) && !schemasLoading;
 
   const steps = [
-    "البحث عن شركة",
-    "تأكيد الشركة",
-    "تحديد الصلاحيات",
-    "المراجعة والإرسال",
+    tDialog("steps.searchCompany"),
+    tDialog("steps.confirmCompany"),
+    tDialog("steps.definePermissions"),
+    tDialog("steps.reviewAndSend"),
   ];
 
   const renderStepContent = () => {
@@ -464,7 +466,7 @@ export default function ShareProjectDialog({
           >
             {!schemaParentId || schemaParentId <= 0 ? (
               <Typography color="warning.main" variant="body2">
-                نوع المشروع مفقود
+                {tDialog("labels.missingProjectType")}
               </Typography>
             ) : null}
 
@@ -476,10 +478,14 @@ export default function ShareProjectDialog({
                   {...field}
                   fullWidth
                   size="small"
-                  label="الرقم التسلسلي للشركة"
-                  placeholder="أدخل الرقم التسلسلي للبحث"
+                  label={tDialog("labels.companySerialNumber")}
+                  placeholder={tDialog("labels.enterSerialToSearch")}
                   error={!!errors.serialSearch}
-                  helperText={errors.serialSearch?.message}
+                  helperText={
+                    errors.serialSearch
+                      ? tDialog("validation.companySerialRequired")
+                      : ""
+                  }
                   disabled={pending}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -492,7 +498,7 @@ export default function ShareProjectDialog({
             />
 
             <Alert severity="info" variant="outlined" sx={{ py: 1 }}>
-              لن تظهر بيانات الشركة إلا بعد البحث
+              {tDialog("labels.companyDataAfterSearch")}
             </Alert>
 
             {lookupError ? (
@@ -515,7 +521,7 @@ export default function ShareProjectDialog({
                   color="text.primary"
                   sx={{ fontWeight: 700 }}
                 >
-                  الشركة المختارة: {company.name}
+                  {tDialog("labels.selectedCompany", { name: company.name })}
                 </Typography>
               </Paper>
             ) : null}
@@ -534,13 +540,13 @@ export default function ShareProjectDialog({
                   sx={{ gap: 2, flexWrap: "wrap" }}
                 >
                   <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    تفاصيل الشركة التي تم العثور عليها
+                    {tDialog("labels.foundCompanyDetails")}
                   </Typography>
                   <Typography
                     variant="subtitle2"
                     sx={{ fontWeight: 700, color: "secondary.main" }}
                   >
-                    تأكيد البيانات
+                    {tDialog("labels.confirmData")}
                   </Typography>
                 </Stack>
 
@@ -561,7 +567,7 @@ export default function ShareProjectDialog({
                             sx={{ fontSize: 22, color: "text.secondary" }}
                           />
                         ),
-                        label: "اسم الشركة",
+                        label: tDialog("labels.companyName"),
                         value: company.name?.trim() || "—",
                       },
                       {
@@ -570,7 +576,7 @@ export default function ShareProjectDialog({
                             sx={{ fontSize: 22, color: "text.secondary" }}
                           />
                         ),
-                        label: "الرقم التسلسلي",
+                        label: tDialog("labels.serialNumber"),
                         value: company.serial_no?.trim() || "—",
                       },
                       {
@@ -579,7 +585,7 @@ export default function ShareProjectDialog({
                             sx={{ fontSize: 22, color: "text.secondary" }}
                           />
                         ),
-                        label: "البريد الإلكتروني",
+                        label: tDialog("labels.email"),
                         value: company.email?.trim() || "—",
                       },
                       {
@@ -588,7 +594,7 @@ export default function ShareProjectDialog({
                             sx={{ fontSize: 22, color: "text.secondary" }}
                           />
                         ),
-                        label: "مالك الشركة",
+                        label: tDialog("labels.ownerName"),
                         value: company.owner_name?.trim() || "—",
                       },
                     ] as const
@@ -631,7 +637,7 @@ export default function ShareProjectDialog({
               </>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                لا توجد بيانات شركة. ارجع للخطوة السابقة وأكمل البحث.
+                {tDialog("labels.noCompanyData")}
               </Typography>
             )}
           </Box>
@@ -643,13 +649,15 @@ export default function ShareProjectDialog({
             {schemasLoading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} />
-                <Typography variant="body2">جاري تحميل الأقسام...</Typography>
+                <Typography variant="body2">
+                  {tDialog("labels.loadingSections")}
+                </Typography>
               </Box>
             ) : null}
 
             {canShowSchemas && filteredTabs.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
-                لا توجد أقسام متاحة
+                {tDialog("labels.noSectionsAvailable")}
               </Typography>
             ) : null}
 
@@ -665,10 +673,12 @@ export default function ShareProjectDialog({
                 }}
               >
                 <FormControl size="small" fullWidth disabled={pending}>
-                  <InputLabel id="share-project-type-label">النوع</InputLabel>
+                  <InputLabel id="share-project-type-label">
+                    {tDialog("labels.type")}
+                  </InputLabel>
                   <Select
                     labelId="share-project-type-label"
-                    label="النوع"
+                    label={tDialog("labels.type")}
                     value={shareTypeId === "" ? "" : shareTypeId}
                     onChange={(e) =>
                       setShareTypeId(parseSelectNumberOrEmpty(e.target.value))
@@ -689,11 +699,11 @@ export default function ShareProjectDialog({
 
                 <FormControl size="small" fullWidth disabled={pending}>
                   <InputLabel id="share-project-relation-label">
-                    العلاقة
+                    {tDialog("labels.relation")}
                   </InputLabel>
                   <Select
                     labelId="share-project-relation-label"
-                    label="العلاقة"
+                    label={tDialog("labels.relation")}
                     value={shareRelationId === "" ? "" : shareRelationId}
                     onChange={(e) =>
                       setShareRelationId(
@@ -715,10 +725,12 @@ export default function ShareProjectDialog({
                 </FormControl>
 
                 <FormControl size="small" fullWidth disabled={pending}>
-                  <InputLabel id="share-project-role-label">الدور</InputLabel>
+                  <InputLabel id="share-project-role-label">
+                    {tDialog("labels.role")}
+                  </InputLabel>
                   <Select
                     labelId="share-project-role-label"
-                    label="الدور"
+                    label={tDialog("labels.role")}
                     value={shareRoleId === "" ? "" : shareRoleId}
                     onChange={(e) =>
                       setShareRoleId(parseSelectNumberOrEmpty(e.target.value))
@@ -745,7 +757,7 @@ export default function ShareProjectDialog({
                   variant="subtitle1"
                   sx={{ mb: 2.5, fontWeight: 700 }}
                 >
-                  حدد الصلاحيات الممنوحة
+                  {tDialog("labels.selectGrantedPermissions")}
                 </Typography>
                 <Box
                   sx={{
@@ -800,6 +812,17 @@ export default function ShareProjectDialog({
                             width: "100%",
                           }}
                         >
+                          <Typography
+                            variant="body2"
+                            fontWeight={600}
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {tab.name}
+                          </Typography>
                           <Checkbox
                             checked={checked}
                             onChange={() => toggleSchemaId(id)}
@@ -810,18 +833,6 @@ export default function ShareProjectDialog({
                               "aria-label": tab.name,
                             }}
                           />
-                          <Typography
-                            variant="body2"
-                            fontWeight={600}
-                            sx={{
-                              flex: 1,
-                              minWidth: 0,
-                              textAlign: "right",
-                              lineHeight: 1.4,
-                            }}
-                          >
-                            {tab.name}
-                          </Typography>
                         </Box>
                       </Paper>
                     );
@@ -850,7 +861,7 @@ export default function ShareProjectDialog({
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "اسم الشركة",
+                label: tDialog("labels.companyName"),
                 value: company.name?.trim() || "—",
               },
               {
@@ -859,7 +870,7 @@ export default function ShareProjectDialog({
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "الرقم التسلسلي",
+                label: tDialog("labels.serialNumber"),
                 value: company.serial_no?.trim() || "—",
               },
               {
@@ -868,7 +879,7 @@ export default function ShareProjectDialog({
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "البريد الإلكتروني",
+                label: tDialog("labels.email"),
                 value: company.email?.trim() || "—",
               },
               {
@@ -877,7 +888,7 @@ export default function ShareProjectDialog({
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "ممثل الشركة",
+                label: tDialog("labels.companyRepresentative"),
                 value: company.owner_name?.trim() || "—",
               },
             ] as const)
@@ -895,7 +906,7 @@ export default function ShareProjectDialog({
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
-                معلومات الشركة
+                {tDialog("labels.companyInfo")}
               </Typography>
               {companyRows.length > 0 ? (
                 <Stack
@@ -941,7 +952,7 @@ export default function ShareProjectDialog({
               <Divider sx={{ my: 2.5 }} />
 
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
-                الصلاحيات المختارة
+                {tDialog("labels.selectedPermissions")}
               </Typography>
               {selectedTabs.length > 0 ? (
                 <Stack direction="row" flexWrap="wrap" gap={1.5}>
@@ -975,12 +986,12 @@ export default function ShareProjectDialog({
               <Divider sx={{ my: 2.5 }} />
 
               <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 700 }}>
-                نوع المشاركة والعلاقة والدور
+                {tDialog("labels.shareTypeRelationRole")}
               </Typography>
               <Stack spacing={1}>
                 <Typography variant="body2">
                   <Box component="span" color="text.secondary">
-                    النوع:{" "}
+                    {tDialog("labels.type")}:{" "}
                   </Box>
                   {shareTypeId === ""
                     ? "—"
@@ -992,7 +1003,7 @@ export default function ShareProjectDialog({
                 </Typography>
                 <Typography variant="body2">
                   <Box component="span" color="text.secondary">
-                    العلاقة:{" "}
+                    {tDialog("labels.relation")}:{" "}
                   </Box>
                   {shareRelationId === ""
                     ? "—"
@@ -1006,7 +1017,7 @@ export default function ShareProjectDialog({
                 </Typography>
                 <Typography variant="body2">
                   <Box component="span" color="text.secondary">
-                    الدور:{" "}
+                    {tDialog("labels.role")}:{" "}
                   </Box>
                   {shareRoleId === ""
                     ? "—"
@@ -1024,7 +1035,7 @@ export default function ShareProjectDialog({
               icon={<InfoOutlined fontSize="inherit" />}
               variant="outlined"
             >
-              يرجى مراجعة البيانات والصلاحيات قبل إرسال الدعوة
+              {tDialog("labels.reviewBeforeSend")}
             </Alert>
           </Box>
         );
@@ -1056,13 +1067,13 @@ export default function ShareProjectDialog({
       >
         <IconButton
           onClick={handleClose}
-          aria-label="مشاركة المشروع"
+          aria-label={tDialog("labels.shareProject")}
           disabled={pending}
         >
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
-          مشاركة المشروع
+          {tDialog("labels.shareProject")}
         </DialogTitle>
       </Box>
 
@@ -1110,7 +1121,7 @@ export default function ShareProjectDialog({
                     onClick={handleClose}
                     disabled={pending}
                   >
-                    إلغاء
+                    {tDialog("actions.cancel")}
                   </Button>
                   <Button
                     type="button"
@@ -1123,7 +1134,7 @@ export default function ShareProjectDialog({
                     {lookupMutation.isPending ? (
                       <CircularProgress size={22} color="inherit" />
                     ) : (
-                      "بحث"
+                      tDialog("actions.search")
                     )}
                   </Button>
                 </>
@@ -1136,7 +1147,7 @@ export default function ShareProjectDialog({
                     variant="outlined"
                     color="inherit"
                   >
-                    تراجع
+                    {tDialog("actions.undo")}
                   </Button>
                   <Button
                     type="button"
@@ -1145,7 +1156,7 @@ export default function ShareProjectDialog({
                     onClick={handleClose}
                     disabled={pending}
                   >
-                    إلغاء
+                    {tDialog("actions.cancel")}
                   </Button>
                   <Button
                     type="submit"
@@ -1166,7 +1177,9 @@ export default function ShareProjectDialog({
                       )
                     }
                   >
-                    {shareMutation.isPending ? "جاري الإرسال…" : "أرسال الدعوة"}
+                    {shareMutation.isPending
+                      ? tDialog("actions.sending")
+                      : tDialog("actions.sendInvitation")}
                   </Button>
                 </>
               ) : (
@@ -1177,7 +1190,7 @@ export default function ShareProjectDialog({
                     onClick={handleBack}
                     variant="outlined"
                   >
-                    رجوع
+                    {tDialog("actions.back")}
                   </Button>
                   <Button
                     type="button"
@@ -1185,7 +1198,7 @@ export default function ShareProjectDialog({
                     onClick={handleNext}
                     disabled={pending}
                   >
-                    التالي
+                    {tDialog("actions.next")}
                   </Button>
                 </>
               )}

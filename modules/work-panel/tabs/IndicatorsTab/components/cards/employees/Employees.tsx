@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { ChartsLabelCustomMarkProps } from "@mui/x-charts/ChartsLabel";
 import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
+import { useTranslations } from "next-intl";
 
 interface GenderData {
     value: number;
@@ -35,12 +36,13 @@ function SVGStar({ className, color }: ChartsLabelCustomMarkProps) {
 }
 
 export const EmployeesChart = () => {
+  const t = useTranslations("WorkPanel");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [chartSize, setChartSize] = useState({ width: 200, height: 240 });
   const [genderData, setGenderData] = useState<GenderData[]>([
-    { value: 90, label: "ذكر", color: "#7086FD", labelMarkType: "circle" },
-    { value: 50, label: "انثي", color: "#6fd195", labelMarkType: "circle" },
-    { value: 10, label: "غير محدد", color: "#FFA500", labelMarkType: "circle" }
+    { value: 90, label: t("male"), color: "#7086FD", labelMarkType: "circle" },
+    { value: 50, label: t("female"), color: "#6fd195", labelMarkType: "circle" },
+    { value: 10, label: t("unspecified"), color: "#FFA500", labelMarkType: "circle" }
   ]);
   const { getAllChartsData } = useIndicatorsService();
 

@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
+import { useTranslations } from "next-intl";
 
 export function ZoomBarChart() {
   const [data, setData] = useState<any[]>([]);
   const { getAllChartsData } = useIndicatorsService();
+  const t = useTranslations("WorkPanel");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,12 +37,12 @@ export function ZoomBarChart() {
   return (
     <Box className="mt-6">
       <Typography variant="h6" className="text-right mb-2">
-        انتهاء التأشيرات شهرياً
+        {t("visaExpiryMonthly")}
       </Typography>
       <BarChart
         xAxis={[{ scaleType: 'band', data: xLabels }]}
         series={[
-          { data: data.map(d => d.count), label: 'Visa Expiration Count', color: '#8884d8' }
+          { data: data.map(d => d.count), label: t("visaExpiryCount"), color: '#8884d8' }
         ]}
 
       />

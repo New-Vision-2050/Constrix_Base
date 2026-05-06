@@ -16,7 +16,10 @@ import ShareStatsWidgets from "./components/ShareStatsWidgets";
 import { countShareAssignmentSegments } from "./share-status-segments";
 
 function toEntityRef(
-  c: { id: string; name: string; serial_number?: string | null } | null | undefined,
+  c:
+    | { id: string; name: string; serial_number?: string | null }
+    | null
+    | undefined,
 ): ProjectShareEntityRef | null {
   if (!c) return null;
   return {
@@ -28,10 +31,10 @@ function toEntityRef(
 
 function extractNameFromObject(value: any): string | null {
   if (!value) return null;
-  if (typeof value === 'string') return value;
-  if (typeof value === 'object' && value.name) {
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && value.name) {
     const nameStr = value.name;
-    if (typeof nameStr === 'string' && nameStr.trim().startsWith('{')) {
+    if (typeof nameStr === "string" && nameStr.trim().startsWith("{")) {
       try {
         const parsed = JSON.parse(nameStr);
         return parsed.ar || parsed.en || nameStr;
@@ -334,11 +337,7 @@ export default function ShareTab() {
         sortable: true,
         render: (row: ProjectShareRow) => {
           const formatted = formatSentDate(row.created_at);
-          return (
-            <span>
-              {formatted.trim() ? formatted : emptyDash}
-            </span>
-          );
+          return <span>{formatted.trim() ? formatted : emptyDash}</span>;
         },
       },
       {
@@ -410,7 +409,6 @@ export default function ShareTab() {
       awaiting: tWidgets("awaiting"),
       rejected: tWidgets("rejected"),
       accepted: tWidgets("accepted"),
-      inProgress: tWidgets("inProgress"),
       total: tWidgets("total"),
     }),
     [tWidgets],
@@ -459,10 +457,7 @@ export default function ShareTab() {
           />
         }
         table={
-          <ShareTableLayout.Table
-            state={state}
-            loadingOptions={{ rows: 5 }}
-          />
+          <ShareTableLayout.Table state={state} loadingOptions={{ rows: 5 }} />
         }
         pagination={<ShareTableLayout.Pagination state={state} />}
       />
