@@ -10,9 +10,15 @@ interface Config {
   icons: React.ReactNode[];
 }
 
-const StatisticsStoreRow = ({ config }: { config: Config }) => {
+const StatisticsStoreRow = ({
+  config,
+  refreshKey = 0,
+}: {
+  config: Config;
+  refreshKey?: number;
+}) => {
   const { data, isLoading, isSuccess } = useQuery({
-    queryKey: ["widgets", config.url],
+    queryKey: ["widgets", config.url, refreshKey],
     queryFn: async () => {
       const response = await apiClient.get(config.url);
       return response.data;

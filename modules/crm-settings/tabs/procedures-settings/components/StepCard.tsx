@@ -9,16 +9,17 @@ import {
   Divider,
   FormControlLabel,
   Grid,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
 import { Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { baseURL } from "@/config/axios-config";
-import { useAllEmployees } from "@/modules/crm-settings/tabs/procedures-settings/hooks/useAllEmployees";
+import { apiClient, baseURL } from "@/config/axios-config";
 import {
   fetchManagementHierarchyOptions,
   type ManagementHierarchyOption,
@@ -32,8 +33,12 @@ import {
 } from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
 import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import { useToast } from "@/modules/table/hooks/use-toast";
-import SearchableSelect from "@/components/shared/SearchableSelect";
-import { withEmptyOption } from "@/modules/crm-settings/tabs/procedures-settings/utils/selectOptions";
+
+interface EmployeeOption {
+  id: string;
+  name: string;
+  email: string;
+}
 
 // ─── Option constants ─────────────────────────────────────────────────────────
 const ORG_BASE_OPTIONS = [
@@ -46,7 +51,6 @@ const ORG_BASE_OPTIONS = [
 
 const ORG_TEMPLATE_OPTIONS = [
   { value: "approve", label: "نموذج موافقه" },
-  { value: "accreditation_form", label: "نموذج قبول" },
 ] as const;
 
 const NOTIFICATION_OPTIONS = [
@@ -78,75 +82,6 @@ interface StepFormData {
   escalationUserId: string;
 }
 
-function firstActionTakerUserId(step: ProcedureStep | null): string {
-  if (!step) return "";
-  const fromArr = step.action_taker_user_ids?.[0];
-  if (fromArr != null && String(fromArr).length > 0) return String(fromArr);
-  const nested = step.action_takers?.[0]?.user?.id;
-  if (nested != null) return String(nested);
-  if (step.employee_id != null && String(step.employee_id).length > 0) {
-    return String(step.employee_id);
-  }
-  return "";
-}
-
-function firstConcernedUserId(step: ProcedureStep | null): string {
-  if (!step) return "";
-  const fromArr = step.concerned_user_ids?.[0];
-  if (fromArr != null && String(fromArr).length > 0) return String(fromArr);
-  const nested = step.concerned_users?.[0]?.user?.id;
-  if (nested != null) return String(nested);
-  return "";
-}
-
-function resolveActionTakerName(
-  step: ProcedureStep | null,
-  userId: string,
-): string {
-  if (!step || !userId) return "";
-  const idStr = String(userId);
-  const hit = step.action_takers?.find(
-    (at) => at.user?.id != null && String(at.user.id) === idStr,
-  );
-  return (
-    hit?.user?.name?.trim() ||
-    (String(step.employee_id) === idStr ? step.employee?.name?.trim() : "") ||
-    ""
-  );
-}
-
-function resolveConcernedUserName(
-  step: ProcedureStep | null,
-  userId: string,
-): string {
-  if (!step || !userId) return "";
-  const idStr = String(userId);
-  const hit = step.concerned_users?.find(
-    (cu) => cu.user?.id != null && String(cu.user.id) === idStr,
-  );
-  return hit?.user?.name?.trim() || "";
-}
-
-function ensureSelectedEmployeeRow(
-  rows: { value: string; label: string }[],
-  id: string,
-  resolvedName: string,
-): { value: string; label: string }[] {
-  const sid = String(id);
-  if (!sid) return rows;
-  const idx = rows.findIndex((r) => String(r.value) === sid);
-  const label =
-    resolvedName.trim() ||
-    (idx >= 0 ? rows[idx].label : "") ||
-    sid;
-  if (idx >= 0) {
-    const next = [...rows];
-    next[idx] = { value: sid, label };
-    return next;
-  }
-  return [...rows, { value: sid, label }];
-}
-
 const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
   if (serverStep) {
     const base: string[] = [];
@@ -168,8 +103,8 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
         : "",
-      actionTakerId: firstActionTakerUserId(serverStep),
-      concernedUserId: firstConcernedUserId(serverStep),
+      actionTakerId: serverStep.action_taker_user_ids?.[0] ?? "",
+      concernedUserId: serverStep.concerned_user_ids?.[0] ?? "",
       orgBase: base.length ? base : ["approve"],
       orgTemplate:
         formsKindToStepCardUi(parseProcedureStepFormsKind(serverStep)) ===
@@ -216,8 +151,6 @@ export default function StepCard({
 
   const stepName = watch("stepName");
   const branchId = watch("branchId");
-  const actionTakerIdW = watch("actionTakerId");
-  const concernedUserIdW = watch("concernedUserId");
   const fieldsDisabled = !!serverStep && !isEditing;
 
   const syncFromServer = useCallback(() => {
@@ -230,7 +163,14 @@ export default function StepCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serverStep]);
 
-  const { data: employeesData = [] } = useAllEmployees();
+  const { data: employeesData = [] } = useQuery<EmployeeOption[]>({
+    queryKey: ["employees"],
+    queryFn: async () => {
+      const response = await apiClient.get("/company-users/employees");
+      const payload = response.data?.payload ?? response.data;
+      return Array.isArray(payload) ? payload : [];
+    },
+  });
 
   const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
     queryKey: ["managements", "hierarchy", "management", branchId],
@@ -248,88 +188,6 @@ export default function StepCard({
         `${baseURL}/management_hierarchies/list?type=branch`,
       ),
   });
-
-  const branchSelectOptions = useMemo(
-    () =>
-      withEmptyOption(
-        branches.map((b) => ({ value: String(b.id), label: b.name })),
-        "اختر الفرع",
-      ),
-    [branches],
-  );
-
-  const managementSelectOptions = useMemo(
-    () =>
-      withEmptyOption(
-        managements.map((m) => ({ value: String(m.id), label: m.name })),
-        "اختر الادارة",
-      ),
-    [managements],
-  );
-
-  const employeeRows = useMemo(
-    () =>
-      employeesData.map((e) => ({ value: String(e.id), label: e.name })),
-    [employeesData],
-  );
-
-  const actionTakerSelectOptions = useMemo(() => {
-    let rows = [...employeeRows];
-    if (serverStep) {
-      const id = firstActionTakerUserId(serverStep);
-      const name = resolveActionTakerName(serverStep, id);
-      if (id) rows = ensureSelectedEmployeeRow(rows, id, name);
-    }
-    return withEmptyOption(rows, "متخذي الاجراء");
-  }, [employeeRows, serverStep]);
-
-  const concernedUserSelectOptions = useMemo(() => {
-    let rows = [...employeeRows];
-    if (serverStep) {
-      const id = firstConcernedUserId(serverStep);
-      const name = resolveConcernedUserName(serverStep, id);
-      if (id) rows = ensureSelectedEmployeeRow(rows, id, name);
-    }
-    return withEmptyOption(rows, "المعنيين بالاجراء");
-  }, [employeeRows, serverStep]);
-
-  const actionTakerDisplayLabel = useMemo(() => {
-    if (!fieldsDisabled || !actionTakerIdW) return undefined;
-    const id = String(actionTakerIdW);
-    const fromApi = serverStep
-      ? resolveActionTakerName(serverStep, id)
-      : "";
-    const fromList =
-      employeeRows.find((r) => String(r.value) === id)?.label ?? "";
-    const text = (fromApi || fromList).trim();
-    return text || id;
-  }, [fieldsDisabled, actionTakerIdW, serverStep, employeeRows]);
-
-  const concernedUserDisplayLabel = useMemo(() => {
-    if (!fieldsDisabled || !concernedUserIdW) return undefined;
-    const id = String(concernedUserIdW);
-    const fromApi = serverStep
-      ? resolveConcernedUserName(serverStep, id)
-      : "";
-    const fromList =
-      employeeRows.find((r) => String(r.value) === id)?.label ?? "";
-    const text = (fromApi || fromList).trim();
-    return text || id;
-  }, [fieldsDisabled, concernedUserIdW, serverStep, employeeRows]);
-
-  const escalationUserSelectOptions = useMemo(
-    () => withEmptyOption(employeeRows, "اختر الجهة المصعد إليها"),
-    [employeeRows],
-  );
-
-  const orgTemplateSelectOptions = useMemo(
-    () =>
-      ORG_TEMPLATE_OPTIONS.map((o) => ({
-        value: o.value,
-        label: o.label,
-      })),
-    [],
-  );
 
   const toggleArrayValue = (current: string[], val: string): string[] =>
     current.includes(val)
@@ -774,17 +632,20 @@ export default function StepCard({
                   name="branchId"
                   control={control}
                   render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={branchSelectOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => field.onChange(String(v))}
-                        placeholder="اختر الفرع"
-                        searchPlaceholder="البحث..."
-                        noResultsText="لا توجد نتائج"
-                        disabled={fieldsDisabled}
-                      />
-                    </Box>
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">اختر الفرع</MenuItem>
+                      {branches.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   )}
                 />
               </Box>
@@ -804,17 +665,20 @@ export default function StepCard({
                   name="managementId"
                   control={control}
                   render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={managementSelectOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => field.onChange(String(v))}
-                        placeholder="اختر الادارة"
-                        searchPlaceholder="البحث..."
-                        noResultsText="لا توجد نتائج"
-                        disabled={fieldsDisabled || !branchId}
-                      />
-                    </Box>
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">اختر الادارة</MenuItem>
+                      {managements.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   )}
                 />
               </Box>
@@ -834,20 +698,20 @@ export default function StepCard({
                   name="actionTakerId"
                   control={control}
                   render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={actionTakerSelectOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => field.onChange(String(v))}
-                        placeholder="متخذي الاجراء"
-                        searchPlaceholder="البحث عن موظف..."
-                        noResultsText="لا توجد نتائج"
-                        disabled={fieldsDisabled}
-                        displayLabel={
-                          fieldsDisabled ? actionTakerDisplayLabel : undefined
-                        }
-                      />
-                    </Box>
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">متخذي الاجراء</MenuItem>
+                      {employeesData.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   )}
                 />
               </Box>
@@ -867,20 +731,20 @@ export default function StepCard({
                   name="concernedUserId"
                   control={control}
                   render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={concernedUserSelectOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => field.onChange(String(v))}
-                        placeholder="المعنيين بالاجراء"
-                        searchPlaceholder="البحث عن موظف..."
-                        noResultsText="لا توجد نتائج"
-                        disabled={fieldsDisabled}
-                        displayLabel={
-                          fieldsDisabled ? concernedUserDisplayLabel : undefined
-                        }
-                      />
-                    </Box>
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      fullWidth
+                      disabled={fieldsDisabled}
+                    >
+                      <MenuItem value="">المعنيين بالاجراء</MenuItem>
+                      {employeesData.map((opt) => (
+                        <MenuItem key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   )}
                 />
               </Box>
@@ -913,17 +777,19 @@ export default function StepCard({
             name="orgTemplate"
             control={control}
             render={({ field }) => (
-              <Box sx={{ width: "100%" }}>
-                <SearchableSelect
-                  options={orgTemplateSelectOptions}
-                  value={field.value ?? "approve"}
-                  onChange={(v) => field.onChange(String(v))}
-                  placeholder="نموذج"
-                  searchPlaceholder="البحث..."
-                  noResultsText="لا توجد نتائج"
-                  disabled={fieldsDisabled}
-                />
-              </Box>
+              <Select
+                {...field}
+                displayEmpty
+                size="small"
+                fullWidth
+                disabled={fieldsDisabled}
+              >
+                {ORG_TEMPLATE_OPTIONS.map((opt) => (
+                  <MenuItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
+              </Select>
             )}
           />
         </Box>
@@ -1015,17 +881,20 @@ export default function StepCard({
               control={control}
               render={({ field }) => (
                 <>
-                  <Box sx={{ width: "100%" }}>
-                    <SearchableSelect
-                      options={escalationUserSelectOptions}
-                      value={field.value ?? ""}
-                      onChange={(v) => field.onChange(String(v))}
-                      placeholder="اختر الجهة المصعد إليها"
-                      searchPlaceholder="البحث عن موظف..."
-                      noResultsText="لا توجد نتائج"
-                      disabled={fieldsDisabled}
-                    />
-                  </Box>
+                  <Select
+                    {...field}
+                    displayEmpty
+                    size="small"
+                    fullWidth
+                    disabled={fieldsDisabled}
+                  >
+                    <MenuItem value="">اختر الجهة المصعد إليها</MenuItem>
+                    {employeesData.map((emp) => (
+                      <MenuItem key={emp.id} value={emp.id}>
+                        {emp.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
                   {field.value && (
                     <Typography
                       variant="caption"

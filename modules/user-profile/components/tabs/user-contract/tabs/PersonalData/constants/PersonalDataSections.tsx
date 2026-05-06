@@ -94,7 +94,7 @@ export const GetPersonalDataSections = (props: PropsT) => {
     ?.filter((ele) => {
       if (ele.id !== "contract-tab-iqama-data-section") return true;
 
-      return !identity;
+      return !identity && !isEgyptian;
     })
     ?.map((btn) => ({
       ...btn,

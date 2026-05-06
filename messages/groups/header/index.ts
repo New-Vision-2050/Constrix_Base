@@ -6,6 +6,7 @@ export const headerMessages = new MessagesGroup({
   branches: _m("Branches", "الفروع"),
   profile: _m("My account", "حسابي"),
   changeMail: _m("Change email", "تغيير البريد الالكتروني"),
+  changeMobile: _m("Change mobile number", "تغيير رقم الجوال"),
   changePassword: _m("Change password", "تغيير كلمة المرور"),
   footerMessage: _m(
     "Powered by New Vision Technology",

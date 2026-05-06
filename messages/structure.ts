@@ -7,6 +7,8 @@ import { loginMessages } from "./groups/login";
 import { forgotPasswordMessages } from "./groups/forgot-password";
 import { resetPasswordMessages } from "./groups/reset-password";
 import { changeEmailMessages } from "./groups/change-email";
+import { changeMobileMessages } from "./groups/change-mobile";
+import { changePasswordMessages } from "./groups/change-password";
 import { securityQuestionsMessages } from "./groups/security-questions";
 import { errorsMessages } from "./groups/errors";
 import { validationMessages } from "./groups/validation";
@@ -64,6 +66,7 @@ import { projectSettingsMessages } from "./groups/projects/settings";
 import { clientRequestsMessages } from "./groups/customer-requests";
 import { pricesOffersMessages } from "./groups/prices-offers";
 import { usersMessages } from "./groups/users";
+import { deleteEmailMessages } from "./groups/delete-email";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -75,6 +78,8 @@ export const messagesStructure = new MessagesGroup({
   ForgotPassword: forgotPasswordMessages,
   ResetPassword: resetPasswordMessages,
   ChangeEmail: changeEmailMessages,
+  ChangeMobile: changeMobileMessages,
+  ChangePassword: changePasswordMessages,
   SecurityQuestions: securityQuestionsMessages,
   Errors: errorsMessages,
   Validation: validationMessages,
@@ -134,4 +139,5 @@ export const messagesStructure = new MessagesGroup({
   clientRequests: clientRequestsMessages,
   pricesOffers: pricesOffersMessages,
   Users: usersMessages,
+  DeleteEmail: deleteEmailMessages,
 });

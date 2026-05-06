@@ -13,9 +13,9 @@ import {
   Select,
 } from "@mui/material";
 import { LayoutGrid, List, EditIcon, Trash2, Eye } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import DeleteButton from "@/components/shared/delete-button";
@@ -38,8 +38,8 @@ const PROJECTS_QUERY_KEY = "all-projects-list";
 function ProjectsList() {
   const t = useTranslations();
   const tProject = useTranslations("project");
+  const locale = useLocale();
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -50,6 +50,7 @@ function ProjectsList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterProjectTypeId, setFilterProjectTypeId] = useState<string>("");
+  const [statisticsRefreshKey, setStatisticsRefreshKey] = useState(0);
 
   const { data: projectTypesData } = useQuery({
     queryKey: ["all-projects-types-filter"],
@@ -78,16 +79,13 @@ function ProjectsList() {
     setDrawerOpen(true);
   }, []);
 
-  const handleView = useCallback(
-    (projectId: number) => {
-      router.push(ROUTER.PROJECT_DETAILS(String(projectId)));
-    },
-    [router],
-  );
-
   const handleCloseDrawer = useCallback(() => {
     setDrawerOpen(false);
     setEditingProjectId(null);
+  }, []);
+
+  const handleProjectSaved = useCallback(() => {
+    setStatisticsRefreshKey((prev) => prev + 1);
   }, []);
 
   const { data: queryData, isLoading } = useQuery({
@@ -168,7 +166,11 @@ function ProjectsList() {
               </MenuItem>
             </Can>
             <Can check={[PERMISSIONS.projectManagement.view]}>
-              <MenuItem onClick={() => handleView(row.id)}>
+              <MenuItem
+                component={Link}
+                href={ROUTER.PROJECT_DETAILS(String(row.id))}
+                locale={locale}
+              >
                 <Eye className="w-4 h-4 ml-2" />
                 {t("labels.show")}
               </MenuItem>
@@ -177,7 +179,7 @@ function ProjectsList() {
         ),
       },
     ],
-    [t, tProject, handleEdit, handleDelete, handleView],
+    [t, tProject, handleEdit, handleDelete, locale],
   );
 
   // ── Table state ──────────────────────────────────────────────────────────
@@ -226,7 +228,10 @@ function ProjectsList() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <StatisticsStoreRow config={statisticsConfig} />
+      <StatisticsStoreRow
+        config={statisticsConfig}
+        refreshKey={statisticsRefreshKey}
+      />
 
       <Paper
         elevation={0}
@@ -348,6 +353,7 @@ function ProjectsList() {
         onClose={handleCloseDrawer}
         editingProjectId={editingProjectId}
         queryKey={PROJECTS_QUERY_KEY}
+        onSaved={handleProjectSaved}
       />
 
       {/* ── Delete Confirmation Dialog ─────────────────────────────────────── */}
@@ -358,6 +364,7 @@ function ProjectsList() {
             if (!deletingProjectId) return;
             await AllProjectsApi.delete(deletingProjectId);
             queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+            setStatisticsRefreshKey((prev) => prev + 1);
             setDeleteDialogOpen(false);
             setDeletingProjectId(null);
           }}

@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { ChartsLabelCustomMarkProps } from "@mui/x-charts/ChartsLabel";
 import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
+import { useTranslations } from "next-intl";
 
 interface JobTypeData {
     value: number;
@@ -35,12 +36,13 @@ function SVGStar({ className, color }: ChartsLabelCustomMarkProps) {
 }
 
 export function SectionsChart() {
+  const t = useTranslations("WorkPanel");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [chartSize, setChartSize] = useState({ width: 200, height: 240 });
   const [jobTypeData, setJobTypeData] = useState<JobTypeData[]>([
-    { value: 45, label: "الموارد البشرية", color: "#6FD195", labelMarkType: "circle" },
-    { value: 20, label: "التقنية", color: "#7086FD", labelMarkType: "circle" },
-    { value: 8, label: "المالية", color: "#FFA500", labelMarkType: "circle" }
+    { value: 45, label: t("hrDepartment"), color: "#6FD195", labelMarkType: "circle" },
+    { value: 20, label: t("technologyDepartment"), color: "#7086FD", labelMarkType: "circle" },
+    { value: 8, label: t("financeDepartment"), color: "#FFA500", labelMarkType: "circle" }
   ]);
   const [totalEmployees, setTotalEmployees] = useState(73);
   const { getAllChartsData } = useIndicatorsService();

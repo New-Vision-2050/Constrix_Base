@@ -18,7 +18,8 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import IconPicker from "@/components/shared/icon-picker";
 import { APP_ICONS } from "@/constants/icons";
-import { useAllEmployees } from "@/modules/crm-settings/tabs/procedures-settings/hooks/useAllEmployees";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/config/axios-config";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import { Stage } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useToast } from "@/modules/table/hooks/use-toast";
@@ -39,6 +40,12 @@ const PROCEDURE_DIALOG_ICONS = APP_ICONS.filter((icon) =>
     icon.id as (typeof PROCEDURE_DIALOG_ICON_IDS)[number],
   ),
 );
+
+interface EmployeeOption {
+  id: string;
+  name: string;
+  email: string;
+}
 
 interface EditStageDialogProps {
   open: boolean;
@@ -69,7 +76,14 @@ export default function EditStageDialog({
   const [deadlineDays, setDeadlineDays] = useState("");
   const [escalationUserId, setEscalationUserId] = useState("");
 
-  const { data: employees = [] } = useAllEmployees();
+  const { data: employees = [] } = useQuery<EmployeeOption[]>({
+    queryKey: ["employees"],
+    queryFn: async () => {
+      const response = await apiClient.get("/company-users/employees");
+      const payload = response.data?.payload ?? response.data;
+      return Array.isArray(payload) ? payload : [];
+    },
+  });
   const [errors, setErrors] = useState<{
     name: string;
     percentage: string;

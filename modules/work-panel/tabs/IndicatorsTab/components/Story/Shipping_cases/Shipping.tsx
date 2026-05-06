@@ -3,14 +3,16 @@
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
+import { useTranslations } from "next-intl";
 
 const COLORS = ['#FFBB28', '#0088FE', '#8884d8'];
 
 export function Shipping() {
+  const t = useTranslations("WorkPanel");
   const [data, setData] = useState<any[]>([
-    { value: 1, name: 'منتهي', percentage: '1%' },
-    { value: 145, name: 'جاري', percentage: '84%' },
-    { value: 26, name: 'لا يوجد', percentage: '15%' }
+    { value: 1, name: t("expired"), percentage: '1%' },
+    { value: 145, name: t("inProgressStatus"), percentage: '84%' },
+    { value: 26, name: t("notAvailable"), percentage: '15%' }
   ]);
   const { getAllChartsData } = useIndicatorsService();
 
@@ -38,7 +40,7 @@ export function Shipping() {
 
   return (
     <div className="w-full h-64 bg-[#5A4409] rounded-lg p-4 flex flex-col">
-      <h3 className="text-white text-lg font-semibold text-right mb-2">حالات الفيزا</h3>
+      <h3 className="text-white text-lg font-semibold text-right mb-2">{t("visaCases")}</h3>
       <div className="flex-1 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

@@ -104,7 +104,6 @@ export const companiesMessages = new MessagesGroup({
     Education: _m("Education", "التعليم"),
     PassportInfo: _m("Passport Information", "معلومات جواز السفر"),
     ResidenceInfo: _m("Residence Information", "معلومات الإقامة"),
-    OpenCV: _m("Open CV", "فتح السيرة الذاتية"),
     ContractDuration: _m("Contract Duration", "مدة العقد"),
     IBAN: _m("IBAN", "رقم الآيبان"),
     ContractNumber: _m("Contract Number", "رقم العقد"),

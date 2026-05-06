@@ -90,9 +90,6 @@ export interface ProcedureStep {
   employee?: Employee;
   duration?: number;
   management_name?: string | null;
-  /** Often present on GET step payloads when flat id arrays are absent */
-  action_takers?: { user?: { id?: string | number; name?: string } }[];
-  concerned_users?: { user?: { id?: string | number; name?: string } }[];
 }
 
 export interface GetStepsResponse {

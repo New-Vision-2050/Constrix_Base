@@ -2,14 +2,15 @@
 
 import * as React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-const data = [
-  { name: 'فرع 1', value: 45, color: '#3B82F6' },
-  { name: 'فرع 2', value: 30, color: '#10B981' },
-  { name: 'فرع 3', value: 25, color: '#F59E0B' }
-];
+import { useTranslations } from "next-intl";
 
 export function Branch() {
+    const t = useTranslations("WorkPanel");
+    const data = [
+      { name: t("branchOne"), value: 45, color: '#3B82F6' },
+      { name: t("branchTwo"), value: 30, color: '#10B981' },
+      { name: t("branchThree"), value: 25, color: '#F59E0B' }
+    ];
     return (
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height={200}>
@@ -36,7 +37,7 @@ export function Branch() {
                 </PieChart>
             </ResponsiveContainer>
             <div className="text-center mt-2">
-                <h3 className="text-lg font-semibold">الفرع</h3>
+                <h3 className="text-lg font-semibold">{t("branch")}</h3>
             </div>
         </div>
     );

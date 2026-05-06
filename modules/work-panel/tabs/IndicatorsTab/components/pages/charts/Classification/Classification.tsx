@@ -2,15 +2,16 @@
 
 import * as React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-const data = [
-  { name: 'ممتاز', value: 30, color: '#10B981' },
-  { name: 'جيد جداً', value: 40, color: '#3B82F6' },
-  { name: 'جيد', value: 20, color: '#F59E0B' },
-  { name: 'مقبول', value: 10, color: '#EF4444' }
-];
+import { useTranslations } from "next-intl";
 
 export function Classification() {
+    const t = useTranslations("WorkPanel");
+    const data = [
+      { name: t("excellent"), value: 30, color: '#10B981' },
+      { name: t("veryGood"), value: 40, color: '#3B82F6' },
+      { name: t("good"), value: 20, color: '#F59E0B' },
+      { name: t("acceptable"), value: 10, color: '#EF4444' }
+    ];
     return (
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height={200}>
@@ -37,7 +38,7 @@ export function Classification() {
                 </PieChart>
             </ResponsiveContainer>
             <div className="text-center mt-2">
-                <h3 className="text-lg font-semibold">التصنيف</h3>
+                <h3 className="text-lg font-semibold">{t("classification")}</h3>
             </div>
         </div>
     );
