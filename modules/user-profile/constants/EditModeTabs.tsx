@@ -20,7 +20,8 @@ export const useGetEditModeTabsList = (
       title: t("profile"),
       icon: <UserIcon />,
       content: <UserProfileTab />,
-      show: can(PERMISSIONS.profile.personalInfo.view),
+      // show: can(PERMISSIONS.profile.personalInfo.view),
+      show: false,
     },
     {
       id: "edit-mode-tabs-contract",

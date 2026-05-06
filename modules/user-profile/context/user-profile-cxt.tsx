@@ -79,7 +79,7 @@ export const UserProfileCxtProvider = ({
   // ** declare and define component state and variables
   const searchParams = useSearchParams();
   const [tab1, setTab1] = useState(
-    searchParams.get("tab1") || "edit-mode-tabs-profile",
+    searchParams.get("tab1") || "edit-mode-tabs-contract",
   );
   const [tab2, setTab2] = useState(
     searchParams.get("tab2") || "user-contract-tab-personal-data",
