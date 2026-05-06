@@ -31,7 +31,7 @@ export interface UserProfileData {
   Job_role?: string;
   address_attendance?: string;
   border_number?: string;
-  branch?: { id: number; company_id: string; parent_id: string | null; is_main: number; country_id?: string; [key: string]: unknown };
+  branch?: string;
   // companies:Company
   data_status?: string;
   identity?: string;
