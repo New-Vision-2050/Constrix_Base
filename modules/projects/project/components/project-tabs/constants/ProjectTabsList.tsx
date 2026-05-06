@@ -3,7 +3,14 @@
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
-import { Paperclip, UserCog, Share2, Shield, Users, UsersRound } from "lucide-react";
+import {
+  Paperclip,
+  UserCog,
+  Share2,
+  Shield,
+  Users,
+  UsersRound,
+} from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
 import AttachmentsTab from "../tabs/attachments";
@@ -67,7 +74,9 @@ function passesProjectTypeVisibility(
     case "project-tab-cadre":
       return permissions.employee_contract_setting?.is_all_data_visible === 1;
     case "project-tab-roles":
-      return permissions.roles_and_permissions_setting?.is_all_data_visible === 1;
+      return (
+        permissions.roles_and_permissions_setting?.is_all_data_visible === 1
+      );
     case "project-tab-share":
       return permissions.project_sharing_setting?.is_all_data_visible === 1;
     case "project-tab-document-cycle":
@@ -173,8 +182,6 @@ export function useProjectTabsList(): SystemTab[] {
         : null;
 
     const topLevel: SystemTab[] = [];
-    if (stakeholdersTab) topLevel.push(stakeholdersTab);
-
     if (
       shouldShowTopLevelTab(
         "project-tab-attachments",
@@ -186,6 +193,8 @@ export function useProjectTabsList(): SystemTab[] {
     ) {
       topLevel.push(attachmentsTab);
     }
+
+    if (stakeholdersTab) topLevel.push(stakeholdersTab);
 
     if (
       shouldShowTopLevelTab(

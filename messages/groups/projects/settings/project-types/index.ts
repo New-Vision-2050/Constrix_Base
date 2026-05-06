@@ -7,8 +7,8 @@ export const projectTypesMessages = new MessagesGroup({
     attachments: _m("Attachments", "المرفقات"),
     contractors: _m("Contractors", "المقاولين"),
     team: _m("Stakeholders (concerned)", "المعنيين"),
-    rolesAndPermissions: _m("Roles and Permissions", "الصلاحيات والأدوار"),
-    projectSharing: _m("Project Sharing", "مشاركة المشروع"),
+    rolesAndPermissions: _m("Roles and permissions", "الأدوار والصلاحيات"),
+    projectSharing: _m("Shared entities", "الجهات المشاركة"),
     stakeholdersGroup: _m("Stakeholders", "أصحاب المصلحة"),
     workOrders: _m("Work Orders", "اوامر العمل"),
     financial: _m("Financial", "المالية"),
@@ -21,10 +21,16 @@ export const projectTypesMessages = new MessagesGroup({
     nameLabel: _m("Category Name", "اسم التصنيف"),
     nameRequired: _m("Category name is required", "اسم التصنيف مطلوب"),
     iconRequired: _m("Icon selection is required", "اختيار الأيقونة مطلوب"),
-    referenceRequired: _m("Project reference is required", "مرجعية المشروع مطلوبة"),
+    referenceRequired: _m(
+      "Project reference is required",
+      "مرجعية المشروع مطلوبة",
+    ),
     referenceLabel: _m("Project Reference", "مرجعية المشروع"),
     projectElementsLabel: _m("Select Project Elements", "تحديد عناصر المشروع"),
-    successMessage: _m("Project type added successfully", "تم اضافة نوع المشروع بنجاح"),
+    successMessage: _m(
+      "Project type added successfully",
+      "تم اضافة نوع المشروع بنجاح",
+    ),
     errorMessage: _m("Failed to add project type", "فشل في اضافة نوع المشروع"),
   }),
   editProjectType: new MessagesGroup({
@@ -34,28 +40,49 @@ export const projectTypesMessages = new MessagesGroup({
     iconRequired: _m("Icon selection is required", "اختيار الأيقونة مطلوب"),
     referenceLabel: _m("Project Reference", "مرجعية المشروع"),
     projectElementsLabel: _m("Select Project Elements", "تحديد عناصر المشروع"),
-    successMessage: _m("Project type updated successfully", "تم تحديث نوع المشروع بنجاح"),
-    errorMessage: _m("Failed to update project type", "فشل في تحديث نوع المشروع"),
+    successMessage: _m(
+      "Project type updated successfully",
+      "تم تحديث نوع المشروع بنجاح",
+    ),
+    errorMessage: _m(
+      "Failed to update project type",
+      "فشل في تحديث نوع المشروع",
+    ),
   }),
   editSubProjectType: new MessagesGroup({
     title: _m("Edit Sub Category", "تعديل التصنيف الفرعي"),
     nameLabel: _m("Category Name", "اسم التصنيف"),
     nameRequired: _m("Category name is required", "اسم التصنيف مطلوب"),
     iconRequired: _m("Icon selection is required", "اختيار الأيقونة مطلوب"),
-    successMessage: _m("Sub category updated successfully", "تم تحديث التصنيف الفرعي بنجاح"),
-    errorMessage: _m("Failed to update sub category", "فشل في تحديث التصنيف الفرعي"),
+    successMessage: _m(
+      "Sub category updated successfully",
+      "تم تحديث التصنيف الفرعي بنجاح",
+    ),
+    errorMessage: _m(
+      "Failed to update sub category",
+      "فشل في تحديث التصنيف الفرعي",
+    ),
   }),
   addSubProjectType: new MessagesGroup({
     title: _m("Add Sub Category", "اضافة تصنيف فرعي"),
     nameLabel: _m("Category Name", "اسم التصنيف"),
     nameRequired: _m("Category name is required", "اسم التصنيف مطلوب"),
     iconRequired: _m("Icon selection is required", "اختيار الأيقونة مطلوب"),
-    successMessage: _m("Sub category added successfully", "تم اضافة التصنيف الفرعي بنجاح"),
-    errorMessage: _m("Failed to add sub category", "فشل في اضافة التصنيف الفرعي"),
+    successMessage: _m(
+      "Sub category added successfully",
+      "تم اضافة التصنيف الفرعي بنجاح",
+    ),
+    errorMessage: _m(
+      "Failed to add sub category",
+      "فشل في اضافة التصنيف الفرعي",
+    ),
   }),
   details: new MessagesGroup({
     mainData: _m("Main Data", "البيانات الرئيسية"),
-    selectProjectType: _m("Please select a project type", "الرجاء اختيار نوع مشروع"),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
     loading: _m("Loading...", "جاري التحميل..."),
     sections: new MessagesGroup({
       mainTable: _m("Main Table", "الجدول الرئيسي"),
@@ -80,7 +107,10 @@ export const projectTypesMessages = new MessagesGroup({
       "Show all project attachments",
       "إظهار جميع مرفقات المشروع",
     ),
-    selectProjectType: _m("Please select a project type", "الرجاء اختيار نوع مشروع"),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
     loading: _m("Loading...", "جاري التحميل..."),
   }),
 });
