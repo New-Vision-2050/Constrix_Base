@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import { baseApi } from "@/config/axios/instances/base";
-import { downloadFromResponse } from "@/utils/downloadFromResponse";
 import { AxiosError } from "axios";
 
 interface ExportButtonProps {
@@ -87,7 +86,29 @@ const ExportButton: React.FC<ExportButtonProps> = ({
         }
       );
 
-      downloadFromResponse(response, `export.${format}`);
+      // Get the filename from the Content-Disposition header or use a default
+      const contentDisposition = response.headers["content-disposition"];
+      let filename = `export.${format}`;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Download the file
+      const blob = new Blob([response.data], {
+        type: format === "csv" ? "text/csv" : "application/json",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
       toast({
         title: t("Table.ExportSuccess"),

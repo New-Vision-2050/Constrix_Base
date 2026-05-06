@@ -18,10 +18,6 @@ export interface Option {
   label: string;
 }
 
-function valuesMatch(a: string | number, b: string | number): boolean {
-  return String(a) === String(b);
-}
-
 interface SearchableSelectProps {
   options: Option[];
   value: string | number;
@@ -36,8 +32,6 @@ interface SearchableSelectProps {
   name?: string;
   error?: string;
   defaultValue?: string | number;
-  /** Shown in the trigger when set (e.g. read-only label from API). */
-  displayLabel?: string;
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -54,7 +48,6 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   label,
   name,
   error,
-  displayLabel: displayLabelProp,
 }) => {
   const theme = useTheme();
   const locale = useLocale();
@@ -64,17 +57,10 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((opt) => valuesMatch(opt.value, value));
+  const selectedOption = options.find((opt) => opt.value === value);
   const defaultValueOption = defaultValue
-    ? options.find((opt) => valuesMatch(opt.value, defaultValue))
+    ? options.find((opt) => opt.value === defaultValue)
     : undefined;
-
-  const displayTrim = displayLabelProp?.trim();
-  const mainLabel =
-    displayTrim ||
-    selectedOption?.label ||
-    defaultValueOption?.label ||
-    placeholder;
 
   const filteredOptions = searchTerm
     ? options.filter((opt) =>
@@ -143,11 +129,12 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            color:
-              displayTrim || selectedOption ? "text.primary" : "text.secondary",
+            color: selectedOption ? "text.primary" : "text.secondary",
           }}
         >
-          {mainLabel}
+          {selectedOption
+            ? selectedOption.label
+            : defaultValueOption?.label || placeholder}
         </Typography>
         <KeyboardArrowDownIcon
           sx={{
@@ -207,7 +194,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <Box
-                  key={`${String(option.value)}-${option.label}`}
+                  key={option.value}
                   onClick={() => {
                     onChange(option.value);
                     setIsOpen(false);
@@ -217,16 +204,17 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
                     px: 2,
                     py: 1.5,
                     cursor: "pointer",
-                    bgcolor: valuesMatch(option.value, value)
-                      ? "primary.main"
-                      : "transparent",
-                    color: valuesMatch(option.value, value)
-                      ? "primary.contrastText"
-                      : "text.primary",
+                    bgcolor:
+                      option.value === value ? "primary.main" : "transparent",
+                    color:
+                      option.value === value
+                        ? "primary.contrastText"
+                        : "text.primary",
                     "&:hover": {
-                      bgcolor: valuesMatch(option.value, value)
-                        ? "primary.dark"
-                        : "action.hover",
+                      bgcolor:
+                        option.value === value
+                          ? "primary.dark"
+                          : "action.hover",
                     },
                   }}
                 >

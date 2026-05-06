@@ -498,7 +498,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
                 </>
               ) : (
                 <>
-                  <AddIcon sx={{color: "text.secondary", fontSize: 20 }} />
+                  <AddIcon sx={{ color: "text.secondary", fontSize: 20 }} />
                   <Typography variant="body2" color="text.secondary">
                     {t("attachFile")}
                   </Typography>

@@ -98,25 +98,19 @@ const TableBody: React.FC<TableBodyProps> = ({
               const isMobileHidden = column.hideOnMobile
                 ? "hidden sm:table-cell"
                 : "";
+
+              // Use logical properties for RTL/LTR support
               const alignment = column.align
                 ? `text-${column.align}`
-                : "text-start";
-              const isFirstCol = colIndex === 0;
-
-              const rendered = formatValue(value, column, row);
-              const isPlainString = typeof rendered === "string";
+                : "text-start"; // text-start respects RTL/LTR
 
               return (
                 <td
                   key={`${rowIndex}-${column.key}`}
-                  className={`p-2 md:p-3 text-sm table-cell-fade-in ${alignment} ${isMobileHidden} ${isFirstCol ? 'sticky start-0 z-10 bg-sidebar' : ''}`}
+                  className={`p-2 md:p-3 text-sm table-cell-fade-in ${alignment} ${isMobileHidden}`}
                   style={{ "--index": colIndex } as React.CSSProperties}
                 >
-                  {isPlainString ? (
-                    <div className="line-clamp-3 max-w-[200px]">{rendered}</div>
-                  ) : (
-                    rendered
-                  )}
+                  {formatValue(value, column, row)}
                 </td>
               );
             })}

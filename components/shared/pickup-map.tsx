@@ -50,7 +50,7 @@ const PickupMap = ({
       const keys = keysToUpdate ?? defaultKeys;
       keys.forEach((key) => {
         if (obj[key] !== undefined) {
-          setTimeout(() => setValue(formId, key, obj[key], true), 100);
+          setTimeout(() => setValue(formId, key, obj[key],true),100);
         }
       });
 
@@ -64,10 +64,10 @@ const PickupMap = ({
   // Get current form values when dialog opens
   const getCurrentLocation = () => {
     if (!formId) return undefined;
-
+    
     const currentLat = getValue(formId, "latitude");
     const currentLng = getValue(formId, "longitude");
-
+    
     if (currentLat && currentLng) {
       return {
         latitude: currentLat.toString(),
@@ -82,7 +82,7 @@ const PickupMap = ({
       <div
         className={cn(
           "relative border h-10 rounded-md flex items-center justify-between px-3",
-          containerClassName,
+          containerClassName
         )}
       >
         <div className="flex w-full items-center gap-2">

@@ -72,7 +72,7 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
               </Button>
             </div>
           </div>
-          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+          <div className="space-y-2">
             {columns.map((column) => (
               <div key={column.key} className="flex items-center gap-x-2">
                 <Checkbox
