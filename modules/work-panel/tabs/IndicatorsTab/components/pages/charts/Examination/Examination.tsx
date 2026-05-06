@@ -2,13 +2,14 @@
 
 import * as React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-const data = [
-  { name: 'ناجح', value: 85, color: '#10B981' },
-  { name: 'راسب', value: 15, color: '#EF4444' }
-];
+import { useTranslations } from "next-intl";
 
 export function Examination() {
+    const t = useTranslations("WorkPanel");
+    const data = [
+      { name: t("passed"), value: 85, color: '#10B981' },
+      { name: t("failed"), value: 15, color: '#EF4444' }
+    ];
     return (
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height={200}>
@@ -35,7 +36,7 @@ export function Examination() {
                 </PieChart>
             </ResponsiveContainer>
             <div className="text-center mt-2">
-                <h3 className="text-lg font-semibold">الفحص</h3>
+                <h3 className="text-lg font-semibold">{t("examination")}</h3>
             </div>
         </div>
     );

@@ -485,9 +485,8 @@ export default function SchemaLevelTabs({
       effectiveTabValue,
     );
 
-  const stakeholderGroupBulkState = getStakeholderGroupBulkState(
-    bulkSettingsData,
-  );
+  const stakeholderGroupBulkState =
+    getStakeholderGroupBulkState(bulkSettingsData);
   const stakeholderGroupLoading = stakeholderTabsInSchema.some((tab) =>
     isBulkTabDataLoading(tab.value),
   );
@@ -640,11 +639,15 @@ export default function SchemaLevelTabs({
                             label={t("tabs.stakeholdersGroup")}
                             value={STAKEHOLDERS_GROUP_ID}
                             hideCheckbox={false}
-                            checked={stakeholderGroupBulkState?.checked ?? false}
+                            checked={
+                              stakeholderGroupBulkState?.checked ?? false
+                            }
                             indeterminate={
                               stakeholderGroupBulkState?.indeterminate ?? false
                             }
-                            onCheckboxChange={handleStakeholderGroupBulkCheckbox}
+                            onCheckboxChange={
+                              handleStakeholderGroupBulkCheckbox
+                            }
                             disabled={stakeholderGroupCheckboxDisabled}
                           />
                         );
@@ -718,7 +721,9 @@ export default function SchemaLevelTabs({
                             onCheckboxChange={(e) => {
                               handleTabBulkCheckbox(e, tab.value);
                             }}
-                            disabled={supportsBulk ? bulkCheckboxDisabled : false}
+                            disabled={
+                              supportsBulk ? bulkCheckboxDisabled : false
+                            }
                           />
                         );
                       })}

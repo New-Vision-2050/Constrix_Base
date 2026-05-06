@@ -1,8 +1,16 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
-import { Paperclip, UserCog, Share2, Shield, Users, UsersRound } from "lucide-react";
+import {
+  Paperclip,
+  UserCog,
+  Share2,
+  Shield,
+  Users,
+  UsersRound,
+} from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
 import AttachmentsTab from "../tabs/attachments";
@@ -24,47 +32,37 @@ import ShareTab from "../tabs/share";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 
-const ATTACHMENTS_TAB: SystemTab = {
-  id: "project-tab-attachments",
-  title: "المرفقات",
-  icon: <Paperclip className="w-4 h-4" />,
-  content: <AttachmentsTab />,
-};
-
-const DOCUMENT_CYCLE_TAB: SystemTab = {
-  id: "project-tab-document-cycle",
-  title: "دورة الوثائق",
-  icon: <FolderSyncIconWithCount />,
-  content: <DocumentCycleTab />,
-};
-
 /** Sub-sections under «أصحاب المصلحة» (RTL: المعنيين on the right). */
-const STAKEHOLDER_SUB_TABS: SystemTab[] = [
-  {
-    id: "project-tab-staff",
-    title: "المعنيين",
-    icon: <UserCog className="w-4 h-4" />,
-    content: <StaffTab />,
-  },
-  {
-    id: "project-tab-cadre",
-    title: "الكادر",
-    icon: <UsersRound className="w-4 h-4" />,
-    content: <CadreTab />,
-  },
-  {
-    id: "project-tab-roles",
-    title: "الأدوار والصلاحيات",
-    icon: <Shield className="w-4 h-4" />,
-    content: <RolesTab />,
-  },
-  {
-    id: "project-tab-share",
-    title: "الجهات المشاركة",
-    icon: <Share2 className="w-4 h-4" />,
-    content: <ShareTab />,
-  },
-];
+function createStakeholderSubTabs(
+  tProject: ReturnType<typeof useTranslations<"project">>,
+): SystemTab[] {
+  return [
+    {
+      id: "project-tab-staff",
+      title: tProject("tabs.concernedParties"),
+      icon: <UserCog className="w-4 h-4" />,
+      content: <StaffTab />,
+    },
+    {
+      id: "project-tab-cadre",
+      title: tProject("tabs.staff"),
+      icon: <UsersRound className="w-4 h-4" />,
+      content: <CadreTab />,
+    },
+    {
+      id: "project-tab-roles",
+      title: tProject("tabs.rolesAndPermissions"),
+      icon: <Shield className="w-4 h-4" />,
+      content: <RolesTab />,
+    },
+    {
+      id: "project-tab-share",
+      title: tProject("tabs.sharedEntities"),
+      icon: <Share2 className="w-4 h-4" />,
+      content: <ShareTab />,
+    },
+  ];
+}
 
 function passesProjectTypeVisibility(
   tabId: string,
@@ -76,7 +74,9 @@ function passesProjectTypeVisibility(
     case "project-tab-cadre":
       return permissions.employee_contract_setting?.is_all_data_visible === 1;
     case "project-tab-roles":
-      return permissions.roles_and_permissions_setting?.is_all_data_visible === 1;
+      return (
+        permissions.roles_and_permissions_setting?.is_all_data_visible === 1
+      );
     case "project-tab-share":
       return permissions.project_sharing_setting?.is_all_data_visible === 1;
     case "project-tab-document-cycle":
@@ -129,6 +129,7 @@ function shouldShowTopLevelTab(
 }
 
 export function useProjectTabsList(): SystemTab[] {
+  const tProject = useTranslations("project");
   const { projectData, projectId } = useProject();
   const { data: authCompanyData } = useCurrentAuthCompany();
   const permissions = projectData?.permissions;
@@ -137,6 +138,20 @@ export function useProjectTabsList(): SystemTab[] {
     useProjectMyPermissionsFlat(projectId);
 
   return useMemo(() => {
+    const attachmentsTab: SystemTab = {
+      id: "project-tab-attachments",
+      title: tProject("tabs.attachments"),
+      icon: <Paperclip className="w-4 h-4" />,
+      content: <AttachmentsTab />,
+    };
+    const documentCycleTab: SystemTab = {
+      id: "project-tab-document-cycle",
+      title: tProject("tabs.documentCycle"),
+      icon: <FolderSyncIconWithCount />,
+      content: <DocumentCycleTab />,
+    };
+    const stakeholderSubTabs = createStakeholderSubTabs(tProject);
+
     const ownerCompanyId = projectData?.company_id;
     const currentCompanyId = authCompanyData?.payload?.id;
     const showShareTab =
@@ -144,7 +159,7 @@ export function useProjectTabsList(): SystemTab[] {
       Boolean(currentCompanyId) &&
       ownerCompanyId === currentCompanyId;
 
-    const visibleStakeholderSubs = STAKEHOLDER_SUB_TABS.filter((tab) => {
+    const visibleStakeholderSubs = stakeholderSubTabs.filter((tab) => {
       if (tab.id === "project-tab-share" && !showShareTab) return false;
       return shouldShowTopLevelTab(
         tab.id,
@@ -159,7 +174,7 @@ export function useProjectTabsList(): SystemTab[] {
       visibleStakeholderSubs.length > 0
         ? {
             id: STAKEHOLDERS_GROUP_ID,
-            title: "أصحاب المصلحة",
+            title: tProject("tabs.stakeholders"),
             icon: <Users className="w-4 h-4" />,
             content: <></>,
             nestedTabs: visibleStakeholderSubs,
@@ -167,8 +182,6 @@ export function useProjectTabsList(): SystemTab[] {
         : null;
 
     const topLevel: SystemTab[] = [];
-    if (stakeholdersTab) topLevel.push(stakeholdersTab);
-
     if (
       shouldShowTopLevelTab(
         "project-tab-attachments",
@@ -178,8 +191,10 @@ export function useProjectTabsList(): SystemTab[] {
         flatPerms,
       )
     ) {
-      topLevel.push(ATTACHMENTS_TAB);
+      topLevel.push(attachmentsTab);
     }
+
+    if (stakeholdersTab) topLevel.push(stakeholdersTab);
 
     if (
       shouldShowTopLevelTab(
@@ -190,7 +205,7 @@ export function useProjectTabsList(): SystemTab[] {
         flatPerms,
       )
     ) {
-      topLevel.push(DOCUMENT_CYCLE_TAB);
+      topLevel.push(documentCycleTab);
     }
 
     return topLevel;
@@ -201,5 +216,6 @@ export function useProjectTabsList(): SystemTab[] {
     projectId,
     flatPermissionsFetched,
     flatPerms,
+    tProject,
   ]);
 }

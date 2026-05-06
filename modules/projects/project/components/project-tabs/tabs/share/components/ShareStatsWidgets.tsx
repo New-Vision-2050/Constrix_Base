@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  AlertCircle,
-  CheckCircle2,
-  ListTodo,
-  Users,
-  XCircle,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Users, XCircle } from "lucide-react";
 import { useTheme } from "@mui/material";
 import StatisticsCardHeader from "@/modules/organizational-structure/components/StatisticsCard/StatisticsCardHeader";
 import type {
@@ -20,7 +14,6 @@ type ShareStatsWidgetsProps = {
     awaiting: string;
     rejected: string;
     accepted: string;
-    inProgress: string;
     total: string;
   };
 };
@@ -32,7 +25,6 @@ const segmentOrder: (
   { kind: "segment", key: "awaiting" },
   { kind: "segment", key: "rejected" },
   { kind: "segment", key: "accepted" },
-  { kind: "segment", key: "in_progress" },
   { kind: "total" },
 ];
 
@@ -42,19 +34,29 @@ export default function ShareStatsWidgets({
 }: ShareStatsWidgetsProps) {
   const { palette } = useTheme();
 
-  function segmentIcon(
-    key: "awaiting" | "rejected" | "accepted" | "in_progress" | "total",
-  ) {
+  function segmentIcon(key: "awaiting" | "rejected" | "accepted" | "total") {
     const size = 22;
     switch (key) {
       case "awaiting":
-        return <AlertCircle size={size} color={palette.warning.main} strokeWidth={2} />;
+        return (
+          <AlertCircle
+            size={size}
+            color={palette.warning.main}
+            strokeWidth={2}
+          />
+        );
       case "rejected":
-        return <XCircle size={size} color={palette.error.main} strokeWidth={2} />;
+        return (
+          <XCircle size={size} color={palette.error.main} strokeWidth={2} />
+        );
       case "accepted":
-        return <CheckCircle2 size={size} color={palette.success.main} strokeWidth={2} />;
-      case "in_progress":
-        return <ListTodo size={size} color={palette.warning.dark} strokeWidth={2} />;
+        return (
+          <CheckCircle2
+            size={size}
+            color={palette.success.main}
+            strokeWidth={2}
+          />
+        );
       default:
         return <Users size={size} color={palette.info.main} strokeWidth={2} />;
     }
@@ -82,7 +84,7 @@ export default function ShareStatsWidgets({
               ? counts.rejected
               : key === "accepted"
                 ? counts.accepted
-                : counts.inProgress;
+                : undefined;
         const label =
           key === "awaiting"
             ? labels.awaiting
@@ -90,14 +92,15 @@ export default function ShareStatsWidgets({
               ? labels.rejected
               : key === "accepted"
                 ? labels.accepted
-                : labels.inProgress;
-
+                : undefined;
         return (
           <div key={key} className="rounded-lg px-1 py-0.5">
             <StatisticsCardHeader
               title={label}
-              number={value.toLocaleString()}
-              icon={segmentIcon(key)}
+              number={value?.toLocaleString() ?? 0}
+              icon={segmentIcon(
+                key as "awaiting" | "rejected" | "accepted" | "total",
+              )}
             />
           </div>
         );

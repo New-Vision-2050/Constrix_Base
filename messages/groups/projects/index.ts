@@ -7,6 +7,15 @@ export const projectMessages = new MessagesGroup({
   Settings: projectSettingsMessages,
   inbox: projectInboxMessages,
   shareTab: projectShareTabMessages,
+  tabs: new MessagesGroup({
+    attachments: _m("Attachments", "المرفقات"),
+    documentCycle: _m("Document cycle", "دورة الوثائق"),
+    stakeholders: _m("Stakeholders", "أصحاب المصلحة"),
+    concernedParties: _m("Concerned parties", "المعنيين"),
+    staff: _m("Staff", "الكادر"),
+    rolesAndPermissions: _m("Roles and permissions", "الأدوار والصلاحيات"),
+    sharedEntities: _m("Shared entities", "الجهات المشاركة"),
+  }),
   addProject: _m("Add Project", "إضافة مشروع"),
   editProject: _m("Edit Project", "تعديل مشروع"),
   save: _m("Save", "حفظ"),
@@ -16,7 +25,7 @@ export const projectMessages = new MessagesGroup({
   subProjectType: _m("Sub Project Type", "النوع الفرعي للمشروع"),
   subProjectTypeRequired: _m(
     "Sub project type is required",
-    "النوع الفرعي للمشروع مطلوب"
+    "النوع الفرعي للمشروع مطلوب",
   ),
   subSubProjectType: _m("Sub Sub Project Type", "النوع الفرعي الثانوي للمشروع"),
   projectName: _m("Project Name", "اسم المشروع"),
@@ -43,14 +52,11 @@ export const projectMessages = new MessagesGroup({
   statusCompleted: _m("Completed", "مكتمل"),
   deleteConfirm: _m(
     "Are you sure you want to delete this project?",
-    "هل أنت متأكد من حذف هذا المشروع؟"
+    "هل أنت متأكد من حذف هذا المشروع؟",
   ),
   columnRefNumber: _m("Ref. No.", "الرقم المرجعي"),
   columnClientName: _m("Client name", "اسم العميل"),
-  columnResponsibleEngineer: _m(
-    "Responsible engineer",
-    "المهندس المسؤول"
-  ),
+  columnResponsibleEngineer: _m("Responsible engineer", "المهندس المسؤول"),
   columnContractNumber: _m("Contract number", "رقم العقد"),
   columnProjectStart: _m("Project start", "بداية المشروع"),
   columnProjectEnd: _m("Project end", "نهاية المشروع"),
@@ -147,8 +153,14 @@ export const projectMessages = new MessagesGroup({
     uploadProgressPercent: _m("{percent}%", "{percent}%"),
     historyActionRequestCreated: _m("Request created", "تم إنشاء الطلب"),
     historyActionRequestApproved: _m("Request approved", "تم اعتماد الطلب"),
-    historyActionRequestFullyApproved: _m("Request fully approved - All attachments approved", "تم اعتماد الطلب بالكامل - تمت الموافقة على جميع المرفقات"),
-    historyActionAttachmentApproved: _m("Attachment approved", "تم اعتماد المرفق"),
+    historyActionRequestFullyApproved: _m(
+      "Request fully approved - All attachments approved",
+      "تم اعتماد الطلب بالكامل - تمت الموافقة على جميع المرفقات",
+    ),
+    historyActionAttachmentApproved: _m(
+      "Attachment approved",
+      "تم اعتماد المرفق",
+    ),
     historyActionRequestDeclined: _m("Request declined", "تم رفض الطلب"),
     historyActionRequestUpdate: _m("Request updated", "تم تحديث الطلب"),
     itemRespondSuccess: _m("Response submitted", "تم إرسال الرد"),
@@ -205,36 +217,21 @@ export const projectMessages = new MessagesGroup({
       "Employee removed from the project",
       "تم إزالة الموظف من المشروع",
     ),
-    removeError: _m(
-      "Could not remove employee",
-      "تعذر إزالة الموظف",
-    ),
+    removeError: _m("Could not remove employee", "تعذر إزالة الموظف"),
     selectEmployees: _m("Select employees", "اختر الموظفين"),
     assignSuccess: _m(
       "Employees assigned to the project",
-      "تم تعيين الموظفين على المشروع"
+      "تم تعيين الموظفين على المشروع",
     ),
-    assignError: _m(
-      "Could not assign employees",
-      "تعذر تعيين الموظفين"
-    ),
-    roleAssignSuccess: _m(
-      "Role updated",
-      "تم تحديث الدور",
-    ),
-    roleAssignError: _m(
-      "Could not update role",
-      "تعذر تحديث الدور",
-    ),
+    assignError: _m("Could not assign employees", "تعذر تعيين الموظفين"),
+    roleAssignSuccess: _m("Role updated", "تم تحديث الدور"),
+    roleAssignError: _m("Could not update role", "تعذر تحديث الدور"),
     validation: new MessagesGroup({
       employeesRequired: _m(
         "Select at least one employee",
-        "اختر موظفاً واحداً على الأقل"
+        "اختر موظفاً واحداً على الأقل",
       ),
-      employeeNameRequired: _m(
-        "Employee name is required",
-        "اسم الموظف مطلوب"
-      ),
+      employeeNameRequired: _m("Employee name is required", "اسم الموظف مطلوب"),
       emailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
       emailInvalid: _m("Enter a valid email", "أدخل بريداً إلكترونياً صالحاً"),
       jobTitleRequired: _m("Job title is required", "المسمى الوظيفي مطلوب"),
@@ -264,16 +261,25 @@ export const projectMessages = new MessagesGroup({
     roleName: _m("Role Name", "اسم الدور"),
     roleNamePlaceholder: _m("Enter role name", "أدخل اسم الدور"),
     roleNameRequired: _m("Role name is required", "اسم الدور مطلوب"),
-    roleNameMinLength: _m("Role name must be at least 3 characters", "يجب أن يكون اسم الدور على الأقل 3 أحرف"),
+    roleNameMinLength: _m(
+      "Role name must be at least 3 characters",
+      "يجب أن يكون اسم الدور على الأقل 3 أحرف",
+    ),
     roleSlug: _m("Slug", "المعرّف"),
-    roleSlugPlaceholder: _m("Enter slug (e.g. team-member)", "أدخل المعرّف (مثل: team-member)"),
+    roleSlugPlaceholder: _m(
+      "Enter slug (e.g. team-member)",
+      "أدخل المعرّف (مثل: team-member)",
+    ),
     roleSlugRequired: _m("Slug is required", "المعرّف مطلوب"),
     roleDescription: _m("Description", "الوصف"),
     roleDescriptionPlaceholder: _m("Enter role description", "أدخل وصف الدور"),
     roleIsActive: _m("Active", "مفعّل"),
     programsCount: _m("Number of Programs", "عدد البرامج"),
     permissionsCount: _m("Number of Permissions", "عدد الصلاحيات"),
-    permissionsRequired: _m("At least one permission must be selected", "يجب تحديد صلاحية واحدة على الأقل"),
+    permissionsRequired: _m(
+      "At least one permission must be selected",
+      "يجب تحديد صلاحية واحدة على الأقل",
+    ),
     employeesCount: _m("Number of Employees", "عدد الموظفين"),
     status: _m("Status", "الحالة"),
     actions: _m("Actions", "الاجراءات"),
@@ -283,7 +289,10 @@ export const projectMessages = new MessagesGroup({
     totalRoles: _m("Total Number of Roles", "اجمالي عدد الادوار"),
     totalMainRoles: _m("Total Main Roles", "اجمالي الادوار الرئيسية"),
     totalActiveRoles: _m("Total Active Roles", "اجمالي الادوار الفعالة"),
-    totalInactiveRoles: _m("Total Inactive Roles", "اجمالي الادوار غير الفعالة"),
+    totalInactiveRoles: _m(
+      "Total Inactive Roles",
+      "اجمالي الادوار غير الفعالة",
+    ),
     createRole: _m("Create", "أنشاء"),
     createRoleTitle: _m("Create Role", "إنشاء دور"),
     editRole: _m("Edit Role", "تعديل الدور"),
@@ -295,7 +304,10 @@ export const projectMessages = new MessagesGroup({
     loading: _m("Loading...", "جاري التحميل..."),
     creating: _m("Creating...", "جاري الإنشاء..."),
     updating: _m("Updating...", "جاري التحديث..."),
-    errorLoadingRole: _m("Error loading role data", "خطأ في تحميل بيانات الدور"),
+    errorLoadingRole: _m(
+      "Error loading role data",
+      "خطأ في تحميل بيانات الدور",
+    ),
     roleNotFound: _m("Role not found", "لم يتم العثور على الدور"),
     filterRoleName: _m("Role Name", "اسم الدور"),
     filterEmployeeName: _m("Employee Name", "اسم الموظف"),
@@ -303,7 +315,10 @@ export const projectMessages = new MessagesGroup({
     edit: _m("Edit", "تعديل"),
     delete: _m("Delete", "حذف"),
     deleteDialogTitle: _m("Delete Role", "حذف الدور"),
-    deleteDialogBody: _m("Are you sure you want to delete this role?", "هل أنت متأكد من حذف هذا الدور؟"),
+    deleteDialogBody: _m(
+      "Are you sure you want to delete this role?",
+      "هل أنت متأكد من حذف هذا الدور؟",
+    ),
     cancel: _m("Cancel", "إلغاء"),
     search: _m("Search", "بحث"),
     export: _m("Export", "تصدير"),
