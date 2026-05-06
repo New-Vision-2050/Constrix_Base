@@ -88,14 +88,13 @@ export const GetPersonalDataSections = (props: PropsT) => {
   const { user, userDataStatus } = useUserProfileCxt();
   const t = useTranslations("UserProfile.tabs.verticalLists.personalList");
 
-  const identity = user?.country?.id === user?.company?.country_id;
-  const isEgyptian = user?.country?.name?.toLowerCase() === "egypt";
+  const identity = user?.country?.id === user?.branch?.country_id;
 
   return PersonalDataSections(t)
     ?.filter((ele) => {
       if (ele.id !== "contract-tab-iqama-data-section") return true;
 
-      return !identity && !isEgyptian;
+      return !identity;
     })
     ?.map((btn) => ({
       ...btn,
