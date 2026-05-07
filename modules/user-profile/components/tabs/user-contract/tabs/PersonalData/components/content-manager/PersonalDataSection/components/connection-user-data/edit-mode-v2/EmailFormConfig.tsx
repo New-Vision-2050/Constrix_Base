@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 export const EmailFormConfig = () => {
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
   const { userConnectionData } = usePersonalDataTabCxt();
-  const { toggleMailOtpDialog } = useConnectionOTPCxt();
+  const { toggleMailOtpDialog, setMailOtpIdentifier } = useConnectionOTPCxt();
 
   const EmailFormConfig: FormConfig = {
     formId: `email-data-form`,
@@ -64,6 +64,9 @@ export const EmailFormConfig = () => {
         };
         
         await apiClient.post(`/company-users/send-otp`, body);
+        
+        // Set the identifier for OTP verification
+        setMailOtpIdentifier(formData.email as string);
         
         // Open OTP dialog
         toggleMailOtpDialog();

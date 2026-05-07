@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 export const ConnnectionFormConfig = () => {
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
   const { userConnectionData } = usePersonalDataTabCxt();
-  const { togglePhoneOtpDialog } = useConnectionOTPCxt();
+  const { togglePhoneOtpDialog, setPhoneOtpIdentifier } = useConnectionOTPCxt();
 
   const PersonalFormConfig: FormConfig = {
     formId: `connection-data-form`,
@@ -64,6 +64,9 @@ export const ConnnectionFormConfig = () => {
         };
         
         await apiClient.post(`/company-users/send-otp`, body);
+        
+        // Set the identifier for OTP verification
+        setPhoneOtpIdentifier(formData.phone as string);
         
         // Open OTP dialog
         togglePhoneOtpDialog();

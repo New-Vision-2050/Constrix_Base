@@ -8,7 +8,7 @@ import Can from "@/lib/permissions/client/Can";
 
 
 export default function UserProfileConnectionDataEditForm2() {
-  const { openPhoneOtp, openMailOtp, togglePhoneOtpDialog, toggleMailOtpDialog } = useConnectionOTPCxt();
+  const { openPhoneOtp, openMailOtp, togglePhoneOtpDialog, toggleMailOtpDialog, phoneOtpIdentifier, mailOtpIdentifier } = useConnectionOTPCxt();
   const phoneFormConfig = ConnnectionFormConfig();
   const emailFormConfig = EmailFormConfig();
   
@@ -16,11 +16,13 @@ export default function UserProfileConnectionDataEditForm2() {
     <Can check={[PERMISSIONS.userProfile.contact.update]}>
       <OTPVerifyDialog
         identifier={phoneFormConfig.initialValues?.phone as string}
+        newIdentifier={phoneOtpIdentifier}
         open={openPhoneOtp}
         setOpen={togglePhoneOtpDialog}
       />
       <OTPVerifyDialog
         identifier={emailFormConfig.initialValues?.email as string}
+        newIdentifier={mailOtpIdentifier}
         open={openMailOtp}
         setOpen={toggleMailOtpDialog}
       />
