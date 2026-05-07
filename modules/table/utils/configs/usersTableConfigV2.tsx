@@ -295,39 +295,51 @@ export const UsersConfigV2 = (options?: {
       {
         key: "family-info",
         label: tSubTable("FamilyInfo"),
-        render: (value: any) => value != null ? value : "—",
+        render: (value: any) => value
+          ? <span className="max-w-[200px] line-clamp-2 block text-start">{value}</span>
+          : "—",
       },
       {
         key: "about-me",
         label: tSubTable("AboutMe"),
         render: (value: any) => value
-          ? <span className="max-w-[180px] line-clamp-2 block text-start">{value}</span>
+          ? <span title={value}>{value.length > 60 ? value.substring(0, 60) + '...' : value}</span>
           : "—",
       },
       {
         key: "cv",
         label: tSubTable("CV"),
-        render: (value: any) => (value ? "✓" : "—"),
+        render: (value: any) => value
+          ? <a href={value} target="_blank" rel="noopener noreferrer" className="underline text-primary hover:opacity-80 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>{tSubTable("OpenCV")}</a>
+          : "—",
       },
       {
         key: "certificates",
         label: tSubTable("Certificates"),
-        render: (value: any) => value != null ? value : "—",
+        render: (value: any) => value
+          ? <span className="max-w-[200px] line-clamp-2 block text-start">{value}</span>
+          : "—",
       },
       {
         key: "qualification",
         label: tSubTable("Qualification"),
-        render: (value: any) => value != null ? value : "—",
+        render: (value: any) => value
+          ? <span className="max-w-[200px] line-clamp-2 block text-start">{value}</span>
+          : "—",
       },
       {
         key: "experience",
         label: tSubTable("Experience"),
-        render: (value: any) => value != null ? value : "—",
+        render: (value: any) => value
+          ? <span className="max-w-[200px] line-clamp-2 block text-start">{value}</span>
+          : "—",
       },
       {
         key: "courses",
         label: tSubTable("Courses"),
-        render: (value: any) => value != null ? value : "—",
+        render: (value: any) => value
+          ? <span title={value}>{value.length > 50 ? value.substring(0, 50) + '...' : value}</span>
+          : "—",
       },
       {
         key: "work-license",
@@ -337,7 +349,9 @@ export const UsersConfigV2 = (options?: {
       {
         key: "privileges",
         label: tSubTable("Privileges"),
-        render: (value: any) => value != null ? value : "—",
+        render: (value: any) => value
+          ? <span className="max-w-[200px] line-clamp-2 block text-start">{value}</span>
+          : "—",
       },
       {
         key: "official-data",
@@ -358,7 +372,9 @@ export const UsersConfigV2 = (options?: {
       {
         key: "education",
         label: tSubTable("Education"),
-        render: (value: any) => value != null ? value : "—",
+        render: (value: any) => value
+          ? <span className="max-w-[200px] line-clamp-2 block text-start">{value}</span>
+          : "—",
       },
       {
         key: "passport-info",

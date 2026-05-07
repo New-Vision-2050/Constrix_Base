@@ -13,8 +13,9 @@ interface TableInitializationProps {
     canDelete?: boolean;
   };
   configColumns?: ColumnConfig[];
-  availableColumnKeys?: string[]; // New: Array of column keys that should be available
-  defaultVisibleColumnKeys?: string[]; // New: Array of column keys that should be visible by default
+  availableColumnKeys?: string[];
+  defaultVisibleColumnKeys?: string[];
+  alwaysVisibleColumnKeys?: string[];
   defaultItemsPerPage: number;
   defaultSortColumn: string | null;
   defaultSortDirection: "asc" | "desc" | null;
@@ -29,8 +30,8 @@ interface TableInitializationProps {
   setSearch: (query: string, fields?: string[]) => void;
   setColumns: (columns: ColumnConfig[]) => void;
   setVisibleColumns?: (columnKeys: string[]) => void;
-  tableId?: string; // Add tableId parameter
-  deleteConfirmMessage?: string; // Add deleteConfirmMessage parameter
+  tableId?: string;
+  deleteConfirmMessage?: string;
 }
 
 export const useTableInitialization = ({
@@ -40,6 +41,7 @@ export const useTableInitialization = ({
   configColumns,
   availableColumnKeys,
   defaultVisibleColumnKeys,
+  alwaysVisibleColumnKeys,
   defaultItemsPerPage,
   defaultSortColumn,
   defaultSortDirection,
@@ -126,18 +128,41 @@ export const useTableInitialization = ({
 
       // Also initialize visible columns if the function is provided
       if (setVisibleColumns) {
-        // Use defaultVisibleColumnKeys if provided, otherwise use all column keys
-        let columnKeys = defaultVisibleColumnKeys && defaultVisibleColumnKeys.length > 0
-          ? defaultVisibleColumnKeys
-          : filteredColumns.map((col) => col.key);
-        
-        // Always include action column in visible columns if it should be added and exists
+        const storageKey = tableId && tableId !== "default" ? `cv-${tableId}` : null;
+        let columnKeys: string[];
+
+        // Try to restore from localStorage first
+        let restored = false;
+        if (storageKey && typeof window !== "undefined") {
+          try {
+            const saved = localStorage.getItem(storageKey);
+            if (saved) {
+              const parsed = JSON.parse(saved) as string[];
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                columnKeys = parsed;
+                restored = true;
+              }
+            }
+          } catch {}
+        }
+
+        if (!restored) {
+          columnKeys = defaultVisibleColumnKeys && defaultVisibleColumnKeys.length > 0
+            ? defaultVisibleColumnKeys
+            : filteredColumns.map((col) => col.key);
+        }
+
+        // Always include alwaysVisibleColumnKeys regardless of saved/default state
+        const alwaysVisible = alwaysVisibleColumnKeys ?? [];
+        alwaysVisible.forEach((key) => {
+          if (!columnKeys.includes(key)) columnKeys = [...columnKeys, key];
+        });
+
+        // Always include action column if needed
         if (shouldAddActionColumn && !columnKeys.includes("id")) {
           columnKeys = [...columnKeys, "id"];
         }
-        
-        console.log("👁️ Visible columns being set:", columnKeys);
-        
+
         setVisibleColumns(columnKeys);
       }
     }

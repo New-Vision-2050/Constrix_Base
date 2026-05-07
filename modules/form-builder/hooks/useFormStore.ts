@@ -557,7 +557,7 @@ export const useFormStore = create<FormState>((set, get) => ({
             // Reject if national number starts with 0
             if (
               (splitValue.length > 0 && splitValue[1].startsWith("0")) ||
-              !phoneUtil.isValidNumber(number)
+              !phoneUtil.isPossibleNumber(number)
             ) {
               store.setError(formId, fieldName, message);
               hasError = true;

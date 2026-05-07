@@ -49,16 +49,16 @@ const TableHeader: React.FC<TableHeaderProps> = ({
             />
           </th>
         )}
-        {columns.map((column) => {
+        {columns.map((column, colIndex) => {
           const isMobileHidden = column.hideOnMobile ? 'hidden sm:table-cell' : '';
-          // Use logical properties for RTL/LTR support
-          const alignment = column.align ? `text-${column.align}` : 'text-start'; // text-start respects RTL/LTR
+          const alignment = column.align ? `text-${column.align}` : 'text-start';
           const width = column.width ? `w-[${column.width}]` : '';
+          const isFirstCol = colIndex === 0;
           
           return (
             <th
               key={column.key}
-              className={`p-2 md:p-3 font-medium text-foreground/80 text-sm ${alignment} ${isMobileHidden} ${width}`}
+              className={`p-2 md:p-3 font-medium text-foreground/80 text-sm ${alignment} ${isMobileHidden} ${width} ${isFirstCol ? 'sticky start-0 z-10 bg-background' : ''}`}
             >
               {enableSorting && column.sortable ? (
                 <button
