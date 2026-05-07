@@ -10,13 +10,19 @@ import { createContext, useContext, useState } from "react";
 type ConnectionOTPCxtType = {
   openMailOtp: boolean;
   openPhoneOtp: boolean;
+  mailOtpIdentifier: string;
+  phoneOtpIdentifier: string;
 
   toggleMailOtpDialog: () => void;
   togglePhoneOtpDialog: () => void;
+  setMailOtpIdentifier: (identifier: string) => void;
+  setPhoneOtpIdentifier: (identifier: string) => void;
 };
 
 export const ConnectionOTPCxt = createContext<ConnectionOTPCxtType>({
   toggleMailOtpDialog: () => {},
+  setMailOtpIdentifier: () => {},
+  setPhoneOtpIdentifier: () => {},
 } as ConnectionOTPCxtType);
 
 // ** create a custom hook to use the context
@@ -38,6 +44,8 @@ export const ConnectionOTPCxtProvider = ({
   // ** declare and define component state and variables
   const [openMailOtp, setOpenMailOtp] = useState(false);
   const [openPhoneOtp, setOpenPhoneOtp] = useState(false);
+  const [mailOtpIdentifier, setMailOtpIdentifier] = useState("");
+  const [phoneOtpIdentifier, setPhoneOtpIdentifier] = useState("");
 
   // ** handle side effects
 
@@ -53,8 +61,12 @@ export const ConnectionOTPCxtProvider = ({
       value={{
         openMailOtp,
         openPhoneOtp,
+        mailOtpIdentifier,
+        phoneOtpIdentifier,
         toggleMailOtpDialog,
         togglePhoneOtpDialog,
+        setMailOtpIdentifier,
+        setPhoneOtpIdentifier,
       }}
     >
       {children}
