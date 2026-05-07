@@ -4,6 +4,7 @@ export const SETTINGS_TABS = [
   { value: "determinant-details", label: "معلومات المحدد" },
   { value: "timing-settings", label: "اعدادات التوقيت" },
   { value: "employees-settings", label: "اعدادات الموظفين" },
+  { value: "maps-settings", label: "اعدادات الخرائط" },
   { value: "notifications-settings", label: "اعدادات الإشعارات" },
 ];
 

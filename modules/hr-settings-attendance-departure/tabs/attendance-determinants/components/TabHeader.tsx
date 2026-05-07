@@ -20,17 +20,31 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title: _title }) => {
 
   const textColor = isDarkMode ? "text-white" : "text-gray-900";
 
-  const { activeConstraint, refetchConstraints, refetchConstraintsList, handleNewDeterminantCreated, branchesData } =
-    useAttendanceDeterminants();
+  const {
+    activeConstraint,
+    refetchConstraints,
+    refetchConstraintsList,
+    handleNewDeterminantCreated,
+    branchesData,
+  } = useAttendanceDeterminants();
   const t = useTranslations(
-    "HRSettingsAttendanceDepartureModule.attendanceDeterminants"
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants",
   );
   const formTranslations = useTranslations(
-    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form"
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form",
   );
   const dialogTranslations = useTranslations(
-    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog"
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog",
   );
+  const determinantFormConfig = getDynamicDeterminantFormConfig({
+    refetchConstraints,
+    refetchConstraintsList,
+    onNewDeterminantCreated: handleNewDeterminantCreated,
+    branchesData,
+    t,
+    attendanceDaysDialogTranslations: (key: string) => dialogTranslations(key),
+    formTranslationsFn: (key: string) => formTranslations(key),
+  });
 
   return (
     <div className="flex items-center justify-between w-full mb-4">
@@ -41,19 +55,12 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title: _title }) => {
       </h2>
       <div className="flex gap-2">
         <Can check={[PERMISSIONS.attendance.settings.create]}>
-          <SheetFormBuilder
-            config={getDynamicDeterminantFormConfig({
-              refetchConstraints,
-              refetchConstraintsList,
-              onNewDeterminantCreated: handleNewDeterminantCreated,
-              branchesData,
-              t,
-              attendanceDaysDialogTranslations: (key: string) =>
-                dialogTranslations(key),
-              formTranslationsFn: (key: string) => formTranslations(key),
-            })}
-            trigger={<Button>{t("createDeterminant")}</Button>}
-          />
+          {!activeConstraint && (
+            <SheetFormBuilder
+              config={determinantFormConfig}
+              trigger={<Button>{t("createDeterminant")}</Button>}
+            />
+          )}
         </Can>
       </div>
     </div>

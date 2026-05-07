@@ -2,9 +2,10 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
-import EmployeeOptionsSection from "./components/EmployeeOptionsSection";
 import TimingSettingsSection from "./components/TimingSettingsSection";
 import { SETTINGS_TABS } from "./constants";
+import SelectedEmployees from "./components/SelectedEmployees";
+import AttendanceSettingsSection from "./components/AttendanceSettingsSection";
 
 export default function DeterminantSettings({
   constraint,
@@ -30,9 +31,11 @@ export default function DeterminantSettings({
       </TabsContent>
       <TabsContent value="timing-settings" className="pt-2">
         <TimingSettingsSection />
-        <EmployeeOptionsSection />
+        <AttendanceSettingsSection />
       </TabsContent>
-      <TabsContent value="employees-settings" className="pt-2" />
+      <TabsContent value="employees-settings" className="pt-2" >
+        <SelectedEmployees />
+      </TabsContent>
       <TabsContent value="notifications-settings" />
     </Tabs>
   );

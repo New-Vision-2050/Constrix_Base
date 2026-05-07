@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { WEEK_DAYS } from "../constants";
 import type { DayPeriod } from "./timing-types";
 import { DEFAULT_DAY_PERIOD } from "./timing-types";
@@ -32,8 +32,11 @@ export default function DailyTimingSettings({
   );
 
   return (
-    <div className="border border-border rounded-xl px-4 py-6">
-      <div className="flex items-center justify-between gap-6 flex-wrap">
+    <div className="border border-border rounded-xl px-3 py-4 md:px-4 md:py-5">
+      <p className="text-right text-lg font-semibold mb-3">فترات الدوام</p>
+
+      <div className="border border-border rounded-lg px-3 py-4">
+        <div className="flex items-center justify-between gap-6 flex-wrap">
         {WEEK_DAYS.map((day) => {
           const isChecked = weeklyDays.includes(day.id);
           return (
@@ -50,14 +53,12 @@ export default function DailyTimingSettings({
             </label>
           );
         })}
+        </div>
       </div>
 
-      <div className="mt-6">
-        <div className="border border-border rounded-lg p-3 space-y-4">
-          <p className="text-xs text-muted-foreground text-right">
-            الايام المحددة
-          </p>
-          <div className="flex flex-col gap-4">
+      <div className="mt-4">
+        <div className="border border-border rounded-lg p-2 md:p-3 space-y-3">
+          <div className="flex flex-col gap-2">
             {selectedWeekDays.length === 0 ? (
               <p className="text-sm text-muted-foreground text-right">
                 لا توجد ايام محددة
@@ -70,19 +71,19 @@ export default function DailyTimingSettings({
                 return (
                   <div
                     key={day.id}
-                    className="border border-border rounded-lg p-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                    className="border border-border rounded-lg p-2.5 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between"
                   >
-                    <div className="flex items-center gap-2 lg:min-w-[96px] lg:justify-end">
-                    <Checkbox
-                      checked
-                      onCheckedChange={() => onToggleDay(day.id)}
-                      className="border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                    />
-                    <span className="text-sm">{day.label}</span>
+                    <div className="flex items-center gap-2 w-1/5">
+                      <Checkbox
+                        checked
+                        onCheckedChange={() => onToggleDay(day.id)}
+                        className="border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                      />
+                      <span className="text-md">{day.label}</span>
                     </div>
 
                     {hasPeriod ? (
-                      <div className="flex-1 max-w-[340px] lg:max-w-[340px] border border-border rounded-md p-2">
+                      <div className="flex-1 border border-border rounded-md p-2">
                         <p className="text-xs text-muted-foreground text-right mb-2">
                           الفترة الاولى
                         </p>
@@ -117,22 +118,27 @@ export default function DailyTimingSettings({
                           />
                         </div>
                       </div>
-                    ) : null}
+                    ) : (
+                      <div className="flex-1">
+                        <Button
+                          variant="default"
+                          className="w-full h-11 gap-4"
+                          onClick={() => onAddDayPeriod(day.id)}
+                        >
+                          <Plus className="h-4 w-4" />
+                          اضافة الفترات
+                        </Button>
+                      </div>
+                    )}
 
-                    <div className="">
-                      <Button
-                        variant="default"
-                        className="w-full lg:w-auto gap-2"
-                        onClick={() => {
-                          if (!hasPeriod) {
-                            onAddDayPeriod(day.id);
-                          }
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                        {hasPeriod ? "edit periods" : "add a period"}
-                      </Button>
-                    </div>
+                    {hasPeriod ? (
+                      <div className="">
+                        <Button variant="default" className="w-full lg:w-auto gap-2">
+                          <Pencil className="h-4 w-4" />
+                          تعديل الفترات
+                        </Button>
+                      </div>
+                    ) : null}
                   </div>
                 );
               })
