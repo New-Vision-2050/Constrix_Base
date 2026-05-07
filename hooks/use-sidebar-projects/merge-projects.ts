@@ -51,13 +51,6 @@ export function mergeProjects(
         }),
       ) || [];
 
-    if (project.slug === SUPER_ENTITY_SLUG.CRM) {
-      return {
-        ...project,
-        ...restMenuProps,
-      };
-    }
-
     return {
       ...project,
       ...restMenuProps,
