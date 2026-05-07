@@ -15,12 +15,14 @@ export default function UserProfileConnectionDataEditForm2() {
   return (
     <Can check={[PERMISSIONS.userProfile.contact.update]}>
       <OTPVerifyDialog
-        identifier={phoneOtpIdentifier || phoneFormConfig.initialValues?.phone as string}
+        identifier={phoneFormConfig.initialValues?.phone as string}
+        newIdentifier={phoneOtpIdentifier}
         open={openPhoneOtp}
         setOpen={togglePhoneOtpDialog}
       />
       <OTPVerifyDialog
-        identifier={mailOtpIdentifier || emailFormConfig.initialValues?.email as string}
+        identifier={emailFormConfig.initialValues?.email as string}
+        newIdentifier={mailOtpIdentifier}
         open={openMailOtp}
         setOpen={toggleMailOtpDialog}
       />
