@@ -26,6 +26,7 @@ export default function TimeSplitInput({
         <div className="flex-1 bg-background px-2 flex items-center gap-2">
           <Clock3 className="h-4 w-4 text-muted-foreground shrink-0" />
           <input
+            type="time"
             value={timeValue}
             onChange={(event) => onTimeChange(event.target.value)}
             placeholder={placeholder}

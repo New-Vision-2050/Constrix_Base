@@ -15,10 +15,7 @@ export default function TimingSettingsSection() {
   );
   const [periodTo, setPeriodTo] = useState("02:00");
   const [periodToMeridiem, setPeriodToMeridiem] = useState<"AM" | "PM">("PM");
-  const [dayPeriods, setDayPeriods] = useState<Record<string, DayPeriod>>({
-    sunday: { ...DEFAULT_DAY_PERIOD },
-    monday: { ...DEFAULT_DAY_PERIOD },
-  });
+  const [dayPeriods, setDayPeriods] = useState<Record<string, DayPeriod>>({});
 
   const toggleWeeklyDay = (dayId: string) => {
     setWeeklyDays((previous) => {
@@ -32,11 +29,19 @@ export default function TimingSettingsSection() {
         return previous.filter((value) => value !== dayId);
       }
 
-      setDayPeriods((old) => ({
-        ...old,
-        [dayId]: old[dayId] ?? { ...DEFAULT_DAY_PERIOD },
-      }));
       return [...previous, dayId];
+    });
+  };
+
+  const addDayPeriod = (dayId: string) => {
+    setDayPeriods((previous) => {
+      if (previous[dayId]) {
+        return previous;
+      }
+      return {
+        ...previous,
+        [dayId]: { ...DEFAULT_DAY_PERIOD },
+      };
     });
   };
 
@@ -76,6 +81,7 @@ export default function TimingSettingsSection() {
           weeklyDays={weeklyDays}
           dayPeriods={dayPeriods}
           onToggleDay={toggleWeeklyDay}
+          onAddDayPeriod={addDayPeriod}
           onUpdateDayPeriod={updateDayPeriod}
         />
       </TabsContent>
