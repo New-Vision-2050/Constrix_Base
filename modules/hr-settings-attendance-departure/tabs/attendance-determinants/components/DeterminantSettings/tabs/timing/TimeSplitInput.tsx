@@ -35,7 +35,9 @@ export default function TimeSplitInput({
         </div>
         <select
           value={meridiem}
-          onChange={(event) => onMeridiemChange(event.target.value as "AM" | "PM")}
+          onChange={(event) =>
+            onMeridiemChange(event.target.value as "AM" | "PM")
+          }
           className="w-16 bg-primary text-primary-foreground text-sm text-center focus:outline-none"
         >
           <option value="AM">AM</option>
