@@ -96,21 +96,14 @@ export function OTPVerifyDialog({ open, identifier, newIdentifier, setOpen }: Pr
         body
       );
 
-      // Update the email/phone on the backend after successful OTP validation
-      const updateBody = type === "email"
-        ? { email: otpIdentifier }
-        : { phone: otpIdentifier };
-
-      await apiClient.put(`/company-users/data-info`, updateBody);
-
       handleClose();
-      toast.success("تم التغير بنجاح");
+      toast.success("تم التعديل بنجاح");
       setLoading(false);
       handleRefreshConnectionData();
     } catch (error) {
       setLoading(false);
       console.log("error", error);
-      setError(`كلمه المرور الموقته غير صحيحية`);
+      setError(`كلمة المرور الموقته خطأ`);
     }
   };
 
