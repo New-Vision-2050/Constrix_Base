@@ -1,11 +1,11 @@
 export type CompanyField = {
-  id: number;
+  id: string | number;
   name: string;
-  description: string;
+  description?: string;
 };
 
 export type Branch = {
-  id: string;
+  id: string | number;
   name: string;
 };
 
@@ -13,6 +13,7 @@ export type GeneralManager = {
   name: string;
   email: string;
   phone: string;
+  nationality?: string;
 };
 
 export type MainBranch = {
@@ -39,15 +40,15 @@ export type CompanyData = {
   country_lat: string;
   country_long: string;
   country_iso2: string;
-  company_type_id: string;
-  registration_type_id: string;
-  company_field_id: string;
-  general_manager_id: string;
-  registration_no: string;
-  general_manager: GeneralManager;
-  company_type: string;  
+  company_type_id: string | null;
+  registration_type_id: string | null;
+  company_field_id: string | null;
+  general_manager_id: string | null;
+  registration_no: string | null;
+  general_manager: GeneralManager | null;
+  company_type: string | null;
   company_field: CompanyField[];
-  registration_type: string;
+  registration_type: string | null;
   logo: string;
   is_active: number;
   complete_data: number;
@@ -78,7 +79,7 @@ export type ShareProjectResponse = {
 export type CompanyLookupResponse = {
   code: string;
   message?: string | null;
-  payload: CompanyData;
+  payload?: CompanyData | null;
 };
 
 /** Company the project is shared with (list payload). */
