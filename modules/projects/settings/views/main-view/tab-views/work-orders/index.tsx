@@ -166,7 +166,10 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
         />
       )}
       {activeCard === "ACTIONS" && (
-        <ActionsView setActiveCard={setActiveCard} />
+        <ActionsView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
       {activeCard === "REPORT_FORMS" && (
         <ReportsFormsView setActiveCard={setActiveCard} />

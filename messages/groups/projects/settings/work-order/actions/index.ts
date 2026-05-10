@@ -53,5 +53,12 @@ export const ActionsMessages = new MessagesGroup({
     actionCode: _m("Code", "الرمز"),
     actionDescription: _m("Description", "الوصف"),
     notFound: _m("Action not found", "لم يتم العثور على الإجراء"),
+    createdAt: _m("Created at", "تاريخ الإنشاء"),
+    updatedAt: _m("Updated at", "تاريخ التحديث"),
   }),
+  loadListError: _m(
+    "Could not load procedures",
+    "تعذر تحميل الإجراءات",
+  ),
+  error: _m("Error", "خطأ"),
 });

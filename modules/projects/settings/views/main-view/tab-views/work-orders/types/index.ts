@@ -27,11 +27,18 @@ export interface ProjectSharingDepartment {
 /** @deprecated Use ProjectSharingDepartment */
 export type Section = ProjectSharingDepartment;
 
-export interface Action {
-  id: string;
-  code: number;
+/** Project sharing procedure (API: project-sharing-procedure) — UI «Action». */
+export interface ProjectSharingProcedure {
+  id: number;
+  project_type_id: number;
+  code: string;
   description: string;
+  created_at: string;
+  updated_at: string;
 }
+
+/** @deprecated Use ProjectSharingProcedure */
+export type Action = ProjectSharingProcedure;
 
 export interface ReportForm {
   id: string;
@@ -57,7 +64,7 @@ export interface RowActionsProps {
   row:
     | ProjectSharingWorkOrder
     | Section
-    | Action
+    | ProjectSharingProcedure
     | ReportForm
     | Task
     | TaskSetting;
