@@ -38,6 +38,7 @@ import {
   hasAnyProjectPermissionKey,
   hasProjectPermissionKey,
 } from "@/modules/projects/project/utils/projectMyPermissions";
+import { useCanAssignProjectStaffRoles } from "@/modules/projects/project/hooks/useCanAssignProjectStaffRoles";
 import type { Employee } from "../staff/types";
 import AddCadreDialog from "./add-cadre/AddCadreDialog";
 import StaffRoleSelect from "../staff/StaffRoleSelect";
@@ -80,6 +81,8 @@ export default function CadreTab() {
     () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_DELETE),
     [flatPerms],
   );
+
+  const canChangeStaffRole = useCanAssignProjectStaffRoles(canUpdate);
 
   const deleteEmployeeMutation = useMutation({
     mutationFn: (assignmentId: string) =>
@@ -135,12 +138,12 @@ export default function CadreTab() {
             projectId={projectId}
             assignmentId={row.id}
             projectRole={row.projectRole}
-            canChangeRole={canUpdate}
+            canChangeRole={canChangeStaffRole}
           />
         ),
       },
     ],
-    [t, projectId, canUpdate],
+    [t, projectId, canChangeStaffRole],
   );
 
   const params = CadreTableLayout.useTableParams({

@@ -1,6 +1,7 @@
 "use client";
 
 import { baseURL } from "@/config/axios-config";
+import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import Can from "@/lib/permissions/client/Can";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
@@ -140,11 +141,20 @@ const UsersSubEntityTable = ({
     handleRefreshWidgetsData,
     tableId: TABLE_ID,
   });
-  const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
-    field.key === "email_or_phone"
-      ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
-      : optionalAttr?.includes(field.name || field.key),
-  );
+  const allSearchedFields = usersConfig.allSearchedFields
+    .filter((field) =>
+      field.key === "email_or_phone"
+        ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
+        : optionalAttr?.includes(field.name || field.key),
+    )
+    .filter(
+      (field) =>
+        !(
+          programName === SUPER_ENTITY_SLUG.HRM &&
+          slug === "employees" &&
+          field.key === "company_id"
+        ),
+    );
 
   const userEditRoleParam =
     registrationFormSlug === ModelsTypes.CLIENT
