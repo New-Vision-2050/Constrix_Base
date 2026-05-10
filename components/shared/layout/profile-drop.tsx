@@ -26,6 +26,7 @@ import CompanyIcon from "@/public/icons/company";
 import { truncateString } from "@/utils/truncate-string";
 import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
 import { useIsRtl } from "@/hooks/use-is-rtl";
+import { ChangeEmailDialog } from "./change-email-dialog";
 
 interface menuItem {
   label: string;
@@ -57,6 +58,7 @@ const ProfileDrop = () => {
     null,
   );
   const [branches, setBranches] = useState<menuItem[]>([]);
+  const [openChangeEmailDialog, setOpenChangeEmailDialog] = useState(false);
 
   useEffect(() => {
     const id = getCookie("current-branch-id");
@@ -232,9 +234,10 @@ const ProfileDrop = () => {
 
         {/* Change Email */}
         <MenuItem
-          component={Link}
-          href="/user-profile?tab1=edit-mode-tabs-contract&tab2=user-contract-tab-personal-data"
-          onClick={handleMenuClose}
+          onClick={() => {
+            handleMenuClose();
+            setOpenChangeEmailDialog(true);
+          }}
         >
           <ListItemIcon sx={{ minWidth: 32 }}>
             <Mail size={18} />
@@ -327,6 +330,11 @@ const ProfileDrop = () => {
           </MenuItem>
         ))}
       </Menu>
+
+      <ChangeEmailDialog
+        open={openChangeEmailDialog}
+        onOpenChange={setOpenChangeEmailDialog}
+      />
     </Box>
   );
 };
