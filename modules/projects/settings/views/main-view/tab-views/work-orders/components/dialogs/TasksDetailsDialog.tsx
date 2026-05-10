@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Dialog,
@@ -6,17 +8,13 @@ import {
   IconButton,
   Typography,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DetailsDialogProps } from "../../types";
+import type { DetailsDialogProps } from "../../types";
 import { useTranslations } from "next-intl";
-
-const mockTasks = [
-  { id: "task1", tasksNumber: 1, tasksName: "مهمة أولى" },
-  { id: "task2", tasksNumber: 2, tasksName: "مهمة ثانية" },
-  { id: "task3", tasksNumber: 3, tasksName: "مهمة ثالثة" },
-  { id: "task4", tasksNumber: 4, tasksName: "مهمة رابعة" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
 
 const TasksDetailsDialog = ({
   open,
@@ -24,19 +22,30 @@ const TasksDetailsDialog = ({
   rowId,
 }: DetailsDialogProps) => {
   const tDetails = useTranslations("projectSettings.addTasks.details");
+
   const handleClose = () => setOpenModal(false);
 
-  const task = mockTasks.find((item) => item.id === rowId);
+  const detailQuery = useQuery({
+    queryKey: ["project-sharing-tasks", rowId],
+    queryFn: async () => {
+      const res = await ProjectSharingTasksApi.show(rowId!);
+      return res.data.payload;
+    },
+    enabled: open && Boolean(rowId),
+  });
+
+  const task = detailQuery.data;
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth="lg"
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         sx: {
           borderRadius: "8px",
-          p: 8,
+          p: 2,
         },
       }}
     >
@@ -55,28 +64,37 @@ const TasksDetailsDialog = ({
         sx={{
           textAlign: "center",
           fontWeight: "bold",
-          fontSize: "1.5rem",
-          mb: 2,
+          fontSize: "1.25rem",
+          pb: 1,
         }}
       >
         {tDetails("title")}
       </DialogTitle>
 
       <DialogContent>
-        {task && (
-          <Box className="flex flex-col gap-4">
-            <Typography variant="body1">
-              <strong>{tDetails("serialNumber")}:</strong> {task.tasksNumber}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{tDetails("tasksName")}:</strong> {task.tasksName}
-            </Typography>
+        {detailQuery.isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
           </Box>
-        )}
-        {!task && (
+        ) : detailQuery.isError || !task ? (
           <Typography textAlign="center" color="error">
             {tDetails("notFound")}
           </Typography>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            <Typography variant="body2">
+              <strong>{tDetails("taskCode")}:</strong> {task.code}
+            </Typography>
+            <Typography variant="body2">
+              <strong>{tDetails("taskName")}:</strong> {task.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{tDetails("createdAt")}:</strong> {task.created_at}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{tDetails("updatedAt")}:</strong> {task.updated_at}
+            </Typography>
+          </Box>
         )}
       </DialogContent>
     </Dialog>

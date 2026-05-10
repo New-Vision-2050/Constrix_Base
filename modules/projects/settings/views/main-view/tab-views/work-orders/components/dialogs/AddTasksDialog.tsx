@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
@@ -9,24 +9,67 @@ import {
   TextField,
   Button,
   Box,
+  IconButton,
+  CircularProgress,
 } from "@mui/material";
-import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
 
 export interface AddTasksDialogProps {
   open: boolean;
   setOpenModal: (open: boolean) => void;
+  projectTypeId: number;
+  onSuccess?: () => void;
 }
 
 export default function AddTasksDialog({
   open,
   setOpenModal,
+  projectTypeId,
+  onSuccess,
 }: AddTasksDialogProps) {
   const t = useTranslations("projectSettings.addTasks");
   const tForm = useTranslations("projectSettings.addTasks.form");
 
+  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+
+  const reset = () => {
+    setCode("");
+    setName("");
+  };
+
   const handleClose = () => {
+    reset();
     setOpenModal(false);
+  };
+
+  const createMutation = useMutation({
+    mutationFn: () =>
+      ProjectSharingTasksApi.create({
+        project_type_id: projectTypeId,
+        code: code.trim(),
+        name: name.trim(),
+      }),
+    onSuccess: () => {
+      toast.success(tForm("createSuccess"));
+      onSuccess?.();
+      handleClose();
+    },
+    onError: () => {
+      toast.error(tForm("createError"));
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code.trim() || !name.trim()) {
+      toast.error(tForm("validationError"));
+      return;
+    }
+    createMutation.mutate();
   };
 
   return (
@@ -67,23 +110,41 @@ export default function AddTasksDialog({
           <CloseIcon />
         </IconButton>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
           <TextField
-            label={tForm("serialNumber")}
+            label={tForm("taskCode")}
             required
             fullWidth
-            placeholder={tForm("serialNumberPlaceholder")}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder={tForm("taskCodePlaceholder")}
           />
 
           <TextField
             label={tForm("tasksName")}
             required
             fullWidth
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder={tForm("tasksNamePlaceholder")}
           />
 
-          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-            {tForm("save")}
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+            disabled={createMutation.isPending || !projectTypeId}
+          >
+            {createMutation.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              tForm("save")
+            )}
           </Button>
         </Box>
       </DialogContent>

@@ -48,11 +48,18 @@ export interface ReportForm {
   notes: string;
 }
 
-export interface Task {
-  id: string;
-  tasksNumber: number;
-  tasksName: string;
+/** Project sharing task (API: project-sharing-tasks) */
+export interface ProjectSharingTask {
+  id: number;
+  project_type_id: number;
+  code: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
 }
+
+/** @deprecated Use ProjectSharingTask */
+export type Task = ProjectSharingTask;
 
 export interface TaskSetting {
   id: string;
@@ -66,7 +73,7 @@ export interface RowActionsProps {
     | Section
     | ProjectSharingProcedure
     | ReportForm
-    | Task
+    | ProjectSharingTask
     | TaskSetting;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;

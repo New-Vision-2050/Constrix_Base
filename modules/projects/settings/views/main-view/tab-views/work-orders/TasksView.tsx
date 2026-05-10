@@ -1,38 +1,60 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { CARDTYPE } from ".";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { RowActions } from "./components/RowActions";
 import EditTasksDialog from "./components/dialogs/EditTasksDialog";
 import TasksDetailsDialog from "./components/dialogs/TasksDetailsDialog";
-import { Task } from "./types";
+import type { ProjectSharingTask } from "./types";
 import AddTasksDialog from "./components/dialogs/AddTasksDialog";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
+import DeleteButton from "@/components/shared/delete-button";
 
-const AddTasksTable = HeadlessTableLayout<Task>("psat");
+const TASKS_QUERY_KEY = "project-sharing-tasks";
+
+const AddTasksTable = HeadlessTableLayout<ProjectSharingTask>("psat");
 
 export default function TasksView({
   setActiveCard,
+  projectTypeId,
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
+  projectTypeId: number;
 }) {
   const t = useTranslations("projectSettings.addTasks");
   const tTable = useTranslations("projectSettings.addTasks.table");
+  const tLabels = useTranslations("labels");
+  const queryClient = useQueryClient();
 
   const [displayedRowId, setDisplayedRowId] = useState<string | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
+
+  const invalidateList = () =>
+    queryClient.invalidateQueries({
+      queryKey: [TASKS_QUERY_KEY, projectTypeId],
+    });
 
   const handleDisplay = (id: string) => {
     setDisplayedRowId(id);
     setOpenModal(true);
   };
+
   const handleEdit = (id: string) => {
     setEditingRowId(id);
     setEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setDeletingTaskId(Number(id));
+    setDeleteDialogOpen(true);
   };
 
   const handleAdd = () => {
@@ -44,41 +66,63 @@ export default function TasksView({
     initialLimit: 10,
   });
 
-  const tasks = [
-    { id: "task1", tasksNumber: 1, tasksName: "مهمة أولى" },
-    { id: "task2", tasksNumber: 2, tasksName: "مهمة ثانية" },
-    { id: "task3", tasksNumber: 3, tasksName: "مهمة ثالثة" },
-    { id: "task4", tasksNumber: 4, tasksName: "مهمة رابعة" },
-  ];
+  const { data: rows = [], isLoading, isError } = useQuery({
+    queryKey: [TASKS_QUERY_KEY, projectTypeId],
+    queryFn: async () => {
+      const res = await ProjectSharingTasksApi.list(projectTypeId);
+      return res.data.payload ?? [];
+    },
+    enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
+  });
+
+  const filteredRows = useMemo(() => {
+    const q = params.search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(
+      (r) =>
+        r.code.toLowerCase().includes(q) ||
+        r.name.toLowerCase().includes(q),
+    );
+  }, [rows, params.search]);
+
+  const pageData = useMemo(() => {
+    const start = (params.page - 1) * params.limit;
+    return filteredRows.slice(start, start + params.limit);
+  }, [filteredRows, params.page, params.limit]);
+
+  const totalItems = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit) || 1);
 
   const columns = [
     {
-      key: "tasksNumber",
-      name: tTable("tasksNumber"),
+      key: "code",
+      name: tTable("taskCode"),
       sortable: false,
-      render: (row: Task) => (
-        <span className="p-2 text-sm">{row.tasksNumber}</span>
+      render: (row: ProjectSharingTask) => (
+        <span className="p-2 text-sm">{row.code}</span>
       ),
     },
     {
-      key: "tasksName",
+      key: "name",
       name: tTable("tasksName"),
       sortable: false,
-      render: (row: Task) => (
-        <span className="p-2 text-sm">{row.tasksName}</span>
+      render: (row: ProjectSharingTask) => (
+        <span className="p-2 text-sm">{row.name}</span>
       ),
     },
     {
       key: "actions",
       name: tTable("actions"),
       sortable: false,
-      render: (row: Task) => (
+      render: (row: ProjectSharingTask) => (
         <RowActions
           row={row}
           onShow={handleDisplay}
           onEdit={handleEdit}
+          onDelete={handleDeleteClick}
           canShow={true}
           canEdit={true}
+          canDelete={true}
           translationNamespace="projectSettings.addTasks.table"
           editLabelKey="editTask"
         />
@@ -87,15 +131,15 @@ export default function TasksView({
   ];
 
   const tableState = AddTasksTable.useTableState({
-    data: tasks,
+    data: pageData,
     columns,
-    totalPages: 1,
-    totalItems: 10,
+    totalPages,
+    totalItems,
     params,
-    getRowId: (task) => task.id,
-    loading: false,
-    searchable: false,
-    filtered: params.search !== "",
+    getRowId: (row) => String(row.id),
+    loading: isLoading,
+    searchable: true,
+    filtered: params.search.trim().length > 0,
   });
 
   return (
@@ -125,6 +169,7 @@ export default function TasksView({
             color="primary"
             sx={{ px: 6 }}
             onClick={handleAdd}
+            disabled={!projectTypeId}
           >
             {tTable("addTask")}
           </Button>
@@ -139,30 +184,63 @@ export default function TasksView({
         </Box>
       </Box>
 
+      {isError ? (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {t("loadListError")}
+        </Typography>
+      ) : null}
+
       <Box sx={{ color: "text.primary" }}>
         <AddTasksTable
+          filters={<AddTasksTable.TopActions state={tableState} />}
           table={
             <AddTasksTable.Table
               state={tableState}
               loadingOptions={{ rows: 5 }}
             />
           }
+          pagination={<AddTasksTable.Pagination state={tableState} />}
         />
       </Box>
 
-      <AddTasksDialog open={openAddDialog} setOpenModal={setOpenAddDialog} />
+      <AddTasksDialog
+        open={openAddDialog}
+        setOpenModal={setOpenAddDialog}
+        projectTypeId={projectTypeId}
+        onSuccess={invalidateList}
+      />
       <TasksDetailsDialog
         open={openModal}
         setOpenModal={setOpenModal}
         rowId={displayedRowId}
       />
       <EditTasksDialog
-        open={editDialogOpen || Boolean(editingRowId)}
+        open={editDialogOpen && Boolean(editingRowId)}
         onClose={() => {
           setEditDialogOpen(false);
           setEditingRowId(null);
         }}
-        taskId={editingRowId || undefined}
+        taskId={editingRowId ?? undefined}
+        onSuccess={invalidateList}
+      />
+
+      <DeleteButton
+        message={tTable("deleteConfirmMessage")}
+        open={deleteDialogOpen}
+        setOpen={setDeleteDialogOpen}
+        onDelete={async () => {
+          if (deletingTaskId == null) {
+            throw new Error("No task selected");
+          }
+          await ProjectSharingTasksApi.delete(deletingTaskId);
+          setDeletingTaskId(null);
+          invalidateList();
+        }}
+        translations={{
+          deleteSuccess: tTable("deleteSuccess"),
+          deleteError: tTable("deleteError"),
+          deleteCancelled: tLabels("deleteCancelled"),
+        }}
       />
     </Box>
   );
