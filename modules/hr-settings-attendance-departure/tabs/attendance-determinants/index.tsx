@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState } from "react";
 import {
   DeterminantDetails,
   AttendanceDeterminantsContent as ContentComponent,
@@ -12,12 +12,13 @@ import {
   useAttendanceDeterminants,
   AttendanceDeterminantsProvider,
 } from "./context/AttendanceDeterminantsContext";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { DeterminantSkeletonGrid } from "./components/DeterminantSkeleton";
 import { useTranslations } from "next-intl";
 import { Pagination } from "../../../../components/shared/Pagination";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import DeterminantSettings from "./components/DeterminantSettings/DeterminantSettings";
 
 // Container component that uses the context
 function AttendanceDeterminantsTabContent() {
@@ -135,10 +136,9 @@ function AttendanceDeterminantsTabContent() {
                 </>
               ) : (
                 activeConstraint && (
-                  <DeterminantDetails
-                    constraint={activeConstraint}
-                    onEdit={handleEditConstraint}
-                  />
+                  <DeterminantSettings
+                     constraint={activeConstraint}
+                   />
                 )
               )}
             </div>
