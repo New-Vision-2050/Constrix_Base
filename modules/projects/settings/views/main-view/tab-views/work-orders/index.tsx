@@ -19,6 +19,7 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useTranslations } from "next-intl";
 import TasksView from "./TasksView";
 import TasksSettingsView from "./TasksSettingsView";
+import { SettingsTabItemProps } from "../../types";
 
 export type CARDTYPE =
   | "WORK_ORDER_TYPES"
@@ -29,7 +30,7 @@ export type CARDTYPE =
   | "TASKS_SETTINGS"
   | "HIDE";
 
-export default function WorkOrdersView() {
+export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
   const t = useTranslations("projectSettings.section");
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
@@ -153,7 +154,10 @@ export default function WorkOrdersView() {
       )}
 
       {activeCard === "WORK_ORDER_TYPES" && (
-        <WorkOrderTypeView setActiveCard={setActiveCard} />
+        <WorkOrderTypeView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
       {activeCard === "SECTION" && (
         <SectionView setActiveCard={setActiveCard} />

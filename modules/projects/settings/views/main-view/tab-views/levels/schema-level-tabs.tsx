@@ -78,7 +78,7 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
     case "document-cycle":
       return <DocumentCycleView {...props} />;
     case "work-orders":
-      return <WorkOrdersView />;
+      return <WorkOrdersView {...props} />;
     case "financial":
       return <FinancialView {...props} />;
     case "contract-management":

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
@@ -9,38 +9,98 @@ import {
   TextField,
   Button,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  IconButton,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
-import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
 
 export interface WorkOrderDialogProps {
   open: boolean;
   onClose: () => void;
   workOrderId?: string;
+  onSuccess?: () => void;
 }
 
 export default function EditWorkOrderDialog({
   open,
   onClose,
   workOrderId,
+  onSuccess,
 }: WorkOrderDialogProps) {
   const t = useTranslations("projectSettings.workOrders");
   const tForm = useTranslations("projectSettings.workOrders.form");
-  const isEditMode = !!workOrderId;
+
+  const [code, setCode] = useState("");
+  const [description, setDescription] = useState("");
+  const [type, setType] = useState("");
+
+  const detailQuery = useQuery({
+    queryKey: ["project-sharing-work-order", workOrderId],
+    queryFn: async () => {
+      const res = await ProjectSharingWorkOrdersApi.show(workOrderId!);
+      return res.data.payload;
+    },
+    enabled: open && Boolean(workOrderId),
+  });
+
+  useEffect(() => {
+    const p = detailQuery.data;
+    if (!p) return;
+    setCode(p.code ?? "");
+    setDescription(p.description ?? "");
+    setType(p.type ?? "");
+  }, [detailQuery.data]);
+
+  useEffect(() => {
+    if (!open) {
+      setCode("");
+      setDescription("");
+      setType("");
+    }
+  }, [open]);
 
   const handleClose = () => {
     onClose();
   };
 
+  const updateMutation = useMutation({
+    mutationFn: () =>
+      ProjectSharingWorkOrdersApi.update(workOrderId!, {
+        code: code.trim(),
+        description: description.trim(),
+        type: type.trim(),
+      }),
+    onSuccess: () => {
+      toast.success(tForm("updateSuccess"));
+      onSuccess?.();
+      handleClose();
+    },
+    onError: () => {
+      toast.error(tForm("updateError"));
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workOrderId) return;
+    if (!code.trim() || !description.trim() || !type.trim()) {
+      toast.error(tForm("validationError"));
+      return;
+    }
+    updateMutation.mutate();
+  };
+
+  const loading = detailQuery.isLoading && open && Boolean(workOrderId);
+
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth="lg"
+      maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: {
@@ -53,8 +113,16 @@ export default function EditWorkOrderDialog({
       }}
     >
       <DialogContent sx={{ p: 4 }}>
-        <DialogTitle sx={{ p: 0, mb: 3, textAlign: "center", fontSize: "1.125rem", fontWeight: 600 }}>
-          {isEditMode ? t("editWorkOrder") : t("addWorkOrder")}
+        <DialogTitle
+          sx={{
+            p: 0,
+            mb: 3,
+            textAlign: "center",
+            fontSize: "1.125rem",
+            fontWeight: 600,
+          }}
+        >
+          {t("editWorkOrder")}
         </DialogTitle>
         <IconButton
           onClick={handleClose}
@@ -68,178 +136,64 @@ export default function EditWorkOrderDialog({
           <CloseIcon />
         </IconButton>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* Consultant Code, Work Order Description, and Work Order Type - 3 Column Grid */}
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}>
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : detailQuery.isError ? (
+          <Typography color="error" textAlign="center">
+            {tForm("updateError")}
+          </Typography>
+        ) : (
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+          >
             <TextField
               label={tForm("consultantCode")}
               required
               fullWidth
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
               placeholder={tForm("consultantCodePlaceholder")}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "divider",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "divider",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "text.secondary",
-                  "&.Mui-focused": {
-                    color: "primary.main",
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "text.primary",
-                },
-              }}
             />
-            
+
             <TextField
               label={tForm("workOrderDescription")}
               required
               fullWidth
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder={tForm("workOrderDescriptionPlaceholder")}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "divider",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "divider",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "text.secondary",
-                  "&.Mui-focused": {
-                    color: "primary.main",
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "text.primary",
-                },
-              }}
+              multiline
+              rows={3}
             />
-            
+
             <TextField
               label={tForm("workOrderType")}
               required
               fullWidth
+              value={type}
+              onChange={(e) => setType(e.target.value)}
               placeholder={tForm("workOrderTypePlaceholder")}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "divider",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "divider",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "text.secondary",
-                  "&.Mui-focused": {
-                    color: "primary.main",
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "text.primary",
-                },
-              }}
             />
-          </Box>
 
-          {/* Task and Procedure Dropdowns - 2 Column Grid */}
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>{tForm("addTask")}</InputLabel>
-              <Select
-                label={tForm("addTask")}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "divider",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "divider",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "primary.main",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "text.secondary",
-                    "&.Mui-focused": {
-                      color: "primary.main",
-                    },
-                  },
-                  "& .MuiInputBase-input": {
-                    color: "text.primary",
-                  },
-                }}
-              >
-                <MenuItem value="">Select a task</MenuItem>
-                <MenuItem value="task1">Task 1</MenuItem>
-                <MenuItem value="task2">Task 2</MenuItem>
-                <MenuItem value="task3">Task 3</MenuItem>
-              </Select>
-            </FormControl>
-            
-            <FormControl fullWidth>
-              <InputLabel>{tForm("addProcedure")}</InputLabel>
-              <Select
-                label={tForm("addProcedure")}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "divider",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "divider",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "primary.main",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "text.secondary",
-                    "&.Mui-focused": {
-                      color: "primary.main",
-                    },
-                  },
-                  "& .MuiInputBase-input": {
-                    color: "text.primary",
-                  },
-                }}
-              >
-                <MenuItem value="">Select a procedure</MenuItem>
-                <MenuItem value="proc1">Procedure 1</MenuItem>
-                <MenuItem value="proc2">Procedure 2</MenuItem>
-                <MenuItem value="proc3">Procedure 3</MenuItem>
-              </Select>
-            </FormControl>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{ mt: 2 }}
+              disabled={updateMutation.isPending}
+            >
+              {updateMutation.isPending ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                tForm("save")
+              )}
+            </Button>
           </Box>
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mt: 2 }}
-          >
-            {tForm("save")}
-          </Button>
-        </Box>
+        )}
       </DialogContent>
     </Dialog>
   );

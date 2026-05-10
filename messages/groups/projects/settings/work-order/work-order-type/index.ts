@@ -83,4 +83,11 @@ export const WorkOrdersMessages = new MessagesGroup({
     reset: _m("Reset", "إعادة تعيين"),
   }),
   title: _m("Work Orders", "أوامر العمل"),
+  detailsTitle: _m("Work order details", "تفاصيل أمر العمل"),
+  createdAt: _m("Created at", "تاريخ الإنشاء"),
+  updatedAt: _m("Updated at", "تاريخ التحديث"),
+  loadListError: _m(
+    "Could not load work orders",
+    "تعذر تحميل أوامر العمل",
+  ),
 });

@@ -9,6 +9,7 @@ import {
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { RowActionsProps } from "../types";
 import { useTranslations } from "next-intl";
 
@@ -18,6 +19,8 @@ export function RowActions({
   onEdit,
   canEdit,
   canShow,
+  onDelete,
+  canDelete = false,
   translationNamespace = "projectSettings.section.table",
   editLabelKey = "editSection",
 }: RowActionsProps) {
@@ -55,7 +58,7 @@ export function RowActions({
         <MenuItem
           disabled={!canShow}
           onClick={() => {
-            onShow(row.id);
+            onShow(String(row.id));
             handleClose();
           }}
         >
@@ -67,7 +70,7 @@ export function RowActions({
         <MenuItem
           disabled={!canEdit}
           onClick={() => {
-            onEdit(row.id);
+            onEdit(String(row.id));
             handleClose();
           }}
         >
@@ -76,6 +79,20 @@ export function RowActions({
           </ListItemIcon>
           <ListItemText>{tTable(editLabelKey)}</ListItemText>
         </MenuItem>
+        {onDelete ? (
+          <MenuItem
+            disabled={!canDelete}
+            onClick={() => {
+              onDelete(String(row.id));
+              handleClose();
+            }}
+          >
+            <ListItemIcon>
+              <DeleteOutlineIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText>{tTable("delete")}</ListItemText>
+          </MenuItem>
+        ) : null}
       </Menu>
     </>
   );

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Dialog,
@@ -5,70 +7,46 @@ import {
   DialogContent,
   IconButton,
   Typography,
-  Grid,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DetailsDialogProps, TasksType } from "../../types";
-import HeadlessTableLayout from "@/components/headless/table";
-
-const TasksTypeTable = HeadlessTableLayout<TasksType>("wott");
+import type { DetailsDialogProps } from "../../types";
+import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
 
 const WorkOrderDetailsDialog = ({
   open,
   setOpenModal,
   rowId,
 }: DetailsDialogProps) => {
+  const t = useTranslations("projectSettings.workOrders");
+  const tForm = useTranslations("projectSettings.workOrders.form");
+
   const handleClose = () => setOpenModal(false);
 
-  // Dummy data
-  const tasks: TasksType[] = [
-    { id: rowId || "400", desc: "تركيب عداد" },
-    { id: "402", desc: "ضخ وتمديد" },
-    { id: "403", desc: "سيفتي - قص - ضخ - تمديد" },
-  ];
-
-  const columns = [
-    {
-      key: "id",
-      name: "الرقم",
-      sortable: false,
-      render: (row: TasksType) => <span className="py-2">{row.id}</span>,
+  const detailQuery = useQuery({
+    queryKey: ["project-sharing-work-order", rowId],
+    queryFn: async () => {
+      const res = await ProjectSharingWorkOrdersApi.show(rowId!);
+      return res.data.payload;
     },
-    {
-      key: "description",
-      name: "الوصف",
-      sortable: false,
-      render: (row: TasksType) => <span className="py-2">{row.desc}</span>,
-    },
-  ];
-
-  const params = TasksTypeTable.useTableParams({
-    initialPage: 1,
-    initialLimit: 10,
+    enabled: open && Boolean(rowId),
   });
 
-  const tableState = TasksTypeTable.useTableState({
-    data: tasks,
-    columns,
-    totalPages: 1,
-    totalItems: 10,
-    params,
-    getRowId: (task) => task.id,
-    loading: false,
-    searchable: true,
-    filtered: params.search !== "",
-  });
+  const p = detailQuery.data;
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth={"lg"}
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         sx: {
           borderRadius: "8px",
-          p: 8,
+          p: 2,
         },
       }}
     >
@@ -87,50 +65,41 @@ const WorkOrderDetailsDialog = ({
         sx={{
           textAlign: "center",
           fontWeight: "bold",
-          fontSize: "1.5rem",
-          mb: 2,
+          fontSize: "1.25rem",
+          pb: 1,
         }}
       >
-        عرض نوع أمر العمل
+        {t("detailsTitle")}
       </DialogTitle>
 
       <DialogContent>
-        <Grid container spacing={2}>
-          <Grid size={6}>
-            <Typography textAlign="center" sx={{ mb: 2 }}>
-              مهام امر العمل
+        {detailQuery.isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : detailQuery.isError || !p ? (
+          <Typography color="error" textAlign="center">
+            {t("error")}
+          </Typography>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            <Typography variant="body2">
+              <strong>{tForm("consultantCode")}:</strong> {p.code}
             </Typography>
-            <Box
-              sx={{
-                color: "text.primary",
-              }}
-            >
-              <TasksTypeTable
-                table={
-                  <TasksTypeTable.Table
-                    state={tableState}
-                    loadingOptions={{ rows: 5 }}
-                  />
-                }
-              />
-            </Box>
-          </Grid>
-          <Grid size={6}>
-            <Typography textAlign="center" sx={{ mb: 2 }}>
-              اجراءات امر العمل
+            <Typography variant="body2">
+              <strong>{tForm("workOrderType")}:</strong> {p.type}
             </Typography>
-            <Box >
-              <TasksTypeTable
-                table={
-                  <TasksTypeTable.Table
-                    state={tableState}
-                    loadingOptions={{ rows: 5 }}
-                  />
-                }
-              />
-            </Box>
-          </Grid>
-        </Grid>
+            <Typography variant="body2">
+              <strong>{tForm("workOrderDescription")}:</strong> {p.description}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{t("createdAt")}:</strong> {p.created_at}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{t("updatedAt")}:</strong> {p.updated_at}
+            </Typography>
+          </Box>
+        )}
       </DialogContent>
     </Dialog>
   );

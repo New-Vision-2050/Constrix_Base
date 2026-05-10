@@ -1,15 +1,18 @@
 import { Dispatch, SetStateAction } from "react";
 
-export interface WorkOrderType {
-  id: string;
-  consultantCode: number;
+/** Project sharing work order (API: project-sharing-work-orders) */
+export interface ProjectSharingWorkOrder {
+  id: number;
+  project_type_id: number;
+  code: string;
   description: string;
-  type: number;
-  workOrderDescription?: string;
-  workOrderType?: number;
-  taskId?: string;
-  procedureId?: string;
+  type: string;
+  created_at: string;
+  updated_at: string;
 }
+
+/** @deprecated Use ProjectSharingWorkOrder */
+export type WorkOrderType = ProjectSharingWorkOrder;
 
 export interface Section {
   id: string;
@@ -44,11 +47,19 @@ export interface TaskSetting {
 }
 
 export interface RowActionsProps {
-  row: WorkOrderType | Section | Action | ReportForm | Task | TaskSetting;
+  row:
+    | ProjectSharingWorkOrder
+    | Section
+    | Action
+    | ReportForm
+    | Task
+    | TaskSetting;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;
   canEdit: boolean;
   canShow: boolean;
+  onDelete?: (id: string) => void;
+  canDelete?: boolean;
   t?: (key: string) => string;
   /** Translation namespace for table labels (e.g. "projectSettings.section.table" or "projectSettings.actions.table") */
   translationNamespace?: string;
