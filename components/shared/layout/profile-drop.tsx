@@ -10,7 +10,7 @@ import {
   ListItemText,
   Avatar,
 } from "@mui/material";
-import { CheckIcon, ChevronDown, UserIcon, Mail, Lock } from "lucide-react";
+import { CheckIcon, ChevronDown, UserIcon, Mail, Lock, Phone } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
@@ -27,6 +27,7 @@ import { truncateString } from "@/utils/truncate-string";
 import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { ChangeEmailDialog } from "./change-email-dialog";
+import { ChangePhoneDialog } from "./change-phone-dialog";
 
 interface menuItem {
   label: string;
@@ -59,6 +60,7 @@ const ProfileDrop = () => {
   );
   const [branches, setBranches] = useState<menuItem[]>([]);
   const [openChangeEmailDialog, setOpenChangeEmailDialog] = useState(false);
+  const [openChangePhoneDialog, setOpenChangePhoneDialog] = useState(false);
 
   useEffect(() => {
     const id = getCookie("current-branch-id");
@@ -245,6 +247,19 @@ const ProfileDrop = () => {
           <ListItemText>{t("changeMail")}</ListItemText>
         </MenuItem>
 
+        {/* Change Phone */}
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            setOpenChangePhoneDialog(true);
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 32 }}>
+            <Phone size={18} />
+          </ListItemIcon>
+          <ListItemText>تغيير رقم الموبايل</ListItemText>
+        </MenuItem>
+
         {/* Change Password */}
 
         <MenuItem
@@ -334,6 +349,11 @@ const ProfileDrop = () => {
       <ChangeEmailDialog
         open={openChangeEmailDialog}
         onOpenChange={setOpenChangeEmailDialog}
+      />
+
+      <ChangePhoneDialog
+        open={openChangePhoneDialog}
+        onOpenChange={setOpenChangePhoneDialog}
       />
     </Box>
   );

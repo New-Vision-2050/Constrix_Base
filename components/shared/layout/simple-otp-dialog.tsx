@@ -84,15 +84,8 @@ export function SimpleOTPVerifyDialog({ open, identifier, type, setOpen, onSucce
         type,
       };
       
-      // Validate OTP first
+      // Validate OTP - this also updates the email/phone automatically
       await apiClient.post(`/company-users/validate-otp`, body);
-
-      // Update the email/phone after successful OTP validation
-      const updateBody = type === "email"
-        ? { email: identifier }
-        : { phone: identifier };
-
-      await apiClient.put(`/company-users/data-info`, updateBody);
 
       setOpen(false);
       toast.success("تم التغير بنجاح");
@@ -105,7 +98,7 @@ export function SimpleOTPVerifyDialog({ open, identifier, type, setOpen, onSucce
       }
     } catch (error) {
       setLoading(false);
-      console.log("error", error);
+      console.log("OTP validation error", error);
       setError(`كلمه المرور الموقته غير صحيحية`);
     }
   };
