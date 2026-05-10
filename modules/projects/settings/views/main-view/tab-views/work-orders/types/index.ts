@@ -14,11 +14,18 @@ export interface ProjectSharingWorkOrder {
 /** @deprecated Use ProjectSharingWorkOrder */
 export type WorkOrderType = ProjectSharingWorkOrder;
 
-export interface Section {
-  id: string;
-  sectionCode: number;
-  sectionDescription: string;
+/** Project sharing department (API: project-sharing-department) — UI «Section». */
+export interface ProjectSharingDepartment {
+  id: number;
+  project_type_id: number;
+  code: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
 }
+
+/** @deprecated Use ProjectSharingDepartment */
+export type Section = ProjectSharingDepartment;
 
 export interface Action {
   id: string;

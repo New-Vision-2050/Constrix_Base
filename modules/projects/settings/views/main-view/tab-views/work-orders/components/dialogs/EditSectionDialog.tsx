@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
@@ -9,34 +9,88 @@ import {
   TextField,
   Button,
   Box,
+  IconButton,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
-
-import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
-// Types
-export interface SectionFormData {
-  sectionCode: string;
-  sectionDescription: string;
-}
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ProjectSharingDepartmentApi } from "@/services/api/projects/project-sharing-department";
 
 export interface SectionDialogProps {
   open: boolean;
   onClose: () => void;
   sectionId?: string;
+  onSuccess?: () => void;
 }
-
 
 export default function EditSectionDialog({
   open,
   onClose,
+  sectionId,
+  onSuccess,
 }: SectionDialogProps) {
   const t = useTranslations("projectSettings.section");
   const tForm = useTranslations("projectSettings.section.form");
 
+  const [code, setCode] = useState("");
+  const [description, setDescription] = useState("");
+
+  const detailQuery = useQuery({
+    queryKey: ["project-sharing-department", sectionId],
+    queryFn: async () => {
+      const res = await ProjectSharingDepartmentApi.show(sectionId!);
+      return res.data.payload;
+    },
+    enabled: open && Boolean(sectionId),
+  });
+
+  useEffect(() => {
+    const p = detailQuery.data;
+    if (!p) return;
+    setCode(p.code ?? "");
+    setDescription(p.description ?? "");
+  }, [detailQuery.data]);
+
+  useEffect(() => {
+    if (!open) {
+      setCode("");
+      setDescription("");
+    }
+  }, [open]);
+
   const handleClose = () => {
     onClose();
   };
+
+  const updateMutation = useMutation({
+    mutationFn: () =>
+      ProjectSharingDepartmentApi.update(sectionId!, {
+        code: code.trim(),
+        description: description.trim(),
+      }),
+    onSuccess: () => {
+      toast.success(tForm("updateSuccess"));
+      onSuccess?.();
+      handleClose();
+    },
+    onError: () => {
+      toast.error(tForm("updateError"));
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sectionId) return;
+    if (!code.trim() || !description.trim()) {
+      toast.error(tForm("validationError"));
+      return;
+    }
+    updateMutation.mutate();
+  };
+
+  const loading = detailQuery.isLoading && open && Boolean(sectionId);
 
   return (
     <Dialog
@@ -77,37 +131,55 @@ export default function EditSectionDialog({
           <CloseIcon />
         </IconButton>
 
-        <Box
-          component="form"
-          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-        >
-          {/* Section Code and Description */}
-          <TextField
-            label={tForm("sectionCode")}
-            required
-            fullWidth
-            placeholder={tForm("sectionCodePlaceholder")}
-          />
-
-          <TextField
-            label={tForm("sectionDescription")}
-            required
-            fullWidth
-            placeholder={tForm("sectionDescriptionPlaceholder")}
-            multiline
-            rows={3}
-          />
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mt: 2 }}
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : detailQuery.isError ? (
+          <Typography color="error" textAlign="center">
+            {tForm("updateError")}
+          </Typography>
+        ) : (
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
-            {tForm("save")}
-          </Button>
-        </Box>
+            <TextField
+              label={tForm("sectionCode")}
+              required
+              fullWidth
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder={tForm("sectionCodePlaceholder")}
+            />
+
+            <TextField
+              label={tForm("sectionDescription")}
+              required
+              fullWidth
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={tForm("sectionDescriptionPlaceholder")}
+              multiline
+              rows={3}
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{ mt: 2 }}
+              disabled={updateMutation.isPending}
+            >
+              {updateMutation.isPending ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                tForm("save")
+              )}
+            </Button>
+          </Box>
+        )}
       </DialogContent>
     </Dialog>
   );

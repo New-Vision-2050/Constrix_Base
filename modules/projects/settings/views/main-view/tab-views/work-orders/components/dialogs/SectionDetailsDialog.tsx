@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Dialog,
@@ -6,10 +8,13 @@ import {
   IconButton,
   Typography,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DetailsDialogProps } from "../../types";
+import type { DetailsDialogProps } from "../../types";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { ProjectSharingDepartmentApi } from "@/services/api/projects/project-sharing-department";
 
 const SectionDetailsDialog = ({
   open,
@@ -17,44 +22,30 @@ const SectionDetailsDialog = ({
   rowId,
 }: DetailsDialogProps) => {
   const tDetails = useTranslations("projectSettings.section.details");
+
   const handleClose = () => setOpenModal(false);
 
-  // Mock section data
-  const mockSections = [
-    {
-      id: "sec1",
-      sectionCode: 100,
-      sectionDescription: "قسم الكهرباء الرئيسي",
+  const detailQuery = useQuery({
+    queryKey: ["project-sharing-department", rowId],
+    queryFn: async () => {
+      const res = await ProjectSharingDepartmentApi.show(rowId!);
+      return res.data.payload;
     },
-    {
-      id: "sec2",
-      sectionCode: 101,
-      sectionDescription: "قسم الصيانة",
-    },
-    {
-      id: "sec3",
-      sectionCode: 102,
-      sectionDescription: "قسم التركيب",
-    },
-    {
-      id: "sec4",
-      sectionCode: 103,
-      sectionDescription: "قسم الفحص والجودة",
-    },
-  ];
+    enabled: open && Boolean(rowId),
+  });
 
-  // Find the section by ID
-  const section = mockSections.find((s) => s.id === rowId);
+  const section = detailQuery.data;
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth={"lg"}
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         sx: {
           borderRadius: "8px",
-          p: 8,
+          p: 2,
         },
       }}
     >
@@ -73,30 +64,38 @@ const SectionDetailsDialog = ({
         sx={{
           textAlign: "center",
           fontWeight: "bold",
-          fontSize: "1.5rem",
-          mb: 2,
+          fontSize: "1.25rem",
+          pb: 1,
         }}
       >
         {tDetails("title")}
       </DialogTitle>
 
       <DialogContent>
-        {section && (
-          <Box className="flex justify-between gap-4">
-            <Typography variant="body1">
-              <strong>{tDetails("sectionCode")}:</strong> {section.sectionCode}
-            </Typography>
-
-            <Typography variant="body1">
-              <strong>{tDetails("sectionDescription")}:</strong>{" "}
-              {section.sectionDescription}
-            </Typography>
+        {detailQuery.isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
           </Box>
-        )}
-        {!section && (
+        ) : detailQuery.isError || !section ? (
           <Typography textAlign="center" color="error">
             {tDetails("notFound")}
           </Typography>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            <Typography variant="body2">
+              <strong>{tDetails("sectionCode")}:</strong> {section.code}
+            </Typography>
+            <Typography variant="body2">
+              <strong>{tDetails("sectionDescription")}:</strong>{" "}
+              {section.description}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{tDetails("createdAt")}:</strong> {section.created_at}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{tDetails("updatedAt")}:</strong> {section.updated_at}
+            </Typography>
+          </Box>
         )}
       </DialogContent>
     </Dialog>
