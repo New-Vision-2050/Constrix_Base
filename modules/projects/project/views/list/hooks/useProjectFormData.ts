@@ -77,11 +77,11 @@ export function useProjectFormData(
   const { data: entityClientsData } = useQuery({
     queryKey: ["entity-clients", watchOwnerType, searchParams.entity_clients],
     queryFn: async () => {
-      const response = await AllProjectsApi.getEntityClients(
-        searchParams.entity_clients
-          ? { name: searchParams.entity_clients }
-          : {},
-      );
+      const params: { name?: string; per_page?: number } = { per_page: 100 };
+      if (searchParams.entity_clients) {
+        params.name = searchParams.entity_clients;
+      }
+      const response = await AllProjectsApi.getEntityClients(params);
       return response.data.payload ?? [];
     },
     enabled: watchOwnerType === "company",
@@ -94,11 +94,11 @@ export function useProjectFormData(
       searchParams.individual_clients,
     ],
     queryFn: async () => {
-      const response = await AllProjectsApi.getIndividualClients(
-        searchParams.individual_clients
-          ? { name: searchParams.individual_clients }
-          : {},
-      );
+      const params: { name?: string; per_page?: number } = { per_page: 100 };
+      if (searchParams.individual_clients) {
+        params.name = searchParams.individual_clients;
+      }
+      const response = await AllProjectsApi.getIndividualClients(params);
       return response.data.payload ?? [];
     },
     enabled: watchOwnerType === "individual",
