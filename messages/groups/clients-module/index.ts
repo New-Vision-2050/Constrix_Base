@@ -178,6 +178,72 @@ export const clientsModuleMessages = new MessagesGroup({
       "Individual Client is required",
       "الفرد الممثل للجهة  مطلوب",
     ),
+    companyClientNestedLoadTab: _m(
+      "Load company by serial",
+      "تحميل جهة بالرقم التسلسلي",
+    ),
+    companyClientNestedManualTab: _m(
+      "Create company client",
+      "إنشاء عميل جهة",
+    ),
+    companyIdForMarkLabel: _m("Company ID", "معرّف الجهة"),
+    companyIdForMarkPlaceholder: _m(
+      "Enter company ID",
+      "أدخل معرّف الجهة",
+    ),
+    companyIdForMarkRequired: _m(
+      "Company ID is required",
+      "معرّف الجهة مطلوب",
+    ),
+    loadCompanyClientSubmit: _m(
+      "Mark as client",
+      "تعيين كعميل",
+    ),
+    markAsClientSuccess: _m(
+      "Company marked as client successfully.",
+      "تم تعيين الجهة كعميل بنجاح.",
+    ),
+    markAsClientError: _m(
+      "Could not mark company as client.",
+      "تعذر تعيين الجهة كعميل.",
+    ),
+    markAsClientLoading: _m("Loading…", "جاري التحميل…"),
+    companySerialLabel: _m("Company serial number", "الرقم التسلسلي للجهة"),
+    companySerialPlaceholder: _m(
+      "e.g. TEC-ab33fd57",
+      "مثال: TEC-ab33fd57",
+    ),
+    companySerialRequired: _m(
+      "Serial number is required",
+      "الرقم التسلسلي مطلوب",
+    ),
+    lookupCompanySubmit: _m("Look up company", "بحث عن الجهة"),
+    lookupCompanyLoading: _m("Searching…", "جاري البحث…"),
+    companyPreviewDialogTitle: _m(
+      "Company details",
+      "بيانات الجهة",
+    ),
+    companyPreviewClose: _m("Close", "إغلاق"),
+    companyPreviewMarkAsClient: _m(
+      "Mark as client",
+      "تعيين كعميل",
+    ),
+    previewEmail: _m("Email", "البريد الإلكتروني"),
+    previewPhone: _m("Phone", "الجوال"),
+    previewCountry: _m("Country", "الدولة"),
+    previewOwner: _m("Owner", "المالك"),
+    previewGeneralManager: _m("General manager", "المدير العام"),
+    previewGmContact: _m("Manager contact", "وسيلة اتصال المدير"),
+    previewBranch: _m("Branch", "الفرع"),
+    previewActivity: _m("Activity", "النشاط"),
+    companyNotFound: _m(
+      "No company found for this serial number.",
+      "لم يتم العثور على جهة بهذا الرقم التسلسلي.",
+    ),
+    companyLookupError: _m(
+      "Could not look up the company. Try again.",
+      "تعذر البحث عن الجهة. حاول مرة أخرى.",
+    ),
   }),
   dialog: new MessagesGroup({
     triggerText: _m("Select location from map", "اختر الموقع من الخريطة"),
