@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
   IconButton,
@@ -17,6 +18,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectSharingProcedureApi } from "@/services/api/projects/project-sharing-procedure";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createActionFormSchema,
+  type ActionFormValues,
+} from "../../shared/form-schemas";
 
 export interface EditActionsDialogProps {
   open: boolean;
@@ -24,6 +30,11 @@ export interface EditActionsDialogProps {
   actionId?: string;
   onSuccess?: () => void;
 }
+
+const emptyValues: ActionFormValues = {
+  code: "",
+  description: "",
+};
 
 export default function EditActionsDialog({
   open,
@@ -34,8 +45,14 @@ export default function EditActionsDialog({
   const t = useTranslations("projectSettings.actions");
   const tForm = useTranslations("projectSettings.actions.form");
 
-  const [code, setCode] = useState("");
-  const [description, setDescription] = useState("");
+  const schema = useMemo(() => createActionFormSchema(tForm), [tForm]);
+
+  const form = useForm<ActionFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: emptyValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
 
   const detailQuery = useQuery({
     queryKey: ["project-sharing-procedure", actionId],
@@ -49,26 +66,27 @@ export default function EditActionsDialog({
   useEffect(() => {
     const p = detailQuery.data;
     if (!p) return;
-    setCode(p.code ?? "");
-    setDescription(p.description ?? "");
-  }, [detailQuery.data]);
+    reset({
+      code: p.code ?? "",
+      description: p.description ?? "",
+    });
+  }, [detailQuery.data, reset]);
 
   useEffect(() => {
     if (!open) {
-      setCode("");
-      setDescription("");
+      reset(emptyValues);
     }
-  }, [open]);
+  }, [open, reset]);
 
   const handleClose = () => {
     onClose();
   };
 
   const updateMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: ActionFormValues) =>
       ProjectSharingProcedureApi.update(actionId!, {
-        code: code.trim(),
-        description: description.trim(),
+        code: values.code,
+        description: values.description,
       }),
     onSuccess: () => {
       toast.success(tForm("updateSuccess"));
@@ -80,14 +98,9 @@ export default function EditActionsDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (values: ActionFormValues) => {
     if (!actionId) return;
-    if (!code.trim() || !description.trim()) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    updateMutation.mutate();
+    updateMutation.mutate(values);
   };
 
   const loading = detailQuery.isLoading && open && Boolean(actionId);
@@ -142,24 +155,22 @@ export default function EditActionsDialog({
         ) : (
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
-            <TextField
+            <RhfTextField
+              name="code"
+              control={control}
               label={tForm("actionCode")}
-              required
               fullWidth
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
               placeholder={tForm("actionCodePlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="description"
+              control={control}
               label={tForm("actionDescription")}
-              required
               fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               placeholder={tForm("actionDescriptionPlaceholder")}
               multiline
               rows={3}

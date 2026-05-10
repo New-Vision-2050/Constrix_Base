@@ -38,6 +38,8 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
             </AccordionSummary>
             <AccordionDetails>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("WORK_ORDER_TYPES")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -50,15 +52,14 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
                   <Typography>{t("workOrderType")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("WORK_ORDER_TYPES")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("SECTION")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -71,15 +72,14 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
                   <Typography>{t("section")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("SECTION")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("ACTIONS")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -92,15 +92,14 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
                   <Typography>{t("actions")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("ACTIONS")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("REPORT_FORMS")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -113,15 +112,14 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
                   <Typography>{t("reportForms")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("REPORT_FORMS")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("ADD_TASKS")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -134,10 +132,7 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
                   <Typography>{t("addTasks")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("ADD_TASKS")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
@@ -172,10 +167,7 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
         />
       )}
       {activeCard === "ADD_TASKS" && (
-        <TasksView
-          setActiveCard={setActiveCard}
-          projectTypeId={thirdLevelId}
-        />
+        <TasksView setActiveCard={setActiveCard} projectTypeId={thirdLevelId} />
       )}
       {activeCard === "TASKS_SETTINGS" && (
         <TasksSettingsView setActiveCard={setActiveCard} />

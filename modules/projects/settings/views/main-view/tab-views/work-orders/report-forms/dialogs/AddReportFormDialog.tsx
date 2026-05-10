@@ -1,26 +1,29 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   IconButton,
   CircularProgress,
+  MenuItem,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ReportFormsApi } from "@/services/api/projects/report-forms";
 import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
+import { RhfTextField, RhfSelect } from "../../shared/rhf-mui";
+import {
+  createReportFormCreateSchema,
+  type ReportFormCreateValues,
+} from "../../shared/form-schemas";
 
 const WORK_ORDERS_QUERY_KEY = "project-sharing-work-orders";
 
@@ -31,6 +34,15 @@ export interface AddReportFormDialogProps {
   onSuccess?: () => void;
 }
 
+const defaultValues: ReportFormCreateValues = {
+  projectSharingWorkOrderId: "",
+  name: "",
+  question: "",
+  value: "",
+  numberOfAttachments: "",
+  notes: "",
+};
+
 export default function AddReportFormDialog({
   open,
   setOpenModal,
@@ -40,13 +52,14 @@ export default function AddReportFormDialog({
   const t = useTranslations("projectSettings.reportForms");
   const tForm = useTranslations("projectSettings.reportForms.form");
 
-  const [projectSharingWorkOrderId, setProjectSharingWorkOrderId] =
-    useState("");
-  const [name, setName] = useState("");
-  const [question, setQuestion] = useState("");
-  const [value, setValue] = useState("");
-  const [numberOfAttachments, setNumberOfAttachments] = useState("");
-  const [notes, setNotes] = useState("");
+  const schema = useMemo(() => createReportFormCreateSchema(tForm), [tForm]);
+
+  const form = useForm<ReportFormCreateValues>({
+    resolver: zodResolver(schema),
+    defaultValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
 
   const { data: workOrders = [], isLoading: workOrdersLoading } = useQuery({
     queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
@@ -59,29 +72,25 @@ export default function AddReportFormDialog({
 
   useEffect(() => {
     if (!open) {
-      setProjectSharingWorkOrderId("");
-      setName("");
-      setQuestion("");
-      setValue("");
-      setNumberOfAttachments("");
-      setNotes("");
+      reset(defaultValues);
     }
-  }, [open]);
+  }, [open, reset]);
 
   const handleClose = () => {
+    reset(defaultValues);
     setOpenModal(false);
   };
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: ReportFormCreateValues) =>
       ReportFormsApi.create({
         project_type_id: projectTypeId,
-        project_sharing_work_order_id: Number(projectSharingWorkOrderId),
-        name: name.trim(),
-        question: question.trim(),
-        value: value.trim(),
-        number_of_attachments: numberOfAttachments.trim(),
-        notes: notes.trim() ? notes.trim() : null,
+        project_sharing_work_order_id: Number(values.projectSharingWorkOrderId),
+        name: values.name,
+        question: values.question,
+        value: values.value,
+        number_of_attachments: values.numberOfAttachments,
+        notes: values.notes.trim() ? values.notes.trim() : null,
       }),
     onSuccess: () => {
       toast.success(tForm("createSuccess"));
@@ -93,19 +102,8 @@ export default function AddReportFormDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      !projectSharingWorkOrderId ||
-      !name.trim() ||
-      !question.trim() ||
-      !value.trim() ||
-      numberOfAttachments.trim() === ""
-    ) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    createMutation.mutate();
+  const onSubmit = (values: ReportFormCreateValues) => {
+    createMutation.mutate(values);
   };
 
   return (
@@ -116,10 +114,10 @@ export default function AddReportFormDialog({
       fullWidth
       PaperProps={{
         sx: {
+          color: "text.primary",
           borderRadius: "8px",
-          position: "fixed",
-          top: 0,
-          right: 0,
+          border: 1,
+          borderColor: "divider",
         },
       }}
     >
@@ -148,68 +146,62 @@ export default function AddReportFormDialog({
 
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <TextField
+          <RhfTextField
+            name="name"
+            control={control}
             label={tForm("formName")}
-            required
             fullWidth
-            value={name}
-            onChange={(e) => setName(e.target.value)}
             placeholder={tForm("formNamePlaceholder")}
           />
 
-          <FormControl fullWidth required disabled={workOrdersLoading}>
-            <InputLabel>{tForm("workOrderType")}</InputLabel>
-            <Select
-              label={tForm("workOrderType")}
-              value={projectSharingWorkOrderId}
-              onChange={(e) => setProjectSharingWorkOrderId(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>{tForm("workOrderTypePlaceholder")}</em>
+          <RhfSelect
+            name="projectSharingWorkOrderId"
+            control={control}
+            label={tForm("workOrderType")}
+            disabled={workOrdersLoading}
+          >
+            <MenuItem value="">
+              <em>{tForm("workOrderTypePlaceholder")}</em>
+            </MenuItem>
+            {workOrders.map((wo) => (
+              <MenuItem key={wo.id} value={String(wo.id)}>
+                {wo.type}
               </MenuItem>
-              {workOrders.map((wo) => (
-                <MenuItem key={wo.id} value={String(wo.id)}>
-                  {wo.type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            ))}
+          </RhfSelect>
 
-          <TextField
+          <RhfTextField
+            name="question"
+            control={control}
             label={tForm("theQuestion")}
-            required
             fullWidth
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
             placeholder={tForm("theQuestionPlaceholder")}
           />
 
-          <TextField
+          <RhfTextField
+            name="value"
+            control={control}
             label={tForm("value")}
-            required
             fullWidth
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
             placeholder={tForm("valuePlaceholder")}
           />
 
-          <TextField
+          <RhfTextField
+            name="numberOfAttachments"
+            control={control}
             label={tForm("numberOfAttachments")}
-            required
             fullWidth
-            value={numberOfAttachments}
-            onChange={(e) => setNumberOfAttachments(e.target.value)}
             placeholder={tForm("numberOfAttachmentsPlaceholder")}
           />
 
-          <TextField
+          <RhfTextField
+            name="notes"
+            control={control}
             label={tForm("notes")}
             fullWidth
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
             placeholder={tForm("notesPlaceholder")}
             multiline
             rows={3}

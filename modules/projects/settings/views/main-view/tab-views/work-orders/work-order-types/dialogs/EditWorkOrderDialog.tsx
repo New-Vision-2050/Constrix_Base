@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
   IconButton,
@@ -17,6 +18,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createWorkOrderFormSchema,
+  type WorkOrderFormValues,
+} from "../../shared/form-schemas";
 
 export interface WorkOrderDialogProps {
   open: boolean;
@@ -24,6 +30,12 @@ export interface WorkOrderDialogProps {
   workOrderId?: string;
   onSuccess?: () => void;
 }
+
+const emptyValues: WorkOrderFormValues = {
+  code: "",
+  description: "",
+  type: "",
+};
 
 export default function EditWorkOrderDialog({
   open,
@@ -34,9 +46,14 @@ export default function EditWorkOrderDialog({
   const t = useTranslations("projectSettings.workOrders");
   const tForm = useTranslations("projectSettings.workOrders.form");
 
-  const [code, setCode] = useState("");
-  const [description, setDescription] = useState("");
-  const [type, setType] = useState("");
+  const schema = useMemo(() => createWorkOrderFormSchema(tForm), [tForm]);
+
+  const form = useForm<WorkOrderFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: emptyValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
 
   const detailQuery = useQuery({
     queryKey: ["project-sharing-work-order", workOrderId],
@@ -50,29 +67,29 @@ export default function EditWorkOrderDialog({
   useEffect(() => {
     const p = detailQuery.data;
     if (!p) return;
-    setCode(p.code ?? "");
-    setDescription(p.description ?? "");
-    setType(p.type ?? "");
-  }, [detailQuery.data]);
+    reset({
+      code: p.code ?? "",
+      description: p.description ?? "",
+      type: p.type ?? "",
+    });
+  }, [detailQuery.data, reset]);
 
   useEffect(() => {
     if (!open) {
-      setCode("");
-      setDescription("");
-      setType("");
+      reset(emptyValues);
     }
-  }, [open]);
+  }, [open, reset]);
 
   const handleClose = () => {
     onClose();
   };
 
   const updateMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: WorkOrderFormValues) =>
       ProjectSharingWorkOrdersApi.update(workOrderId!, {
-        code: code.trim(),
-        description: description.trim(),
-        type: type.trim(),
+        code: values.code,
+        description: values.description,
+        type: values.type,
       }),
     onSuccess: () => {
       toast.success(tForm("updateSuccess"));
@@ -84,14 +101,9 @@ export default function EditWorkOrderDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (values: WorkOrderFormValues) => {
     if (!workOrderId) return;
-    if (!code.trim() || !description.trim() || !type.trim()) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    updateMutation.mutate();
+    updateMutation.mutate(values);
   };
 
   const loading = detailQuery.isLoading && open && Boolean(workOrderId);
@@ -147,35 +159,32 @@ export default function EditWorkOrderDialog({
         ) : (
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
-            <TextField
+            <RhfTextField
+              name="code"
+              control={control}
               label={tForm("consultantCode")}
-              required
               fullWidth
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
               placeholder={tForm("consultantCodePlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="description"
+              control={control}
               label={tForm("workOrderDescription")}
-              required
               fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               placeholder={tForm("workOrderDescriptionPlaceholder")}
               multiline
               rows={3}
             />
 
-            <TextField
+            <RhfTextField
+              name="type"
+              control={control}
               label={tForm("workOrderType")}
-              required
               fullWidth
-              value={type}
-              onChange={(e) => setType(e.target.value)}
               placeholder={tForm("workOrderTypePlaceholder")}
             />
 

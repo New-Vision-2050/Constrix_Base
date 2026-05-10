@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
   IconButton,
@@ -16,6 +17,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectSharingProcedureApi } from "@/services/api/projects/project-sharing-procedure";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createActionFormSchema,
+  type ActionFormValues,
+} from "../../shared/form-schemas";
 
 export interface AddActionsDialogProps {
   open: boolean;
@@ -23,6 +29,11 @@ export interface AddActionsDialogProps {
   projectTypeId: number;
   onSuccess?: () => void;
 }
+
+const defaultValues: ActionFormValues = {
+  code: "",
+  description: "",
+};
 
 export default function AddActionsDialog({
   open,
@@ -33,25 +44,32 @@ export default function AddActionsDialog({
   const t = useTranslations("projectSettings.actions");
   const tForm = useTranslations("projectSettings.actions.form");
 
-  const [code, setCode] = useState("");
-  const [description, setDescription] = useState("");
+  const schema = useMemo(() => createActionFormSchema(tForm), [tForm]);
 
-  const reset = () => {
-    setCode("");
-    setDescription("");
-  };
+  const form = useForm<ActionFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
+
+  useEffect(() => {
+    if (!open) {
+      reset(defaultValues);
+    }
+  }, [open, reset]);
 
   const handleClose = () => {
-    reset();
+    reset(defaultValues);
     setOpenModal(false);
   };
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: ActionFormValues) =>
       ProjectSharingProcedureApi.create({
         project_type_id: projectTypeId,
-        code: code.trim(),
-        description: description.trim(),
+        code: values.code,
+        description: values.description,
       }),
     onSuccess: () => {
       toast.success(tForm("createSuccess"));
@@ -63,13 +81,8 @@ export default function AddActionsDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!code.trim() || !description.trim()) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    createMutation.mutate();
+  const onSubmit = (values: ActionFormValues) => {
+    createMutation.mutate(values);
   };
 
   return (
@@ -80,10 +93,10 @@ export default function AddActionsDialog({
       fullWidth
       PaperProps={{
         sx: {
+          color: "text.primary",
           borderRadius: "8px",
-          position: "fixed",
-          top: 0,
-          right: 0,
+          border: 1,
+          borderColor: "divider",
         },
       }}
     >
@@ -112,24 +125,22 @@ export default function AddActionsDialog({
 
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <TextField
+          <RhfTextField
+            name="code"
+            control={control}
             label={tForm("actionCode")}
-            required
             fullWidth
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
             placeholder={tForm("actionCodePlaceholder")}
           />
 
-          <TextField
+          <RhfTextField
+            name="description"
+            control={control}
             label={tForm("actionDescription")}
-            required
             fullWidth
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
             placeholder={tForm("actionDescriptionPlaceholder")}
             multiline
             rows={3}

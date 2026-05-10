@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
   IconButton,
@@ -18,6 +19,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ReportFormsApi } from "@/services/api/projects/report-forms";
 import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createReportFormEditSchema,
+  type ReportFormEditValues,
+} from "../../shared/form-schemas";
 
 const WORK_ORDERS_QUERY_KEY = "project-sharing-work-orders";
 
@@ -29,6 +35,14 @@ export interface EditReportFormDialogProps {
   onSuccess?: () => void;
 }
 
+const emptyValues: ReportFormEditValues = {
+  name: "",
+  question: "",
+  value: "",
+  numberOfAttachments: "",
+  notes: "",
+};
+
 export default function EditReportFormDialog({
   open,
   onClose,
@@ -39,11 +53,14 @@ export default function EditReportFormDialog({
   const t = useTranslations("projectSettings.reportForms");
   const tForm = useTranslations("projectSettings.reportForms.form");
 
-  const [name, setName] = useState("");
-  const [question, setQuestion] = useState("");
-  const [value, setValue] = useState("");
-  const [numberOfAttachments, setNumberOfAttachments] = useState("");
-  const [notes, setNotes] = useState("");
+  const schema = useMemo(() => createReportFormEditSchema(tForm), [tForm]);
+
+  const form = useForm<ReportFormEditValues>({
+    resolver: zodResolver(schema),
+    defaultValues: emptyValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
 
   const { data: workOrders = [] } = useQuery({
     queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
@@ -71,41 +88,41 @@ export default function EditReportFormDialog({
     const wid = detailQuery.data?.project_sharing_work_order_id;
     if (wid == null) return "";
     const wo = workOrders.find((w) => w.id === wid);
-    return wo ? `${wo.code}${wo.description ? ` — ${wo.description}` : ""}` : "";
+    return wo
+      ? `${wo.code}${wo.description ? ` — ${wo.description}` : ""}`
+      : "";
   }, [detailQuery.data, workOrders]);
 
   useEffect(() => {
     const p = detailQuery.data;
     if (!p) return;
-    setName(p.name ?? "");
-    setQuestion(p.question ?? "");
-    setValue(p.value ?? "");
-    setNumberOfAttachments(p.number_of_attachments ?? "");
-    setNotes(p.notes ?? "");
-  }, [detailQuery.data]);
+    reset({
+      name: p.name ?? "",
+      question: p.question ?? "",
+      value: p.value ?? "",
+      numberOfAttachments: p.number_of_attachments ?? "",
+      notes: p.notes ?? "",
+    });
+  }, [detailQuery.data, reset]);
 
   useEffect(() => {
     if (!open) {
-      setName("");
-      setQuestion("");
-      setValue("");
-      setNumberOfAttachments("");
-      setNotes("");
+      reset(emptyValues);
     }
-  }, [open]);
+  }, [open, reset]);
 
   const handleClose = () => {
     onClose();
   };
 
   const updateMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: ReportFormEditValues) =>
       ReportFormsApi.update(reportFormId!, {
-        name: name.trim(),
-        question: question.trim(),
-        value: value.trim(),
-        number_of_attachments: numberOfAttachments.trim(),
-        notes: notes.trim() ? notes.trim() : null,
+        name: values.name,
+        question: values.question,
+        value: values.value,
+        number_of_attachments: values.numberOfAttachments,
+        notes: values.notes.trim() ? values.notes.trim() : null,
       }),
     onSuccess: () => {
       toast.success(tForm("updateSuccess"));
@@ -117,19 +134,9 @@ export default function EditReportFormDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (values: ReportFormEditValues) => {
     if (!reportFormId) return;
-    if (
-      !name.trim() ||
-      !question.trim() ||
-      !value.trim() ||
-      numberOfAttachments.trim() === ""
-    ) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    updateMutation.mutate();
+    updateMutation.mutate(values);
   };
 
   const loading = detailQuery.isLoading && open && Boolean(reportFormId);
@@ -184,7 +191,7 @@ export default function EditReportFormDialog({
         ) : (
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
             {workOrderLabel ? (
@@ -193,47 +200,43 @@ export default function EditReportFormDialog({
               </Typography>
             ) : null}
 
-            <TextField
+            <RhfTextField
+              name="name"
+              control={control}
               label={tForm("formName")}
-              required
               fullWidth
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               placeholder={tForm("formNamePlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="question"
+              control={control}
               label={tForm("theQuestion")}
-              required
               fullWidth
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
               placeholder={tForm("theQuestionPlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="value"
+              control={control}
               label={tForm("value")}
-              required
               fullWidth
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
               placeholder={tForm("valuePlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="numberOfAttachments"
+              control={control}
               label={tForm("numberOfAttachments")}
-              required
               fullWidth
-              value={numberOfAttachments}
-              onChange={(e) => setNumberOfAttachments(e.target.value)}
               placeholder={tForm("numberOfAttachmentsPlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="notes"
+              control={control}
               label={tForm("notes")}
               fullWidth
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
               placeholder={tForm("notesPlaceholder")}
               multiline
               rows={3}

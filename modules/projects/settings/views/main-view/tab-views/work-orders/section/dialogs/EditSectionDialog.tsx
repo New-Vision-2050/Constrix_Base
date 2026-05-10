@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
   IconButton,
@@ -17,6 +18,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectSharingDepartmentApi } from "@/services/api/projects/project-sharing-department";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createSectionFormSchema,
+  type SectionFormValues,
+} from "../../shared/form-schemas";
 
 export interface SectionDialogProps {
   open: boolean;
@@ -24,6 +30,11 @@ export interface SectionDialogProps {
   sectionId?: string;
   onSuccess?: () => void;
 }
+
+const emptyValues: SectionFormValues = {
+  code: "",
+  description: "",
+};
 
 export default function EditSectionDialog({
   open,
@@ -34,8 +45,14 @@ export default function EditSectionDialog({
   const t = useTranslations("projectSettings.section");
   const tForm = useTranslations("projectSettings.section.form");
 
-  const [code, setCode] = useState("");
-  const [description, setDescription] = useState("");
+  const schema = useMemo(() => createSectionFormSchema(tForm), [tForm]);
+
+  const form = useForm<SectionFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: emptyValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
 
   const detailQuery = useQuery({
     queryKey: ["project-sharing-department", sectionId],
@@ -49,26 +66,27 @@ export default function EditSectionDialog({
   useEffect(() => {
     const p = detailQuery.data;
     if (!p) return;
-    setCode(p.code ?? "");
-    setDescription(p.description ?? "");
-  }, [detailQuery.data]);
+    reset({
+      code: p.code ?? "",
+      description: p.description ?? "",
+    });
+  }, [detailQuery.data, reset]);
 
   useEffect(() => {
     if (!open) {
-      setCode("");
-      setDescription("");
+      reset(emptyValues);
     }
-  }, [open]);
+  }, [open, reset]);
 
   const handleClose = () => {
     onClose();
   };
 
   const updateMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: SectionFormValues) =>
       ProjectSharingDepartmentApi.update(sectionId!, {
-        code: code.trim(),
-        description: description.trim(),
+        code: values.code,
+        description: values.description,
       }),
     onSuccess: () => {
       toast.success(tForm("updateSuccess"));
@@ -80,14 +98,9 @@ export default function EditSectionDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (values: SectionFormValues) => {
     if (!sectionId) return;
-    if (!code.trim() || !description.trim()) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    updateMutation.mutate();
+    updateMutation.mutate(values);
   };
 
   const loading = detailQuery.isLoading && open && Boolean(sectionId);
@@ -142,24 +155,22 @@ export default function EditSectionDialog({
         ) : (
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
-            <TextField
+            <RhfTextField
+              name="code"
+              control={control}
               label={tForm("sectionCode")}
-              required
               fullWidth
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
               placeholder={tForm("sectionCodePlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="description"
+              control={control}
               label={tForm("sectionDescription")}
-              required
               fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               placeholder={tForm("sectionDescriptionPlaceholder")}
               multiline
               rows={3}

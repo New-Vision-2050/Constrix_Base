@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
   IconButton,
@@ -16,6 +17,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectSharingDepartmentApi } from "@/services/api/projects/project-sharing-department";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createSectionFormSchema,
+  type SectionFormValues,
+} from "../../shared/form-schemas";
 
 export interface AddSectionDialogProps {
   open: boolean;
@@ -23,6 +29,11 @@ export interface AddSectionDialogProps {
   projectTypeId: number;
   onSuccess?: () => void;
 }
+
+const defaultValues: SectionFormValues = {
+  code: "",
+  description: "",
+};
 
 export default function AddSectionDialog({
   open,
@@ -33,25 +44,32 @@ export default function AddSectionDialog({
   const t = useTranslations("projectSettings.section");
   const tForm = useTranslations("projectSettings.section.form");
 
-  const [code, setCode] = useState("");
-  const [description, setDescription] = useState("");
+  const schema = useMemo(() => createSectionFormSchema(tForm), [tForm]);
 
-  const reset = () => {
-    setCode("");
-    setDescription("");
-  };
+  const form = useForm<SectionFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
+
+  useEffect(() => {
+    if (!open) {
+      reset(defaultValues);
+    }
+  }, [open, reset]);
 
   const handleClose = () => {
-    reset();
+    reset(defaultValues);
     setOpenModal(false);
   };
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: SectionFormValues) =>
       ProjectSharingDepartmentApi.create({
         project_type_id: projectTypeId,
-        code: code.trim(),
-        description: description.trim(),
+        code: values.code,
+        description: values.description,
       }),
     onSuccess: () => {
       toast.success(tForm("createSuccess"));
@@ -63,13 +81,8 @@ export default function AddSectionDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!code.trim() || !description.trim()) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    createMutation.mutate();
+  const onSubmit = (values: SectionFormValues) => {
+    createMutation.mutate(values);
   };
 
   return (
@@ -80,10 +93,10 @@ export default function AddSectionDialog({
       fullWidth
       PaperProps={{
         sx: {
+          color: "text.primary",
           borderRadius: "8px",
-          position: "fixed",
-          top: 0,
-          right: 0,
+          border: 1,
+          borderColor: "divider",
         },
       }}
     >
@@ -112,24 +125,24 @@ export default function AddSectionDialog({
 
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <TextField
+          <RhfTextField
+            name="code"
+            control={control}
             label={tForm("sectionCode")}
-            required
+            
             fullWidth
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
             placeholder={tForm("sectionCodePlaceholder")}
           />
 
-          <TextField
+          <RhfTextField
+            name="description"
+            control={control}
             label={tForm("sectionDescription")}
-            required
+            
             fullWidth
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
             placeholder={tForm("sectionDescriptionPlaceholder")}
             multiline
             rows={3}

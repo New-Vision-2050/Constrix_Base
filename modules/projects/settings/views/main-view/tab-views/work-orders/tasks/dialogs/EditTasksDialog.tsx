@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
   IconButton,
@@ -17,6 +18,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createTaskFormSchema,
+  type TaskFormValues,
+} from "../../shared/form-schemas";
 
 export interface EditTasksDialogProps {
   open: boolean;
@@ -24,6 +30,11 @@ export interface EditTasksDialogProps {
   taskId?: string;
   onSuccess?: () => void;
 }
+
+const emptyValues: TaskFormValues = {
+  code: "",
+  name: "",
+};
 
 export default function EditTasksDialog({
   open,
@@ -34,8 +45,14 @@ export default function EditTasksDialog({
   const t = useTranslations("projectSettings.addTasks");
   const tForm = useTranslations("projectSettings.addTasks.form");
 
-  const [code, setCode] = useState("");
-  const [name, setName] = useState("");
+  const schema = useMemo(() => createTaskFormSchema(tForm), [tForm]);
+
+  const form = useForm<TaskFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: emptyValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
 
   const detailQuery = useQuery({
     queryKey: ["project-sharing-tasks", taskId],
@@ -49,26 +66,27 @@ export default function EditTasksDialog({
   useEffect(() => {
     const p = detailQuery.data;
     if (!p) return;
-    setCode(p.code ?? "");
-    setName(p.name ?? "");
-  }, [detailQuery.data]);
+    reset({
+      code: p.code ?? "",
+      name: p.name ?? "",
+    });
+  }, [detailQuery.data, reset]);
 
   useEffect(() => {
     if (!open) {
-      setCode("");
-      setName("");
+      reset(emptyValues);
     }
-  }, [open]);
+  }, [open, reset]);
 
   const handleClose = () => {
     onClose();
   };
 
   const updateMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (values: TaskFormValues) =>
       ProjectSharingTasksApi.update(taskId!, {
-        code: code.trim(),
-        name: name.trim(),
+        code: values.code,
+        name: values.name,
       }),
     onSuccess: () => {
       toast.success(tForm("updateSuccess"));
@@ -80,14 +98,9 @@ export default function EditTasksDialog({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (values: TaskFormValues) => {
     if (!taskId) return;
-    if (!code.trim() || !name.trim()) {
-      toast.error(tForm("validationError"));
-      return;
-    }
-    updateMutation.mutate();
+    updateMutation.mutate(values);
   };
 
   const loading = detailQuery.isLoading && open && Boolean(taskId);
@@ -142,24 +155,22 @@ export default function EditTasksDialog({
         ) : (
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
-            <TextField
+            <RhfTextField
+              name="code"
+              control={control}
               label={tForm("taskCode")}
-              required
               fullWidth
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
               placeholder={tForm("taskCodePlaceholder")}
             />
 
-            <TextField
+            <RhfTextField
+              name="name"
+              control={control}
               label={tForm("tasksName")}
-              required
               fullWidth
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               placeholder={tForm("tasksNamePlaceholder")}
             />
 

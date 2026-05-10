@@ -14,6 +14,7 @@ export const TasksSettingsMessages = new MessagesGroup({
     tasksName: _m("Tasks Name", "اسم المهام"),
     tasksNamePlaceholder: _m("Select tasks", "اختر المهام"),
     save: _m("Save", "حفظ"),
+    validationError: _m("Validation error", "خطأ في التحقق من البيانات"),
   }),
   table: new MessagesGroup({
     addTasksSettings: _m("Add Tasks Settings", "إضافة إعدادات المهام"),

@@ -1,23 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Button,
   Box,
+  IconButton,
+  MenuItem,
+  Checkbox,
+  ListItemText,
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
-  ListItemText,
-  Checkbox,
+  FormHelperText,
 } from "@mui/material";
-import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { RhfTextField } from "../../shared/rhf-mui";
+import {
+  createTasksSettingsEditFormSchema,
+  type TasksSettingsEditFormValues,
+} from "../../shared/form-schemas";
 
 export interface EditTasksSettingsDialogProps {
   open: boolean;
@@ -25,16 +32,49 @@ export interface EditTasksSettingsDialogProps {
   taskSettingId?: string;
 }
 
+const emptyValues: TasksSettingsEditFormValues = {
+  serialNumber: "",
+  tasks: [],
+};
+
+const TASK_OPTIONS = [
+  { value: "task1", label: "مهمة أولى" },
+  { value: "task2", label: "مهمة ثانية" },
+  { value: "task3", label: "مهمة ثالثة" },
+  { value: "task4", label: "مهمة رابعة" },
+];
+
 export default function EditTasksSettingsDialog({
   open,
   onClose,
 }: EditTasksSettingsDialogProps) {
   const t = useTranslations("projectSettings.tasksSettings");
   const tForm = useTranslations("projectSettings.tasksSettings.form");
-  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+
+  const schema = useMemo(
+    () => createTasksSettingsEditFormSchema(tForm),
+    [tForm],
+  );
+
+  const form = useForm<TasksSettingsEditFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: emptyValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
+
+  useEffect(() => {
+    if (!open) {
+      reset(emptyValues);
+    }
+  }, [open, reset]);
 
   const handleClose = () => {
     onClose();
+  };
+
+  const onSubmit = (_values: TasksSettingsEditFormValues) => {
+    handleClose();
   };
 
   return (
@@ -78,44 +118,51 @@ export default function EditTasksSettingsDialog({
 
         <Box
           component="form"
+          onSubmit={handleSubmit(onSubmit)}
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <TextField
+          <RhfTextField
+            name="serialNumber"
+            control={control}
             label={tForm("serialNumber")}
             required
             fullWidth
             placeholder={tForm("serialNumberPlaceholder")}
           />
 
-          <FormControl fullWidth>
-            <InputLabel>{tForm("tasksName")}</InputLabel>
-            <Select
-              multiple
-              value={selectedTasks}
-              onChange={(e) => setSelectedTasks(e.target.value as string[])}
-              label={tForm("tasksName")}
-              renderValue={(selected) =>
-                Array.isArray(selected) ? selected.join(", ") : ""
-              }
-            >
-              <MenuItem value="task1">
-                <Checkbox checked={selectedTasks.includes("task1")} />
-                <ListItemText primary="مهمة أولى" />
-              </MenuItem>
-              <MenuItem value="task2">
-                <Checkbox checked={selectedTasks.includes("task2")} />
-                <ListItemText primary="مهمة ثانية" />
-              </MenuItem>
-              <MenuItem value="task3">
-                <Checkbox checked={selectedTasks.includes("task3")} />
-                <ListItemText primary="مهمة ثالثة" />
-              </MenuItem>
-              <MenuItem value="task4">
-                <Checkbox checked={selectedTasks.includes("task4")} />
-                <ListItemText primary="مهمة رابعة" />
-              </MenuItem>
-            </Select>
-          </FormControl>
+          <Controller
+            name="tasks"
+            control={control}
+            render={({ field, fieldState }) => (
+              <FormControl fullWidth error={!!fieldState.error}>
+                <InputLabel>{tForm("tasksName")}</InputLabel>
+                <Select
+                  multiple
+                  label={tForm("tasksName")}
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                  renderValue={(selected) =>
+                    Array.isArray(selected) ? selected.join(", ") : ""
+                  }
+                >
+                  {TASK_OPTIONS.map((opt) => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      <Checkbox
+                        checked={(field.value ?? []).includes(opt.value)}
+                      />
+                      <ListItemText primary={opt.label} />
+                    </MenuItem>
+                  ))}
+                </Select>
+                {fieldState.error?.message ? (
+                  <FormHelperText>{fieldState.error.message}</FormHelperText>
+                ) : null}
+              </FormControl>
+            )}
+          />
 
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
             {tForm("save")}

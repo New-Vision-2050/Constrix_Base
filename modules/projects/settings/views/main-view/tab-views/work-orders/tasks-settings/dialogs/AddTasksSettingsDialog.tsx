@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
@@ -8,20 +10,38 @@ import {
   DialogTitle,
   Button,
   Box,
+  IconButton,
+  MenuItem,
+  Checkbox,
+  ListItemText,
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
-  ListItemText,
-  Checkbox,
+  FormHelperText,
 } from "@mui/material";
-import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { RhfSelect } from "../../shared/rhf-mui";
+import {
+  createTasksSettingsFormSchema,
+  type TasksSettingsFormValues,
+} from "../../shared/form-schemas";
 
 export interface AddTasksSettingsDialogProps {
   open: boolean;
   setOpenModal: (open: boolean) => void;
 }
+
+const defaultValues: TasksSettingsFormValues = {
+  workOrderType: "",
+  tasks: [],
+};
+
+const TASK_OPTIONS = [
+  { value: "task1", label: "مهمة أولى" },
+  { value: "task2", label: "مهمة ثانية" },
+  { value: "task3", label: "مهمة ثالثة" },
+  { value: "task4", label: "مهمة رابعة" },
+];
 
 export default function AddTasksSettingsDialog({
   open,
@@ -29,10 +49,29 @@ export default function AddTasksSettingsDialog({
 }: AddTasksSettingsDialogProps) {
   const t = useTranslations("projectSettings.tasksSettings");
   const tForm = useTranslations("projectSettings.tasksSettings.form");
-  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+
+  const schema = useMemo(() => createTasksSettingsFormSchema(tForm), [tForm]);
+
+  const form = useForm<TasksSettingsFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues,
+  });
+
+  const { control, handleSubmit, reset } = form;
+
+  useEffect(() => {
+    if (!open) {
+      reset(defaultValues);
+    }
+  }, [open, reset]);
 
   const handleClose = () => {
+    reset(defaultValues);
     setOpenModal(false);
+  };
+
+  const onSubmit = (_values: TasksSettingsFormValues) => {
+    handleClose();
   };
 
   return (
@@ -43,10 +82,10 @@ export default function AddTasksSettingsDialog({
       fullWidth
       PaperProps={{
         sx: {
+          color: "text.primary",
           borderRadius: "8px",
-          position: "fixed",
-          top: 0,
-          right: 0,
+          border: 1,
+          borderColor: "divider",
         },
       }}
     >
@@ -73,48 +112,57 @@ export default function AddTasksSettingsDialog({
           <CloseIcon />
         </IconButton>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <FormControl fullWidth>
-            <InputLabel>{tForm("workOrderType")}</InputLabel>
-            <Select label={tForm("workOrderType")}>
-              <MenuItem value="">
-                {tForm("workOrderTypePlaceholder")}
-              </MenuItem>
-              <MenuItem value="type1">نوع أمر العمل 1</MenuItem>
-              <MenuItem value="type2">نوع أمر العمل 2</MenuItem>
-              <MenuItem value="type3">نوع أمر العمل 3</MenuItem>
-            </Select>
-          </FormControl>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
+          <RhfSelect
+            name="workOrderType"
+            control={control}
+            label={tForm("workOrderType")}
+          >
+            <MenuItem value="">
+              <em>{tForm("workOrderTypePlaceholder")}</em>
+            </MenuItem>
+            <MenuItem value="type1">نوع أمر العمل 1</MenuItem>
+            <MenuItem value="type2">نوع أمر العمل 2</MenuItem>
+            <MenuItem value="type3">نوع أمر العمل 3</MenuItem>
+          </RhfSelect>
 
-          <FormControl fullWidth>
-            <InputLabel>{tForm("tasks")}</InputLabel>
-            <Select
-              multiple
-              value={selectedTasks}
-              onChange={(e) => setSelectedTasks(e.target.value as string[])}
-              label={tForm("tasks")}
-              renderValue={(selected) =>
-                Array.isArray(selected) ? selected.join(", ") : ""
-              }
-            >
-              <MenuItem value="task1">
-                <Checkbox checked={selectedTasks.includes("task1")} />
-                <ListItemText primary="مهمة أولى" />
-              </MenuItem>
-              <MenuItem value="task2">
-                <Checkbox checked={selectedTasks.includes("task2")} />
-                <ListItemText primary="مهمة ثانية" />
-              </MenuItem>
-              <MenuItem value="task3">
-                <Checkbox checked={selectedTasks.includes("task3")} />
-                <ListItemText primary="مهمة ثالثة" />
-              </MenuItem>
-              <MenuItem value="task4">
-                <Checkbox checked={selectedTasks.includes("task4")} />
-                <ListItemText primary="مهمة رابعة" />
-              </MenuItem>
-            </Select>
-          </FormControl>
+          <Controller
+            name="tasks"
+            control={control}
+            render={({ field, fieldState }) => (
+              <FormControl fullWidth error={!!fieldState.error}>
+                <InputLabel>{tForm("tasks")}</InputLabel>
+                <Select
+                  multiple
+                  label={tForm("tasks")}
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                  renderValue={(selected) =>
+                    Array.isArray(selected) ? selected.join(", ") : ""
+                  }
+                >
+                  {TASK_OPTIONS.map((opt) => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      <Checkbox
+                        checked={(field.value ?? []).includes(opt.value)}
+                      />
+                      <ListItemText primary={opt.label} />
+                    </MenuItem>
+                  ))}
+                </Select>
+                {fieldState.error?.message ? (
+                  <FormHelperText>{fieldState.error.message}</FormHelperText>
+                ) : null}
+              </FormControl>
+            )}
+          />
 
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
             {tForm("save")}
