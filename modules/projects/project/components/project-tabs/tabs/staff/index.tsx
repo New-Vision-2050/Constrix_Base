@@ -37,6 +37,7 @@ import {
   hasAnyProjectPermissionKey,
   hasProjectPermissionKey,
 } from "@/modules/projects/project/utils/projectMyPermissions";
+import { useCanAssignProjectStaffRoles } from "@/modules/projects/project/hooks/useCanAssignProjectStaffRoles";
 import { Employee } from "./types";
 import AddStaffDialog, {
   employeesNotInProjectQueryKey,
@@ -78,6 +79,8 @@ export default function StaffTab() {
     () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_DELETE),
     [flatPerms],
   );
+
+  const canChangeStaffRole = useCanAssignProjectStaffRoles(canUpdate);
 
   const deleteEmployeeMutation = useMutation({
     mutationFn: (assignmentId: string) =>
@@ -142,12 +145,12 @@ export default function StaffTab() {
             projectId={projectId}
             assignmentId={row.id}
             projectRole={row.projectRole}
-            canChangeRole={canUpdate}
+            canChangeRole={canChangeStaffRole}
           />
         ),
       },
     ],
-    [t, projectId, canUpdate],
+    [t, projectId, canChangeStaffRole],
   );
 
   const params = StaffTableLayout.useTableParams({
