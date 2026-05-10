@@ -1,31 +1,32 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { CARDTYPE } from ".";
+import type { CARDTYPE } from "../card-types";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
-import { RowActions } from "./components/RowActions";
-import EditActionsDialog from "./components/dialogs/EditActionsDialog";
-import ActionsDetailsDialog from "./components/dialogs/ActionsDetailsDialog";
-import type { ProjectSharingProcedure } from "./types";
-import AddActionsDialog from "./components/dialogs/AddActionsDialog";
+import { RowActions } from "../shared/RowActions";
+import EditWorkOrderDialog from "./dialogs/EditWorkOrderDialog";
+import WorkOrderDetailsDialog from "./dialogs/WorkOrderDetailsDialog";
+import type { ProjectSharingWorkOrder } from "../shared/types";
+import AddWorkOrderDialog from "./dialogs/AddWorkOrderDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ProjectSharingProcedureApi } from "@/services/api/projects/project-sharing-procedure";
+import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
 import DeleteButton from "@/components/shared/delete-button";
 
-const PROCEDURES_QUERY_KEY = "project-sharing-procedure";
+const WORK_ORDERS_QUERY_KEY = "project-sharing-work-orders";
 
-const ActionsTable = HeadlessTableLayout<ProjectSharingProcedure>("psact");
+const WorkOrderTypeTable =
+  HeadlessTableLayout<ProjectSharingWorkOrder>("pswo");
 
-export default function ActionsView({
+export default function WorkOrderTypePage({
   setActiveCard,
   projectTypeId,
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
   projectTypeId: number;
 }) {
-  const t = useTranslations("projectSettings.actions");
-  const tTable = useTranslations("projectSettings.actions.table");
+  const t = useTranslations("projectSettings.workOrders");
+  const tTable = useTranslations("projectSettings.workOrders.table");
   const tLabels = useTranslations("labels");
   const queryClient = useQueryClient();
 
@@ -35,13 +36,13 @@ export default function ActionsView({
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingProcedureId, setDeletingProcedureId] = useState<number | null>(
+  const [deletingWorkOrderId, setDeletingWorkOrderId] = useState<number | null>(
     null,
   );
 
   const invalidateList = () =>
     queryClient.invalidateQueries({
-      queryKey: [PROCEDURES_QUERY_KEY, projectTypeId],
+      queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
     });
 
   const handleDisplay = (id: string) => {
@@ -55,7 +56,7 @@ export default function ActionsView({
   };
 
   const handleDeleteClick = (id: string) => {
-    setDeletingProcedureId(Number(id));
+    setDeletingWorkOrderId(Number(id));
     setDeleteDialogOpen(true);
   };
 
@@ -63,15 +64,15 @@ export default function ActionsView({
     setOpenAddDialog(true);
   };
 
-  const params = ActionsTable.useTableParams({
+  const params = WorkOrderTypeTable.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
 
   const { data: rows = [], isLoading, isError } = useQuery({
-    queryKey: [PROCEDURES_QUERY_KEY, projectTypeId],
+    queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
     queryFn: async () => {
-      const res = await ProjectSharingProcedureApi.list(projectTypeId);
+      const res = await ProjectSharingWorkOrdersApi.list(projectTypeId);
       return res.data.payload ?? [];
     },
     enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
@@ -83,7 +84,8 @@ export default function ActionsView({
     return rows.filter(
       (r) =>
         r.code.toLowerCase().includes(q) ||
-        r.description.toLowerCase().includes(q),
+        r.description.toLowerCase().includes(q) ||
+        r.type.toLowerCase().includes(q),
     );
   }, [rows, params.search]);
 
@@ -98,17 +100,25 @@ export default function ActionsView({
   const columns = [
     {
       key: "code",
-      name: tTable("code"),
+      name: tTable("consultantCode"),
       sortable: false,
-      render: (row: ProjectSharingProcedure) => (
+      render: (row: ProjectSharingWorkOrder) => (
         <span className="p-2 text-sm">{row.code}</span>
       ),
     },
     {
-      key: "description",
-      name: tTable("description"),
+      key: "type",
+      name: tTable("workOrderType"),
       sortable: false,
-      render: (row: ProjectSharingProcedure) => (
+      render: (row: ProjectSharingWorkOrder) => (
+        <span className="p-2 text-sm">{row.type}</span>
+      ),
+    },
+    {
+      key: "description",
+      name: tTable("workOrderDescription"),
+      sortable: false,
+      render: (row: ProjectSharingWorkOrder) => (
         <span className="p-2 text-sm">{row.description}</span>
       ),
     },
@@ -116,7 +126,7 @@ export default function ActionsView({
       key: "actions",
       name: tTable("actions"),
       sortable: false,
-      render: (row: ProjectSharingProcedure) => (
+      render: (row: ProjectSharingWorkOrder) => (
         <RowActions
           row={row}
           onShow={handleDisplay}
@@ -125,14 +135,14 @@ export default function ActionsView({
           canShow={true}
           canEdit={true}
           canDelete={true}
-          translationNamespace="projectSettings.actions.table"
-          editLabelKey="editAction"
+          translationNamespace="projectSettings.workOrders.table"
+          editLabelKey="editWorkOrder"
         />
       ),
     },
   ];
 
-  const tableState = ActionsTable.useTableState({
+  const tableState = WorkOrderTypeTable.useTableState({
     data: pageData,
     columns,
     totalPages,
@@ -172,7 +182,7 @@ export default function ActionsView({
           onClick={handleAdd}
           disabled={!projectTypeId}
         >
-          {tTable("addAction")}
+          {tTable("addWorkOrder")}
         </Button>
       </Box>
 
@@ -182,37 +192,43 @@ export default function ActionsView({
         </Typography>
       ) : null}
 
-      <Box sx={{ color: "text.primary" }}>
-        <ActionsTable
-          filters={<ActionsTable.TopActions state={tableState} />}
+      <Box
+        sx={{
+          color: "text.primary",
+        }}
+      >
+        <WorkOrderTypeTable
+          filters={
+            <WorkOrderTypeTable.TopActions state={tableState} />
+          }
           table={
-            <ActionsTable.Table
+            <WorkOrderTypeTable.Table
               state={tableState}
               loadingOptions={{ rows: 5 }}
             />
           }
-          pagination={<ActionsTable.Pagination state={tableState} />}
+          pagination={<WorkOrderTypeTable.Pagination state={tableState} />}
         />
       </Box>
 
-      <AddActionsDialog
+      <AddWorkOrderDialog
         open={openAddDialog}
         setOpenModal={setOpenAddDialog}
         projectTypeId={projectTypeId}
         onSuccess={invalidateList}
       />
-      <ActionsDetailsDialog
+      <WorkOrderDetailsDialog
         open={openModal}
         setOpenModal={setOpenModal}
         rowId={displayedRowId}
       />
-      <EditActionsDialog
+      <EditWorkOrderDialog
         open={editDialogOpen && Boolean(editingRowId)}
         onClose={() => {
           setEditDialogOpen(false);
           setEditingRowId(null);
         }}
-        actionId={editingRowId ?? undefined}
+        workOrderId={editingRowId ?? undefined}
         onSuccess={invalidateList}
       />
 
@@ -221,11 +237,11 @@ export default function ActionsView({
         open={deleteDialogOpen}
         setOpen={setDeleteDialogOpen}
         onDelete={async () => {
-          if (deletingProcedureId == null) {
-            throw new Error("No procedure selected");
+          if (deletingWorkOrderId == null) {
+            throw new Error("No work order selected");
           }
-          await ProjectSharingProcedureApi.delete(deletingProcedureId);
-          setDeletingProcedureId(null);
+          await ProjectSharingWorkOrdersApi.delete(deletingWorkOrderId);
+          setDeletingWorkOrderId(null);
           invalidateList();
         }}
         translations={{

@@ -11,30 +11,30 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import type { DetailsDialogProps } from "../../types";
+import type { DetailsDialogProps } from "../../shared/types";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { ProjectSharingProcedureApi } from "@/services/api/projects/project-sharing-procedure";
+import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
 
-const ActionsDetailsDialog = ({
+const TasksDetailsDialog = ({
   open,
   setOpenModal,
   rowId,
 }: DetailsDialogProps) => {
-  const tDetails = useTranslations("projectSettings.actions.details");
+  const tDetails = useTranslations("projectSettings.addTasks.details");
 
   const handleClose = () => setOpenModal(false);
 
   const detailQuery = useQuery({
-    queryKey: ["project-sharing-procedure", rowId],
+    queryKey: ["project-sharing-tasks", rowId],
     queryFn: async () => {
-      const res = await ProjectSharingProcedureApi.show(rowId!);
+      const res = await ProjectSharingTasksApi.show(rowId!);
       return res.data.payload;
     },
     enabled: open && Boolean(rowId),
   });
 
-  const action = detailQuery.data;
+  const task = detailQuery.data;
 
   return (
     <Dialog
@@ -76,24 +76,23 @@ const ActionsDetailsDialog = ({
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <CircularProgress />
           </Box>
-        ) : detailQuery.isError || !action ? (
+        ) : detailQuery.isError || !task ? (
           <Typography textAlign="center" color="error">
             {tDetails("notFound")}
           </Typography>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
             <Typography variant="body2">
-              <strong>{tDetails("actionCode")}:</strong> {action.code}
+              <strong>{tDetails("taskCode")}:</strong> {task.code}
             </Typography>
             <Typography variant="body2">
-              <strong>{tDetails("actionDescription")}:</strong>{" "}
-              {action.description}
+              <strong>{tDetails("taskName")}:</strong> {task.name}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              <strong>{tDetails("createdAt")}:</strong> {action.created_at}
+              <strong>{tDetails("createdAt")}:</strong> {task.created_at}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              <strong>{tDetails("updatedAt")}:</strong> {action.updated_at}
+              <strong>{tDetails("updatedAt")}:</strong> {task.updated_at}
             </Typography>
           </Box>
         )}
@@ -102,4 +101,4 @@ const ActionsDetailsDialog = ({
   );
 };
 
-export default ActionsDetailsDialog;
+export default TasksDetailsDialog;

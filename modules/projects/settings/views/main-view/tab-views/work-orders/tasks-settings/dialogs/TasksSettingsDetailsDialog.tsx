@@ -8,7 +8,7 @@ import {
   Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DetailsDialogProps } from "../../types";
+import type { DetailsDialogProps } from "../../shared/types";
 import { useTranslations } from "next-intl";
 
 const mockTasksSettings = [

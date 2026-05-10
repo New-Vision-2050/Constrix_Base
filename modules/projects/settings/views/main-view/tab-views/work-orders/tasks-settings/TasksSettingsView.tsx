@@ -1,14 +1,14 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { CARDTYPE } from ".";
+import type { CARDTYPE } from "../card-types";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
-import { RowActions } from "./components/RowActions";
-import EditTasksSettingsDialog from "./components/dialogs/EditTasksSettingsDialog";
-import TasksSettingsDetailsDialog from "./components/dialogs/TasksSettingsDetailsDialog";
-import { TaskSetting } from "./types";
-import AddTasksSettingsDialog from "./components/dialogs/AddTasksSettingsDialog";
+import { RowActions } from "../shared/RowActions";
+import EditTasksSettingsDialog from "./dialogs/EditTasksSettingsDialog";
+import TasksSettingsDetailsDialog from "./dialogs/TasksSettingsDetailsDialog";
+import type { TaskSetting } from "../shared/types";
+import AddTasksSettingsDialog from "./dialogs/AddTasksSettingsDialog";
 
 const TasksSettingsTable = HeadlessTableLayout<TaskSetting>("psts");
 

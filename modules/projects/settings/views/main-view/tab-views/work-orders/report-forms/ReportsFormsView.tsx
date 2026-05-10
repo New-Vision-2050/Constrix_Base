@@ -1,14 +1,17 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { CARDTYPE } from ".";
+import type { CARDTYPE } from "../card-types";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
-import { RowActions } from "./components/RowActions";
-import EditReportFormDialog from "./components/dialogs/EditReportFormDialog";
-import ReportFormDetailsDialog from "./components/dialogs/ReportFormDetailsDialog";
-import type { ProjectSharingReportForm, ProjectSharingWorkOrder } from "./types";
-import AddReportFormDialog from "./components/dialogs/AddReportFormDialog";
+import { RowActions } from "../shared/RowActions";
+import EditReportFormDialog from "./dialogs/EditReportFormDialog";
+import ReportFormDetailsDialog from "./dialogs/ReportFormDetailsDialog";
+import type {
+  ProjectSharingReportForm,
+  ProjectSharingWorkOrder,
+} from "../shared/types";
+import AddReportFormDialog from "./dialogs/AddReportFormDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ReportFormsApi } from "@/services/api/projects/report-forms";
 import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";

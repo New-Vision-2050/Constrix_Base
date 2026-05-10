@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import type { DetailsDialogProps } from "../../types";
+import type { DetailsDialogProps } from "../../shared/types";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
@@ -21,8 +21,8 @@ const WorkOrderDetailsDialog = ({
   setOpenModal,
   rowId,
 }: DetailsDialogProps) => {
-  const t = useTranslations("projectSettings.workOrders");
   const tForm = useTranslations("projectSettings.workOrders.form");
+  const tDetails = useTranslations("projectSettings.workOrders.details");
 
   const handleClose = () => setOpenModal(false);
 
@@ -69,7 +69,7 @@ const WorkOrderDetailsDialog = ({
           pb: 1,
         }}
       >
-        {t("detailsTitle")}
+        {tDetails("title")}
       </DialogTitle>
 
       <DialogContent>
@@ -79,7 +79,7 @@ const WorkOrderDetailsDialog = ({
           </Box>
         ) : detailQuery.isError || !p ? (
           <Typography color="error" textAlign="center">
-            {t("error")}
+            {tDetails("notFound")}
           </Typography>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
@@ -93,10 +93,10 @@ const WorkOrderDetailsDialog = ({
               <strong>{tForm("workOrderDescription")}:</strong> {p.description}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              <strong>{t("createdAt")}:</strong> {p.created_at}
+              <strong>{tDetails("createdAt")}:</strong> {p.created_at}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              <strong>{t("updatedAt")}:</strong> {p.updated_at}
+              <strong>{tDetails("updatedAt")}:</strong> {p.updated_at}
             </Typography>
           </Box>
         )}

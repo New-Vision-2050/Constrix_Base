@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import type { DetailsDialogProps } from "../../types";
+import type { DetailsDialogProps } from "../../shared/types";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectSharingDepartmentApi } from "@/services/api/projects/project-sharing-department";

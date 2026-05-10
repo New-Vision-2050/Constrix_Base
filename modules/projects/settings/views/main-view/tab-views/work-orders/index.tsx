@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import WorkOrderTypeView from "./WorkOrderTypeView";
-import SectionView from "./SectionView";
-import ActionsView from "./ActionsView";
-import ReportsFormsView from "./ReportsFormsView";
+import WorkOrderTypeView from "./work-order-types/WorkOrderTypeView";
+import SectionView from "./section/SectionView";
+import ActionsView from "./actions/ActionsView";
+import ReportsFormsView from "./report-forms/ReportsFormsView";
 import {
   Accordion,
   AccordionSummary,
@@ -17,18 +17,12 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useTranslations } from "next-intl";
-import TasksView from "./TasksView";
-import TasksSettingsView from "./TasksSettingsView";
+import TasksView from "./tasks/TasksView";
+import TasksSettingsView from "./tasks-settings/TasksSettingsView";
 import { SettingsTabItemProps } from "../../types";
+import type { CARDTYPE } from "./card-types";
 
-export type CARDTYPE =
-  | "WORK_ORDER_TYPES"
-  | "SECTION"
-  | "ACTIONS"
-  | "REPORT_FORMS"
-  | "ADD_TASKS"
-  | "TASKS_SETTINGS"
-  | "HIDE";
+export type { CARDTYPE } from "./card-types";
 
 export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
   const t = useTranslations("projectSettings.section");
