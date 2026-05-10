@@ -45,7 +45,6 @@ export default function SelectedEmployees() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  
 
   const params = SelectedEmployeesTable.useTableParams({
     initialPage: 1,

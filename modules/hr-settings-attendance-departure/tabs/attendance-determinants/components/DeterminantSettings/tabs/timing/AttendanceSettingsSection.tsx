@@ -1,6 +1,6 @@
 "use client";
 
-import { EMPLOYEE_OPTIONS } from "../constants";
+import { EMPLOYEE_OPTIONS } from "./timing-constants";
 
 export default function AttendanceSettingsSection() {
   return (

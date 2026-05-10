@@ -18,7 +18,7 @@ import { useTranslations } from "next-intl";
 import { Pagination } from "../../../../components/shared/Pagination";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import DeterminantSettings from "./components/DeterminantSettings/DeterminantSettings";
+import DeterminantSettings from "./components/DeterminantSettings";
 
 // Container component that uses the context
 function AttendanceDeterminantsTabContent() {
