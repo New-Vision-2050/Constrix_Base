@@ -22,10 +22,17 @@ export const EmailFormConfig = () => {
         title: t("changeEmail"),
         fields: [
           {
-            name: "email",
-            label: t("email"),
+            name: "oldEmail",
+            label: t("oldEmail"),
             type: "email",
-            placeholder: t("email"),
+            placeholder: t("oldEmail"),
+            disabled: true,
+          },
+          {
+            name: "newEmail",
+            label: t("newEmail"),
+            type: "email",
+            placeholder: t("newEmail"),
             validation: [
               {
                 type: "required",
@@ -42,7 +49,8 @@ export const EmailFormConfig = () => {
       },
     ],
     initialValues: {
-      email: userConnectionData?.email,
+      oldEmail: userConnectionData?.email,
+      newEmail: "",
     },
     submitButtonText: t("changeEmail"),
     cancelButtonText: t("cancel"),
@@ -59,14 +67,14 @@ export const EmailFormConfig = () => {
       try {
         // Send OTP to email
         const body = {
-          identifier: formData.email,
+          identifier: formData.newEmail,
           type: "email",
         };
         
         await apiClient.post(`/company-users/send-otp`, body);
         
         // Set the identifier for OTP verification
-        setMailOtpIdentifier(formData.email as string);
+        setMailOtpIdentifier(formData.newEmail as string);
         
         // Open OTP dialog
         toggleMailOtpDialog();
