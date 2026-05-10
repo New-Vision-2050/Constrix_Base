@@ -40,13 +40,22 @@ export interface ProjectSharingProcedure {
 /** @deprecated Use ProjectSharingProcedure */
 export type Action = ProjectSharingProcedure;
 
-export interface ReportForm {
-  id: string;
-  referenceNumber: string;
-  formName: string;
-  workOrderType: string;
-  notes: string;
+/** Report form (API: report-forms) */
+export interface ProjectSharingReportForm {
+  id: number;
+  project_type_id: number;
+  project_sharing_work_order_id: number;
+  name: string;
+  question: string;
+  value: string;
+  number_of_attachments: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
+
+/** @deprecated Use ProjectSharingReportForm */
+export type ReportForm = ProjectSharingReportForm;
 
 /** Project sharing task (API: project-sharing-tasks) */
 export interface ProjectSharingTask {
@@ -72,7 +81,7 @@ export interface RowActionsProps {
     | ProjectSharingWorkOrder
     | Section
     | ProjectSharingProcedure
-    | ReportForm
+    | ProjectSharingReportForm
     | ProjectSharingTask
     | TaskSetting;
   onShow: (id: string) => void;

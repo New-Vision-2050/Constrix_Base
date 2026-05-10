@@ -96,7 +96,7 @@ export default function TasksView({
   const columns = [
     {
       key: "code",
-      name: tTable("taskCode"),
+      name: tTable("code"),
       sortable: false,
       render: (row: ProjectSharingTask) => (
         <span className="p-2 text-sm">{row.code}</span>

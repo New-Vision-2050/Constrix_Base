@@ -1,4 +1,4 @@
-import { MessagesGroup, _m } from "@/messages";
+import { MessagesGroup, _m } from "../../../../../types";
 
 export const AddTasksMessages = new MessagesGroup({
   title: _m("Add Tasks", "إضافة مهام"),
@@ -28,7 +28,8 @@ export const AddTasksMessages = new MessagesGroup({
   }),
   table: new MessagesGroup({
     addTask: _m("Add Task", "إضافة مهمة"),
-    taskCode: _m("Code", "الرمز"),
+    /** Column header for task code (same pattern as actions.table.code) */
+    code: _m("Code", "الرمز"),
     tasksNumber: _m("Number", "الرقم"),
     tasksName: _m("Tasks Name", "اسم المهام"),
     actions: _m("Actions", "الإجراءات"),

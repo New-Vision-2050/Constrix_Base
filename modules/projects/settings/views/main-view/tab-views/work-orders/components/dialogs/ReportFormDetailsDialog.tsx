@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,54 +8,71 @@ import {
   IconButton,
   Typography,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DetailsDialogProps } from "../../types";
+import type { DetailsDialogProps } from "../../types";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { ReportFormsApi } from "@/services/api/projects/report-forms";
+import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
 
-const mockReportForms = [
-  {
-    id: "rf1",
-    referenceNumber: "REF-001",
-    formName: "نموذج التقرير الأول",
-    workOrderType: "نوع أمر العمل 1",
-    notes: "ملاحظات أولى",
-  },
-  {
-    id: "rf2",
-    referenceNumber: "REF-002",
-    formName: "نموذج التقرير الثاني",
-    workOrderType: "نوع أمر العمل 2",
-    notes: "ملاحظات ثانية",
-  },
-  {
-    id: "rf3",
-    referenceNumber: "REF-003",
-    formName: "نموذج التقرير الثالث",
-    workOrderType: "نوع أمر العمل 3",
-    notes: "ملاحظات ثالثة",
-  },
-];
+const WORK_ORDERS_QUERY_KEY = "project-sharing-work-orders";
+
+export interface ReportFormDetailsDialogProps extends DetailsDialogProps {
+  projectTypeId: number;
+}
 
 const ReportFormDetailsDialog = ({
   open,
   setOpenModal,
   rowId,
-}: DetailsDialogProps) => {
+  projectTypeId,
+}: ReportFormDetailsDialogProps) => {
   const tDetails = useTranslations("projectSettings.reportForms.details");
+
   const handleClose = () => setOpenModal(false);
 
-  const reportForm = mockReportForms.find((rf) => rf.id === rowId);
+  const { data: workOrders = [] } = useQuery({
+    queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
+    queryFn: async () => {
+      const res = await ProjectSharingWorkOrdersApi.list(projectTypeId);
+      return res.data.payload ?? [];
+    },
+    enabled:
+      open &&
+      Boolean(rowId) &&
+      Number.isFinite(projectTypeId) &&
+      projectTypeId > 0,
+  });
+
+  const detailQuery = useQuery({
+    queryKey: ["report-forms", rowId],
+    queryFn: async () => {
+      const res = await ReportFormsApi.show(rowId!);
+      return res.data.payload;
+    },
+    enabled: open && Boolean(rowId),
+  });
+
+  const rf = detailQuery.data;
+
+  const workOrderLabel = useMemo(() => {
+    if (!rf) return "";
+    const wo = workOrders.find((w) => w.id === rf.project_sharing_work_order_id);
+    return wo ? `${wo.code}${wo.description ? ` — ${wo.description}` : ""}` : "—";
+  }, [rf, workOrders]);
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth="lg"
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         sx: {
           borderRadius: "8px",
-          p: 8,
+          p: 2,
         },
       }}
     >
@@ -72,36 +91,51 @@ const ReportFormDetailsDialog = ({
         sx={{
           textAlign: "center",
           fontWeight: "bold",
-          fontSize: "1.5rem",
-          mb: 2,
+          fontSize: "1.25rem",
+          pb: 1,
         }}
       >
         {tDetails("title")}
       </DialogTitle>
 
       <DialogContent>
-        {reportForm && (
-          <Box className="flex flex-col gap-4">
-            <Typography variant="body1">
-              <strong>{tDetails("referenceNumber")}:</strong>{" "}
-              {reportForm.referenceNumber}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{tDetails("formName")}:</strong> {reportForm.formName}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{tDetails("workOrderType")}:</strong>{" "}
-              {reportForm.workOrderType}
-            </Typography>
-            <Typography variant="body1">
-              <strong>{tDetails("notes")}:</strong> {reportForm.notes}
-            </Typography>
+        {detailQuery.isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
           </Box>
-        )}
-        {!reportForm && (
+        ) : detailQuery.isError || !rf ? (
           <Typography textAlign="center" color="error">
             {tDetails("notFound")}
           </Typography>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            <Typography variant="body2">
+              <strong>{tDetails("formName")}:</strong> {rf.name}
+            </Typography>
+            <Typography variant="body2">
+              <strong>{tDetails("workOrderType")}:</strong> {workOrderLabel}
+            </Typography>
+            <Typography variant="body2">
+              <strong>{tDetails("question")}:</strong> {rf.question}
+            </Typography>
+            <Typography variant="body2">
+              <strong>{tDetails("value")}:</strong> {rf.value}
+            </Typography>
+            <Typography variant="body2">
+              <strong>{tDetails("numberOfAttachments")}:</strong>{" "}
+              {rf.number_of_attachments}
+            </Typography>
+            <Typography variant="body2">
+              <strong>{tDetails("notes")}:</strong>{" "}
+              {rf.notes ?? "—"}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{tDetails("createdAt")}:</strong> {rf.created_at}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>{tDetails("updatedAt")}:</strong> {rf.updated_at}
+            </Typography>
+          </Box>
         )}
       </DialogContent>
     </Dialog>
