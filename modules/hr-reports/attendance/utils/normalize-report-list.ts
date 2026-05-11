@@ -1,12 +1,19 @@
 import type { CreatedAttendanceReport } from "@/services/api/hr-reports/attendance";
 import { createInitialReportWizardPayload } from "../components/report-wizard/initial-payload";
 import type {
+  EmployeeScopeMode,
   ReportWizardPayload,
   ReportWizardStep1,
   ReportTypeId,
 } from "../components/report-wizard/types";
-import { STEP2_FILTER_UNSET } from "../components/report-wizard/constants-step2";
-import { REPORT_TYPE_OPTIONS } from "../components/report-wizard/constants";
+import {
+  STEP2_FILTER_UNSET,
+  STEP2_JOB_TITLE_VALUES,
+  STEP2_LOCATION_VALUES,
+  STEP2_MANAGEMENT_VALUES,
+} from "../components/report-wizard/constants-step2";
+import { REPORT_TYPE_OPTIONS } from "../components/report-wizard/constants-step1";
+import { derivedDateRangeFromLegacyStep1 } from "../components/report-wizard/step1-date-range";
 import { normalizeStep3EnumFields } from "./step3-enums";
 
 function mergeStep<T extends object>(base: T, patch: unknown): T {
@@ -31,9 +38,21 @@ function normalizeStep1Inbound(
   const reportTypeIds = merged.reportTypeIds
     .map((id) => LEGACY_REPORT_TYPE_ID[id] ?? id)
     .filter((id): id is ReportTypeId => ALLOWED.has(id as ReportTypeId));
+
+  const ranged = derivedDateRangeFromLegacyStep1(merged);
+  const y = Number.parseInt(ranged.dateFrom.slice(0, 4), 10);
+  const mo = Number.parseInt(ranged.dateFrom.slice(5, 7), 10);
+
   return {
     ...merged,
     reportTypeIds,
+    periodType: "range",
+    dateFrom: ranged.dateFrom,
+    dateTo: ranged.dateTo,
+    year: y,
+    month: mo,
+    week: null,
+    quarter: null,
   };
 }
 
@@ -42,10 +61,9 @@ function normalizeStep3Inbound(
   patch: unknown,
 ): ReportWizardPayload["step3"] {
   const merged = mergeStep(base, patch);
-  return normalizeStep3EnumFields({
-    ...merged,
-    attendanceDataTypeIds: [...merged.attendanceDataTypeIds],
-  });
+  return normalizeStep3EnumFields(
+    merged as Partial<ReportWizardPayload["step3"]> & Record<string, unknown>,
+  );
 }
 
 function coerceStep2OptionalString(raw: unknown): string {
@@ -54,18 +72,99 @@ function coerceStep2OptionalString(raw: unknown): string {
   return s === "" ? STEP2_FILTER_UNSET : s;
 }
 
+const LEGACY_BRANCH_SLUGS = new Set<string>(STEP2_LOCATION_VALUES);
+const LEGACY_MANAGEMENT_SLUGS = new Set<string>(STEP2_MANAGEMENT_VALUES);
+const LEGACY_JOB_TITLE_SLUGS = new Set<string>(STEP2_JOB_TITLE_VALUES);
+
+function downgradeLegacySlug(
+  slug: string,
+  legacySlugs: Set<string>,
+): string {
+  if (slug !== STEP2_FILTER_UNSET && legacySlugs.has(slug)) {
+    return STEP2_FILTER_UNSET;
+  }
+  return slug;
+}
+
 function normalizeStep2Inbound(
   base: ReportWizardPayload["step2"],
   patch: unknown,
 ): ReportWizardPayload["step2"] {
-  const merged = mergeStep(base, patch);
+  type M = ReportWizardPayload["step2"] & {
+    location?: string;
+    management?: string;
+    jobTitle?: string;
+    employeeStatus?: string;
+    branch_id?: string;
+    management_id?: string;
+    job_title?: string;
+    employee_user_ids?: unknown;
+  };
+  const merged = mergeStep(base, patch) as M;
+
+  const branchId = downgradeLegacySlug(
+    coerceStep2OptionalString(
+      merged.branchId ?? merged.branch_id ?? merged.location,
+    ),
+    LEGACY_BRANCH_SLUGS,
+  );
+
+  const managementId = downgradeLegacySlug(
+    coerceStep2OptionalString(
+      merged.managementId ??
+        merged.management_id ??
+        merged.management,
+    ),
+    LEGACY_MANAGEMENT_SLUGS,
+  );
+
+  const jobTitleId = downgradeLegacySlug(
+    coerceStep2OptionalString(
+      merged.jobTitleId ?? merged.job_title ?? merged.jobTitle,
+    ),
+    LEGACY_JOB_TITLE_SLUGS,
+  );
+
+  let employeeScope: EmployeeScopeMode = "all";
+  if (merged.employeeScope === "select_employees") {
+    employeeScope = "select_employees";
+  } else if (merged.employeeScope === "all") {
+    employeeScope = "all";
+  } else if (
+    typeof merged.employeeStatus === "string" &&
+    merged.employeeStatus !== "all"
+  ) {
+    employeeScope = "select_employees";
+  }
+
+  const rawIds = merged.employeeUserIds ?? merged.employee_user_ids;
+  const employeeUserIds = Array.isArray(rawIds)
+    ? rawIds.map((x) => String(x))
+    : [];
+
+  const gender =
+    typeof merged.gender === "string" && merged.gender.trim() !== ""
+      ? merged.gender
+      : "all";
+
   return {
-    ...merged,
-    location: coerceStep2OptionalString(merged.location),
-    management: coerceStep2OptionalString(merged.management),
+    employeeScope,
+    employeeUserIds,
+    branchId,
+    managementId,
+    jobTitleId,
     department: coerceStep2OptionalString(merged.department),
-    jobTitle: coerceStep2OptionalString(merged.jobTitle),
     nationality: coerceStep2OptionalString(merged.nationality),
+    gender,
+    contractTypeIds: [...merged.contractTypeIds],
+    branchName:
+      typeof merged.branchName === "string" ? merged.branchName : undefined,
+    managementName:
+      typeof merged.managementName === "string"
+        ? merged.managementName
+        : undefined,
+    jobTitleName:
+      typeof merged.jobTitleName === "string" ? merged.jobTitleName : undefined,
   };
 }
 
@@ -78,8 +177,6 @@ export function configToPayload(config: unknown): ReportWizardPayload {
     step1: normalizeStep1Inbound(base.step1, c.step1),
     step2: normalizeStep2Inbound(base.step2, c.step2),
     step3: normalizeStep3Inbound(base.step3, c.step3),
-    step4: mergeStep(base.step4, c.step4),
-    step5: mergeStep(base.step5, c.step5),
   };
 }
 

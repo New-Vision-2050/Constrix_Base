@@ -58,8 +58,8 @@ export default function AttendanceReportTable() {
   const tBranch = useTranslations(
     "HRReports.attendanceReport.wizard.employeesData.branches",
   );
-  const tFilters = useTranslations(
-    "HRReports.attendanceReport.wizard.filtersOptions",
+  const tAttendanceData = useTranslations(
+    "HRReports.attendanceReport.wizard.attendanceData",
   );
   const tReview = useTranslations(
     "HRReports.attendanceReport.wizard.reviewScreen",
@@ -87,10 +87,10 @@ export default function AttendanceReportTable() {
       month: tMonth,
       employeesData: tEmp,
       branches: tBranch,
-      filtersOptions: tFilters,
+      attendanceData: tAttendanceData,
       reviewScreen: tReview,
     }),
-    [tWizard, tRt, tMonth, tEmp, tBranch, tFilters, tReview],
+    [tWizard, tRt, tMonth, tEmp, tBranch, tAttendanceData, tReview],
   );
 
   const displayRows = useMemo((): DisplayRow[] => {
@@ -280,7 +280,7 @@ export default function AttendanceReportTable() {
           <Chip
             size="small"
             label={row.summary.emailLabel}
-            color={row.payload.step5.autoEmail ? "success" : "default"}
+            color="default"
             variant={theme.palette.mode === "dark" ? "outlined" : "filled"}
             sx={{ fontWeight: 600 }}
           />

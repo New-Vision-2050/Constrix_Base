@@ -168,6 +168,8 @@ export const hrReportsMessages = new MessagesGroup({
         "ما نوع التقرير المطلوب؟",
       ),
       sectionPeriod: _m("Report time period", "الفترة الزمنية للتقرير"),
+      periodDateFrom: _m("From", "من"),
+      periodDateTo: _m("To", "إلى"),
       sectionOutput: _m(
         "Report shape and output format",
         "شكل التقرير وتنسيق الإخراج",
@@ -261,8 +263,8 @@ export const hrReportsMessages = new MessagesGroup({
           "مكونات الراتب المختارة",
         ),
         footerHint: _m(
-          "The report will be generated and sent automatically to the emails you specified when you click Create report.",
-          "سيتم إنشاء التقرير وإرساله تلقائياً إلى البريد المحدد فور النقر على «إنشاء التقرير».",
+          "Review the summary and click «Create report now» when you're ready.",
+          "راجع الملخص ثم انقر «إنشاء التقرير الآن» عند الجاهزية.",
         ),
         btnCreateNow: _m(
           "Create report now",
@@ -275,6 +277,7 @@ export const hrReportsMessages = new MessagesGroup({
         enabled: _m("Enabled", "مفعل"),
         disabled: _m("Disabled", "غير مفعل"),
         noneSelected: _m("None selected", "لم يتم الاختيار"),
+        notApplicable: _m("Not applicable", "لا ينطبق"),
       }),
       reportTypes: new MessagesGroup({
         attendance_absence: _m(
@@ -328,6 +331,20 @@ export const hrReportsMessages = new MessagesGroup({
         fieldGender: _m("Gender", "الجنس"),
         filterNotSet: _m("No filter", "بدون تصفية"),
         statusAll: _m("All", "الكل"),
+        scopeSelectEmployees: _m(
+          "Select employee(s)",
+          "اختيار موظف / موظفين",
+        ),
+        scopeSelectEmployeesSummary: _m(
+          "Selected employees ({count})",
+          "موظفون محددون ({count})",
+        ),
+        employeePickerLabel: _m("Employees", "الموظفون"),
+        employeePickerHintBranch: _m(
+          "Choose a branch above to load employees for that branch.",
+          "اختر الفرع أعلاه لتحميل قائمة الموظفين.",
+        ),
+        employeePickerEmpty: _m("No employees found for this branch.", "لا يوجد موظفون لهذا الفرع."),
         statusActive: _m("Active only", "نشط فقط"),
         statusInactive: _m("Inactive", "غير نشط"),
         statusOnLeave: _m("On leave", "في إجازة"),
@@ -385,6 +402,12 @@ export const hrReportsMessages = new MessagesGroup({
           "Required attendance data types",
           "نوع بيانات الحضور المطلوبة",
         ),
+        sectionDisplayModeTitle: _m("Display mode", "وضع العرض"),
+        displayModeEmployeePerPage: _m(
+          "Show each employee on a separate page",
+          "عرض كل موظف بصفحة",
+        ),
+        displayModeByDay: _m("Display by day", "عرض باليوم"),
         section2Title: _m(
           "Filter by attendance pattern",
           "تصفية حسب نمط الحضور",

@@ -47,11 +47,8 @@ export default function WizardStepReview({
   const tAttTypes = useTranslations(
     "HRReports.attendanceReport.wizard.attendanceData.dataTypes",
   );
-  const tSalComp = useTranslations(
-    "HRReports.attendanceReport.wizard.salaryData.salaryComponents",
-  );
-  const tFilters = useTranslations(
-    "HRReports.attendanceReport.wizard.filtersOptions",
+  const tAttendanceData = useTranslations(
+    "HRReports.attendanceReport.wizard.attendanceData",
   );
 
   const summary = useMemo(
@@ -62,10 +59,10 @@ export default function WizardStepReview({
         month: tMonth,
         employeesData: tEmp,
         branches: tBranch,
-        filtersOptions: tFilters,
+        attendanceData: tAttendanceData,
         reviewScreen: tReview,
       }),
-    [payload, t, tRt, tMonth, tEmp, tBranch, tFilters, tReview],
+    [payload, t, tRt, tMonth, tEmp, tBranch, tAttendanceData, tReview],
   );
 
   const {
@@ -77,10 +74,10 @@ export default function WizardStepReview({
     languageLabel,
     emailLabel,
     sortingLabel,
+    displayModeLabel,
   } = summary;
 
   const attendanceTags = payload.step3.attendanceDataTypeIds;
-  const salaryTags = payload.step4.salaryComponentIds;
 
   const busy = creatingReport || savingTemplate;
 
@@ -102,6 +99,10 @@ export default function WizardStepReview({
         <SummaryCell label={tReview("labelLanguage")} value={languageLabel} />
         <SummaryCell label={tReview("labelEmailEnabled")} value={emailLabel} />
         <SummaryCell label={tReview("labelSorting")} value={sortingLabel} />
+        <SummaryCell
+          label={tAttendanceData("sectionDisplayModeTitle")}
+          value={displayModeLabel}
+        />
       </Grid>
 
       <Box>
@@ -120,28 +121,6 @@ export default function WizardStepReview({
                 size="small"
                 variant="outlined"
                 label={tAttTypes(id)}
-              />
-            ))}
-          </Stack>
-        )}
-      </Box>
-
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-          {tReview("tagsSalaryTitle")}
-        </Typography>
-        {!salaryTags.length ? (
-          <Typography variant="body2" color="text.secondary">
-            {tReview("noneSelected")}
-          </Typography>
-        ) : (
-          <Stack direction="row" flexWrap="wrap" useFlexGap gap={1}>
-            {salaryTags.map((id) => (
-              <Chip
-                key={id}
-                size="small"
-                variant="outlined"
-                label={tSalComp(id)}
               />
             ))}
           </Stack>
