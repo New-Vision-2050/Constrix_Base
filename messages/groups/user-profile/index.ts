@@ -391,6 +391,12 @@ export const userProfileMessages = new MessagesGroup({
       email: _m("Email", "البريد الالكتروني"),
       changePhone: _m("Change Phone", "تغيير رقم الجوال"),
       changeEmail: _m("Change Email", "تغيير البريد الالكتروني"),
+      changeMobileNumber: _m("Change Mobile Number", "تغيير رقم الجوال"),
+      changeEmailAddress: _m("Change Email Address", "تغيير البريد الالكتروني"),
+      oldPhone: _m("Old Phone", "رقم الجوال القديم"),
+      newPhone: _m("New Phone", "رقم الجوال الجديد"),
+      oldEmail: _m("Old Email", "البريد الالكتروني القديم"),
+      newEmail: _m("New Email", "البريد الالكتروني الجديد"),
       phoneRequired: _m("Phone is required", "رقم الجوال مطلوب"),
       phoneInvalid: _m(
         "Please enter a valid phone number",
