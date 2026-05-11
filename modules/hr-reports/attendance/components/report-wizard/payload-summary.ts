@@ -1,5 +1,6 @@
 import type {
-  EmployeeStatusFilter,
+  EmployeeScopeMode,
+  ReportDisplayModeId,
   ReportWizardPayload,
   ReportWizardStep1,
 } from "./types";
@@ -28,9 +29,12 @@ export type WizardPayloadSummaryTranslators = {
   ) => string;
   reportTypes: (key: string) => string;
   month: (key: string) => string;
-  employeesData: (key: string) => string;
+  employeesData: (
+    key: string,
+    values?: Record<string, string | number | boolean | Date>,
+  ) => string;
   branches: (key: string) => string;
-  filtersOptions: (key: string) => string;
+  attendanceData: (key: string) => string;
   reviewScreen: (key: string) => string;
 };
 
@@ -41,8 +45,10 @@ export type WizardPayloadSummaryLabels = {
   branchLabel: string;
   exportLabel: string;
   languageLabel: string;
+  /** Payroll / scheduling steps are omitted from this flow. */
   emailLabel: string;
   sortingLabel: string;
+  displayModeLabel: string;
 };
 
 export function formatWizardPeriod(
@@ -52,6 +58,8 @@ export function formatWizardPeriod(
 ): string {
   const { periodType, year, month } = step1;
   switch (periodType) {
+    case "range":
+      return `${step1.dateFrom} – ${step1.dateTo}`;
     case "monthly":
       return `${tMonth(MONTH_KEYS[month - 1])} ${year}`;
     case "yearly":
@@ -67,31 +75,29 @@ export function formatWizardPeriod(
   }
 }
 
-function employeeStatusLabel(
-  status: EmployeeStatusFilter,
+function employeeScopeSummaryLabel(
+  scope: EmployeeScopeMode,
+  selectedCount: number,
   tEmp: WizardPayloadSummaryTranslators["employeesData"],
 ): string {
-  switch (status) {
-    case "all":
-      return tEmp("statusAll");
-    case "active":
-      return tEmp("statusActive");
-    case "inactive":
-      return tEmp("statusInactive");
-    case "on_leave":
-      return tEmp("statusOnLeave");
-    case "dismissed":
-      return tEmp("statusDismissed");
-    default:
-      return status;
-  }
+  if (scope === "all") return tEmp("statusAll");
+  return tEmp("scopeSelectEmployeesSummary", { count: selectedCount });
+}
+
+function displayModeSummaryLabel(
+  mode: ReportDisplayModeId,
+  tAtt: WizardPayloadSummaryTranslators["attendanceData"],
+): string {
+  return mode === "by_day"
+    ? tAtt("displayModeByDay")
+    : tAtt("displayModeEmployeePerPage");
 }
 
 export function buildWizardPayloadSummary(
   payload: ReportWizardPayload,
   tr: WizardPayloadSummaryTranslators,
 ): WizardPayloadSummaryLabels {
-  const { step1, step2, step5 } = payload;
+  const { step1, step2, step3 } = payload;
 
   const reportTypesLabel =
     step1.reportTypeIds.length === 0
@@ -110,27 +116,31 @@ export function buildWizardPayloadSummary(
       ? tr.wizard("langAr")
       : tr.wizard("langEn");
 
-  const emailLabel = step5.autoEmail
-    ? tr.reviewScreen("enabled")
-    : tr.reviewScreen("disabled");
-
-  const sortingLabel = `${tr.filtersOptions(
-    `mainSortValues.${step5.mainSortBy}`,
-  )} (${tr.filtersOptions(`sortDirections.${step5.sortDirection}`)})`;
+  const emailLabel = tr.reviewScreen("notApplicable");
+  const sortingLabel = tr.reviewScreen("notApplicable");
+  const displayModeLabel = displayModeSummaryLabel(
+    step3.displayMode,
+    tr.attendanceData,
+  );
 
   const branchLabel =
-    step2.location.trim() === "" || step2.location === STEP2_FILTER_UNSET
+    step2.branchId.trim() === "" || step2.branchId === STEP2_FILTER_UNSET
       ? tr.reviewScreen("noneSelected")
-      : tr.branches(step2.location);
+      : (step2.branchName?.trim() || step2.branchId);
 
   return {
     periodLabel: formatWizardPeriod(step1, tr.wizard, tr.month),
     reportTypesLabel,
-    employeeStatusLabel: employeeStatusLabel(step2.employeeStatus, tr.employeesData),
+    employeeStatusLabel: employeeScopeSummaryLabel(
+      step2.employeeScope,
+      step2.employeeUserIds.length,
+      tr.employeesData,
+    ),
     branchLabel,
     exportLabel,
     languageLabel,
     emailLabel,
     sortingLabel,
+    displayModeLabel,
   };
 }
