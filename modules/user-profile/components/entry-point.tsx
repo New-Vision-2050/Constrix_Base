@@ -25,7 +25,7 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
   const photoUserId = profileUserId ?? userId;
   
   const { userContactData } = useConnectionDataCxt();
-  const { userContractData } =
+  const { userEmploymentContractData } =
   useFunctionalContractualCxt();
   const subItems: ProfileSubItem[] = [
     {
@@ -46,7 +46,7 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
     {
       label: t("appointmentDate"),
       icon: <CalendarRangeIcon />,
-      value: userContractData?.start_date ?? "-",
+      value: userEmploymentContractData?.start_date ?? "-",
     },
   ];
 
