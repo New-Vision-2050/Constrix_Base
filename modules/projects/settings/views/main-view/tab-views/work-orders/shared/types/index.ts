@@ -44,7 +44,7 @@ export type Action = ProjectSharingProcedure;
 export interface ProjectSharingReportForm {
   id: number;
   project_type_id: number;
-  project_sharing_work_order_id: number;
+  order_permit_procedure_id: number;
   name: string;
   question: string;
   value: string;
@@ -71,11 +71,24 @@ export interface ProjectSharingTask {
 export type Task = ProjectSharingTask;
 
 /** Task setting link (API: project-sharing-tasks-setting) */
+export interface ProjectSharingTaskSettingOrderPermit {
+  id: number;
+  code: string;
+  description: string;
+  type: string;
+}
+
+export interface ProjectSharingTaskSettingOrderPermitTask {
+  id: number;
+  code: string;
+  name: string;
+}
+
 export interface ProjectSharingTaskSetting {
   id: number;
   project_type_id: number;
-  project_sharing_work_order_id: number;
-  project_sharing_task_id: number;
+  order_permit: ProjectSharingTaskSettingOrderPermit;
+  order_permit_task: ProjectSharingTaskSettingOrderPermitTask;
   created_at: string;
   updated_at: string;
 }

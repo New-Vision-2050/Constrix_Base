@@ -1,7 +1,7 @@
 export interface ReportFormPayload {
   id: number;
   project_type_id: number;
-  project_sharing_work_order_id: number;
+  order_permit_procedure_id: number;
   name: string;
   question: string;
   value: string;

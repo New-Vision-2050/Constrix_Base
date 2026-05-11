@@ -12,18 +12,18 @@ import type {
 export const ProjectSharingDepartmentApi = {
   list: (projectTypeId: number | string) =>
     baseApi.get<ListProjectSharingDepartmentsResponse>(
-      "project-sharing-department",
+      "order-permit-departments",
       { params: { project_type_id: projectTypeId } },
     ),
 
   show: (departmentId: number | string) =>
     baseApi.get<GetProjectSharingDepartmentResponse>(
-      `project-sharing-department/${departmentId}`,
+      `order-permit-departments/${departmentId}`,
     ),
 
   create: (body: CreateProjectSharingDepartmentPayload) =>
     baseApi.post<MutateProjectSharingDepartmentResponse>(
-      "project-sharing-department",
+      "order-permit-departments",
       body,
     ),
 
@@ -32,12 +32,12 @@ export const ProjectSharingDepartmentApi = {
     body: UpdateProjectSharingDepartmentPayload,
   ) =>
     baseApi.put<MutateProjectSharingDepartmentResponse>(
-      `project-sharing-department/${departmentId}`,
+      `order-permit-departments/${departmentId}`,
       body,
     ),
 
   delete: (departmentId: number | string) =>
     baseApi.delete<MutateProjectSharingDepartmentResponse>(
-      `project-sharing-department/${departmentId}`,
+      `order-permit-departments/${departmentId}`,
     ),
 };

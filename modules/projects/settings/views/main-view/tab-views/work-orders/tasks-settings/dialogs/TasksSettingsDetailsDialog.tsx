@@ -15,12 +15,8 @@ import type { DetailsDialogProps } from "../../shared/types";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectSharingTaskSettingApi } from "@/services/api/projects/project-sharing-tasks-setting";
-import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
-import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
 
 const TASK_SETTING_DETAIL_KEY = "project-sharing-tasks-setting";
-const WORK_ORDERS_QUERY_KEY = "project-sharing-work-orders";
-const TASKS_QUERY_KEY = "project-sharing-tasks";
 
 export type TasksSettingsDetailsDialogProps = DetailsDialogProps & {
   projectTypeId: number;
@@ -30,7 +26,6 @@ const TasksSettingsDetailsDialog = ({
   open,
   setOpenModal,
   rowId,
-  projectTypeId,
 }: TasksSettingsDetailsDialogProps) => {
   const tDetails = useTranslations("projectSettings.tasksSettings.details");
   const handleClose = () => setOpenModal(false);
@@ -44,49 +39,19 @@ const TasksSettingsDetailsDialog = ({
     enabled: open && Boolean(rowId),
   });
 
-  const { data: workOrders = [] } = useQuery({
-    queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
-    queryFn: async () => {
-      const res = await ProjectSharingWorkOrdersApi.list(projectTypeId);
-      return res.data.payload ?? [];
-    },
-    enabled:
-      open &&
-      Boolean(rowId) &&
-      Number.isFinite(projectTypeId) &&
-      projectTypeId > 0,
-  });
-
-  const { data: tasksList = [] } = useQuery({
-    queryKey: [TASKS_QUERY_KEY, projectTypeId],
-    queryFn: async () => {
-      const res = await ProjectSharingTasksApi.list(projectTypeId);
-      return res.data.payload ?? [];
-    },
-    enabled:
-      open &&
-      Boolean(rowId) &&
-      Number.isFinite(projectTypeId) &&
-      projectTypeId > 0,
-  });
-
   const setting = detailQuery.data;
 
   const workOrderLabel = useMemo(() => {
     if (!setting) return "";
-    const wo = workOrders.find(
-      (w) => w.id === setting.project_sharing_work_order_id,
-    );
-    return wo ? `${wo.code} — ${wo.type}` : String(setting.project_sharing_work_order_id);
-  }, [setting, workOrders]);
+    const wo = setting.order_permit;
+    return wo ? `${wo.type}` : "—";
+  }, [setting]);
 
   const taskLabel = useMemo(() => {
     if (!setting) return "";
-    const tk = tasksList.find((t) => t.id === setting.project_sharing_task_id);
-    return tk
-      ? `${tk.code} — ${tk.name}`
-      : String(setting.project_sharing_task_id);
-  }, [setting, tasksList]);
+    const tk = setting.order_permit_task;
+    return tk ? `${tk.name}` : "—";
+  }, [setting]);
 
   return (
     <Dialog

@@ -68,7 +68,11 @@ export default function ActionsView({
     initialLimit: 10,
   });
 
-  const { data: rows = [], isLoading, isError } = useQuery({
+  const {
+    data: rows = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: [PROCEDURES_QUERY_KEY, projectTypeId],
     queryFn: async () => {
       const res = await ProjectSharingProcedureApi.list(projectTypeId);

@@ -85,7 +85,7 @@ export default function AddReportFormDialog({
     mutationFn: (values: ReportFormCreateValues) =>
       ReportFormsApi.create({
         project_type_id: projectTypeId,
-        project_sharing_work_order_id: Number(values.projectSharingWorkOrderId),
+        order_permit_procedure_id: Number(values.projectSharingWorkOrderId),
         name: values.name,
         question: values.question,
         value: values.value,

@@ -1,5 +1,8 @@
 import { baseApi } from "@/config/axios/instances/base";
-import type { CreateReportFormPayload, UpdateReportFormPayload } from "./types/params";
+import type {
+  CreateReportFormPayload,
+  UpdateReportFormPayload,
+} from "./types/params";
 import type {
   GetReportFormResponse,
   ListReportFormsResponse,
@@ -8,19 +11,26 @@ import type {
 
 export const ReportFormsApi = {
   list: (projectTypeId: number | string) =>
-    baseApi.get<ListReportFormsResponse>("report-forms", {
+    baseApi.get<ListReportFormsResponse>("order-permit-report-forms", {
       params: { project_type_id: projectTypeId },
     }),
 
   show: (reportFormId: number | string) =>
-    baseApi.get<GetReportFormResponse>(`report-forms/${reportFormId}`),
+    baseApi.get<GetReportFormResponse>(
+      `order-permit-report-forms/${reportFormId}`,
+    ),
 
   create: (body: CreateReportFormPayload) =>
-    baseApi.post<MutateReportFormResponse>("report-forms", body),
+    baseApi.post<MutateReportFormResponse>("order-permit-report-forms", body),
 
   update: (reportFormId: number | string, body: UpdateReportFormPayload) =>
-    baseApi.put<MutateReportFormResponse>(`report-forms/${reportFormId}`, body),
+    baseApi.put<MutateReportFormResponse>(
+      `order-permit-report-forms/${reportFormId}`,
+      body,
+    ),
 
   delete: (reportFormId: number | string) =>
-    baseApi.delete<MutateReportFormResponse>(`report-forms/${reportFormId}`),
+    baseApi.delete<MutateReportFormResponse>(
+      `order-permit-report-forms/${reportFormId}`,
+    ),
 };

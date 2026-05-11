@@ -88,7 +88,11 @@ export default function ReportsFormsView({
     return m;
   }, [workOrders]);
 
-  const { data: rows = [], isLoading, isError } = useQuery({
+  const {
+    data: rows = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: [REPORT_FORMS_QUERY_KEY, projectTypeId],
     queryFn: async () => {
       const res = await ReportFormsApi.list(projectTypeId);
@@ -101,15 +105,8 @@ export default function ReportsFormsView({
     const q = params.search.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter((r) => {
-      const woCode =
-        workOrderById.get(r.project_sharing_work_order_id)?.code ?? "";
-      const hay = [
-        r.name,
-        r.question,
-        r.value,
-        r.notes ?? "",
-        woCode,
-      ]
+      const woCode = workOrderById.get(r.order_permit_procedure_id)?.code ?? "";
+      const hay = [r.name, r.question, r.value, r.notes ?? "", woCode]
         .join(" ")
         .toLowerCase();
       return hay.includes(q);
@@ -139,7 +136,7 @@ export default function ReportsFormsView({
       sortable: false,
       render: (row: ProjectSharingReportForm) => (
         <span className="p-2 text-sm">
-          {workOrderById.get(row.project_sharing_work_order_id)?.code ?? "—"}
+          {workOrderById.get(row.order_permit_procedure_id)?.code ?? "—"}
         </span>
       ),
     },

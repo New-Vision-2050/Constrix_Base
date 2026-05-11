@@ -50,10 +50,7 @@ export default function AddTasksSettingsDialog({
   const t = useTranslations("projectSettings.tasksSettings");
   const tForm = useTranslations("projectSettings.tasksSettings.form");
 
-  const schema = useMemo(
-    () => createTaskSettingLinkFormSchema(tForm),
-    [tForm],
-  );
+  const schema = useMemo(() => createTaskSettingLinkFormSchema(tForm), [tForm]);
 
   const form = useForm<TaskSettingLinkFormValues>({
     resolver: zodResolver(schema),
@@ -95,8 +92,8 @@ export default function AddTasksSettingsDialog({
     mutationFn: (values: TaskSettingLinkFormValues) =>
       ProjectSharingTaskSettingApi.create({
         project_type_id: projectTypeId,
-        project_sharing_work_order_id: Number(values.projectSharingWorkOrderId),
-        project_sharing_task_id: Number(values.projectSharingTaskId),
+        order_permit_id: Number(values.projectSharingWorkOrderId),
+        order_permit_task_id: Number(values.projectSharingTaskId),
       }),
     onSuccess: () => {
       toast.success(tForm("createSuccess"));
@@ -172,7 +169,7 @@ export default function AddTasksSettingsDialog({
               </MenuItem>
               {workOrders.map((wo) => (
                 <MenuItem key={wo.id} value={String(wo.id)}>
-                  {wo.code} — {wo.type}
+                  {wo.type}
                 </MenuItem>
               ))}
             </RhfSelect>
@@ -187,7 +184,7 @@ export default function AddTasksSettingsDialog({
               </MenuItem>
               {tasks.map((task) => (
                 <MenuItem key={task.id} value={String(task.id)}>
-                  {task.code} — {task.name}
+                  {task.name}
                 </MenuItem>
               ))}
             </RhfSelect>

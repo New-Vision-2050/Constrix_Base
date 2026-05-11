@@ -59,8 +59,10 @@ const ReportFormDetailsDialog = ({
 
   const workOrderLabel = useMemo(() => {
     if (!rf) return "";
-    const wo = workOrders.find((w) => w.id === rf.project_sharing_work_order_id);
-    return wo ? `${wo.code}${wo.description ? ` — ${wo.description}` : ""}` : "—";
+    const wo = workOrders.find((w) => w.id === rf.order_permit_procedure_id);
+    return wo
+      ? `${wo.code}${wo.description ? ` — ${wo.description}` : ""}`
+      : "—";
   }, [rf, workOrders]);
 
   return (
@@ -126,8 +128,7 @@ const ReportFormDetailsDialog = ({
               {rf.number_of_attachments}
             </Typography>
             <Typography variant="body2">
-              <strong>{tDetails("notes")}:</strong>{" "}
-              {rf.notes ?? "—"}
+              <strong>{tDetails("notes")}:</strong> {rf.notes ?? "—"}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               <strong>{tDetails("createdAt")}:</strong> {rf.created_at}

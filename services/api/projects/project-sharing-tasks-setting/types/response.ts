@@ -1,8 +1,21 @@
+export interface OrderPermit {
+  id: number;
+  code: string;
+  description: string;
+  type: string;
+}
+
+export interface OrderPermitTask {
+  id: number;
+  code: string;
+  name: string;
+}
+
 export interface ProjectSharingTaskSettingPayload {
   id: number;
   project_type_id: number;
-  project_sharing_work_order_id: number;
-  project_sharing_task_id: number;
+  order_permit: OrderPermit;
+  order_permit_task: OrderPermitTask;
   created_at: string;
   updated_at: string;
 }

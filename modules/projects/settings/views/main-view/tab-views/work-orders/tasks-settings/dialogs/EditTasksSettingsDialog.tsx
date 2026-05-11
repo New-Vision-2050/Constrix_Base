@@ -54,10 +54,7 @@ export default function EditTasksSettingsDialog({
   const t = useTranslations("projectSettings.tasksSettings");
   const tForm = useTranslations("projectSettings.tasksSettings.form");
 
-  const schema = useMemo(
-    () => createTaskSettingLinkFormSchema(tForm),
-    [tForm],
-  );
+  const schema = useMemo(() => createTaskSettingLinkFormSchema(tForm), [tForm]);
 
   const form = useForm<TaskSettingLinkFormValues>({
     resolver: zodResolver(schema),
@@ -105,8 +102,8 @@ export default function EditTasksSettingsDialog({
     const p = detailQuery.data;
     if (!p) return;
     reset({
-      projectSharingWorkOrderId: String(p.project_sharing_work_order_id),
-      projectSharingTaskId: String(p.project_sharing_task_id),
+      projectSharingWorkOrderId: String(p.order_permit?.id ?? ""),
+      projectSharingTaskId: String(p.order_permit_task?.id ?? ""),
     });
   }, [detailQuery.data, reset]);
 
@@ -123,8 +120,8 @@ export default function EditTasksSettingsDialog({
   const updateMutation = useMutation({
     mutationFn: (values: TaskSettingLinkFormValues) =>
       ProjectSharingTaskSettingApi.update(taskSettingId!, {
-        project_sharing_work_order_id: Number(values.projectSharingWorkOrderId),
-        project_sharing_task_id: Number(values.projectSharingTaskId),
+        order_permit_id: Number(values.projectSharingWorkOrderId),
+        order_permit_task_id: Number(values.projectSharingTaskId),
       }),
     onSuccess: () => {
       toast.success(tForm("updateSuccess"));

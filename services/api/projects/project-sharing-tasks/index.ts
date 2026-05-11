@@ -11,29 +11,24 @@ import type {
 
 export const ProjectSharingTasksApi = {
   list: (projectTypeId: number | string) =>
-    baseApi.get<ListProjectSharingTasksResponse>("project-sharing-tasks", {
+    baseApi.get<ListProjectSharingTasksResponse>("order-permit-tasks", {
       params: { project_type_id: projectTypeId },
     }),
 
   show: (taskId: number | string) =>
-    baseApi.get<GetProjectSharingTaskResponse>(
-      `project-sharing-tasks/${taskId}`,
-    ),
+    baseApi.get<GetProjectSharingTaskResponse>(`order-permit-tasks/${taskId}`),
 
   create: (body: CreateProjectSharingTaskPayload) =>
-    baseApi.post<MutateProjectSharingTaskResponse>(
-      "project-sharing-tasks",
-      body,
-    ),
+    baseApi.post<MutateProjectSharingTaskResponse>("order-permit-tasks", body),
 
   update: (taskId: number | string, body: UpdateProjectSharingTaskPayload) =>
     baseApi.put<MutateProjectSharingTaskResponse>(
-      `project-sharing-tasks/${taskId}`,
+      `order-permit-tasks/${taskId}`,
       body,
     ),
 
   delete: (taskId: number | string) =>
     baseApi.delete<MutateProjectSharingTaskResponse>(
-      `project-sharing-tasks/${taskId}`,
+      `order-permit-tasks/${taskId}`,
     ),
 };

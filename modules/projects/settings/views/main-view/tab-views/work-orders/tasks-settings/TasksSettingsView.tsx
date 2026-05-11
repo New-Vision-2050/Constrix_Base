@@ -11,17 +11,12 @@ import type { ProjectSharingTaskSetting } from "../shared/types";
 import AddTasksSettingsDialog from "./dialogs/AddTasksSettingsDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProjectSharingTaskSettingApi } from "@/services/api/projects/project-sharing-tasks-setting";
-import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
-import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
 import DeleteButton from "@/components/shared/delete-button";
 
 const TASK_SETTINGS_QUERY_KEY = "project-sharing-tasks-setting";
-const WORK_ORDERS_QUERY_KEY = "project-sharing-work-orders";
-const TASKS_QUERY_KEY = "project-sharing-tasks";
 
-const TasksSettingsTable = HeadlessTableLayout<ProjectSharingTaskSetting>(
-  "psts",
-);
+const TasksSettingsTable =
+  HeadlessTableLayout<ProjectSharingTaskSetting>("psts");
 
 export default function TasksSettingsView({
   setActiveCard,
@@ -74,7 +69,11 @@ export default function TasksSettingsView({
     initialLimit: 10,
   });
 
-  const { data: rows = [], isLoading, isError } = useQuery({
+  const {
+    data: rows = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: [TASK_SETTINGS_QUERY_KEY, projectTypeId],
     queryFn: async () => {
       const res = await ProjectSharingTaskSettingApi.list(projectTypeId);
@@ -83,50 +82,14 @@ export default function TasksSettingsView({
     enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
   });
 
-  const { data: workOrders = [] } = useQuery({
-    queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
-    queryFn: async () => {
-      const res = await ProjectSharingWorkOrdersApi.list(projectTypeId);
-      return res.data.payload ?? [];
-    },
-    enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
-  });
-
-  const { data: tasksList = [] } = useQuery({
-    queryKey: [TASKS_QUERY_KEY, projectTypeId],
-    queryFn: async () => {
-      const res = await ProjectSharingTasksApi.list(projectTypeId);
-      return res.data.payload ?? [];
-    },
-    enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
-  });
-
-  const workOrderById = useMemo(() => {
-    const m = new Map<number, (typeof workOrders)[number]>();
-    for (const wo of workOrders) {
-      m.set(wo.id, wo);
-    }
-    return m;
-  }, [workOrders]);
-
-  const taskById = useMemo(() => {
-    const m = new Map<number, (typeof tasksList)[number]>();
-    for (const tk of tasksList) {
-      m.set(tk.id, tk);
-    }
-    return m;
-  }, [tasksList]);
-
   const rowWorkOrderLabel = (row: ProjectSharingTaskSetting) => {
-    const wo = workOrderById.get(row.project_sharing_work_order_id);
-    return wo
-      ? `${wo.code} — ${wo.type}`
-      : String(row.project_sharing_work_order_id);
+    const wo = row.order_permit;
+    return wo ? `${wo.type}` : "—";
   };
 
   const rowTaskLabel = (row: ProjectSharingTaskSetting) => {
-    const tk = taskById.get(row.project_sharing_task_id);
-    return tk ? `${tk.code} — ${tk.name}` : String(row.project_sharing_task_id);
+    const tk = row.order_permit_task;
+    return tk ? `${tk.name}` : "—";
   };
 
   const filteredRows = useMemo(() => {
@@ -135,14 +98,9 @@ export default function TasksSettingsView({
     return rows.filter((r) => {
       const wo = rowWorkOrderLabel(r).toLowerCase();
       const tk = rowTaskLabel(r).toLowerCase();
-      return (
-        wo.includes(q) ||
-        tk.includes(q) ||
-        String(r.project_sharing_work_order_id).includes(q) ||
-        String(r.project_sharing_task_id).includes(q)
-      );
+      return wo.includes(q) || tk.includes(q);
     });
-  }, [rows, params.search, workOrderById, taskById]);
+  }, [rows, params.search]);
 
   const pageData = useMemo(() => {
     const start = (params.page - 1) * params.limit;

@@ -12,32 +12,29 @@ import type {
 export const ProjectSharingTaskSettingApi = {
   list: (projectTypeId: number | string) =>
     baseApi.get<ListProjectSharingTaskSettingsResponse>(
-      "project-sharing-tasks-setting",
+      "order-permit-tasks-setting",
       { params: { project_type_id: projectTypeId } },
     ),
 
   show: (id: number | string) =>
     baseApi.get<GetProjectSharingTaskSettingResponse>(
-      `project-sharing-tasks-setting/${id}`,
+      `order-permit-tasks-setting/${id}`,
     ),
 
   create: (body: CreateProjectSharingTaskSettingPayload) =>
     baseApi.post<MutateProjectSharingTaskSettingResponse>(
-      "project-sharing-tasks-setting",
+      "order-permit-tasks-setting",
       body,
     ),
 
-  update: (
-    id: number | string,
-    body: UpdateProjectSharingTaskSettingPayload,
-  ) =>
+  update: (id: number | string, body: UpdateProjectSharingTaskSettingPayload) =>
     baseApi.put<MutateProjectSharingTaskSettingResponse>(
-      `project-sharing-tasks-setting/${id}`,
+      `order-permit-tasks-setting/${id}`,
       body,
     ),
 
   delete: (id: number | string) =>
     baseApi.delete<MutateProjectSharingTaskSettingResponse>(
-      `project-sharing-tasks-setting/${id}`,
+      `order-permit-tasks-setting/${id}`,
     ),
 };

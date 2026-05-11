@@ -12,18 +12,18 @@ import type {
 export const ProjectSharingProcedureApi = {
   list: (projectTypeId: number | string) =>
     baseApi.get<ListProjectSharingProceduresResponse>(
-      "project-sharing-procedure",
+      "order-permit-procedures",
       { params: { project_type_id: projectTypeId } },
     ),
 
   show: (procedureId: number | string) =>
     baseApi.get<GetProjectSharingProcedureResponse>(
-      `project-sharing-procedure/${procedureId}`,
+      `order-permit-procedures/${procedureId}`,
     ),
 
   create: (body: CreateProjectSharingProcedurePayload) =>
     baseApi.post<MutateProjectSharingProcedureResponse>(
-      "project-sharing-procedure",
+      "order-permit-procedures",
       body,
     ),
 
@@ -32,12 +32,12 @@ export const ProjectSharingProcedureApi = {
     body: UpdateProjectSharingProcedurePayload,
   ) =>
     baseApi.put<MutateProjectSharingProcedureResponse>(
-      `project-sharing-procedure/${procedureId}`,
+      `order-permit-procedures/${procedureId}`,
       body,
     ),
 
   delete: (procedureId: number | string) =>
     baseApi.delete<MutateProjectSharingProcedureResponse>(
-      `project-sharing-procedure/${procedureId}`,
+      `order-permit-procedures/${procedureId}`,
     ),
 };

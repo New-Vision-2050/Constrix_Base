@@ -11,33 +11,29 @@ import type {
 
 export const ProjectSharingWorkOrdersApi = {
   list: (projectTypeId: number | string) =>
-    baseApi.get<ListProjectSharingWorkOrdersResponse>(
-      "project-sharing-work-orders",
-      { params: { project_type_id: projectTypeId } },
-    ),
+    baseApi.get<ListProjectSharingWorkOrdersResponse>("/order-permits", {
+      params: { project_type_id: projectTypeId },
+    }),
 
   show: (workOrderId: number | string) =>
     baseApi.get<GetProjectSharingWorkOrderResponse>(
-      `project-sharing-work-orders/${workOrderId}`,
+      `order-permits/${workOrderId}`,
     ),
 
   create: (body: CreateProjectSharingWorkOrderPayload) =>
-    baseApi.post<MutateProjectSharingWorkOrderResponse>(
-      "project-sharing-work-orders",
-      body,
-    ),
+    baseApi.post<MutateProjectSharingWorkOrderResponse>("order-permits", body),
 
   update: (
     workOrderId: number | string,
     body: UpdateProjectSharingWorkOrderPayload,
   ) =>
     baseApi.put<MutateProjectSharingWorkOrderResponse>(
-      `project-sharing-work-orders/${workOrderId}`,
+      `order-permits/${workOrderId}`,
       body,
     ),
 
   delete: (workOrderId: number | string) =>
     baseApi.delete<MutateProjectSharingWorkOrderResponse>(
-      `project-sharing-work-orders/${workOrderId}`,
+      `order-permits/${workOrderId}`,
     ),
 };
