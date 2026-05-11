@@ -170,7 +170,10 @@ export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
         <TasksView setActiveCard={setActiveCard} projectTypeId={thirdLevelId} />
       )}
       {activeCard === "TASKS_SETTINGS" && (
-        <TasksSettingsView setActiveCard={setActiveCard} />
+        <TasksSettingsView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
     </Paper>
   );

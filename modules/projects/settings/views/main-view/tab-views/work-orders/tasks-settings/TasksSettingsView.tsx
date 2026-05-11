@@ -1,38 +1,68 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import type { CARDTYPE } from "../card-types";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { RowActions } from "../shared/RowActions";
 import EditTasksSettingsDialog from "./dialogs/EditTasksSettingsDialog";
 import TasksSettingsDetailsDialog from "./dialogs/TasksSettingsDetailsDialog";
-import type { TaskSetting } from "../shared/types";
+import type { ProjectSharingTaskSetting } from "../shared/types";
 import AddTasksSettingsDialog from "./dialogs/AddTasksSettingsDialog";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ProjectSharingTaskSettingApi } from "@/services/api/projects/project-sharing-tasks-setting";
+import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
+import { ProjectSharingTasksApi } from "@/services/api/projects/project-sharing-tasks";
+import DeleteButton from "@/components/shared/delete-button";
 
-const TasksSettingsTable = HeadlessTableLayout<TaskSetting>("psts");
+const TASK_SETTINGS_QUERY_KEY = "project-sharing-tasks-setting";
+const WORK_ORDERS_QUERY_KEY = "project-sharing-work-orders";
+const TASKS_QUERY_KEY = "project-sharing-tasks";
+
+const TasksSettingsTable = HeadlessTableLayout<ProjectSharingTaskSetting>(
+  "psts",
+);
 
 export default function TasksSettingsView({
   setActiveCard,
+  projectTypeId,
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
+  projectTypeId: number;
 }) {
   const t = useTranslations("projectSettings.tasksSettings");
   const tTable = useTranslations("projectSettings.tasksSettings.table");
+  const tLabels = useTranslations("labels");
+  const queryClient = useQueryClient();
 
   const [displayedRowId, setDisplayedRowId] = useState<string | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingSettingId, setDeletingSettingId] = useState<number | null>(
+    null,
+  );
+
+  const invalidateList = () =>
+    queryClient.invalidateQueries({
+      queryKey: [TASK_SETTINGS_QUERY_KEY, projectTypeId],
+    });
 
   const handleDisplay = (id: string) => {
     setDisplayedRowId(id);
     setOpenModal(true);
   };
+
   const handleEdit = (id: string) => {
     setEditingRowId(id);
     setEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setDeletingSettingId(Number(id));
+    setDeleteDialogOpen(true);
   };
 
   const handleAdd = () => {
@@ -44,52 +74,114 @@ export default function TasksSettingsView({
     initialLimit: 10,
   });
 
-  const tasksSettings = [
-    {
-      id: "ts1",
-      workOrderType: "نوع أمر العمل 1",
-      tasks: "مهمة أولى، مهمة ثانية",
+  const { data: rows = [], isLoading, isError } = useQuery({
+    queryKey: [TASK_SETTINGS_QUERY_KEY, projectTypeId],
+    queryFn: async () => {
+      const res = await ProjectSharingTaskSettingApi.list(projectTypeId);
+      return res.data.payload ?? [];
     },
-    {
-      id: "ts2",
-      workOrderType: "نوع أمر العمل 2",
-      tasks: "مهمة ثانية، مهمة ثالثة",
+    enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
+  });
+
+  const { data: workOrders = [] } = useQuery({
+    queryKey: [WORK_ORDERS_QUERY_KEY, projectTypeId],
+    queryFn: async () => {
+      const res = await ProjectSharingWorkOrdersApi.list(projectTypeId);
+      return res.data.payload ?? [];
     },
-    {
-      id: "ts3",
-      workOrderType: "نوع أمر العمل 3",
-      tasks: "مهمة أولى، مهمة رابعة",
+    enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
+  });
+
+  const { data: tasksList = [] } = useQuery({
+    queryKey: [TASKS_QUERY_KEY, projectTypeId],
+    queryFn: async () => {
+      const res = await ProjectSharingTasksApi.list(projectTypeId);
+      return res.data.payload ?? [];
     },
-  ];
+    enabled: Number.isFinite(projectTypeId) && projectTypeId > 0,
+  });
+
+  const workOrderById = useMemo(() => {
+    const m = new Map<number, (typeof workOrders)[number]>();
+    for (const wo of workOrders) {
+      m.set(wo.id, wo);
+    }
+    return m;
+  }, [workOrders]);
+
+  const taskById = useMemo(() => {
+    const m = new Map<number, (typeof tasksList)[number]>();
+    for (const tk of tasksList) {
+      m.set(tk.id, tk);
+    }
+    return m;
+  }, [tasksList]);
+
+  const rowWorkOrderLabel = (row: ProjectSharingTaskSetting) => {
+    const wo = workOrderById.get(row.project_sharing_work_order_id);
+    return wo
+      ? `${wo.code} — ${wo.type}`
+      : String(row.project_sharing_work_order_id);
+  };
+
+  const rowTaskLabel = (row: ProjectSharingTaskSetting) => {
+    const tk = taskById.get(row.project_sharing_task_id);
+    return tk ? `${tk.code} — ${tk.name}` : String(row.project_sharing_task_id);
+  };
+
+  const filteredRows = useMemo(() => {
+    const q = params.search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => {
+      const wo = rowWorkOrderLabel(r).toLowerCase();
+      const tk = rowTaskLabel(r).toLowerCase();
+      return (
+        wo.includes(q) ||
+        tk.includes(q) ||
+        String(r.project_sharing_work_order_id).includes(q) ||
+        String(r.project_sharing_task_id).includes(q)
+      );
+    });
+  }, [rows, params.search, workOrderById, taskById]);
+
+  const pageData = useMemo(() => {
+    const start = (params.page - 1) * params.limit;
+    return filteredRows.slice(start, start + params.limit);
+  }, [filteredRows, params.page, params.limit]);
+
+  const totalItems = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit) || 1);
 
   const columns = [
     {
       key: "workOrderType",
       name: tTable("workOrderType"),
       sortable: false,
-      render: (row: TaskSetting) => (
-        <span className="p-2 text-sm">{row.workOrderType}</span>
+      render: (row: ProjectSharingTaskSetting) => (
+        <span className="p-2 text-sm">{rowWorkOrderLabel(row)}</span>
       ),
     },
     {
       key: "tasks",
       name: tTable("tasks"),
       sortable: false,
-      render: (row: TaskSetting) => (
-        <span className="p-2 text-sm">{row.tasks}</span>
+      render: (row: ProjectSharingTaskSetting) => (
+        <span className="p-2 text-sm">{rowTaskLabel(row)}</span>
       ),
     },
     {
       key: "actions",
       name: tTable("actions"),
       sortable: false,
-      render: (row: TaskSetting) => (
+      render: (row: ProjectSharingTaskSetting) => (
         <RowActions
           row={row}
           onShow={handleDisplay}
           onEdit={handleEdit}
+          onDelete={handleDeleteClick}
           canShow={true}
           canEdit={true}
+          canDelete={true}
           translationNamespace="projectSettings.tasksSettings.table"
           editLabelKey="editTasksSettings"
         />
@@ -98,15 +190,15 @@ export default function TasksSettingsView({
   ];
 
   const tableState = TasksSettingsTable.useTableState({
-    data: tasksSettings,
+    data: pageData,
     columns,
-    totalPages: 1,
-    totalItems: 10,
+    totalPages,
+    totalItems,
     params,
-    getRowId: (taskSetting) => taskSetting.id,
-    loading: false,
-    searchable: false,
-    filtered: params.search !== "",
+    getRowId: (taskSetting) => String(taskSetting.id),
+    loading: isLoading,
+    searchable: true,
+    filtered: params.search.trim().length > 0,
   });
 
   return (
@@ -135,38 +227,71 @@ export default function TasksSettingsView({
           color="primary"
           sx={{ px: 6 }}
           onClick={handleAdd}
+          disabled={!projectTypeId}
         >
           {tTable("addTasksSettings")}
         </Button>
       </Box>
 
+      {isError ? (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {t("loadListError")}
+        </Typography>
+      ) : null}
+
       <Box sx={{ color: "text.primary" }}>
         <TasksSettingsTable
+          filters={<TasksSettingsTable.TopActions state={tableState} />}
           table={
             <TasksSettingsTable.Table
               state={tableState}
               loadingOptions={{ rows: 5 }}
             />
           }
+          pagination={<TasksSettingsTable.Pagination state={tableState} />}
         />
       </Box>
 
       <AddTasksSettingsDialog
         open={openAddDialog}
         setOpenModal={setOpenAddDialog}
+        projectTypeId={projectTypeId}
+        onSuccess={invalidateList}
       />
       <TasksSettingsDetailsDialog
         open={openModal}
         setOpenModal={setOpenModal}
         rowId={displayedRowId}
+        projectTypeId={projectTypeId}
       />
       <EditTasksSettingsDialog
-        open={editDialogOpen || Boolean(editingRowId)}
+        open={editDialogOpen && Boolean(editingRowId)}
         onClose={() => {
           setEditDialogOpen(false);
           setEditingRowId(null);
         }}
-        taskSettingId={editingRowId || undefined}
+        taskSettingId={editingRowId ?? undefined}
+        projectTypeId={projectTypeId}
+        onSuccess={invalidateList}
+      />
+
+      <DeleteButton
+        message={tTable("deleteConfirmMessage")}
+        open={deleteDialogOpen}
+        setOpen={setDeleteDialogOpen}
+        onDelete={async () => {
+          if (deletingSettingId == null) {
+            throw new Error("No task setting selected");
+          }
+          await ProjectSharingTaskSettingApi.delete(deletingSettingId);
+          setDeletingSettingId(null);
+          invalidateList();
+        }}
+        translations={{
+          deleteSuccess: tTable("deleteSuccess"),
+          deleteError: tTable("deleteError"),
+          deleteCancelled: tLabels("deleteCancelled"),
+        }}
       />
     </Box>
   );

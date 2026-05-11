@@ -70,11 +70,18 @@ export interface ProjectSharingTask {
 /** @deprecated Use ProjectSharingTask */
 export type Task = ProjectSharingTask;
 
-export interface TaskSetting {
-  id: string;
-  workOrderType: string;
-  tasks: string;
+/** Task setting link (API: project-sharing-tasks-setting) */
+export interface ProjectSharingTaskSetting {
+  id: number;
+  project_type_id: number;
+  project_sharing_work_order_id: number;
+  project_sharing_task_id: number;
+  created_at: string;
+  updated_at: string;
 }
+
+/** @deprecated Use ProjectSharingTaskSetting */
+export type TaskSetting = ProjectSharingTaskSetting;
 
 export interface RowActionsProps {
   row:
@@ -83,7 +90,7 @@ export interface RowActionsProps {
     | ProjectSharingProcedure
     | ProjectSharingReportForm
     | ProjectSharingTask
-    | TaskSetting;
+    | ProjectSharingTaskSetting;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;
   canEdit: boolean;

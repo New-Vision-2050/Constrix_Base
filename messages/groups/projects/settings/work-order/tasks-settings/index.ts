@@ -15,6 +15,22 @@ export const TasksSettingsMessages = new MessagesGroup({
     tasksNamePlaceholder: _m("Select tasks", "اختر المهام"),
     save: _m("Save", "حفظ"),
     validationError: _m("Validation error", "خطأ في التحقق من البيانات"),
+    createSuccess: _m(
+      "Task setting created successfully!",
+      "تم إنشاء ربط المهمة بنجاح!",
+    ),
+    createError: _m(
+      "Failed to create task setting. Please try again.",
+      "فشل إنشاء الربط. يرجى المحاولة مرة أخرى.",
+    ),
+    updateSuccess: _m(
+      "Task setting updated successfully!",
+      "تم تحديث الربط بنجاح!",
+    ),
+    updateError: _m(
+      "Failed to update task setting. Please try again.",
+      "فشل تحديث الربط. يرجى المحاولة مرة أخرى.",
+    ),
   }),
   table: new MessagesGroup({
     addTasksSettings: _m("Add Tasks Settings", "إضافة إعدادات المهام"),
@@ -38,6 +54,15 @@ export const TasksSettingsMessages = new MessagesGroup({
     title: _m("Tasks Settings Details", "تفاصيل إعدادات المهام"),
     workOrderType: _m("Work Order Type", "نوع أمر العمل"),
     tasks: _m("Tasks", "المهام"),
+    task: _m("Task", "المهمة"),
+    taskCode: _m("Task code", "رمز المهمة"),
+    taskName: _m("Task name", "اسم المهمة"),
     notFound: _m("Tasks settings not found", "لم يتم العثور على إعدادات المهام"),
+    createdAt: _m("Created at", "تاريخ الإنشاء"),
+    updatedAt: _m("Updated at", "تاريخ التحديث"),
   }),
+  loadListError: _m(
+    "Could not load task settings",
+    "تعذر تحميل إعدادات المهام",
+  ),
 });

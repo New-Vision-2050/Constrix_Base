@@ -76,24 +76,14 @@ export type ReportFormEditValues = z.infer<
   ReturnType<typeof createReportFormEditSchema>
 >;
 
-export function createTasksSettingsFormSchema(t: TranslateForm) {
+/** Link one work order to one task (tasks-setting create/edit forms) */
+export function createTaskSettingLinkFormSchema(t: TranslateForm) {
   return z.object({
-    workOrderType: z.string().min(1, t("validationError")),
-    tasks: z.array(z.string()).min(1, t("validationError")),
+    projectSharingWorkOrderId: z.string().min(1, t("validationError")),
+    projectSharingTaskId: z.string().min(1, t("validationError")),
   });
 }
 
-export type TasksSettingsFormValues = z.infer<
-  ReturnType<typeof createTasksSettingsFormSchema>
->;
-
-export function createTasksSettingsEditFormSchema(t: TranslateForm) {
-  return z.object({
-    serialNumber: z.string().trim().min(1, t("validationError")),
-    tasks: z.array(z.string()).min(1, t("validationError")),
-  });
-}
-
-export type TasksSettingsEditFormValues = z.infer<
-  ReturnType<typeof createTasksSettingsEditFormSchema>
+export type TaskSettingLinkFormValues = z.infer<
+  ReturnType<typeof createTaskSettingLinkFormSchema>
 >;
