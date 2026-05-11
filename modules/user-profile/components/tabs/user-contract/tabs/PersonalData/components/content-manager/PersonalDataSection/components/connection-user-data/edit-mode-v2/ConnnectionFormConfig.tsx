@@ -22,10 +22,17 @@ export const ConnnectionFormConfig = () => {
         title:t("changePhone"),
         fields: [
           {
-            name: "phone",
-            label: t("phone"),
+            name: "oldPhone",
+            label: t("oldPhone"),
             type: "phone",
-            placeholder: t("phone"),
+            placeholder: t("oldPhone"),
+            disabled: true,
+          },
+          {
+            name: "newPhone",
+            label: t("newPhone"),
+            type: "phone",
+            placeholder: t("newPhone"),
             validation: [
               {
                 type: "required",
@@ -42,7 +49,8 @@ export const ConnnectionFormConfig = () => {
       },
     ],
     initialValues: {
-      phone: userConnectionData?.phone,
+      oldPhone: userConnectionData?.phone,
+      newPhone: "",
     },
     submitButtonText: t("changePhone"),
     cancelButtonText: t("cancel"),
@@ -59,14 +67,14 @@ export const ConnnectionFormConfig = () => {
       try {
         // Send OTP to mobile
         const body = {
-          identifier: formData.phone,
+          identifier: formData.newPhone,
           type: "phone",
         };
         
         await apiClient.post(`/company-users/send-otp`, body);
         
         // Set the identifier for OTP verification
-        setPhoneOtpIdentifier(formData.phone as string);
+        setPhoneOtpIdentifier(formData.newPhone as string);
         
         // Open OTP dialog
         togglePhoneOtpDialog();
