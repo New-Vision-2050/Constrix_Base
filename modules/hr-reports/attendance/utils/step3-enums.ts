@@ -1,63 +1,36 @@
-import {
-  STEP3_DELAY_VALUES,
-  STEP3_OVERTIME_VALUES,
-  STEP3_PATTERN_VALUES,
-  STEP3_RATE_MIN_VALUES,
-} from "../components/report-wizard/constants-step3";
+import { STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS } from "../components/report-wizard/constants-step3";
 import type {
-  AttendancePatternId,
-  AttendanceRateMinId,
-  DelayLimitMinutesId,
-  MinOvertimeId,
+  ReportDisplayModeId,
   ReportWizardPayload,
 } from "../components/report-wizard/types";
 
-const LEGACY_RATE: Record<string, AttendanceRateMinId> = {
-  min_50: "fifty",
-  min_80: "ninety",
-  min_95: "ninety",
-  sixty: "seventy",
-  eighty: "ninety",
-  ninety_five: "ninety",
-};
+function coerceBool(v: unknown, fallback: boolean): boolean {
+  return typeof v === "boolean" ? v : fallback;
+}
 
-const PATTERN_SET = new Set<string>(STEP3_PATTERN_VALUES);
-const RATE_SET = new Set<string>(STEP3_RATE_MIN_VALUES);
-const DELAY_SET = new Set<string>(STEP3_DELAY_VALUES);
-const OT_SET = new Set<string>(STEP3_OVERTIME_VALUES);
-
-/** Coerce step3 string enums to backend-allowed values (wizard + legacy API configs). */
+/**
+ * Canonical step 3 wizard state (fixes lists, parses `displayMode` /
+ * snake_case `display_mode`, ignores removed pattern/rate fields from legacy payloads).
+ */
 export function normalizeStep3EnumFields(
-  step3: ReportWizardPayload["step3"],
+  raw:
+    | ReportWizardPayload["step3"]
+    | (Partial<ReportWizardPayload["step3"]> & Record<string, unknown>),
 ): ReportWizardPayload["step3"] {
-  let rate = String(step3.attendanceRateMin ?? "no_filter");
-  rate = LEGACY_RATE[rate] ?? rate;
-  const attendanceRateMin = (
-    RATE_SET.has(rate) ? rate : "no_filter"
-  ) as AttendanceRateMinId;
-
-  let delay =
-    step3.delayLimitMinutes === "none"
-      ? "no_filter"
-      : step3.delayLimitMinutes;
-  const delayLimitMinutes = (
-    DELAY_SET.has(delay) ? delay : "no_filter"
-  ) as DelayLimitMinutesId;
-
-  let ot =
-    step3.minOvertime === "none" ? "no_filter" : step3.minOvertime;
-  const minOvertime = (OT_SET.has(ot) ? ot : "no_filter") as MinOvertimeId;
-
-  const pattern = String(step3.attendancePattern ?? "all");
-  const attendancePattern = (
-    PATTERN_SET.has(pattern) ? pattern : "all"
-  ) as AttendancePatternId;
+  const dmUnknown = raw.displayMode ?? raw.display_mode;
+  const displayMode: ReportDisplayModeId =
+    dmUnknown === "by_day" ? "by_day" : "employee_per_page";
 
   return {
-    ...step3,
-    attendancePattern,
-    attendanceRateMin,
-    delayLimitMinutes,
-    minOvertime,
+    attendanceDataTypeIds: [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS],
+    displayMode,
+    includeEntryExitTime: coerceBool(raw.includeEntryExitTime, true),
+    includeShiftName: coerceBool(raw.includeShiftName, true),
+    includeAttendanceNotes: coerceBool(raw.includeAttendanceNotes, true),
+    calculateTotalWorkHours: coerceBool(raw.calculateTotalWorkHours, true),
+    showPreviousMonthComparison: coerceBool(
+      raw.showPreviousMonthComparison,
+      true,
+    ),
   };
 }

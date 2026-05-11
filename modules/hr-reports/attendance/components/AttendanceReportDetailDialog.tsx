@@ -52,8 +52,8 @@ export default function AttendanceReportDetailDialog({
   const tBranch = useTranslations(
     "HRReports.attendanceReport.wizard.employeesData.branches",
   );
-  const tFilters = useTranslations(
-    "HRReports.attendanceReport.wizard.filtersOptions",
+  const tAttendanceData = useTranslations(
+    "HRReports.attendanceReport.wizard.attendanceData",
   );
   const tReview = useTranslations(
     "HRReports.attendanceReport.wizard.reviewScreen",
@@ -66,10 +66,10 @@ export default function AttendanceReportDetailDialog({
       month: tMonth,
       employeesData: tEmp,
       branches: tBranch,
-      filtersOptions: tFilters,
+      attendanceData: tAttendanceData,
       reviewScreen: tReview,
     }),
-    [tWizard, tRt, tMonth, tEmp, tBranch, tFilters, tReview],
+    [tWizard, tRt, tMonth, tEmp, tBranch, tAttendanceData, tReview],
   );
 
   const [loading, setLoading] = useState(false);
@@ -217,12 +217,13 @@ export default function AttendanceReportDetailDialog({
               <Chip
                 size="small"
                 label={summary.emailLabel}
-                color={detail.payload.step5.autoEmail ? "success" : "default"}
+                color="default"
                 variant={theme.palette.mode === "dark" ? "outlined" : "filled"}
                 sx={{ fontWeight: 600, mt: 0.5 }}
               />
             </Box>
             {row(t("colSorting"), summary.sortingLabel)}
+            {row(tAttendanceData("sectionDisplayModeTitle"), summary.displayModeLabel)}
           </Box>
         ) : !loading ? (
           <Typography variant="body2" color="text.secondary">

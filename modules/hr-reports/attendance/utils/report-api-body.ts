@@ -1,7 +1,10 @@
 import { hrReportsMessages } from "@/messages/groups/hr-reports";
 import type { CreateReportApiBody } from "@/services/api/hr-reports/attendance";
 import type { Locale, MessageItem, MessagesGroup } from "@/messages/types";
-import type { ReportWizardPayload, ReportWizardStep1 } from "../components/report-wizard/types";
+import type {
+  ReportWizardPayload,
+  ReportWizardStep1,
+} from "../components/report-wizard/types";
 import { STEP2_FILTER_UNSET } from "../components/report-wizard/constants-step2";
 import { normalizeStep3EnumFields } from "./step3-enums";
 
@@ -83,6 +86,8 @@ function formatPeriodPart(step1: ReportWizardStep1, locale: Locale): string {
   const { periodType, year, month } = step1;
 
   switch (periodType) {
+    case "range":
+      return `${step1.dateFrom} – ${step1.dateTo}`;
     case "monthly":
       return `${monthLabel(month, locale)} ${year}`;
     case "yearly":
@@ -131,7 +136,10 @@ export function mapStep1ForApi(step1: ReportWizardStep1) {
   const common = {
     reportTypeIds: [...step1.reportTypeIds],
     periodType: step1.periodType,
-    year: step1.year,
+    year:
+      step1.periodType === "range"
+        ? Number.parseInt(step1.dateFrom.slice(0, 4), 10)
+        : step1.year,
     exportFormat: step1.exportFormat,
     reportLanguage: step1.reportLanguage,
     paperSize: step1.paperSize,
@@ -139,6 +147,15 @@ export function mapStep1ForApi(step1: ReportWizardStep1) {
   };
 
   switch (step1.periodType) {
+    case "range":
+      return {
+        ...common,
+        month: null,
+        week: null,
+        quarter: null,
+        dateFrom: step1.dateFrom,
+        dateTo: step1.dateTo,
+      };
     case "monthly":
       return { ...common, month: step1.month, week: null, quarter: null };
     case "weekly":
@@ -167,11 +184,42 @@ export function mapStep1ForApi(step1: ReportWizardStep1) {
   }
 }
 
-function sanitizeStep3ForApi(step3: ReportWizardPayload["step3"]) {
+export function mapStep2ForApi(step2: ReportWizardPayload["step2"]) {
+  return {
+    employee_scope: step2.employeeScope,
+    employee_user_ids:
+      step2.employeeScope === "select_employees"
+        ? [...step2.employeeUserIds]
+        : [],
+    branch_id: nullableFilterField(step2.branchId),
+    management_id: nullableFilterField(step2.managementId),
+    department: nullableFilterField(step2.department),
+    job_title: nullableFilterField(step2.jobTitleId),
+    contractTypeIds: [...step2.contractTypeIds],
+    nationality: nullableFilterField(step2.nationality),
+    gender:
+      step2.gender === "all" || step2.gender.trim() === ""
+        ? null
+        : step2.gender,
+  };
+}
+
+function sanitizeStep3ForApi(
+  step3: ReportWizardPayload["step3"],
+): CreateReportApiBody["config"]["step3"] {
   const n = normalizeStep3EnumFields(step3);
   return {
-    ...n,
     attendanceDataTypeIds: [...n.attendanceDataTypeIds],
+    display_mode: n.displayMode,
+    includeEntryExitTime: n.includeEntryExitTime,
+    includeShiftName: n.includeShiftName,
+    includeAttendanceNotes: n.includeAttendanceNotes,
+    calculateTotalWorkHours: n.calculateTotalWorkHours,
+    showPreviousMonthComparison: n.showPreviousMonthComparison,
+    attendancePattern: "all",
+    attendanceRateMin: "no_filter",
+    delayLimitMinutes: "no_filter",
+    minOvertime: "no_filter",
   };
 }
 
@@ -179,32 +227,15 @@ export function buildCreateReportApiBody(
   payload: ReportWizardPayload,
   name: { ar: string; en: string },
 ): CreateReportApiBody {
-  const { step2, step3, step4, step5 } = payload;
+  const { step2, step3 } = payload;
 
   return {
     name: { ar: name.ar, en: name.en },
     template_id: null,
     config: {
       step1: mapStep1ForApi(payload.step1),
-      step2: {
-        employeeStatus: step2.employeeStatus,
-        location: nullableFilterField(step2.location),
-        management: nullableFilterField(step2.management),
-        department: nullableFilterField(step2.department),
-        jobTitle: nullableFilterField(step2.jobTitle),
-        contractTypeIds: [...step2.contractTypeIds],
-        nationality: nullableFilterField(step2.nationality),
-        gender:
-          step2.gender === "all" || step2.gender.trim() === ""
-            ? null
-            : step2.gender,
-      },
+      step2: mapStep2ForApi(step2),
       step3: sanitizeStep3ForApi(step3),
-      step4: { ...step4, salaryComponentIds: [...step4.salaryComponentIds], deductionIds: [...step4.deductionIds] },
-      step5: {
-        ...step5,
-        visualElementIds: [...step5.visualElementIds],
-      },
     },
   };
 }

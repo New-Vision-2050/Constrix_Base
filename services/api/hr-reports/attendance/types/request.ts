@@ -1,4 +1,10 @@
-import type { ReportWizardPayload } from "@/modules/hr-reports/attendance/components/report-wizard/types";
+import type {
+  AttendancePatternId,
+  AttendanceRateMinId,
+  DelayLimitMinutesId,
+  MinOvertimeId,
+  ReportWizardPayload,
+} from "@/modules/hr-reports/attendance/components/report-wizard/types";
 
 /** Body for `POST /reports` and `POST /reports/templates`. */
 export type CreateReportApiBody = {
@@ -12,23 +18,36 @@ export type CreateReportApiBody = {
       month: number | null;
       week: number | null;
       quarter: number | null;
+      dateFrom?: string | null;
+      dateTo?: string | null;
       exportFormat: ReportWizardPayload["step1"]["exportFormat"];
       reportLanguage: ReportWizardPayload["step1"]["reportLanguage"];
       paperSize: ReportWizardPayload["step1"]["paperSize"];
       printOrientation: ReportWizardPayload["step1"]["printOrientation"];
     };
     step2: {
-      employeeStatus: ReportWizardPayload["step2"]["employeeStatus"];
-      location: string | null;
-      management: string | null;
+      employee_scope: ReportWizardPayload["step2"]["employeeScope"];
+      employee_user_ids: string[];
+      branch_id: string | null;
+      management_id: string | null;
       department: string | null;
-      jobTitle: string | null;
+      job_title: string | null;
       contractTypeIds: string[];
       nationality: string | null;
       gender: string | null;
     };
-    step3: ReportWizardPayload["step3"];
-    step4: ReportWizardPayload["step4"];
-    step5: ReportWizardPayload["step5"];
+    step3: {
+      attendanceDataTypeIds: string[];
+      display_mode: ReportWizardPayload["step3"]["displayMode"];
+      includeEntryExitTime: boolean;
+      includeShiftName: boolean;
+      includeAttendanceNotes: boolean;
+      calculateTotalWorkHours: boolean;
+      showPreviousMonthComparison: boolean;
+      attendancePattern: AttendancePatternId;
+      attendanceRateMin: AttendanceRateMinId;
+      delayLimitMinutes: DelayLimitMinutesId;
+      minOvertime: MinOvertimeId;
+    };
   };
 };

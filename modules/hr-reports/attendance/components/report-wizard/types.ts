@@ -9,12 +9,8 @@ export type ReportTypeId =
   | "deductions"
   | "branches_comparison";
 
-export type EmployeeStatusFilter =
-  | "all"
-  | "active"
-  | "inactive"
-  | "on_leave"
-  | "dismissed";
+/** Who the report covers — step 2 first section. */
+export type EmployeeScopeMode = "all" | "select_employees";
 
 /** Contract / employment type checkbox ids (step 2). */
 export type EmployeeContractTypeId =
@@ -26,14 +22,20 @@ export type EmployeeContractTypeId =
   | "seasonal";
 
 export type ReportWizardStep2 = {
-  employeeStatus: EmployeeStatusFilter;
-  location: string;
-  management: string;
+  employeeScope: EmployeeScopeMode;
+  /** Selected employee user ids when `employeeScope` is `select_employees`. */
+  employeeUserIds: string[];
+  branchId: string;
+  managementId: string;
   department: string;
-  jobTitle: string;
+  jobTitleId: string;
   contractTypeIds: EmployeeContractTypeId[];
   nationality: string;
   gender: string;
+  /** Cached labels for review summary (optional). */
+  branchName?: string;
+  managementName?: string;
+  jobTitleName?: string;
 };
 
 /** Attendance metric row ids (step 3, section 1). */
@@ -47,7 +49,10 @@ export type AttendanceDataTypeId =
   | "sick_leaves"
   | "early_departure";
 
-/** API `config.step3.attendanceRateMin` — backend `ATT_RATE_*`. */
+/** Report layout — step 3 section 2 (was pattern filters UI). */
+export type ReportDisplayModeId = "employee_per_page" | "by_day";
+
+/** API `config.step3.attendanceRateMin` — backend `ATT_RATE_*` (legacy payloads / API shim). */
 export type AttendanceRateMinId =
   | "no_filter"
   | "fifty"
@@ -80,10 +85,7 @@ export type MinOvertimeId =
 
 export type ReportWizardStep3 = {
   attendanceDataTypeIds: AttendanceDataTypeId[];
-  attendancePattern: AttendancePatternId;
-  attendanceRateMin: AttendanceRateMinId;
-  delayLimitMinutes: DelayLimitMinutesId;
-  minOvertime: MinOvertimeId;
+  displayMode: ReportDisplayModeId;
   includeEntryExitTime: boolean;
   includeShiftName: boolean;
   includeAttendanceNotes: boolean;
@@ -175,8 +177,11 @@ export type ReportWizardStep1 = {
   /** Selected report type option ids (checkboxes). */
   reportTypeIds: ReportTypeId[];
   periodType: ReportPeriodType;
+  /** Inclusive bounds `YYYY-MM-DD` when `periodType` is `range`. */
+  dateFrom: string;
+  dateTo: string;
   year: number;
-  /** 1–12; used for monthly period and as fallback for quarterly/week derivation. */
+  /** 1–12; kept in sync with `dateFrom` for legacy/API helpers. */
   month: number;
   /** ISO-style week when `periodType` is `weekly` (backend field). */
   week?: number | null;
@@ -192,7 +197,8 @@ export type ReportPeriodType =
   | "monthly"
   | "weekly"
   | "quarterly"
-  | "yearly";
+  | "yearly"
+  | "range";
 
 export type ReportExportFormat = "pdf" | "excel" | "csv";
 
@@ -207,6 +213,4 @@ export type ReportWizardPayload = {
   step1: ReportWizardStep1;
   step2: ReportWizardStep2;
   step3: ReportWizardStep3;
-  step4: ReportWizardStep4;
-  step5: ReportWizardStep5;
 };
