@@ -7,6 +7,10 @@ export const hrReportsMessages = new MessagesGroup({
     "عرض وتصدير تقارير الموارد البشرية"
   ),
   attendanceReports: _m("Attendance reports", "تقارير الحضور"),
+  attendancePageDescription: _m(
+    "Create, view, download, and manage generated attendance reports.",
+    "أنشئ واعرض وحمّل وأدر التقارير المُنشأة للحضور.",
+  ),
   employeeReports: _m("Employee reports", "تقارير الموظفين"),
   performanceReports: _m("Performance reports", "تقارير الاداء"),
   generalReports: _m("General reports", "التقارير العامة"),
@@ -137,6 +141,26 @@ export const hrReportsMessages = new MessagesGroup({
         "Something went wrong. Please try again.",
         "حدث خطأ. يُرجى المحاولة مرة أخرى.",
       ),
+      deleteReportConfirm: _m(
+        "Delete this report? This cannot be undone.",
+        "حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء.",
+      ),
+      deleteReportSuccessTitle: _m(
+        "Report deleted",
+        "تم حذف التقرير",
+      ),
+      deleteReportSuccessDesc: _m(
+        "The report was removed from your list.",
+        "تمت إزالة التقرير من القائمة.",
+      ),
+      deleteReportErrorTitle: _m(
+        "Could not delete report",
+        "تعذر حذف التقرير",
+      ),
+      deleteReportErrorDesc: _m(
+        "Something went wrong. Please try again.",
+        "حدث خطأ. يُرجى المحاولة مرة أخرى.",
+      ),
     }),
     createAttendanceReport: _m(
       "Create attendance report",
@@ -191,6 +215,9 @@ export const hrReportsMessages = new MessagesGroup({
       langAr: _m("Arabic", "العربية"),
       langEn: _m("English", "English"),
       paperSize: _m("Paper size", "حجم الورقة"),
+      paperSizeA4: _m("A4", "A4"),
+      paperSizeLetter: _m("US Letter", "US Letter"),
+      paperSizeA3: _m("A3", "A3"),
       printOrientation: _m("Print orientation", "اتجاه الطباعة"),
       orientationPortrait: _m("Portrait", "عمودي"),
       orientationLandscape: _m("Landscape", "أفقي"),

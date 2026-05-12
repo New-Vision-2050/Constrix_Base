@@ -20,7 +20,7 @@ export default function HRReportsAttendanceIndex() {
           color="text.secondary"
           className="mt-2 max-w-2xl leading-relaxed"
         >
-          {t("description")}
+          {t("attendancePageDescription")}
         </Typography>
       </Box>
 
