@@ -335,19 +335,31 @@ function extractRowsAndTotal(data: unknown): {
   if (rows.length === 0) assignIfArray(root.result);
 
   let total: number | undefined;
+  const readTotalFromObject = (obj: Record<string, unknown>) => {
+    for (const key of ["total", "result_count", "total_count"] as const) {
+      const v = obj[key];
+      if (typeof v === "number" && Number.isFinite(v)) return v;
+    }
+    return undefined;
+  };
+
   const meta =
     root.meta && typeof root.meta === "object"
       ? (root.meta as Record<string, unknown>)
       : undefined;
-  if (typeof meta?.total === "number") total = meta.total;
-  if (total == null && typeof root.total === "number") total = root.total;
-  if (
-    total == null &&
-    root.pagination &&
-    typeof root.pagination === "object" &&
-    typeof (root.pagination as Record<string, unknown>).total === "number"
-  ) {
-    total = (root.pagination as Record<string, unknown>).total as number;
+  if (meta) {
+    const fromMeta = readTotalFromObject(meta);
+    if (fromMeta != null) total = fromMeta;
+  }
+  if (total == null) {
+    const fromRoot = readTotalFromObject(root);
+    if (fromRoot != null) total = fromRoot;
+  }
+  if (total == null && root.pagination && typeof root.pagination === "object") {
+    const fromPag = readTotalFromObject(
+      root.pagination as Record<string, unknown>,
+    );
+    if (fromPag != null) total = fromPag;
   }
   if (
     total == null &&
@@ -355,8 +367,8 @@ function extractRowsAndTotal(data: unknown): {
     typeof root.payload === "object" &&
     !Array.isArray(root.payload)
   ) {
-    const p = root.payload as Record<string, unknown>;
-    if (typeof p.total === "number") total = p.total;
+    const fromP = readTotalFromObject(root.payload as Record<string, unknown>);
+    if (fromP != null) total = fromP;
   }
   if (
     total == null &&
@@ -365,12 +377,22 @@ function extractRowsAndTotal(data: unknown): {
     !Array.isArray(root.data)
   ) {
     const inner = root.data as Record<string, unknown>;
-    if (typeof inner.total === "number") total = inner.total;
+    const fromInner = readTotalFromObject(inner);
+    if (fromInner != null) total = fromInner;
     const innerMeta =
       inner.meta && typeof inner.meta === "object"
         ? (inner.meta as Record<string, unknown>)
         : undefined;
-    if (typeof innerMeta?.total === "number") total = innerMeta.total;
+    if (total == null && innerMeta) {
+      const fromInnerMeta = readTotalFromObject(innerMeta);
+      if (fromInnerMeta != null) total = fromInnerMeta;
+    }
+    if (total == null && inner.pagination && typeof inner.pagination === "object") {
+      const fromInnerPag = readTotalFromObject(
+        inner.pagination as Record<string, unknown>,
+      );
+      if (fromInnerPag != null) total = fromInnerPag;
+    }
   }
 
   return { rows, total: total ?? rows.length };

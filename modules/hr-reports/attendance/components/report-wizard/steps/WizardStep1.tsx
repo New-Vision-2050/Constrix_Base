@@ -170,9 +170,9 @@ export default function WizardStep1({ value, onChange }: Props) {
                   })
                 }
               >
-                <MenuItem value="pdf">PDF</MenuItem>
+                <MenuItem value="pdf">{t("fmtPdf")}</MenuItem>
                 <MenuItem value="excel">{t("fmtExcel")}</MenuItem>
-                <MenuItem value="csv">CSV</MenuItem>
+                <MenuItem value="csv">{t("fmtCsv")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -206,9 +206,9 @@ export default function WizardStep1({ value, onChange }: Props) {
                   })
                 }
               >
-                <MenuItem value="A4">A4</MenuItem>
-                <MenuItem value="Letter">Letter</MenuItem>
-                <MenuItem value="A3">A3</MenuItem>
+                <MenuItem value="A4">{t("paperSizeA4")}</MenuItem>
+                <MenuItem value="Letter">{t("paperSizeLetter")}</MenuItem>
+                <MenuItem value="A3">{t("paperSizeA3")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>

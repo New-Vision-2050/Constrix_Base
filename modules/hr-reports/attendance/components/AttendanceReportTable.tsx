@@ -5,11 +5,14 @@ import {
   Box,
   Button,
   Chip,
+  MenuItem,
   Paper,
   Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -28,7 +31,9 @@ import {
   type WizardPayloadSummaryTranslators,
 } from "./report-wizard/payload-summary";
 import AttendanceReportDetailDialog from "./AttendanceReportDetailDialog";
+import DeleteAttendanceReportDialog from "./DeleteAttendanceReportDialog";
 import ReportCreationWizardDialog from "./report-wizard/ReportCreationWizardDialog";
+import CustomMenu from "@/components/headless/custom-menu";
 
 type DisplayRow = CreatedAttendanceReport & {
   summary: ReturnType<typeof buildWizardPayloadSummary>;
@@ -37,8 +42,9 @@ type DisplayRow = CreatedAttendanceReport & {
   reportTitle: string;
 };
 
-const HeadlessCreatedReportsTable =
-  HeadlessTableLayout<DisplayRow>("hr-attendance-created-reports");
+const HeadlessCreatedReportsTable = HeadlessTableLayout<DisplayRow>(
+  "hr-attendance-created-reports",
+);
 
 export default function AttendanceReportTable() {
   const t = useTranslations("HRReports.attendanceReport.table");
@@ -47,10 +53,9 @@ export default function AttendanceReportTable() {
   const theme = useTheme();
   const format = useFormatter();
 
+  const tDeleteConfirm = useTranslations("common.deleteConfirmation");
   const tWizard = useTranslations("HRReports.attendanceReport.wizard");
-  const tRt = useTranslations(
-    "HRReports.attendanceReport.wizard.reportTypes",
-  );
+  const tRt = useTranslations("HRReports.attendanceReport.wizard.reportTypes");
   const tMonth = useTranslations("HRReports.attendanceReport.wizard.month");
   const tEmp = useTranslations(
     "HRReports.attendanceReport.wizard.employeesData",
@@ -66,14 +71,16 @@ export default function AttendanceReportTable() {
   );
 
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [createdReports, setCreatedReports] = useState<CreatedAttendanceReport[]>(
-    [],
-  );
+  const [createdReports, setCreatedReports] = useState<
+    CreatedAttendanceReport[]
+  >([]);
   const [listLoading, setListLoading] = useState(true);
   const [apiTotal, setApiTotal] = useState(0);
   const [listVersion, setListVersion] = useState(0);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [detailReportId, setDetailReportId] = useState<string | null>(null);
+  const [reportToDeleteId, setReportToDeleteId] = useState<string | null>(null);
+  const [deleteConfirmLoading, setDeleteConfirmLoading] = useState(false);
 
   const params = HeadlessCreatedReportsTable.useTableParams({
     initialPage: 1,
@@ -96,12 +103,11 @@ export default function AttendanceReportTable() {
   const displayRows = useMemo((): DisplayRow[] => {
     return createdReports.map((r) => {
       const summary = buildWizardPayloadSummary(r.payload, tr);
-      const lang =
-        (locale ?? "en").split("-")[0]?.toLowerCase() ?? "en";
+      const lang = (locale ?? "en").split("-")[0]?.toLowerCase() ?? "en";
       const preferAr = lang === "ar";
       const fromApi = preferAr
-        ? r.apiName?.ar ?? r.apiName?.en
-        : r.apiName?.en ?? r.apiName?.ar;
+        ? (r.apiName?.ar ?? r.apiName?.en)
+        : (r.apiName?.en ?? r.apiName?.ar);
       const reportTitle =
         typeof fromApi === "string" && fromApi.trim() !== ""
           ? fromApi.trim()
@@ -119,7 +125,8 @@ export default function AttendanceReportTable() {
   }, [createdReports, tr, format, locale]);
 
   const totalItems = apiTotal;
-  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit) || 1);
+  const pageSize = Math.max(1, params.limit);
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize) || 1);
 
   useEffect(() => {
     let cancelled = false;
@@ -142,8 +149,7 @@ export default function AttendanceReportTable() {
         toast({
           variant: "destructive",
           title: t("fetchReportsErrorTitle"),
-          description:
-            getErrorMessage(err) ?? t("fetchReportsErrorDesc"),
+          description: getErrorMessage(err) ?? t("fetchReportsErrorDesc"),
         });
       })
       .finally(() => {
@@ -155,10 +161,13 @@ export default function AttendanceReportTable() {
   }, [params.page, params.limit, listVersion, t]);
 
   useEffect(() => {
+    // While loading, `apiTotal` is often still 0 so `totalPages` is 1; clamping then
+    // would wipe a legitimate URL page (e.g. ?...-p=5) before the request finishes.
+    if (listLoading) return;
     if (params.page > totalPages) {
       params.setPage(totalPages);
     }
-  }, [params.page, totalPages, params]);
+  }, [params.page, totalPages, listLoading, params]);
 
   const handleWizardSubmit = async (payload: ReportWizardPayload) => {
     const name = buildBilingualReportName(payload);
@@ -175,8 +184,7 @@ export default function AttendanceReportTable() {
       toast({
         variant: "destructive",
         title: t("createReportErrorTitle"),
-        description:
-          getErrorMessage(err) ?? t("createReportErrorDesc"),
+        description: getErrorMessage(err) ?? t("createReportErrorDesc"),
       });
       throw err;
     }
@@ -195,20 +203,47 @@ export default function AttendanceReportTable() {
       toast({
         variant: "destructive",
         title: t("saveTemplateErrorTitle"),
-        description:
-          getErrorMessage(err) ?? t("saveTemplateErrorDesc"),
+        description: getErrorMessage(err) ?? t("saveTemplateErrorDesc"),
       });
       throw err;
     }
   };
 
+  const handleConfirmDeleteReport = async () => {
+    if (!reportToDeleteId) return;
+    setDeleteConfirmLoading(true);
+    try {
+      await AttendanceReportsApi.delete(reportToDeleteId);
+      toast({
+        title: t("deleteReportSuccessTitle"),
+        description: t("deleteReportSuccessDesc"),
+      });
+      setListVersion((v) => v + 1);
+      params.setPage(1);
+      setReportToDeleteId(null);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: t("deleteReportErrorTitle"),
+        description: getErrorMessage(err) ?? t("deleteReportErrorDesc"),
+      });
+    } finally {
+      setDeleteConfirmLoading(false);
+    }
+  };
   const ellipsisCell = (text: string, maxWidth: number) => (
     <Tooltip title={text}>
       <Typography
         variant="body2"
         component="span"
         className="p-2 text-sm"
-        sx={{ display: "block", maxWidth, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        sx={{
+          display: "block",
+          maxWidth,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
       >
         {text}
       </Typography>
@@ -237,8 +272,7 @@ export default function AttendanceReportTable() {
         key: "reportTypes",
         name: t("colReportTypes"),
         sortable: false,
-        render: (row: DisplayRow) =>
-          ellipsisCell(row.reportTitle, 260),
+        render: (row: DisplayRow) => ellipsisCell(row.reportTitle, 260),
       },
       {
         key: "branch",
@@ -261,7 +295,9 @@ export default function AttendanceReportTable() {
         name: t("colExport"),
         sortable: false,
         render: (row: DisplayRow) => (
-          <span className="p-2 text-sm font-medium">{row.summary.exportLabel}</span>
+          <span className="p-2 text-sm font-medium">
+            {row.summary.exportLabel}
+          </span>
         ),
       },
       {
@@ -298,26 +334,41 @@ export default function AttendanceReportTable() {
         name: t("colActions"),
         sortable: false,
         render: (row: DisplayRow) => (
-          <Tooltip title={t("viewReport")}>
-            <Button
-              variant="outlined"
-              size="small"
-              color="primary"
-              aria-label={t("viewReport")}
-              endIcon={<VisibilityOutlinedIcon fontSize="small" />}
-              sx={{ whiteSpace: "nowrap" }}
+          <CustomMenu
+            renderAnchor={({ onClick }) => (
+              <Button
+                size="small"
+                variant="contained"
+                color="primary"
+                onClick={onClick}
+                endIcon={<KeyboardArrowDownIcon />}
+              >
+                {t("colActions")}
+              </Button>
+            )}
+          >
+            <MenuItem
               onClick={() => {
                 setDetailReportId(row.id);
                 setDetailDialogOpen(true);
               }}
             >
               {t("viewReport")}
-            </Button>
-          </Tooltip>
+              <VisibilityOutlinedIcon fontSize="small" color="primary"  className="mr-2"/>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setReportToDeleteId(row.id);
+              }}
+            >
+              {tDeleteConfirm("delete")}
+              <DeleteIcon fontSize="small" color="error" className="mr-2" />
+            </MenuItem>
+          </CustomMenu>
         ),
       },
     ],
-    [t, theme.palette.mode],
+    [t, theme.palette.mode, tDeleteConfirm],
   );
 
   const state = HeadlessCreatedReportsTable.useTableState({
@@ -334,7 +385,11 @@ export default function AttendanceReportTable() {
   });
 
   return (
-    <Box component={Paper} elevation={0} sx={{ p: 0, border: 1, borderColor: "divider", borderRadius: 2 }}>
+    <Box
+      component={Paper}
+      elevation={0}
+      sx={{ p: 0, border: 1, borderColor: "divider", borderRadius: 2 }}
+    >
       <Box sx={{ px: 2, pt: 2 }}>
         <Typography variant="subtitle1" fontWeight={700}>
           {t("createdReportsTitle")}
@@ -382,6 +437,12 @@ export default function AttendanceReportTable() {
         onClose={() => setWizardOpen(false)}
         onSubmit={handleWizardSubmit}
         onSaveTemplate={handleSaveWizardTemplate}
+      />
+      <DeleteAttendanceReportDialog
+        open={reportToDeleteId !== null}
+        loading={deleteConfirmLoading}
+        onClose={() => setReportToDeleteId(null)}
+        onConfirm={handleConfirmDeleteReport}
       />
     </Box>
   );
