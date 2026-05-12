@@ -7,8 +7,13 @@ export interface MedicalInsuranceRow {
   employee_name?: string;
   status: number;
   end_date?: string;
+  start_date?: string;
   created_at?: string;
   updated_at?: string;
+  service_name?: string;
+  provider_name?: string;
+  value?: number;
+  number_of_individuals?: number;
 }
 
 export interface CreateMedicalInsuranceForm {
