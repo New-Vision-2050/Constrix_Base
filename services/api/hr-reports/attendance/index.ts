@@ -33,6 +33,8 @@ export const AttendanceReportsApi = {
     });
     downloadFromResponse(response, `report-${reportId}`);
   },
+  delete: (reportId: string) =>
+    baseApi.delete(`reports/${reportId}`),
 };
 
 export type {
