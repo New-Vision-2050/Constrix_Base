@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import WorkOrderTypeView from "./WorkOrderTypeView";
-import SectionView from "./SectionView";
-import ActionsView from "./ActionsView";
-import ReportsFormsView from "./ReportsFormsView";
+import WorkOrderTypeView from "./work-order-types/WorkOrderTypeView";
+import SectionView from "./section/SectionView";
+import ActionsView from "./actions/ActionsView";
+import ReportsFormsView from "./report-forms/ReportsFormsView";
 import {
   Accordion,
   AccordionSummary,
@@ -17,19 +17,14 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useTranslations } from "next-intl";
-import TasksView from "./TasksView";
-import TasksSettingsView from "./TasksSettingsView";
+import TasksView from "./tasks/TasksView";
+import TasksSettingsView from "./tasks-settings/TasksSettingsView";
+import { SettingsTabItemProps } from "../../types";
+import type { CARDTYPE } from "./card-types";
 
-export type CARDTYPE =
-  | "WORK_ORDER_TYPES"
-  | "SECTION"
-  | "ACTIONS"
-  | "REPORT_FORMS"
-  | "ADD_TASKS"
-  | "TASKS_SETTINGS"
-  | "HIDE";
+export type { CARDTYPE } from "./card-types";
 
-export default function WorkOrdersView() {
+export default function WorkOrdersView({ thirdLevelId }: SettingsTabItemProps) {
   const t = useTranslations("projectSettings.section");
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
@@ -43,6 +38,8 @@ export default function WorkOrdersView() {
             </AccordionSummary>
             <AccordionDetails>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("WORK_ORDER_TYPES")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -55,15 +52,14 @@ export default function WorkOrdersView() {
                   <Typography>{t("workOrderType")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("WORK_ORDER_TYPES")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("SECTION")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -76,15 +72,14 @@ export default function WorkOrdersView() {
                   <Typography>{t("section")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("SECTION")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("ACTIONS")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -97,15 +92,14 @@ export default function WorkOrdersView() {
                   <Typography>{t("actions")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("ACTIONS")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("REPORT_FORMS")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -118,15 +112,14 @@ export default function WorkOrdersView() {
                   <Typography>{t("reportForms")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("REPORT_FORMS")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
               </Card>
               <Card
+                className="cursor-pointer"
+                onClick={() => setActiveCard("ADD_TASKS")}
                 sx={{
                   minWidth: 275,
                   color: "text.primary",
@@ -139,10 +132,7 @@ export default function WorkOrdersView() {
                   <Typography>{t("addTasks")}</Typography>
                 </CardContent>
                 <CardActions>
-                  <IconButton
-                    className="cursor-pointer"
-                    onClick={() => setActiveCard("ADD_TASKS")}
-                  >
+                  <IconButton>
                     <KeyboardArrowRightIcon />
                   </IconButton>
                 </CardActions>
@@ -153,22 +143,37 @@ export default function WorkOrdersView() {
       )}
 
       {activeCard === "WORK_ORDER_TYPES" && (
-        <WorkOrderTypeView setActiveCard={setActiveCard} />
+        <WorkOrderTypeView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
       {activeCard === "SECTION" && (
-        <SectionView setActiveCard={setActiveCard} />
+        <SectionView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
       {activeCard === "ACTIONS" && (
-        <ActionsView setActiveCard={setActiveCard} />
+        <ActionsView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
       {activeCard === "REPORT_FORMS" && (
-        <ReportsFormsView setActiveCard={setActiveCard} />
+        <ReportsFormsView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
       {activeCard === "ADD_TASKS" && (
-        <TasksView setActiveCard={setActiveCard} />
+        <TasksView setActiveCard={setActiveCard} projectTypeId={thirdLevelId} />
       )}
       {activeCard === "TASKS_SETTINGS" && (
-        <TasksSettingsView setActiveCard={setActiveCard} />
+        <TasksSettingsView
+          setActiveCard={setActiveCard}
+          projectTypeId={thirdLevelId}
+        />
       )}
     </Paper>
   );

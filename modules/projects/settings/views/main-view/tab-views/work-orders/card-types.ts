@@ -1,0 +1,8 @@
+export type CARDTYPE =
+  | "WORK_ORDER_TYPES"
+  | "SECTION"
+  | "ACTIONS"
+  | "REPORT_FORMS"
+  | "ADD_TASKS"
+  | "TASKS_SETTINGS"
+  | "HIDE";
