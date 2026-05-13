@@ -1,5 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useTranslations } from "next-intl";
@@ -11,8 +11,13 @@ export const JobFormConfig = () => {
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const tJobData = useTranslations("UserProfile.nestedTabs.jobData");
   const { userId, handleRefetchDataStatus, companyId } = useUserProfileCxt();
-  const { professionalData, company, handleRefetchProfessionalData } =
-    useFunctionalContractualCxt();
+  const {
+    professionalData,
+    company,
+    handleRefetchProfessionalData,
+    additionalConstraints,
+    handleRefetchAdditionalConstraints,
+  } = useFunctionalContractualCxt();
 
   const jobFormConfig: FormConfig = {
     formId: "job-data-form",
@@ -186,6 +191,22 @@ export const JobFormConfig = () => {
               },
             ],
           },
+          {
+            name: "additional_constraint_ids",
+            label: tJobData("additionalAttendanceConstraints"),
+            type: "select",
+            placeholder: tJobData("additionalAttendanceConstraints"),
+            required: false,
+            isMulti: true,
+            dynamicOptions: {
+              url: `${baseURL}/attendance/constraints/list`,
+              valueField: "id",
+              labelField: "constraint_name",
+              searchParam: "constraint_name",
+              paginationEnabled: true,
+              totalCountHeader: "X-Total-Count",
+            },
+          },
            {
             name: "roles",
             label: tJobData("roles"),
@@ -220,6 +241,7 @@ export const JobFormConfig = () => {
       job_title_id: professionalData?.job_title?.id,
       job_code: professionalData?.job_code,
       attendance_constraint_id: professionalData?.attendance_constraint?.id,
+      additional_constraint_ids: additionalConstraints.map((c) => c.id),
       roles: professionalData?.roles,
     },
     submitButtonText: t("save"),
@@ -235,15 +257,27 @@ export const JobFormConfig = () => {
       handleRefetchProfessionalData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
+      const { additional_constraint_ids, ...restData } = formData;
+
       const body = {
-        ...formData,
+        ...restData,
         user_id: userId,
       };
 
-      return await defaultSubmitHandler(serialize(body), jobFormConfig, {
+      const result = await defaultSubmitHandler(serialize(body), jobFormConfig, {
         url: `/user_professional_data`,
         method: "POST",
       });
+
+      if (userId) {
+        await apiClient.post(
+          `/attendance/constraints/users/${userId}/additional`,
+          { constraint_ids: (additional_constraint_ids as string[]) ?? [] }
+        );
+        handleRefetchAdditionalConstraints();
+      }
+
+      return result;
     },
   };
   return jobFormConfig;

@@ -16,6 +16,8 @@ import { Contract } from "@/modules/user-profile/types/Contract";
 import useProfessionalData from "../hooks/useUserProfessionalData";
 import { ProfessionalT } from "../api/get-professinal-data";
 import useTimeUnitsData from "../hooks/useTimeUnitsData";
+import useAdditionalConstraints from "../hooks/useAdditionalConstraints";
+import { AdditionalConstraint } from "../api/get-additional-constraints";
 import { TimeUnit } from "../api/get-time-units";
 import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
 import { CompanyData } from "@/modules/company-profile/types/company";
@@ -40,6 +42,10 @@ type FunctionalContractualCxtType = {
   professionalDataLoading: boolean;
   professionalData: ProfessionalT | undefined;
   handleRefetchProfessionalData: () => void;
+  // additional attendance constraints
+  additionalConstraints: AdditionalConstraint[];
+  additionalConstraintsLoading: boolean;
+  handleRefetchAdditionalConstraints: () => void;
   // time units
   timeUnits: TimeUnit[] | undefined;
   // company data
@@ -114,11 +120,23 @@ export const FunctionalContractualCxtProvider = ({
     refetch: refetchProfessionalData,
   } = useProfessionalData(userId ?? "");
 
+  const {
+    data: additionalConstraintsData,
+    isLoading: additionalConstraintsLoading,
+    refetch: refetchAdditionalConstraints,
+  } = useAdditionalConstraints(userId ?? "");
+
+  const additionalConstraints = additionalConstraintsData ?? [];
+
   const { data: timeUnits } = useTimeUnitsData();
 
   // ** declare and define component helper methods
   const handleRefetchProfessionalData = () => {
     refetchProfessionalData();
+  };
+
+  const handleRefetchAdditionalConstraints = () => {
+    refetchAdditionalConstraints();
   };
   const handleRefetchContractData = () => {
     refetchContractData();
@@ -159,6 +177,10 @@ export const FunctionalContractualCxtProvider = ({
         professionalData,
         professionalDataLoading,
         handleRefetchProfessionalData,
+        // additional attendance constraints
+        additionalConstraints,
+        additionalConstraintsLoading,
+        handleRefetchAdditionalConstraints,
         // time unit
         timeUnits,
         // company data

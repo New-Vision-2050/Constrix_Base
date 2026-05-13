@@ -212,6 +212,7 @@ export const userProfileMessages = new MessagesGroup({
       jobTitle: _m("Job Title", "المسمى الوظيفي"),
       jobCode: _m("Job Code", "الرقم الوظيفي"),
       attendanceConstraint: _m("Attendance Constraint", "المحدد"),
+      additionalAttendanceConstraints: _m("Additional Attendance Constraints", "محددات الحضور الإضافية"),
       roles: _m("Roles", "الصلاحيات"),
       validation: new MessagesGroup({
         branchRequired: _m("Branch is required", "الفرع مطلوب"),
