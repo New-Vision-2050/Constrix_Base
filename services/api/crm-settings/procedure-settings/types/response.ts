@@ -27,7 +27,7 @@ export interface Stage {
   percentage: number;
   deadline_days?: number;
   deadline_hours?: number;
-  escalation_user_id?: string;
+  escalation_management_hierarchy_id?: string;
   escalation_user?: EscalationUser;
   work_flow_id?: string;
   work_flow?: WorkFlow;
@@ -72,7 +72,7 @@ export interface ProcedureStep {
   branch_id?: number | null;
   management_id?: number | null;
   action_taker_user_ids?: string[];
-  concerned_user_ids?: string[];
+  concerned_management_hierarchy_ids?: string[];
   /** API may send boolean or 0/1 */
   is_accept: boolean | number;
   is_approve: boolean | number;
@@ -82,7 +82,7 @@ export interface ProcedureStep {
   forms: ProcedureStepForms;
   approval_within_days?: number;
   approval_within_hours?: number;
-  escalation_user_id?: string | null;
+  escalation_management_hierarchy_id?: string | null;
   notify_by_email?: boolean;
   notify_by_whatsapp?: boolean;
   /** Legacy fields */

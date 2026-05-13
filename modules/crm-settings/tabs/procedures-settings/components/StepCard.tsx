@@ -92,7 +92,7 @@ function firstActionTakerUserId(step: ProcedureStep | null): string {
 
 function firstConcernedUserId(step: ProcedureStep | null): string {
   if (!step) return "";
-  const fromArr = step.concerned_user_ids?.[0];
+  const fromArr = step.concerned_management_hierarchy_ids?.[0];
   if (fromArr != null && String(fromArr).length > 0) return String(fromArr);
   const nested = step.concerned_users?.[0]?.user?.id;
   if (nested != null) return String(nested);
@@ -135,10 +135,7 @@ function ensureSelectedEmployeeRow(
   const sid = String(id);
   if (!sid) return rows;
   const idx = rows.findIndex((r) => String(r.value) === sid);
-  const label =
-    resolvedName.trim() ||
-    (idx >= 0 ? rows[idx].label : "") ||
-    sid;
+  const label = resolvedName.trim() || (idx >= 0 ? rows[idx].label : "") || sid;
   if (idx >= 0) {
     const next = [...rows];
     next[idx] = { value: sid, label };
@@ -179,7 +176,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       notifications,
       deadlineDays: String(serverStep.approval_within_days || 0),
       deadlineHours: String(serverStep.approval_within_hours || 0),
-      escalationUserId: serverStep.escalation_user_id ?? "",
+      escalationUserId: serverStep.escalation_management_hierarchy_id ?? "",
     };
   }
   return {
@@ -268,9 +265,13 @@ export default function StepCard({
   );
 
   const employeeRows = useMemo(
-    () =>
-      employeesData.map((e) => ({ value: String(e.id), label: e.name })),
+    () => employeesData.map((e) => ({ value: String(e.id), label: e.name })),
     [employeesData],
+  );
+
+  const managementRows = useMemo(
+    () => managements.map((m) => ({ value: String(m.id), label: m.name })),
+    [managements],
   );
 
   const actionTakerSelectOptions = useMemo(() => {
@@ -284,21 +285,19 @@ export default function StepCard({
   }, [employeeRows, serverStep]);
 
   const concernedUserSelectOptions = useMemo(() => {
-    let rows = [...employeeRows];
+    let rows = [...managementRows];
     if (serverStep) {
       const id = firstConcernedUserId(serverStep);
       const name = resolveConcernedUserName(serverStep, id);
       if (id) rows = ensureSelectedEmployeeRow(rows, id, name);
     }
     return withEmptyOption(rows, "المعنيين بالاجراء");
-  }, [employeeRows, serverStep]);
+  }, [managementRows, serverStep]);
 
   const actionTakerDisplayLabel = useMemo(() => {
     if (!fieldsDisabled || !actionTakerIdW) return undefined;
     const id = String(actionTakerIdW);
-    const fromApi = serverStep
-      ? resolveActionTakerName(serverStep, id)
-      : "";
+    const fromApi = serverStep ? resolveActionTakerName(serverStep, id) : "";
     const fromList =
       employeeRows.find((r) => String(r.value) === id)?.label ?? "";
     const text = (fromApi || fromList).trim();
@@ -308,18 +307,16 @@ export default function StepCard({
   const concernedUserDisplayLabel = useMemo(() => {
     if (!fieldsDisabled || !concernedUserIdW) return undefined;
     const id = String(concernedUserIdW);
-    const fromApi = serverStep
-      ? resolveConcernedUserName(serverStep, id)
-      : "";
+    const fromApi = serverStep ? resolveConcernedUserName(serverStep, id) : "";
     const fromList =
-      employeeRows.find((r) => String(r.value) === id)?.label ?? "";
+      managementRows.find((r) => String(r.value) === id)?.label ?? "";
     const text = (fromApi || fromList).trim();
     return text || id;
-  }, [fieldsDisabled, concernedUserIdW, serverStep, employeeRows]);
+  }, [fieldsDisabled, concernedUserIdW, serverStep, managementRows]);
 
   const escalationUserSelectOptions = useMemo(
-    () => withEmptyOption(employeeRows, "اختر الجهة المصعد إليها"),
-    [employeeRows],
+    () => withEmptyOption(managementRows, "اختر الجهة المصعد إليها"),
+    [managementRows],
   );
 
   const orgTemplateSelectOptions = useMemo(
@@ -349,7 +346,9 @@ export default function StepCard({
     const body: CreateStepArgs = {
       name: data.stepName.trim(),
       action_taker_user_ids: data.actionTakerId ? [data.actionTakerId] : [],
-      concerned_user_ids: data.concernedUserId ? [data.concernedUserId] : [],
+      concerned_management_hierarchy_ids: data.concernedUserId
+        ? [data.concernedUserId]
+        : [],
       is_approve: data.orgBase.includes("approve"),
       is_accept: data.orgBase.includes("accept"),
       is_view_only: data.orgBase.includes("view_only"),
@@ -363,7 +362,7 @@ export default function StepCard({
         ? { management_id: Number(data.managementId) }
         : {}),
       ...(data.escalationUserId
-        ? { escalation_user_id: data.escalationUserId }
+        ? { escalation_management_hierarchy_id: data.escalationUserId }
         : {}),
       approval_within_days: Number(data.deadlineDays) || 0,
       approval_within_hours: Number(data.deadlineHours) || 0,
@@ -521,7 +520,7 @@ export default function StepCard({
                           stepData.action_takers?.map(
                             (at: { user: { id: string } }) => at.user.id,
                           ) || [],
-                        concerned_user_ids:
+                        concerned_management_hierarchy_ids:
                           stepData.concerned_users?.map(
                             (cu: { user: { id: string } }) => cu.user.id,
                           ) || [],
@@ -551,7 +550,7 @@ export default function StepCard({
                             stepData.action_takers?.map(
                               (at: { user: { id: string } }) => at.user.id,
                             ) || [],
-                          concerned_user_ids:
+                          concerned_management_hierarchy_ids:
                             stepData.concerned_users?.map(
                               (cu: { user: { id: string } }) => cu.user.id,
                             ) || [],
