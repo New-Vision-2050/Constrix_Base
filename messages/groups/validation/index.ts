@@ -13,5 +13,6 @@ export const validationMessages = new MessagesGroup({
   }),
   PasswordMatch: _m("Passwords must match", "يجب أن تتطابق كلمة المرور الجديدة مع تأكيد كلمة المرور"),
   EmailMatch: _m("Email addresses must match", "يجب أن تتطابق البريد الالكتروني الجديد مع تأكيد البريد الالكتروني"),
-  OTP: _m("Temporary password is required", "يجب إدخال كلمة المرور المؤقتة")
+  OTP: _m("Temporary password is required", "يجب إدخال كلمة المرور المؤقتة"),
+  "user-found": _m("User already exists", "المستخدم موجود بالفعل")
 });

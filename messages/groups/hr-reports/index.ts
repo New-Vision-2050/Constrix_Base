@@ -7,6 +7,10 @@ export const hrReportsMessages = new MessagesGroup({
     "عرض وتصدير تقارير الموارد البشرية"
   ),
   attendanceReports: _m("Attendance reports", "تقارير الحضور"),
+  attendancePageDescription: _m(
+    "Create, view, download, and manage generated attendance reports.",
+    "أنشئ واعرض وحمّل وأدر التقارير المُنشأة للحضور.",
+  ),
   employeeReports: _m("Employee reports", "تقارير الموظفين"),
   performanceReports: _m("Performance reports", "تقارير الاداء"),
   generalReports: _m("General reports", "التقارير العامة"),
@@ -137,6 +141,26 @@ export const hrReportsMessages = new MessagesGroup({
         "Something went wrong. Please try again.",
         "حدث خطأ. يُرجى المحاولة مرة أخرى.",
       ),
+      deleteReportConfirm: _m(
+        "Delete this report? This cannot be undone.",
+        "حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء.",
+      ),
+      deleteReportSuccessTitle: _m(
+        "Report deleted",
+        "تم حذف التقرير",
+      ),
+      deleteReportSuccessDesc: _m(
+        "The report was removed from your list.",
+        "تمت إزالة التقرير من القائمة.",
+      ),
+      deleteReportErrorTitle: _m(
+        "Could not delete report",
+        "تعذر حذف التقرير",
+      ),
+      deleteReportErrorDesc: _m(
+        "Something went wrong. Please try again.",
+        "حدث خطأ. يُرجى المحاولة مرة أخرى.",
+      ),
     }),
     createAttendanceReport: _m(
       "Create attendance report",
@@ -168,6 +192,8 @@ export const hrReportsMessages = new MessagesGroup({
         "ما نوع التقرير المطلوب؟",
       ),
       sectionPeriod: _m("Report time period", "الفترة الزمنية للتقرير"),
+      periodDateFrom: _m("From", "من"),
+      periodDateTo: _m("To", "إلى"),
       sectionOutput: _m(
         "Report shape and output format",
         "شكل التقرير وتنسيق الإخراج",
@@ -189,6 +215,9 @@ export const hrReportsMessages = new MessagesGroup({
       langAr: _m("Arabic", "العربية"),
       langEn: _m("English", "English"),
       paperSize: _m("Paper size", "حجم الورقة"),
+      paperSizeA4: _m("A4", "A4"),
+      paperSizeLetter: _m("US Letter", "US Letter"),
+      paperSizeA3: _m("A3", "A3"),
       printOrientation: _m("Print orientation", "اتجاه الطباعة"),
       orientationPortrait: _m("Portrait", "عمودي"),
       orientationLandscape: _m("Landscape", "أفقي"),
@@ -261,8 +290,8 @@ export const hrReportsMessages = new MessagesGroup({
           "مكونات الراتب المختارة",
         ),
         footerHint: _m(
-          "The report will be generated and sent automatically to the emails you specified when you click Create report.",
-          "سيتم إنشاء التقرير وإرساله تلقائياً إلى البريد المحدد فور النقر على «إنشاء التقرير».",
+          "Review the summary and click «Create report now» when you're ready.",
+          "راجع الملخص ثم انقر «إنشاء التقرير الآن» عند الجاهزية.",
         ),
         btnCreateNow: _m(
           "Create report now",
@@ -275,6 +304,7 @@ export const hrReportsMessages = new MessagesGroup({
         enabled: _m("Enabled", "مفعل"),
         disabled: _m("Disabled", "غير مفعل"),
         noneSelected: _m("None selected", "لم يتم الاختيار"),
+        notApplicable: _m("Not applicable", "لا ينطبق"),
       }),
       reportTypes: new MessagesGroup({
         attendance_absence: _m(
@@ -328,6 +358,20 @@ export const hrReportsMessages = new MessagesGroup({
         fieldGender: _m("Gender", "الجنس"),
         filterNotSet: _m("No filter", "بدون تصفية"),
         statusAll: _m("All", "الكل"),
+        scopeSelectEmployees: _m(
+          "Select employee(s)",
+          "اختيار موظف / موظفين",
+        ),
+        scopeSelectEmployeesSummary: _m(
+          "Selected employees ({count})",
+          "موظفون محددون ({count})",
+        ),
+        employeePickerLabel: _m("Employees", "الموظفون"),
+        employeePickerHintBranch: _m(
+          "Choose a branch above to load employees for that branch.",
+          "اختر الفرع أعلاه لتحميل قائمة الموظفين.",
+        ),
+        employeePickerEmpty: _m("No employees found for this branch.", "لا يوجد موظفون لهذا الفرع."),
         statusActive: _m("Active only", "نشط فقط"),
         statusInactive: _m("Inactive", "غير نشط"),
         statusOnLeave: _m("On leave", "في إجازة"),
@@ -385,6 +429,12 @@ export const hrReportsMessages = new MessagesGroup({
           "Required attendance data types",
           "نوع بيانات الحضور المطلوبة",
         ),
+        sectionDisplayModeTitle: _m("Display mode", "وضع العرض"),
+        displayModeEmployeePerPage: _m(
+          "Show each employee on a separate page",
+          "عرض كل موظف بصفحة",
+        ),
+        displayModeByDay: _m("Display by day", "عرض باليوم"),
         section2Title: _m(
           "Filter by attendance pattern",
           "تصفية حسب نمط الحضور",

@@ -60,5 +60,12 @@ export const SectionMessages = new MessagesGroup({
     sectionCode: _m("Section Code", "كود القسم"),
     sectionDescription: _m("Section Description", "وصف القسم"),
     notFound: _m("Section not found", "لم يتم العثور على القسم"),
+    createdAt: _m("Created at", "تاريخ الإنشاء"),
+    updatedAt: _m("Updated at", "تاريخ التحديث"),
   }),
+  loadListError: _m(
+    "Could not load departments",
+    "تعذر تحميل الأقسام",
+  ),
+  error: _m("Error", "خطأ"),
 });

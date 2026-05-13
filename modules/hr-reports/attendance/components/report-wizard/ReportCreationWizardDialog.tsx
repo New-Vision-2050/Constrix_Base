@@ -22,11 +22,12 @@ import WizardStepTemplatePick, {
 import WizardStep1 from "./steps/WizardStep1";
 import WizardStep2 from "./steps/WizardStep2";
 import WizardStep3 from "./steps/WizardStep3";
-import WizardStep4 from "./steps/WizardStep4";
-import WizardStep5 from "./steps/WizardStep5";
+// import WizardStep4 from "./steps/WizardStep4";
+// import WizardStep5 from "./steps/WizardStep5";
 import WizardStepReview from "./steps/WizardStepReview";
 
-const TOTAL_STEPS = 7;
+/** Template + 3 data steps + review. Payroll (step 4) & filters (step 5) are disabled. */
+const TOTAL_STEPS = 5;
 
 export type ReportCreationWizardDialogProps = {
   open: boolean;
@@ -99,25 +100,25 @@ export default function ReportCreationWizardDialog({
     [],
   );
 
-  const patchStep4 = useCallback(
-    (patch: Partial<ReportWizardPayload["step4"]>) => {
-      setPayload((p) => ({
-        ...p,
-        step4: { ...p.step4, ...patch },
-      }));
-    },
-    [],
-  );
+  // const patchStep4 = useCallback(
+  //   (patch: Partial<ReportWizardPayload["step4"]>) => {
+  //     setPayload((p) => ({
+  //       ...p,
+  //       step4: { ...p.step4, ...patch },
+  //     }));
+  //   },
+  //   [],
+  // );
 
-  const patchStep5 = useCallback(
-    (patch: Partial<ReportWizardPayload["step5"]>) => {
-      setPayload((p) => ({
-        ...p,
-        step5: { ...p.step5, ...patch },
-      }));
-    },
-    [],
-  );
+  // const patchStep5 = useCallback(
+  //   (patch: Partial<ReportWizardPayload["step5"]>) => {
+  //     setPayload((p) => ({
+  //       ...p,
+  //       step5: { ...p.step5, ...patch },
+  //     }));
+  //   },
+  //   [],
+  // );
 
   const handleFinish = async () => {
     setCreatingReport(true);
@@ -146,8 +147,11 @@ export default function ReportCreationWizardDialog({
         t("stepLabel1"),
         t("stepLabel2"),
         t("stepLabel3"),
+        /* بيانات الرواتب — disabled
         t("stepLabel4"),
+        الفلاتر والخيارات — disabled
         t("stepLabel5"),
+        */
         t("stepLabel6"),
       ] as const,
     [t],
@@ -185,6 +189,7 @@ export default function ReportCreationWizardDialog({
         <WizardStep3 value={payload.step3} onChange={patchStep3} />
       );
       break;
+    /* بيانات الرواتب (WizardStep4) و الفلاتر والخيارات (WizardStep5) معطّلان
     case 4:
       body = (
         <WizardStep4 value={payload.step4} onChange={patchStep4} />
@@ -195,6 +200,7 @@ export default function ReportCreationWizardDialog({
         <WizardStep5 value={payload.step5} onChange={patchStep5} />
       );
       break;
+    */
     default:
       body = (
         <WizardStepReview

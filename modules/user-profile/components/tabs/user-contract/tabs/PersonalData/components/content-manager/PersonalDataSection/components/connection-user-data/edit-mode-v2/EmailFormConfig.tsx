@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 export const EmailFormConfig = () => {
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
   const { userConnectionData } = usePersonalDataTabCxt();
-  const { toggleMailOtpDialog } = useConnectionOTPCxt();
+  const { toggleMailOtpDialog, setMailOtpIdentifier } = useConnectionOTPCxt();
 
   const EmailFormConfig: FormConfig = {
     formId: `email-data-form`,
@@ -22,10 +22,17 @@ export const EmailFormConfig = () => {
         title: t("changeEmail"),
         fields: [
           {
-            name: "email",
-            label: t("email"),
+            name: "oldEmail",
+            label: t("oldEmail"),
             type: "email",
-            placeholder: t("email"),
+            placeholder: t("oldEmail"),
+            disabled: true,
+          },
+          {
+            name: "newEmail",
+            label: t("newEmail"),
+            type: "email",
+            placeholder: t("newEmail"),
             validation: [
               {
                 type: "required",
@@ -42,7 +49,8 @@ export const EmailFormConfig = () => {
       },
     ],
     initialValues: {
-      email: userConnectionData?.email,
+      oldEmail: userConnectionData?.email,
+      newEmail: "",
     },
     submitButtonText: t("changeEmail"),
     cancelButtonText: t("cancel"),
@@ -59,11 +67,14 @@ export const EmailFormConfig = () => {
       try {
         // Send OTP to email
         const body = {
-          identifier: formData.email,
+          identifier: formData.newEmail,
           type: "email",
         };
         
         await apiClient.post(`/company-users/send-otp`, body);
+        
+        // Set the identifier for OTP verification
+        setMailOtpIdentifier(formData.newEmail as string);
         
         // Open OTP dialog
         toggleMailOtpDialog();

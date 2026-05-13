@@ -20,10 +20,11 @@ import { X } from "lucide-react";
 type PropsT = {
   open: boolean;
   identifier: string;
+  newIdentifier?: string;
   setOpen: React.Dispatch<SetStateAction<boolean>>;
 };
 
-export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
+export function OTPVerifyDialog({ open, identifier, newIdentifier, setOpen }: PropsT) {
   const { userId } = useUserProfileCxt();
   const [timer, setTimer] = useState(0);
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
@@ -66,8 +67,9 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const handleResend = async () => {
     try {
       setLoading(true);
+      const otpIdentifier = newIdentifier || identifier;
       const body = {
-        identifier: identifier,
+        identifier: otpIdentifier,
         type: type,
       };
       await apiClient.post(`/company-users/send-otp`, body);
@@ -83,8 +85,9 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
     try {
       setError("");
       setLoading(true);
+      const otpIdentifier = newIdentifier || identifier;
       const body = {
-        identifier: identifier,
+        identifier: otpIdentifier,
         otp: otp,
         type,
       };
@@ -92,14 +95,15 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
         `/company-users/validate-otp${Boolean(userId) ? "/" + userId : ""}`,
         body
       );
+
       handleClose();
-      toast.success("تم التغير بنجاح");
+      toast.success("تم التعديل بنجاح");
       setLoading(false);
       handleRefreshConnectionData();
     } catch (error) {
       setLoading(false);
       console.log("error", error);
-      setError(`كلمه المرور الموقته غير صحيحية`);
+      setError(`كلمة المرور الموقته خطأ`);
     }
   };
 

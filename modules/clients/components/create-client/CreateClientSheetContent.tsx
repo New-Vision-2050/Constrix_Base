@@ -1,7 +1,7 @@
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { useTranslations } from "next-intl";
 import CreateIndividualClientForm from "./individual";
-import CreateClientCompanyForm from "./company";
+import CreateCompanyClientSection from "./CreateCompanyClientSection";
 
 export default function CreateClientSheetContent({
   sub_entity_id,
@@ -20,7 +20,12 @@ export default function CreateClientSheetContent({
     {
       id: "company-client",
       title: t("companyClient"),
-      content: <CreateClientCompanyForm sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />,
+      content: (
+        <CreateCompanyClientSection
+          sub_entity_id={sub_entity_id}
+          handleRefreshWidgetsData={handleRefreshWidgetsData}
+        />
+      ),
     },
   ];
 

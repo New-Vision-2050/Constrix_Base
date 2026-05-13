@@ -1,4 +1,9 @@
-import type { AttendanceDataTypeId } from "./types";
+import type { AttendanceDataTypeId, ReportDisplayModeId } from "./types";
+
+export const DISPLAY_MODE_VALUES: ReportDisplayModeId[] = [
+  "employee_per_page",
+  "by_day",
+];
 
 /** Section 1 — two columns (RTL: column “a” renders first in DOM ≈ visual right). */
 export const ATTENDANCE_DATA_TYPE_OPTIONS: {
@@ -14,6 +19,10 @@ export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   { id: "sick_leaves", column: "b" },
   { id: "early_departure", column: "b" },
 ];
+
+/** This attendance wizard always includes every data type; checkboxes are read-only. */
+export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] =
+  ATTENDANCE_DATA_TYPE_OPTIONS.map((o) => o.id);
 
 /** Backend `ATT_PATTERN_*`. */
 export const STEP3_PATTERN_VALUES = [

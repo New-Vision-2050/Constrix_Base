@@ -13,10 +13,15 @@ import {
   Paper,
   Select,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
-import type { ReportWizardStep1, ReportTypeId } from "../types";
-import { REPORT_TYPE_OPTIONS } from "../constants";
+import type { ReportWizardStep1 } from "../types";
+import {
+  REPORT_TYPE_OPTIONS,
+  STEP1_ATTENDANCE_WIZARD_REPORT_TYPE_IDS,
+} from "../constants-step1";
+import { ensureOrderedRange } from "../step1-date-range";
 import { useTranslations } from "next-intl";
 
 type Props = {
@@ -24,47 +29,29 @@ type Props = {
   onChange: (patch: Partial<ReportWizardStep1>) => void;
 };
 
-const MONTH_KEYS = [
-  "m1",
-  "m2",
-  "m3",
-  "m4",
-  "m5",
-  "m6",
-  "m7",
-  "m8",
-  "m9",
-  "m10",
-  "m11",
-  "m12",
-] as const;
+function yearMonthFromIso(iso: string): Pick<ReportWizardStep1, "year" | "month"> {
+  return {
+    year: Number(iso.slice(0, 4)),
+    month: Number(iso.slice(5, 7)),
+  };
+}
 
 export default function WizardStep1({ value, onChange }: Props) {
   const t = useTranslations("HRReports.attendanceReport.wizard");
-  const tRt = useTranslations(
-    "HRReports.attendanceReport.wizard.reportTypes",
-  );
-  const tMonth = useTranslations("HRReports.attendanceReport.wizard.month");
+  const tRt = useTranslations("HRReports.attendanceReport.wizard.reportTypes");
 
-  const colA = REPORT_TYPE_OPTIONS.filter((o) => o.column === "a" && !o.disabled);
-  const colB = REPORT_TYPE_OPTIONS.filter((o) => o.column === "b" && !o.disabled);
+  React.useEffect(() => {
+    const ids = value.reportTypeIds;
+    const fixed = STEP1_ATTENDANCE_WIZARD_REPORT_TYPE_IDS;
+    const onlyAttendance =
+      ids.length === fixed.length && ids.every((id, i) => id === fixed[i]);
+    if (!onlyAttendance) {
+      onChange({ reportTypeIds: [...fixed] });
+    }
+  }, [value.reportTypeIds, onChange]);
 
-  const toggleType = (id: string) => {
-    const next = value.reportTypeIds.includes(id as ReportTypeId)
-      ? value.reportTypeIds.filter((x) => x !== id)
-      : [...value.reportTypeIds, id as ReportTypeId];
-    onChange({ reportTypeIds: next });
-  };
-
-  const years = React.useMemo(() => {
-    const y = new Date().getFullYear();
-    return [y - 1, y, y + 1, y + 2];
-  }, []);
-
-  const months = React.useMemo(
-    () => Array.from({ length: 12 }, (_, i) => i + 1),
-    [],
-  );
+  const colA = REPORT_TYPE_OPTIONS.filter((o) => o.column === "a");
+  const colB = REPORT_TYPE_OPTIONS.filter((o) => o.column === "b");
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -80,7 +67,6 @@ export default function WizardStep1({ value, onChange }: Props) {
             <StackedTypes
               options={colA}
               selected={value.reportTypeIds}
-              onToggle={toggleType}
               tRt={tRt}
             />
           </Grid>
@@ -88,7 +74,6 @@ export default function WizardStep1({ value, onChange }: Props) {
             <StackedTypes
               options={colB}
               selected={value.reportTypeIds}
-              onToggle={toggleType}
               tRt={tRt}
             />
           </Grid>
@@ -106,98 +91,59 @@ export default function WizardStep1({ value, onChange }: Props) {
         </Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="period-type-label">{t("periodType")}</InputLabel>
-              <Select
-                labelId="period-type-label"
-                label={t("periodType")}
-                value={value.periodType}
-                onChange={(e) => {
-                  const pt = e.target.value as ReportWizardStep1["periodType"];
-                  const patch: Partial<ReportWizardStep1> = {
-                    periodType: pt,
-                  };
-                  if (pt === "quarterly") {
-                    patch.quarter =
-                      value.quarter ?? Math.ceil(value.month / 3);
-                    patch.week = null;
-                  } else if (pt === "yearly") {
-                    patch.quarter = null;
-                    patch.week = null;
-                  } else if (pt === "weekly") {
-                    patch.quarter = null;
-                  } else {
-                    patch.quarter = null;
-                    patch.week = null;
-                  }
-                  onChange(patch);
-                }}
-              >
-                <MenuItem value="monthly">{t("periodMonthly")}</MenuItem>
-                <MenuItem value="weekly">{t("periodWeekly")}</MenuItem>
-                <MenuItem value="quarterly">{t("periodQuarterly")}</MenuItem>
-                <MenuItem value="yearly">{t("periodYearly")}</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              label={t("periodDateFrom")}
+              type="date"
+              size="small"
+              fullWidth
+              value={value.dateFrom}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (!v) return;
+                const { dateFrom, dateTo } = ensureOrderedRange(
+                  v,
+                  value.dateTo,
+                );
+                onChange({
+                  periodType: "range",
+                  dateFrom,
+                  dateTo,
+                  ...yearMonthFromIso(dateFrom),
+                });
+              }}
+              slotProps={{
+                htmlInput: { max: value.dateTo },
+                inputLabel: { shrink: true },
+              }}
+            />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="year-label">{t("year")}</InputLabel>
-              <Select
-                labelId="year-label"
-                label={t("year")}
-                value={value.year}
-                onChange={(e) => onChange({ year: Number(e.target.value) })}
-              >
-                {years.map((y) => (
-                  <MenuItem key={y} value={y}>
-                    {y}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              label={t("periodDateTo")}
+              type="date"
+              size="small"
+              fullWidth
+              value={value.dateTo}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (!v) return;
+                const { dateFrom, dateTo } = ensureOrderedRange(
+                  value.dateFrom,
+                  v,
+                );
+                onChange({
+                  periodType: "range",
+                  dateFrom,
+                  dateTo,
+                  ...yearMonthFromIso(dateFrom),
+                });
+              }}
+              slotProps={{
+                htmlInput: { min: value.dateFrom },
+                inputLabel: { shrink: true },
+              }}
+            />
           </Grid>
-          {(value.periodType === "monthly" ||
-            value.periodType === "weekly") && (
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="month-label">{t("monthField")}</InputLabel>
-                <Select
-                  labelId="month-label"
-                  label={t("monthField")}
-                  value={value.month}
-                  onChange={(e) => onChange({ month: Number(e.target.value) })}
-                >
-                  {months.map((m) => (
-                    <MenuItem key={m} value={m}>
-                      {tMonth(MONTH_KEYS[m - 1])}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          {value.periodType === "quarterly" && (
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="quarter-label">{t("quarterField")}</InputLabel>
-                <Select
-                  labelId="quarter-label"
-                  label={t("quarterField")}
-                  value={value.quarter ?? Math.ceil(value.month / 3)}
-                  onChange={(e) =>
-                    onChange({ quarter: Number(e.target.value) })
-                  }
-                >
-                  {[1, 2, 3, 4].map((q) => (
-                    <MenuItem key={q} value={q}>
-                      Q{q}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
         </Grid>
       </Box>
 
@@ -224,9 +170,9 @@ export default function WizardStep1({ value, onChange }: Props) {
                   })
                 }
               >
-                <MenuItem value="pdf">PDF</MenuItem>
+                <MenuItem value="pdf">{t("fmtPdf")}</MenuItem>
                 <MenuItem value="excel">{t("fmtExcel")}</MenuItem>
-                <MenuItem value="csv">CSV</MenuItem>
+                <MenuItem value="csv">{t("fmtCsv")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -260,9 +206,9 @@ export default function WizardStep1({ value, onChange }: Props) {
                   })
                 }
               >
-                <MenuItem value="A4">A4</MenuItem>
-                <MenuItem value="Letter">Letter</MenuItem>
-                <MenuItem value="A3">A3</MenuItem>
+                <MenuItem value="A4">{t("paperSizeA4")}</MenuItem>
+                <MenuItem value="Letter">{t("paperSizeLetter")}</MenuItem>
+                <MenuItem value="A3">{t("paperSizeA3")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -295,12 +241,10 @@ export default function WizardStep1({ value, onChange }: Props) {
 function StackedTypes({
   options,
   selected,
-  onToggle,
   tRt,
 }: {
-  options: { id: string }[];
+  options: { id: string; disabled?: boolean }[];
   selected: string[];
-  onToggle: (id: string) => void;
   tRt: (key: string) => string;
 }) {
   return (
@@ -320,7 +264,7 @@ function StackedTypes({
             control={
               <Checkbox
                 checked={selected.includes(opt.id)}
-                onChange={() => onToggle(opt.id)}
+                disabled={opt.disabled ?? false}
                 color="primary"
               />
             }

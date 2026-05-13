@@ -1,4 +1,4 @@
-import { MessagesGroup, _m } from "@/messages";
+import { MessagesGroup, _m } from "../../../../../types";
 
 export const WorkOrdersMessages = new MessagesGroup({
   addWorkOrder: _m("Add Work Order", "إضافة أمر عمل"),
@@ -83,4 +83,17 @@ export const WorkOrdersMessages = new MessagesGroup({
     reset: _m("Reset", "إعادة تعيين"),
   }),
   title: _m("Work Orders", "أوامر العمل"),
+  details: new MessagesGroup({
+    title: _m("Work order details", "تفاصيل أمر العمل"),
+    notFound: _m(
+      "Work order not found",
+      "لم يتم العثور على أمر العمل",
+    ),
+    createdAt: _m("Created at", "تاريخ الإنشاء"),
+    updatedAt: _m("Updated at", "تاريخ التحديث"),
+  }),
+  loadListError: _m(
+    "Could not load work orders",
+    "تعذر تحميل أوامر العمل",
+  ),
 });
