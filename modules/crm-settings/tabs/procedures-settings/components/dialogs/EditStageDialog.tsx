@@ -16,9 +16,14 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { baseURL } from "@/config/axios-config";
 import IconPicker from "@/components/shared/icon-picker";
 import { APP_ICONS } from "@/constants/icons";
-import { useAllEmployees } from "@/modules/crm-settings/tabs/procedures-settings/hooks/useAllEmployees";
+import {
+  fetchManagementHierarchyOptions,
+  type ManagementHierarchyOption,
+} from "@/utils/fetchDropdownOptions";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import { Stage } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useToast } from "@/modules/table/hooks/use-toast";
@@ -69,7 +74,13 @@ export default function EditStageDialog({
   const [deadlineDays, setDeadlineDays] = useState("");
   const [escalationUserId, setEscalationUserId] = useState("");
 
-  const { data: employees = [] } = useAllEmployees();
+  const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
+    queryKey: ["managements", "hierarchy", "management"],
+    queryFn: () =>
+      fetchManagementHierarchyOptions(
+        `${baseURL}/management_hierarchies/list?type=management`,
+      ),
+  });
   const [errors, setErrors] = useState<{
     name: string;
     percentage: string;
@@ -93,7 +104,7 @@ export default function EditStageDialog({
     setDeadlineDays(
       procedure.deadline_days != null ? String(procedure.deadline_days) : "",
     );
-    setEscalationUserId(procedure.escalation_user_id || "");
+    setEscalationUserId(procedure.escalation_management_hierarchy_id || "");
     setErrors({ name: "", percentage: "", timeLimit: "" });
   }, [open, procedure]);
 
@@ -126,7 +137,7 @@ export default function EditStageDialog({
         type: procedure.type,
         deadline_days: parseInt(deadlineDays) || 0,
         deadline_hours: parseInt(deadlineHours) || 0,
-        escalation_user_id: escalationUserId,
+        escalation_management_hierarchy_id: escalationUserId,
       });
       toast({
         title: tRoot("actions.edit"),
@@ -382,9 +393,9 @@ export default function EditStageDialog({
             {/* Escalation target */}
             <Box>
               <SearchableSelect
-                options={employees.map((emp) => ({
-                  value: emp.id,
-                  label: emp.name,
+                options={managements.map((m) => ({
+                  value: String(m.id),
+                  label: m.name,
                 }))}
                 value={escalationUserId}
                 onChange={(val) => setEscalationUserId(String(val))}
