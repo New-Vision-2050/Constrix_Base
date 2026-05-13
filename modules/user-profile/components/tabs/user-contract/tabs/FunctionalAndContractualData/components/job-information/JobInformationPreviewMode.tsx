@@ -3,7 +3,8 @@ import { useFunctionalContractualCxt } from "../../context";
 import { useTranslations } from "next-intl";
 
 export default function JobInformationPreviewMode() {
-  const { professionalData } = useFunctionalContractualCxt();
+  const { professionalData, additionalConstraints } =
+    useFunctionalContractualCxt();
   const tJobData = useTranslations("UserProfile.nestedTabs.jobData");
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -69,7 +70,15 @@ export default function JobInformationPreviewMode() {
           required
         />
       </div>
-      
+
+      <div className="p-2">
+        <PreviewTextField
+          label={tJobData("additionalAttendanceConstraints")}
+          value={additionalConstraints.map((c) => c.constraint_name).join(", ")}
+          valid={Boolean(additionalConstraints.length)}
+        />
+      </div>
+
       <div className="p-2">
         <PreviewTextField
           label={tJobData("roles")}
