@@ -16,7 +16,14 @@ export default function PublicDocsTabEntryPoint() {
     setSearchData,
     projectId,
   } = usePublicDocsCxt();
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    try {
+      const stored = localStorage.getItem("docs-library-view-mode");
+      return (stored === "grid" || stored === "list") ? stored : "list";
+    } catch {
+      return "list";
+    }
+  });
 
   // Handle add button click
   const handleAddClick = () => {
@@ -28,6 +35,9 @@ export default function PublicDocsTabEntryPoint() {
     storeSelectedDocument(undefined);
     clearSelectedDocs();
     setViewMode(mode);
+    try {
+      localStorage.setItem("docs-library-view-mode", mode);
+    } catch {}
   };
 
   return (
