@@ -6,7 +6,7 @@ export interface CreateStageArgs {
   percentage: number;
   deadline_days: number;
   deadline_hours: number;
-  escalation_user_id: string;
+  escalation_management_hierarchy_id: string;
   work_flow_id: string;
 }
 
@@ -18,7 +18,7 @@ export interface UpdateStageArgs {
   percentage?: number;
   deadline_days?: number;
   deadline_hours?: number;
-  escalation_user_id?: string;
+  escalation_management_hierarchy_id?: string;
   work_flow_id?: string;
 }
 
@@ -27,7 +27,7 @@ export interface CreateStepArgs {
   branch_id?: number;
   management_id?: number;
   action_taker_user_ids: string[];
-  concerned_user_ids: string[];
+  concerned_management_hierarchy_ids: string[];
   is_accept: boolean;
   is_approve: boolean;
   is_view_only: boolean;
@@ -36,7 +36,7 @@ export interface CreateStepArgs {
   forms: string; // "approve" | "accept"
   approval_within_days?: number;
   approval_within_hours?: number;
-  escalation_user_id?: string;
+  escalation_management_hierarchy_id?: string;
   notify_by_email: boolean;
   notify_by_whatsapp: boolean;
 }

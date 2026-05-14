@@ -16,8 +16,13 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { baseURL } from "@/config/axios-config";
 import IconPicker from "@/components/shared/icon-picker";
-import { useAllEmployees } from "@/modules/crm-settings/tabs/procedures-settings/hooks/useAllEmployees";
+import {
+  fetchManagementHierarchyOptions,
+  type ManagementHierarchyOption,
+} from "@/utils/fetchDropdownOptions";
 import { APP_ICONS } from "@/constants/icons";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 
@@ -48,7 +53,7 @@ interface AddStageDialogProps {
     percentage: number;
     deadline_days: number;
     deadline_hours: number;
-    escalation_user_id: string;
+    escalation_management_hierarchy_id: string;
   }) => void;
   currentTabType?: string;
 }
@@ -70,7 +75,13 @@ export default function AddStageDialog({
   const [deadlineDays, setDeadlineDays] = useState("");
   const [escalationUserId, setEscalationUserId] = useState("");
 
-  const { data: employees = [] } = useAllEmployees();
+  const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
+    queryKey: ["managements", "hierarchy", "management"],
+    queryFn: () =>
+      fetchManagementHierarchyOptions(
+        `${baseURL}/management_hierarchies/list?type=management`,
+      ),
+  });
   const [errors, setErrors] = useState<{
     name: string;
     percentage: string;
@@ -99,7 +110,7 @@ export default function AddStageDialog({
       percentage: percentageValue,
       deadline_days: parseInt(deadlineDays) || 0,
       deadline_hours: parseInt(deadlineHours) || 0,
-      escalation_user_id: escalationUserId,
+      escalation_management_hierarchy_id: escalationUserId,
     });
     handleClose();
   };
@@ -311,9 +322,9 @@ export default function AddStageDialog({
             {/* Escalation target */}
             <Box>
               <SearchableSelect
-                options={employees.map((emp) => ({
-                  value: emp.id,
-                  label: emp.name,
+                options={managements.map((m) => ({
+                  value: String(m.id),
+                  label: m.name,
                 }))}
                 value={escalationUserId}
                 onChange={(val) => setEscalationUserId(String(val))}

@@ -164,7 +164,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
           action_taker_user_ids: procedure.employee_id
             ? [procedure.employee_id]
             : [],
-          concerned_user_ids: [],
+          concerned_management_hierarchy_ids: [],
           is_accept: procedure.is_accept,
           is_approve: procedure.is_approve,
           is_view_only: false,
@@ -221,7 +221,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
         action_taker_user_ids: procedureData.employee_id
           ? [procedureData.employee_id]
           : [],
-        concerned_user_ids: [],
+        concerned_management_hierarchy_ids: [],
         is_accept: procedureData.is_accept,
         is_approve: procedureData.is_approve,
         is_view_only: false,

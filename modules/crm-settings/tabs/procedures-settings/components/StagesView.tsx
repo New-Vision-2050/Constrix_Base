@@ -98,7 +98,7 @@ export default function StagesView({
     percentage: number;
     deadline_days: number;
     deadline_hours: number;
-    escalation_user_id: string;
+    escalation_management_hierarchy_id: string;
   }) => {
     if (!workFlowId) {
       toast({
