@@ -1,4 +1,4 @@
-import { EMPLOYEE_ROWS } from "./SelectedEmployees";
+import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
@@ -7,23 +7,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@mui/material";
+import { Button } from "@/components/ui/button";
 
 interface AddEmployeeDialogProps {
   isOpen: boolean;
-  onClose: () => void;
-  selectedEmployee: string;
-  setSelectedEmployee: (employee: string) => void;
+  onOpenChange: (open: boolean) => void;
+  selectedEmployeeId: string;
+  onSelectedEmployeeChange: (id: string) => void;
+  /** Users that can still be assigned to this determinant */
+  employees: Array<{ id: string; name: string }>;
+  isAssigning?: boolean;
+  onAssign: () => void;
 }
 
 export default function AddEmployeeDialog({
   isOpen,
-  onClose,
-  selectedEmployee,
-  setSelectedEmployee,
+  onOpenChange,
+  selectedEmployeeId,
+  onSelectedEmployeeChange,
+  employees,
+  isAssigning = false,
+  onAssign,
 }: AddEmployeeDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogTitle className="text-right text-base">
           اضافة اسم الموظف
@@ -34,14 +41,14 @@ export default function AddEmployeeDialog({
               اسم الموظف
             </p>
             <Select
-              value={selectedEmployee}
-              onValueChange={(value: string) => setSelectedEmployee(value)}
+              value={selectedEmployeeId}
+              onValueChange={(value: string) => onSelectedEmployeeChange(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="اسم الموظف" />
               </SelectTrigger>
               <SelectContent>
-                {EMPLOYEE_ROWS.map((employee) => (
+                {employees.map((employee) => (
                   <SelectItem key={employee.id} value={employee.id}>
                     {employee.name}
                   </SelectItem>
@@ -50,7 +57,17 @@ export default function AddEmployeeDialog({
             </Select>
           </div>
 
-          <Button variant="contained" className="w-full" onClick={onClose}>
+          <Button
+            type="button"
+            className="w-full gap-2"
+            disabled={
+              !selectedEmployeeId.trim() || isAssigning || employees.length === 0
+            }
+            onClick={onAssign}
+          >
+            {isAssigning ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            ) : null}
             إضافة
           </Button>
         </div>

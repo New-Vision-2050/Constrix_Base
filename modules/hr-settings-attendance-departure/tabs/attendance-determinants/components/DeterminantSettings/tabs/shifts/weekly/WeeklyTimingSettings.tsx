@@ -3,15 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Plus } from "lucide-react";
-import { WEEK_DAYS } from "./timing-constants";
-import type { DayPeriodRow } from "./timing-types";
-import { shiftPeriodLabel } from "./timing-types";
+import { WEEK_DAYS } from "../timing-constants";
+import type { DayPeriodRow } from "../timing-types";
+import { shiftPeriodLabel } from "../timing-types";
 
 type WeeklyTimingSettingsProps = {
   weeklyDays: string[];
   periodRows: DayPeriodRow[];
   onToggleDay: (dayId: string) => void;
   onOpenPeriodsDialog: (intent: "add" | "edit") => void;
+  onAssignWeeklyShifts: () => void;
+  assignWeeklyShiftsPending: boolean;
+  assignWeeklyShiftsError?: string | null;
 };
 
 export default function WeeklyTimingSettings({
@@ -19,6 +22,9 @@ export default function WeeklyTimingSettings({
   periodRows,
   onToggleDay,
   onOpenPeriodsDialog,
+  onAssignWeeklyShifts,
+  assignWeeklyShiftsPending,
+  assignWeeklyShiftsError,
 }: WeeklyTimingSettingsProps) {
   const hasPeriods = periodRows.length > 0;
 
@@ -94,6 +100,27 @@ export default function WeeklyTimingSettings({
             </div>
           </div>
         )}
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
+        {assignWeeklyShiftsError ? (
+          <p className="text-right text-sm text-destructive" role="alert">
+            {assignWeeklyShiftsError}
+          </p>
+        ) : null}
+        <Button
+          type="button"
+          variant="default"
+          className="w-full h-11"
+          disabled={
+            assignWeeklyShiftsPending ||
+            weeklyDays.length === 0 ||
+            !hasPeriods
+          }
+          onClick={onAssignWeeklyShifts}
+        >
+          {assignWeeklyShiftsPending ? "جاري التعيين…" : "تعيين دوام الأسبوع"}
+        </Button>
       </div>
     </div>
   );
