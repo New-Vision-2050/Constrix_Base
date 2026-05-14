@@ -54,6 +54,7 @@ export const hrSettingsInsuranceMessages = new MessagesGroup({
     policyCategories: _m("Policy Categories", "فئات البوليصة"),
     noEmployees: _m("No Employees", "لا يوجد موظفين"),
     noCategories: _m("No Categories", "لا يوجد فئات"),
+    addCategory: _m("Add Category", "إضافة فئة"),
     attachments: _m("Attachments", "المرفقات"),
     noAttachments: _m("No Attachments", "لا توجد مرفقات"),
     cancel: _m("Cancel", "إلغاء"),

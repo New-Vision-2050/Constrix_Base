@@ -5,7 +5,7 @@ import { useInsurance } from "../context/InsuranceContext";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Box, Typography, Button, Grid, Dialog, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
-import { X, UploadCloud, FileText, Plus } from "lucide-react";
+import { X, UploadCloud, FileText, Plus, Edit } from "lucide-react";
 import EditIcon from '@mui/icons-material/Edit';
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import { MedicalInsuranceRow } from "../types";
@@ -15,9 +15,11 @@ interface InsuranceTableProps {
   activeTab?: number;
   onInsuranceSelect?: (insurance: MedicalInsuranceRow) => void;
   onTabChange?: (tab: number) => void;
+  categories?: any[];
+  onEditCategory?: (category: any) => void;
 }
 
-export default function InsuranceTable({ selectedInsurance, activeTab = 0, onInsuranceSelect, onTabChange }: InsuranceTableProps) {
+export default function InsuranceTable({ selectedInsurance, activeTab = 0, onInsuranceSelect, onTabChange, categories = [], onEditCategory }: InsuranceTableProps) {
   const { insurances } = useInsurance();
   const t = useTranslations("hr-settings.insurance");
   const { theme, systemTheme } = useTheme();
@@ -726,11 +728,120 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
           )}
 
           {activeTab === 2 && (
-            <Box sx={{ py: 4, textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: secondaryTextColor }}>
-                {t("noCategories")}
-              </Typography>
-            </Box>
+            <>
+              {categories.length === 0 ? (
+                <Box sx={{ py: 4, textAlign: "center" }}>
+                  <Typography variant="body2" sx={{ color: secondaryTextColor }}>
+                    {t("noCategories")}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box
+                  component="fieldset"
+                  sx={{
+                    border: "1px solid rgba(255, 255, 255, 0.4)",
+                    borderRadius: "24px",
+                    px: 3,
+                    pb: 3,
+                    pt: 2,
+                    width: "100%",
+                  }}
+                >
+                  <Box
+                    component="legend"
+                    sx={{
+                      px: 2,
+                      fontSize: "24px",
+                      fontWeight: 700,
+                      color: isDarkMode ? "#fff" : "#111827",
+                    }}
+                  >
+                    جميع الفئات
+                  </Box>
+
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    {categories.map((category, index) => (
+                      <Box
+                        key={index}
+                        component="fieldset"
+                        sx={{
+                          border: "1px solid rgba(255, 255, 255, 0.4)",
+                          borderRadius: "24px",
+                          px: 3,
+                          pb: 3,
+                          pt: 2,
+                          position: "relative",
+                          width: "100%",
+                        }}
+                      >
+                        <Box
+                          component="legend"
+                          sx={{
+                            width: "100%",
+                            px: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: "20px",
+                              fontWeight: 700,
+                              color: isDarkMode ? "#fff" : "#111827",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {category.name}
+                          </Typography>
+
+                          <Box
+                            sx={{
+                              flex: 1,
+                              height: "1px",
+                              background: isDarkMode
+                                ? "rgba(255, 255, 255, 0.4)"
+                                : "#d1d5db",
+                            }}
+                          />
+
+                          <IconButton size="small" onClick={() => onEditCategory && onEditCategory(category)} sx={{ color: "primary.main", p: 0.5, "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" } }}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
+                            <Typography variant="body2" className={secondaryTextColor}>
+                              نوع الفئة
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
+                              {category.categoryType}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
+                            <Typography variant="body2" className={secondaryTextColor}>
+                              الحد الأقصى للتغطية
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
+                              {category.maxCoverage}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
+                            <Typography variant="body2" className={secondaryTextColor}>
+                              الوصف
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
+                              {category.description || "-"}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </>
           )}
         </>
       ) : (
