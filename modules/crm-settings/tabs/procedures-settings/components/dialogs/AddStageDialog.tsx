@@ -329,7 +329,7 @@ export default function AddStageDialog({
                 value={escalationUserId}
                 onChange={(val) => setEscalationUserId(String(val))}
                 placeholder="الجهة المصعد اليها"
-                searchPlaceholder="البحث عن موظف..."
+                searchPlaceholder="البحث عن اداره..."
                 noResultsText="لا توجد نتائج"
                 label="الجهة المصعد اليها"
               />
