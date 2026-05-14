@@ -839,7 +839,7 @@ export default function StepCard({
                         value={field.value ?? ""}
                         onChange={(v) => field.onChange(String(v))}
                         placeholder="متخذي الاجراء"
-                        searchPlaceholder="البحث عن موظف..."
+                        searchPlaceholder="البحث عن اداره..."
                         noResultsText="لا توجد نتائج"
                         disabled={fieldsDisabled}
                         displayLabel={
@@ -872,7 +872,7 @@ export default function StepCard({
                         value={field.value ?? ""}
                         onChange={(v) => field.onChange(String(v))}
                         placeholder="المعنيين بالاجراء"
-                        searchPlaceholder="البحث عن موظف..."
+                        searchPlaceholder="البحث عن اداره..."
                         noResultsText="لا توجد نتائج"
                         disabled={fieldsDisabled}
                         displayLabel={
@@ -1020,7 +1020,7 @@ export default function StepCard({
                       value={field.value ?? ""}
                       onChange={(v) => field.onChange(String(v))}
                       placeholder="اختر الجهة المصعد إليها"
-                      searchPlaceholder="البحث عن موظف..."
+                      searchPlaceholder="البحث عن اداره..."
                       noResultsText="لا توجد نتائج"
                       disabled={fieldsDisabled}
                     />
