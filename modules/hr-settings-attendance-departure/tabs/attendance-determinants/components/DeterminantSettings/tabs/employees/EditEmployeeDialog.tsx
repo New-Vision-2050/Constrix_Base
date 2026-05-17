@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { ConstraintCatalogRow } from "@/modules/hr-settings-attendance-departure/api/getConstraintsCatalogGrouped";
 import { getEmployeeConstraintLocationsGrouped } from "@/modules/hr-settings-attendance-departure/api/getEmployeeConstraintLocations";
 import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
 import {
@@ -28,20 +27,15 @@ const CONSTRAINT_SECTIONS: { id: ConstraintSection; title: string }[] = [
   { id: "sub", title: "المحددات الفرعية" },
 ];
 
-/** Shown until API returns rows for that section (or when loading / no user / error). */
-const DUMMY_CONSTRAINT_LOCATIONS: {
-  main: ConstraintCatalogRow[];
-  sub: ConstraintCatalogRow[];
-} = {
-  main: [
-    { id: "dummy-main-1", constraint_name: "فرع جدة" },
-    { id: "dummy-main-2", constraint_name: "الرياض" },
-  ],
-  sub: [{ id: "dummy-sub-1", constraint_name: "فرع القصيم" }],
-};
-
 function rowKey(section: ConstraintSection, constraintId: string) {
   return `${section}:${constraintId}`;
+}
+
+function constraintDisplayName(
+  pool: { id: string; constraint_name: string }[],
+  constraintId: string,
+) {
+  return pool.find((r) => r.id === constraintId)?.constraint_name ?? constraintId;
 }
 
 interface EditEmployeeDialogProps {
@@ -80,28 +74,11 @@ export default function EditEmployeeDialog({
     refetchOnWindowFocus: false,
   });
 
-  const { optionsBySection, usingFallbackData } = useMemo(() => {
-    const loadingOrNoUser = !employeeUserId || isLoading;
+  const optionsBySection = useMemo(() => {
     const apiMain = groupedConstraints?.main ?? [];
     const apiSub = groupedConstraints?.additional ?? [];
-
-    if (loadingOrNoUser || isError) {
-      return {
-        usingFallbackData: true,
-        optionsBySection: {
-          main: DUMMY_CONSTRAINT_LOCATIONS.main,
-          sub: DUMMY_CONSTRAINT_LOCATIONS.sub,
-        },
-      };
-    }
-
-    const main = apiMain.length > 0 ? apiMain : DUMMY_CONSTRAINT_LOCATIONS.main;
-    const sub = apiSub.length > 0 ? apiSub : DUMMY_CONSTRAINT_LOCATIONS.sub;
-    const usingFallbackData =
-      apiMain.length === 0 || apiSub.length === 0;
-
-    return { usingFallbackData, optionsBySection: { main, sub } };
-  }, [employeeUserId, isLoading, isError, groupedConstraints]);
+    return { main: apiMain, sub: apiSub };
+  }, [groupedConstraints]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -149,32 +126,22 @@ export default function EditEmployeeDialog({
 
   const statusMessages = (pool: { id: string }[]) => (
     <>
-      {usingFallbackData &&
-        employeeUserId &&
-        !isLoading &&
-        !isError &&
-        (groupedConstraints?.main?.length === 0 ||
-          groupedConstraints?.additional?.length === 0) && (
-          <p className="text-xs text-muted-foreground text-right px-1">
-            عرض بيانات تجريبية للقسم الذي لا يملك بيانات بعد.
-          </p>
-        )}
       {isError && employeeUserId && !isLoading && (
         <p className="text-sm text-destructive text-right px-1">
-          تعذر تحميل المحددات؛ يتم عرض قائمة تجريبية.
+          تعذر تحميل المحددات.
         </p>
       )}
       {isLoading && employeeUserId && (
         <p className="text-sm text-muted-foreground text-right px-1">
-          جاري التحميل… (قائمة تجريبية مؤقتة)
+          جاري التحميل…
         </p>
       )}
       {!employeeUserId && (
         <p className="text-xs text-muted-foreground text-right px-1">
-          لم يتم ربط موظف؛ عرض محددات تجريبية.
+          لم يتم ربط موظف.
         </p>
       )}
-      {!isLoading && !isError && pool.length === 0 && (
+      {!isLoading && !isError && employeeUserId && pool.length === 0 && (
         <p className="text-sm text-muted-foreground text-right px-1">
           لا توجد محددات
         </p>
@@ -264,9 +231,6 @@ export default function EditEmployeeDialog({
                 const pool = sectionPool(id);
                 const optionPool = pool;
                 const emptyPool = optionPool.length === 0;
-                const selectedRows = pool.filter((row) =>
-                  selectedKeysSet.has(rowKey(id, row.id)),
-                );
 
                 return (
                   <AccordionItem key={id} value={id} className="border-none">
@@ -276,15 +240,33 @@ export default function EditEmployeeDialog({
                     <AccordionContent className="px-0 pb-2">
                       <div className="space-y-3 max-h-[min(40vh,280px)] overflow-y-auto pe-1">
                         {statusMessages(pool)}
-                        {pool.length > 0 && selectedRows.length === 0 && (
-                          <p className="text-sm text-muted-foreground text-right px-1">
-                            لم يتم اختيار محددات من هذا القسم في الخطوة الأولى
-                          </p>
-                        )}
-                        {selectedRows.map((row) => {
+                        {pool.length > 0 &&
+                          !Array.from(selectedKeysSet).some((k) =>
+                            k.startsWith(`${id}:`),
+                          ) && (
+                            <p className="text-sm text-muted-foreground text-right px-1">
+                              لم يتم اختيار محددات من هذا القسم في الخطوة الأولى
+                            </p>
+                          )}
+                        {pool.map((row) => {
                           const rk = rowKey(id, row.id);
+                          const isSelectedInStep1 = selectedKeysSet.has(rk);
                           const replacementId = replacementByKey[rk] ?? "";
                           const selectValue = replacementId || row.id;
+
+                          if (!isSelectedInStep1) {
+                            return (
+                              <div
+                                key={rk}
+                                className="h-12 border border-border rounded-md px-3 flex items-center justify-start bg-muted/50 text-muted-foreground pointer-events-none select-none"
+                              >
+                                <span className="text-sm">
+                                  {row.constraint_name}
+                                </span>
+                              </div>
+                            );
+                          }
+
                           return (
                             <div key={rk}>
                               <Select
@@ -320,94 +302,46 @@ export default function EditEmployeeDialog({
               })}
             </Accordion>
           ) : (
-            <div className="space-y-3" dir="rtl">
-              <div className="grid grid-cols-2 gap-4 text-sm font-medium">
-                <p className="text-right">قبل</p>
-                <p className="text-right">بعد</p>
-              </div>
+            <div className="space-y-4" dir="rtl">
+              {selectedKeysList.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-right px-1">
+                  لم يتم اختيار أي محدد للعرض.
+                </p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-4 text-sm font-medium border-b border-border pb-2">
+                    <p className="text-right">قبل</p>
+                    <p className="text-right">بعد</p>
+                  </div>
 
-              <Accordion
-                type="multiple"
-                defaultValue={["main", "sub"]}
-                className="w-full space-y-2"
-              >
-                {CONSTRAINT_SECTIONS.map(({ id, title }) => {
-                  const pool = sectionPool(id);
-                  const optionPool = pool;
-                  const emptyPool = optionPool.length === 0;
-                  const selectedRows = pool.filter((row) =>
-                    selectedKeysSet.has(rowKey(id, row.id)),
-                  );
+                  <div className="space-y-2 max-h-[min(50vh,360px)] overflow-y-auto pe-1">
+                    {CONSTRAINT_SECTIONS.flatMap(({ id }) => {
+                      const pool = sectionPool(id);
+                      return pool
+                        .filter((row) =>
+                          selectedKeysSet.has(rowKey(id, row.id)),
+                        )
+                        .map((row) => {
+                          const rk = rowKey(id, row.id);
+                          const replacementId = replacementByKey[rk] ?? "";
+                          const afterId = replacementId || row.id;
+                          const beforeLabel = row.constraint_name;
+                          const afterLabel = constraintDisplayName(pool, afterId);
 
-                  return (
-                    <AccordionItem key={id} value={id} className="border-none">
-                      <AccordionTrigger className="py-4 text-right rounded-lg">
-                        {title}
-                      </AccordionTrigger>
-                      <AccordionContent className="px-0 pb-2">
-                        <div className="space-y-3 max-h-[min(40vh,280px)] overflow-y-auto pe-1">
-                          {statusMessages(pool)}
-                          {pool.length > 0 && selectedRows.length === 0 && (
-                            <p className="text-sm text-muted-foreground text-right px-1">
-                              لم يتم اختيار محددات من هذا القسم في الخطوة الأولى
-                            </p>
-                          )}
-                          {selectedRows.map((row) => {
-                            const rk = rowKey(id, row.id);
-                            const replacementId = replacementByKey[rk] ?? "";
-                            const selectValue = replacementId || row.id;
-
-                            return (
-                              <div
-                                key={rk}
-                                className="grid grid-cols-2 gap-4 items-stretch"
-                              >
-                                <label className="min-h-12 border border-border rounded-md px-3 flex items-center justify-between gap-3 bg-background cursor-default">
-                                  <span className="text-sm text-right flex-1">
-                                    {row.constraint_name}
-                                  </span>
-                                  <input
-                                    type="checkbox"
-                                    checked
-                                    readOnly
-                                    tabIndex={-1}
-                                    aria-hidden
-                                    className="h-4 w-4 accent-primary shrink-0 pointer-events-none"
-                                  />
-                                </label>
-
-                                <Select
-                                  value={selectValue}
-                                  onValueChange={(value) =>
-                                    setReplacementByKey((previous) => ({
-                                      ...previous,
-                                      [rk]: value === row.id ? "" : value,
-                                    }))
-                                  }
-                                  disabled={emptyPool}
-                                >
-                                  <SelectTrigger className="w-full min-h-12 h-auto py-2">
-                                    <SelectValue
-                                      placeholder={row.constraint_name}
-                                    />
-                                  </SelectTrigger>
-                                  <SelectContent className="max-h-[min(60vh,320px)] overflow-y-auto">
-                                    {optionPool.map((opt) => (
-                                      <SelectItem key={opt.id} value={opt.id}>
-                                        {opt.constraint_name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  );
-                })}
-              </Accordion>
+                          return (
+                            <div
+                              key={rk}
+                              className="grid grid-cols-2 gap-4 items-center py-2 border-b border-border last:border-b-0"
+                            >
+                              <p className="text-sm text-right">{beforeLabel}</p>
+                              <p className="text-sm text-right">{afterLabel}</p>
+                            </div>
+                          );
+                        });
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           )}
 
