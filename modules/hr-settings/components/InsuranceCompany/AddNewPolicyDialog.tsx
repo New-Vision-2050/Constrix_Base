@@ -42,25 +42,19 @@ export default function AddNewPolicyDialog({
   const [formData, setFormData] = useState<CreateMedicalInsuranceForm>({
     name: "",
     policy_number: "",
+    provider: "",
+    start_date: "",
+    end_date: "",
+    value: 0,
+    individuals_count: 0,
     employee_id: "",
     status: 1,
-    end_date: "",
   });
 
   const [attachment, setAttachment] = useState<File | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Fetch employees for dropdown
-  const { data: employeesData } = useQuery({
-    queryKey: ["employees"],
-    queryFn: async () => {
-      const response = await baseApi.get("company-users/employees");
-      console.log("Full API Response:", response);
-      console.log("Response data:", response.data);
-      console.log("Employees array:", response.data.payload);
-      return response.data.payload || [];
-    },
-  });
+  // Removed employees dropdown - not needed
 
   // Reset form when dialog opens/closes or editing insurance changes
   useEffect(() => {
@@ -69,17 +63,25 @@ export default function AddNewPolicyDialog({
         setFormData({
           name: editingInsurance.name,
           policy_number: editingInsurance.policy_number,
-          employee_id: editingInsurance.employee_id,
-          status: editingInsurance.status,
+          provider: editingInsurance.provider || "",
+          start_date: editingInsurance.start_date || "",
           end_date: editingInsurance.end_date || "",
+          value: editingInsurance.value || 0,
+          individuals_count: editingInsurance.individuals_count || 0,
+          employee_id: editingInsurance.employee_id || "",
+          status: editingInsurance.status,
         });
       } else {
         setFormData({
           name: "",
           policy_number: "",
+          provider: "",
+          start_date: "",
+          end_date: "",
+          value: 0,
+          individuals_count: 0,
           employee_id: "",
           status: 1,
-          end_date: "",
         });
       }
     }
@@ -88,17 +90,22 @@ export default function AddNewPolicyDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.policy_number || !formData.employee_id) {
+    if (!formData.name || !formData.policy_number || !formData.provider || !formData.start_date || !formData.end_date) {
       toast.error(t("allFieldsRequired"));
       return;
     }
 
     try {
+      const submitData = {
+        ...formData,
+        attachment: attachment || undefined,
+      };
+
       if (editingInsurance) {
-        await MedicalInsuranceApi.update(editingInsurance.id, formData as UpdateMedicalInsuranceForm);
+        await MedicalInsuranceApi.update(editingInsurance.id, submitData as UpdateMedicalInsuranceForm);
         toast.success(t("updateSuccess"));
       } else {
-        await MedicalInsuranceApi.create(formData);
+        await MedicalInsuranceApi.create(submitData);
         toast.success(t("addSuccess"));
       }
 
@@ -170,66 +177,69 @@ export default function AddNewPolicyDialog({
 
         <TextField
           fullWidth
-          label={t("name")}
+          label={t("name") || "اسم الخدمة"}
           value={formData.name}
           onChange={(e) => handleInputChange("name", e.target.value)}
           placeholder={t("enterName")}
+          required
         />
 
         <TextField
           fullWidth
-          label={t("policyNumber")}
+          label={t("policyNumber") || "رقم الوثيقة"}
           value={formData.policy_number}
           onChange={(e) => handleInputChange("policy_number", e.target.value)}
           placeholder={t("enterPolicyNumber")}
+          required
         />
-
-        <FormControl fullWidth>
-          <InputLabel>{t("employee")}</InputLabel>
-          <MuiSelect
-            value={formData.employee_id}
-            label={t("employee")}
-            onChange={(e) => handleInputChange("employee_id", e.target.value)}
-          >
-            {employeesData?.map((employee) => (
-              <MenuItem key={employee.id} value={employee.id}>
-                {employee.name}
-              </MenuItem>
-            ))}
-          </MuiSelect>
-        </FormControl>
 
         <TextField
           fullWidth
-          type="date"
-          label={t("startData")}
-          value={formData.end_date}
-          onChange={(e) => handleInputChange("end_date", e.target.value)}
-          InputLabelProps={{ shrink: true }}
+          label="مزود الخدمة"
+          value={formData.provider}
+          onChange={(e) => handleInputChange("provider", e.target.value)}
+          placeholder="أدخل مزود الخدمة"
+          required
         />
 
         <TextField
           fullWidth
           type="date"
-          label={t("endData")}
-          value={formData.end_date}
-          onChange={(e) => handleInputChange("end_date", e.target.value)}
+          label="تاريخ البداية"
+          value={formData.start_date}
+          onChange={(e) => handleInputChange("start_date", e.target.value)}
           InputLabelProps={{ shrink: true }}
-        />
-        <TextField
-          fullWidth
-          label={t("theTop")}
-          value={formData.name}
-          onChange={(e) => handleInputChange("name", e.target.value)}
-          placeholder={t("enterTheTop")}
+          required
         />
 
         <TextField
           fullWidth
-          label={t("numberOfIndividuals")}
-          value={formData.policy_number}
-          onChange={(e) => handleInputChange("policy_number", e.target.value)}
-          placeholder={t("enterNumberOfIndividuals")}
+          type="date"
+          label="تاريخ النهاية"
+          value={formData.end_date}
+          onChange={(e) => handleInputChange("end_date", e.target.value)}
+          InputLabelProps={{ shrink: true }}
+          required
+        />
+
+        <TextField
+          fullWidth
+          type="number"
+          label="القيمة"
+          value={formData.value}
+          onChange={(e) => handleInputChange("value", Number(e.target.value))}
+          placeholder="أدخل القيمة"
+          required
+        />
+
+        <TextField
+          fullWidth
+          type="number"
+          label="عدد الأفراد"
+          value={formData.individuals_count}
+          onChange={(e) => handleInputChange("individuals_count", Number(e.target.value))}
+          placeholder="أدخل عدد الأفراد"
+          required
         />
 
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

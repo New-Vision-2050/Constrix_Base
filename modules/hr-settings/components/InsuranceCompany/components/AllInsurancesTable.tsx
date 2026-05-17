@@ -10,16 +10,45 @@ import { MedicalInsuranceRow } from "../types";
 interface AllInsurancesTableProps {
   onInsuranceSelect?: (insurance: MedicalInsuranceRow | null) => void;
   selectedInsurance?: MedicalInsuranceRow | null;
+  onPaginationChange?: (data: { currentPage: number; totalPages: number; startIndex: number; endIndex: number; total: number }) => void;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  itemsPerPage?: number;
 }
 
-export default function AllInsurancesTable({ onInsuranceSelect, selectedInsurance }: AllInsurancesTableProps) {
+export default function AllInsurancesTable({ onInsuranceSelect, selectedInsurance, onPaginationChange, currentPage: externalCurrentPage, onPageChange: externalOnPageChange, itemsPerPage: externalItemsPerPage }: AllInsurancesTableProps) {
   const { insurances } = useInsurance();
   const t = useTranslations("hr-settings.insurance");
+  const [internalCurrentPage, setInternalCurrentPage] = React.useState(1);
+  const itemsPerPage = externalItemsPerPage || 10;
+  
+  // Use external page if provided, otherwise use internal
+  const currentPage = externalCurrentPage !== undefined ? externalCurrentPage : internalCurrentPage;
+  const setCurrentPage = externalOnPageChange || setInternalCurrentPage;
   
   // Get current theme
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === 'system' ? systemTheme : theme;
   const isDarkMode = currentTheme === 'dark';
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(insurances.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedInsurances = insurances.slice(startIndex, endIndex);
+
+  // Send pagination data to parent
+  React.useEffect(() => {
+    if (onPaginationChange) {
+      onPaginationChange({
+        currentPage,
+        totalPages,
+        startIndex,
+        endIndex: Math.min(endIndex, insurances.length),
+        total: insurances.length
+      });
+    }
+  }, [currentPage, totalPages, startIndex, endIndex, insurances.length, onPaginationChange]);
   
   // Theme specific colors
   const containerBg = isDarkMode ? 'bg-[#1A103C]' : 'bg-white';
@@ -72,7 +101,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, selectedInsuranc
             </div>
           </div>
         ) : (
-          insurances.map((insurance) => (
+          paginatedInsurances.map((insurance) => (
             <div
               key={insurance.id}
               className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} last:border-b-0 cursor-pointer ${itemHoverBg} transition-colors`}
@@ -102,6 +131,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, selectedInsuranc
           ))
         )}
       </div>
+
     </div>
   );
 }

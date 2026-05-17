@@ -86,6 +86,7 @@ export default function AddEmployeeDialog({
     if (open) {
       setCurrentStep(0);
       if (editingEmployee) {
+        setIsEditMode(true);
         setFormData({
           name: editingEmployee.name ? (Array.isArray(editingEmployee.name) ? editingEmployee.name : [editingEmployee.name]) : [],
           employeeId: editingEmployee.employeeId || "",
@@ -101,6 +102,7 @@ export default function AddEmployeeDialog({
           relationship: editingEmployee.relationship || "",
         });
       } else {
+        setIsEditMode(false);
         setFormData({
           name: [],
           employeeId: "",
@@ -142,10 +144,16 @@ export default function AddEmployeeDialog({
       : formData;
 
     console.log("Saving employee:", employeeData);
-    toast.success(editingEmployee ? "تم تعديل الموظف بنجاح" : "تم إضافة الموظف بنجاح");
 
-    onOpenChange(false);
-    onSuccess(employeeData);
+    try {
+      // سيتم استدعاء API من المكون الأب (index.tsx)
+      toast.success(editingEmployee ? "تم تعديل الموظف بنجاح" : "تم إضافة الموظف بنجاح");
+      onOpenChange(false);
+      onSuccess(employeeData);
+    } catch (error) {
+      console.error("Error saving employee:", error);
+      toast.error("حدث خطأ أثناء حفظ الموظف");
+    }
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string | string[]) => {

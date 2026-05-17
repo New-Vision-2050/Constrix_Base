@@ -21,6 +21,12 @@ interface InsuranceContextType {
   selectedInsurance: MedicalInsuranceRow | null;
   setSelectedInsurance: (insurance: MedicalInsuranceRow | null) => void;
 
+  // Employees list
+  employees: any[];
+  setEmployees: (employees: any[]) => void;
+  addEmployee: (employee: any) => void;
+  updateEmployee: (id: string, employee: any) => void;
+
   // Dialog state
   isAddDialogOpen: boolean;
   setAddDialogOpen: (isOpen: boolean) => void;
@@ -57,6 +63,25 @@ export const InsuranceProvider: React.FC<InsuranceProviderProps> = ({
 
   // Selected insurance for table view
   const [selectedInsurance, setSelectedInsurance] = useState<MedicalInsuranceRow | null>(null);
+
+  // Employees state
+  const [employees, setEmployees] = useState<any[]>([]);
+
+  // Employee functions
+  const addEmployee = useCallback((employee: any) => {
+    const newEmployee = {
+      ...employee,
+      id: employee.id || Date.now().toString(),
+      createdAt: new Date().toISOString(),
+    };
+    setEmployees(prev => [...prev, newEmployee]);
+  }, []);
+
+  const updateEmployee = useCallback((id: string, employee: any) => {
+    setEmployees(prev => prev.map(emp => 
+      emp.id === id ? { ...emp, ...employee } : emp
+    ));
+  }, []);
 
   // Dialog states
   const [isAddDialogOpen, setAddDialogOpen] = useState<boolean>(false);
@@ -98,6 +123,12 @@ export const InsuranceProvider: React.FC<InsuranceProviderProps> = ({
     // Selected insurance
     selectedInsurance,
     setSelectedInsurance,
+
+    // Employees
+    employees,
+    setEmployees,
+    addEmployee,
+    updateEmployee,
 
     // Dialog states
     isAddDialogOpen,

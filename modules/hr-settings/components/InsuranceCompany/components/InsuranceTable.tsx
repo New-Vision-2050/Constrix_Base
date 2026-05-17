@@ -4,7 +4,7 @@ import React, { useState, useRef } from "react";
 import { useInsurance } from "../context/InsuranceContext";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { Box, Typography, Button, Grid, Dialog, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
+import { Box, Typography, Button, Grid, Dialog, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Menu, MenuItem } from "@mui/material";
 import { X, UploadCloud, FileText, Plus, Edit } from "lucide-react";
 import EditIcon from '@mui/icons-material/Edit';
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
@@ -17,14 +17,27 @@ interface InsuranceTableProps {
   onTabChange?: (tab: number) => void;
   categories?: any[];
   onEditCategory?: (category: any) => void;
+  onEditEmployee?: (employee: any) => void;
+  employees?: any[];
+  onDeleteEmployee?: (employeeId: string) => void;
 }
 
-export default function InsuranceTable({ selectedInsurance, activeTab = 0, onInsuranceSelect, onTabChange, categories = [], onEditCategory }: InsuranceTableProps) {
+export default function InsuranceTable({ selectedInsurance, activeTab = 0, onInsuranceSelect, onTabChange, categories = [], onEditCategory, onEditEmployee, employees = [], onDeleteEmployee }: InsuranceTableProps) {
   const { insurances } = useInsurance();
   const t = useTranslations("hr-settings.insurance");
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === 'system' ? systemTheme : theme;
   const isDarkMode = currentTheme === 'dark';
+  
+  // Pagination state
+  const [categoryPage, setCategoryPage] = React.useState(1);
+  const itemsPerPage = 10;
+  
+  // Calculate pagination
+  const totalCategoryPages = Math.ceil(categories.length / itemsPerPage);
+  const startIndex = (categoryPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCategories = categories.slice(startIndex, endIndex);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [detailsInsurance, setDetailsInsurance] = useState<MedicalInsuranceRow | null>(null);
@@ -34,6 +47,8 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
   const [editedPolicy, setEditedPolicy] = useState<MedicalInsuranceRow | null>(null);
   const [editingAttachmentIndex, setEditingAttachmentIndex] = useState<number | null>(null);
   const [editedAttachmentName, setEditedAttachmentName] = useState<string>("");
+  const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(null);
+  const [selectedEmployeeForAction, setSelectedEmployeeForAction] = useState<any>(null);
 
   const displayInsurances = selectedInsurance ? [selectedInsurance] : insurances;
 
@@ -117,6 +132,30 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
   const handleCancelEditAttachment = () => {
     setEditingAttachmentIndex(null);
     setEditedAttachmentName("");
+  };
+
+  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, employee: any) => {
+    setActionMenuAnchor(event.currentTarget);
+    setSelectedEmployeeForAction(employee);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchor(null);
+    setSelectedEmployeeForAction(null);
+  };
+
+  const handleEditEmployeeAction = () => {
+    if (selectedEmployeeForAction && onEditEmployee) {
+      onEditEmployee(selectedEmployeeForAction);
+    }
+    handleActionMenuClose();
+  };
+
+  const handleDeleteEmployeeAction = () => {
+    if (selectedEmployeeForAction && onDeleteEmployee) {
+      onDeleteEmployee(selectedEmployeeForAction.id);
+    }
+    handleActionMenuClose();
   };
 
   const cardBg = isDarkMode ? 'bg-[#251842]' : 'bg-white';
@@ -279,7 +318,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {t("policyData") || "بيانات البوليصة"}
+                      {selectedInsurance?.name || "بيانات البوليصة"}
                     </Typography>
 
                     {/* الخط الممتد */}
@@ -720,128 +759,307 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
           )}
 
           {activeTab === 1 && (
-            <Box sx={{ py: 4, textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: secondaryTextColor }}>
-                {t("noEmployees")}
-              </Typography>
+            <Box
+              component="fieldset"
+              sx={{
+                border: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.4)" : "#d1d5db"}`,
+                borderRadius: "24px",
+                px: 3,
+                pb: 3,
+                pt: 2,
+                width: "100%",
+              }}
+            >
+              <Box
+                component="legend"
+                sx={{
+                  px: 2,
+                  fontSize: "24px",
+                  fontWeight: 700,
+                  color: isDarkMode ? "#fff" : "#111827",
+                }}
+              >
+                {selectedInsurance?.name || "تأمين بوبا"}
+              </Box>
+
+              {/* Table */}
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
+                        اسم الموظف
+                      </TableCell>
+                      <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
+                        الفئة
+                      </TableCell>
+                      <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
+                        العائلون
+                      </TableCell>
+                      <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
+                        نسبة التغطية
+                      </TableCell>
+                      <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
+                        الحالة
+                      </TableCell>
+                      <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
+                        الإجراء
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {employees.length > 0 ? (
+                      employees.map((employee, index) => (
+                        <TableRow 
+                          key={employee.id}
+                          sx={{
+                            '&:last-child td': { borderBottom: 0 },
+                            '& td': { 
+                              borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.1)" : "#f3f4f6"}`,
+                              py: 2
+                            }
+                          }}
+                        >
+                          <TableCell align="center" sx={{ color: textColor, fontWeight: 500 }}>
+                            {Array.isArray(employee.name) ? employee.name[0] : employee.name}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography variant="body2" sx={{ fontWeight: "medium", color: "#fbbf24" }}>
+                              {employee.category || "فئة A"}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography variant="body2" sx={{ fontWeight: "medium", color: "#8b5cf6" }}>
+                              {employee.dependents?.length ? `يوجد ${employee.dependents.length} معالون` : "يوجد معالون"}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography variant="body2" sx={{ fontWeight: "medium", color: "#ec4899" }}>
+                              {employee.value || "75%"}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button
+                              variant="contained"
+                              size="small"
+                              sx={{
+                                backgroundColor: "transparent",
+                                color: "#10b981",
+                                borderRadius: "20px",
+                                px: 2,
+                                fontSize: "12px",
+                                textTransform: "none",
+                                minWidth: "60px",
+                                boxShadow: "none",
+                                "&:hover": {
+                                  backgroundColor: "rgba(16, 185, 129, 0.1)",
+                                  boxShadow: "none",
+                                }
+                              }}
+                            >
+                              ● نشط
+                            </Button>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button
+                              variant="contained"
+                              size="small"
+                              onClick={(e) => handleActionMenuOpen(e, employee)}
+                              sx={{
+                                backgroundColor: "#64748b",
+                                color: "#fff",
+                                borderRadius: "8px",
+                                px: 2,
+                                fontSize: "12px",
+                                textTransform: "none",
+                                minWidth: "60px",
+                                "&:hover": {
+                                  backgroundColor: "#475569",
+                                }
+                              }}
+                            >
+                              إجراء ▼
+                            </Button>
+                            <Menu
+                              anchorEl={actionMenuAnchor}
+                              open={Boolean(actionMenuAnchor)}
+                              onClose={handleActionMenuClose}
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                              }}
+                              transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                              }}
+                            >
+                              <MenuItem onClick={handleEditEmployeeAction}>
+                                <EditIcon fontSize="small" sx={{ mr: 1 }} />
+                                تعديل
+                              </MenuItem>
+                              <MenuItem onClick={handleDeleteEmployeeAction} sx={{ color: "#ef4444" }}>
+                                <X fontSize="small" sx={{ mr: 1 }} />
+                                حذف
+                              </MenuItem>
+                            </Menu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center" sx={{ py: 4, color: secondaryTextColor }}>
+                          {t("noEmployees") || "لا يوجد موظفين"}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
           )}
 
           {activeTab === 2 && (
-            <>
-              {categories.length === 0 ? (
-                <Box sx={{ py: 4, textAlign: "center" }}>
-                  <Typography variant="body2" sx={{ color: secondaryTextColor }}>
-                    {t("noCategories")}
-                  </Typography>
-                </Box>
-              ) : (
-                <Box
-                  component="fieldset"
-                  sx={{
-                    border: "1px solid rgba(255, 255, 255, 0.4)",
-                    borderRadius: "24px",
-                    px: 3,
-                    pb: 3,
-                    pt: 2,
-                    width: "100%",
-                  }}
-                >
-                  <Box
-                    component="legend"
-                    sx={{
-                      px: 2,
-                      fontSize: "24px",
-                      fontWeight: 700,
-                      color: isDarkMode ? "#fff" : "#111827",
-                    }}
-                  >
-                    جميع الفئات
-                  </Box>
+            <Box
+              component="fieldset"
+              sx={{
+                border: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.4)" : "#d1d5db"}`,
+                borderRadius: "24px",
+                px: 3,
+                pb: 3,
+                pt: 2,
+                width: "100%",
+              }}
+            >
+              <Box
+                component="legend"
+                sx={{
+                  px: 2,
+                  fontSize: "24px",
+                  fontWeight: 700,
+                  color: isDarkMode ? "#fff" : "#111827",
+                }}
+              >
+                جميع الفئات
+              </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    {categories.map((category, index) => (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {categories.length > 0 ? (
+                  paginatedCategories.map((category, index) => (
+                    <Box
+                      key={index}
+                      component="fieldset"
+                      sx={{
+                        border: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.4)" : "#d1d5db"}`,
+                        borderRadius: "24px",
+                        px: 3,
+                        pb: 3,
+                        pt: 2,
+                        position: "relative",
+                        width: "100%",
+                      }}
+                    >
                       <Box
-                        key={index}
-                        component="fieldset"
+                        component="legend"
                         sx={{
-                          border: "1px solid rgba(255, 255, 255, 0.4)",
-                          borderRadius: "24px",
-                          px: 3,
-                          pb: 3,
-                          pt: 2,
-                          position: "relative",
                           width: "100%",
+                          px: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 2,
                         }}
                       >
-                        <Box
-                          component="legend"
+                        <Typography
                           sx={{
-                            width: "100%",
-                            px: 2,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 2,
+                            fontSize: "20px",
+                            fontWeight: 700,
+                            color: isDarkMode ? "#fff" : "#111827",
+                            whiteSpace: "nowrap",
                           }}
                         >
-                          <Typography
-                            sx={{
-                              fontSize: "20px",
-                              fontWeight: 700,
-                              color: isDarkMode ? "#fff" : "#111827",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {category.name}
+                          {category.name}
+                        </Typography>
+
+                        <Box
+                          sx={{
+                            flex: 1,
+                            height: "1px",
+                            background: isDarkMode
+                              ? "rgba(255, 255, 255, 0.4)"
+                              : "#d1d5db",
+                          }}
+                        />
+
+                        <IconButton size="small" onClick={() => onEditCategory && onEditCategory(category)} sx={{ color: "primary.main", p: 0.5, "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" } }}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
+                          <Typography variant="body2" className={secondaryTextColor}>
+                            نوع الفئة
                           </Typography>
-
-                          <Box
-                            sx={{
-                              flex: 1,
-                              height: "1px",
-                              background: isDarkMode
-                                ? "rgba(255, 255, 255, 0.4)"
-                                : "#d1d5db",
-                            }}
-                          />
-
-                          <IconButton size="small" onClick={() => onEditCategory && onEditCategory(category)} sx={{ color: "primary.main", p: 0.5, "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" } }}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
+                          <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
+                            {category.categoryType}
+                          </Typography>
                         </Box>
-
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
-                            <Typography variant="body2" className={secondaryTextColor}>
-                              نوع الفئة
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-                              {category.categoryType}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
-                            <Typography variant="body2" className={secondaryTextColor}>
-                              الحد الأقصى للتغطية
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-                              {category.maxCoverage}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
-                            <Typography variant="body2" className={secondaryTextColor}>
-                              الوصف
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-                              {category.description || "-"}
-                            </Typography>
-                          </Box>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
+                          <Typography variant="body2" className={secondaryTextColor}>
+                            الحد الأقصى للتغطية
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
+                            {category.maxCoverage}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
+                          <Typography variant="body2" className={secondaryTextColor}>
+                            الوصف
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
+                            {category.description || "-"}
+                          </Typography>
                         </Box>
                       </Box>
-                    ))}
+                    </Box>
+                  ))
+                ) : (
+                  <Box sx={{ py: 4, textAlign: "center" }}>
+                    <Typography variant="body2" sx={{ color: secondaryTextColor }}>
+                      {t("noCategories")}
+                    </Typography>
                   </Box>
+                )}
+              </Box>
+              
+              {/* Pagination Controls */}
+              {totalCategoryPages > 1 && (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2, mt: 3 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={categoryPage === 1}
+                    onClick={() => setCategoryPage(prev => Math.max(1, prev - 1))}
+                    sx={{ minWidth: "auto" }}
+                  >
+                    السابق
+                  </Button>
+                  
+                  <Typography variant="body2" sx={{ color: textColor }}>
+                    صفحة {categoryPage} من {totalCategoryPages}
+                  </Typography>
+                  
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={categoryPage === totalCategoryPages}
+                    onClick={() => setCategoryPage(prev => Math.min(totalCategoryPages, prev + 1))}
+                    sx={{ minWidth: "auto" }}
+                  >
+                    التالي
+                  </Button>
                 </Box>
               )}
-            </>
+            </Box>
           )}
         </>
       ) : (
