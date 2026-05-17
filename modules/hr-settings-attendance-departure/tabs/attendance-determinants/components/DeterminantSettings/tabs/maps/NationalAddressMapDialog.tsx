@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { MapRangePicker } from "@/components/shared/map-range-picker";
 import { AlertCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,9 @@ export type NationalAddressMapPayload = {
 const DEFAULT_COORD = "25.325348647861";
 const DEFAULT_RADIUS = "1000";
 const DEFAULT_LOCATION = "مركز العمل الرئيسي";
+
+const coordInputClassName =
+  "flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono tabular-nums text-end text-foreground shadow-sm ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
 type NationalAddressMapDialogProps = {
   open: boolean;
@@ -101,35 +104,62 @@ export default function NationalAddressMapDialog({
 
         <div className="space-y-4 px-4 pb-4 pt-4 sm:px-0">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Input
-              label="خط الطول"
-              variant="secondary"
-              dir="ltr"
-              inputClassName="text-end font-mono text-sm"
-              value={longitude}
-              onChange={(e) => setLongitude(e.target.value)}
-              placeholder={DEFAULT_COORD}
-            />
-            <Input
-              label="خط العرض"
-              variant="secondary"
-              dir="ltr"
-              inputClassName="text-end font-mono text-sm"
-              value={latitude}
-              onChange={(e) => setLatitude(e.target.value)}
-              placeholder={DEFAULT_COORD}
-            />
+            <div className="space-y-2">
+              <Label
+                htmlFor="national-map-longitude"
+                className="block text-right text-sm font-medium leading-none"
+              >
+                خط الطول
+              </Label>
+              <input
+                id="national-map-longitude"
+                type="text"
+                dir="ltr"
+                autoComplete="off"
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+                placeholder={DEFAULT_COORD}
+                className={coordInputClassName}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="national-map-latitude"
+                className="block text-right text-sm font-medium leading-none"
+              >
+                خط العرض
+              </Label>
+              <input
+                id="national-map-latitude"
+                type="text"
+                dir="ltr"
+                autoComplete="off"
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+                placeholder={DEFAULT_COORD}
+                className={coordInputClassName}
+              />
+            </div>
           </div>
 
-          <Input
-            label="نص القطر"
-            variant="secondary"
-            dir="ltr"
-            inputClassName="text-end font-mono text-sm"
-            value={radius}
-            onChange={(e) => setRadius(e.target.value)}
-            placeholder="دائرة نصف القطر"
-          />
+          <div className="space-y-2">
+            <Label
+              htmlFor="national-map-radius"
+              className="block text-right text-sm font-medium leading-none"
+            >
+              نصف القطر
+            </Label>
+            <input
+              id="national-map-radius"
+              type="text"
+              dir="ltr"
+              autoComplete="off"
+              value={radius}
+              onChange={(e) => setRadius(e.target.value)}
+              placeholder="مثال: 1000"
+              className={coordInputClassName}
+            />
+          </div>
 
           <div className="relative overflow-hidden rounded-xl border border-border bg-muted/20">
             <MapRangePicker

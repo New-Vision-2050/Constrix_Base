@@ -77,20 +77,22 @@ export default function TimingSettingsSection() {
   return (
     <>
       <Tabs defaultValue="weekly" dir="rtl" className="gap-4">
-        <TabsList className="h-auto p-1 bg-transparent border border-border rounded-xl mx-auto justify-center gap-2">
-          <TabsTrigger
-            value="daily"
-            className="rounded-lg px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-          >
-            يومي
-          </TabsTrigger>
-          <TabsTrigger
-            value="weekly"
-            className="rounded-lg px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-          >
-            اسبوعي
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex w-full justify-center">
+          <TabsList className="h-auto p-1 bg-transparent border rounded-full border-border gap-2">
+            <TabsTrigger
+              value="daily"
+              className="rounded-3xl px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
+            >
+              يومي
+            </TabsTrigger>
+            <TabsTrigger
+              value="weekly"
+              className="rounded-3xl px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
+            >
+              اسبوعي
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="daily" className="pt-2">
           <DailyTimingSettings

@@ -45,6 +45,7 @@ export default function SelectedEmployees() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [editEmployeeUserId, setEditEmployeeUserId] = useState("");
 
   const params = SelectedEmployeesTable.useTableParams({
     initialPage: 1,
@@ -89,7 +90,7 @@ export default function SelectedEmployees() {
         key: "actions",
         name: "الاجراء",
         sortable: false,
-        render: () => (
+        render: (row: EmployeeRow) => (
           <CustomMenu
             renderAnchor={({ onClick }) => (
               <Button className="h-8 px-4 gap-1" onClick={onClick}>
@@ -99,7 +100,14 @@ export default function SelectedEmployees() {
             )}
           >
             <MenuItem disabled>عرض</MenuItem>
-            <MenuItem onClick={() => setIsEditDialogOpen(true)}>تعديل</MenuItem>
+            <MenuItem
+              onClick={() => {
+                setEditEmployeeUserId(row.id);
+                setIsEditDialogOpen(true);
+              }}
+            >
+              تعديل
+            </MenuItem>
           </CustomMenu>
         ),
       },
@@ -147,9 +155,11 @@ export default function SelectedEmployees() {
 
       <EditEmployeeDialog
         isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        selectedEmployee={selectedEmployee}
-        setSelectedEmployee={setSelectedEmployee}
+        onClose={() => {
+          setIsEditDialogOpen(false);
+          setEditEmployeeUserId("");
+        }}
+        userId={editEmployeeUserId}
       />
     </section>
   );

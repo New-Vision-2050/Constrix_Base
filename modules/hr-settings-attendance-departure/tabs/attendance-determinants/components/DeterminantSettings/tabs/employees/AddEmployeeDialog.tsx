@@ -1,13 +1,7 @@
+import { useMemo } from "react";
 import { EMPLOYEE_ROWS } from "./SelectedEmployees";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@mui/material";
+import { Autocomplete, Button, TextField } from "@mui/material";
 
 interface AddEmployeeDialogProps {
   isOpen: boolean;
@@ -22,6 +16,11 @@ export default function AddEmployeeDialog({
   selectedEmployee,
   setSelectedEmployee,
 }: AddEmployeeDialogProps) {
+  const selectedOption = useMemo(
+    () => EMPLOYEE_ROWS.find((e) => e.id === selectedEmployee) ?? null,
+    [selectedEmployee],
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -33,21 +32,37 @@ export default function AddEmployeeDialog({
             <p className="text-xs text-muted-foreground text-right">
               اسم الموظف
             </p>
-            <Select
-              value={selectedEmployee}
-              onValueChange={(value: string) => setSelectedEmployee(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اسم الموظف" />
-              </SelectTrigger>
-              <SelectContent>
-                {EMPLOYEE_ROWS.map((employee) => (
-                  <SelectItem key={employee.id} value={employee.id}>
-                    {employee.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Autocomplete
+              fullWidth
+              options={EMPLOYEE_ROWS}
+              value={selectedOption}
+              onChange={(_, option) => setSelectedEmployee(option?.id ?? "")}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(a, b) => a.id === b.id}
+              ListboxProps={{
+                sx: { maxHeight: 280, direction: "rtl" },
+              }}
+              slotProps={{
+                popper: {
+                  sx: { zIndex: (theme) => theme.zIndex.modal + 2 },
+                },
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="اسم الموظف"
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": { direction: "rtl" },
+                  }}
+                  inputProps={{
+                    ...params.inputProps,
+                    dir: "rtl",
+                  }}
+                />
+              )}
+              noOptionsText="لا توجد نتائج"
+            />
           </div>
 
           <Button variant="contained" className="w-full" onClick={onClose}>

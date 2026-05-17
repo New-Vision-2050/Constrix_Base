@@ -57,8 +57,8 @@ export default function WeeklyTimingSettings({
             اضافة الفترات
           </Button>
         ) : (
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6">
-            <div className="flex-1 min-w-0 space-y-2">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 bg-background rounded-lg p-1">
+            <div className="flex-1 min-w-0 space-y-2 ">
               {periodRows.map((row, idx) => (
                 <div
                   key={idx}
