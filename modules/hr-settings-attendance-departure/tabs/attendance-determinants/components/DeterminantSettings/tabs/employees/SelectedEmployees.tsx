@@ -15,184 +15,32 @@ import type {
   ConstraintSelectedEmployeePayload,
 } from "@/services/api/attendance-constraints/types/response";
 import { useCompanyEmployees } from "@/modules/company-profile/query/useCompanyEmployees";
+import { parseConstraintEmployeesList } from "./parseConstraintEmployeesList";
 
-type EmployeeRow = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  project: string;
-  status: string;
+type EmployeesTableSlice = {
+  rows: ConstraintSelectedEmployeePayload[];
+  totalPages: number;
+  totalItems: number;
 };
 
-function str(v: unknown, fallback = ""): string {
-  if (v === undefined || v === null) return fallback;
-  const s = String(v).trim();
-  return s.length > 0 ? s : fallback;
-}
+const EMPTY_EMPLOYEES_TABLE: EmployeesTableSlice = {
+  rows: [],
+  totalPages: 1,
+  totalItems: 0,
+};
 
-function record(v: unknown): Record<string, unknown> | undefined {
-  if (v !== null && typeof v === "object" && !Array.isArray(v)) {
-    return v as Record<string, unknown>;
-  }
-  return undefined;
-}
-
-/** Supports array payload, object map payload, nested list keys, flat pagination roots. */
-function parseEmployeesListResponse(apiBody: ConstraintEmployeesListApiResponse) {
-  const root = apiBody as unknown as Record<string, unknown>;
-
-  const rawPayload: unknown =
-    root.payload ??
-    root.data ??
-    root.employees ??
-    root.records ??
-    root.users;
-
-  let list: ConstraintSelectedEmployeePayload[] = [];
-
-  if (Array.isArray(rawPayload)) {
-    list = rawPayload as ConstraintSelectedEmployeePayload[];
-  } else {
-    const r = record(rawPayload);
-    if (r) {
-      const nested = r.objects ?? r.items ?? r.results ?? r.employees ?? r.users;
-      if (Array.isArray(nested))
-        list = nested as ConstraintSelectedEmployeePayload[];
-      else if (
-        str(r.id) &&
-        (str(r.name) ||
-          str(r.full_name as string | undefined) ||
-          str(r.email) ||
-          str(r.phone))
-      ) {
-        list = [r as unknown as ConstraintSelectedEmployeePayload];
-      } else {
-        const values = Object.values(r);
-        if (
-          values.length > 0 &&
-          values.every(
-            (entry) =>
-              entry !== null &&
-              typeof entry === "object" &&
-              !Array.isArray(entry),
-          )
-        )
-          list = values as ConstraintSelectedEmployeePayload[];
-      }
-    }
-  }
-
-  const nestedPm = record(root.pagination);
-  let totalPages =
-    nestedPm?.last_page != null
-      ? Number(nestedPm.last_page)
-      : root.last_page != null
-        ? Number(root.last_page)
-        : 1;
-  if (!Number.isFinite(totalPages) || totalPages < 1) totalPages = 1;
-
-  let resultCount =
-    nestedPm?.result_count != null
-      ? Number(nestedPm.result_count)
-      : root.result_count != null
-        ? Number(root.result_count)
-        : list.length;
-  if (!Number.isFinite(resultCount) || resultCount < 0) resultCount = list.length;
-
-  return {
-    rows: list,
-    totalPages,
-    totalItems: resultCount,
-  };
-}
-
-function deriveProject(payload: ConstraintSelectedEmployeePayload): string {
-  const p = payload.project;
-  const b = payload.branch;
-
-  const companies = payload.company;
-  if (Array.isArray(companies) && companies.length > 0) {
-    const names = companies.map((c) => str(c?.name)).filter(Boolean);
-    const joined = names.join("، ");
-    if (joined) return joined;
-  }
-
-  if (typeof p === "string") return str(p, "—");
-  if (p && typeof p === "object") return str(p.name, "—");
-  if (typeof b === "string") return str(b, "—");
-  if (b && typeof b === "object") return str(b.name, "—");
-  return "—";
-}
-
-function deriveStatus(payload: ConstraintSelectedEmployeePayload): string {
-  const fromPayload = str(payload.status ?? payload.state);
-  if (fromPayload) {
-    const lower = fromPayload.toLowerCase();
-    if (lower === "active") return "نشط";
-    return fromPayload;
-  }
-
-  const companies = payload.company;
-  const firstRole = companies?.[0]?.roles?.[0];
-  if (firstRole?.status) {
-    const s = str(firstRole.status);
-    if (s.toLowerCase() === "active") return "نشط";
-    return s || "—";
-  }
-
-  if (payload.is_active === 1 || payload.is_active === true) return "نشط";
-  if (payload.is_active === 0 || payload.is_active === false) return "غير نشط";
-  return "—";
-}
-
-function mapPayloadToEmployeeRow(
-  payload: ConstraintSelectedEmployeePayload,
-  index: number,
-): EmployeeRow {
-  const user = payload.user ?? {};
-  const name =
-    str(payload.full_name) ||
-    str(payload.name) ||
-    str(user.name) ||
-    "—";
-  const email = str(payload.email ?? user.email) || "—";
-  const phone =
-    str(
-      payload.phone ?? payload.mobile ?? user.phone ?? user.mobile,
-    ) || "—";
-
-  const stableId =
-    str(user.id) ||
-    str(payload.user_id) ||
-    str(payload.id) ||
-    `constraint-employee-${index}`;
-
-  return {
-    id: stableId,
-    name,
-    email,
-    phone,
-    project: deriveProject(payload),
-    status: deriveStatus(payload),
-  };
-}
-
-const SelectedEmployeesTable = HeadlessTableLayout<EmployeeRow>(
-  "attendance-determinants-selected-employees",
-);
+const SelectedEmployeesTable =
+  HeadlessTableLayout<ConstraintSelectedEmployeePayload>(
+    "attendance-determinants-selected-employees",
+  );
 
 function safePagingParams(page: unknown, limit: unknown) {
   const p =
-    typeof page === "number" &&
-    Number.isFinite(page) &&
-    page >= 1
+    typeof page === "number" && Number.isFinite(page) && page >= 1
       ? Math.floor(page)
       : 1;
   let l =
-    typeof limit === "number" &&
-    Number.isFinite(limit) &&
-    limit >= 1
+    typeof limit === "number" && Number.isFinite(limit) && limit >= 1
       ? Math.floor(limit)
       : 10;
   l = Math.min(l, 200);
@@ -225,12 +73,12 @@ export default function SelectedEmployees({
       paging.page,
       paging.per_page,
     ],
-    queryFn: async () => {
+    queryFn: async (): Promise<ConstraintEmployeesListApiResponse> => {
       const res = await AttendanceConstraints.getEmployees(constraintId, {
         page: paging.page,
         per_page: paging.per_page,
       });
-      return res.data as ConstraintEmployeesListApiResponse;
+      return res.data;
     },
     enabled: Boolean(constraintId),
     refetchOnWindowFocus: false,
@@ -238,29 +86,26 @@ export default function SelectedEmployees({
 
   const { data: companyEmployees = [] } = useCompanyEmployees();
 
-  const { rows, totalPages, totalItems } = useMemo(() => {
+  const { rows, totalPages, totalItems } = useMemo((): EmployeesTableSlice => {
     if (!apiBody) {
-      return {
-        rows: [] as EmployeeRow[],
-        totalPages: 1,
-        totalItems: 0,
-      };
+      return EMPTY_EMPLOYEES_TABLE;
     }
 
-    const { rows: rawList, totalPages: tp, totalItems: ti } =
-      parseEmployeesListResponse(apiBody);
-    const mapped = rawList.map((p, i) =>
-      mapPayloadToEmployeeRow(p, i),
-    );
+    const {
+      employees,
+      totalPages: tp,
+      totalItems: ti,
+    } = parseConstraintEmployeesList(apiBody);
     return {
-      rows: mapped,
+      rows: employees,
       totalPages: tp,
       totalItems: ti,
     };
   }, [apiBody]);
 
   const assignedIds = useMemo(
-    () => new Set(rows.map((r) => String(r.id))),
+    () =>
+      new Set(rows.map((r) => String(r.id ?? r.user_id ?? "")).filter(Boolean)),
     [rows],
   );
 
@@ -292,39 +137,78 @@ export default function SelectedEmployees({
         key: "name",
         name: "اسم الموظف",
         sortable: false,
-        render: (row: EmployeeRow) => <span>{row.name}</span>,
+        render: (row: ConstraintSelectedEmployeePayload) => (
+          <span>{row.name ?? row.full_name ?? row.user?.name ?? "—"}</span>
+        ),
       },
       {
         key: "email",
         name: "البريد الالكتروني",
         sortable: false,
-        render: (row: EmployeeRow) => <span>{row.email}</span>,
+        render: (row: ConstraintSelectedEmployeePayload) => (
+          <span>{row.email ?? row.user?.email ?? "—"}</span>
+        ),
       },
       {
         key: "phone",
         name: "رقم الجوال",
         sortable: false,
-        render: (row: EmployeeRow) => <span>{row.phone}</span>,
+        render: (row: ConstraintSelectedEmployeePayload) => (
+          <span>
+            {row.phone ??
+              row.mobile ??
+              row.user?.phone ??
+              row.user?.mobile ??
+              "—"}
+          </span>
+        ),
       },
       {
         key: "project",
         name: "المشروع",
         sortable: false,
-        render: (row: EmployeeRow) => <span>{row.project}</span>,
+        render: (row: ConstraintSelectedEmployeePayload) => (
+          <span>
+            {typeof row.project === "string"
+              ? row.project
+              : (row.project?.name ??
+                (typeof row.branch === "string"
+                  ? row.branch
+                  : row.branch?.name) ??
+                "—")}
+          </span>
+        ),
       },
       {
         key: "status",
         name: "الحاله",
         sortable: false,
-        render: (row: EmployeeRow) => (
-          <span className="text-emerald-500">{row.status}</span>
+        render: (row: ConstraintSelectedEmployeePayload) => (
+          <span
+            className={
+              row.status === "نشط" ||
+              row.status?.toLowerCase() === "active" ||
+              row.is_active === 1 ||
+              row.is_active === true
+                ? "text-emerald-500"
+                : undefined
+            }
+          >
+            {row.status ??
+              row.state ??
+              (row.is_active === 1 || row.is_active === true
+                ? "نشط"
+                : row.is_active === 0 || row.is_active === false
+                  ? "غير نشط"
+                  : "—")}
+          </span>
         ),
       },
       {
         key: "actions",
         name: "الاجراء",
         sortable: false,
-        render: (row: EmployeeRow) => (
+        render: (row: ConstraintSelectedEmployeePayload) => (
           <CustomMenu
             renderAnchor={({ onClick }) => (
               <Button className="h-8 px-4 gap-1" onClick={onClick}>
@@ -336,7 +220,7 @@ export default function SelectedEmployees({
             <MenuItem disabled>عرض</MenuItem>
             <MenuItem
               onClick={() => {
-                setSelectedEmployee(row.id);
+                setSelectedEmployee(String(row.id ?? row.user_id ?? ""));
                 setIsEditDialogOpen(true);
               }}
             >
@@ -355,7 +239,7 @@ export default function SelectedEmployees({
     totalPages,
     totalItems,
     params,
-    getRowId: (row) => row.id,
+    getRowId: (row) => String(row.id ?? row.user_id ?? ""),
     loading: isLoading,
     searchable: false,
   });

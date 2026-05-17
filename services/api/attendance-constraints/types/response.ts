@@ -9,12 +9,9 @@ export interface ConstraintBasicInfo {
   constraint_type?: string;
   branches?: { id: string; name: string }[];
   branch_locations?: { id: string; name: string }[];
-  /** IDs for PATCH `/basic-info` and some GET payloads. */
   branch_ids?: string[];
-  /** ISO-ish code, e.g. `sa`. */
   country_code?: string;
   country?: string;
-  /** IANA zone label or HH:mm depending on backend. */
   timezone?: string;
   reference_time?: string;
   daily_start_time?: string;
@@ -25,7 +22,6 @@ export interface ConstraintBasicInfo {
 export type ConstraintBasicInfoApiResponse =
   ApiBaseResponse<ConstraintBasicInfo>;
 
-/** One row from GET `/attendance/constraints/:id/employees` — shape may vary per backend */
 export interface ConstraintSelectedEmployeePayload {
   id?: string;
   user_id?: string;
@@ -52,6 +48,14 @@ export interface ConstraintSelectedEmployeePayload {
     name?: string;
     roles?: Array<{ role?: string; status?: string }>;
   }>;
+}
+export const CONSTRAINT_EMPLOYEES_LIST_PAYLOAD_OBJECTS_CODE =
+  "SUCCESS_WITH_LIST_PAYLOAD_OBJECTS" as const;
+
+export interface ConstraintEmployeesListNormalized {
+  employees: ConstraintSelectedEmployeePayload[];
+  totalPages: number;
+  totalItems: number;
 }
 
 /** GET employees — pagination may live on `pagination` OR at response root alongside `payload` */
