@@ -958,67 +958,82 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                         width: "100%",
                       }}
                     >
+                      {/* Legend with only Edit Icon - Left aligned */}
                       <Box
                         component="legend"
                         sx={{
-                          width: "100%",
-                          px: 2,
+                          px: 1,
                           display: "flex",
                           alignItems: "center",
-                          gap: 2,
+                          justifyContent: "flex-start",
                         }}
                       >
-                        <Typography
-                          sx={{
-                            fontSize: "20px",
-                            fontWeight: 700,
-                            color: isDarkMode ? "#fff" : "#111827",
-                            whiteSpace: "nowrap",
+                        <IconButton 
+                          size="small" 
+                          onClick={() => onEditCategory && onEditCategory(category)} 
+                          sx={{ 
+                            color: "primary.main",
+                            p: 0.5,
+                            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" }
                           }}
                         >
-                          {category.name}
-                        </Typography>
-
-                        <Box
-                          sx={{
-                            flex: 1,
-                            height: "1px",
-                            background: isDarkMode
-                              ? "rgba(255, 255, 255, 0.4)"
-                              : "#d1d5db",
-                          }}
-                        />
-
-                        <IconButton size="small" onClick={() => onEditCategory && onEditCategory(category)} sx={{ color: "primary.main", p: 0.5, "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" } }}>
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Box>
 
-                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
-                          <Typography variant="body2" className={secondaryTextColor}>
-                            نوع الفئة
-                          </Typography>
-                          <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-                            {category.categoryType}
-                          </Typography>
+                      {/* Category Name - Left aligned */}
+                      <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
+                        <Typography
+                          sx={{
+                            fontSize: "18px",
+                            fontWeight: 700,
+                            color: isDarkMode ? "#fff" : "#111827",
+                          }}
+                        >
+                          {category.name}
+                        </Typography>
+                      </Box>
+
+                      {/* Description - Left aligned */}
+                      <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: secondaryTextColor,
+                            lineHeight: 1.6,
+                            textAlign: "left"
+                          }}
+                        >
+                          {category.description || "تغطية شاملة داخل المملكة مع استثناء علاج خارجي"}
+                        </Typography>
+                      </Box>
+
+                      {/* Category Type Badge - Left aligned */}
+                      <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
+                        <Box
+                          sx={{
+                            border: "1px solid #a78bfa",
+                            backgroundColor: "rgba(167, 139, 250, 0.15)",
+                            color: "#a78bfa",
+                            borderRadius: "20px",
+                            px: 2.5,
+                            py: 0.8,
+                            fontSize: "14px",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {category.type || category.categoryType}
                         </Box>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
-                          <Typography variant="body2" className={secondaryTextColor}>
-                            الحد الأقصى للتغطية
-                          </Typography>
-                          <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-                            {category.maxCoverage}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
-                          <Typography variant="body2" className={secondaryTextColor}>
-                            الوصف
-                          </Typography>
-                          <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-                            {category.description || "-"}
-                          </Typography>
-                        </Box>
+                      </Box>
+
+                      {/* Coverage Label and Limit on same line */}
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Typography variant="body2" sx={{ color: secondaryTextColor }}>
+                          الحد الأقصى
+                        </Typography>
+                        <Typography sx={{ fontSize: "16px", fontWeight: 600, color: textColor }}>
+                          للتغطية {category.coverage_limit || category.maxCoverage} ريال
+                        </Typography>
                       </Box>
                     </Box>
                   ))

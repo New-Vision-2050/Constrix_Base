@@ -47,7 +47,6 @@ export default function AddNewPolicyDialog({
     end_date: "",
     value: 0,
     individuals_count: 0,
-    employee_id: "",
     status: 1,
   });
 
@@ -68,7 +67,6 @@ export default function AddNewPolicyDialog({
           end_date: editingInsurance.end_date || "",
           value: editingInsurance.value || 0,
           individuals_count: editingInsurance.individuals_count || 0,
-          employee_id: editingInsurance.employee_id || "",
           status: editingInsurance.status,
         });
       } else {
@@ -80,7 +78,6 @@ export default function AddNewPolicyDialog({
           end_date: "",
           value: 0,
           individuals_count: 0,
-          employee_id: "",
           status: 1,
         });
       }

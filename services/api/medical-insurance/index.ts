@@ -10,8 +10,6 @@ export interface MedicalInsuranceResponse {
     end_date: string;
     value: number;
     individuals_count: number;
-    employee_id?: string;
-    employee_name?: string;
     status: number;
     attachment?: string;
     created_at?: string;
@@ -38,7 +36,6 @@ export interface CreateMedicalInsuranceParams {
   end_date: string;
   value: number;
   individuals_count: number;
-  employee_id?: string;
   status?: number;
   attachment?: File;
 }
@@ -51,7 +48,6 @@ export interface UpdateMedicalInsuranceParams {
   end_date: string;
   value: number;
   individuals_count: number;
-  employee_id?: string;
   status?: number;
   attachment?: File;
 }
@@ -60,8 +56,9 @@ export interface CategoryResponse {
   data: {
     id: string;
     name: string;
-    categoryType: string;
-    maxCoverage: string;
+    type?: string;
+    categoryType?: string;
+    coverage_limit: string;
     description?: string;
     created_at?: string;
     updated_at?: string;
@@ -81,15 +78,15 @@ export interface CategoryListResponse {
 
 export interface CreateCategoryParams {
   name: string;
-  categoryType: string;
-  maxCoverage: string;
+  type: string;
+  coverage_limit: string;
   description?: string;
 }
 
 export interface UpdateCategoryParams {
   name: string;
-  categoryType: string;
-  maxCoverage: string;
+  type: string;
+  coverage_limit: string;
   description?: string;
 }
 
@@ -143,7 +140,6 @@ export const MedicalInsuranceApi = {
     name?: string;
     policy_number?: string;
     provider?: string;
-    employee_id?: string;
     end_date?: string;
     status?: string;
   }) =>

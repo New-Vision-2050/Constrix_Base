@@ -33,8 +33,8 @@ export default function AddCategoryDialog({
 
   const [formData, setFormData] = useState({
     name: "",
-    categoryType: "",
-    maxCoverage: "",
+    type: "",
+    coverage_limit: "",
     description: "",
   });
 
@@ -44,15 +44,15 @@ export default function AddCategoryDialog({
       if (editingCategory) {
         setFormData({
           name: editingCategory.name,
-          categoryType: editingCategory.categoryType,
-          maxCoverage: editingCategory.maxCoverage,
+          type: editingCategory.type || editingCategory.categoryType,
+          coverage_limit: editingCategory.coverage_limit || editingCategory.coveragelimit || editingCategory.maxCoverage,
           description: editingCategory.description,
         });
       } else {
         setFormData({
           name: "",
-          categoryType: "",
-          maxCoverage: "",
+          type: "",
+          coverage_limit: "",
           description: "",
         });
       }
@@ -138,13 +138,13 @@ export default function AddCategoryDialog({
         <FormControl fullWidth>
           <InputLabel>نوع الفئة</InputLabel>
           <MuiSelect
-            value={formData.categoryType}
+            value={formData.type}
             label="نوع الفئة"
-            onChange={(e) => handleInputChange("categoryType", e.target.value)}
+            onChange={(e) => handleInputChange("type", e.target.value)}
           >
-            <MenuItem value="individual">A</MenuItem>
-            <MenuItem value="family">B</MenuItem>
-            <MenuItem value="corporate">C</MenuItem>
+            <MenuItem value="موظفون داخليون">موظفون داخليون</MenuItem>
+            <MenuItem value="موظفون خارجيون">موظفون خارجيون</MenuItem>
+            <MenuItem value="عائلات">عائلات</MenuItem>
           </MuiSelect>
         </FormControl>
 
@@ -152,8 +152,8 @@ export default function AddCategoryDialog({
         <TextField
             fullWidth
             label="الحد الاقصي لتغطيه"
-            value={formData.maxCoverage}
-            onChange={(e) => handleInputChange("maxCoverage", e.target.value)}
+            value={formData.coverage_limit}
+            onChange={(e) => handleInputChange("coverage_limit", e.target.value)}
             placeholder="أدخل الحد الاقصي لتغطيه"
             required
         />
