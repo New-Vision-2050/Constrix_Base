@@ -18,6 +18,7 @@ import AllInsurancesTable from "./components/AllInsurancesTable";
 import InsuranceTable from "./components/InsuranceTable";
 import {MedicalInsuranceApi} from "@/services/api/medical-insurance";
 import {MedicalInsuranceRow} from "./types";
+import {toast} from "sonner";
 import Pagination from "@/components/shared/Pagination/Pagination";
 
 function InsuranceContent() {
@@ -57,9 +58,20 @@ function InsuranceContent() {
     }
   }, [selectedInsurance?.id]);
 
+  // Fetch employees when switching to employees tab
+  useEffect(() => {
+    if (activeTab === 1 && selectedInsurance?.id) {
+      console.log("🔄 Switched to employees tab, fetching employees...");
+      fetchEmployees();
+    }
+  }, [activeTab]);
+
   const fetchInsurances = async () => {
     try {
-      const response = await MedicalInsuranceApi.list();
+      const response = await MedicalInsuranceApi.list({
+        per_page: 100, // Fetch more items
+      });
+      console.log("📋 Insurances from API:", response.data.payload);
       setInsurances(response.data.payload || []);
     } catch (error) {
       console.error("Error fetching insurances:", error);
@@ -87,19 +99,58 @@ function InsuranceContent() {
   };
 
   const fetchEmployees = async () => {
-    if (!selectedInsurance?.id) return;
+    if (!selectedInsurance?.id) {
+      console.log("❌ No selected insurance, skipping fetch");
+      return;
+    }
+    
     try {
-      const response = await MedicalInsuranceApi.employees.list(selectedInsurance.id, {
+      console.log("🔄 Fetching subscriptions...");
+      const response = await MedicalInsuranceApi.subscriptions.list({
         page: 1,
         per_page: 100,
       });
-      setEmployees(response.data.payload || []);
+      
+      console.log("📋 Full API response:", response);
+      console.log("📋 All subscriptions:", response.data.payload);
+      console.log("🔍 Selected insurance ID:", selectedInsurance.id);
+      console.log("🔍 Selected insurance ID type:", typeof selectedInsurance.id);
+      
+      // Show all subscriptions with their policy_ids
+      if (response.data.payload && response.data.payload.length > 0) {
+        console.log("📋 All subscriptions with policy_ids:");
+        response.data.payload.forEach((sub: any, idx: number) => {
+          console.log(`  ${idx + 1}. policy_id: ${sub.policy_id}, employee_name: ${sub.employee_name}, employee_id: ${sub.employee_id}`);
+        });
+      }
+      
+      if (response.data.payload && response.data.payload.length > 0) {
+        console.log("📋 First subscription:", response.data.payload[0]);
+        console.log("📋 First subscription policy_id:", response.data.payload[0].policy_id);
+        console.log("📋 First subscription policy_id type:", typeof response.data.payload[0].policy_id);
+      }
+      
+      // Filter subscriptions for the selected insurance
+      const filteredEmployees = response.data.payload.filter(
+        (sub: any) => {
+          // Try both policy_id and medical_insurance_id (backend may use either)
+          const matches = sub.policy_id === selectedInsurance.id || sub.medical_insurance_id === selectedInsurance.id;
+          console.log(`Comparing: policy_id=${sub.policy_id}, medical_insurance_id=${sub.medical_insurance_id} === ${selectedInsurance.id}`, matches);
+          return matches;
+        }
+      );
+      
+      console.log("✅ Filtered employees count:", filteredEmployees.length);
+      console.log("✅ Filtered employees:", filteredEmployees);
+      setEmployees(filteredEmployees || []);
     } catch (error: any) {
-      // If 404, it means no employees exist yet - that's okay
+      console.error("❌ Error fetching employees:", error);
+      // If 404, it means no subscriptions exist yet - that's okay
       if (error?.response?.status === 404) {
+        console.log("ℹ️ No subscriptions found (404)");
         setEmployees([]);
       } else {
-        console.error("Error fetching employees:", error);
+        console.error("Error details:", error?.response?.data);
       }
     }
   };
@@ -142,46 +193,21 @@ function InsuranceContent() {
     }
   };
 
-  const handleEmployeeSuccess = async (employee: any) => {
-    if (!selectedInsurance?.id) return;
+  const handleEmployeeSuccess = async () => {
+    // Refresh employee list after successful save
+    await fetchEmployees();
+    setOpenEmployee(false);
+    setEditingEmployee(null);
+  };
 
-    console.log("📤 Sending employee data to API:", employee);
-    console.log("📤 Insurance ID:", selectedInsurance.id);
-
+  const handleDeleteEmployee = async (employeeId: string) => {
     try {
-      if (editingEmployee) {
-        await MedicalInsuranceApi.employees.update(
-          selectedInsurance.id,
-          editingEmployee.id,
-          employee
-        );
-      } else {
-        await MedicalInsuranceApi.employees.create(selectedInsurance.id, employee);
-      }
+      await MedicalInsuranceApi.subscriptions.delete(employeeId);
+      toast.success(t("deleteSuccess"));
       await fetchEmployees();
-      setOpenEmployee(false);
-      setEditingEmployee(null);
     } catch (error: any) {
-      console.error("Error saving employee:", error);
-      console.error("Error response:", error?.response?.data);
-      console.error("Error status:", error?.response?.status);
-
-      // إضافة الموظف محلياً في حالة فشل الـ API
-      if (!editingEmployee) {
-        const newEmployee = {
-          id: Date.now().toString(),
-          name: employee.name,
-          policyId: employee.policyId,
-          value: employee.value,
-          subscriberId: employee.subscriberId,
-          dependents: employee.dependents || [],
-          category: "فئة A",
-        };
-        setEmployees([...employees, newEmployee]);
-        toast.success("تم إضافة الموظف محلياً (الـ API غير متاح)");
-      }
-      setOpenEmployee(false);
-      setEditingEmployee(null);
+      console.error("Error deleting employee:", error);
+      toast.error(t("deleteError"));
     }
   };
 
@@ -190,21 +216,28 @@ function InsuranceContent() {
     setOpenEmployee(true);
   };
 
-  const handleDeleteEmployee = (employeeId: string) => {
-    setEmployees(employees.filter(emp => emp.id !== employeeId));
-    toast.success("تم حذف الموظف بنجاح");
-  };
-
-  const handleSuccess = () => {
-    fetchInsurances();
+  const handleSuccess = async () => {
+    await fetchInsurances();
     setOpen(false);
+    // Auto-select the newly added insurance if it's the first one
+    if (insurances.length === 0) {
+      setTimeout(() => {
+        if (insurances.length > 0) {
+          setSelectedInsurance(insurances[0]);
+          setActiveTab(0);
+        }
+      }, 500);
+    }
   };
 
   const handleInsuranceSelect = (insurance: MedicalInsuranceRow | null) => {
+    console.log("🎯 Selected Insurance:", insurance);
+    console.log("🎯 Current activeTab:", activeTab);
     setSelectedInsurance(insurance);
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    console.log("🔄 Tab changed to:", newValue);
     setActiveTab(newValue);
   };
 
@@ -212,11 +245,12 @@ function InsuranceContent() {
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
       {/* Header */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2, px: 2 }}>
-        {selectedInsurance && (
+        {console.log("🔍 Render - selectedInsurance:", selectedInsurance, "activeTab:", activeTab)}
+        {!selectedInsurance && (
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
             <TextField
               className="flex-1"
-              placeholder={activeTab === 1 ? "البحث عن الموظفين" : activeTab === 2 ? "البحث عن الفئات" : ""}
+              placeholder="البحث عن التأمينات"
               variant="outlined"
               size="small"
               InputProps={{
@@ -227,22 +261,60 @@ function InsuranceContent() {
                 ),
               }}
             />
-            {activeTab === 2 && (
-              <>
-                <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
-                  الكل
-                </Button>
-                <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
-                  الفئة A
-                </Button>
-                <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
-                  الفئة B
-                </Button>
-              </>
-            )}
             <Button onClick={handleAddNewInsurance}>
               <Plus className="h-4 w-4 mr-2" />
-              {activeTab === 1 ? "إضافة موظف" : activeTab === 2 ? t("addCategory") : t("addNewInsurance")}
+              {t("addNewInsurance")}
+            </Button>
+          </Box>
+        )}
+        {selectedInsurance && activeTab === 1 && (
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <TextField
+              className="flex-1"
+              placeholder="البحث عن الموظفين"
+              variant="outlined"
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button onClick={handleAddNewInsurance}>
+              <Plus className="h-4 w-4 mr-2" />
+              إضافة موظف
+            </Button>
+          </Box>
+        )}
+        {selectedInsurance && activeTab === 2 && (
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <TextField
+              className="flex-1"
+              placeholder="البحث عن الفئات"
+              variant="outlined"
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
+              الكل
+            </Button>
+            <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
+              الفئة A
+            </Button>
+            <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
+              الفئة B
+            </Button>
+            <Button onClick={handleAddNewInsurance}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("addCategory")}
             </Button>
           </Box>
         )}
@@ -253,11 +325,13 @@ function InsuranceContent() {
         <Box sx={{ display: "flex", flex: 1, overflow: "hidden", px: 2, gap: 2 }}>
           <AllInsurancesTable 
             onInsuranceSelect={handleInsuranceSelect} 
+            onTabChange={handleTabChange}
             selectedInsurance={selectedInsurance} 
             onPaginationChange={setPaginationData}
             currentPage={currentPage}
             onPageChange={setCurrentPage}
             itemsPerPage={itemsPerPage}
+            currentTab={activeTab}
           />
           <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
             {/* Tabs */}
@@ -320,6 +394,7 @@ function InsuranceContent() {
         onOpenChange={setOpenEmployee}
         onSuccess={handleEmployeeSuccess}
         editingEmployee={editingEmployee}
+        selectedInsuranceId={selectedInsurance?.id}
       />
     </Box>
   );

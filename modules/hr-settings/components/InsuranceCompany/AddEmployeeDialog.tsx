@@ -27,12 +27,15 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import PremiumStepper from "./components/PremiumStepper";
+import { AllProjectsApi } from "@/services/api/projects/all-projects";
+import { MedicalInsuranceApi, CreateSubscriptionParams, UpdateSubscriptionParams } from "@/services/api/medical-insurance";
 
 interface AddEmployeeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: (employee: any) => void;
+  onSuccess: () => void;
   editingEmployee?: any;
+  selectedInsuranceId?: string;
 }
 
 export default function AddEmployeeDialog({
@@ -40,6 +43,7 @@ export default function AddEmployeeDialog({
   onOpenChange,
   onSuccess,
   editingEmployee,
+  selectedInsuranceId,
 }: AddEmployeeDialogProps) {
   const t = useTranslations("hr-settings.insurance");
   const [currentStep, setCurrentStep] = useState(0);
@@ -57,6 +61,11 @@ export default function AddEmployeeDialog({
   });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedDependent, setSelectedDependent] = useState<any>(null);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [employeeSearchQuery, setEmployeeSearchQuery] = useState("");
+  const [insurances, setInsurances] = useState<any[]>([]);
+  const [loadingInsurances, setLoadingInsurances] = useState(false);
 
   const STEPS = useMemo(() => [
     { number: 1, label: "اختيار الموظف" },
@@ -80,6 +89,72 @@ export default function AddEmployeeDialog({
     oldSubscriberId: "",
     relationship: "",
   });
+
+  // Fetch employees from API
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      if (!open) return;
+      
+      setLoadingEmployees(true);
+      try {
+        const response = await AllProjectsApi.getCompanyUsers({
+          name: employeeSearchQuery,
+          per_page: 50,
+        });
+        
+        // Handle different response structures
+        let employeesList = [];
+        if (response?.data?.data?.payload) {
+          employeesList = response.data.data.payload;
+        } else if (response?.data?.payload) {
+          employeesList = response.data.payload;
+        } else if (Array.isArray(response?.data?.data)) {
+          employeesList = response.data.data;
+        } else if (Array.isArray(response?.data)) {
+          employeesList = response.data;
+        }
+        
+        console.log("👥 Loaded employees:", employeesList.length, "employees");
+        if (employeesList.length > 0) {
+          console.log("👤 First employee structure:", employeesList[0]);
+        }
+        setEmployees(employeesList);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+        toast.error(t("saveError") || "حدث خطأ أثناء تحميل الموظفين");
+      } finally {
+        setLoadingEmployees(false);
+      }
+    };
+
+    fetchEmployees();
+  }, [open, employeeSearchQuery]);
+
+  // Fetch insurances from API
+  useEffect(() => {
+    const fetchInsurances = async () => {
+      if (!open) return;
+      
+      setLoadingInsurances(true);
+      try {
+        const response = await MedicalInsuranceApi.list({
+          per_page: 100,
+        });
+        
+        if (response?.data?.payload) {
+          setInsurances(response.data.payload);
+          console.log("📋 Loaded insurances:", response.data.payload.length, "insurances");
+        }
+      } catch (error) {
+        console.error("Error fetching insurances:", error);
+        toast.error(t("saveError") || "حدث خطأ أثناء تحميل التأمينات");
+      } finally {
+        setLoadingInsurances(false);
+      }
+    };
+
+    fetchInsurances();
+  }, [open]);
 
   // Reset form when dialog opens/closes or editing employee changes
   useEffect(() => {
@@ -135,24 +210,81 @@ export default function AddEmployeeDialog({
 
   const handleSubmit = async () => {
     if (!formData.name || formData.name.length === 0) {
-      toast.error("يرجى اختيار الموظفين");
+      toast.error(t("selectEmployee") || "يرجى اختيار الموظفين");
       return;
     }
 
-    const employeeData = editingEmployee
-      ? { ...formData, id: editingEmployee.id }
-      : formData;
+    if (!formData.employeeId) {
+      toast.error(t("selectEmployee") || "يرجى اختيار موظف");
+      return;
+    }
 
-    console.log("Saving employee:", employeeData);
+    if (!formData.policyId) {
+      toast.error(t("selectInsurance") || "يرجى اختيار بوليصة");
+      return;
+    }
+
+    if (!formData.subscriberId) {
+      toast.error(t("enterSubscriptionNumber") || "يرجى إدخال رقم المشترك");
+      return;
+    }
+
+    if (!formData.value) {
+      toast.error(t("enterValue") || "يرجى إدخال القيمة");
+      return;
+    }
 
     try {
-      // سيتم استدعاء API من المكون الأب (index.tsx)
-      toast.success(editingEmployee ? "تم تعديل الموظف بنجاح" : "تم إضافة الموظف بنجاح");
+      if (editingEmployee) {
+        // Update subscription
+        const updateParams: UpdateSubscriptionParams = {
+          user_id: formData.employeeId,
+          medical_insurance_id: formData.policyId,
+          amount: parseFloat(formData.value),
+          subscription_no: formData.subscriberId,
+          start_date: new Date().toISOString().split('T')[0],
+          end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+          status: 1,
+        };
+        
+        await MedicalInsuranceApi.subscriptions.update(editingEmployee.id, updateParams);
+        toast.success(t("employeeUpdatedSuccessfully"));
+      } else {
+        // Create subscription
+        const createParams: CreateSubscriptionParams = {
+          user_id: formData.employeeId,
+          medical_insurance_id: formData.policyId,
+          amount: parseFloat(formData.value),
+          subscription_no: formData.subscriberId,
+          start_date: new Date().toISOString().split('T')[0],
+          end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+          status: 1,
+        };
+        
+        console.log("📤 Sending subscription data:", createParams);
+        const response = await MedicalInsuranceApi.subscriptions.create(createParams);
+        console.log("✅ Subscription created successfully:", response);
+        toast.success(t("employeeAddedSuccessfully"));
+      }
+      
       onOpenChange(false);
-      onSuccess(employeeData);
-    } catch (error) {
-      console.error("Error saving employee:", error);
-      toast.error("حدث خطأ أثناء حفظ الموظف");
+      onSuccess();
+    } catch (error: any) {
+      console.error("❌ Error saving employee:", error);
+      console.error("❌ Error status:", error?.response?.status);
+      console.error("❌ Error response data:", error?.response?.data);
+      console.error("❌ Error response headers:", error?.response?.headers);
+      console.error("❌ Full error:", JSON.stringify(error, null, 2));
+      
+      // Try to get validation errors
+      if (error?.response?.data?.errors) {
+        console.error("❌ Validation errors:", error.response.data.errors);
+        toast.error(error.response.data.errors[0]?.message || t("saveError"));
+      } else if (error?.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(t("saveError"));
+      }
     }
   };
 
@@ -172,7 +304,7 @@ export default function AddEmployeeDialog({
 
   const handleAddDependent = () => {
     if (!dependentFormData.name || !dependentFormData.residenceNumber) {
-      toast.error("يرجى إدخال الاسم ورقم الإقامة");
+      toast.error(t("enterName") + " " + t("enterResidenceNumber"));
       return;
     }
 
@@ -180,10 +312,10 @@ export default function AddEmployeeDialog({
       setDependents(prev =>
         prev.map(dep => (dep.id === editingDependent.id ? { ...dependentFormData, id: editingDependent.id } : dep))
       );
-      toast.success("تم تعديل بيانات العالون بنجاح");
+      toast.success(t("dependentUpdatedSuccessfully"));
     } else {
       setDependents(prev => [...prev, { ...dependentFormData, id: Date.now() }]);
-      toast.success("تم إضافة العالون بنجاح");
+      toast.success(t("dependentAddedSuccessfully"));
     }
 
     setDependentFormData({
@@ -246,7 +378,7 @@ export default function AddEmployeeDialog({
 
   const handleDeleteDependent = (id: number) => {
     setDependents(prev => prev.filter(dep => dep.id !== id));
-    toast.success("تم حذف العالون بنجاح");
+    toast.success(t("dependentDeletedSuccessfully"));
   };
 
   const renderStepContent = () => {
@@ -321,9 +453,21 @@ export default function AddEmployeeDialog({
             {isEditMode ? (
               // Edit mode: single employee search
               <Autocomplete
-                options={["موظف 1", "موظف 2", "موظف 3", "موظف 4", "موظف 5"]}
-                value={formData.name[0] || null}
-                onChange={(event, newValue) => handleInputChange("name", newValue ? [newValue] : [])}
+                options={employees}
+                getOptionLabel={(option) => option?.name || option?.email || ""}
+                value={employees.find(emp => emp.name === formData.name[0]) || null}
+                onChange={(event, newValue) => {
+                  handleInputChange("name", newValue ? [newValue.name] : []);
+                  if (newValue) {
+                    handleInputChange("employeeId", newValue.id);
+                  }
+                }}
+                onInputChange={(event, newInputValue) => {
+                  setEmployeeSearchQuery(newInputValue);
+                }}
+                loading={loadingEmployees}
+                noOptionsText="لا توجد نتائج"
+                loadingText="جاري التحميل..."
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -357,17 +501,30 @@ export default function AddEmployeeDialog({
               // Add mode: multiple employees
               <Autocomplete
                 multiple
-                options={["موظف 1", "موظف 2", "موظف 3", "موظف 4", "موظف 5"]}
-                value={formData.name}
-                onChange={(event, newValue) => handleInputChange("name", newValue)}
-                renderTags={(value: readonly string[], getTagProps) =>
-                  value.map((option: string, index: number) => {
+                options={employees}
+                getOptionLabel={(option) => option?.name || option?.email || ""}
+                value={employees.filter(emp => formData.name.includes(emp.name))}
+                onChange={(event, newValue) => {
+                  handleInputChange("name", newValue.map(emp => emp.name));
+                  // Store employee IDs as well
+                  if (newValue.length > 0) {
+                    handleInputChange("employeeId", newValue[0].id);
+                  }
+                }}
+                onInputChange={(event, newInputValue) => {
+                  setEmployeeSearchQuery(newInputValue);
+                }}
+                loading={loadingEmployees}
+                noOptionsText="لا توجد نتائج"
+                loadingText="جاري التحميل..."
+                renderTags={(value: readonly any[], getTagProps) =>
+                  value.map((option: any, index: number) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     return (
                       <Chip
                         key={key}
                         variant="outlined"
-                        label={option}
+                        label={option?.name || ""}
                         {...tagProps}
                         sx={{
                           background: "rgba(139, 92, 246, 0.2)",
@@ -442,40 +599,30 @@ export default function AddEmployeeDialog({
               </FormControl>
               {isEditMode && (
                 <>
-                  <FormControl fullWidth size="large">
-                    <InputLabel>البوليصة القديمة</InputLabel>
-                    <Select
-                      value={formData.oldPolicyId}
-                      label="البوليصة القديمة"
-                      disabled
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          height: 56,
-                        },
-                      }}
-                    >
-                      <MenuItem value="">البوليصة الحالية</MenuItem>
-                      <MenuItem value="بوليصة 1">بوليصة 1</MenuItem>
-                      <MenuItem value="بوليصة 2">بوليصة 2</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl fullWidth size="large">
-                    <InputLabel>القيمة القديمة</InputLabel>
-                    <Select
-                      value={formData.oldValue}
-                      label="القيمة القديمة"
-                      disabled
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          height: 56,
-                        },
-                      }}
-                    >
-                      <MenuItem value="">القيمة الحالية</MenuItem>
-                      <MenuItem value="1000">1000</MenuItem>
-                      <MenuItem value="2000">2000</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <TextField
+                    fullWidth
+                    label="البوليصة القديمة"
+                    value={formData.oldPolicyId}
+                    disabled
+                    size="large"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: 56,
+                      },
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="القيمة القديمة"
+                    value={formData.oldValue}
+                    disabled
+                    size="large"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: 56,
+                      },
+                    }}
+                  />
                 </>
               )}
               <FormControl fullWidth size="large">
@@ -484,6 +631,7 @@ export default function AddEmployeeDialog({
                   value={formData.policyId}
                   label="بوليصة جديدة"
                   onChange={(e) => handleInputChange("policyId", e.target.value)}
+                  disabled={loadingInsurances}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       height: 56,
@@ -491,29 +639,27 @@ export default function AddEmployeeDialog({
                   }}
                 >
                   <MenuItem value="">اختر البوليصة</MenuItem>
-                  <MenuItem value="بوليصة 1">بوليصة 1</MenuItem>
-                  <MenuItem value="بوليصة 2">بوليصة 2</MenuItem>
-                  <MenuItem value="بوليصة 3">بوليصة 3</MenuItem>
+                  {insurances.map((insurance) => (
+                    <MenuItem key={insurance.id} value={insurance.id}>
+                      {insurance.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
-              <FormControl fullWidth size="large">
-                <InputLabel>القيمة الجديدة</InputLabel>
-                <Select
-                  value={formData.value}
-                  label="القيمة الجديدة"
-                  onChange={(e) => handleInputChange("value", e.target.value)}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                >
-                  <MenuItem value="">اختر القيمة</MenuItem>
-                  <MenuItem value="1000">1000</MenuItem>
-                  <MenuItem value="2000">2000</MenuItem>
-                  <MenuItem value="3000">3000</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                fullWidth
+                label="القيمة الجديدة"
+                value={formData.value}
+                onChange={(e) => handleInputChange("value", e.target.value)}
+                type="number"
+                size="large"
+                placeholder="أدخل القيمة"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    height: 56,
+                  },
+                }}
+              />
             </Box>
           </Box>
         );
@@ -561,42 +707,32 @@ export default function AddEmployeeDialog({
                 </Select>
               </FormControl>
               {isEditMode && (
-                <FormControl fullWidth size="large">
-                  <InputLabel>رقم المشترك القديم</InputLabel>
-                  <Select
-                    value={formData.oldSubscriberId}
-                    label="رقم المشترك القديم"
-                    disabled
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  >
-                    <MenuItem value="">الرقم الحالي</MenuItem>
-                    <MenuItem value="12345">12345</MenuItem>
-                    <MenuItem value="67890">67890</MenuItem>
-                  </Select>
-                </FormControl>
-              )}
-              <FormControl fullWidth size="large">
-                <InputLabel>رقم المشترك {isEditMode ? "الجديد" : ""}</InputLabel>
-                <Select
-                  value={formData.subscriberId}
-                  label={isEditMode ? "رقم المشترك الجديد" : "رقم المشترك"}
-                  onChange={(e) => handleInputChange("subscriberId", e.target.value)}
+                <TextField
+                  fullWidth
+                  label="رقم المشترك القديم"
+                  value={formData.oldSubscriberId}
+                  disabled
+                  size="large"
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       height: 56,
                     },
                   }}
-                >
-                  <MenuItem value="">اختر رقم المشترك</MenuItem>
-                  <MenuItem value="12345">12345</MenuItem>
-                  <MenuItem value="67890">67890</MenuItem>
-                  <MenuItem value="11223">11223</MenuItem>
-                </Select>
-              </FormControl>
+                />
+              )}
+              <TextField
+                fullWidth
+                label={isEditMode ? "رقم المشترك الجديد" : "رقم المشترك"}
+                value={formData.subscriberId}
+                onChange={(e) => handleInputChange("subscriberId", e.target.value)}
+                placeholder="أدخل رقم المشترك"
+                size="large"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    height: 56,
+                  },
+                }}
+              />
             </Box>
           </Box>
         );

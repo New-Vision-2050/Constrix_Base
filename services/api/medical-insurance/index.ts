@@ -133,6 +133,54 @@ export interface UpdateEmployeeParams {
   category?: string;
 }
 
+export interface SubscriptionResponse {
+  data: {
+    id: string;
+    employee_id: string;
+    employee_name?: string;
+    policy_id: string;
+    policy_name?: string;
+    start_date: string;
+    end_date: string;
+    status: number;
+    coverage_amount?: number;
+    premium_amount?: number;
+    created_at?: string;
+    updated_at?: string;
+  };
+}
+
+export interface SubscriptionListResponse {
+  data: {
+    payload: SubscriptionResponse['data'][];
+    pagination: {
+      current_page: number;
+      last_page: number;
+      result_count: number;
+    };
+  };
+}
+
+export interface CreateSubscriptionParams {
+  user_id: string;
+  medical_insurance_id: string;
+  amount: number;
+  subscription_no: string;
+  start_date: string;
+  end_date: string;
+  status?: number;
+}
+
+export interface UpdateSubscriptionParams {
+  user_id?: string;
+  medical_insurance_id?: string;
+  amount?: number;
+  subscription_no?: string;
+  start_date?: string;
+  end_date?: string;
+  status?: number;
+}
+
 export const MedicalInsuranceApi = {
   list: (params?: { 
     page?: number; 
@@ -183,5 +231,21 @@ export const MedicalInsuranceApi = {
       baseApi.put<EmployeeResponse>(`medical-insurances/${medicalInsuranceId}/employees/${employeeId}`, params),
     delete: (medicalInsuranceId: string, employeeId: string) =>
       baseApi.delete(`medical-insurances/${medicalInsuranceId}/employees/${employeeId}`),
+  },
+
+  // Subscriptions endpoints
+  subscriptions: {
+    list: (params?: { page?: number; per_page?: number }) =>
+      baseApi.get<SubscriptionListResponse>("medical-insurances/subscriptions", {
+        params,
+      }),
+    show: (subscriptionId: string) =>
+      baseApi.get<SubscriptionResponse>(`medical-insurances/subscriptions/${subscriptionId}`),
+    create: (params: CreateSubscriptionParams) =>
+      baseApi.post<SubscriptionResponse>("medical-insurances/subscriptions", params),
+    update: (subscriptionId: string, params: UpdateSubscriptionParams) =>
+      baseApi.put<SubscriptionResponse>(`medical-insurances/subscriptions/${subscriptionId}`, params),
+    delete: (subscriptionId: string) =>
+      baseApi.delete(`medical-insurances/subscriptions/${subscriptionId}`),
   },
 };

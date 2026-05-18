@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useInsurance } from "../context/InsuranceContext";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -43,6 +43,19 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
   const [detailsInsurance, setDetailsInsurance] = useState<MedicalInsuranceRow | null>(null);
   const [attachments, setAttachments] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset attachments and edited policy when selected insurance changes
+  useEffect(() => {
+    // If selectedInsurance has attachment URL, fetch it
+    if (selectedInsurance?.attachment) {
+      console.log("📎 Insurance has attachment:", selectedInsurance.attachment);
+      // TODO: Fetch attachment from URL and add to attachments array
+    } else {
+      setAttachments([]);
+    }
+    setEditedPolicy(null);
+    setIsEditingPolicy(false);
+  }, [selectedInsurance?.id]);
   const [isEditingPolicy, setIsEditingPolicy] = useState(false);
   const [editedPolicy, setEditedPolicy] = useState<MedicalInsuranceRow | null>(null);
   const [editingAttachmentIndex, setEditingAttachmentIndex] = useState<number | null>(null);
@@ -214,7 +227,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("serviceProvider") || "مزود الخدمة"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {insurance.provider_name || insurance.employee_name || insurance.employee?.name || "-"}
+            {insurance.provider_name || insurance.provider || insurance.employee_name || insurance.employee?.name || "غير محدد"}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
@@ -222,7 +235,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("startData") || "تاريخ البدء"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {insurance.start_date || "-"}
+            {insurance.start_date || "غير محدد"}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
@@ -238,7 +251,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("value") || "القيمة"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {insurance.value ? `${insurance.value.toLocaleString()} ريال` : "-"}
+            {insurance.value ? `${insurance.value.toLocaleString()} ريال` : "غير محدد"}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
@@ -246,7 +259,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("numberOfIndividuals") || "عدد الأفراد"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {insurance.number_of_individuals ? `${insurance.number_of_individuals} فرد` : "-"}
+            {(insurance.number_of_individuals || insurance.individuals_count) ? `${(insurance.number_of_individuals || insurance.individuals_count)} فرد` : "غير محدد"}
           </Typography>
         </Box>
       </Box>
@@ -318,7 +331,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {selectedInsurance?.name || "بيانات البوليصة"}
+                      {selectedInsurance?.name}
                     </Typography>
 
                     {/* الخط الممتد */}
@@ -345,7 +358,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           </Typography>
                           <TextField
                             size="small"
-                            defaultValue={editedPolicy?.service_name || editedPolicy?.name || selectedInsurance.service_name || selectedInsurance.name}
+                            value={isEditingPolicy ? (editedPolicy?.service_name || editedPolicy?.name) : (selectedInsurance.service_name || selectedInsurance.name)}
                             onChange={(e) => handlePolicyChange("service_name", e.target.value)}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -395,7 +408,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           </Typography>
                           <TextField
                             size="small"
-                            defaultValue={editedPolicy?.provider_name || editedPolicy?.employee_name || editedPolicy?.employee?.name || selectedInsurance.provider_name || selectedInsurance.employee_name || selectedInsurance.employee?.name || "-"}
+                            value={isEditingPolicy ? (editedPolicy?.provider_name || editedPolicy?.provider || editedPolicy?.employee_name || editedPolicy?.employee?.name) : (selectedInsurance.provider_name || selectedInsurance.provider || selectedInsurance.employee_name || selectedInsurance.employee?.name || "-")}
                             onChange={(e) => handlePolicyChange("provider_name", e.target.value)}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -421,9 +434,10 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="date"
-                            defaultValue={editedPolicy?.start_date || selectedInsurance.start_date}
+                            value={isEditingPolicy ? editedPolicy?.start_date : selectedInsurance.start_date}
                             onChange={(e) => handlePolicyChange("start_date", e.target.value)}
                             disabled={!isEditingPolicy}
+                            InputLabelProps={{ shrink: true }}
                             sx={{
                               width: "100%",
                               "& .MuiInputBase-input": {
@@ -447,9 +461,10 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="date"
-                            defaultValue={editedPolicy?.end_date || selectedInsurance.end_date}
+                            value={isEditingPolicy ? editedPolicy?.end_date : selectedInsurance.end_date}
                             onChange={(e) => handlePolicyChange("end_date", e.target.value)}
                             disabled={!isEditingPolicy}
+                            InputLabelProps={{ shrink: true }}
                             sx={{
                               width: "100%",
                               "& .MuiInputBase-input": {
@@ -473,7 +488,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="number"
-                            defaultValue={editedPolicy?.value || selectedInsurance.value}
+                            value={isEditingPolicy ? editedPolicy?.value : selectedInsurance.value}
                             onChange={(e) => handlePolicyChange("value", parseFloat(e.target.value))}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -499,7 +514,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="number"
-                            defaultValue={editedPolicy?.number_of_individuals || selectedInsurance.number_of_individuals}
+                            value={isEditingPolicy ? (editedPolicy?.number_of_individuals || editedPolicy?.individuals_count) : (selectedInsurance.number_of_individuals || selectedInsurance.individuals_count)}
                             onChange={(e) => handlePolicyChange("number_of_individuals", parseInt(e.target.value))}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -788,22 +803,22 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                   <TableHead>
                     <TableRow>
                       <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
-                        اسم الموظف
+                        {t("employeeName")}
                       </TableCell>
                       <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
-                        الفئة
+                        {t("category")}
                       </TableCell>
                       <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
-                        العائلون
+                        {t("dependents")}
                       </TableCell>
                       <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
-                        نسبة التغطية
+                        {t("coveragePercentage")}
                       </TableCell>
                       <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
-                        الحالة
+                        {t("status")}
                       </TableCell>
                       <TableCell align="center" sx={{ color: secondaryTextColor, fontWeight: 600, borderBottom: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.2)" : "#e5e7eb"}` }}>
-                        الإجراء
+                        {t("action")}
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -821,21 +836,21 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           }}
                         >
                           <TableCell align="center" sx={{ color: textColor, fontWeight: 500 }}>
-                            {Array.isArray(employee.name) ? employee.name[0] : employee.name}
+                            {employee.employee_name || employee.user_name || (Array.isArray(employee.name) ? employee.name[0] : employee.name) || `ID: ${employee.employee_id?.substring(0, 8)}...`}
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={{ fontWeight: "medium", color: "#fbbf24" }}>
-                              {employee.category || "فئة A"}
+                              {employee.category || "-"}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={{ fontWeight: "medium", color: "#8b5cf6" }}>
-                              {employee.dependents?.length ? `يوجد ${employee.dependents.length} معالون` : "يوجد معالون"}
+                              {employee.dependents?.length ? `${employee.dependents.length} ${t("dependentsCount")}` : "-"}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={{ fontWeight: "medium", color: "#ec4899" }}>
-                              {employee.value || "75%"}
+                              {employee.amount ? `${employee.amount} ريال` : (employee.value ? `${employee.value} ريال` : "-")}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
@@ -857,7 +872,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                                 }
                               }}
                             >
-                              ● نشط
+                              ● {t("active")}
                             </Button>
                           </TableCell>
                           <TableCell align="center">
@@ -878,7 +893,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                                 }
                               }}
                             >
-                              إجراء ▼
+                              {t("action")} ▼
                             </Button>
                             <Menu
                               anchorEl={actionMenuAnchor}

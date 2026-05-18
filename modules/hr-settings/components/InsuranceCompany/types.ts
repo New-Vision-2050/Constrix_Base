@@ -12,10 +12,10 @@ export interface MedicalInsuranceRow {
   updated_at?: string;
   service_name?: string;
   provider_name?: string;
-  provider?: string;
+  provider?: string; // From API
   value?: number;
   number_of_individuals?: number;
-  individuals_count?: number;
+  individuals_count?: number; // From API
 }
 
 export interface CreateMedicalInsuranceForm {

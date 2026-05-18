@@ -9,16 +9,25 @@ import { MedicalInsuranceRow } from "../types";
 
 interface AllInsurancesTableProps {
   onInsuranceSelect?: (insurance: MedicalInsuranceRow | null) => void;
+  onTabChange?: (tab: number) => void;
   selectedInsurance?: MedicalInsuranceRow | null;
   onPaginationChange?: (data: { currentPage: number; totalPages: number; startIndex: number; endIndex: number; total: number }) => void;
   currentPage?: number;
   onPageChange?: (page: number) => void;
   itemsPerPage?: number;
+  currentTab?: number;
 }
 
-export default function AllInsurancesTable({ onInsuranceSelect, selectedInsurance, onPaginationChange, currentPage: externalCurrentPage, onPageChange: externalOnPageChange, itemsPerPage: externalItemsPerPage }: AllInsurancesTableProps) {
+export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, selectedInsurance, onPaginationChange, currentPage: externalCurrentPage, onPageChange: externalOnPageChange, itemsPerPage: externalItemsPerPage, currentTab }: AllInsurancesTableProps) {
   const { insurances } = useInsurance();
   const t = useTranslations("hr-settings.insurance");
+  
+  console.log("🔍 AllInsurancesTable - Total insurances:", insurances.length);
+  console.log("🔍 AllInsurancesTable - Insurances:", insurances);
+  if (insurances.length > 0) {
+    console.log("🔍 First insurance data:", insurances[0]);
+    console.log("🔍 First insurance keys:", Object.keys(insurances[0]));
+  }
   const [internalCurrentPage, setInternalCurrentPage] = React.useState(1);
   const itemsPerPage = externalItemsPerPage || 10;
   
@@ -52,11 +61,12 @@ export default function AllInsurancesTable({ onInsuranceSelect, selectedInsuranc
   
   // Theme specific colors
   const containerBg = isDarkMode ? 'bg-[#1A103C]' : 'bg-white';
-  const itemHoverBg = isDarkMode ? 'hover:bg-[#2A204C]' : 'hover:bg-gray-50';
+  const itemHoverBg = isDarkMode ? 'hover:bg-gradient-to-r hover:from-purple-900/40 hover:to-pink-800/40' : 'hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100';
   const borderColor = isDarkMode ? 'border-gray-600 border-opacity-20' : 'border-gray-200';
   const activeTextTitle = isDarkMode ? 'text-white font-bold' : 'text-gray-900 font-bold';
   const inactiveTextTitle = isDarkMode ? 'text-gray-400' : 'text-gray-600';
   const iconColor = isDarkMode ? 'text-white' : 'text-gray-600';
+  const selectedItemBg = isDarkMode ? 'bg-gradient-to-r from-purple-900/60 to-pink-800/60' : 'bg-gradient-to-r from-purple-200 to-pink-200';
 
   const handleAllInsurancesClick = () => {
     if (onInsuranceSelect) {
@@ -67,6 +77,11 @@ export default function AllInsurancesTable({ onInsuranceSelect, selectedInsuranc
   const handleInsuranceClick = (insurance: MedicalInsuranceRow) => {
     if (onInsuranceSelect) {
       onInsuranceSelect(insurance);
+    }
+    // Only switch to policy data tab if no tab is currently selected (currentTab is undefined or null)
+    // Otherwise, keep the current tab
+    if (onTabChange && (currentTab === undefined || currentTab === null)) {
+      onTabChange(0); // Switch to policy data tab only on first selection
     }
   };
 
@@ -104,7 +119,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, selectedInsuranc
           paginatedInsurances.map((insurance) => (
             <div
               key={insurance.id}
-              className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} last:border-b-0 cursor-pointer ${itemHoverBg} transition-colors`}
+              className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} last:border-b-0 cursor-pointer ${itemHoverBg} transition-colors ${selectedInsurance?.id === insurance.id ? selectedItemBg : ''}`}
               onClick={() => handleInsuranceClick(insurance)}
             >
               <div className="flex items-center justify-center">
