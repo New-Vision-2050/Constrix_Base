@@ -28,7 +28,7 @@ const AttendanceDaysDialogDaySelector: React.FC<
       (day) => ({
         value: day.value,
         label: isArabic ? day.labelAr : day.labelEn,
-      })
+      }),
     );
   }, [usedDays, isArabic]);
 

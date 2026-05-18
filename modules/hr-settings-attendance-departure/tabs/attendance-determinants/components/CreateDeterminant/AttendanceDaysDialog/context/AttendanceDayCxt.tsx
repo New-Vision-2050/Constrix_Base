@@ -382,7 +382,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         | { day?: string }
         | null
         | undefined;
-      const isDev = (process.env.NEXT_PUBLIC_API_BASE_URL || "").includes("dev");
+      const isDev = (process.env.NEXT_PUBLIC_API_BASE_URL || "").includes(
+        "dev",
+      );
       if (edited?.day && !isDev) return;
       SetSelectedDay(day);
     };
