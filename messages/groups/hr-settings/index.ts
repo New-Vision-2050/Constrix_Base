@@ -7,7 +7,7 @@ export const hrSettingsMessages = new MessagesGroup({
     recruitment: _m("Recruitment", "التوظيف"),
     vacations: _m("Holidays and vacations", "الإجازات و العطلات"),
     service: _m("Service", "الخدمة"),
-    insuranceCompany: _m("Insurance Company", "شركه التامين"),
+    insuranceCompany: _m("Medical insurance", "التامين الطبي"),
     contractManagement: _m("Contract Management", "ادارة عقد العمل")
   }),
   insurance: new MessagesGroup({

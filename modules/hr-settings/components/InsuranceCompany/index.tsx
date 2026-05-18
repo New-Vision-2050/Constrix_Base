@@ -1,643 +1,412 @@
 "use client";
 
-import React, {useState, useMemo} from "react";
 import {useTranslations} from "next-intl";
-import {useQuery} from "@tanstack/react-query";
-import HeadlessTableLayout from "@/components/headless/table";
-import {toast} from "sonner";
+import {useState, useEffect} from "react";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
+
 import {Button} from "@/components/ui/button";
-import {createColumns} from "./columns";
-import {MedicalInsuranceRow, CreateMedicalInsuranceForm, UpdateMedicalInsuranceForm, Employee} from "./types";
-import AddMedicalInsuranceDialog from "./AddMedicalInsuranceDialog";
-import ConfirmDeleteDialog
-    from "@/modules/company-profile/components/official-data/official-docs-section/docs-settings-dialog/AddDocumentType/ConfirmDeleteDialog";
 import {Plus} from "lucide-react";
-import { MedicalInsuranceApi } from "@/services/api/medical-insurance";
+import AddNewPolicyDialog from "./AddNewPolicyDialog";
+import AddCategoryDialog from "./AddCategoryDialog";
+import AddEmployeeDialog from "./AddEmployeeDialog";
+import {Typography, Tabs, Tab} from "@mui/material";
+import {Box} from "@mui/material";
+import {InsuranceProvider, useInsurance} from "./context/InsuranceContext";
+import AllInsurancesTable from "./components/AllInsurancesTable";
+import InsuranceTable from "./components/InsuranceTable";
+import {MedicalInsuranceApi} from "@/services/api/medical-insurance";
+import {MedicalInsuranceRow} from "./types";
+import {toast} from "sonner";
+import Pagination from "@/components/shared/Pagination/Pagination";
 
-// Create typed table instance
-const MedicalInsuranceTable = HeadlessTableLayout<MedicalInsuranceRow>("medical-insurance");
-
-export default function MedicalInsuranceView() {
+function InsuranceContent() {
   const t = useTranslations("hr-settings.insurance");
+  const [open, setOpen] = useState(false);
+  const [openCategory, setOpenCategory] = useState(false);
+  const [openEmployee, setOpenEmployee] = useState(false);
+  const [editingInsurance, setEditingInsurance] = useState(null);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingEmployee, setEditingEmployee] = useState<any>(null);
+  const [selectedInsurance, setSelectedInsurance] = useState<MedicalInsuranceRow | null>(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [paginationData, setPaginationData] = useState({ currentPage: 1, totalPages: 1, startIndex: 0, endIndex: 0, total: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-    // Dialog states
-    const [editingInsuranceId, setEditingInsuranceId] = useState<string | null>(null);
-    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-    const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const {insurances, setInsurances} = useInsurance();
 
-    // Form data for add/edit
-    const [formData, setFormData] = useState<CreateMedicalInsuranceForm>({
-        name: "",
-        policy_number: "",
-        employee_id: "",
-        status: 1,
-    });
+  // Fetch insurances on component mount
+  useEffect(() => {
+    fetchInsurances();
+  }, []);
 
-    // Fetch employees from API
-  const { data: employeesData } = useQuery({
-    queryKey: ["employees"],
-    queryFn: async () => {
-      const response = await fetch('/api/company-users/employees');
-      const result = await response.json();
-      return result.data || [];
-    },
-  });
+  // Fetch categories and employees when selectedInsurance changes
+  useEffect(() => {
+    if (selectedInsurance?.id) {
+      console.log("🔍 Selected Insurance:", selectedInsurance);
+      console.log("🔍 Insurance ID:", selectedInsurance.id);
+      console.log("🔍 Insurance ID length:", selectedInsurance.id.length);
+      fetchCategories();
+      fetchEmployees();
+    } else {
+      setCategories([]);
+      setEmployees([]);
+    }
+  }, [selectedInsurance?.id]);
 
-    // Use employees from API or fallback to mock data
-    const employees = useMemo(() => {
-        if (employeesData && Array.isArray(employeesData)) {
-            return employeesData.map((emp: any) => ({
-                id: emp.id,
-                name: emp.name
-            }));
-        }
-        // Fallback to mock data
-        return [
-            {id: "1", name: "أحمد محمد"},
-            {id: "2", name: "فاطمة علي"},
-            {id: "3", name: "محمود إبراهيم"},
-            {id: "4", name: "مريم أحمد"},
-        ];
-    }, [employeesData]);
+  // Fetch employees when switching to employees tab
+  useEffect(() => {
+    if (activeTab === 1 && selectedInsurance?.id) {
+      console.log("🔄 Switched to employees tab, fetching employees...");
+      fetchEmployees();
+    }
+  }, [activeTab]);
 
-    // ✅ STEP 1: useTableParams (BEFORE query)
-    const params = MedicalInsuranceTable.useTableParams({
-        initialPage: 1,
-        initialLimit: 10,
-    });
+  const fetchInsurances = async () => {
+    try {
+      const response = await MedicalInsuranceApi.list({
+        per_page: 100, // Fetch more items
+      });
+      console.log("📋 Insurances from API:", response.data.payload);
+      setInsurances(response.data.payload || []);
+    } catch (error) {
+      console.error("Error fetching insurances:", error);
+    }
+  };
 
-    // ✅ STEP 2: Fetch data using useQuery directly
-    const {data, isLoading, refetch} = useQuery({
-        queryKey: ["medical-insurance", params.page, params.limit, params.search],
-        queryFn: async () => {
-            const response = await MedicalInsuranceApi.list({
-                page: params.page,
-                per_page: params.limit,
-                search: params.search || undefined,
-            });
-            return response.data;
-        },
-    });
+  const fetchCategories = async () => {
+    if (!selectedInsurance?.id) return;
+    try {
+      const response = await MedicalInsuranceApi.categories.list(selectedInsurance.id, {
+        page: 1,
+        per_page: 100,
+      });
+      console.log("✅ Categories fetched successfully:", response.data.payload);
+      setCategories(response.data.payload || []);
+    } catch (error: any) {
+      // If 404, it means no categories exist yet - that's okay
+      if (error?.response?.status === 404) {
+        console.log("ℹ️ No categories found (404) - setting empty array");
+        setCategories([]);
+      } else {
+        console.error("Error fetching categories:", error);
+      }
+    }
+  };
 
-    // Extract data for table
-    const policies = data?.payload || [];
-    const totalPages = data?.pagination?.last_page || 1;
-    const totalItems = data?.pagination?.result_count || 0;
-
-    // Dialog handlers
-    const handleAddInsurance = () => {
-        setFormData({
-            name: "",
-            policy_number: "",
-            employee_id: "",
-            status: 1,
+  const fetchEmployees = async () => {
+    if (!selectedInsurance?.id) {
+      console.log("❌ No selected insurance, skipping fetch");
+      return;
+    }
+    
+    try {
+      console.log("🔄 Fetching subscriptions...");
+      const response = await MedicalInsuranceApi.subscriptions.list({
+        page: 1,
+        per_page: 100,
+      });
+      
+      console.log("📋 Full API response:", response);
+      console.log("📋 All subscriptions:", response.data.payload);
+      console.log("🔍 Selected insurance ID:", selectedInsurance.id);
+      console.log("🔍 Selected insurance ID type:", typeof selectedInsurance.id);
+      
+      // Show all subscriptions with their policy_ids
+      if (response.data.payload && response.data.payload.length > 0) {
+        console.log("📋 All subscriptions with policy_ids:");
+        response.data.payload.forEach((sub: any, idx: number) => {
+          console.log(`  ${idx + 1}. policy_id: ${sub.policy_id}, employee_name: ${sub.employee_name}, employee_id: ${sub.employee_id}`);
         });
-        setEditingInsuranceId(null);
-        setAddDialogOpen(true);
-    };
-
-    const handleEditInsurance = (insurance: MedicalInsuranceRow) => {
-        setFormData({
-            name: insurance.name,
-            policy_number: insurance.policy_number,
-            employee_id: insurance.employee_id,
-            status: insurance.status,
-        });
-        setEditingInsuranceId(insurance.id);
-        setAddDialogOpen(true);
-    };
-
-    const cancelEdit = () => {
-        setAddDialogOpen(false);
-        setEditingInsuranceId(null);
-        setFormData({
-            name: "",
-            policy_number: "",
-            employee_id: "",
-            status: 1,
-        });
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!formData.name || !formData.policy_number || !formData.employee_id) {
-            toast.error(t("allFieldsRequired"));
-            return;
+      }
+      
+      if (response.data.payload && response.data.payload.length > 0) {
+        console.log("📋 First subscription:", response.data.payload[0]);
+        console.log("📋 First subscription policy_id:", response.data.payload[0].policy_id);
+        console.log("📋 First subscription policy_id type:", typeof response.data.payload[0].policy_id);
+      }
+      
+      // Filter subscriptions for the selected insurance
+      const filteredEmployees = response.data.payload.filter(
+        (sub: any) => {
+          // Try both policy_id and medical_insurance_id (backend may use either)
+          const matches = sub.policy_id === selectedInsurance.id || sub.medical_insurance_id === selectedInsurance.id;
+          console.log(`Comparing: policy_id=${sub.policy_id}, medical_insurance_id=${sub.medical_insurance_id} === ${selectedInsurance.id}`, matches);
+          return matches;
         }
+      );
+      
+      console.log("✅ Filtered employees count:", filteredEmployees.length);
+      console.log("✅ Filtered employees:", filteredEmployees);
+      setEmployees(filteredEmployees || []);
+    } catch (error: any) {
+      console.error("❌ Error fetching employees:", error);
+      // If 404, it means no subscriptions exist yet - that's okay
+      if (error?.response?.status === 404) {
+        console.log("ℹ️ No subscriptions found (404)");
+        setEmployees([]);
+      } else {
+        console.error("Error details:", error?.response?.data);
+      }
+    }
+  };
 
-        try {
-            if (editingInsuranceId) {
-                // Update existing insurance
-                await MedicalInsuranceApi.update(editingInsuranceId, formData as UpdateMedicalInsuranceForm);
-                toast.success(t("updateSuccess"));
-            } else {
-                // Add new insurance
-                await MedicalInsuranceApi.create(formData);
-                toast.success(t("addSuccess"));
-            }
+  const handleAddNewInsurance = () => {
+    if (activeTab === 1) {
+      setEditingEmployee(null);
+      setOpenEmployee(true);
+    } else if (activeTab === 2) {
+      setEditingCategory(null);
+      setOpenCategory(true);
+    } else {
+      setOpen(true);
+    }
+  };
 
-            setAddDialogOpen(false);
-            setEditingInsuranceId(null);
-            refetch();
-        } catch {
-            toast.error(t("saveError"));
+  const handleEditCategory = (category: any) => {
+    setEditingCategory(category);
+    setOpenCategory(true);
+  };
+
+  const handleCategorySuccess = async (category: any) => {
+    if (!selectedInsurance?.id) return;
+    
+    try {
+      if (editingCategory) {
+        await MedicalInsuranceApi.categories.update(
+          selectedInsurance.id,
+          editingCategory.id,
+          category
+        );
+      } else {
+        await MedicalInsuranceApi.categories.create(selectedInsurance.id, category);
+      }
+      await fetchCategories();
+      setOpenCategory(false);
+      setEditingCategory(null);
+    } catch (error) {
+      console.error("Error saving category:", error);
+    }
+  };
+
+  const handleEmployeeSuccess = async () => {
+    // Refresh employee list after successful save
+    await fetchEmployees();
+    setOpenEmployee(false);
+    setEditingEmployee(null);
+  };
+
+  const handleDeleteEmployee = async (employeeId: string) => {
+    try {
+      await MedicalInsuranceApi.subscriptions.delete(employeeId);
+      toast.success(t("deleteSuccess"));
+      await fetchEmployees();
+    } catch (error: any) {
+      console.error("Error deleting employee:", error);
+      toast.error(t("deleteError"));
+    }
+  };
+
+  const handleEditEmployee = (employee: any) => {
+    setEditingEmployee(employee);
+    setOpenEmployee(true);
+  };
+
+  const handleSuccess = async () => {
+    await fetchInsurances();
+    setOpen(false);
+    // Auto-select the newly added insurance if it's the first one
+    if (insurances.length === 0) {
+      setTimeout(() => {
+        if (insurances.length > 0) {
+          setSelectedInsurance(insurances[0]);
+          setActiveTab(0);
         }
-    };
+      }, 500);
+    }
+  };
 
-    // Delete handlers
-    const handleDeleteClick = (id: string) => {
-        setDeleteConfirmId(id);
-    };
+  const handleInsuranceSelect = (insurance: MedicalInsuranceRow | null) => {
+    console.log("🎯 Selected Insurance:", insurance);
+    console.log("🎯 Current activeTab:", activeTab);
+    setSelectedInsurance(insurance);
+  };
 
-    const confirmDelete = async () => {
-        if (!deleteConfirmId) return;
-        try {
-            await MedicalInsuranceApi.delete(deleteConfirmId);
-            toast.success(t("deleteSuccess"));
-            setDeleteConfirmId(null);
-            refetch();
-        } catch {
-            toast.error(t("deleteError"));
-        }
-    };
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    console.log("🔄 Tab changed to:", newValue);
+    setActiveTab(newValue);
+  };
 
-    const cancelDelete = () => {
-        setDeleteConfirmId(null);
-    };
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
+      {/* Header */}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, px: 2 }}>
+        {console.log("🔍 Render - selectedInsurance:", selectedInsurance, "activeTab:", activeTab)}
+        {!selectedInsurance && (
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <TextField
+              className="flex-1"
+              placeholder="البحث عن التأمينات"
+              variant="outlined"
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button onClick={handleAddNewInsurance}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("addNewInsurance")}
+            </Button>
+          </Box>
+        )}
+        {selectedInsurance && activeTab === 1 && (
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <TextField
+              className="flex-1"
+              placeholder="البحث عن الموظفين"
+              variant="outlined"
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button onClick={handleAddNewInsurance}>
+              <Plus className="h-4 w-4 mr-2" />
+              إضافة موظف
+            </Button>
+          </Box>
+        )}
+        {selectedInsurance && activeTab === 2 && (
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <TextField
+              className="flex-1"
+              placeholder="البحث عن الفئات"
+              variant="outlined"
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
+              الكل
+            </Button>
+            <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
+              الفئة A
+            </Button>
+            <Button variant="outlined" size="small" sx={{ borderColor: "red", color: "text.primary" }}>
+              الفئة B
+            </Button>
+            <Button onClick={handleAddNewInsurance}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("addCategory")}
+            </Button>
+          </Box>
+        )}
+      </Box>
 
-    // Table columns
-    const columns = createColumns({
-        onEdit: handleEditInsurance,
-        onDelete: handleDeleteClick,
-        canEdit: true, // Temporarily removed permissions check
-        canDelete: true, // Temporarily removed permissions check
-    });
+      {/* Main content with side-by-side layout */}
+      <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+        <Box sx={{ display: "flex", flex: 1, overflow: "hidden", px: 2, gap: 2 }}>
+          <AllInsurancesTable 
+            onInsuranceSelect={handleInsuranceSelect} 
+            onTabChange={handleTabChange}
+            selectedInsurance={selectedInsurance} 
+            onPaginationChange={setPaginationData}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            currentTab={activeTab}
+          />
+          <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+            {/* Tabs */}
+            {selectedInsurance && (
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', borderBottomStyle: 'solid' }}>
+                <Tabs value={activeTab ?? 0} onChange={handleTabChange} sx={{ width: '100%' }}>
+                  <Tab label={t("policyData")} sx={{ flex: 1 }} />
+                  <Tab label={t("policyEmployees")} sx={{ flex: 1 }} />
+                  <Tab label={t("policyCategories")} sx={{ flex: 1 }} />
+                </Tabs>
+              </Box>
+            )}
+            <InsuranceTable selectedInsurance={selectedInsurance} activeTab={activeTab} onInsuranceSelect={handleInsuranceSelect} onTabChange={handleTabChange} categories={categories} onEditCategory={handleEditCategory} onEditEmployee={handleEditEmployee} employees={employees} onDeleteEmployee={handleDeleteEmployee} />
+          </Box>
+        </Box>
 
-    // ✅ STEP 3: Create table state
-    const state = MedicalInsuranceTable.useTableState({
-        data: policies,
-        columns,
-        totalPages,
-        totalItems,
-        params,
-        getRowId: (insurance) => insurance.id,
-        loading: isLoading,
-        searchable: true,
-        filtered: params.search !== "",
-    });
+        {/* Pagination at bottom */}
+        {paginationData.total > 0 && (
+          <Box sx={{ 
+            py: 2, 
+            borderTop: "1px solid", 
+            borderColor: "divider",
+            display: "flex",
+            justifyContent: "center"
+          }}>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={paginationData.totalPages}
+              onPageChange={setCurrentPage}
+              currentLimit={itemsPerPage}
+              limitOptions={[5, 10, 25, 50]}
+              onLimitChange={(newLimit) => {
+                setItemsPerPage(newLimit);
+                setCurrentPage(1);
+              }}
+            />
+          </Box>
+        )}
+      </Box>
 
-    return (
-        <div className="px-8 space-y-4">
-            {/* Medical Insurance Table */}
-            <MedicalInsuranceTable
-                filters={
-                    <MedicalInsuranceTable.TopActions
-                        state={state}
-                        customActions={
-    <Button onClick={handleAddInsurance}>
-        <Plus className="h-4 w-4 ml-2"/>
-        {t("addNewInsurance")}
-    </Button>
+      {/* Dialog */}
+      <AddNewPolicyDialog
+        open={open}
+        onOpenChange={setOpen}
+        editingInsurance={editingInsurance}
+        onSuccess={handleSuccess}
+      />
+
+      {/* Category Dialog */}
+      <AddCategoryDialog
+        open={openCategory}
+        onOpenChange={setOpenCategory}
+        onSuccess={handleCategorySuccess}
+        editingCategory={editingCategory}
+      />
+
+      {/* Employee Dialog */}
+      <AddEmployeeDialog
+        open={openEmployee}
+        onOpenChange={setOpenEmployee}
+        onSuccess={handleEmployeeSuccess}
+        editingEmployee={editingEmployee}
+        selectedInsuranceId={selectedInsurance?.id}
+      />
+    </Box>
+  );
 }
-                    />
-                }
-                table={
-                    <MedicalInsuranceTable.Table state={state} loadingOptions={{rows: 5}}/>
-                }
-                pagination={<MedicalInsuranceTable.Pagination state={state}/>}
-            />
 
-            {/* Add/Edit Insurance Dialog */}
-            <AddMedicalInsuranceDialog
-                open={addDialogOpen}
-                onOpenChange={setAddDialogOpen}
-                editingInsurance={policies.find(p => p.id === editingInsuranceId) || null}
-                onSuccess={() => refetch()}
-            />
-
-            {/* Delete Confirmation Dialog */}
-            <ConfirmDeleteDialog
-                open={Boolean(deleteConfirmId)}
-                onConfirm={confirmDelete}
-                onClose={cancelDelete}
-                title={t("deleteConfirmMessage")}
-            />
-        </div>
-    );
+// Main component that provides the context
+export default function MedicalInsuranceView() {
+  return (
+    <InsuranceProvider>
+      <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+        <InsuranceContent />
+      </Box>
+    </InsuranceProvider>
+  );
 }
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-
-interface Employee {
-    id: string;
-    name: string;
-}
-
-interface InsurancePolicy {
-    id: string;
-    policyNumber: string;
-    responsiblePersonId: string;
-    responsiblePersonName: string;
-    expiryDate: string;
-    status: number;
-}
-
-// API functions
-const InsuranceApi = {
-  list: async (params?: { search?: string; page?: number; per_page?: number }) => {
-    const response = await fetch(`/api/medical-insurance${params ? '?' + new URLSearchParams({
-      search: params.search || '',
-      page: params.page?.toString() || '1',
-      per_page: params.per_page?.toString() || '10'
-    }) : ''}`);
-    return response.json();
-  },
-  get: async (id: string) => {
-    const response = await fetch(`/api/medical-insurance/${id}`);
-    return response.json();
-  },
-  getEmployees: async () => {
-    const response = await fetch('/api/company-users/employees');
-    return response.json();
-  },
-  create: async (data: any) => {
-    const response = await fetch('/api/medical-insurance', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    return response.json();
-  },
-  update: async (id: string, data: any) => {
-    const response = await fetch(`/api/medical-insurance/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    return response.json();
-  },
-  delete: async (id: string) => {
-    const response = await fetch(`/api/medical-insurance/${id}`, {
-      method: 'DELETE',
-    });
-    return response.json();
-  },
-};
-
-// Create typed table instance
-const InsuranceTable = HeadlessTableLayout<InsurancePolicy>("insurance");
-
-const InsuranceCompanyComponent: React.FC = () => {
-    const t = useTranslations("hr-settings.insurance");
-
-    // Dialog states
-    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-    const [editingPolicyId, setEditingPolicyId] = useState<string | null>(null);
-    const [addDialogOpen, setAddDialogOpen] = useState(false);
-
-    // Form data for add/edit
-    const [formData, setFormData] = useState({
-        policyNumber: "",
-        responsiblePersonName: "",
-        expiryDate: "",
-    });
-
-    // Fetch employees from API
-    const {data: employeesData} = useQuery({
-        queryKey: ["employees"],
-        queryFn: async () => {
-            const response = await InsuranceApi.getEmployees();
-            return response.data || [];
-        },
-    });
-
-    // Use employees from API or fallback to mock data
-    const employees = useMemo(() => {
-        if (employeesData && Array.isArray(employeesData)) {
-            return employeesData.map((emp: any) => ({
-                id: emp.id,
-                name: emp.name
-            }));
-        }
-        // Fallback to mock data
-        return [
-            {id: "1", name: "أحمد محمد"},
-            {id: "2", name: "فاطمة علي"},
-            {id: "3", name: "محمود إبراهيم"},
-            {id: "4", name: "مريم أحمد"},
-        ];
-    }, [employeesData]);
-
-    // ✅ STEP 1: useTableParams (BEFORE query)
-    const params = InsuranceTable.useTableParams({
-        initialPage: 1,
-        initialLimit: 10,
-    });
-
-    // ✅ STEP 2: Fetch data using useQuery directly
-    const {data, isLoading, refetch} = useQuery({
-        queryKey: ["insurance-policies", params.page, params.limit, params.search],
-        queryFn: async () => {
-            const response = await InsuranceApi.list({
-                page: params.page,
-                per_page: params.limit,
-                search: params.search || undefined,
-            });
-            return response.data;
-        },
-    });
-
-    // Extract data from response
-    const policies = useMemo<InsurancePolicy[]>(
-        () => (data?.payload || []) as unknown as InsurancePolicy[],
-        [data],
-    );
-
-    const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
-    const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
-
-    // Form handlers
-    const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value,
-        }));
-    };
-
-    const handleAddPolicy = () => {
-        setFormData({
-            policyNumber: "",
-            responsiblePersonName: "",
-            expiryDate: "",
-        });
-        setEditingPolicyId(null);
-        setAddDialogOpen(true);
-    };
-
-    const handleEditPolicy = (policy: InsurancePolicy) => {
-        setFormData({
-            policyNumber: policy.policyNumber,
-            responsiblePersonName: policy.responsiblePersonName,
-            expiryDate: policy.expiryDate,
-        });
-        setEditingPolicyId(policy.id);
-        setAddDialogOpen(true);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!formData.policyNumber || !formData.responsiblePersonName || !formData.expiryDate) {
-            toast.error(t("allFieldsRequired"));
-            return;
-        }
-
-        try {
-            if (editingPolicyId) {
-                // Update existing policy
-                await InsuranceApi.update(editingPolicyId, formData);
-                toast.success(t("updateSuccess"));
-            } else {
-                // Add new policy
-                await InsuranceApi.create(formData);
-                toast.success(t("addSuccess"));
-            }
-
-            setAddDialogOpen(false);
-            setEditingPolicyId(null);
-            refetch();
-        } catch {
-            toast.error(t("saveError"));
-        }
-    };
-
-    const cancelEdit = () => {
-        setAddDialogOpen(false);
-        setEditingPolicyId(null);
-        setFormData({
-            policyNumber: "",
-            responsiblePersonName: "",
-            expiryDate: "",
-        });
-    };
-
-    // Delete handlers
-    const handleDeleteClick = (id: string) => {
-        setDeleteConfirmId(id);
-    };
-
-    const confirmDelete = async () => {
-        if (!deleteConfirmId) return;
-        try {
-            await InsuranceApi.delete(deleteConfirmId);
-            toast.success(t("deleteSuccess"));
-            setDeleteConfirmId(null);
-            refetch();
-        } catch {
-            toast.error(t("deleteError"));
-        }
-    };
-
-    const cancelDelete = () => {
-        setDeleteConfirmId(null);
-    };
-
-    // Table columns
-    const columns = [
-        {
-            key: "policyNumber",
-            name: t("policyNumber"),
-            sortable: true,
-            render: (row: InsurancePolicy) => {
-                return <strong className="text-sm">{row.policyNumber}</strong>;
-            },
-        },
-        {
-            key: "responsiblePersonName",
-            name: t("responsiblePerson"),
-            sortable: true,
-            render: (row: InsurancePolicy) => {
-                return (
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-            {row.responsiblePersonName}
-          </span>
-                );
-            },
-        },
-        {
-            key: "expiryDate",
-            name: t("expiryDate"),
-            sortable: true,
-            render: (row: InsurancePolicy) => {
-                return (
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-            {row.expiryDate}
-          </span>
-                );
-            },
-        },
-        {
-            key: "status",
-            name: t("status"),
-            sortable: false,
-            render: (row: InsurancePolicy) => {
-                const isActive = row.status === 1;
-                return (
-                    <div className="flex items-center">
-                        <div className={`w-2 h-2 rounded-full mr-2 ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        <span className="text-sm">{isActive ? t("active") : t("inactive")}</span>
-                    </div>
-                );
-            },
-        },
-        {
-            key: "actions",
-            name: t("actions"),
-            sortable: false,
-            render: (row: InsurancePolicy) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button size="sm" color="">
-                            {t("action")}
-                            <ChevronDown className="h-4 w-4"/>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditPolicy(row)}>
-                            <Edit className="mr-2 h-4 w-4"/>
-                            {t("edit")}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator/>
-                        <DropdownMenuItem onClick={() => handleDeleteClick(row.id)}
-                                          className="text-red-600 focus:text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4"/>
-                            {t("delete")}
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            ),
-        },
-    ];
-
-    // ✅ STEP 3: useTableState (AFTER query)
-    const state = InsuranceTable.useTableState({
-        data: policies,
-        columns,
-        totalPages,
-        totalItems,
-        params,
-        getRowId: (policy) => policy.id,
-        loading: isLoading,
-        searchable: true,
-        filtered: params.search !== "",
-    });
-
-    return (
-        <div className="px-8 space-y-4">
-            {/* Insurance Policies Table */}
-            <InsuranceTable
-                filters={
-                    <InsuranceTable.TopActions
-                        state={state}
-                        customActions={
-                            <Button onClick={handleAddPolicy}>
-                                <Plus className="h-4 w-4 ml-2"/>
-                                {t("addNewPolicy")}
-                            </Button>
-                        }
-                    />
-                }
-                table={
-                    <InsuranceTable.Table state={state} loadingOptions={{rows: 5}}/>
-                }
-                pagination={<InsuranceTable.Pagination state={state}/>}
-            />
-
-            {/* Add/Edit Policy Dialog */}
-            <Dialog open={addDialogOpen} onOpenChange={cancelEdit}>
-                <DialogContent className="max-w-2xl w-full bg-sidebar">
-                    <DialogHeader>
-                        <DialogTitle className="text-center text-lg font-semibold">
-                            {editingPolicyId ? t("editPolicy") : t("addPolicy")}
-                        </DialogTitle>
-                    </DialogHeader>
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-2">
-                                    {t("policyNumber")}
-                                </label>
-                                <Input
-                                    value={formData.policyNumber}
-                                    onChange={(e) => handleInputChange("policyNumber", e.target.value)}
-                                    placeholder={t("enterPolicyNumber")}
-                                    className="bg-sidebar border-gray-700"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2">
-                                    {t("responsiblePerson")}
-                                </label>
-                                <Select
-                                    value={formData.responsiblePersonName}
-                                    onValueChange={(value) => handleInputChange("responsiblePersonName", value)}
-                                >
-                                    <SelectTrigger className="bg-sidebar border-gray-700">
-                                        <SelectValue placeholder={t("selectResponsible")}/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {employees.map((employee) => (
-                                            <SelectItem key={employee.id} value={employee.name}>
-                                                {employee.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2">
-                                    {t("expiryDate")}
-                                </label>
-                                <Input
-                                    type="date"
-                                    value={formData.expiryDate}
-                                    onChange={(e) => handleInputChange("expiryDate", e.target.value)}
-                                    className="bg-sidebar border-gray-700"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-6">
-                            <Button
-                                type="submit"
-                                className="w-full"
-                            >
-                                {editingPolicyId ? t("update") : t("add")}
-                            </Button>
-                        </div>
-                    </form>
-                </DialogContent>
-            </Dialog>
-
-            {/* Delete Confirmation Dialog */}
-            <ConfirmDeleteDialog
-                open={Boolean(deleteConfirmId)}
-                onConfirm={confirmDelete}
-                onClose={cancelDelete}
-                title={t("deleteConfirmMessage")}
-            />
-        </div>
-    );
-};
