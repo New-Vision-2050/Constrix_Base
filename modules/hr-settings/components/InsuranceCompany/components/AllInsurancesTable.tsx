@@ -61,12 +61,12 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
   
   // Theme specific colors
   const containerBg = isDarkMode ? 'bg-[#1A103C]' : 'bg-white';
-  const itemHoverBg = isDarkMode ? 'hover:bg-gradient-to-r hover:from-purple-900/40 hover:to-pink-800/40' : 'hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100';
+  const itemHoverBg = isDarkMode ? 'hover:bg-[#2A204C]' : 'hover:bg-gray-50';
+  const selectedItemBg = isDarkMode ? 'bg-[#1A0F2E]' : 'bg-blue-100';
   const borderColor = isDarkMode ? 'border-gray-600 border-opacity-20' : 'border-gray-200';
   const activeTextTitle = isDarkMode ? 'text-white font-bold' : 'text-gray-900 font-bold';
   const inactiveTextTitle = isDarkMode ? 'text-gray-400' : 'text-gray-600';
-  const iconColor = isDarkMode ? 'text-white' : 'text-gray-600';
-  const selectedItemBg = isDarkMode ? 'bg-gradient-to-r from-purple-900/60 to-pink-800/60' : 'bg-gradient-to-r from-purple-200 to-pink-200';
+  const iconColor = isDarkMode ? 'text-white' : 'text-blue-900';
 
   const handleAllInsurancesClick = () => {
     if (onInsuranceSelect) {

@@ -77,9 +77,11 @@ export default function AddEmployeeDialog({
 
   const [formData, setFormData] = useState({
     name: [] as string[],
-    employeeId: "",
+    employeeId: "", // subscription_id
+    employee_id: "", // actual employee_id (user_id)
     policyId: "",
     value: "",
+    categoryId: "",
     oldPolicyId: "",
     oldValue: "",
     department: "",
@@ -90,6 +92,11 @@ export default function AddEmployeeDialog({
     relationship: "",
   });
 
+  const [selectedEmployees, setSelectedEmployees] = useState<any[]>([]);
+
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
   // Fetch employees from API
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -97,16 +104,15 @@ export default function AddEmployeeDialog({
       
       setLoadingEmployees(true);
       try {
-        const response = await AllProjectsApi.getCompanyUsers({
-          name: employeeSearchQuery,
-          per_page: 50,
+        // Fetch subscriptions (employees with insurance) instead of company users
+        const response = await MedicalInsuranceApi.subscriptions.list({
+          page: 1,
+          per_page: 100,
         });
         
         // Handle different response structures
         let employeesList = [];
-        if (response?.data?.data?.payload) {
-          employeesList = response.data.data.payload;
-        } else if (response?.data?.payload) {
+        if (response?.data?.payload) {
           employeesList = response.data.payload;
         } else if (Array.isArray(response?.data?.data)) {
           employeesList = response.data.data;
@@ -114,9 +120,9 @@ export default function AddEmployeeDialog({
           employeesList = response.data;
         }
         
-        console.log("👥 Loaded employees:", employeesList.length, "employees");
+        console.log("👥 Loaded subscriptions:", employeesList.length, "employees");
         if (employeesList.length > 0) {
-          console.log("👤 First employee structure:", employeesList[0]);
+          console.log("👤 First subscription structure:", employeesList[0]);
         }
         setEmployees(employeesList);
       } catch (error) {
@@ -156,6 +162,32 @@ export default function AddEmployeeDialog({
     fetchInsurances();
   }, [open]);
 
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!open) return;
+      
+      setLoadingCategories(true);
+      try {
+        const response = await MedicalInsuranceApi.categories.list({
+          per_page: 100,
+        });
+        
+        if (response?.data?.payload) {
+          setCategories(response.data.payload);
+          console.log("📋 Loaded categories:", response.data.payload.length, "categories");
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error(t("saveError") || "حدث خطأ أثناء تحميل الفئات");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, [open]);
+
   // Reset form when dialog opens/closes or editing employee changes
   useEffect(() => {
     if (open) {
@@ -164,25 +196,32 @@ export default function AddEmployeeDialog({
         setIsEditMode(true);
         setFormData({
           name: editingEmployee.name ? (Array.isArray(editingEmployee.name) ? editingEmployee.name : [editingEmployee.name]) : [],
-          employeeId: editingEmployee.employeeId || "",
-          policyId: editingEmployee.policyId || "",
-          value: editingEmployee.value || "",
+          employeeId: editingEmployee.id || "",
+          employee_id: editingEmployee.employee_id || "",
+          policyId: editingEmployee.policy_id || editingEmployee.medical_insurance_id || "",
+          value: editingEmployee.amount?.toString() || editingEmployee.value || "",
+          categoryId: editingEmployee.category_id || "",
           oldPolicyId: editingEmployee.oldPolicyId || editingEmployee.policyId || "",
           oldValue: editingEmployee.oldValue || editingEmployee.value || "",
           department: editingEmployee.department || "",
           position: editingEmployee.position || "",
           subscriberName: editingEmployee.subscriberName || "",
-          subscriberId: editingEmployee.subscriberId || "",
+          subscriberId: editingEmployee.subscription_no || "",
           oldSubscriberId: editingEmployee.oldSubscriberId || editingEmployee.subscriberId || "",
           relationship: editingEmployee.relationship || "",
         });
+        
+        // Fetch dependents from API
+        fetchDependents(editingEmployee.id);
       } else {
         setIsEditMode(false);
         setFormData({
           name: [],
           employeeId: "",
+          employee_id: "",
           policyId: "",
           value: "",
+          categoryId: "",
           oldPolicyId: "",
           oldValue: "",
           department: "",
@@ -192,9 +231,38 @@ export default function AddEmployeeDialog({
           oldSubscriberId: "",
           relationship: "",
         });
+        setSelectedEmployees([]);
+        setDependents([]);
       }
     }
   }, [open, editingEmployee]);
+
+  // Fetch dependents from API
+  const fetchDependents = async (subscriptionId: string) => {
+    try {
+      const response = await MedicalInsuranceApi.dependents.list(subscriptionId, {
+        page: 1,
+        per_page: 100,
+      });
+      console.log("📋 Fetched dependents:", response.data.payload);
+      
+      // Map API response to local format
+      const mappedDependents = response.data.payload.map((dep: any) => ({
+        id: dep.id,
+        name: dep.name,
+        residenceNumber: dep.residence_number,
+        relationship: dep.relationship,
+        subscriberNumber: dep.subscriber_number,
+        value: dep.value,
+      }));
+      
+      setDependents(mappedDependents);
+    } catch (error) {
+      console.error("Error fetching dependents:", error);
+      // If 404 or error, set empty array
+      setDependents([]);
+    }
+  };
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -238,13 +306,21 @@ export default function AddEmployeeDialog({
       if (editingEmployee) {
         // Update subscription
         const updateParams: UpdateSubscriptionParams = {
-          user_id: formData.employeeId,
+          user_id: formData.employee_id, // actual employee_id
           medical_insurance_id: formData.policyId,
           amount: parseFloat(formData.value),
           subscription_no: formData.subscriberId,
+          category_id: formData.categoryId,
           start_date: new Date().toISOString().split('T')[0],
           end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-          status: 1,
+          status: 1, // 1 for update
+          dependents: dependents.map(dep => ({
+            name: dep.name,
+            residence_number: dep.residenceNumber,
+            relationship: dep.relationship,
+            subscriber_number: dep.subscriberNumber,
+            value: dep.value,
+          })),
         };
         
         await MedicalInsuranceApi.subscriptions.update(editingEmployee.id, updateParams);
@@ -252,13 +328,21 @@ export default function AddEmployeeDialog({
       } else {
         // Create subscription
         const createParams: CreateSubscriptionParams = {
-          user_id: formData.employeeId,
+          user_id: formData.employee_id, // actual employee_id
           medical_insurance_id: formData.policyId,
           amount: parseFloat(formData.value),
           subscription_no: formData.subscriberId,
+          category_id: formData.categoryId,
           start_date: new Date().toISOString().split('T')[0],
           end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-          status: 1,
+          status: 0, // 0 for create
+          dependents: dependents.map(dep => ({
+            name: dep.name,
+            residence_number: dep.residenceNumber,
+            relationship: dep.relationship,
+            subscriber_number: dep.subscriberNumber,
+            value: dep.value,
+          })),
         };
         
         console.log("📤 Sending subscription data:", createParams);
@@ -451,15 +535,35 @@ export default function AddEmployeeDialog({
             </Box>
 
             {isEditMode ? (
-              // Edit mode: single employee search
+              // Edit mode: single employee - show employees with policies
               <Autocomplete
-                options={employees}
-                getOptionLabel={(option) => option?.name || option?.email || ""}
-                value={employees.find(emp => emp.name === formData.name[0]) || null}
+                options={employees.filter(emp => {
+                  if (!employeeSearchQuery) return true;
+                  const userName = emp?.user?.name || emp?.name || emp?.employee_name || '';
+                  const subscriptionNo = emp?.subscription_no || '';
+                  const searchLower = employeeSearchQuery.toLowerCase();
+                  return userName.toLowerCase().includes(searchLower) || 
+                         subscriptionNo.toLowerCase().includes(searchLower);
+                })}
+                getOptionLabel={(option) => {
+                  const userName = option?.user?.name || option?.name || option?.employee_name;
+                  const subscriptionNo = option?.subscription_no;
+                  if (userName) {
+                    return subscriptionNo ? `${userName} (${subscriptionNo})` : userName;
+                  }
+                  return `Subscription No: ${subscriptionNo || 'N/A'} (ID: ${option?.employee_id?.substring(0, 8)}...)`;
+                }}
+                value={employees.find(emp => emp.id === formData.employeeId) || null}
                 onChange={(event, newValue) => {
-                  handleInputChange("name", newValue ? [newValue.name] : []);
+                  const userName = newValue?.user?.name || newValue?.name || newValue?.employee_name;
+                  handleInputChange("name", newValue ? [userName] : []);
                   if (newValue) {
-                    handleInputChange("employeeId", newValue.id);
+                    handleInputChange("employeeId", newValue.id); // subscription_id
+                    handleInputChange("employee_id", newValue.employee_id); // actual employee_id
+                    // Auto-select policy from subscription
+                    if (newValue.policy_id || newValue.medical_insurance_id) {
+                      handleInputChange("policyId", newValue.policy_id || newValue.medical_insurance_id);
+                    }
                   }
                 }}
                 onInputChange={(event, newInputValue) => {
@@ -501,14 +605,34 @@ export default function AddEmployeeDialog({
               // Add mode: multiple employees
               <Autocomplete
                 multiple
-                options={employees}
-                getOptionLabel={(option) => option?.name || option?.email || ""}
-                value={employees.filter(emp => formData.name.includes(emp.name))}
+                options={employees.filter(emp => {
+                  if (!employeeSearchQuery) return true;
+                  const userName = emp?.user?.name || emp?.name || emp?.employee_name || '';
+                  const subscriptionNo = emp?.subscription_no || '';
+                  const searchLower = employeeSearchQuery.toLowerCase();
+                  return userName.toLowerCase().includes(searchLower) || 
+                         subscriptionNo.toLowerCase().includes(searchLower);
+                })}
+                getOptionLabel={(option) => {
+                  const userName = option?.user?.name || option?.name || option?.employee_name;
+                  const subscriptionNo = option?.subscription_no;
+                  if (userName) {
+                    return subscriptionNo ? `${userName} (${subscriptionNo})` : userName;
+                  }
+                  return `Subscription No: ${subscriptionNo || 'N/A'} (ID: ${option?.employee_id?.substring(0, 8)}...)`;
+                }}
+                value={selectedEmployees}
                 onChange={(event, newValue) => {
-                  handleInputChange("name", newValue.map(emp => emp.name));
-                  // Store employee IDs as well
+                  setSelectedEmployees(newValue);
+                  handleInputChange("name", newValue.map(emp => emp?.user?.name || emp?.name || emp?.employee_name));
+                  // Store employee IDs as well and auto-select policy
                   if (newValue.length > 0) {
-                    handleInputChange("employeeId", newValue[0].id);
+                    handleInputChange("employeeId", newValue[0].id); // subscription_id
+                    handleInputChange("employee_id", newValue[0].employee_id); // actual employee_id
+                    // Auto-select policy from subscription
+                    if (newValue[0].policy_id || newValue[0].medical_insurance_id) {
+                      handleInputChange("policyId", newValue[0].policy_id || newValue[0].medical_insurance_id);
+                    }
                   }
                 }}
                 onInputChange={(event, newInputValue) => {
@@ -520,18 +644,19 @@ export default function AddEmployeeDialog({
                 renderTags={(value: readonly any[], getTagProps) =>
                   value.map((option: any, index: number) => {
                     const { key, ...tagProps } = getTagProps({ index });
+                    const userName = option?.user?.name || option?.name || option?.employee_name || 'موظف';
                     return (
                       <Chip
                         key={key}
                         variant="outlined"
-                        label={option?.name || ""}
+                        label={userName}
                         {...tagProps}
                         sx={{
-                          background: "rgba(139, 92, 246, 0.2)",
+                          background: "rgba(236, 72, 153, 0.2)",
                           color: "white",
-                          borderColor: "rgba(139, 92, 246, 0.5)",
+                          borderColor: "rgba(236, 72, 153, 0.5)",
                           "& .MuiChip-deleteIcon": {
-                            color: "white",
+                            color: "rgba(255, 255, 255, 0.7)",
                             "&:hover": {
                               color: "rgba(239, 68, 68, 1)",
                             },
@@ -667,72 +792,139 @@ export default function AddEmployeeDialog({
       case 2:
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: isEditMode ? "1fr 1fr 1fr 1fr" : "1fr 1fr 1fr" }, gap: 3 }}>
-              <FormControl fullWidth size="large">
-                <InputLabel>الاسم</InputLabel>
-                <Select
-                  value={formData.name.join(", ")}
-                  label="الاسم"
-                  disabled
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                >
-                  <MenuItem value="">اختر الموظف</MenuItem>
-                  <MenuItem value="موظف 1">موظف 1</MenuItem>
-                  <MenuItem value="موظف 2">موظف 2</MenuItem>
-                  <MenuItem value="موظف 3">موظف 3</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth size="large">
-                <InputLabel>القيمة</InputLabel>
-                <Select
-                  value={formData.value}
-                  label="القيمة"
-                  disabled
-                  onChange={(e) => handleInputChange("value", e.target.value)}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                >
-                  <MenuItem value="">اختر القيمة</MenuItem>
-                  <MenuItem value="1000">1000</MenuItem>
-                  <MenuItem value="2000">2000</MenuItem>
-                  <MenuItem value="3000">3000</MenuItem>
-                </Select>
-              </FormControl>
-              {isEditMode && (
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr 1fr" }, gap: 3 }}>
+              {/* Policy - Editable */}
+              <Box sx={{ position: "relative" }}>
+                <FormControl fullWidth size="large">
+                  <InputLabel>البوليصة {isEditMode && formData.oldPolicyId && `(القديمة: ${insurances.find(i => i.id === formData.oldPolicyId)?.name || formData.oldPolicyId})`}</InputLabel>
+                  <Select
+                    value={formData.policyId}
+                    label={`البوليصة ${isEditMode && formData.oldPolicyId ? `(القديمة: ${insurances.find(i => i.id === formData.oldPolicyId)?.name || formData.oldPolicyId})` : ''}`}
+                    onChange={(e) => handleInputChange("policyId", e.target.value)}
+                    disabled={loadingInsurances}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: 56,
+                        paddingLeft: "40px",
+                      },
+                    }}
+                  >
+                    <MenuItem value="">اختر البوليصة</MenuItem>
+                    {insurances.map((insurance) => (
+                      <MenuItem key={insurance.id} value={insurance.id}>
+                        {insurance.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Pencil 
+                  size={20} 
+                  style={{ 
+                    position: "absolute", 
+                    left: 15, 
+                    top: "50%", 
+                    transform: "translateY(-50%)", 
+                    color: "rgba(236, 72, 153, 0.7)",
+                    cursor: "pointer"
+                  }} 
+                />
+              </Box>
+              
+              {/* Category - Editable */}
+              <Box sx={{ position: "relative" }}>
+                <FormControl fullWidth size="large">
+                  <InputLabel>الفئة</InputLabel>
+                  <Select
+                    value={formData.categoryId}
+                    label="الفئة"
+                    onChange={(e) => handleInputChange("categoryId", e.target.value)}
+                    disabled={loadingCategories}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: 56,
+                        paddingLeft: "40px",
+                      },
+                    }}
+                  >
+                    <MenuItem value="">اختر الفئة</MenuItem>
+                    {categories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Pencil 
+                  size={20} 
+                  style={{ 
+                    position: "absolute", 
+                    left: 15, 
+                    top: "50%", 
+                    transform: "translateY(-50%)", 
+                    color: "rgba(236, 72, 153, 0.7)",
+                    cursor: "pointer"
+                  }} 
+                />
+              </Box>
+              
+              {/* Value - Editable */}
+              <Box sx={{ position: "relative" }}>
                 <TextField
                   fullWidth
-                  label="رقم المشترك القديم"
-                  value={formData.oldSubscriberId}
-                  disabled
+                  label={`القيمة ${isEditMode && formData.oldValue ? `(القديمة: ${formData.oldValue})` : ''}`}
+                  value={formData.value}
+                  onChange={(e) => handleInputChange("value", e.target.value)}
+                  type="number"
+                  size="large"
+                  placeholder="أدخل القيمة"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      height: 56,
+                      paddingLeft: "40px",
+                    },
+                  }}
+                />
+                <Pencil 
+                  size={20} 
+                  style={{ 
+                    position: "absolute", 
+                    left: 15, 
+                    top: "50%", 
+                    transform: "translateY(-50%)", 
+                    color: "rgba(236, 72, 153, 0.7)",
+                    cursor: "pointer"
+                  }} 
+                />
+              </Box>
+              
+              {/* Subscription Number - Editable */}
+              <Box sx={{ position: "relative" }}>
+                <TextField
+                  fullWidth
+                  label={`رقم المشترك ${isEditMode && formData.oldSubscriberId ? `(القديم: ${formData.oldSubscriberId})` : ''}`}
+                  value={formData.subscriberId}
+                  onChange={(e) => handleInputChange("subscriberId", e.target.value)}
+                  placeholder="أدخل رقم المشترك"
                   size="large"
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       height: 56,
+                      paddingLeft: "40px",
                     },
                   }}
                 />
-              )}
-              <TextField
-                fullWidth
-                label={isEditMode ? "رقم المشترك الجديد" : "رقم المشترك"}
-                value={formData.subscriberId}
-                onChange={(e) => handleInputChange("subscriberId", e.target.value)}
-                placeholder="أدخل رقم المشترك"
-                size="large"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    height: 56,
-                  },
-                }}
-              />
+                <Pencil 
+                  size={20} 
+                  style={{ 
+                    position: "absolute", 
+                    left: 15, 
+                    top: "50%", 
+                    transform: "translateY(-50%)", 
+                    color: "rgba(236, 72, 153, 0.7)",
+                    cursor: "pointer"
+                  }} 
+                />
+              </Box>
             </Box>
           </Box>
         );
@@ -741,44 +933,30 @@ export default function AddEmployeeDialog({
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 3 }}>
-              <FormControl fullWidth size="large">
-                <InputLabel>الاسم</InputLabel>
-                <Select
-                  value={formData.name.join(", ")}
-                  label="الاسم"
-                  disabled
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                >
-                  <MenuItem value="">اختر الموظف</MenuItem>
-                  <MenuItem value="موظف 1">موظف 1</MenuItem>
-                  <MenuItem value="موظف 2">موظف 2</MenuItem>
-                  <MenuItem value="موظف 3">موظف 3</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth size="large">
-                <InputLabel>القيمة</InputLabel>
-                <Select
-                  value={formData.value}
-                  label="القيمة"
-                  disabled
-                  onChange={(e) => handleInputChange("value", e.target.value)}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                >
-                  <MenuItem value="">اختر القيمة</MenuItem>
-                  <MenuItem value="1000">1000</MenuItem>
-                  <MenuItem value="2000">2000</MenuItem>
-                  <MenuItem value="3000">3000</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                fullWidth
+                label="الاسم"
+                value={formData.name.join(", ")}
+                disabled
+                size="large"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    height: 56,
+                  },
+                }}
+              />
+              <TextField
+                fullWidth
+                label="القيمة"
+                value={formData.value}
+                disabled
+                size="large"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    height: 56,
+                  },
+                }}
+              />
               <Button
                 onClick={() => setDependentsDialogOpen(true)}
                 variant="contained"
