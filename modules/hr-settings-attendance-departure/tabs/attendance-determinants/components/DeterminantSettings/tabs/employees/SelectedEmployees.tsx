@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import HeadlessTableLayout from "@/components/headless/table";
+import type { ColumnDef } from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { MenuItem } from "@mui/material";
 import EditEmployeeDialog from "./EditEmployeeDialog";
@@ -131,7 +132,7 @@ export default function SelectedEmployees({
     },
   });
 
-  const columns = useMemo(
+  const columns: ColumnDef<ConstraintSelectedEmployeePayload>[] = useMemo(
     () => [
       {
         key: "name",
@@ -285,9 +286,12 @@ export default function SelectedEmployees({
 
       <EditEmployeeDialog
         isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        selectedEmployee={selectedEmployee}
-        setSelectedEmployee={setSelectedEmployee}
+        onClose={() => {
+          setIsEditDialogOpen(false);
+          setSelectedEmployee("");
+        }}
+        userId={selectedEmployee}
+        constraintId={constraintId}
       />
     </section>
   );
