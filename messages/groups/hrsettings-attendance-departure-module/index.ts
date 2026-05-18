@@ -138,7 +138,62 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
     status: new MessagesGroup({
       active: _m("Active", "نشط"),
       inactive: _m("Inactive", "غير نشط")
-    })
+    }),
+    determinantSettings: new MessagesGroup({
+      tabs: new MessagesGroup({
+        determinantDetails: _m(
+          "Determinant information",
+          "معلومات المحدد",
+        ),
+        selectedEmployee: _m("Selected employee", "الموظف المحدد"),
+        shifts: _m("Work periods", "فترات العمل"),
+        mapSettings: _m("Map settings", "اعدادات الخريطة"),
+        notifications: _m("Notifications", "الاشعارات"),
+      }),
+      shifts: new MessagesGroup({
+        toastWeeklySaved: _m(
+          "Weekly work periods assigned successfully.",
+          "تم تعيين فترات الأسبوع بنجاح.",
+        ),
+        toastDailySaved: _m(
+          "Daily work periods assigned successfully.",
+          "تم تعيين الدوام اليومي بنجاح.",
+        ),
+        toastError: _m("Could not save work periods.", "تعذر حفظ فترات العمل."),
+        toastWeeklyFailed: _m(
+          "Failed to assign weekly work periods.",
+          "فشل تعيين دوام الأسبوع.",
+        ),
+        toastDailyFailed: _m(
+          "Failed to assign daily work periods.",
+          "فشل تعيين الدوام اليومي.",
+        ),
+        validationSelectAtLeastOneDay: _m(
+          "Please select at least one day.",
+          "يرجى اختيار يوم واحد على الأقل.",
+        ),
+        validationWeeklyAddPeriods: _m(
+          "Please add work periods.",
+          "يرجى إضافة فترات الدوام.",
+        ),
+        validationWeeklyValidDays: _m(
+          "Please select valid weekdays.",
+          "يرجى اختيار أيام الأسبوع الصحيحة.",
+        ),
+        validationDailyAllDaysNeedPeriods: _m(
+          "Please add periods for each selected day.",
+          "يرجى إضافة فترات لكل الأيام المحددة.",
+        ),
+        validationInvalidTimes: _m(
+          "Please make sure the period times are valid.",
+          "يرجى التأكد من صحة أوقات الفترات.",
+        ),
+        modeDaily: _m("Daily", "يومي"),
+        modeWeekly: _m("Weekly", "اسبوعي"),
+        dialogAddPeriods: _m("Add periods", "اضافة الفترات"),
+        dialogEditPeriods: _m("Edit periods", "تعديل الفترات"),
+      }),
+    }),
   }),
   attendanceDeterminantDetails: new MessagesGroup({
     determinantType: _m("Determinant System Type", "نظام المحدد"),

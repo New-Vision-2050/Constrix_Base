@@ -3,15 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Plus } from "lucide-react";
-import { WEEK_DAYS } from "./timing-constants";
-import type { DayPeriodRow } from "./timing-types";
-import { shiftPeriodLabel } from "./timing-types";
+import { WEEK_DAYS } from "../timing-constants";
+import type { DayPeriodRow } from "../timing-types";
+import { shiftPeriodLabel } from "../timing-types";
 
 type DailyTimingSettingsProps = {
   weeklyDays: string[];
   dayPeriodRows: Record<string, DayPeriodRow[]>;
   onToggleDay: (dayId: string) => void;
   onOpenPeriodsDialog: (dayId: string, intent: "add" | "edit") => void;
+  onAssignDailyShifts: () => void;
+  assignDailyShiftsPending: boolean;
+  assignDailyShiftsError?: string | null;
 };
 
 export default function DailyTimingSettings({
@@ -19,10 +22,17 @@ export default function DailyTimingSettings({
   dayPeriodRows,
   onToggleDay,
   onOpenPeriodsDialog,
+  onAssignDailyShifts,
+  assignDailyShiftsPending,
+  assignDailyShiftsError,
 }: DailyTimingSettingsProps) {
   const selectedWeekDays = WEEK_DAYS.filter((day) =>
     weeklyDays.includes(day.id),
   );
+
+  const dailyAssignReady =
+    weeklyDays.length > 0 &&
+    weeklyDays.every((id) => (dayPeriodRows[id] ?? []).length > 0);
 
   return (
     <div className="border border-border rounded-xl px-3 py-4 md:px-4 md:py-5">
@@ -133,9 +143,22 @@ export default function DailyTimingSettings({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
-        <Button variant="default" type="button">
-          Save changes
+      <div className="mt-6 flex flex-col gap-2">
+        {assignDailyShiftsError ? (
+          <p className="text-right text-sm text-destructive" role="alert">
+            {assignDailyShiftsError}
+          </p>
+        ) : null}
+        <Button
+          variant="default"
+          type="button"
+          className="w-full h-11 lg:ms-auto lg:w-auto disabled:bg-muted-foreground disabled:text-muted-foreground-foreground"
+          disabled={
+            assignDailyShiftsPending || weeklyDays.length === 0 || !dailyAssignReady
+          }
+          onClick={onAssignDailyShifts}
+        >
+          {assignDailyShiftsPending ? "جاري التعيين…" : "تعيين الدوام اليومي"}
         </Button>
       </div>
     </div>
