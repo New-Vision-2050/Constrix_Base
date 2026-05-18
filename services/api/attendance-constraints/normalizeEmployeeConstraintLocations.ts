@@ -1,14 +1,8 @@
-import { apiClient } from "@/config/axios-config";
 import {
   mapConstraintCatalogRow,
   readAdditionalFlag,
-  type ConstraintCatalogRow,
-} from "@/modules/hr-settings-attendance-departure/api/getConstraintsCatalogGrouped";
-
-type ApiEnvelope = {
-  payload?: unknown;
-  data?: unknown;
-};
+} from "./catalogMappers";
+import type { ConstraintCatalogRow, GroupedConstraintsLocations } from "./types/response";
 
 const MAIN_KEYS = [
   "main",
@@ -103,10 +97,10 @@ function splitFlat(rows: ConstraintCatalogRow[]): {
   };
 }
 
-function normalizePayload(payload: unknown): {
-  main: ConstraintCatalogRow[];
-  additional: ConstraintCatalogRow[];
-} {
+/** Used by `AttendanceConstraintsApi.getEmployeeConstraintLocationsGrouped` */
+export function normalizeEmployeeConstraintLocationsPayload(
+  payload: unknown,
+): GroupedConstraintsLocations {
   if (payload == null) {
     return { main: [], additional: [] };
   }
@@ -147,24 +141,4 @@ function normalizePayload(payload: unknown): {
   }
 
   return { main: [], additional: [] };
-}
-
-/**
- * Employee constraint assignments/locations from:
- * GET /attendance/constraints/employees/{userId}/constraint-locations
- */
-export async function getEmployeeConstraintLocationsGrouped(
-  userId: string,
-): Promise<{ main: ConstraintCatalogRow[]; additional: ConstraintCatalogRow[] }> {
-  const trimmed = String(userId ?? "").trim();
-  if (!trimmed) {
-    return { main: [], additional: [] };
-  }
-
-  const res = await apiClient.get<ApiEnvelope>(
-    `/attendance/constraints/employees/${encodeURIComponent(trimmed)}/constraint-locations`,
-  );
-
-  const payload = res.data?.payload ?? res.data?.data ?? res.data;
-  return normalizePayload(payload);
 }

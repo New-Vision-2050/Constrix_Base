@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getEmployeeConstraintLocationsGrouped } from "@/modules/hr-settings-attendance-departure/api/getEmployeeConstraintLocations";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  AttendanceConstraintsApi,
+  type EmployeeConstraintReplacement,
+} from "@/services/api/attendance-constraints";
 import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
 import {
   Accordion,
@@ -27,6 +31,10 @@ const CONSTRAINT_SECTIONS: { id: ConstraintSection; title: string }[] = [
   { id: "sub", title: "المحددات الفرعية" },
 ];
 
+/** Shared with invalidateQueries after assign-constraint succeeds. */
+const EMPLOYEE_CONSTRAINT_LOCATIONS_QUERY_KEY =
+  "attendance-constraints-employee-constraint-locations" as const;
+
 function rowKey(section: ConstraintSection, constraintId: string) {
   return `${section}:${constraintId}`;
 }
@@ -36,6 +44,32 @@ function constraintDisplayName(
   constraintId: string,
 ) {
   return pool.find((r) => r.id === constraintId)?.constraint_name ?? constraintId;
+}
+
+function constraintIdFromCompositeKey(compositeKey: string): string | null {
+  const colon = compositeKey.indexOf(":");
+  if (colon <= 0 || colon >= compositeKey.length - 1) return null;
+  return compositeKey.slice(colon + 1);
+}
+
+function buildConstraintReplacements(
+  selectedKeys: string[],
+  replacementByKey: Record<string, string>,
+): EmployeeConstraintReplacement[] {
+  const out: EmployeeConstraintReplacement[] = [];
+  for (const key of selectedKeys) {
+    const oldId = constraintIdFromCompositeKey(key);
+    if (!oldId) continue;
+    const chosen = replacementByKey[key]?.trim();
+    const newId = chosen || oldId;
+    if (newId !== oldId) {
+      out.push({
+        old_constraint_id: oldId,
+        new_constraint_id: newId,
+      });
+    }
+  }
+  return out;
 }
 
 interface EditEmployeeDialogProps {
@@ -63,16 +97,69 @@ export default function EditEmployeeDialog({
 
   const employeeUserId = userId.trim();
 
+  const queryClient = useQueryClient();
+
+  const assignReplacementsMutation = useMutation({
+    mutationFn: (
+      replacements: EmployeeConstraintReplacement[],
+    ): Promise<unknown> =>
+      AttendanceConstraintsApi.assignReplacements(
+        employeeUserId,
+        replacements,
+      ),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: [EMPLOYEE_CONSTRAINT_LOCATIONS_QUERY_KEY, employeeUserId],
+      });
+      toast.success("تم حفظ التعديلات بنجاح");
+      onClose();
+    },
+    onError: (error: unknown) => {
+      const ax = error as {
+        response?: { data?: { message?: unknown } };
+      };
+      const raw = ax.response?.data?.message;
+      const msg =
+        typeof raw === "string"
+          ? raw
+          : raw &&
+              typeof raw === "object" &&
+              "description" in raw &&
+              typeof (raw as { description?: unknown }).description ===
+                "string"
+            ? String((raw as { description: string }).description)
+            : null;
+      toast.error(msg ?? "تعذر حفظ التعديلات");
+    },
+  });
+
   const { data: groupedConstraints, isLoading, isError } = useQuery({
-    queryKey: [
-      "attendance-constraints-employee-constraint-locations",
-      employeeUserId,
-    ],
-    queryFn: () => getEmployeeConstraintLocationsGrouped(employeeUserId),
+    queryKey: [EMPLOYEE_CONSTRAINT_LOCATIONS_QUERY_KEY, employeeUserId],
+    queryFn: () =>
+      AttendanceConstraintsApi.getEmployeeConstraintLocationsGrouped(
+        employeeUserId,
+      ),
     enabled: isOpen && Boolean(employeeUserId),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+
+  const handleSaveAssignments = () => {
+    if (!employeeUserId) {
+      toast.error("لم يتم ربط موظف");
+      return;
+    }
+    const replacements = buildConstraintReplacements(
+      selectedKeysList,
+      replacementByKey,
+    );
+    if (replacements.length === 0) {
+      toast.info("لم يتم تغيير أي محدد");
+      onClose();
+      return;
+    }
+    assignReplacementsMutation.mutate(replacements);
+  };
 
   const optionsBySection = useMemo(() => {
     const apiMain = groupedConstraints?.main ?? [];
@@ -369,8 +456,15 @@ export default function EditEmployeeDialog({
               </div>
             ) : (
               <div className="flex justify-end">
-                <Button variant="contained" className="px-8" onClick={onClose}>
-                  حفظ
+                <Button
+                  variant="contained"
+                  className="px-8"
+                  disabled={assignReplacementsMutation.isPending}
+                  onClick={handleSaveAssignments}
+                >
+                  {assignReplacementsMutation.isPending
+                    ? "جاري الحفظ…"
+                    : "حفظ"}
                 </Button>
               </div>
             )}
