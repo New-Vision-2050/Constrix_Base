@@ -54,6 +54,9 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
 
   const isCurrentCalendarDayLocked = useMemo(() => {
     if (!isEditMode) return false;
+    // Allow editing current day in dev environments
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    if (apiBaseUrl.includes("dev")) return false;
     const todayKey = JS_DATE_TO_DAY_KEY[new Date().getDay()];
     return dayConfig.day === todayKey;
   }, [isEditMode, dayConfig.day]);

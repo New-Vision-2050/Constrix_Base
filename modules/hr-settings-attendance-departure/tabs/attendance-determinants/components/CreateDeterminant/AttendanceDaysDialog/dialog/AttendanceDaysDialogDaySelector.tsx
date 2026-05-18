@@ -20,6 +20,8 @@ const AttendanceDaysDialogDaySelector: React.FC<
   const isArabic = locale === "ar";
   const { usedDays, isEdit } = useAttendanceDayCxt();
 
+  const isDev = (process.env.NEXT_PUBLIC_API_BASE_URL || "").includes("dev");
+
   // Convert days to options format based on current locale
   const dayOptions: Option[] = useMemo(() => {
     return DAYS_OF_WEEK.filter((day) => !usedDays?.includes(day.value)).map(
@@ -41,7 +43,7 @@ const AttendanceDaysDialogDaySelector: React.FC<
         placeholder={placeholder || t("selectDay")}
         searchPlaceholder={isArabic ? t("search") : t("search")}
         noResultsText={isArabic ? t("noResults") : t("noResults")}
-        disabled={isEdit}
+        disabled={isEdit && !isDev}
       />
     </div>
   );
