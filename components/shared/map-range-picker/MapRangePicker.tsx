@@ -120,6 +120,8 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
     const mapRef = useRef<google.maps.Map | null>(null);
     const markerRef = useRef<google.maps.Marker | null>(null);
     const circleRef = useRef<google.maps.Circle | null>(null);
+    /** Set when `onLoad` runs so marker/circle/listener effects rerun after the map exists. */
+    const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
     const [mapType, setMapType] = useState<"roadmap" | "satellite">("roadmap");
 
     const { isLoaded } = useJsApiLoader({
@@ -127,14 +129,14 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
       libraries,
     });
 
-    // Initialize marker when currentPin changes
+    // Initialize marker when the map is ready or pin changes
     useEffect(() => {
-      if (!isLoaded || !mapRef.current) return;
+      if (!isLoaded || !mapInstance) return;
 
       if (currentPin) {
         if (!markerRef.current) {
           markerRef.current = new window.google.maps.Marker({
-            map: mapRef.current,
+            map: mapInstance,
             position: currentPin,
             title: "Current Location",
           });
@@ -147,17 +149,17 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
           markerRef.current = null;
         }
       }
-    }, [currentPin, isLoaded]);
+    }, [currentPin, isLoaded, mapInstance]);
 
-    // Initialize circle when radius or currentPin changes
+    // Initialize / update circle when map, pin, center, or radius changes
     useEffect(() => {
-      if (!isLoaded || !mapRef.current) return;
+      if (!isLoaded || !mapInstance) return;
 
-      const circleCenter = currentPin || center;
+      const circleCenter = currentPin ?? center;
 
       if (!circleRef.current) {
         circleRef.current = new window.google.maps.Circle({
-          map: mapRef.current,
+          map: mapInstance,
           center: circleCenter,
           radius,
           fillColor: "#4F46E5",
@@ -170,7 +172,13 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
         circleRef.current.setCenter(circleCenter);
         circleRef.current.setRadius(radius);
       }
-    }, [isLoaded, currentPin, center, radius]);
+    }, [isLoaded, mapInstance, currentPin, center, radius]);
+
+    // Keep viewport aligned with the pin when it updates (e.g. dialog initial values or inputs).
+    useEffect(() => {
+      if (!mapInstance || !currentPin) return;
+      mapInstance.panTo(currentPin);
+    }, [mapInstance, currentPin?.lat, currentPin?.lng]);
 
     if (!isLoaded) {
       return (
@@ -226,9 +234,15 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
           zoom={zoom}
           onLoad={(map) => {
             mapRef.current = map;
+            setMapInstance(map);
           }}
           onUnmount={() => {
+            markerRef.current?.setMap(null);
+            markerRef.current = null;
+            circleRef.current?.setMap(null);
+            circleRef.current = null;
             mapRef.current = null;
+            setMapInstance(null);
           }}
           options={{
             disableDefaultUI: disabled,
@@ -238,7 +252,7 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
           }}
         >
           <MapEvents
-            mapRef={mapRef}
+            mapInstance={mapInstance}
             markerRef={markerRef}
             circleRef={circleRef}
             onSelect={onSelect}
