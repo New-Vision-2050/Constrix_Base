@@ -8,7 +8,12 @@ import {
   type ConstraintCatalogRow,
   type EmployeeConstraintReplacement,
 } from "@/services/api/attendance-constraints";
-import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogHeader,
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -16,7 +21,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@mui/material";
-import { ChevronLeft, ChevronRight, ShieldCloseIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -24,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CloseOutlined } from "@mui/icons-material";
 
 type ConstraintSection = "main" | "sub";
 
@@ -317,15 +323,21 @@ export default function EditEmployeeDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTitle className="text-right text-base">
-        تعديل الموظف المحدد
-      </DialogTitle>
-      <ShieldCloseIcon
-        onClick={onClose}
-        className="absolute top-4 left-4 cursor-pointer"
-      />
       <DialogContent className="max-w-2xl p-6">
-        <div className="mt-2 space-y-6">
+        <DialogHeader className="gap-3 space-y-0 text-right sm:text-right">
+          <DialogTitle className="text-center text-lg font-semibold leading-snug">
+            تعديل الموظف المحدد
+          </DialogTitle>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 rounded-sm text-muted-foreground opacity-80 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 absolute top-4 left-4"
+            aria-label="إغلاق"
+          >
+            <CloseOutlined className="h-5 w-5 cursor-pointer" />
+          </button>
+        </DialogHeader>
+        <div className="space-y-6">
           <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <span className={stepClassName(1)}>1</span>
@@ -533,14 +545,14 @@ export default function EditEmployeeDialog({
 
           <div className="flex justify-between">
             <div className="flex justify-end">
-              <Button
+              {currentStep > 1 && <Button
                 variant="contained"
                 className="px-8"
                 onClick={goToPreviousStep}
               >
                 <ChevronRight className="h-4 w-4" />
                 السابق
-              </Button>
+              </Button>}
             </div>
             {currentStep < 3 ? (
               <div className="flex justify-end">

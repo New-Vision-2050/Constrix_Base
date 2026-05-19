@@ -49,11 +49,14 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
 }) => {
   const { resolvedTheme } = useTheme();
   const t = useTranslations(
-    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog"
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog",
   );
 
   const isCurrentCalendarDayLocked = useMemo(() => {
     if (!isEditMode) return false;
+    // Allow editing current day in dev environments
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    if (apiBaseUrl.includes("dev")) return false;
     const todayKey = JS_DATE_TO_DAY_KEY[new Date().getDay()];
     return dayConfig.day === todayKey;
   }, [isEditMode, dayConfig.day]);
@@ -82,7 +85,7 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
       .getValues("create-determinant-form").weekly_schedule;
     // remove day from weekly schedule
     const _weeklyScheduleWithoutDay = _weeklySchedule.filter(
-      (day: any) => day.day !== dayConfig.day
+      (day: any) => day.day !== dayConfig.day,
     );
     // update weekly schedule
     useFormStore?.getState().setValues("create-determinant-form", {
@@ -90,7 +93,7 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
     });
     console.log(
       "dayConfig _weeklyScheduleWithoutDay",
-      _weeklyScheduleWithoutDay
+      _weeklyScheduleWithoutDay,
     );
     console.log("dayConfig _weeklySchedule", _weeklySchedule);
     console.log("dayConfig", dayConfig);
@@ -169,7 +172,10 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
         <span className={labelClass}>{t("periods")}</span>
         <div className="mt-2 space-y-2">
           {dayConfig?.periods?.map((period, index) => (
-            <div key={index} className={`flex flex-col bg-gray-700 p-2 rounded-sm`}>
+            <div
+              key={index}
+              className={`flex flex-col bg-gray-700 p-2 rounded-sm`}
+            >
               <div className={periodClass}>
                 <Clock className="h-4 w-4 text-pink-500 mr-2" />
                 <span>
