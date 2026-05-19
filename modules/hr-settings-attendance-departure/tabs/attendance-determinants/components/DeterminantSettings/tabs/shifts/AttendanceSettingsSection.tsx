@@ -12,7 +12,7 @@ export default function AttendanceSettingsSection() {
         {EMPLOYEE_OPTIONS.map((option) => (
           <div
             key={option.id}
-            className="border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center bg-background/20"
+            className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center"
           >
             <p className="text-3xl font-semibold text-primary leading-none">
               {option.value}

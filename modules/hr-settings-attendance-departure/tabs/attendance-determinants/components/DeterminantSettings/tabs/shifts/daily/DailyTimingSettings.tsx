@@ -74,7 +74,7 @@ export default function DailyTimingSettings({
                 return (
                   <div
                     key={day.id}
-                    className="border border-border rounded-lg p-2.5 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between"
+                    className="bg-background border border-border rounded-lg p-2.5 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between"
                   >
                     <div className="flex items-center gap-2 lg:w-1/5 shrink-0">
                       <Checkbox
