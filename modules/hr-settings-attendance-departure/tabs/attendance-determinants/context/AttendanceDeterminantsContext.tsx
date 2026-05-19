@@ -43,6 +43,12 @@ interface AttendanceDeterminantsContextType {
   constraintsListError: unknown;
   refetchConstraintsList: () => void;
 
+  // sidebar pagination
+  sidebarPage: number;
+  sidebarLimit: number;
+  sidebarTotalPages: number;
+  handleSidebarPageChange: (page: number) => void;
+
   // cities data
   citiesData: City[] | undefined;
   
@@ -108,6 +114,12 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     setLimit(limit);
   };
 
+  // sidebar pagination
+  const sidebarTotalPages = constraintsData?.pagination?.last_page ?? 1;
+  const handleSidebarPageChange = (newPage: number) => {
+    setSidebarPage(newPage);
+  };
+
   // Handle click on a constraint
   const handleConstraintClick = (id: string) => {
     // Special case for "all constraints" (show all when no active constraint)
@@ -156,6 +168,11 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     constraintsListLoading,
     constraintsListError,
     refetchConstraintsList,
+    // sidebar pagination
+    sidebarPage,
+    sidebarLimit,
+    sidebarTotalPages,
+    handleSidebarPageChange,
     // cities data
     citiesData,
     // Add new function
