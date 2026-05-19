@@ -1,3 +1,5 @@
+"use client";
+
 import React, {
   createContext,
   useContext,
@@ -13,7 +15,6 @@ import { useConstraintsList } from "@/modules/hr-settings-attendance-departure/h
 import { useCitiesData } from "../hooks/useCities";
 import { City } from "../api/get-cities";
 
-//
 type constraintsListType = {
   payload: Constraint[];
   pagination: {
@@ -21,13 +22,12 @@ type constraintsListType = {
   };
 };
 
-// Define the context interface
 interface AttendanceDeterminantsContextType {
   constraintsData: Constraint[] | undefined;
   activeConstraint: Constraint | undefined;
   constraintsLoading: boolean;
   constraintsError: unknown;
-  branchesData: any[] | undefined; // Add branchesData property
+  branchesData: any[] | undefined;
   setActiveConstraint: React.Dispatch<
     React.SetStateAction<Constraint | undefined>
   >;
@@ -38,30 +38,20 @@ interface AttendanceDeterminantsContextType {
   page: number;
   limit: number;
   // constraints list
-  constraintsList: constraintsListType| undefined;
+  constraintsList: constraintsListType | undefined;
   constraintsListLoading: boolean;
   constraintsListError: unknown;
   refetchConstraintsList: () => void;
-
-  // sidebar pagination
-  sidebarPage: number;
-  sidebarLimit: number;
-  sidebarTotalPages: number;
-  handleSidebarPageChange: (page: number) => void;
-
   // cities data
   citiesData: City[] | undefined;
-  
   // Function to handle newly created determinant
   handleNewDeterminantCreated: (determinant: any) => void;
 }
 
-// Create the context with an initial value
 const AttendanceDeterminantsContext = createContext<
   AttendanceDeterminantsContextType | undefined
 >(undefined);
 
-// Context provider
 export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
@@ -84,15 +74,12 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 
   const { data: branchesData } = useBranchiesData();
 
-  // cities data
   const { data: citiesData } = useCitiesData();
 
   console.log("citiesData", citiesData);
 
-  // State for active constraint
   const [activeConstraint, setActiveConstraint] = useState<Constraint>();
 
-  // refresh active constraint when data updated
   useEffect(() => {
     if (constraintsData && activeConstraint) {
       const updatedConstraint = constraintsData.payload.find(
@@ -104,31 +91,20 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     }
   }, [constraintsData, activeConstraint]);
 
-  // handle change page
   const handlePageChange = (pageNumber: number) => {
     setPage(pageNumber);
   };
 
-  // handle change limit
-  const handleLimitChange = (limit: number) => {
-    setLimit(limit);
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
   };
 
-  // sidebar pagination
-  const sidebarTotalPages = constraintsData?.pagination?.last_page ?? 1;
-  const handleSidebarPageChange = (newPage: number) => {
-    setSidebarPage(newPage);
-  };
-
-  // Handle click on a constraint
   const handleConstraintClick = (id: string) => {
-    // Special case for "all constraints" (show all when no active constraint)
     if (id === "all-determinants") {
       setActiveConstraint(undefined);
       return;
     }
 
-    // Find and set the selected constraint
     if (constraintsData) {
       const selectedConstraint = constraintsData.payload.find(
         (c) => c.id === id
@@ -139,23 +115,20 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     }
   };
 
-  // Handle newly created determinant
   const handleNewDeterminantCreated = (determinant: any) => {
-    // Wait a moment for the refetch to complete, then select the new determinant
     setTimeout(() => {
       if (determinant?.id) {
         setActiveConstraint(determinant);
       }
-    }, 500); // Give some time for the refetch to complete
+    }, 500);
   };
 
-  // Context value to export
   const contextValue: AttendanceDeterminantsContextType = {
     constraintsData: constraintsData?.payload,
     activeConstraint,
     constraintsLoading,
     constraintsError,
-    branchesData, // Add branchesData to the context value
+    branchesData,
     setActiveConstraint,
     handleConstraintClick,
     refetchConstraints,
@@ -163,19 +136,11 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     handleLimitChange,
     page,
     limit,
-    // constraints list
     constraintsList,
     constraintsListLoading,
     constraintsListError,
     refetchConstraintsList,
-    // sidebar pagination
-    sidebarPage,
-    sidebarLimit,
-    sidebarTotalPages,
-    handleSidebarPageChange,
-    // cities data
     citiesData,
-    // Add new function
     handleNewDeterminantCreated,
   };
 
@@ -186,7 +151,6 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   );
 };
 
-// Custom hook to use the context
 export const useAttendanceDeterminants =
   (): AttendanceDeterminantsContextType => {
     const context = useContext(AttendanceDeterminantsContext);
