@@ -1,8 +1,8 @@
-/** Tab definitions for determinant settings (values match `TabsTrigger` `value`). */
+/** Tab definitions for determinant settings (`value` matches `TabsTrigger` / `TabsContent`). */
 export const SETTINGS_TABS = [
-  { value: "determinant-details", label: "معلومات المحدد" },
-  { value: "employees-settings", label: "الموظف المحدد" },
-  { value: "timing-settings", label: "فترات العمل" },
-  { value: "maps-settings", label: "اعدادات الخريطة" },
-  { value: "notifications-settings", label: "الاشعارات" },
+  { value: "determinant-details", labelKey: "determinantDetails" },
+  { value: "employees-settings", labelKey: "selectedEmployee" },
+  { value: "shifts", labelKey: "shifts" },
+  { value: "maps-settings", labelKey: "mapSettings" },
+  { value: "notifications-settings", labelKey: "notifications" },
 ] as const;

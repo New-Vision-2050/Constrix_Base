@@ -1,0 +1,77 @@
+export type ConstraintCatalogRow = {
+  id: string;
+  constraint_name: string;
+  /** When API omits this, both accordions use the full catalog (same as job form selects). */
+  is_additional?: boolean;
+};
+
+/** Result shape shared by catalog list + employee constraint-locations grouping. */
+export type GroupedConstraintsLocations = {
+  main: ConstraintCatalogRow[];
+  additional: ConstraintCatalogRow[];
+};
+
+/** Payload merged from PATCH basic-info responses (flexible backend shape). */
+export type ConstraintBasicInfo = Partial<{
+  name: string;
+  constraint_name: string;
+  constraint_type: string;
+  branches: { id: string; name: string }[];
+  branch_locations: { id: string; name: string }[];
+  branch_ids: (string | number)[];
+  config: Record<string, unknown>;
+  timezone: string;
+  reference_time: string;
+  daily_start_time: string;
+  daily_reference_time: string;
+  country_code: string;
+  country: string;
+}>;
+
+/** One row inside constraint employees API list payloads (normalized in UI parsers). */
+export type ConstraintSelectedEmployeePayload = {
+  id?: string;
+  user_id?: string;
+  name?: string;
+  full_name?: string;
+  email?: string;
+  phone?: string;
+  mobile?: string;
+  user?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    mobile?: string;
+  };
+  project?: string | { name?: string };
+  branch?: string | { name?: string };
+  status?: string;
+  state?: string;
+  is_active?: number | boolean;
+};
+
+export type ConstraintEmployeesListApiResponse = {
+  payload?:
+    | ConstraintSelectedEmployeePayload[]
+    | Record<string, ConstraintSelectedEmployeePayload>
+    | unknown;
+  pagination?: { last_page?: number; result_count?: number };
+  last_page?: number;
+  result_count?: number;
+};
+
+export type ConstraintEmployeesListNormalized = {
+  employees: ConstraintSelectedEmployeePayload[];
+  totalPages: number;
+  totalItems: number;
+};
+
+export type ConstraintLocationPayload = Record<string, unknown>;
+
+export type ConstraintLocationsListApiResponse = {
+  payload?: unknown;
+  pagination?: { last_page?: number; result_count?: number };
+  last_page?: number;
+  result_count?: number;
+  [key: string]: unknown;
+};

@@ -28,7 +28,9 @@ type NationalAddressMapDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialValues?: Partial<NationalAddressMapPayload>;
-  onSave: (payload: NationalAddressMapPayload) => void;
+  /** May return a Promise — dialog stays open until it rejects */
+  onSave: (payload: NationalAddressMapPayload) => void | Promise<void>;
+  savePending?: boolean;
 };
 
 export default function NationalAddressMapDialog({
@@ -36,11 +38,14 @@ export default function NationalAddressMapDialog({
   onOpenChange,
   initialValues,
   onSave,
+  savePending = false,
 }: NationalAddressMapDialogProps) {
   const [longitude, setLongitude] = useState(DEFAULT_COORD);
   const [latitude, setLatitude] = useState(DEFAULT_COORD);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
   const [locationLabel, setLocationLabel] = useState(DEFAULT_LOCATION);
+  const [submitting, setSubmitting] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -48,6 +53,8 @@ export default function NationalAddressMapDialog({
     setLatitude(initialValues?.latitude ?? DEFAULT_COORD);
     setRadius(initialValues?.radius ?? DEFAULT_RADIUS);
     setLocationLabel(initialValues?.location ?? DEFAULT_LOCATION);
+    setSaveError(null);
+    setSubmitting(false);
   }, [open, initialValues]);
 
   const pin = useMemo(() => {
@@ -62,15 +69,29 @@ export default function NationalAddressMapDialog({
     return Number.isFinite(n) && n > 0 ? n : 1000;
   }, [radius]);
 
-  const handleSave = () => {
-    onSave({
-      longitude,
-      latitude,
-      radius,
-      location: locationLabel,
-    });
-    onOpenChange(false);
+  const handleSave = async () => {
+    setSaveError(null);
+    setSubmitting(true);
+    try {
+      await Promise.resolve(
+        onSave({
+          longitude,
+          latitude,
+          radius,
+          location: locationLabel,
+        }),
+      );
+      onOpenChange(false);
+    } catch (e) {
+      setSaveError(
+        e instanceof Error ? e.message : "حدث خطأ أثناء الحفظ.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  const isBusy = submitting || savePending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -170,12 +191,23 @@ export default function NationalAddressMapDialog({
             </div>
           </div>
 
+          {saveError ? (
+            <p className="text-sm text-destructive" role="alert">
+              {saveError}
+            </p>
+          ) : null}
+
           <div
             className="flex justify-between gap-3 border-t border-border pt-4"
             dir="rtl"
           >
-            <Button type="button" variant="default" onClick={handleSave}>
-              حفظ
+            <Button
+              type="button"
+              variant="default"
+              onClick={() => void handleSave()}
+              disabled={isBusy}
+            >
+              {isBusy ? "جاري الحفظ…" : "حفظ"}
             </Button>
             <Button
               type="button"
