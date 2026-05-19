@@ -196,7 +196,6 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
       <Box
         component="legend"
         sx={{
-          px: 2,
           fontSize: "24px",
           fontWeight: 700,
           color: isDarkMode ? "#fff" : "#111827",
@@ -227,7 +226,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("serviceProvider") || "مزود الخدمة"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {insurance.provider_name || insurance.provider || insurance.employee_name || insurance.employee?.name || "غير محدد"}
+            {insurance.provider || insurance.provider_name || "-"}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
@@ -235,7 +234,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("startData") || "تاريخ البدء"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {insurance.start_date || "غير محدد"}
+            {insurance.start_date || "-"}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
@@ -251,7 +250,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("value") || "القيمة"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {insurance.value ? `${insurance.value.toLocaleString()} ريال` : "غير محدد"}
+            {insurance.value ? `${insurance.value.toLocaleString()} ريال` : "-"}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", py: 1.5, backgroundColor: "rgba(0, 0, 0, 0.10)", px: 2 }}>
@@ -259,7 +258,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
             {t("numberOfIndividuals") || "عدد الأفراد"}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "medium", color: textColor }}>
-            {(insurance.number_of_individuals || insurance.individuals_count) ? `${(insurance.number_of_individuals || insurance.individuals_count)} فرد` : "غير محدد"}
+            {insurance.individuals_count || insurance.number_of_individuals || "-"}
           </Typography>
         </Box>
       </Box>
@@ -383,7 +382,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           </Typography>
                           <TextField
                             size="small"
-                            defaultValue={editedPolicy?.policy_number || selectedInsurance.policy_number}
+                            value={isEditingPolicy ? (editedPolicy?.policy_number || selectedInsurance.policy_number) : selectedInsurance.policy_number}
                             onChange={(e) => handlePolicyChange("policy_number", e.target.value)}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -824,7 +823,12 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                   </TableHead>
                   <TableBody>
                     {employees.length > 0 ? (
-                      employees.map((employee, index) => (
+                      employees.map((employee, index) => {
+                        console.log(`🔍 Employee ${index + 1}:`, employee);
+                        console.log(`🔍 Employee keys:`, Object.keys(employee));
+                        console.log(`🔍 Category:`, employee.category);
+                        console.log(`🔍 Dependents:`, employee.dependents);
+                        return (
                         <TableRow 
                           key={employee.id}
                           sx={{
@@ -836,16 +840,16 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           }}
                         >
                           <TableCell align="center" sx={{ color: textColor, fontWeight: 500 }}>
-                            {employee.employee_name || employee.user_name || (Array.isArray(employee.name) ? employee.name[0] : employee.name) || `ID: ${employee.employee_id?.substring(0, 8)}...`}
+                            {employee.user?.name || employee.employee_name || employee.user_name || (Array.isArray(employee.name) ? employee.name[0] : employee.name) || `ID: ${employee.employee_id?.substring(0, 8)}...`}
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={{ fontWeight: "medium", color: "#fbbf24" }}>
-                              {employee.category || "-"}
+                              {employee.category?.name || employee.category_name || (employee.category_id ? `فئة ${employee.category_id}` : "-")}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={{ fontWeight: "medium", color: "#8b5cf6" }}>
-                              {employee.dependents?.length ? `${employee.dependents.length} ${t("dependentsCount")}` : "-"}
+                              {employee.dependents?.length ? `${employee.dependents.length} ${t("dependentsCount")}` : (employee.dependents_count ? `${employee.dependents_count} ${t("dependentsCount")}` : "-")}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
@@ -919,7 +923,8 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                             </Menu>
                           </TableCell>
                         </TableRow>
-                      ))
+                      );
+                      })
                     ) : (
                       <TableRow>
                         <TableCell colSpan={6} align="center" sx={{ py: 4, color: secondaryTextColor }}>
