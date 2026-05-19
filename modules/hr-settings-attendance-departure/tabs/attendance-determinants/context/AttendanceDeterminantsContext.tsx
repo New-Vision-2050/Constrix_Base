@@ -67,15 +67,13 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
-  const [sidebarPage, setSidebarPage] = useState(1);
-  const sidebarLimit = 10;
 
   const {
     data: constraintsData,
     isLoading: constraintsLoading,
     error: constraintsError,
     refetch: refetchConstraints,
-  } = useConstraintsData({ limit: sidebarLimit, page: sidebarPage });
+  } = useConstraintsData({ limit: 1000 });
 
   const {
     data: constraintsList,

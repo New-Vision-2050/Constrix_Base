@@ -48,7 +48,7 @@ const DeterminantsList: React.FC<DeterminantsListProps> = ({
       </div>
 
       {/* Scrollable list */}
-      <div className="overflow-y-auto px-4" style={{ maxHeight: "calc(100vh - 320px)" }}>
+      <div className="overflow-y-auto px-4" style={{ maxHeight: "calc(100vh - 280px)" }}>
         {determinants.map((determinant) => (
           <DeterminantItem
             key={determinant.id}
