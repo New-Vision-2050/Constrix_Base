@@ -43,12 +43,6 @@ interface AttendanceDeterminantsContextType {
   constraintsListError: unknown;
   refetchConstraintsList: () => void;
 
-  // sidebar pagination
-  sidebarPage: number;
-  sidebarLimit: number;
-  sidebarTotalPages: number;
-  handleSidebarPageChange: (page: number) => void;
-
   // cities data
   citiesData: City[] | undefined;
   
@@ -67,15 +61,13 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
-  const [sidebarPage, setSidebarPage] = useState(1);
-  const sidebarLimit = 10;
 
   const {
     data: constraintsData,
     isLoading: constraintsLoading,
     error: constraintsError,
     refetch: refetchConstraints,
-  } = useConstraintsData({ limit: sidebarLimit, page: sidebarPage });
+  } = useConstraintsData({ limit: 1000 });
 
   const {
     data: constraintsList,
@@ -114,12 +106,6 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   // handle change limit
   const handleLimitChange = (limit: number) => {
     setLimit(limit);
-  };
-
-  // sidebar pagination
-  const sidebarTotalPages = constraintsData?.pagination?.last_page ?? 1;
-  const handleSidebarPageChange = (newPage: number) => {
-    setSidebarPage(newPage);
   };
 
   // Handle click on a constraint
@@ -170,11 +156,6 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     constraintsListLoading,
     constraintsListError,
     refetchConstraintsList,
-    // sidebar pagination
-    sidebarPage,
-    sidebarLimit,
-    sidebarTotalPages,
-    handleSidebarPageChange,
     // cities data
     citiesData,
     // Add new function
