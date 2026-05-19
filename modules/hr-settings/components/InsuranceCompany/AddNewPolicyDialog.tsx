@@ -59,6 +59,8 @@ export default function AddNewPolicyDialog({
   useEffect(() => {
     if (open) {
       if (editingInsurance) {
+        console.log("📝 Editing insurance:", editingInsurance);
+        console.log("📝 Provider from editing insurance:", editingInsurance.provider);
         setFormData({
           name: editingInsurance.name,
           policy_number: editingInsurance.policy_number,
@@ -98,17 +100,23 @@ export default function AddNewPolicyDialog({
         attachment: attachment || undefined,
       };
 
+      console.log("📤 Submitting insurance data:", submitData);
+      console.log("📤 Provider value:", submitData.provider);
+
       if (editingInsurance) {
-        await MedicalInsuranceApi.update(editingInsurance.id, submitData as UpdateMedicalInsuranceForm);
+        const response = await MedicalInsuranceApi.update(editingInsurance.id, submitData as UpdateMedicalInsuranceForm);
+        console.log("✅ Update response:", response);
         toast.success(t("updateSuccess"));
       } else {
-        await MedicalInsuranceApi.create(submitData);
+        const response = await MedicalInsuranceApi.create(submitData);
+        console.log("✅ Create response:", response);
         toast.success(t("addSuccess"));
       }
 
       onOpenChange(false);
       onSuccess();
     } catch (error) {
+      console.error("❌ Submit error:", error);
       toast.error(t("saveError"));
     }
   };

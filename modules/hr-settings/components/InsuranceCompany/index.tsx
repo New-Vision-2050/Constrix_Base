@@ -72,6 +72,10 @@ function InsuranceContent() {
         per_page: 100, // Fetch more items
       });
       console.log("📋 Insurances from API:", response.data.payload);
+      if (response.data.payload && response.data.payload.length > 0) {
+        console.log("🔍 First insurance object:", response.data.payload[0]);
+        console.log("🔍 Available keys:", Object.keys(response.data.payload[0]));
+      }
       setInsurances(response.data.payload || []);
     } catch (error) {
       console.error("Error fetching insurances:", error);

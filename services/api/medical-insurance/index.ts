@@ -147,6 +147,7 @@ export interface SubscriptionResponse {
     premium_amount?: number;
     created_at?: string;
     updated_at?: string;
+    dependents?: Dependent[];
   };
 }
 
@@ -166,9 +167,11 @@ export interface CreateSubscriptionParams {
   medical_insurance_id: string;
   amount: number;
   subscription_no: string;
+  category_id?: string;
   start_date: string;
   end_date: string;
   status?: number;
+  dependents?: Dependent[];
 }
 
 export interface UpdateSubscriptionParams {
@@ -176,9 +179,35 @@ export interface UpdateSubscriptionParams {
   medical_insurance_id?: string;
   amount?: number;
   subscription_no?: string;
+  category_id?: string;
   start_date?: string;
   end_date?: string;
   status?: number;
+  dependents?: Dependent[];
+}
+
+export interface Dependent {
+  id?: string;
+  name: string;
+  residence_number: string;
+  relationship: string;
+  subscriber_number: string;
+  value: string;
+}
+
+export interface DependentResponse {
+  data: Dependent;
+}
+
+export interface DependentListResponse {
+  data: {
+    payload: Dependent[];
+    pagination: {
+      current_page: number;
+      last_page: number;
+      result_count: number;
+    };
+  };
 }
 
 export const MedicalInsuranceApi = {
@@ -247,5 +276,21 @@ export const MedicalInsuranceApi = {
       baseApi.put<SubscriptionResponse>(`medical-insurances/subscriptions/${subscriptionId}`, params),
     delete: (subscriptionId: string) =>
       baseApi.delete(`medical-insurances/subscriptions/${subscriptionId}`),
+  },
+
+  // Dependents endpoints
+  dependents: {
+    list: (subscriptionId: string, params?: { page?: number; per_page?: number }) =>
+      baseApi.get<DependentListResponse>(`medical-insurances/subscriptions/${subscriptionId}/dependents`, {
+        params,
+      }),
+    show: (subscriptionId: string, dependentId: string) =>
+      baseApi.get<DependentResponse>(`medical-insurances/subscriptions/${subscriptionId}/dependents/${dependentId}`),
+    create: (subscriptionId: string, params: Dependent) =>
+      baseApi.post<DependentResponse>(`medical-insurances/subscriptions/${subscriptionId}/dependents`, params),
+    update: (subscriptionId: string, dependentId: string, params: Partial<Dependent>) =>
+      baseApi.put<DependentResponse>(`medical-insurances/subscriptions/${subscriptionId}/dependents/${dependentId}`, params),
+    delete: (subscriptionId: string, dependentId: string) =>
+      baseApi.delete(`medical-insurances/subscriptions/${subscriptionId}/dependents/${dependentId}`),
   },
 };
