@@ -83,9 +83,7 @@ export default function NationalAddressMapDialog({
       );
       onOpenChange(false);
     } catch (e) {
-      setSaveError(
-        e instanceof Error ? e.message : "حدث خطأ أثناء الحفظ.",
-      );
+      setSaveError(e instanceof Error ? e.message : "حدث خطأ أثناء الحفظ.");
     } finally {
       setSubmitting(false);
     }
@@ -122,36 +120,40 @@ export default function NationalAddressMapDialog({
 
         <div className="space-y-4 px-4 pb-4 pt-4 sm:px-0">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Input
-              label="خط الطول"
-              variant="secondary"
-              dir="ltr"
-              inputClassName="text-end font-mono text-sm"
-              value={longitude}
-              onChange={(e) => setLongitude(e.target.value)}
-              placeholder={DEFAULT_COORD}
-            />
-            <Input
-              label="خط العرض"
-              variant="secondary"
-              dir="ltr"
-              inputClassName="text-end font-mono text-sm"
-              value={latitude}
-              onChange={(e) => setLatitude(e.target.value)}
-              placeholder={DEFAULT_COORD}
-            />
+            <div>
+              <label className="text-sm">خط الطول</label>
+              <Input
+                variant="secondary"
+                dir="ltr"
+                inputClassName="text-end font-mono text-sm"
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+                placeholder={DEFAULT_COORD}
+              />
+            </div>
+            <div>
+              <label className="text-sm">خط العرض</label>
+              <Input
+                variant="secondary"
+                dir="ltr"
+                inputClassName="text-end font-mono text-sm"
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+                placeholder={DEFAULT_COORD}
+              />
+            </div>
+            <div>
+              <label className="text-sm">نصف القطر</label>
+              <Input
+                variant="secondary"
+                dir="ltr"
+                inputClassName="text-end font-mono text-sm"
+                value={radius}
+                onChange={(e) => setRadius(e.target.value)}
+                placeholder="دائرة نصف القطر"
+              />
+            </div>
           </div>
-
-          <Input
-            label="نص القطر"
-            variant="secondary"
-            dir="ltr"
-            inputClassName="text-end font-mono text-sm"
-            value={radius}
-            onChange={(e) => setRadius(e.target.value)}
-            placeholder="دائرة نصف القطر"
-          />
-
           <div className="relative overflow-hidden rounded-xl border border-border bg-muted/20">
             <MapRangePicker
               onSelect={(lat, lng) => {

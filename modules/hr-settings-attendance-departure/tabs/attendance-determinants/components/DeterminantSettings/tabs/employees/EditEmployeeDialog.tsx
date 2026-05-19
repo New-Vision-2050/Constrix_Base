@@ -354,7 +354,7 @@ export default function EditEmployeeDialog({
                 const pool = sectionPool(id);
                 return (
                   <AccordionItem key={id} value={id} className="border-none">
-                    <AccordionTrigger className="text-right rounded-lg border border-primary p-4">
+                    <AccordionTrigger className="text-right rounded-lg p-4">
                       {title}
                     </AccordionTrigger>
                     <AccordionContent className="px-0 pb-2">
@@ -403,7 +403,7 @@ export default function EditEmployeeDialog({
 
                 return (
                   <AccordionItem key={id} value={id}>
-                    <AccordionTrigger className="py-4 text-right rounded-lg border border-primary p-4">
+                    <AccordionTrigger className="py-4 text-right rounded-lg p-4">
                       {title}
                     </AccordionTrigger>
                     <AccordionContent className="px-0 pb-2">
@@ -458,12 +458,12 @@ export default function EditEmployeeDialog({
                                 }
                                 disabled={emptyPool}
                               >
-                                <SelectTrigger className="w-full h-12 border border-primary rounded-md">
+                                <SelectTrigger className="w-full h-12 rounded-md">
                                   <SelectValue
                                     placeholder={row.constraint_name}
                                   />
                                 </SelectTrigger>
-                                <SelectContent className="max-h-[min(60vh,320px)] overflow-y-auto border border-primary rounded-md">
+                                <SelectContent className="max-h-[min(60vh,320px)] overflow-y-auto rounded-md">
                                   {optionPool.map((opt: ConstraintCatalogRow) => (
                                     <SelectItem key={opt.id} value={opt.id}>
                                       {opt.constraint_name}

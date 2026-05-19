@@ -16,36 +16,22 @@ import type {
   ConstraintSelectedEmployeePayload,
 } from "@/services/api/attendance-constraints/types/response";
 import { useCompanyEmployees } from "@/modules/company-profile/query/useCompanyEmployees";
-import { parseConstraintEmployeesList } from "./parseConstraintEmployeesList";
-
-type EmployeesTableSlice = {
-  rows: ConstraintSelectedEmployeePayload[];
-  totalPages: number;
-  totalItems: number;
-};
-
-const EMPTY_EMPLOYEES_TABLE: EmployeesTableSlice = {
-  rows: [],
-  totalPages: 1,
-  totalItems: 0,
-};
 
 const SelectedEmployeesTable =
   HeadlessTableLayout<ConstraintSelectedEmployeePayload>(
     "attendance-determinants-selected-employees",
   );
 
-function safePagingParams(page: unknown, limit: unknown) {
-  const p =
-    typeof page === "number" && Number.isFinite(page) && page >= 1
-      ? Math.floor(page)
-      : 1;
-  let l =
-    typeof limit === "number" && Number.isFinite(limit) && limit >= 1
-      ? Math.floor(limit)
-      : 10;
-  l = Math.min(l, 200);
-  return { page: p, per_page: l };
+function payloadToRows(
+  body: ConstraintEmployeesListApiResponse | undefined,
+): ConstraintSelectedEmployeePayload[] {
+  const raw = body?.payload;
+  if (raw == null) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "object") {
+    return Object.values(raw as Record<string, ConstraintSelectedEmployeePayload>);
+  }
+  return [];
 }
 
 export default function SelectedEmployees({
@@ -65,19 +51,17 @@ export default function SelectedEmployees({
     initialLimit: 10,
   });
 
-  const paging = safePagingParams(params.page, params.limit);
-
   const { data: apiBody, isLoading } = useQuery({
     queryKey: [
       "constraint-employees",
       constraintId,
-      paging.page,
-      paging.per_page,
+      params.page,
+      params.limit,
     ],
     queryFn: async (): Promise<ConstraintEmployeesListApiResponse> => {
       const res = await AttendanceConstraints.getEmployees(constraintId, {
-        page: paging.page,
-        per_page: paging.per_page,
+        page: params.page,
+        per_page: params.limit,
       });
       return res.data;
     },
@@ -87,22 +71,10 @@ export default function SelectedEmployees({
 
   const { data: companyEmployees = [] } = useCompanyEmployees();
 
-  const { rows, totalPages, totalItems } = useMemo((): EmployeesTableSlice => {
-    if (!apiBody) {
-      return EMPTY_EMPLOYEES_TABLE;
-    }
+  const rows = useMemo(() => payloadToRows(apiBody), [apiBody]);
 
-    const {
-      employees,
-      totalPages: tp,
-      totalItems: ti,
-    } = parseConstraintEmployeesList(apiBody);
-    return {
-      rows: employees,
-      totalPages: tp,
-      totalItems: ti,
-    };
-  }, [apiBody]);
+  const totalPages = apiBody?.pagination?.last_page ?? 1;
+  const totalItems = apiBody?.pagination?.result_count ?? 0;
 
   const assignedIds = useMemo(
     () =>
