@@ -64,6 +64,14 @@ export default function NationalAddressMapDialog({
     return { lat, lng };
   }, [latitude, longitude]);
 
+  const mapFallbackCenter = useMemo(
+    () => ({
+      lat: Number.parseFloat(DEFAULT_COORD),
+      lng: Number.parseFloat(DEFAULT_COORD),
+    }),
+    [],
+  );
+
   const radiusMeters = useMemo(() => {
     const n = Number.parseFloat(radius.replace(",", "."));
     return Number.isFinite(n) && n > 0 ? n : 1000;
@@ -162,12 +170,7 @@ export default function NationalAddressMapDialog({
               }}
               currentPin={pin}
               radius={radiusMeters}
-              center={
-                pin ?? {
-                  lat: Number.parseFloat(DEFAULT_COORD),
-                  lng: Number.parseFloat(DEFAULT_COORD),
-                }
-              }
+              center={pin ?? mapFallbackCenter}
               zoom={15}
               height="380px"
             />

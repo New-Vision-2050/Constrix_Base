@@ -7,7 +7,7 @@ import { useEffect } from "react";
  * and updates the marker position when the user clicks on the map.
  */
 interface MapEventsProps {
-  mapRef: React.MutableRefObject<google.maps.Map | null>;
+  mapInstance: google.maps.Map | null;
   markerRef: React.MutableRefObject<google.maps.Marker | null>;
   circleRef: React.MutableRefObject<google.maps.Circle | null>;
   onSelect: (lat: number, lng: number) => void;
@@ -15,14 +15,14 @@ interface MapEventsProps {
 }
 
 export const MapEvents: React.FC<MapEventsProps> = ({
-  mapRef,
+  mapInstance,
   markerRef,
   circleRef,
   onSelect,
   radius = 1000,
 }) => {
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapInstance) return;
 
     const handleMapClick = (event: google.maps.MapMouseEvent) => {
       if (!event.latLng) return;
@@ -44,12 +44,12 @@ export const MapEvents: React.FC<MapEventsProps> = ({
       onSelect(lat, lng);
     };
 
-    const listener = mapRef.current.addListener("click", handleMapClick);
+    const listener = mapInstance.addListener("click", handleMapClick);
 
     return () => {
       listener.remove();
     };
-  }, [mapRef, markerRef, circleRef, onSelect, radius]);
+  }, [mapInstance, markerRef, circleRef, onSelect, radius]);
 
   return null;
 };
