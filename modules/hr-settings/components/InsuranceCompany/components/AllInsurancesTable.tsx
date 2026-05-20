@@ -4,7 +4,7 @@ import React from "react";
 import { useInsurance } from "../context/InsuranceContext";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { CheckCircle2Icon, AlertCircle, Shield } from "lucide-react";
+import { CheckCircle2Icon, AlertCircle, Shield, MapPin } from "lucide-react";
 import { MedicalInsuranceRow } from "../types";
 
 interface AllInsurancesTableProps {
@@ -86,14 +86,14 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
   };
 
   return (
-    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-fit min-w-[300px] ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`}>
+    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-fit min-w-[300px] h-full flex flex-col ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`}>
       {/* Header row for "All Insurances" */}
       <div
         className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} cursor-pointer ${itemHoverBg} transition-colors`}
         onClick={handleAllInsurancesClick}
       >
         <div className="flex items-center justify-center">
-          <CheckCircle2Icon size={20} className="text-green-500" />
+
         </div>
         <div className="flex flex-row-reverse items-center gap-2">
           <div className="text-right">
@@ -108,7 +108,13 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
       </div>
       
       {/* Insurance items */}
-      <div className="px-4">
+      <div
+        className="flex-1 overflow-y-auto custom-scrollbar"
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: isDarkMode ? '#4B5563 transparent' : '#9CA3AF transparent',
+        }}
+      >
         {insurances.length === 0 ? (
           <div className="flex items-center justify-center py-8">
             <div className={`${inactiveTextTitle} text-sm`}>
@@ -116,9 +122,9 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
             </div>
           </div>
         ) : (
-          paginatedInsurances.map((insurance) => (
+          paginatedInsurances.map((insurance, index) => (
             <div
-              key={insurance.id}
+              key={`${insurance.id}-${index}`}
               className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} last:border-b-0 cursor-pointer ${itemHoverBg} transition-colors ${selectedInsurance?.id === insurance.id ? selectedItemBg : ''}`}
               onClick={() => handleInsuranceClick(insurance)}
             >
@@ -134,9 +140,11 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
                   <div className={`text-sm ${activeTextTitle}`}>
                     {insurance.name}
                   </div>
-                  <div className={`text-xs ${inactiveTextTitle}`}>
-                    {insurance.policy_number}
-                  </div>
+                  {insurance.policy_number && (
+                    <div className={`text-xs ${inactiveTextTitle}`}>
+                      {insurance.policy_number}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-center">
                   <Shield size={20} className={iconColor} />

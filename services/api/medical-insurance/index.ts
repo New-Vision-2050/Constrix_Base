@@ -135,25 +135,15 @@ export interface UpdateEmployeeParams {
 
 export interface SubscriptionResponse {
   data: {
-    id: string;
-    employee_id: string;
-    employee_name?: string;
-    policy_id: string;
-    policy_name?: string;
-    start_date: string;
-    end_date: string;
-    status: number;
-    coverage_amount?: number;
-    premium_amount?: number;
-    created_at?: string;
-    updated_at?: string;
-    dependents?: Dependent[];
+    code: string;
+    message: string | null;
+    payload: SubscriptionItem[];
   };
 }
 
 export interface SubscriptionListResponse {
   data: {
-    payload: SubscriptionResponse['data'][];
+    payload: SubscriptionItem[];
     pagination: {
       current_page: number;
       last_page: number;
@@ -162,30 +152,61 @@ export interface SubscriptionListResponse {
   };
 }
 
-export interface CreateSubscriptionParams {
+export interface SingleSubscriptionResponse {
+  data: {
+    payload: SubscriptionItem;
+  };
+}
+
+export interface FamilyMember {
+  id?: string;
+  name: string;
+  national_id: string;
+  relation: string;
+  amount: number;
+  subscription_no?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SubscriptionItem {
+  id?: string;
   user_id: string;
   medical_insurance_id: string;
+  medical_insurance_category_id?: string | null;
   amount: number;
   subscription_no: string;
-  category_id?: string;
-  start_date: string;
-  end_date: string;
   status?: number;
-  dependents?: Dependent[];
+  family_members?: FamilyMember[];
+  user?: {
+    id: string;
+    name: string;
+  };
+  medical_insurance?: {
+    id: string;
+    name: string;
+    policy_number: string;
+  };
+  medical_insurance_category?: {
+    id: string;
+    name: string;
+    type?: string;
+    coverage_limit?: string;
+    description?: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CreateSubscriptionParams {
+  subscriptions: SubscriptionItem[];
 }
 
 export interface UpdateSubscriptionParams {
-  user_id?: string;
-  medical_insurance_id?: string;
-  amount?: number;
-  subscription_no?: string;
-  category_id?: string;
-  start_date?: string;
-  end_date?: string;
-  status?: number;
-  dependents?: Dependent[];
+  subscriptions: SubscriptionItem[];
 }
 
+// Legacy Dependent interface for backward compatibility
 export interface Dependent {
   id?: string;
   name: string;
@@ -264,16 +285,43 @@ export const MedicalInsuranceApi = {
 
   // Subscriptions endpoints
   subscriptions: {
-    list: (params?: { page?: number; per_page?: number }) =>
-      baseApi.get<SubscriptionListResponse>("medical-insurances/subscriptions", {
-        params,
-      }),
+    list: (params?: { 
+      page?: number; 
+      per_page?: number;
+      user_id?: string;
+      user_ids?: string[];
+      medical_insurance_id?: string;
+      medical_insurance_category_id?: string;
+      status?: number;
+    }) => {
+      const queryParams: any = { ...params };
+      // Convert user_ids array to user_ids[] format
+      if (params?.user_ids && Array.isArray(params.user_ids)) {
+        delete queryParams.user_ids;
+        return baseApi.get<SubscriptionListResponse>("medical-insurances/subscriptions", {
+          params: queryParams,
+          paramsSerializer: (p) => {
+            const searchParams = new URLSearchParams();
+            Object.entries(p).forEach(([key, value]) => {
+              if (value !== undefined && value !== null) {
+                searchParams.append(key, String(value));
+              }
+            });
+            params.user_ids!.forEach(id => searchParams.append('user_ids[]', id));
+            return searchParams.toString();
+          }
+        });
+      }
+      return baseApi.get<SubscriptionListResponse>("medical-insurances/subscriptions", {
+        params: queryParams,
+      });
+    },
     show: (subscriptionId: string) =>
-      baseApi.get<SubscriptionResponse>(`medical-insurances/subscriptions/${subscriptionId}`),
+      baseApi.get<SingleSubscriptionResponse>(`medical-insurances/subscriptions/${subscriptionId}`),
     create: (params: CreateSubscriptionParams) =>
       baseApi.post<SubscriptionResponse>("medical-insurances/subscriptions", params),
-    update: (subscriptionId: string, params: UpdateSubscriptionParams) =>
-      baseApi.put<SubscriptionResponse>(`medical-insurances/subscriptions/${subscriptionId}`, params),
+    update: (params: UpdateSubscriptionParams) =>
+      baseApi.put<SubscriptionResponse>("medical-insurances/subscriptions", params),
     delete: (subscriptionId: string) =>
       baseApi.delete(`medical-insurances/subscriptions/${subscriptionId}`),
   },

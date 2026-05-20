@@ -146,6 +146,16 @@ function InsuranceContent() {
       
       console.log("✅ Filtered employees count:", filteredEmployees.length);
       console.log("✅ Filtered employees:", filteredEmployees);
+      
+      // Check for medical_insurance_category and family_members
+      if (filteredEmployees.length > 0) {
+        console.log("🔍 First employee data:", filteredEmployees[0]);
+        console.log("🔍 medical_insurance_category:", filteredEmployees[0].medical_insurance_category);
+        console.log("🔍 family_members:", filteredEmployees[0].family_members);
+        console.log("🔍 category:", filteredEmployees[0].category);
+        console.log("🔍 dependents:", filteredEmployees[0].dependents);
+      }
+      
       setEmployees(filteredEmployees || []);
     } catch (error: any) {
       console.error("❌ Error fetching employees:", error);
@@ -352,8 +362,8 @@ function InsuranceContent() {
           </Box>
         </Box>
 
-        {/* Pagination at bottom */}
-        {paginationData.total > 0 && (
+        {/* Pagination at bottom - only show on main page (no insurance selected) */}
+        {!selectedInsurance && paginationData.total > 0 && (
           <Box sx={{ 
             py: 2, 
             borderTop: "1px solid", 

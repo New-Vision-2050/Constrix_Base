@@ -844,12 +844,12 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={{ fontWeight: "medium", color: "#fbbf24" }}>
-                              {employee.category?.name || employee.category_name || (employee.category_id ? `فئة ${employee.category_id}` : "-")}
+                              {employee.medical_insurance_category?.name || "-"}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={{ fontWeight: "medium", color: "#8b5cf6" }}>
-                              {employee.dependents?.length ? `${employee.dependents.length} ${t("dependentsCount")}` : (employee.dependents_count ? `${employee.dependents_count} ${t("dependentsCount")}` : "-")}
+                              {employee.family_members?.length ? `${employee.family_members.length} عائل` : "-"}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
