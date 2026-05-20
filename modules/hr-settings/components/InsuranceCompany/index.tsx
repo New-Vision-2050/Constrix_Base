@@ -47,9 +47,6 @@ function InsuranceContent() {
   // Fetch categories and employees when selectedInsurance changes
   useEffect(() => {
     if (selectedInsurance?.id) {
-      console.log("🔍 Selected Insurance:", selectedInsurance);
-      console.log("🔍 Insurance ID:", selectedInsurance.id);
-      console.log("🔍 Insurance ID length:", selectedInsurance.id.length);
       fetchCategories();
       fetchEmployees();
     } else {
@@ -61,7 +58,6 @@ function InsuranceContent() {
   // Fetch employees when switching to employees tab
   useEffect(() => {
     if (activeTab === 1 && selectedInsurance?.id) {
-      console.log("🔄 Switched to employees tab, fetching employees...");
       fetchEmployees();
     }
   }, [activeTab]);
@@ -71,11 +67,6 @@ function InsuranceContent() {
       const response = await MedicalInsuranceApi.list({
         per_page: 100, // Fetch more items
       });
-      console.log("📋 Insurances from API:", response.data.payload);
-      if (response.data.payload && response.data.payload.length > 0) {
-        console.log("🔍 First insurance object:", response.data.payload[0]);
-        console.log("🔍 Available keys:", Object.keys(response.data.payload[0]));
-      }
       setInsurances(response.data.payload || []);
     } catch (error) {
       console.error("Error fetching insurances:", error);
@@ -89,12 +80,10 @@ function InsuranceContent() {
         page: 1,
         per_page: 100,
       });
-      console.log("✅ Categories fetched successfully:", response.data.payload);
       setCategories(response.data.payload || []);
     } catch (error: any) {
       // If 404, it means no categories exist yet - that's okay
       if (error?.response?.status === 404) {
-        console.log("ℹ️ No categories found (404) - setting empty array");
         setCategories([]);
       } else {
         console.error("Error fetching categories:", error);
@@ -104,64 +93,29 @@ function InsuranceContent() {
 
   const fetchEmployees = async () => {
     if (!selectedInsurance?.id) {
-      console.log("❌ No selected insurance, skipping fetch");
       return;
     }
     
     try {
-      console.log("🔄 Fetching subscriptions...");
       const response = await MedicalInsuranceApi.subscriptions.list({
         page: 1,
         per_page: 100,
       });
-      
-      console.log("📋 Full API response:", response);
-      console.log("📋 All subscriptions:", response.data.payload);
-      console.log("🔍 Selected insurance ID:", selectedInsurance.id);
-      console.log("🔍 Selected insurance ID type:", typeof selectedInsurance.id);
-      
-      // Show all subscriptions with their policy_ids
-      if (response.data.payload && response.data.payload.length > 0) {
-        console.log("📋 All subscriptions with policy_ids:");
-        response.data.payload.forEach((sub: any, idx: number) => {
-          console.log(`  ${idx + 1}. policy_id: ${sub.policy_id}, employee_name: ${sub.employee_name}, employee_id: ${sub.employee_id}`);
-        });
-      }
-      
-      if (response.data.payload && response.data.payload.length > 0) {
-        console.log("📋 First subscription:", response.data.payload[0]);
-        console.log("📋 First subscription policy_id:", response.data.payload[0].policy_id);
-        console.log("📋 First subscription policy_id type:", typeof response.data.payload[0].policy_id);
-      }
       
       // Filter subscriptions for the selected insurance
       const filteredEmployees = response.data.payload.filter(
         (sub: any) => {
           // Try both policy_id and medical_insurance_id (backend may use either)
           const matches = sub.policy_id === selectedInsurance.id || sub.medical_insurance_id === selectedInsurance.id;
-          console.log(`Comparing: policy_id=${sub.policy_id}, medical_insurance_id=${sub.medical_insurance_id} === ${selectedInsurance.id}`, matches);
           return matches;
         }
       );
-      
-      console.log("✅ Filtered employees count:", filteredEmployees.length);
-      console.log("✅ Filtered employees:", filteredEmployees);
-      
-      // Check for medical_insurance_category and family_members
-      if (filteredEmployees.length > 0) {
-        console.log("🔍 First employee data:", filteredEmployees[0]);
-        console.log("🔍 medical_insurance_category:", filteredEmployees[0].medical_insurance_category);
-        console.log("🔍 family_members:", filteredEmployees[0].family_members);
-        console.log("🔍 category:", filteredEmployees[0].category);
-        console.log("🔍 dependents:", filteredEmployees[0].dependents);
-      }
       
       setEmployees(filteredEmployees || []);
     } catch (error: any) {
       console.error("❌ Error fetching employees:", error);
       // If 404, it means no subscriptions exist yet - that's okay
       if (error?.response?.status === 404) {
-        console.log("ℹ️ No subscriptions found (404)");
         setEmployees([]);
       } else {
         console.error("Error details:", error?.response?.data);
@@ -245,13 +199,10 @@ function InsuranceContent() {
   };
 
   const handleInsuranceSelect = (insurance: MedicalInsuranceRow | null) => {
-    console.log("🎯 Selected Insurance:", insurance);
-    console.log("🎯 Current activeTab:", activeTab);
     setSelectedInsurance(insurance);
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    console.log("🔄 Tab changed to:", newValue);
     setActiveTab(newValue);
   };
 
@@ -259,7 +210,6 @@ function InsuranceContent() {
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
       {/* Header */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2, px: 2 }}>
-        {console.log("🔍 Render - selectedInsurance:", selectedInsurance, "activeTab:", activeTab)}
         {!selectedInsurance && (
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
             <TextField
@@ -341,10 +291,6 @@ function InsuranceContent() {
             onInsuranceSelect={handleInsuranceSelect} 
             onTabChange={handleTabChange}
             selectedInsurance={selectedInsurance} 
-            onPaginationChange={setPaginationData}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            itemsPerPage={itemsPerPage}
             currentTab={activeTab}
           />
           <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>

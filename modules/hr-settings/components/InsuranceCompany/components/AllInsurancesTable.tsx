@@ -11,53 +11,17 @@ interface AllInsurancesTableProps {
   onInsuranceSelect?: (insurance: MedicalInsuranceRow | null) => void;
   onTabChange?: (tab: number) => void;
   selectedInsurance?: MedicalInsuranceRow | null;
-  onPaginationChange?: (data: { currentPage: number; totalPages: number; startIndex: number; endIndex: number; total: number }) => void;
-  currentPage?: number;
-  onPageChange?: (page: number) => void;
-  itemsPerPage?: number;
   currentTab?: number;
 }
 
-export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, selectedInsurance, onPaginationChange, currentPage: externalCurrentPage, onPageChange: externalOnPageChange, itemsPerPage: externalItemsPerPage, currentTab }: AllInsurancesTableProps) {
+export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, selectedInsurance, currentTab }: AllInsurancesTableProps) {
   const { insurances } = useInsurance();
   const t = useTranslations("hr-settings.insurance");
-  
-  console.log("🔍 AllInsurancesTable - Total insurances:", insurances.length);
-  console.log("🔍 AllInsurancesTable - Insurances:", insurances);
-  if (insurances.length > 0) {
-    console.log("🔍 First insurance data:", insurances[0]);
-    console.log("🔍 First insurance keys:", Object.keys(insurances[0]));
-  }
-  const [internalCurrentPage, setInternalCurrentPage] = React.useState(1);
-  const itemsPerPage = externalItemsPerPage || 10;
-  
-  // Use external page if provided, otherwise use internal
-  const currentPage = externalCurrentPage !== undefined ? externalCurrentPage : internalCurrentPage;
-  const setCurrentPage = externalOnPageChange || setInternalCurrentPage;
   
   // Get current theme
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === 'system' ? systemTheme : theme;
   const isDarkMode = currentTheme === 'dark';
-  
-  // Calculate pagination
-  const totalPages = Math.ceil(insurances.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedInsurances = insurances.slice(startIndex, endIndex);
-
-  // Send pagination data to parent
-  React.useEffect(() => {
-    if (onPaginationChange) {
-      onPaginationChange({
-        currentPage,
-        totalPages,
-        startIndex,
-        endIndex: Math.min(endIndex, insurances.length),
-        total: insurances.length
-      });
-    }
-  }, [currentPage, totalPages, startIndex, endIndex, insurances.length, onPaginationChange]);
   
   // Theme specific colors
   const containerBg = isDarkMode ? 'bg-[#1A103C]' : 'bg-white';
@@ -86,7 +50,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
   };
 
   return (
-    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-fit min-w-[300px] h-full flex flex-col ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`}>
+    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-fit min-w-[300px] h-full flex flex-col ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`} style={{ maxHeight: 'calc(100vh - 200px)' }}>
       {/* Header row for "All Insurances" */}
       <div
         className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} cursor-pointer ${itemHoverBg} transition-colors`}
@@ -113,6 +77,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
         style={{
           scrollbarWidth: 'thin',
           scrollbarColor: isDarkMode ? '#4B5563 transparent' : '#9CA3AF transparent',
+          maxHeight: 'calc(100vh - 280px)',
         }}
       >
         {insurances.length === 0 ? (
@@ -122,7 +87,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
             </div>
           </div>
         ) : (
-          paginatedInsurances.map((insurance, index) => (
+          insurances.map((insurance, index) => (
             <div
               key={`${insurance.id}-${index}`}
               className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} last:border-b-0 cursor-pointer ${itemHoverBg} transition-colors ${selectedInsurance?.id === insurance.id ? selectedItemBg : ''}`}
