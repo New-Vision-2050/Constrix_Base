@@ -390,28 +390,6 @@ export default function AddEmployeeDialog({
     }
 
     try {
-      // Check for duplicate subscription_no in create mode
-      if (!editingEmployee) {
-        try {
-          const existingSubs = await MedicalInsuranceApi.subscriptions.list({
-            page: 1,
-            per_page: 100,
-          });
-          
-          const duplicate = existingSubs.data.payload.find(
-            sub => sub.subscription_no === formData.subscriberId
-          );
-          
-          if (duplicate) {
-            toast.error("رقم المشترك مستخدم بالفعل، يرجى استخدام رقم آخر");
-            return;
-          }
-        } catch (error) {
-          console.error("Error checking duplicate subscription_no:", error);
-          // Continue anyway, let backend handle validation
-        }
-      }
-
       // Prepare subscription items for all selected employees
       const subscriptionItems = selectedEmployees.map((employee: any) => {
         const employeeId = employee.employee_id || employee.user_id || employee.id;
@@ -659,6 +637,11 @@ export default function AddEmployeeDialog({
                   const userName = option?.user?.name || option?.employee_name || option?.name || '';
                   return userName || 'موظف';
                 }}
+                isOptionEqualToValue={(option, value) => {
+                  const optionId = option?.employee_id || option?.user_id || option?.id;
+                  const valueId = value?.employee_id || value?.user_id || value?.id;
+                  return optionId === valueId;
+                }}
                 value={selectedEmployees}
                 onChange={async (event, newValue) => {
                   setSelectedEmployees(newValue);
@@ -732,9 +715,10 @@ export default function AddEmployeeDialog({
                   value.map((option: any, index: number) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     const userName = option?.user?.name || option?.employee_name || option?.name || 'موظف';
+                    const employeeId = option?.employee_id || option?.user_id || option?.id || index;
                     return (
                       <Chip
-                        key={key}
+                        key={`${employeeId}-${key}`}
                         variant="outlined"
                         label={userName}
                         {...tagProps}
@@ -790,6 +774,11 @@ export default function AddEmployeeDialog({
                 getOptionLabel={(option) => {
                   const userName = option?.name || '';
                   return userName || `ID: ${option?.id?.substring(0, 8)}...`;
+                }}
+                isOptionEqualToValue={(option, value) => {
+                  const optionId = option?.id || option?.user_id;
+                  const valueId = value?.id || value?.user_id;
+                  return optionId === valueId;
                 }}
                 value={selectedEmployees}
                 onChange={async (event, newValue) => {
@@ -884,9 +873,10 @@ export default function AddEmployeeDialog({
                   value.map((option: any, index: number) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     const userName = option?.name || 'موظف';
+                    const employeeId = option?.id || option?.user_id || index;
                     return (
                       <Chip
-                        key={key}
+                        key={`${employeeId}-${key}`}
                         variant="outlined"
                         label={userName}
                         {...tagProps}
@@ -979,7 +969,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}`}
+                        key={`${employeeId}-${index}-${Math.random()}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -1142,7 +1132,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}`}
+                        key={`${employeeId}-${index}-${Math.random()}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -1194,7 +1184,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}`}
+                        key={`${employeeId}-${index}-${Math.random()}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -1256,7 +1246,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}`}
+                        key={`${employeeId}-${index}-${Math.random()}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {

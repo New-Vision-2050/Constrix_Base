@@ -179,7 +179,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
 
   const renderInsuranceCard = (insurance: MedicalInsuranceRow) => (
     <Box
-      key={insurance.id}
+      key={insurance.id || insurance.policy_number || `insurance-${Math.random()}`}
       component="fieldset"
       sx={{
         border: "1px solid rgba(255, 255, 255, 0.4)",
@@ -357,7 +357,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           </Typography>
                           <TextField
                             size="small"
-                            value={isEditingPolicy ? (editedPolicy?.service_name || editedPolicy?.name) : (selectedInsurance.service_name || selectedInsurance.name)}
+                            value={isEditingPolicy ? (editedPolicy?.service_name || editedPolicy?.name || "") : (selectedInsurance.service_name || selectedInsurance.name || "")}
                             onChange={(e) => handlePolicyChange("service_name", e.target.value)}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -382,7 +382,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           </Typography>
                           <TextField
                             size="small"
-                            value={isEditingPolicy ? (editedPolicy?.policy_number || selectedInsurance.policy_number) : selectedInsurance.policy_number}
+                            value={isEditingPolicy ? (editedPolicy?.policy_number || selectedInsurance.policy_number || "") : (selectedInsurance.policy_number || "")}
                             onChange={(e) => handlePolicyChange("policy_number", e.target.value)}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -407,7 +407,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           </Typography>
                           <TextField
                             size="small"
-                            value={isEditingPolicy ? (editedPolicy?.provider_name || editedPolicy?.provider || editedPolicy?.employee_name || editedPolicy?.employee?.name) : (selectedInsurance.provider_name || selectedInsurance.provider || selectedInsurance.employee_name || selectedInsurance.employee?.name || "-")}
+                            value={isEditingPolicy ? (editedPolicy?.provider_name || editedPolicy?.provider || editedPolicy?.employee_name || editedPolicy?.employee?.name || "") : (selectedInsurance.provider_name || selectedInsurance.provider || selectedInsurance.employee_name || selectedInsurance.employee?.name || "")}
                             onChange={(e) => handlePolicyChange("provider_name", e.target.value)}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -433,7 +433,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="date"
-                            value={isEditingPolicy ? editedPolicy?.start_date : selectedInsurance.start_date}
+                            value={isEditingPolicy ? (editedPolicy?.start_date || "") : (selectedInsurance.start_date || "")}
                             onChange={(e) => handlePolicyChange("start_date", e.target.value)}
                             disabled={!isEditingPolicy}
                             InputLabelProps={{ shrink: true }}
@@ -460,7 +460,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="date"
-                            value={isEditingPolicy ? editedPolicy?.end_date : selectedInsurance.end_date}
+                            value={isEditingPolicy ? (editedPolicy?.end_date || "") : (selectedInsurance.end_date || "")}
                             onChange={(e) => handlePolicyChange("end_date", e.target.value)}
                             disabled={!isEditingPolicy}
                             InputLabelProps={{ shrink: true }}
@@ -487,7 +487,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="number"
-                            value={isEditingPolicy ? editedPolicy?.value : selectedInsurance.value}
+                            value={isEditingPolicy ? (editedPolicy?.value ?? "") : (selectedInsurance.value ?? "")}
                             onChange={(e) => handlePolicyChange("value", parseFloat(e.target.value))}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -513,7 +513,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                           <TextField
                             size="small"
                             type="number"
-                            value={isEditingPolicy ? (editedPolicy?.number_of_individuals || editedPolicy?.individuals_count) : (selectedInsurance.number_of_individuals || selectedInsurance.individuals_count)}
+                            value={isEditingPolicy ? (editedPolicy?.number_of_individuals || editedPolicy?.individuals_count ?? "") : (selectedInsurance.number_of_individuals || selectedInsurance.individuals_count ?? "")}
                             onChange={(e) => handlePolicyChange("number_of_individuals", parseInt(e.target.value))}
                             disabled={!isEditingPolicy}
                             sx={{
@@ -657,7 +657,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                       />
                       {attachments.map((file, index) => (
                           <Box
-                              key={index}
+                              key={`${file.name}-${file.size}-${index}`}
                               sx={{
                                 position: "relative",
                               }}
@@ -830,7 +830,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                         console.log(`🔍 Dependents:`, employee.dependents);
                         return (
                         <TableRow 
-                          key={employee.id}
+                          key={employee.id || employee.employee_id || employee.user_id || `employee-${index}`}
                           sx={{
                             '&:last-child td': { borderBottom: 0 },
                             '& td': { 
@@ -966,7 +966,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
                 {categories.length > 0 ? (
                   paginatedCategories.map((category, index) => (
                     <Box
-                      key={index}
+                      key={category.id || `category-${index}`}
                       component="fieldset"
                       sx={{
                         border: `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.4)" : "#d1d5db"}`,
