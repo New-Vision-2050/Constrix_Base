@@ -4,6 +4,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
   title: _m("Procedures Settings", "اعداد إجراءات الطلبات"),
   subTabs: new MessagesGroup({
     clientRequests: _m("Client Requests", "طلبات العملاء"),
+    employeeTaskRequests: _m("Employee Task Requests", "مهمات العمل"),
     contracts: _m("Contracts", "العقود"),
     priceOffers: _m("Price Offers", "عرض السعر"),
     meetings: _m("Meetings", "اجتماع"),

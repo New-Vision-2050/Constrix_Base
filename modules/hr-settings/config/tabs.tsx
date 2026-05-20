@@ -7,17 +7,23 @@ import { useTranslations } from "next-intl";
 import HRSettingsVacations from "@/modules/hr-settings-vacations";
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import InsuranceCompanyComponent from "@/modules/hr-settings/components/InsuranceCompany";
+import ProceduresSettings from "@/modules/hr-settings/tabs/procedures-settings";
 
 // ServiceTabs component for sub-tabs inside service
 const ServiceTabs: React.FC = () => {
   const t = useTranslations("hr-settings.tabs");
-  
+
   const serviceTabs = [
     {
       id: "insurance-company",
       title: t("insuranceCompany"),
       icon: <Building />,
       content: <InsuranceCompanyComponent />,
+    },
+    {
+      id: "proceduresSettings",
+      title: t("proceduresSettings"),
+      content: <ProceduresSettings />,
     },
   ];
 
@@ -27,7 +33,7 @@ const ServiceTabs: React.FC = () => {
 // Tabs config for HR settings - this will be used in HRSettingsTabs component
 const createHRSettingsTabs = (): SystemTab[] => {
   const t = useTranslations("hr-settings.tabs");
-  
+
   return [
     {
       id: "employee-positions",
@@ -57,6 +63,11 @@ const createHRSettingsTabs = (): SystemTab[] => {
       id: "job-titles",
       title: t("contractManagement"),
       content: <>{t("contractManagement")}</>,
+    },
+    {
+      id: "proceduresSettings",
+      title: t("proceduresSettings"),
+      content: <ProceduresSettings />,
     },
   ];
 };
