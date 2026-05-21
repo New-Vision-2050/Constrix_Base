@@ -118,7 +118,7 @@ function HrInboxPageView() {
         sortable: false,
         render: (row) => (
           <span className="font-mono text-sm tabular-nums">
-            {row.serial_number ?? row.id}
+            {row.task?.serial_number ?? row.serial_number ?? row.id}
           </span>
         ),
       },
@@ -127,7 +127,7 @@ function HrInboxPageView() {
         name: t("colTitle"),
         sortable: false,
         render: (row) => {
-          const title = row.title ?? dash;
+          const title = row.task?.title ?? row.title ?? dash;
           return (
             <span className="max-w-xs truncate md:max-w-md" title={title}>
               {title}
@@ -139,28 +139,35 @@ function HrInboxPageView() {
         key: "user",
         name: t("colEmployee"),
         sortable: false,
-        render: (row) => row.user?.name ?? dash,
+        render: (row) => row.employee?.name ?? row.user?.name ?? dash,
       },
       {
         key: "status_label",
         name: t("colStatus"),
         sortable: false,
-        render: (row) => row.status_label || row.status || dash,
+        render: (row) =>
+          row.task?.status_label ||
+          row.task?.status ||
+          row.status_label ||
+          row.status ||
+          dash,
       },
       {
         key: "task_date",
         name: t("colTaskDate"),
         sortable: false,
-        render: (row) => formatTaskDateOnly(row.task_date, dash),
+        render: (row) =>
+          formatTaskDateOnly(row.task?.task_date ?? row.task_date, dash),
       },
       {
         key: "duration_hours",
         name: t("colDuration"),
         sortable: false,
-        render: (row) =>
-          row.duration_hours != null && row.duration_hours !== ""
-            ? row.duration_hours
-            : dash,
+        render: (row) => {
+          const hours =
+            row.summary?.total_task_hours ?? row.duration_hours ?? null;
+          return hours != null && hours !== "" ? String(hours) : dash;
+        },
       },
       {
         key: "current_step",

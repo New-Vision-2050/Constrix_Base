@@ -18,7 +18,11 @@ export const hrInboxMessages = new MessagesGroup({
   detailsTitle: _m("Task details", "تفاصيل المهمة"),
   detailsEmpty: _m("No task selected.", "لم يتم اختيار مهمة."),
   viewDetails: _m("View details", "عرض التفاصيل"),
+  colType: _m("Type", "النوع"),
   detailLocation: _m("Location", "الموقع"),
+  detailNotes: _m("Notes", "الملاحظات"),
+  detailTimeFrom: _m("Time from", "وقت البداية"),
+  detailTimeTo: _m("Time to", "وقت النهاية"),
   dash: _m("—", "—"),
   detailLocationSummary: _m(
     "{lat}, {lng} (radius {radius} m)",
