@@ -25,6 +25,7 @@ export const ROUTER = {
   },
   HR_SETTINGS: "/hr-settings",
   HR_REPORTS: "/hr-reports",
+  HR_INBOX: "/hr-inbox",
   HR_REPORTS_ATTENDANCE: "/hr-reports/attendance",
   Organizational_Structure: "/organizational-structure",
   WORK_PANEL: "/work-panel",
@@ -51,7 +52,6 @@ export const ROUTER = {
   TERMS_CONDITIONS: "/stores/terms",
   PROJECTS_SETTINGS: "/projects/settings",
   ALL_PROJECTS: "/projects",
-  /** Pending share invitations (inbox). */
   PROJECTS_INBOX: "/projects/inbox",
   PROJECT_DETAILS: (id: string) => `/projects/${id}`,
   CMS: {

@@ -58,6 +58,7 @@ import { storesMessages } from "./groups/stores";
 import { imageUploadCropMessages } from "./groups/image-upload-crop";
 import { workPanelMessages } from "./groups/work-panel";
 import { hrReportsMessages } from "./groups/hr-reports";
+import { hrInboxMessages } from "./groups/hr-inbox";
 import { iconsMessages } from "./groups/icons";
 import { projectMessages } from "./groups/projects";
 import { projectSettingsMessages } from "./groups/projects/settings";
@@ -128,6 +129,7 @@ export const messagesStructure = new MessagesGroup({
   ImageUploadCrop: imageUploadCropMessages,
   WorkPanel: workPanelMessages,
   HRReports: hrReportsMessages,
+  HrInbox: hrInboxMessages,
   icons: iconsMessages,
   project: projectMessages,
   Projects: projectMessages,
