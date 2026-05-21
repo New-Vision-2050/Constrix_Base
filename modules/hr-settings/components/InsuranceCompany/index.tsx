@@ -44,6 +44,22 @@ function InsuranceContent() {
     fetchInsurances();
   }, []);
 
+  // Update pagination data when insurances change
+  useEffect(() => {
+    const total = insurances.length;
+    const totalPages = Math.ceil(total / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    setPaginationData({
+      currentPage,
+      totalPages,
+      startIndex,
+      endIndex,
+      total,
+    });
+  }, [insurances, currentPage, itemsPerPage]);
+
   // Fetch categories and employees when selectedInsurance changes
   useEffect(() => {
     if (selectedInsurance?.id) {

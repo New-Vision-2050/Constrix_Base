@@ -156,6 +156,7 @@ export default function AddCategoryDialog({
             onChange={(e) => handleInputChange("coverage_limit", e.target.value)}
             placeholder="أدخل الحد الاقصي لتغطيه"
             required
+            type="number"
         />
         <TextField
           fullWidth
