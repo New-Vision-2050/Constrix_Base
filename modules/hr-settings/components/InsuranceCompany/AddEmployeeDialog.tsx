@@ -440,6 +440,8 @@ export default function AddEmployeeDialog({
         };
         
         console.log("📤 Sending subscription data:", createParams);
+        console.log("📤 user_id:", createParams.user_id);
+        console.log("📤 family_members:", createParams.family_members);
         const response = await MedicalInsuranceApi.subscriptions.create(createParams);
         console.log("✅ Subscriptions created successfully:", response);
         toast.success(`تم إضافة ${subscriptionItems.length} موظف بنجاح`);
