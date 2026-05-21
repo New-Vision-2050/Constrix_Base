@@ -8,7 +8,8 @@ export const hrSettingsMessages = new MessagesGroup({
     vacations: _m("Holidays and vacations", "الإجازات و العطلات"),
     service: _m("Service", "الخدمة"),
     insuranceCompany: _m("Medical insurance", "التامين الطبي"),
-    contractManagement: _m("Contract Management", "ادارة عقد العمل")
+    contractManagement: _m("Contract Management", "ادارة عقد العمل"),
+    proceduresSettings: _m("Procedures Settings", "اعدادات الإجراءات")
   }),
   insurance: new MessagesGroup({
     addPolicy: _m("Add Policy", "إضافة بوليصة"),

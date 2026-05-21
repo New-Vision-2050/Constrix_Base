@@ -63,6 +63,7 @@ export default function AddEmployeeDialog({
   const [selectedDependent, setSelectedDependent] = useState<any>(null);
   const [employees, setEmployees] = useState<any[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]); // For edit mode - employees with insurance
+  const [allSubscriptions, setAllSubscriptions] = useState<any[]>([]); // For add mode - all subscriptions to check which employees have insurance
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState("");
   const [insurances, setInsurances] = useState<any[]>([]);
@@ -97,6 +98,17 @@ export default function AddEmployeeDialog({
 
   const [categories, setCategories] = useState<any[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // State to hold individual data for each employee (policy, value, subscription_no, category)
+  const [employeeData, setEmployeeData] = useState<Record<string, {
+    policyId: string;
+    value: string;
+    subscriptionNo: string;
+    categoryId: string;
+    oldPolicyId: string;
+    oldValue: string;
+    oldSubscriptionNo: string;
+  }>>({});
 
   // Fetch employees from API
   useEffect(() => {
@@ -140,7 +152,20 @@ export default function AddEmployeeDialog({
           }
 
           console.log("👥 Loaded employees:", employeesList.length, "employees");
-          setEmployees(employeesList);
+
+          // Filter out employees who already have insurance
+          const employeeIdsWithInsurance = new Set(
+            allSubscriptions.map((sub: any) => sub.user_id || sub.employee_id)
+          );
+
+          const filteredEmployees = employeesList.filter((emp: any) => {
+            const employeeId = emp.id || emp.user_id;
+            return !employeeIdsWithInsurance.has(employeeId);
+          });
+
+          console.log("👥 Filtered employees (without insurance):", filteredEmployees.length, "employees");
+          console.log("👥 Employees with insurance excluded:", employeeIdsWithInsurance.size);
+          setEmployees(filteredEmployees);
         }
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -151,7 +176,30 @@ export default function AddEmployeeDialog({
     };
 
     fetchEmployees();
-  }, [open, employeeSearchQuery, isEditMode]);
+  }, [open, employeeSearchQuery, isEditMode, allSubscriptions]);
+
+  // Fetch all subscriptions to check which employees have insurance (for add mode)
+  useEffect(() => {
+    const fetchAllSubscriptions = async () => {
+      if (!open || isEditMode) return;
+      
+      try {
+        const response = await MedicalInsuranceApi.subscriptions.list({
+          page: 1,
+          per_page: 100,
+        });
+        
+        if (response?.data?.payload) {
+          setAllSubscriptions(response.data.payload);
+          console.log("👥 Loaded all subscriptions:", response.data.payload.length, "subscriptions");
+        }
+      } catch (error) {
+        console.error("Error fetching all subscriptions:", error);
+      }
+    };
+
+    fetchAllSubscriptions();
+  }, [open, isEditMode]);
 
   // Fetch insurances from API
   useEffect(() => {
@@ -184,28 +232,41 @@ export default function AddEmployeeDialog({
     fetchInsurances();
   }, [open]);
 
-  // Fetch categories from API
+  // Fetch categories from API based on selected insurance
   useEffect(() => {
     const fetchCategories = async () => {
-      if (!open) return;
+      if (!open || !formData.policyId) return;
       
       setLoadingCategories(true);
       try {
-        // Note: Categories endpoint requires medicalInsuranceId
-        // For now, we'll skip loading categories or use a different approach
-        // You may need to load categories after selecting an insurance
-        setCategories([]);
-        console.log("📋 Categories loading skipped - requires insurance selection");
+        const response = await MedicalInsuranceApi.categories.list(formData.policyId, {
+          page: 1,
+          per_page: 100,
+        });
+        
+        if (response?.data?.payload) {
+          setCategories(response.data.payload);
+          console.log("✅ Loaded categories:", response.data.payload.length, "categories");
+        } else {
+          setCategories([]);
+          console.log("⚠️ No categories found for this insurance");
+        }
       } catch (error) {
         console.error("Error fetching categories:", error);
-        toast.error(t("saveError") || "حدث خطأ أثناء تحميل الفئات");
+        // If 404, it means no categories exist yet - that's okay
+        if (error?.response?.status === 404) {
+          setCategories([]);
+          console.log("ℹ️ No categories found (404)");
+        } else {
+          toast.error(t("saveError") || "حدث خطأ أثناء تحميل الفئات");
+        }
       } finally {
         setLoadingCategories(false);
       }
     };
 
     fetchCategories();
-  }, [open]);
+  }, [open, formData.policyId]);
 
   // Reset form when dialog opens/closes or editing employee changes
   useEffect(() => {
@@ -258,25 +319,25 @@ export default function AddEmployeeDialog({
     }
   }, [open, editingEmployee]);
 
-  // Fetch dependents from API
+  // Fetch dependents from API (now from subscription's family_members)
   const fetchDependents = async (subscriptionId: string) => {
     try {
-      console.log("🔄 Fetching dependents for subscription:", subscriptionId);
-      const response = await MedicalInsuranceApi.dependents.list(subscriptionId, {
-        page: 1,
-        per_page: 100,
-      });
-      console.log("📋 Fetched dependents response:", response);
-      console.log("📋 Dependents payload:", response.data.payload);
+      console.log("🔄 Fetching subscription with family members:", subscriptionId);
+      const response = await MedicalInsuranceApi.subscriptions.show(subscriptionId);
+      console.log("📋 Fetched subscription response:", response);
+      
+      const subscription = response.data.payload;
+      const familyMembers = subscription.family_members || [];
+      console.log("📋 Family members:", familyMembers);
       
       // Map API response to local format
-      const mappedDependents = response.data.payload.map((dep: any) => ({
-        id: dep.id,
-        name: dep.name,
-        residenceNumber: dep.residence_number,
-        relationship: dep.relationship,
-        subscriberNumber: dep.subscriber_number,
-        value: dep.value,
+      const mappedDependents = familyMembers.map((member: any) => ({
+        id: member.id,
+        name: member.name,
+        residenceNumber: member.national_id,
+        relationship: member.relation,
+        subscriberNumber: member.subscription_no || "",
+        value: member.amount?.toString() || "0",
       }));
       
       console.log("✅ Mapped dependents:", mappedDependents);
@@ -302,79 +363,88 @@ export default function AddEmployeeDialog({
   };
 
   const handleSubmit = async () => {
-    if (!formData.name || formData.name.length === 0) {
+    if (selectedEmployees.length === 0) {
       toast.error(t("selectEmployee") || "يرجى اختيار الموظفين");
       return;
     }
 
-    if (!formData.employee_id) {
-      toast.error(t("selectEmployee") || "يرجى اختيار موظف");
-      return;
-    }
-
-    if (!formData.policyId) {
-      toast.error(t("selectInsurance") || "يرجى اختيار بوليصة");
-      return;
-    }
-
-    if (!formData.subscriberId) {
-      toast.error(t("enterSubscriptionNumber") || "يرجى إدخال رقم المشترك");
-      return;
-    }
-
-    if (!formData.value) {
-      toast.error(t("enterValue") || "يرجى إدخال القيمة");
-      return;
+    // Validate each employee has required data
+    for (const employee of selectedEmployees) {
+      const employeeId = employee.employee_id || employee.user_id || employee.id;
+      const data = employeeData[employeeId] || {};
+      
+      if (!data.policyId) {
+        toast.error(`يرجى اختيار بوليصة للموظف: ${employee.user?.name || employee.employee_name || employee.name}`);
+        return;
+      }
+      
+      if (!data.subscriptionNo) {
+        toast.error(`يرجى إدخال رقم المشترك للموظف: ${employee.user?.name || employee.employee_name || employee.name}`);
+        return;
+      }
+      
+      if (!data.value) {
+        toast.error(`يرجى إدخال القيمة للموظف: ${employee.user?.name || employee.employee_name || employee.name}`);
+        return;
+      }
     }
 
     try {
-      if (editingEmployee) {
-        // Update subscription
-        const updateParams: any = {
-          user_id: formData.employee_id, // user_id from company-users/employees
-          medical_insurance_id: formData.policyId,
-          amount: parseFloat(formData.value),
-          subscription_no: formData.subscriberId,
-          status: 1, // 1 for update
+      // Prepare subscription items for all selected employees
+      const subscriptionItems = selectedEmployees.map((employee: any) => {
+        const employeeId = employee.employee_id || employee.user_id || employee.id;
+        const data = employeeData[employeeId] || {};
+        
+        // Use individual data for each employee from employeeData state
+        const policyId = data.policyId || formData.policyId;
+        const amount = data.value || formData.value;
+        const subscriptionNo = data.subscriptionNo || formData.subscriberId;
+        const categoryId = data.categoryId || formData.categoryId;
+
+        return {
+          id: employee.id, // Include ID for update mode
+          user_id: employeeId,
+          medical_insurance_id: policyId,
+          medical_insurance_category_id: categoryId || null,
+          amount: parseFloat(amount) || 0,
+          subscription_no: subscriptionNo,
+          status: editingEmployee ? 1 : 0,
           family_members: dependents.map(dep => ({
             name: dep.name,
             national_id: dep.residenceNumber,
             relation: dep.relationship,
             amount: parseFloat(dep.value) || 0,
+            subscription_no: dep.subscriberNumber || null,
           })),
+        };
+      });
+
+      console.log("📤 Subscription items for all employees:", subscriptionItems);
+
+      if (editingEmployee) {
+        // Update subscriptions - wrap in subscriptions array
+        const updateParams = {
+          subscriptions: subscriptionItems
         };
 
         console.log("📤 Updating subscription data:", updateParams);
-        console.log("📤 user_id:", updateParams.user_id);
-        console.log("📤 family_members:", updateParams.family_members);
-
-        await MedicalInsuranceApi.subscriptions.update(editingEmployee.id, updateParams);
-        toast.success(t("employeeUpdatedSuccessfully"));
+        await MedicalInsuranceApi.subscriptions.update(updateParams);
+        toast.success(`تم تحديث ${subscriptionItems.length} موظف بنجاح`);
       } else {
         console.log("📝 formData:", formData);
-        console.log("📝 formData.employee_id (user_id):", formData.employee_id);
+        console.log("📝 selectedEmployees:", selectedEmployees);
         
-        // Create subscription
-        const createParams: any = {
-          user_id: formData.employee_id, // user_id from company-users/employees
-          medical_insurance_id: formData.policyId,
-          amount: parseFloat(formData.value),
-          subscription_no: formData.subscriberId,
-          status: 0, // 0 for create
-          family_members: dependents.map(dep => ({
-            name: dep.name,
-            national_id: dep.residenceNumber,
-            relation: dep.relationship,
-            amount: parseFloat(dep.value) || 0,
-          })),
+        // Create subscriptions - wrap in subscriptions array
+        const createParams = {
+          subscriptions: subscriptionItems
         };
         
         console.log("📤 Sending subscription data:", createParams);
         console.log("📤 user_id:", createParams.user_id);
         console.log("📤 family_members:", createParams.family_members);
         const response = await MedicalInsuranceApi.subscriptions.create(createParams);
-        console.log("✅ Subscription created successfully:", response);
-        toast.success(t("employeeAddedSuccessfully"));
+        console.log("✅ Subscriptions created successfully:", response);
+        toast.success(`تم إضافة ${subscriptionItems.length} موظف بنجاح`);
       }
       
       onOpenChange(false);
@@ -561,57 +631,80 @@ export default function AddEmployeeDialog({
             </Box>
 
             {isEditMode ? (
-              // Edit mode: single employee - show employees with insurance
+              // Edit mode: multiple employees - show employees with insurance
               <Autocomplete
+                multiple
                 options={subscriptions}
                 getOptionLabel={(option) => {
                   const userName = option?.user?.name || option?.employee_name || option?.name || '';
                   return userName || 'موظف';
                 }}
-                value={subscriptions.find(sub => sub.employee_id === formData.employee_id || sub.user_id === formData.employee_id) || null}
+                isOptionEqualToValue={(option, value) => {
+                  const optionId = option?.employee_id || option?.user_id || option?.id;
+                  const valueId = value?.employee_id || value?.user_id || value?.id;
+                  return optionId === valueId;
+                }}
+                value={selectedEmployees}
                 onChange={async (event, newValue) => {
-                  console.log("🔍 Selected subscription:", newValue);
-                  const userName = newValue?.user?.name || newValue?.employee_name || newValue?.name || '';
-                  handleInputChange("name", newValue ? [userName] : []);
-                  if (newValue) {
-                    // Fill employee_id (user_id)
-                    const employeeId = newValue.employee_id || newValue.user_id;
-                    console.log("👤 Employee ID:", employeeId);
-                    handleInputChange("employee_id", employeeId);
+                  setSelectedEmployees(newValue);
+                  handleInputChange("name", newValue.map(emp => emp?.user?.name || emp?.employee_name || emp?.name || ''));
+                  
+                  // Initialize employeeData for all selected employees
+                  const newEmployeeData: Record<string, any> = {};
+                  newValue.forEach((emp: any) => {
+                    const employeeId = emp.employee_id || emp.user_id || emp.id;
+                    newEmployeeData[employeeId] = {
+                      policyId: emp.medical_insurance_id || emp.policy_id || formData.policyId || "",
+                      value: emp.amount?.toString() || emp.value?.toString() || formData.value || "",
+                      subscriptionNo: emp.subscription_no || formData.subscriberId || "",
+                      categoryId: emp.medical_insurance_category_id || formData.categoryId || "",
+                      oldPolicyId: emp.medical_insurance_id || emp.policy_id || "",
+                      oldValue: emp.amount?.toString() || emp.value?.toString() || "",
+                      oldSubscriptionNo: emp.subscription_no || "",
+                    };
+                  });
+                  setEmployeeData(newEmployeeData);
+                  
+                  if (newValue.length > 0) {
+                    const firstEmployee = newValue[0];
+                    handleInputChange("employee_id", firstEmployee.employee_id || firstEmployee.user_id);
                     
-                    // Fill old policy data
-                    const policyId = newValue.medical_insurance_id || newValue.policy_id;
-                    console.log("📋 Policy ID:", policyId);
+                    // Fill old policy data from first employee
+                    const policyId = firstEmployee.medical_insurance_id || firstEmployee.policy_id;
                     if (policyId) {
                       handleInputChange("oldPolicyId", policyId);
                       handleInputChange("policyId", policyId);
                     }
                     
-                    // Fill old value
-                    const amount = newValue.amount || newValue.value;
-                    console.log("💰 Amount:", amount);
+                    // Fill old value from first employee
+                    const amount = firstEmployee.amount || firstEmployee.value;
                     if (amount) {
                       handleInputChange("oldValue", amount?.toString() || "");
                       handleInputChange("value", amount?.toString() || "");
                     }
                     
-                    // Fill old subscriber number
-                    const subscriptionNo = newValue.subscription_no;
-                    console.log("🔢 Subscription No:", subscriptionNo);
+                    // Fill old subscriber number from first employee
+                    const subscriptionNo = firstEmployee.subscription_no;
                     if (subscriptionNo) {
                       handleInputChange("oldSubscriberId", subscriptionNo);
                       handleInputChange("subscriberId", subscriptionNo);
                     }
                     
-                    // Load dependents for this subscription
+                    // Load dependents for first employee
                     try {
-                      await fetchDependents(newValue.id);
-                      console.log("✅ Loaded dependents for selected subscription");
+                      await fetchDependents(firstEmployee.id);
+                      console.log("✅ Loaded dependents for first selected subscription");
                     } catch (error) {
                       console.error("❌ Error loading dependents:", error);
                     }
-                    
-                    console.log("✅ Form data updated");
+                  } else {
+                    // Clear form if no employees selected
+                    handleInputChange("employee_id", "");
+                    handleInputChange("oldPolicyId", "");
+                    handleInputChange("oldValue", "");
+                    handleInputChange("oldSubscriberId", "");
+                    setDependents([]);
+                    setEmployeeData({});
                   }
                 }}
                 onInputChange={(event, newInputValue) => {
@@ -620,11 +713,37 @@ export default function AddEmployeeDialog({
                 loading={loadingEmployees}
                 noOptionsText="لا توجد نتائج"
                 loadingText="جاري التحميل..."
+                renderTags={(value: readonly any[], getTagProps) =>
+                  value.map((option: any, index: number) => {
+                    const { key, ...tagProps } = getTagProps({ index });
+                    const userName = option?.user?.name || option?.employee_name || option?.name || 'موظف';
+                    const employeeId = option?.employee_id || option?.user_id || option?.id || index;
+                    return (
+                      <Chip
+                        key={`${employeeId}-${key}`}
+                        variant="outlined"
+                        label={userName}
+                        {...tagProps}
+                        sx={{
+                          background: "rgba(236, 72, 153, 0.2)",
+                          color: "white",
+                          borderColor: "rgba(236, 72, 153, 0.5)",
+                          "& .MuiChip-deleteIcon": {
+                            color: "rgba(255, 255, 255, 0.7)",
+                            "&:hover": {
+                              color: "rgba(239, 68, 68, 1)",
+                            },
+                          },
+                        }}
+                      />
+                    );
+                  })
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label="الاسم"
-                    placeholder="ابحث عن موظف"
+                    placeholder="اختر الموظفين"
                     size="large"
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -658,16 +777,36 @@ export default function AddEmployeeDialog({
                   const userName = option?.name || '';
                   return userName || `ID: ${option?.id?.substring(0, 8)}...`;
                 }}
+                isOptionEqualToValue={(option, value) => {
+                  const optionId = option?.id || option?.user_id;
+                  const valueId = value?.id || value?.user_id;
+                  return optionId === valueId;
+                }}
                 value={selectedEmployees}
                 onChange={async (event, newValue) => {
                   setSelectedEmployees(newValue);
                   handleInputChange("name", newValue.map(emp => emp?.name || ''));
                   
+                  // Initialize employeeData for all selected employees
+                  const newEmployeeData: Record<string, any> = {};
+                  newValue.forEach((emp: any) => {
+                    const employeeId = emp.id || emp.user_id;
+                    newEmployeeData[employeeId] = {
+                      policyId: formData.policyId || "",
+                      value: formData.value || "",
+                      subscriptionNo: formData.subscriberId || "",
+                      categoryId: formData.categoryId || "",
+                      oldPolicyId: "",
+                      oldValue: "",
+                      oldSubscriptionNo: "",
+                    };
+                  });
+                  
+                  // Check for existing subscriptions for each employee
                   if (newValue.length > 0) {
                     const firstEmployee = newValue[0];
-                    handleInputChange("employee_id", firstEmployee.id); // user_id from company-users/employees
+                    handleInputChange("employee_id", firstEmployee.id);
                     
-                    // Check if employee has existing subscription
                     try {
                       const subsResponse = await MedicalInsuranceApi.subscriptions.list({
                         page: 1,
@@ -683,54 +822,47 @@ export default function AddEmployeeDialog({
                         subscriptionsList = subsResponse.data;
                       }
                       
-                      // Find subscription for this employee
-                      const existingSub = subscriptionsList.find(
+                      // Check each employee for existing subscription
+                      newValue.forEach((emp: any) => {
+                        const employeeId = emp.id || emp.user_id;
+                        const existingSub = subscriptionsList.find(
+                          sub => (sub.employee_id === employeeId || sub.user_id === employeeId)
+                        );
+                        
+                        if (existingSub) {
+                          console.log("🔍 Found existing subscription for employee:", existingSub);
+                          newEmployeeData[employeeId] = {
+                            policyId: existingSub.medical_insurance_id || existingSub.policy_id || formData.policyId || "",
+                            value: existingSub.amount?.toString() || existingSub.value?.toString() || formData.value || "",
+                            subscriptionNo: existingSub.subscription_no || formData.subscriberId || "",
+                            categoryId: existingSub.medical_insurance_category_id || formData.categoryId || "",
+                            oldPolicyId: existingSub.medical_insurance_id || existingSub.policy_id || "",
+                            oldValue: existingSub.amount?.toString() || existingSub.value?.toString() || "",
+                            oldSubscriptionNo: existingSub.subscription_no || "",
+                          };
+                        }
+                      });
+                      
+                      setEmployeeData(newEmployeeData);
+                      
+                      // Load dependents for first employee if exists
+                      const firstEmployeeSub = subscriptionsList.find(
                         sub => (sub.employee_id === firstEmployee.id || sub.user_id === firstEmployee.id)
                       );
-                      
-                      if (existingSub) {
-                        console.log("🔍 Found existing subscription for employee:", existingSub);
-                        
-                        // Fill old policy data
-                        const policyId = existingSub.medical_insurance_id || existingSub.policy_id;
-                        if (policyId) {
-                          handleInputChange("oldPolicyId", policyId);
-                          handleInputChange("policyId", policyId);
-                        }
-                        
-                        // Fill old value
-                        const amount = existingSub.amount || existingSub.value;
-                        if (amount) {
-                          handleInputChange("oldValue", amount?.toString() || "");
-                          handleInputChange("value", amount?.toString() || "");
-                        }
-                        
-                        // Fill old subscriber number
-                        if (existingSub.subscription_no) {
-                          handleInputChange("oldSubscriberId", existingSub.subscription_no);
-                          handleInputChange("subscriberId", existingSub.subscription_no);
-                        }
-                        
-                        // Load dependents if exists
+                      if (firstEmployeeSub) {
                         try {
-                          await fetchDependents(existingSub.id);
+                          await fetchDependents(firstEmployeeSub.id);
                           console.log("✅ Loaded dependents for existing subscription");
                         } catch (error) {
                           console.error("❌ Error loading dependents:", error);
                         }
-                        
-                        toast.info("تم ملء بيانات البوليصة القديمة تلقائياً");
-                      } else {
-                        console.log("⚠️ No existing subscription found for employee");
-                        // Clear old values if no subscription found
-                        handleInputChange("oldPolicyId", "");
-                        handleInputChange("oldValue", "");
-                        handleInputChange("oldSubscriberId", "");
-                        setDependents([]);
                       }
                     } catch (error) {
                       console.error("❌ Error checking existing subscription:", error);
                     }
+                  } else {
+                    setEmployeeData({});
+                    setDependents([]);
                   }
                 }}
                 onInputChange={(event, newInputValue) => {
@@ -743,9 +875,10 @@ export default function AddEmployeeDialog({
                   value.map((option: any, index: number) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     const userName = option?.name || 'موظف';
+                    const employeeId = option?.id || option?.user_id || index;
                     return (
                       <Chip
-                        key={key}
+                        key={`${employeeId}-${key}`}
                         variant="outlined"
                         label={userName}
                         {...tagProps}
@@ -798,504 +931,355 @@ export default function AddEmployeeDialog({
         );
 
       case 1:
-        console.log("📊 Step 1 - Form Data:", formData);
+        console.log("📊 Step 1 - Selected Employees:", selectedEmployees);
+        console.log("📊 Step 1 - Employee Data:", employeeData);
         console.log("📊 Step 1 - Loading Insurances:", loadingInsurances);
         console.log("📊 Step 1 - Insurances Count:", insurances.length);
         
-        // Show old policy fields if there's old data (in both edit and add modes)
-        const hasOldPolicy = formData.oldPolicyId || formData.oldValue;
-        
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: hasOldPolicy ? "1fr 1fr 1fr 1fr" : "1fr 1fr 1fr" }, gap: 3 }}>
-              <TextField
-                fullWidth
-                label="الاسم"
-                value={formData.name.join(", ")}
-                disabled
-                size="large"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    height: 56,
-                  },
-                }}
-              />
-              {hasOldPolicy && (
-                <>
-                  <TextField
-                    fullWidth
-                    label="البوليصة القديمة"
-                    value={insurances.find(i => i.id === formData.oldPolicyId)?.name || formData.oldPolicyId || ""}
-                    disabled
-                    size="large"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="القيمة القديمة"
-                    value={formData.oldValue}
-                    disabled
-                    size="large"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  />
-                </>
-              )}
-              <FormControl fullWidth size="large">
-                <InputLabel>بوليصة جديدة</InputLabel>
-                <Select
-                  value={formData.policyId}
-                  label="بوليصة جديدة"
-                  onChange={(e) => {
-                    console.log("🔄 Policy changed to:", e.target.value);
-                    handleInputChange("policyId", e.target.value);
-                  }}
-                  disabled={loadingInsurances}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                >
-                  <MenuItem value="">اختر البوليصة</MenuItem>
-                  {insurances.map((insurance) => (
-                    <MenuItem key={insurance.id} value={insurance.id}>
-                      {insurance.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                label="القيمة الجديدة"
-                value={formData.value}
-                onChange={(e) => handleInputChange("value", e.target.value)}
-                type="number"
-                size="large"
-                placeholder="أدخل القيمة"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    height: 56,
-                  },
-                }}
-              />
-            </Box>
+            <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
+              بيانات الموظفين المختارين
+            </Typography>
+            
+            <TableContainer sx={{ maxHeight: 400 }}>
+              <Table>
+                <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
+                  <TableRow>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة القديمة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة الجديدة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة القديمة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة الجديدة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك القديم</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك الجديد</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedEmployees.map((employee: any, index: number) => {
+                    const employeeId = employee.employee_id || employee.user_id || employee.id;
+                    const data = employeeData[employeeId] || {
+                      policyId: formData.policyId || "",
+                      value: formData.value || "",
+                      subscriptionNo: formData.subscriberId || "",
+                      categoryId: formData.categoryId || "",
+                      oldPolicyId: "",
+                      oldValue: "",
+                      oldSubscriptionNo: "",
+                    };
+                    
+                    return (
+                      <TableRow
+                        key={`${employeeId}-${index}-${Math.random()}`}
+                        sx={{
+                          borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
+                          "&:hover": {
+                            background: "rgba(30, 41, 59, 0.3)",
+                          },
+                        }}
+                      >
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {insurances.find(i => i.id === data.oldPolicyId)?.name || data.oldPolicyId || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          <FormControl fullWidth size="small">
+                            <Select
+                              value={data.policyId}
+                              onChange={(e) => {
+                                const newData = { ...employeeData };
+                                newData[employeeId] = {
+                                  ...newData[employeeId],
+                                  policyId: e.target.value,
+                                  categoryId: "", // Reset category when policy changes
+                                };
+                                setEmployeeData(newData);
+                              }}
+                              disabled={loadingInsurances}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  color: "white",
+                                  height: 40,
+                                },
+                                "& .MuiInputLabel-root": {
+                                  color: "rgba(255, 255, 255, 0.7)",
+                                },
+                              }}
+                            >
+                              <MenuItem value="">اختر البوليصة</MenuItem>
+                              {insurances.map((insurance) => (
+                                <MenuItem key={insurance.id} value={insurance.id}>
+                                  {insurance.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          <FormControl fullWidth size="small">
+                            <Select
+                              value={data.categoryId}
+                              onChange={(e) => {
+                                const newData = { ...employeeData };
+                                newData[employeeId] = {
+                                  ...newData[employeeId],
+                                  categoryId: e.target.value,
+                                };
+                                setEmployeeData(newData);
+                              }}
+                              disabled={loadingCategories || !data.policyId}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  color: "white",
+                                  height: 40,
+                                },
+                                "& .MuiInputLabel-root": {
+                                  color: "rgba(255, 255, 255, 0.7)",
+                                },
+                              }}
+                            >
+                              <MenuItem value="">اختر الفئة</MenuItem>
+                              {categories.map((category) => (
+                                <MenuItem key={category.id} value={category.id}>
+                                  {category.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {data.oldValue || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          <TextField
+                            fullWidth
+                            value={data.value}
+                            onChange={(e) => {
+                              const newData = { ...employeeData };
+                              newData[employeeId] = {
+                                ...newData[employeeId],
+                                value: e.target.value,
+                              };
+                              setEmployeeData(newData);
+                            }}
+                            type="number"
+                            size="small"
+                            placeholder="أدخل القيمة"
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                color: "white",
+                                height: 40,
+                              },
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {data.oldSubscriptionNo || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          <TextField
+                            fullWidth
+                            value={data.subscriptionNo}
+                            onChange={(e) => {
+                              const newData = { ...employeeData };
+                              newData[employeeId] = {
+                                ...newData[employeeId],
+                                subscriptionNo: e.target.value,
+                              };
+                              setEmployeeData(newData);
+                            }}
+                            size="small"
+                            placeholder="أدخل رقم المشترك"
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                color: "white",
+                                height: 40,
+                              },
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         );
 
       case 2:
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr 1fr" }, gap: 3 }}>
-              {/* Name - Display only */}
-              <TextField
-                fullWidth
-                label="الاسم"
-                value={formData.name.join(", ")}
-                disabled
-                size="large"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    height: 56,
-                  },
-                }}
-              />
-              
-              {/* Policy - Editable */}
-              <Box sx={{ position: "relative" }}>
-                <FormControl fullWidth size="large">
-                  <InputLabel>البوليصة {formData.oldPolicyId && `(القديمة: ${insurances.find(i => i.id === formData.oldPolicyId)?.name || formData.oldPolicyId})`}</InputLabel>
-                  <Select
-                    value={formData.policyId}
-                    label={`البوليصة ${formData.oldPolicyId ? `(القديمة: ${insurances.find(i => i.id === formData.oldPolicyId)?.name || formData.oldPolicyId})` : ''}`}
-                    onChange={(e) => handleInputChange("policyId", e.target.value)}
-                    disabled={loadingInsurances}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                        paddingLeft: "40px",
-                      },
-                    }}
-                  >
-                    <MenuItem value="">اختر البوليصة</MenuItem>
-                    {insurances.map((insurance) => (
-                      <MenuItem key={insurance.id} value={insurance.id}>
-                        {insurance.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Pencil 
-                  size={20} 
-                  style={{ 
-                    position: "absolute", 
-                    left: 15, 
-                    top: "50%", 
-                    transform: "translateY(-50%)", 
-                    color: "rgba(236, 72, 153, 0.7)",
-                    cursor: "pointer"
-                  }} 
-                />
-              </Box>
-
-              {/* Value - Editable */}
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  fullWidth
-                  label={`القيمة ${formData.oldValue ? `(القديمة: ${formData.oldValue})` : ''}`}
-                  value={formData.value}
-                  onChange={(e) => handleInputChange("value", e.target.value)}
-                  type="number"
-                  size="large"
-                  placeholder="أدخل القيمة"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                      paddingLeft: "40px",
-                    },
-                  }}
-                />
-                <Pencil 
-                  size={20} 
-                  style={{ 
-                    position: "absolute", 
-                    left: 15, 
-                    top: "50%", 
-                    transform: "translateY(-50%)", 
-                    color: "rgba(236, 72, 153, 0.7)",
-                    cursor: "pointer"
-                  }} 
-                />
-              </Box>
-              
-              {/* Subscription Number - Editable */}
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  fullWidth
-                  label={`رقم المشترك ${formData.oldSubscriberId ? `(القديم: ${formData.oldSubscriberId})` : ''}`}
-                  value={formData.subscriberId}
-                  onChange={(e) => handleInputChange("subscriberId", e.target.value)}
-                  placeholder="أدخل رقم المشترك"
-                  size="large"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                      paddingLeft: "40px",
-                    },
-                  }}
-                />
-                <Pencil 
-                  size={20} 
-                  style={{ 
-                    position: "absolute", 
-                    left: 15, 
-                    top: "50%", 
-                    transform: "translateY(-50%)", 
-                    color: "rgba(236, 72, 153, 0.7)",
-                    cursor: "pointer"
-                  }} 
-                />
-              </Box>
-            </Box>
+            <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
+              بيانات المشترك لكل موظف
+            </Typography>
+            
+            <TableContainer sx={{ maxHeight: 400 }}>
+              <Table>
+                <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
+                  <TableRow>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedEmployees.map((employee: any, index: number) => {
+                    const employeeId = employee.employee_id || employee.user_id || employee.id;
+                    const data = employeeData[employeeId] || {};
+                    
+                    return (
+                      <TableRow
+                        key={`${employeeId}-${index}-${Math.random()}`}
+                        sx={{
+                          borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
+                          "&:hover": {
+                            background: "rgba(30, 41, 59, 0.3)",
+                          },
+                        }}
+                      >
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {insurances.find(i => i.id === data.policyId)?.name || data.policyId || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {data.value || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {data.subscriptionNo || "-"}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         );
 
       case 3:
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 3 }}>
-              <TextField
-                fullWidth
-                label="الاسم"
-                value={formData.name.join(", ")}
-                disabled
-                size="large"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    height: 56,
-                  },
-                }}
-              />
-              <TextField
-                fullWidth
-                label="القيمة"
-                value={formData.value}
-                disabled
-                size="large"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    height: 56,
-                  },
-                }}
-              />
-              <Button
-                onClick={() => setDependentsDialogOpen(true)}
-                variant="contained"
-                size="large"
-                sx={{
-                  height: 56,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  background: "rgb(27,39,74)",
-                }}
-              >
-                العالون
-              </Button>
-            </Box>
+            <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
+              العائلون لكل موظف
+            </Typography>
+            
+            <TableContainer sx={{ maxHeight: 400 }}>
+              <Table>
+                <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
+                  <TableRow>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>عدد العائلون</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>إجراءات</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedEmployees.map((employee: any, index: number) => {
+                    const employeeId = employee.employee_id || employee.user_id || employee.id;
+                    
+                    return (
+                      <TableRow
+                        key={`${employeeId}-${index}-${Math.random()}`}
+                        sx={{
+                          borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
+                          "&:hover": {
+                            background: "rgba(30, 41, 59, 0.3)",
+                          },
+                        }}
+                      >
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {employeeData[employeeId]?.value || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {dependents.length} عالون
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          <Button
+                            onClick={() => setDependentsDialogOpen(true)}
+                            variant="contained"
+                            size="small"
+                            sx={{ fontSize: 12 }}
+                          >
+                            إدارة العائلون
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         );
 
       case 4:
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr 1fr" }, gap: 3 }}>
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  fullWidth
-                  label="الاسم"
-                  value={formData.name.join(", ")}
-                  disabled
-                  size="large"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    right: 12,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                </Box>
-              </Box>
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  fullWidth
-                  label="رقم المشترك"
-                  value={formData.subscriberId}
-                  onChange={(e) => handleInputChange("subscriberId", e.target.value)}
-                  size="large"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    right: 12,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                </Box>
-              </Box>
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  fullWidth
-                  label="رقم البوليصة"
-                  value={formData.policyId}
-                  onChange={(e) => handleInputChange("policyId", e.target.value)}
-                  size="large"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    right: 12,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                </Box>
-              </Box>
-              <Box sx={{ position: "relative" }}>
-                <TextField
-                  fullWidth
-                  label="القيمة"
-                  value={formData.value}
-                  onChange={(e) => handleInputChange("value", e.target.value)}
-                  size="large"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      height: 56,
-                    },
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    right: 12,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                </Box>
-              </Box>
-            </Box>
-
-            {/* Dependents Data Section */}
-            <Box
-              sx={{
-                p: 4,
-              }}
-            >
-              <Typography sx={{ color: "rgb(255,255,255)", fontSize: 25, fontWeight: 800, mb: 4 }}>
-                بيانات العائلون المحددة
-              </Typography>
-              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr 1fr 1fr" }, gap: 3 }}>
-                <Box sx={{ position: "relative" }}>
-                  <TextField
-                    fullWidth
-                    label="الاسم"
-                    value={formData.name.join(", ")}
-                    disabled
-                    size="large"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      right: 12,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                  </Box>
-                </Box>
-                <Box sx={{ position: "relative" }}>
-                  <TextField
-                    fullWidth
-                    label="رقم الإقامة"
-                    value={formData.residenceNumber}
-                    onChange={(e) => handleInputChange("residenceNumber", e.target.value)}
-                    size="large"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      right: 12,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                  </Box>
-                </Box>
-                <Box sx={{ position: "relative" }}>
-                  <TextField
-                    fullWidth
-                    label="العلاقة"
-                    value={formData.relationship}
-                    onChange={(e) => handleInputChange("relationship", e.target.value)}
-                    size="large"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      right: 12,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                  </Box>
-                </Box>
-                <Box sx={{ position: "relative" }}>
-                  <TextField
-                    fullWidth
-                    label="رقم المشترك"
-                    value={formData.subscriberId}
-                    onChange={(e) => handleInputChange("subscriberId", e.target.value)}
-                    size="large"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      right: 12,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                  </Box>
-                </Box>
-                <Box sx={{ position: "relative" }}>
-                  <TextField
-                    fullWidth
-                    label="القيمة"
-                    value={formData.value}
-                    onChange={(e) => handleInputChange("value", e.target.value)}
-                    size="large"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: 56,
-                      },
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      right: 12,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <Pencil size={20} color="rgba(148, 163, 184, 0.7)" />
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
+            <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
+              ملخص البيانات لكل موظف
+            </Typography>
+            
+            <TableContainer sx={{ maxHeight: 400 }}>
+              <Table>
+                <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
+                  <TableRow>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>عدد العائلون</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedEmployees.map((employee: any, index: number) => {
+                    const employeeId = employee.employee_id || employee.user_id || employee.id;
+                    const data = employeeData[employeeId] || {};
+                    
+                    return (
+                      <TableRow
+                        key={`${employeeId}-${index}-${Math.random()}`}
+                        sx={{
+                          borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
+                          "&:hover": {
+                            background: "rgba(30, 41, 59, 0.3)",
+                          },
+                        }}
+                      >
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {insurances.find(i => i.id === data.policyId)?.name || data.policyId || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {categories.find(c => c.id === data.categoryId)?.name || data.categoryId || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {data.value || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {data.subscriptionNo || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {dependents.length} عالون
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         );
 
