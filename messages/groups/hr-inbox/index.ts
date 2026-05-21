@@ -30,6 +30,10 @@ export const hrInboxMessages = new MessagesGroup({
   ),
   approve: _m("Approve", "موافقة"),
   reject: _m("Reject", "رفض"),
+  rejectDialogTitle: _m(
+    "Reject task",
+    "رفض المهمة",
+  ),
   rejectReason: _m(
     "Rejection reason",
     "سبب الرفض",
