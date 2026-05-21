@@ -122,57 +122,29 @@ export default function AddEmployeeDialog({
 
       setLoadingEmployees(true);
       try {
-        if (isEditMode) {
-          // In edit mode, fetch subscriptions (employees with insurance)
-          const response = await MedicalInsuranceApi.subscriptions.list({
-            page: 1,
-            per_page: 100,
-          });
+        // Fetch company employees with filter based on mode
+        const response = await AllProjectsApi.getCompanyUsers({
+          name: employeeSearchQuery || undefined,
+          per_page: 10,
+          has_medical_insurance_subscription: isEditMode ? 1 : 0,
+        });
 
-          let subscriptionsList = [];
-          if (response?.data?.payload) {
-            subscriptionsList = response.data.payload;
-          } else if (Array.isArray(response?.data?.data)) {
-            subscriptionsList = response.data.data;
-          } else if (Array.isArray(response?.data)) {
-            subscriptionsList = response.data;
-          }
-
-          console.log("👥 Loaded subscriptions:", subscriptionsList.length, "subscriptions");
-          setSubscriptions(subscriptionsList);
-        } else {
-          // In add mode, fetch all company employees
-          const response = await AllProjectsApi.getCompanyUsers({
-            name: employeeSearchQuery || undefined,
-            per_page: 100,
-            has_medical_insurance_subscription: 0,
-          });
-
-          let employeesList = [];
-          if (response?.data?.payload) {
-            employeesList = response.data.payload;
-          } else if (Array.isArray(response?.data?.data)) {
-            employeesList = response.data.data;
-          } else if (Array.isArray(response?.data)) {
-            employeesList = response.data;
-          }
-
-          console.log("👥 Loaded employees:", employeesList.length, "employees");
-
-          // Filter out employees who already have insurance
-          const employeeIdsWithInsurance = new Set(
-            allSubscriptions.map((sub: any) => sub.user_id || sub.employee_id)
-          );
-
-          const filteredEmployees = employeesList.filter((emp: any) => {
-            const employeeId = emp.id || emp.user_id;
-            return !employeeIdsWithInsurance.has(employeeId);
-          });
-
-          console.log("👥 Filtered employees (without insurance):", filteredEmployees.length, "employees");
-          console.log("👥 Employees with insurance excluded:", employeeIdsWithInsurance.size);
-          setEmployees(filteredEmployees);
+        let employeesList = [];
+        if (response?.data?.payload) {
+          employeesList = response.data.payload;
+        } else if (Array.isArray(response?.data?.data)) {
+          employeesList = response.data.data;
+        } else if (Array.isArray(response?.data)) {
+          employeesList = response.data;
         }
+
+        console.log("👥 Loaded employees:", employeesList.length, "employees");
+
+        if (isEditMode) {
+          // In edit mode, set both subscriptions and employees state
+          setSubscriptions(employeesList);
+        }
+        setEmployees(employeesList);
       } catch (error) {
         console.error("Error fetching employees:", error);
         toast.error(t("saveError") || "حدث خطأ أثناء تحميل الموظفين");
@@ -192,7 +164,7 @@ export default function AddEmployeeDialog({
       try {
         const response = await MedicalInsuranceApi.subscriptions.list({
           page: 1,
-          per_page: 100,
+          per_page: 10,
         });
 
         if (response?.data?.payload) {
@@ -216,7 +188,7 @@ export default function AddEmployeeDialog({
       setLoadingInsurances(true);
       try {
         const response = await MedicalInsuranceApi.list({
-          per_page: 100,
+          per_page: 10,
         });
 
         if (response?.data?.payload) {
@@ -253,7 +225,7 @@ export default function AddEmployeeDialog({
       try {
         const response = await MedicalInsuranceApi.categories.list(policyId, {
           page: 1,
-          per_page: 100,
+          per_page: 10,
         });
 
         if (response?.data?.payload) {
@@ -705,12 +677,13 @@ export default function AddEmployeeDialog({
                   const newEmployeeData: Record<string, any> = {};
                   newValue.forEach((emp: any) => {
                     const employeeId = emp.employee_id || emp.user_id || emp.id;
+                    const currentPolicyId = emp.medical_insurance_id || emp.policy_id;
                     newEmployeeData[employeeId] = {
-                      policyId: emp.medical_insurance_id || emp.policy_id || formData.policyId || "",
+                      policyId: selectedInsuranceId || currentPolicyId || formData.policyId || "",
                       value: emp.amount?.toString() || emp.value?.toString() || formData.value || "",
                       subscriptionNo: emp.subscription_no || formData.subscriberId || "",
                       categoryId: emp.medical_insurance_category_id || formData.categoryId || "",
-                      oldPolicyId: emp.medical_insurance_id || emp.policy_id || "",
+                      oldPolicyId: currentPolicyId || "",
                       oldValue: emp.amount?.toString() || emp.value?.toString() || "",
                       oldSubscriptionNo: emp.subscription_no || "",
                       oldCategoryId: emp.medical_insurance_category_id || formData.categoryId || "",
@@ -845,7 +818,7 @@ export default function AddEmployeeDialog({
                   newValue.forEach((emp: any) => {
                     const employeeId = emp.id || emp.user_id;
                     newEmployeeData[employeeId] = {
-                      policyId: formData.policyId || "",
+                      policyId: selectedInsuranceId || formData.policyId || "",
                       value: formData.value || "",
                       subscriptionNo: formData.subscriberId || "",
                       categoryId: formData.categoryId || "",
@@ -864,7 +837,7 @@ export default function AddEmployeeDialog({
                     try {
                       const subsResponse = await MedicalInsuranceApi.subscriptions.list({
                         page: 1,
-                        per_page: 100,
+                        per_page: 10,
                       });
 
                       let subscriptionsList = [];

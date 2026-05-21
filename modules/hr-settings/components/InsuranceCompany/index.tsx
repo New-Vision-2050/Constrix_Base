@@ -115,7 +115,7 @@ function InsuranceContent() {
     try {
       const response = await MedicalInsuranceApi.subscriptions.list({
         page: 1,
-        per_page: 100,
+        per_page: 10,
       });
       
       // Filter subscriptions for the selected insurance
