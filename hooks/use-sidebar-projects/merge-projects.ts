@@ -1,5 +1,6 @@
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
+import { ROUTER } from "@/router";
 import { Entity, Menu, Project } from "@/types/sidebar-menu";
 import { CanFn, TranslationFn } from "./types";
 
@@ -10,6 +11,37 @@ export interface MergeProjectsOpts {
   pageName: string;
   fullPath: string;
   isCentralCompany: boolean;
+}
+
+/**
+ * Sidebar merge appends dynamic sub-entities after static ones. Program settings URLs
+ * (HR / CRM / projects) must render after those dynamic rows so «Settings» stays last.
+ */
+const SETTINGS_ROUTES_ALWAYS_LAST = [
+  ROUTER.HR_SETTINGS,
+  ROUTER.WORK_PANEL_SETTINGS,
+  ROUTER.PROJECTS_SETTINGS,
+  ROUTER.CRM.settings,
+];
+
+function matchesSettingsDeferRoute(url: string | undefined): boolean {
+  if (url == null || url === "") return false;
+  return SETTINGS_ROUTES_ALWAYS_LAST.some(
+    (prefix) => url === prefix || url.startsWith(`${prefix}/`),
+  );
+}
+
+/** Split static sub-entities into [non-settings-first, settings-last]. */
+function partitionStaticSubEntitiesSettingsLast(
+  entities: Entity[],
+): [Entity[], Entity[]] {
+  const before: Entity[] = [];
+  const settingsTail: Entity[] = [];
+  for (const e of entities) {
+    if (matchesSettingsDeferRoute(e.url)) settingsTail.push(e);
+    else before.push(e);
+  }
+  return [before, settingsTail];
 }
 
 export function mergeProjects(
@@ -51,12 +83,17 @@ export function mergeProjects(
         }),
       ) || [];
 
+    const staticEntities = project.sub_entities || [];
+    const [staticBeforeSettings, settingsStaticTail] =
+      partitionStaticSubEntitiesSettingsLast(staticEntities);
+
     return {
       ...project,
       ...restMenuProps,
       sub_entities: [
-        ...(project.sub_entities || []),
+        ...staticBeforeSettings,
         ...transformedMenuSubEntities,
+        ...settingsStaticTail,
       ],
     };
   });

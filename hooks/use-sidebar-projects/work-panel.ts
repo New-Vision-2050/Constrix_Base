@@ -15,10 +15,10 @@ export function getWorkPanelProject({
   return {
     name: t("Sidebar.WorkPanel"),
     urls: [
-      ROUTER.WORK_PANEL_SETTINGS,
-      ROUTER.PROJECTS_SETTINGS,
       ROUTER.ALL_PROJECTS,
       ROUTER.PROJECTS_INBOX,
+      ROUTER.WORK_PANEL_SETTINGS,
+      ROUTER.PROJECTS_SETTINGS,
     ],
     icon: LayoutDashboardIcon,
     isActive:
@@ -27,15 +27,6 @@ export function getWorkPanelProject({
     slug: "work-panel",
     show: !isCentralCompany,
     sub_entities: [
-      {
-        name: t("Sidebar.WorkPanelSettings"),
-        url: ROUTER.WORK_PANEL_SETTINGS,
-        icon: SettingsIcon,
-        isActive:
-          fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) ||
-          fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
-        show: !isCentralCompany && can(PERMISSIONS.projectType.list),
-      },
       {
         name: t("Sidebar.Projects"),
         url: ROUTER.ALL_PROJECTS,
@@ -52,6 +43,15 @@ export function getWorkPanelProject({
         icon: InboxIconWithCount,
         isActive: fullPath.startsWith(ROUTER.PROJECTS_INBOX),
         show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
+      },
+      {
+        name: t("Sidebar.WorkPanelSettings"),
+        url: ROUTER.WORK_PANEL_SETTINGS,
+        icon: SettingsIcon,
+        isActive:
+          fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) ||
+          fullPath.startsWith(ROUTER.PROJECTS_SETTINGS),
+        show: !isCentralCompany && can(PERMISSIONS.projectType.list),
       },
     ],
   };
