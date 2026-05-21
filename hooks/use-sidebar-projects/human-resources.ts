@@ -1,4 +1,4 @@
-import { BarChart3, LayoutDashboardIcon, UserIcon } from "lucide-react";
+import { BarChart3, Inbox, LayoutDashboardIcon, UserIcon } from "lucide-react";
 import SettingsIcon from "@/public/icons/settings";
 import { ROUTER } from "@/router";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
@@ -6,22 +6,38 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Project } from "@/types/sidebar-menu";
 import { SidebarProjectProps } from "./types";
 
+/** Exact or nested match for sidebar selection (same idea as CRM / work-panel). */
+function matchesRoute(fullPath: string, route: string) {
+  return fullPath === route || fullPath.startsWith(`${route}/`);
+}
+
 export function getHumanResourcesProject({
   t,
-  pageName,
   fullPath,
   can,
   isCentralCompany,
 }: SidebarProjectProps): Project {
+  const hrRoutes = [
+    ROUTER.WORK_PANEL,
+    ROUTER.HR_INBOX,
+    ROUTER.Organizational_Structure,
+    ROUTER.AttendanceDeparture,
+    ROUTER.HR_REPORTS,
+    ROUTER.HR_SETTINGS,
+  ];
+
   return {
     name: t("Sidebar.HumanResources"),
     icon: LayoutDashboardIcon,
     urls: [
-      ROUTER.Organizational_Structure,
       ROUTER.WORK_PANEL,
+      ROUTER.HR_INBOX,
+      ROUTER.Organizational_Structure,
+      ROUTER.AttendanceDeparture,
       ROUTER.HR_REPORTS,
+      ROUTER.HR_SETTINGS,
     ],
-    isActive: pageName === ROUTER.Organizational_Structure,
+    isActive: hrRoutes.some((route) => matchesRoute(fullPath, route)),
     slug: SUPER_ENTITY_SLUG.HRM,
     show: !isCentralCompany,
     sub_entities: [
@@ -29,7 +45,20 @@ export function getHumanResourcesProject({
         name: t("WorkPanel.title"),
         url: ROUTER.WORK_PANEL,
         icon: LayoutDashboardIcon,
-        isActive: pageName === ROUTER.WORK_PANEL,
+        isActive: matchesRoute(fullPath, ROUTER.WORK_PANEL),
+        show:
+          !isCentralCompany &&
+          can([
+            PERMISSIONS.humanResources.charts.view,
+            PERMISSIONS.humanResources.procedures.view,
+            PERMISSIONS.humanResources.services.view,
+          ]),
+      },
+      {
+        name: t("Sidebar.Inbox"),
+        url: ROUTER.HR_INBOX,
+        icon: Inbox,
+        isActive: matchesRoute(fullPath, ROUTER.HR_INBOX),
         show:
           !isCentralCompany &&
           can([
@@ -42,7 +71,7 @@ export function getHumanResourcesProject({
         name: t("Sidebar.OrganizationalStructure"),
         url: ROUTER.Organizational_Structure,
         icon: LayoutDashboardIcon,
-        isActive: pageName === ROUTER.Organizational_Structure,
+        isActive: matchesRoute(fullPath, ROUTER.Organizational_Structure),
         show:
           !isCentralCompany &&
           can([
@@ -58,7 +87,7 @@ export function getHumanResourcesProject({
         name: t("Sidebar.AttendanceDeparture"),
         url: ROUTER.AttendanceDeparture,
         icon: UserIcon,
-        isActive: pageName === ROUTER.AttendanceDeparture,
+        isActive: matchesRoute(fullPath, ROUTER.AttendanceDeparture),
         show:
           !isCentralCompany &&
           can([PERMISSIONS.attendance.attendance_departure.view]),
@@ -67,9 +96,7 @@ export function getHumanResourcesProject({
         name: t("Sidebar.Reports"),
         url: ROUTER.HR_REPORTS,
         icon: BarChart3,
-        isActive:
-          pageName === ROUTER.HR_REPORTS ||
-          fullPath.startsWith(`${ROUTER.HR_REPORTS}/`),
+        isActive: matchesRoute(fullPath, ROUTER.HR_REPORTS),
         show:
           !isCentralCompany &&
           can([
@@ -82,7 +109,7 @@ export function getHumanResourcesProject({
         name: t("Sidebar.HRSettings"),
         url: ROUTER.HR_SETTINGS,
         icon: SettingsIcon,
-        isActive: pageName === ROUTER.HR_SETTINGS,
+        isActive: matchesRoute(fullPath, ROUTER.HR_SETTINGS),
         show: !isCentralCompany && can([PERMISSIONS.attendance.settings.view]),
       },
     ],
