@@ -140,6 +140,7 @@ export default function AddEmployeeDialog({
           const response = await AllProjectsApi.getCompanyUsers({
             name: employeeSearchQuery || undefined,
             per_page: 100,
+            has_medical_insurance_subscription: 0,
           });
 
           let employeesList = [];
@@ -947,11 +948,10 @@ export default function AddEmployeeDialog({
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة القديمة</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة الجديدة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة القديمة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة الجديدة</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة القديمة</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة الجديدة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك القديم</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك الجديد</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -969,7 +969,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
+                        key={`${employeeId}-${index}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -1074,31 +1074,6 @@ export default function AddEmployeeDialog({
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.oldSubscriptionNo || "-"}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          <TextField
-                            fullWidth
-                            value={data.subscriptionNo}
-                            onChange={(e) => {
-                              const newData = { ...employeeData };
-                              newData[employeeId] = {
-                                ...newData[employeeId],
-                                subscriptionNo: e.target.value,
-                              };
-                              setEmployeeData(newData);
-                            }}
-                            size="small"
-                            placeholder="أدخل رقم المشترك"
-                            sx={{
-                              "& .MuiOutlinedInput-root": {
-                                color: "white",
-                                height: 40,
-                              },
-                            }}
-                          />
-                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -1120,9 +1095,11 @@ export default function AddEmployeeDialog({
                 <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
                   <TableRow>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك القديم</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك الجديد</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1132,7 +1109,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
+                        key={`${employeeId}-${index}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -1144,13 +1121,67 @@ export default function AddEmployeeDialog({
                           {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
                         </TableCell>
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          {data.oldSubscriptionNo || "-"}
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                          <TextField
+                            fullWidth
+                            value={data.subscriptionNo || ""}
+                            onChange={(e) => {
+                              const newData = { ...employeeData };
+                              newData[employeeId] = {
+                                ...newData[employeeId],
+                                subscriptionNo: e.target.value,
+                              };
+                              setEmployeeData(newData);
+                            }}
+                            size="small"
+                            placeholder="أدخل رقم المشترك"
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                color: "white",
+                                height: 40,
+                              },
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
                           {insurances.find(i => i.id === data.policyId)?.name || data.policyId || "-"}
                         </TableCell>
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.value || "-"}
+                          <FormControl fullWidth size="small">
+                            <Select
+                              value={data.categoryId}
+                              onChange={(e) => {
+                                const newData = { ...employeeData };
+                                newData[employeeId] = {
+                                  ...newData[employeeId],
+                                  categoryId: e.target.value,
+                                };
+                                setEmployeeData(newData);
+                              }}
+                              disabled={loadingCategories || !data.policyId}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  color: "white",
+                                  height: 40,
+                                },
+                                "& .MuiInputLabel-root": {
+                                  color: "rgba(255, 255, 255, 0.7)",
+                                },
+                              }}
+                            >
+                              <MenuItem value="">اختر الفئة</MenuItem>
+                              {categories.map((category) => (
+                                <MenuItem key={category.id} value={category.id}>
+                                  {category.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
                         </TableCell>
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.subscriptionNo || "-"}
+                          {data.value || "-"}
                         </TableCell>
                       </TableRow>
                     );
@@ -1184,7 +1215,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
+                        key={`${employeeId}-${index}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -1246,7 +1277,7 @@ export default function AddEmployeeDialog({
                     
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
+                        key={`${employeeId}-${index}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
