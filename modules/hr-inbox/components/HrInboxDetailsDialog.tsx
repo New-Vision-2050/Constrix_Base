@@ -178,32 +178,44 @@ export default function HrInboxDetailsDialog({
           <Box sx={{ pt: 1 }}>
             <DetailRow
               label={t("colSerial")}
-              value={row.serial_number ?? row.id}
+              value={row.task?.serial_number ?? row.serial_number ?? row.id}
             />
             <DetailRow
               label={t("colTitle")}
-              value={row.title ?? dash}
+              value={row.task?.title ?? row.title ?? dash}
             />
             <DetailRow
               label={t("colEmployee")}
-              value={row.user?.name ?? dash}
+              value={row.employee?.name ?? row.user?.name ?? dash}
             />
             <DetailRow
               label={t("colStatus")}
-              value={row.status_label || row.status || dash}
+              value={
+                row.task?.status_label ||
+                row.task?.status ||
+                row.status_label ||
+                row.status ||
+                dash
+              }
             />
             <DetailRow
               label={t("colTaskDate")}
-              value={formatTaskDateOnly(row.task_date, dash)}
+              value={formatTaskDateOnly(
+                row.task?.task_date ?? row.task_date,
+                dash,
+              )}
             />
             <DetailRow
               label={t("colDuration")}
-              value={
-                row.duration_hours != null && row.duration_hours !== ""
-                  ? row.duration_hours
-                  : dash
-              }
+              value={(() => {
+                const hours =
+                  row.summary?.total_task_hours ?? row.duration_hours ?? null;
+                return hours != null && hours !== "" ? String(hours) : dash;
+              })()}
             />
+            {row.type_label ? (
+              <DetailRow label={t("colType")} value={row.type_label} />
+            ) : null}
             <DetailRow
               label={t("colCurrentStep")}
               value={row.current_step?.name ?? dash}
@@ -216,6 +228,22 @@ export default function HrInboxDetailsDialog({
               label={t("colCreated")}
               value={formatDateTime(row.created_at, dash)}
             />
+            {row.summary ? (
+              <>
+                <DetailRow
+                  label={t("detailNotes")}
+                  value={row.summary.notes ?? dash}
+                />
+                <DetailRow
+                  label={t("detailTimeFrom")}
+                  value={formatDateTime(row.summary.time_from ?? undefined, dash)}
+                />
+                <DetailRow
+                  label={t("detailTimeTo")}
+                  value={formatDateTime(row.summary.time_to ?? undefined, dash)}
+                />
+              </>
+            ) : null}
             <DetailRow label={t("detailLocation")} value={locationDisplay} />
             {canRespond ? (
               <Box sx={{ pt: 2 }}>

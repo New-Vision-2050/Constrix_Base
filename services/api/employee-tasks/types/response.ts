@@ -18,24 +18,50 @@ export interface EmployeeTaskActionTaker {
 
 export interface EmployeeTaskCurrentStep {
   id: number;
-  name: string;
-  step_order: number;
+  name: string | null;
+  step_order: number | null;
   is_approve: boolean;
   action_takers: EmployeeTaskActionTaker[];
 }
 
+export interface EmployeeTaskSummary {
+  notes: string | null;
+  attachment_path: string | null;
+  time_from: string | null;
+  time_to: string | null;
+  total_task_hours: string | number | null;
+}
+
+export interface EmployeeTaskTask {
+  id: string;
+  serial_number?: string;
+  status?: string;
+  status_label?: string;
+  task_date?: string;
+  title?: string;
+}
+
 export interface EmployeeTaskInboxRow {
   id: string;
+  type?: string;
+  type_label?: string;
+  status?: string;
+  created_at?: string;
+  /** New API: employee info */
+  employee?: EmployeeTaskUser | null;
+  /** New API: nested task details */
+  task?: EmployeeTaskTask | null;
+  /** New API: task completion summary */
+  summary?: EmployeeTaskSummary | null;
+  current_step?: EmployeeTaskCurrentStep | null;
+  /** Legacy fields – kept for backward compatibility */
   serial_number?: string;
   title?: string;
   duration_hours?: string;
   task_date?: string;
-  status?: string;
   status_label?: string;
   task_location?: EmployeeTaskLocation | null;
-  created_at?: string;
   user?: EmployeeTaskUser | null;
-  current_step?: EmployeeTaskCurrentStep | null;
   sessions?: unknown[] | null;
 }
 
