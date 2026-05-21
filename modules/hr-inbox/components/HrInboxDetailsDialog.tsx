@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -91,6 +91,7 @@ export default function HrInboxDetailsDialog({
   const t = useTranslations("HrInbox");
   const tLabels = useTranslations("labels");
   const queryClient = useQueryClient();
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
   const dash = t("dash");
@@ -106,7 +107,10 @@ export default function HrInboxDetailsDialog({
   }, [row, dash, t]);
 
   useEffect(() => {
-    setRejectionReason("");
+    if (!open) {
+      setRejectDialogOpen(false);
+      setRejectionReason("");
+    }
   }, [open, row?.id]);
 
   const canRespond = useMemo(() => isPendingRow(row), [row]);
@@ -120,6 +124,16 @@ export default function HrInboxDetailsDialog({
     });
   };
 
+  const openRejectDialog = useCallback(() => {
+    setRejectionReason("");
+    setRejectDialogOpen(true);
+  }, []);
+
+  const closeRejectDialog = useCallback(() => {
+    setRejectDialogOpen(false);
+    setRejectionReason("");
+  }, []);
+
   const approveMutation = useMutation({
     mutationFn: async () => {
       if (!row?.id) throw new Error("missing task");
@@ -128,6 +142,7 @@ export default function HrInboxDetailsDialog({
     onSuccess: () => {
       toast.success(t("toastApproveSuccess"));
       invalidateInbox();
+      closeRejectDialog();
       onClose();
     },
     onError: (error: unknown) => {
@@ -143,6 +158,7 @@ export default function HrInboxDetailsDialog({
     onSuccess: () => {
       toast.success(t("toastRejectSuccess"));
       invalidateInbox();
+      closeRejectDialog();
       onClose();
     },
     onError: (error: unknown) => {
@@ -150,150 +166,159 @@ export default function HrInboxDetailsDialog({
     },
   });
 
-  const actionPending =
-    approveMutation.isPending || rejectMutation.isPending;
+  const submitReject = () => {
+    if (rejectReasonInvalid) return;
+    rejectMutation.mutate(rejectReasonTrimmed);
+  };
+
+  const handleRejectDialogClose = () => {
+    if (rejectMutation.isPending) return;
+    closeRejectDialog();
+  };
 
   return (
-    <Dialog
-      open={open}
-      onClose={(_, reason) => {
-        if (
-          actionPending &&
-          (reason === "backdropClick" || reason === "escapeKeyDown")
-        ) {
-          return;
-        }
-        onClose();
-      }}
-      maxWidth="sm"
-      fullWidth
-    >
-      <DialogTitle sx={{ textAlign: "inherit" }}>
-        {t("detailsTitle")}
-      </DialogTitle>
-      <DialogContent dividers>
-        {!row ? (
-          <Typography color="text.secondary">{t("detailsEmpty")}</Typography>
-        ) : (
-          <Box sx={{ pt: 1 }}>
-            <DetailRow
-              label={t("colSerial")}
-              value={row.task?.serial_number ?? row.serial_number ?? row.id}
-            />
-            <DetailRow
-              label={t("colTitle")}
-              value={row.task?.title ?? row.title ?? dash}
-            />
-            <DetailRow
-              label={t("colEmployee")}
-              value={row.employee?.name ?? row.user?.name ?? dash}
-            />
-            <DetailRow
-              label={t("colStatus")}
-              value={
-                row.task?.status_label ||
-                row.task?.status ||
-                row.status_label ||
-                row.status ||
-                dash
-              }
-            />
-            <DetailRow
-              label={t("colTaskDate")}
-              value={formatTaskDateOnly(
-                row.task?.task_date ?? row.task_date,
-                dash,
-              )}
-            />
-            <DetailRow
-              label={t("colDuration")}
-              value={(() => {
-                const hours =
-                  row.summary?.total_task_hours ?? row.duration_hours ?? null;
-                return hours != null && hours !== "" ? String(hours) : dash;
-              })()}
-            />
-            {row.type_label ? (
-              <DetailRow label={t("colType")} value={row.type_label} />
-            ) : null}
-            <DetailRow
-              label={t("colCurrentStep")}
-              value={row.current_step?.name ?? dash}
-            />
-            <DetailRow
-              label={t("colApprovers")}
-              value={approversLabel(row, dash)}
-            />
-            <DetailRow
-              label={t("colCreated")}
-              value={formatDateTime(row.created_at, dash)}
-            />
-            {row.summary ? (
-              <>
-                <DetailRow
-                  label={t("detailNotes")}
-                  value={row.summary.notes ?? dash}
-                />
-                <DetailRow
-                  label={t("detailTimeFrom")}
-                  value={formatDateTime(row.summary.time_from ?? undefined, dash)}
-                />
-                <DetailRow
-                  label={t("detailTimeTo")}
-                  value={formatDateTime(row.summary.time_to ?? undefined, dash)}
-                />
-              </>
-            ) : null}
-            <DetailRow label={t("detailLocation")} value={locationDisplay} />
-            {canRespond ? (
-              <Box sx={{ pt: 2 }}>
-                <TextField
-                  label={t("rejectReason")}
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  fullWidth
-                  required
-                  multiline
-                  minRows={2}
-                  disabled={actionPending}
-                  size="small"
-                  helperText={t("rejectReasonHelper")}
-                />
-              </Box>
-            ) : null}
-          </Box>
-        )}
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2, gap: 1, flexWrap: "wrap" }}>
-        {canRespond ? (
-          <>
-            <Button
-              color="error"
-              variant="outlined"
-              disabled={actionPending || rejectReasonInvalid}
-              onClick={() => rejectMutation.mutate(rejectReasonTrimmed)}
-            >
-              {t("reject")}
-            </Button>
-            <Button
-              color="success"
-              variant="contained"
-              disabled={actionPending}
-              onClick={() => approveMutation.mutate()}
-            >
-              {t("approve")}
-            </Button>
-          </>
-        ) : null}
-        <Button
-          onClick={onClose}
-          variant="contained"
-          disabled={actionPending}
-          sx={{ ml: "auto" }}
-        >
-          {tLabels("close")}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <>
+      <Dialog
+        open={open}
+        onClose={() => {
+          if (approveMutation.isPending || rejectMutation.isPending) return;
+          if (rejectDialogOpen) return;
+          onClose();
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: "inherit" }}>
+          {t("detailsTitle")}
+        </DialogTitle>
+        <DialogContent dividers>
+          {!row ? (
+            <Typography color="text.secondary">{t("detailsEmpty")}</Typography>
+          ) : (
+            <Box sx={{ pt: 1 }}>
+              <DetailRow
+                label={t("colSerial")}
+                value={row.serial_number ?? row.id}
+              />
+              <DetailRow
+                label={t("colTitle")}
+                value={row.title ?? dash}
+              />
+              <DetailRow
+                label={t("colEmployee")}
+                value={row.user?.name ?? dash}
+              />
+              <DetailRow
+                label={t("colStatus")}
+                value={row.status_label || row.status || dash}
+              />
+              <DetailRow
+                label={t("colTaskDate")}
+                value={formatTaskDateOnly(row.task_date, dash)}
+              />
+              <DetailRow
+                label={t("colDuration")}
+                value={
+                  row.duration_hours != null && row.duration_hours !== ""
+                    ? row.duration_hours
+                    : dash
+                }
+              />
+              <DetailRow
+                label={t("colCurrentStep")}
+                value={row.current_step?.name ?? dash}
+              />
+              <DetailRow
+                label={t("colApprovers")}
+                value={approversLabel(row, dash)}
+              />
+              <DetailRow
+                label={t("colCreated")}
+                value={formatDateTime(row.created_at, dash)}
+              />
+              <DetailRow label={t("detailLocation")} value={locationDisplay} />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2, gap: 1, flexWrap: "wrap" }}>
+          {canRespond ? (
+            <>
+              <Button
+                color="error"
+                variant="outlined"
+                disabled={approveMutation.isPending || rejectMutation.isPending}
+                onClick={openRejectDialog}
+              >
+                {t("reject")}
+              </Button>
+              <Button
+                color="success"
+                variant="contained"
+                disabled={approveMutation.isPending || rejectMutation.isPending}
+                onClick={() => approveMutation.mutate()}
+              >
+                {t("approve")}
+              </Button>
+            </>
+          ) : null}
+          <Button
+            onClick={onClose}
+            variant="contained"
+            disabled={
+              approveMutation.isPending ||
+              rejectMutation.isPending ||
+              rejectDialogOpen
+            }
+            sx={{ ml: "auto" }}
+          >
+            {tLabels("close")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={rejectDialogOpen}
+        onClose={handleRejectDialogClose}
+        maxWidth="xs"
+        fullWidth
+        disableEscapeKeyDown={rejectMutation.isPending}
+      >
+        <DialogTitle sx={{ textAlign: "inherit" }}>
+          {t("rejectDialogTitle")}
+        </DialogTitle>
+        <DialogContent dividers>
+          <TextField
+            label={t("rejectReason")}
+            value={rejectionReason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            autoFocus
+            fullWidth
+            required
+            multiline
+            minRows={3}
+            disabled={rejectMutation.isPending}
+            size="small"
+            sx={{ mt: 0.5 }}
+            helperText={t("rejectReasonHelper")}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+          <Button
+            onClick={closeRejectDialog}
+            disabled={rejectMutation.isPending}
+          >
+            {tLabels("cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            disabled={rejectMutation.isPending || rejectReasonInvalid}
+            onClick={submitReject}
+          >
+            {tLabels("confirm")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
