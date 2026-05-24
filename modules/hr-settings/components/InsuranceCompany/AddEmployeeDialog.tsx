@@ -98,6 +98,10 @@ export default function AddEmployeeDialog({
 
   const [categories, setCategories] = useState<any[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [showSummaryTable, setShowSummaryTable] = useState(true);
+  const [selectedEmployeeForDetails, setSelectedEmployeeForDetails] = useState<string | null>(null);
+  const [dependentsDetailsDialogOpen, setDependentsDetailsDialogOpen] = useState(false);
+  const [selectedEmployeeForDependents, setSelectedEmployeeForDependents] = useState<any>(null);
 
   // State to hold individual data for each employee (policy, value, subscription_no, category)
   const [employeeData, setEmployeeData] = useState<Record<string, {
@@ -108,6 +112,7 @@ export default function AddEmployeeDialog({
     oldPolicyId: string;
     oldValue: string;
     oldSubscriptionNo: string;
+    oldCategoryId: string;
   }>>({});
 
   // Fetch employees from API
@@ -117,56 +122,29 @@ export default function AddEmployeeDialog({
 
       setLoadingEmployees(true);
       try {
-        if (isEditMode) {
-          // In edit mode, fetch subscriptions (employees with insurance)
-          const response = await MedicalInsuranceApi.subscriptions.list({
-            page: 1,
-            per_page: 100,
-          });
+        // Fetch company employees with filter based on mode
+        const response = await AllProjectsApi.getCompanyUsers({
+          name: employeeSearchQuery || undefined,
+          per_page: 10,
+          has_medical_insurance_subscription: isEditMode ? 1 : 0,
+        });
 
-          let subscriptionsList = [];
-          if (response?.data?.payload) {
-            subscriptionsList = response.data.payload;
-          } else if (Array.isArray(response?.data?.data)) {
-            subscriptionsList = response.data.data;
-          } else if (Array.isArray(response?.data)) {
-            subscriptionsList = response.data;
-          }
-
-          console.log("👥 Loaded subscriptions:", subscriptionsList.length, "subscriptions");
-          setSubscriptions(subscriptionsList);
-        } else {
-          // In add mode, fetch all company employees
-          const response = await AllProjectsApi.getCompanyUsers({
-            name: employeeSearchQuery || undefined,
-            per_page: 100,
-          });
-
-          let employeesList = [];
-          if (response?.data?.payload) {
-            employeesList = response.data.payload;
-          } else if (Array.isArray(response?.data?.data)) {
-            employeesList = response.data.data;
-          } else if (Array.isArray(response?.data)) {
-            employeesList = response.data;
-          }
-
-          console.log("👥 Loaded employees:", employeesList.length, "employees");
-
-          // Filter out employees who already have insurance
-          const employeeIdsWithInsurance = new Set(
-            allSubscriptions.map((sub: any) => sub.user_id || sub.employee_id)
-          );
-
-          const filteredEmployees = employeesList.filter((emp: any) => {
-            const employeeId = emp.id || emp.user_id;
-            return !employeeIdsWithInsurance.has(employeeId);
-          });
-
-          console.log("👥 Filtered employees (without insurance):", filteredEmployees.length, "employees");
-          console.log("👥 Employees with insurance excluded:", employeeIdsWithInsurance.size);
-          setEmployees(filteredEmployees);
+        let employeesList = [];
+        if (response?.data?.payload) {
+          employeesList = response.data.payload;
+        } else if (Array.isArray(response?.data?.data)) {
+          employeesList = response.data.data;
+        } else if (Array.isArray(response?.data)) {
+          employeesList = response.data;
         }
+
+        console.log("👥 Loaded employees:", employeesList.length, "employees");
+
+        if (isEditMode) {
+          // In edit mode, set both subscriptions and employees state
+          setSubscriptions(employeesList);
+        }
+        setEmployees(employeesList);
       } catch (error) {
         console.error("Error fetching employees:", error);
         toast.error(t("saveError") || "حدث خطأ أثناء تحميل الموظفين");
@@ -182,13 +160,13 @@ export default function AddEmployeeDialog({
   useEffect(() => {
     const fetchAllSubscriptions = async () => {
       if (!open || isEditMode) return;
-      
+
       try {
         const response = await MedicalInsuranceApi.subscriptions.list({
           page: 1,
-          per_page: 100,
+          per_page: 10,
         });
-        
+
         if (response?.data?.payload) {
           setAllSubscriptions(response.data.payload);
           console.log("👥 Loaded all subscriptions:", response.data.payload.length, "subscriptions");
@@ -205,14 +183,14 @@ export default function AddEmployeeDialog({
   useEffect(() => {
     const fetchInsurances = async () => {
       if (!open) return;
-      
+
       console.log("🔄 Fetching insurances...");
       setLoadingInsurances(true);
       try {
         const response = await MedicalInsuranceApi.list({
-          per_page: 100,
+          per_page: 10,
         });
-        
+
         if (response?.data?.payload) {
           setInsurances(response.data.payload);
           console.log("✅ Loaded insurances:", response.data.payload.length, "insurances");
@@ -235,15 +213,21 @@ export default function AddEmployeeDialog({
   // Fetch categories from API based on selected insurance
   useEffect(() => {
     const fetchCategories = async () => {
-      if (!open || !formData.policyId) return;
-      
+      if (!open) return;
+
+      // Get the first employee's policyId for categories fetching
+      const firstEmployeeId = selectedEmployees[0]?.employee_id || selectedEmployees[0]?.user_id || selectedEmployees[0]?.id;
+      const policyId = firstEmployeeId ? employeeData[firstEmployeeId]?.policyId : formData.policyId;
+
+      if (!policyId) return;
+
       setLoadingCategories(true);
       try {
-        const response = await MedicalInsuranceApi.categories.list(formData.policyId, {
+        const response = await MedicalInsuranceApi.categories.list(policyId, {
           page: 1,
-          per_page: 100,
+          per_page: 10,
         });
-        
+
         if (response?.data?.payload) {
           setCategories(response.data.payload);
           console.log("✅ Loaded categories:", response.data.payload.length, "categories");
@@ -266,7 +250,7 @@ export default function AddEmployeeDialog({
     };
 
     fetchCategories();
-  }, [open, formData.policyId]);
+  }, [open, selectedEmployees, employeeData]);
 
   // Reset form when dialog opens/closes or editing employee changes
   useEffect(() => {
@@ -290,7 +274,7 @@ export default function AddEmployeeDialog({
           relationship: editingEmployee.relationship || "",
           residenceNumber: editingEmployee.residenceNumber || editingEmployee.residence_number || "",
         });
-        
+
         // Fetch dependents from API
         console.log("🔍 Editing employee data:", editingEmployee);
         console.log("🔍 Using subscription ID:", editingEmployee.id);
@@ -325,11 +309,11 @@ export default function AddEmployeeDialog({
       console.log("🔄 Fetching subscription with family members:", subscriptionId);
       const response = await MedicalInsuranceApi.subscriptions.show(subscriptionId);
       console.log("📋 Fetched subscription response:", response);
-      
+
       const subscription = response.data.payload;
       const familyMembers = subscription.family_members || [];
       console.log("📋 Family members:", familyMembers);
-      
+
       // Map API response to local format
       const mappedDependents = familyMembers.map((member: any) => ({
         id: member.id,
@@ -339,7 +323,7 @@ export default function AddEmployeeDialog({
         subscriberNumber: member.subscription_no || "",
         value: member.amount?.toString() || "0",
       }));
-      
+
       console.log("✅ Mapped dependents:", mappedDependents);
       console.log("✅ Dependents count:", mappedDependents.length);
       setDependents(mappedDependents);
@@ -352,6 +336,48 @@ export default function AddEmployeeDialog({
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
+      // Validation for Step 0 (Employee Selection)
+      if (currentStep === 0) {
+        if (selectedEmployees.length === 0) {
+          toast.error("يرجى اختيار موظف واحد على الأقل");
+          return;
+        }
+      }
+
+      // Validation for Step 1 (Policy Selection)
+      if (currentStep === 1) {
+        for (const employee of selectedEmployees) {
+          const employeeId = employee.employee_id || employee.user_id || employee.id;
+          const data = employeeData[employeeId] || {};
+
+          if (!data.policyId) {
+            toast.error(`يرجى اختيار البوليصة للموظف: ${employee.user?.name || employee.employee_name || employee.name || 'موظف'}`);
+            return;
+          }
+          if (!data.categoryId) {
+            toast.error(`يرجى اختيار الفئة للموظف: ${employee.user?.name || employee.employee_name || employee.name || 'موظف'}`);
+            return;
+          }
+          if (!data.value) {
+            toast.error(`يرجى إدخال القيمة للموظف: ${employee.user?.name || employee.employee_name || employee.name || 'موظف'}`);
+            return;
+          }
+        }
+      }
+
+      // Validation for Step 2 (Subscriber Data)
+      if (currentStep === 2) {
+        for (const employee of selectedEmployees) {
+          const employeeId = employee.employee_id || employee.user_id || employee.id;
+          const data = employeeData[employeeId] || {};
+
+          if (!data.subscriptionNo) {
+            toast.error(`يرجى إدخال رقم المشترك للموظف: ${employee.user?.name || employee.employee_name || employee.name || 'موظف'}`);
+            return;
+          }
+        }
+      }
+
       setCurrentStep(currentStep + 1);
     }
   };
@@ -372,17 +398,17 @@ export default function AddEmployeeDialog({
     for (const employee of selectedEmployees) {
       const employeeId = employee.employee_id || employee.user_id || employee.id;
       const data = employeeData[employeeId] || {};
-      
+
       if (!data.policyId) {
         toast.error(`يرجى اختيار بوليصة للموظف: ${employee.user?.name || employee.employee_name || employee.name}`);
         return;
       }
-      
+
       if (!data.subscriptionNo) {
         toast.error(`يرجى إدخال رقم المشترك للموظف: ${employee.user?.name || employee.employee_name || employee.name}`);
         return;
       }
-      
+
       if (!data.value) {
         toast.error(`يرجى إدخال القيمة للموظف: ${employee.user?.name || employee.employee_name || employee.name}`);
         return;
@@ -394,7 +420,7 @@ export default function AddEmployeeDialog({
       const subscriptionItems = selectedEmployees.map((employee: any) => {
         const employeeId = employee.employee_id || employee.user_id || employee.id;
         const data = employeeData[employeeId] || {};
-        
+
         // Use individual data for each employee from employeeData state
         const policyId = data.policyId || formData.policyId;
         const amount = data.value || formData.value;
@@ -433,12 +459,12 @@ export default function AddEmployeeDialog({
       } else {
         console.log("📝 formData:", formData);
         console.log("📝 selectedEmployees:", selectedEmployees);
-        
+
         // Create subscriptions - wrap in subscriptions array
         const createParams = {
           subscriptions: subscriptionItems
         };
-        
+
         console.log("📤 Sending subscription data:", createParams);
         console.log("📤 user_id:", createParams.user_id);
         console.log("📤 family_members:", createParams.family_members);
@@ -446,7 +472,7 @@ export default function AddEmployeeDialog({
         console.log("✅ Subscriptions created successfully:", response);
         toast.success(`تم إضافة ${subscriptionItems.length} موظف بنجاح`);
       }
-      
+
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
@@ -455,7 +481,7 @@ export default function AddEmployeeDialog({
       console.error("❌ Error response data:", error?.response?.data);
       console.error("❌ Error response headers:", error?.response?.headers);
       console.error("❌ Full error:", JSON.stringify(error, null, 2));
-      
+
       // Try to get validation errors
       if (error?.response?.data?.errors) {
         console.error("❌ Validation errors:", error.response.data.errors);
@@ -648,48 +674,50 @@ export default function AddEmployeeDialog({
                 onChange={async (event, newValue) => {
                   setSelectedEmployees(newValue);
                   handleInputChange("name", newValue.map(emp => emp?.user?.name || emp?.employee_name || emp?.name || ''));
-                  
+
                   // Initialize employeeData for all selected employees
                   const newEmployeeData: Record<string, any> = {};
                   newValue.forEach((emp: any) => {
                     const employeeId = emp.employee_id || emp.user_id || emp.id;
+                    const currentPolicyId = emp.medical_insurance_id || emp.policy_id;
                     newEmployeeData[employeeId] = {
-                      policyId: emp.medical_insurance_id || emp.policy_id || formData.policyId || "",
+                      policyId: selectedInsuranceId || currentPolicyId || formData.policyId || "",
                       value: emp.amount?.toString() || emp.value?.toString() || formData.value || "",
                       subscriptionNo: emp.subscription_no || formData.subscriberId || "",
                       categoryId: emp.medical_insurance_category_id || formData.categoryId || "",
-                      oldPolicyId: emp.medical_insurance_id || emp.policy_id || "",
+                      oldPolicyId: currentPolicyId || "",
                       oldValue: emp.amount?.toString() || emp.value?.toString() || "",
                       oldSubscriptionNo: emp.subscription_no || "",
+                      oldCategoryId: emp.medical_insurance_category_id || formData.categoryId || "",
                     };
                   });
                   setEmployeeData(newEmployeeData);
-                  
+
                   if (newValue.length > 0) {
                     const firstEmployee = newValue[0];
                     handleInputChange("employee_id", firstEmployee.employee_id || firstEmployee.user_id);
-                    
+
                     // Fill old policy data from first employee
                     const policyId = firstEmployee.medical_insurance_id || firstEmployee.policy_id;
                     if (policyId) {
                       handleInputChange("oldPolicyId", policyId);
                       handleInputChange("policyId", policyId);
                     }
-                    
+
                     // Fill old value from first employee
                     const amount = firstEmployee.amount || firstEmployee.value;
                     if (amount) {
                       handleInputChange("oldValue", amount?.toString() || "");
                       handleInputChange("value", amount?.toString() || "");
                     }
-                    
+
                     // Fill old subscriber number from first employee
                     const subscriptionNo = firstEmployee.subscription_no;
                     if (subscriptionNo) {
                       handleInputChange("oldSubscriberId", subscriptionNo);
                       handleInputChange("subscriberId", subscriptionNo);
                     }
-                    
+
                     // Load dependents for first employee
                     try {
                       await fetchDependents(firstEmployee.id);
@@ -786,33 +814,34 @@ export default function AddEmployeeDialog({
                 onChange={async (event, newValue) => {
                   setSelectedEmployees(newValue);
                   handleInputChange("name", newValue.map(emp => emp?.name || ''));
-                  
+
                   // Initialize employeeData for all selected employees
                   const newEmployeeData: Record<string, any> = {};
                   newValue.forEach((emp: any) => {
                     const employeeId = emp.id || emp.user_id;
                     newEmployeeData[employeeId] = {
-                      policyId: formData.policyId || "",
+                      policyId: selectedInsuranceId || formData.policyId || "",
                       value: formData.value || "",
                       subscriptionNo: formData.subscriberId || "",
                       categoryId: formData.categoryId || "",
                       oldPolicyId: "",
                       oldValue: "",
                       oldSubscriptionNo: "",
+                      oldCategoryId: "",
                     };
                   });
-                  
+
                   // Check for existing subscriptions for each employee
                   if (newValue.length > 0) {
                     const firstEmployee = newValue[0];
                     handleInputChange("employee_id", firstEmployee.id);
-                    
+
                     try {
                       const subsResponse = await MedicalInsuranceApi.subscriptions.list({
                         page: 1,
-                        per_page: 100,
+                        per_page: 10,
                       });
-                      
+
                       let subscriptionsList = [];
                       if (subsResponse?.data?.payload) {
                         subscriptionsList = subsResponse.data.payload;
@@ -821,14 +850,14 @@ export default function AddEmployeeDialog({
                       } else if (Array.isArray(subsResponse?.data)) {
                         subscriptionsList = subsResponse.data;
                       }
-                      
+
                       // Check each employee for existing subscription
                       newValue.forEach((emp: any) => {
                         const employeeId = emp.id || emp.user_id;
                         const existingSub = subscriptionsList.find(
                           sub => (sub.employee_id === employeeId || sub.user_id === employeeId)
                         );
-                        
+
                         if (existingSub) {
                           console.log("🔍 Found existing subscription for employee:", existingSub);
                           newEmployeeData[employeeId] = {
@@ -839,12 +868,13 @@ export default function AddEmployeeDialog({
                             oldPolicyId: existingSub.medical_insurance_id || existingSub.policy_id || "",
                             oldValue: existingSub.amount?.toString() || existingSub.value?.toString() || "",
                             oldSubscriptionNo: existingSub.subscription_no || "",
+                            oldCategoryId: existingSub.medical_insurance_category_id || formData.categoryId || "",
                           };
                         }
                       });
-                      
+
                       setEmployeeData(newEmployeeData);
-                      
+
                       // Load dependents for first employee if exists
                       const firstEmployeeSub = subscriptionsList.find(
                         sub => (sub.employee_id === firstEmployee.id || sub.user_id === firstEmployee.id)
@@ -935,25 +965,30 @@ export default function AddEmployeeDialog({
         console.log("📊 Step 1 - Employee Data:", employeeData);
         console.log("📊 Step 1 - Loading Insurances:", loadingInsurances);
         console.log("📊 Step 1 - Insurances Count:", insurances.length);
-        
+
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
               بيانات الموظفين المختارين
             </Typography>
-            
+
             <TableContainer sx={{ maxHeight: 400 }}>
               <Table>
                 <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
                   <TableRow>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة القديمة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة الجديدة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة القديمة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة الجديدة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك القديم</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك الجديد</TableCell>
+                    {isEditMode && (
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة القديمة</TableCell>
+                    )}
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>{isEditMode ? "البوليصة الجديدة" : "البوليصة"}</TableCell>
+                    {isEditMode && (
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة القديمة</TableCell>
+                    )}
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>{isEditMode ? "الفئة الجديدة" : "الفئة"}</TableCell>
+                    {isEditMode && (
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة القديمة</TableCell>
+                    )}
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>{isEditMode ? "القيمة الجديدة" : "القيمة"}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -967,11 +1002,12 @@ export default function AddEmployeeDialog({
                       oldPolicyId: "",
                       oldValue: "",
                       oldSubscriptionNo: "",
+                      oldCategoryId: "",
                     };
-                    
+
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
+                        key={`${employeeId}-${index}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -982,9 +1018,11 @@ export default function AddEmployeeDialog({
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
                           {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
                         </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {insurances.find(i => i.id === data.oldPolicyId)?.name || data.oldPolicyId || "-"}
-                        </TableCell>
+                        {isEditMode && (
+                          <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                            {insurances.find(i => i.id === data.oldPolicyId)?.name || data.oldPolicyId || "-"}
+                          </TableCell>
+                        )}
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
                           <FormControl fullWidth size="small">
                             <Select
@@ -1018,6 +1056,11 @@ export default function AddEmployeeDialog({
                             </Select>
                           </FormControl>
                         </TableCell>
+                        {isEditMode && (
+                          <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                            {categories.find(c => c.id === data.oldCategoryId)?.name || data.oldCategoryId || "-"}
+                          </TableCell>
+                        )}
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
                           <FormControl fullWidth size="small">
                             <Select
@@ -1050,9 +1093,11 @@ export default function AddEmployeeDialog({
                             </Select>
                           </FormControl>
                         </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.oldValue || "-"}
-                        </TableCell>
+                        {isEditMode && (
+                          <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                            {data.oldValue || "-"}
+                          </TableCell>
+                        )}
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
                           <TextField
                             fullWidth
@@ -1076,13 +1121,60 @@ export default function AddEmployeeDialog({
                             }}
                           />
                         </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        );
+
+      case 2:
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
+              بيانات المشترك لكل موظف
+            </Typography>
+
+            <TableContainer sx={{ maxHeight: 400 }}>
+              <Table>
+                <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
+                  <TableRow>
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                    {isEditMode && (
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك القديم</TableCell>
+                    )}
+                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>{isEditMode ? "رقم المشترك الجديد" : "رقم المشترك"}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedEmployees.map((employee: any, index: number) => {
+                    const employeeId = employee.employee_id || employee.user_id || employee.id;
+                    const data = employeeData[employeeId] || {};
+
+                    return (
+                      <TableRow
+                        key={`${employeeId}-${index}`}
+                        sx={{
+                          borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
+                          "&:hover": {
+                            background: "rgba(30, 41, 59, 0.3)",
+                          },
+                        }}
+                      >
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.oldSubscriptionNo || "-"}
+                          {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
                         </TableCell>
+                        {isEditMode && (
+                          <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                            {data.oldSubscriptionNo || "-"}
+                          </TableCell>
+                        )}
                         <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
                           <TextField
                             fullWidth
-                            value={data.subscriptionNo}
+                            value={data.subscriptionNo || ""}
                             onChange={(e) => {
                               const newData = { ...employeeData };
                               newData[employeeId] = {
@@ -1110,66 +1202,13 @@ export default function AddEmployeeDialog({
           </Box>
         );
 
-      case 2:
-        return (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
-              بيانات المشترك لكل موظف
-            </Typography>
-            
-            <TableContainer sx={{ maxHeight: 400 }}>
-              <Table>
-                <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
-                  <TableRow>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {selectedEmployees.map((employee: any, index: number) => {
-                    const employeeId = employee.employee_id || employee.user_id || employee.id;
-                    const data = employeeData[employeeId] || {};
-                    
-                    return (
-                      <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
-                        sx={{
-                          borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
-                          "&:hover": {
-                            background: "rgba(30, 41, 59, 0.3)",
-                          },
-                        }}
-                      >
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {insurances.find(i => i.id === data.policyId)?.name || data.policyId || "-"}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.value || "-"}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.subscriptionNo || "-"}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        );
-
       case 3:
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
               العائلون لكل موظف
             </Typography>
-            
+
             <TableContainer sx={{ maxHeight: 400 }}>
               <Table>
                 <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
@@ -1183,10 +1222,10 @@ export default function AddEmployeeDialog({
                 <TableBody>
                   {selectedEmployees.map((employee: any, index: number) => {
                     const employeeId = employee.employee_id || employee.user_id || employee.id;
-                    
+
                     return (
                       <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
+                        key={`${employeeId}-${index}`}
                         sx={{
                           borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
                           "&:hover": {
@@ -1225,61 +1264,98 @@ export default function AddEmployeeDialog({
       case 4:
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Typography sx={{ color: "white", fontSize: 18, fontWeight: 600 }}>
-              ملخص البيانات لكل موظف
-            </Typography>
-            
-            <TableContainer sx={{ maxHeight: 400 }}>
-              <Table>
-                <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
-                  <TableRow>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>عدد العائلون</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {selectedEmployees.map((employee: any, index: number) => {
-                    const employeeId = employee.employee_id || employee.user_id || employee.id;
-                    const data = employeeData[employeeId] || {};
-                    
-                    return (
-                      <TableRow
-                        key={`${employeeId}-${index}-${Math.random()}`}
-                        sx={{
-                          borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
-                          "&:hover": {
-                            background: "rgba(30, 41, 59, 0.3)",
-                          },
-                        }}
-                      >
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {insurances.find(i => i.id === data.policyId)?.name || data.policyId || "-"}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {categories.find(c => c.id === data.categoryId)?.name || data.categoryId || "-"}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.value || "-"}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {data.subscriptionNo || "-"}
-                        </TableCell>
-                        <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
-                          {dependents.length} عالون
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <Button
+              onClick={() => setShowSummaryTable(!showSummaryTable)}
+              sx={{
+                color: "white",
+                fontSize: 18,
+                fontWeight: 600,
+                textTransform: "none",
+                justifyContent: "flex-start",
+                px: 0,
+                "&:hover": {
+                  background: "transparent",
+                  textDecoration: "underline",
+                },
+              }}
+            >
+              {showSummaryTable ? "▼ ملخص البيانات لكل موظف" : "▶ ملخص البيانات لكل موظف"}
+            </Button>
+
+            {showSummaryTable && (
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table>
+                  <TableHead sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
+                    <TableRow>
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة</TableCell>
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الفئة</TableCell>
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك</TableCell>
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>عدد العائلون</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {selectedEmployees.map((employee: any, index: number) => {
+                      const employeeId = employee.employee_id || employee.user_id || employee.id;
+                      const data = employeeData[employeeId] || {};
+
+                      return (
+                        <>
+                          <TableRow
+                            key={`${employeeId}-${index}`}
+                            sx={{
+                              borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
+                              "&:hover": {
+                                background: "rgba(30, 41, 59, 0.3)",
+                              },
+                            }}
+                          >
+                            <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                              {employee.user?.name || employee.employee_name || employee.name || 'موظف'}
+                            </TableCell>
+                            <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                              {insurances.find(i => i.id === data.policyId)?.name || data.policyId || "-"}
+                            </TableCell>
+                            <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                              {categories.find(c => c.id === data.categoryId)?.name || data.categoryId || "-"}
+                            </TableCell>
+                            <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                              {data.value || "-"}
+                            </TableCell>
+                            <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                              {data.subscriptionNo || "-"}
+                            </TableCell>
+                            <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                              <Button
+                                onClick={() => {
+                                  setSelectedEmployeeForDependents(employee);
+                                  setDependentsDetailsDialogOpen(true);
+                                }}
+                                sx={{
+                                  color: "rgba(255, 255, 255, 0.9)",
+                                  fontSize: 14,
+                                  textTransform: "none",
+                                  px: 0,
+                                  justifyContent: "flex-start",
+                                  "&:hover": {
+                                    background: "transparent",
+                                    textDecoration: "underline",
+                                    color: "rgba(255, 255, 255, 1)",
+                                  },
+                                }}
+                              >
+                                {dependents.length} عالون
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        </>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
           </Box>
         );
 
@@ -1592,6 +1668,124 @@ export default function AddEmployeeDialog({
           </Box>
         </Box>
       </Dialog>
+
+      {/* Dependents Details Dialog */}
+      <Dialog
+        open={dependentsDetailsDialogOpen}
+        onClose={() => setDependentsDetailsDialogOpen(false)}
+        maxWidth="lg"
+        PaperProps={{
+          sx: {
+            width: { xs: "90vw", md: "80vw" },
+            maxHeight: "90vh",
+            borderRadius: 3,
+            p: 4,
+          },
+        }}
+        sx={{
+          "& .MuiBackdrop-root": {
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+          },
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Typography variant="h5" fontWeight="bold" fontSize={24}>
+              تفاصيل العائلون: {selectedEmployeeForDependents?.user?.name || selectedEmployeeForDependents?.employee_name || selectedEmployeeForDependents?.name || 'موظف'}
+            </Typography>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                onClick={() => setDependentsDialogOpen(true)}
+                variant="contained"
+                size="small"
+                sx={{ fontSize: 14 }}
+              >
+                إضافة
+              </Button>
+              <IconButton onClick={() => setDependentsDetailsDialogOpen(false)} sx={{ minWidth: "auto", p: 1 }}>
+                <ArrowLeft size={24} />
+              </IconButton>
+            </Box>
+          </Box>
+
+          {/* Table */}
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ background: "rgba(30, 41, 59, 0.5)" }}>
+                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم الإقامة</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>العلاقة</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>رقم المشترك</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>القيمة</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>إجراءات</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {dependents.map((dependent) => (
+                  <TableRow
+                    key={dependent.id}
+                    sx={{
+                      borderBottom: "1px solid rgba(139, 92, 246, 0.3)",
+                      "&:hover": {
+                        background: "rgba(30, 41, 59, 0.3)",
+                      },
+                    }}
+                  >
+                    <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>{dependent.name}</TableCell>
+                    <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>{dependent.residenceNumber}</TableCell>
+                    <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>{dependent.relationship}</TableCell>
+                    <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>{dependent.subscriberNumber}</TableCell>
+                    <TableCell sx={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>{dependent.value}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleMenuOpen(e, dependent)}
+                        sx={{ minWidth: "auto", p: 0.5 }}
+                      >
+                        <MoreVertical size={16} />
+                      </IconButton>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'right',
+                        }}
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
+                      >
+                        <MuiMenuItem onClick={handleMenuEdit}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Pencil size={14} />
+                            تعديل
+                          </Box>
+                        </MuiMenuItem>
+                        <MuiMenuItem onClick={handleMenuDelete} sx={{ color: "red" }}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <X size={14} />
+                            حذف
+                          </Box>
+                        </MuiMenuItem>
+                      </Menu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {dependents.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} sx={{ textAlign: "center", py: 4 }}>
+                      <Typography color="rgba(148, 163, 184, 0.7)">لا يوجد عائلون مضافين</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Dialog>
     </>
   );
-}
+};
