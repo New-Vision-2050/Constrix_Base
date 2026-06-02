@@ -73,11 +73,12 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
       
       {/* Insurance items */}
       <div
-        className="flex-1 overflow-y-auto custom-scrollbar"
+        className="flex-1 overflow-y-scroll custom-scrollbar"
         style={{
           scrollbarWidth: 'thin',
-          scrollbarColor: isDarkMode ? '#4B5563 transparent' : '#9CA3AF transparent',
-          maxHeight: 'calc(100vh - 280px)',
+          scrollbarColor: isDarkMode ? '#6B7280 #2A1F4E' : '#9CA3AF #E5E7EB',
+          height: 'calc(100vh - 280px)',
+          minHeight: '200px',
         }}
       >
         {insurances.length === 0 ? (
