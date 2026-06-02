@@ -94,6 +94,19 @@ export default function AddNewPolicyDialog({
       return;
     }
 
+    // Validate end date is at least one day after start date
+    if (formData.start_date && formData.end_date) {
+      const startDate = new Date(formData.start_date);
+      const endDate = new Date(formData.end_date);
+      const minEndDate = new Date(startDate);
+      minEndDate.setDate(minEndDate.getDate() + 1);
+
+      if (endDate < minEndDate) {
+        toast.error("تاريخ النهاية يجب أن يكون بعد تاريخ البداية بيوم واحد على الأقل");
+        return;
+      }
+    }
+
     try {
       const submitData = {
         ...formData,
@@ -224,6 +237,13 @@ export default function AddNewPolicyDialog({
           value={formData.end_date}
           onChange={(e) => handleInputChange("end_date", e.target.value)}
           InputLabelProps={{ shrink: true }}
+          inputProps={{
+            min: formData.start_date ? (() => {
+              const startDate = new Date(formData.start_date);
+              startDate.setDate(startDate.getDate() + 1);
+              return startDate.toISOString().split('T')[0];
+            })() : undefined
+          }}
           required
         />
 
