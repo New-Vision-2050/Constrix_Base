@@ -115,6 +115,17 @@ export default function AddEmployeeDialog({
     oldCategoryId: string;
   }>>({});
 
+  // State to hold individual data for each employee (policy, value, subscription_no, category)
+  const [employeeData, setEmployeeData] = useState<Record<string, {
+    policyId: string;
+    value: string;
+    subscriptionNo: string;
+    categoryId: string;
+    oldPolicyId: string;
+    oldValue: string;
+    oldSubscriptionNo: string;
+  }>>({});
+
   // Fetch employees from API
   useEffect(() => {
     const fetchEmployees = async () => {
