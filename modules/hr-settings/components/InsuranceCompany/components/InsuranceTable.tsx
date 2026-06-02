@@ -181,6 +181,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
     <Box
       key={insurance.id || insurance.policy_number || `insurance-${Math.random()}`}
       component="fieldset"
+      className="insurance-card"
       sx={{
         border: "1px solid rgba(255, 255, 255, 0.4)",
         borderRadius: "24px",
@@ -188,9 +189,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
         pb: 3,
         pt: 2,
         position: "relative",
-        minWidth: 500,
-        flex: "1 1 auto",
-        maxWidth: "calc(50% - 8px)",
+        flex: "0 0 auto",
       }}
     >
       <Box
@@ -287,7 +286,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
   );
 
   return (
-    <Box sx={{ flex: 1, pl: 2, overflow: "auto" }}>
+    <Box sx={{ pl: 2, overflow: "auto" }}>
       {selectedInsurance ? (
         <>
           {/* Tab Content */}
@@ -1099,7 +1098,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
         </>
       ) : (
         <>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "flex-start" }}>
             {displayInsurances.map(renderInsuranceCard)}
           </Box>
         </>

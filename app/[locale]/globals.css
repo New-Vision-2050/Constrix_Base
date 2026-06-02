@@ -470,3 +470,28 @@ html {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #9CA3AF;
 }
+
+/* Insurance card responsive layout */
+.insurance-card {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 1666px) {
+  .insurance-card {
+    width: calc(50% - 8px);
+    max-width: calc(50% - 8px);
+  }
+}
+
+.insurance-main-layout {
+  flex-direction: row !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 860px) {
+  .insurance-main-layout {
+    flex-direction: column !important;
+    overflow: auto !important;
+  }
+}

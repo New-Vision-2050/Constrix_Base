@@ -50,7 +50,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
   };
 
   return (
-    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-fit min-w-[300px] h-full flex flex-col ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`} style={{ maxHeight: 'calc(100vh - 200px)' }}>
+    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-[300px] flex flex-col flex-shrink-0 ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`} style={{ maxHeight: 'calc(100vh - 200px)' }}>
       {/* Header row for "All Insurances" */}
       <div
         className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} cursor-pointer ${itemHoverBg} transition-colors`}
