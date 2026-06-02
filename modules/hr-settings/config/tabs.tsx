@@ -20,11 +20,7 @@ const ServiceTabs: React.FC = () => {
       icon: <Building />,
       content: <InsuranceCompanyComponent />,
     },
-    {
-      id: "proceduresSettings",
-      title: t("proceduresSettings"),
-      content: <ProceduresSettings />,
-    },
+
   ];
 
   return <HorizontalTabs list={serviceTabs} />;

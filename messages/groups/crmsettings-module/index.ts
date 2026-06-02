@@ -9,7 +9,7 @@ export const crmsettingsModuleMessages = new MessagesGroup({
     clientsPermissions: _m("Clients Permissions", "صلاحيات العملاء"),
     terms: _m("Terms", "البنود"),
     servicesSettings: _m("Services Settings", "إعدادات الخدمات"),
-    proceduresSettings: _m("Procedures Settings", "اعدادات الإجراءات"),
+
   }),
   ClientsSettings: new MessagesGroup({
     shareClientsData: _m(

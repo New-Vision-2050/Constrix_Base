@@ -439,3 +439,59 @@ html {
   color: hsl(var(--sidebar-primary-foreground));
   opacity: 0.9;
 }
+
+/* Custom scrollbar - always visible */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #E5E7EB;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #9CA3AF;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #2A1F4E;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #6B7280;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Insurance card responsive layout */
+.insurance-card {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 1666px) {
+  .insurance-card {
+    width: calc(50% - 8px);
+    max-width: calc(50% - 8px);
+  }
+}
+
+.insurance-main-layout {
+  flex-direction: row !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 860px) {
+  .insurance-main-layout {
+    flex-direction: column !important;
+    overflow: auto !important;
+  }
+}
