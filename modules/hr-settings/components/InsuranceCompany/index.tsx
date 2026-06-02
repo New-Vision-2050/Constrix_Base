@@ -44,22 +44,6 @@ function InsuranceContent() {
     fetchInsurances();
   }, []);
 
-  // Update pagination data when insurances change
-  useEffect(() => {
-    const total = insurances.length;
-    const totalPages = Math.ceil(total / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    setPaginationData({
-      currentPage,
-      totalPages,
-      startIndex,
-      endIndex,
-      total,
-    });
-  }, [insurances, currentPage, itemsPerPage]);
-
   // Fetch categories and employees when selectedInsurance changes
   useEffect(() => {
     if (selectedInsurance?.id) {
@@ -81,7 +65,7 @@ function InsuranceContent() {
   const fetchInsurances = async () => {
     try {
       const response = await MedicalInsuranceApi.list({
-        per_page: 10, // Fetch more items
+        per_page: 100, // Fetch more items
       });
       setInsurances(response.data.payload || []);
     } catch (error) {
@@ -94,7 +78,7 @@ function InsuranceContent() {
     try {
       const response = await MedicalInsuranceApi.categories.list(selectedInsurance.id, {
         page: 1,
-        per_page: 10,
+        per_page: 100,
       });
       setCategories(response.data.payload || []);
     } catch (error: any) {
@@ -113,42 +97,21 @@ function InsuranceContent() {
     }
     
     try {
-      console.log("🔍 Fetching employees for insurance ID:", selectedInsurance.id);
-      
-      // Fetch with medical_insurance_id filter
       const response = await MedicalInsuranceApi.subscriptions.list({
         page: 1,
-        per_page: 10,
-        medical_insurance_id: selectedInsurance.id,
-      } as any);
+        per_page: 100,
+      });
       
-      console.log("📋 Total subscriptions fetched:", response.data.payload.length);
-      
-      // Filter subscriptions for the selected insurance (backup if API doesn't filter)
-      const filteredSubscriptions = response.data.payload.filter(
-        (item: any) => {
-          const policyId = item.policy_id || item.medical_insurance_id;
-          return policyId === selectedInsurance.id;
+      // Filter subscriptions for the selected insurance
+      const filteredEmployees = response.data.payload.filter(
+        (sub: any) => {
+          // Try both policy_id and medical_insurance_id (backend may use either)
+          const matches = sub.policy_id === selectedInsurance.id || sub.medical_insurance_id === selectedInsurance.id;
+          return matches;
         }
       );
       
-      console.log("📊 Filtered subscriptions:", filteredSubscriptions.length);
-      
-      // Remove duplicates by user_id - keep only one subscription per employee
-      const uniqueEmployees = Array.from(
-        new Map(
-          filteredSubscriptions.map((item: any) => [item.user_id, item])
-        ).values()
-      );
-      
-      console.log("✅ Unique employees:", uniqueEmployees.length);
-      console.log("✅ Employees:", uniqueEmployees.map((e: any) => ({
-        id: e.id,
-        user_id: e.user_id,
-        user_name: e.user?.name
-      })));
-      
-      setEmployees(uniqueEmployees);
+      setEmployees(filteredEmployees || []);
     } catch (error: any) {
       console.error("❌ Error fetching employees:", error);
       // If 404, it means no subscriptions exist yet - that's okay
