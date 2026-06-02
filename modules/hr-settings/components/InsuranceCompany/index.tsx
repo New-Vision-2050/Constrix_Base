@@ -318,14 +318,14 @@ function InsuranceContent() {
 
       {/* Main content with side-by-side layout */}
       <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-        <Box className="insurance-main-layout" sx={{ display: "flex", px: 2, gap: 2, flexDirection: 'column', overflow: 'auto' }}>
+        <Box className="insurance-main-layout" sx={{ display: "flex", px: 2, gap: 2, flexDirection: 'column', overflow: 'auto', height: "100%" }}>
           <AllInsurancesTable 
             onInsuranceSelect={handleInsuranceSelect} 
             onTabChange={handleTabChange}
             selectedInsurance={selectedInsurance} 
             currentTab={activeTab}
           />
-          <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1, height: "100%" }}>
             {/* Tabs */}
             {selectedInsurance && (
               <Box sx={{ borderBottom: 1, borderColor: 'divider', borderBottomStyle: 'solid' }}>

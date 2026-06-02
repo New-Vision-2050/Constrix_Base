@@ -286,7 +286,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
   );
 
   return (
-    <Box sx={{ pl: 2, overflow: "auto" }}>
+    <Box sx={{ pl: 2, overflow: "auto", height: "100%", display: "flex", flexDirection: "column" }}>
       {selectedInsurance ? (
         <>
           {/* Tab Content */}
