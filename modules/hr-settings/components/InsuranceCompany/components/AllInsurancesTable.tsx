@@ -50,7 +50,7 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
   };
 
   return (
-    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-fit min-w-[300px] h-full flex flex-col ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`} style={{ maxHeight: 'calc(100vh - 200px)' }}>
+    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-[300px] flex flex-col flex-shrink-0 ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`} style={{ maxHeight: 'calc(100vh - 200px)' }}>
       {/* Header row for "All Insurances" */}
       <div
         className={`flex flex-row-reverse items-center justify-between py-4 border-b ${borderColor} cursor-pointer ${itemHoverBg} transition-colors`}
@@ -73,11 +73,12 @@ export default function AllInsurancesTable({ onInsuranceSelect, onTabChange, sel
       
       {/* Insurance items */}
       <div
-        className="flex-1 overflow-y-auto custom-scrollbar"
+        className="flex-1 overflow-y-scroll custom-scrollbar"
         style={{
           scrollbarWidth: 'thin',
-          scrollbarColor: isDarkMode ? '#4B5563 transparent' : '#9CA3AF transparent',
-          maxHeight: 'calc(100vh - 280px)',
+          scrollbarColor: isDarkMode ? '#6B7280 #2A1F4E' : '#9CA3AF #E5E7EB',
+          height: 'calc(100vh - 280px)',
+          minHeight: '200px',
         }}
       >
         {insurances.length === 0 ? (

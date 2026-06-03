@@ -9,7 +9,6 @@ import { X, UploadCloud, FileText, Plus, Edit } from "lucide-react";
 import EditIcon from '@mui/icons-material/Edit';
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import { MedicalInsuranceRow } from "../types";
-import Pagination from "@/components/shared/Pagination/Pagination";
 
 interface InsuranceTableProps {
   selectedInsurance?: MedicalInsuranceRow | null;
@@ -65,21 +64,6 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
   const [selectedEmployeeForAction, setSelectedEmployeeForAction] = useState<any>(null);
 
   const displayInsurances = selectedInsurance ? [selectedInsurance] : insurances;
-
-  // Pagination state for insurance cards
-  const [insurancePage, setInsurancePage] = useState(1);
-  const [insuranceItemsPerPage, setInsuranceItemsPerPage] = useState(10);
-
-  // Calculate pagination for insurance cards
-  const totalInsurancePages = Math.ceil(displayInsurances.length / insuranceItemsPerPage);
-  const insuranceStartIndex = (insurancePage - 1) * insuranceItemsPerPage;
-  const insuranceEndIndex = insuranceStartIndex + insuranceItemsPerPage;
-  const paginatedInsurances = displayInsurances.slice(insuranceStartIndex, insuranceEndIndex);
-
-  // Reset insurance page when insurances change or when selecting/deselecting insurance
-  useEffect(() => {
-    setInsurancePage(1);
-  }, [insurances.length, selectedInsurance]);
 
   const handleOpenDetailsDialog = (insurance: MedicalInsuranceRow) => {
     if (onInsuranceSelect) {
@@ -197,6 +181,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
     <Box
       key={insurance.id || insurance.policy_number || `insurance-${Math.random()}`}
       component="fieldset"
+      className="insurance-card"
       sx={{
         border: "1px solid rgba(255, 255, 255, 0.4)",
         borderRadius: "24px",
@@ -204,9 +189,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
         pb: 3,
         pt: 2,
         position: "relative",
-        minWidth: 500,
-        flex: "1 1 auto",
-        maxWidth: "calc(50% - 8px)",
+        flex: "0 0 auto",
       }}
     >
       <Box
@@ -303,7 +286,7 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
   );
 
   return (
-    <Box sx={{ flex: 1, pl: 2, overflow: "auto" }}>
+    <Box sx={{ pl: 2, overflow: "auto", height: "100%", display: "flex", flexDirection: "column" }}>
       {selectedInsurance ? (
         <>
           {/* Tab Content */}
@@ -1115,32 +1098,9 @@ export default function InsuranceTable({ selectedInsurance, activeTab = 0, onIns
         </>
       ) : (
         <>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            {paginatedInsurances.map(renderInsuranceCard)}
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "flex-start" }}>
+            {displayInsurances.map(renderInsuranceCard)}
           </Box>
-
-          {/* Pagination for insurance cards */}
-          {totalInsurancePages > 1 && (
-            <Box sx={{ 
-              py: 2, 
-              borderTop: "1px solid", 
-              borderColor: isDarkMode ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.1)",
-              display: "flex",
-              justifyContent: "center"
-            }}>
-              <Pagination
-                currentPage={insurancePage}
-                totalPages={totalInsurancePages}
-                onPageChange={setInsurancePage}
-                currentLimit={insuranceItemsPerPage}
-                limitOptions={[5, 10, 25, 50]}
-                onLimitChange={(newLimit) => {
-                  setInsuranceItemsPerPage(newLimit);
-                  setInsurancePage(1);
-                }}
-              />
-            </Box>
-          )}
         </>
       )}
 

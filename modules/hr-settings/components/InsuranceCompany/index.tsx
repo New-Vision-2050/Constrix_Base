@@ -39,26 +39,10 @@ function InsuranceContent() {
 
   const {insurances, setInsurances} = useInsurance();
 
-  // Fetch insurances on component mount
+  // Fetch insurances on component mount and when pagination changes
   useEffect(() => {
     fetchInsurances();
-  }, []);
-
-  // Update pagination data when insurances change
-  useEffect(() => {
-    const total = insurances.length;
-    const totalPages = Math.ceil(total / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    setPaginationData({
-      currentPage,
-      totalPages,
-      startIndex,
-      endIndex,
-      total,
-    });
-  }, [insurances, currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage]);
 
   // Fetch categories and employees when selectedInsurance changes
   useEffect(() => {
@@ -81,9 +65,20 @@ function InsuranceContent() {
   const fetchInsurances = async () => {
     try {
       const response = await MedicalInsuranceApi.list({
-        per_page: 10, // Fetch more items
+        page: currentPage,
+        per_page: itemsPerPage,
       });
       setInsurances(response.data.payload || []);
+      const pagination = response.data.pagination;
+      const total = pagination?.result_count ?? response.data.payload?.length ?? 0;
+      const totalPages = pagination?.last_page ?? 1;
+      setPaginationData({
+        currentPage,
+        totalPages,
+        startIndex: (currentPage - 1) * itemsPerPage,
+        endIndex: (currentPage - 1) * itemsPerPage + (response.data.payload?.length || 0),
+        total,
+      });
     } catch (error) {
       console.error("Error fetching insurances:", error);
     }
@@ -323,14 +318,14 @@ function InsuranceContent() {
 
       {/* Main content with side-by-side layout */}
       <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-        <Box sx={{ display: "flex", flex: 1, overflow: "hidden", px: 2, gap: 2 }}>
+        <Box className="insurance-main-layout" sx={{ display: "flex", px: 2, gap: 2, flexDirection: 'column', overflow: 'auto', height: "100%" }}>
           <AllInsurancesTable 
             onInsuranceSelect={handleInsuranceSelect} 
             onTabChange={handleTabChange}
             selectedInsurance={selectedInsurance} 
             currentTab={activeTab}
           />
-          <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1, height: "100%" }}>
             {/* Tabs */}
             {selectedInsurance && (
               <Box sx={{ borderBottom: 1, borderColor: 'divider', borderBottomStyle: 'solid' }}>
@@ -347,9 +342,9 @@ function InsuranceContent() {
 
         {/* Pagination at bottom - only show on main page (no insurance selected) */}
         {!selectedInsurance && paginationData.total > 0 && (
-          <Box sx={{ 
-            py: 2, 
-            borderTop: "1px solid", 
+          <Box sx={{
+            py: 2,
+            borderTop: "1px solid",
             borderColor: "divider",
             display: "flex",
             justifyContent: "center"
