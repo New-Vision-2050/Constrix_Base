@@ -14,12 +14,19 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useTranslations } from "next-intl";
-import type { ReportDisplayModeId, ReportWizardStep3 } from "../types";
+import { useLocale, useTranslations } from "next-intl";
+import {
+  attendanceDataTypeLabel,
+  resolveWizardLocale,
+} from "../attendance-data-type-labels";
+import type {
+  AttendanceDataTypeId,
+  ReportDisplayModeId,
+  ReportWizardStep3,
+} from "../types";
 import {
   ATTENDANCE_DATA_TYPE_OPTIONS,
   DISPLAY_MODE_VALUES,
-  STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS,
 } from "../constants-step3";
 
 type Props = {
@@ -28,22 +35,18 @@ type Props = {
 };
 
 export default function WizardStep3({ value, onChange }: Props) {
+  const locale = resolveWizardLocale(useLocale());
   const tWizard = useTranslations("HRReports.attendanceReport.wizard");
   const t = useTranslations("HRReports.attendanceReport.wizard.attendanceData");
-  const tTypes = useTranslations(
-    "HRReports.attendanceReport.wizard.attendanceData.dataTypes",
-  );
 
-  React.useEffect(() => {
-    const ids = value.attendanceDataTypeIds;
-    const fixed = STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS;
-    const complete =
-      ids.length === fixed.length &&
-      fixed.every((id) => ids.includes(id));
-    if (!complete) {
-      onChange({ attendanceDataTypeIds: [...fixed] });
-    }
-  }, [value.attendanceDataTypeIds, onChange]);
+  const selected = new Set(value.attendanceDataTypeIds);
+
+  const toggleDataType = (id: AttendanceDataTypeId) => {
+    const next = selected.has(id)
+      ? value.attendanceDataTypeIds.filter((x) => x !== id)
+      : [...value.attendanceDataTypeIds, id];
+    onChange({ attendanceDataTypeIds: next });
+  };
 
   const colA = ATTENDANCE_DATA_TYPE_OPTIONS.filter((o) => o.column === "a");
   const colB = ATTENDANCE_DATA_TYPE_OPTIONS.filter((o) => o.column === "b");
@@ -52,6 +55,39 @@ export default function WizardStep3({ value, onChange }: Props) {
     mode === "employee_per_page"
       ? t("displayModeEmployeePerPage")
       : t("displayModeByDay");
+
+  const renderColumn = (options: typeof ATTENDANCE_DATA_TYPE_OPTIONS) => (
+    <Stack spacing={1}>
+      {options.map(({ id }) => (
+        <Paper
+          key={id}
+          variant="outlined"
+          sx={{
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 2,
+            bgcolor: selected.has(id) ? "background.paper" : "action.hover",
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={selected.has(id)}
+                onChange={() => toggleDataType(id)}
+                color="primary"
+                size="small"
+              />
+            }
+            label={
+              <Typography variant="body2" fontWeight={500}>
+                {attendanceDataTypeLabel(id, locale)}
+              </Typography>
+            }
+          />
+        </Paper>
+      ))}
+    </Stack>
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -66,70 +102,8 @@ export default function WizardStep3({ value, onChange }: Props) {
           })}
         </Typography>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Stack spacing={1}>
-              {colA.map(({ id }) => (
-                <Paper
-                  key={id}
-                  variant="outlined"
-                  sx={{
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: 2,
-                    bgcolor: "action.hover",
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked
-                        disabled
-                        color="primary"
-                        size="small"
-                      />
-                    }
-                    label={
-                      <Typography variant="body2" fontWeight={500}>
-                        {tTypes(id)}
-                      </Typography>
-                    }
-                  />
-                </Paper>
-              ))}
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Stack spacing={1}>
-              {colB.map(({ id }) => (
-                <Paper
-                  key={id}
-                  variant="outlined"
-                  sx={{
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: 2,
-                    bgcolor: "action.hover",
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked
-                        disabled
-                        color="primary"
-                        size="small"
-                      />
-                    }
-                    label={
-                      <Typography variant="body2" fontWeight={500}>
-                        {tTypes(id)}
-                      </Typography>
-                    }
-                  />
-                </Paper>
-              ))}
-            </Stack>
-          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>{renderColumn(colA)}</Grid>
+          <Grid size={{ xs: 12, md: 6 }}>{renderColumn(colB)}</Grid>
         </Grid>
       </Paper>
 

@@ -14,6 +14,10 @@ import {
 } from "../components/report-wizard/constants-step2";
 import { REPORT_TYPE_OPTIONS } from "../components/report-wizard/constants-step1";
 import { derivedDateRangeFromLegacyStep1 } from "../components/report-wizard/step1-date-range";
+import {
+  extractDateRangeFromReportName,
+  extractDateRangeFromTexts,
+} from "./period-display";
 import { normalizeStep3EnumFields } from "./step3-enums";
 
 function mergeStep<T extends object>(base: T, patch: unknown): T {
@@ -21,11 +25,100 @@ function mergeStep<T extends object>(base: T, patch: unknown): T {
   return { ...base, ...(patch as Partial<T>) };
 }
 
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return v != null && typeof v === "object" && !Array.isArray(v);
+}
+
+/** Map API snake_case step1 fields onto wizard camelCase before merge. */
+function coerceStep1Patch(patch: unknown): Record<string, unknown> | undefined {
+  if (!isRecord(patch)) return undefined;
+  const p = patch;
+  return {
+    ...p,
+    reportTypeIds: p.reportTypeIds ?? p.report_type_ids,
+    periodType: p.periodType ?? p.period_type,
+    dateFrom: p.dateFrom ?? p.date_from,
+    dateTo: p.dateTo ?? p.date_to,
+    exportFormat: p.exportFormat ?? p.export_format,
+    reportLanguage: p.reportLanguage ?? p.report_language,
+    paperSize: p.paperSize ?? p.paper_size,
+    printOrientation: p.printOrientation ?? p.print_orientation,
+  };
+}
+
+function resolveStep1Patch(config: Record<string, unknown>): unknown {
+  if (config.step1 != null) return config.step1;
+  if (
+    config.period_type != null ||
+    config.periodType != null ||
+    config.date_from != null ||
+    config.dateFrom != null
+  ) {
+    return config;
+  }
+  return undefined;
+}
+
+function parseNameField(raw: unknown): { ar?: string; en?: string } | undefined {
+  if (raw == null) return undefined;
+  if (typeof raw === "string") {
+    const t = raw.trim();
+    if (t === "") return undefined;
+    if (t.startsWith("{")) {
+      try {
+        return parseNameField(JSON.parse(t) as unknown);
+      } catch {
+        return { ar: t, en: t };
+      }
+    }
+    return { ar: t, en: t };
+  }
+  if (!isRecord(raw)) return undefined;
+  const ar = typeof raw.ar === "string" ? raw.ar : undefined;
+  const en = typeof raw.en === "string" ? raw.en : undefined;
+  if (ar == null && en == null) return undefined;
+  return { ar, en };
+}
+
+function applyApiNamePeriodToPayload(
+  payload: ReportWizardPayload,
+  apiName?: { ar?: string; en?: string },
+): ReportWizardPayload {
+  if (payload.step1.periodType !== "range") return payload;
+
+  const fromName = extractDateRangeFromReportName(apiName);
+  if (!fromName) return payload;
+
+  const { step1 } = payload;
+  if (
+    step1.dateFrom === fromName.dateFrom &&
+    step1.dateTo === fromName.dateTo
+  ) {
+    return payload;
+  }
+
+  const y = Number.parseInt(fromName.dateFrom.slice(0, 4), 10);
+  const mo = Number.parseInt(fromName.dateFrom.slice(5, 7), 10);
+  return {
+    ...payload,
+    step1: {
+      ...step1,
+      periodType: "range",
+      dateFrom: fromName.dateFrom,
+      dateTo: fromName.dateTo,
+      year: y,
+      month: mo,
+      week: null,
+      quarter: null,
+    },
+  };
+}
+
 function normalizeStep1Inbound(
   base: ReportWizardStep1,
   patch: unknown,
 ): ReportWizardStep1 {
-  const merged = mergeStep(base, patch);
+  const merged = mergeStep(base, coerceStep1Patch(patch));
   const LEGACY_REPORT_TYPE_ID: Record<string, ReportTypeId> = {
     leave: "leaves",
     payroll: "salaries",
@@ -39,20 +132,24 @@ function normalizeStep1Inbound(
     .map((id) => LEGACY_REPORT_TYPE_ID[id] ?? id)
     .filter((id): id is ReportTypeId => ALLOWED.has(id as ReportTypeId));
 
-  const ranged = derivedDateRangeFromLegacyStep1(merged);
+  const periodType = merged.periodType ?? "range";
+  const ranged = derivedDateRangeFromLegacyStep1({
+    ...merged,
+    periodType,
+  });
   const y = Number.parseInt(ranged.dateFrom.slice(0, 4), 10);
   const mo = Number.parseInt(ranged.dateFrom.slice(5, 7), 10);
 
   return {
     ...merged,
     reportTypeIds,
-    periodType: "range",
+    periodType,
     dateFrom: ranged.dateFrom,
     dateTo: ranged.dateTo,
-    year: y,
-    month: mo,
-    week: null,
-    quarter: null,
+    year: periodType === "range" ? y : merged.year,
+    month: periodType === "range" ? mo : merged.month,
+    week: merged.week ?? null,
+    quarter: merged.quarter ?? null,
   };
 }
 
@@ -169,15 +266,21 @@ function normalizeStep2Inbound(
 }
 
 /** Merge API `config` into wizard defaults so the summary helpers stay usable. */
-export function configToPayload(config: unknown): ReportWizardPayload {
+export function configToPayload(
+  config: unknown,
+  apiName?: { ar?: string; en?: string },
+): ReportWizardPayload {
   const base = createInitialReportWizardPayload();
-  if (!config || typeof config !== "object") return base;
+  if (!config || typeof config !== "object") {
+    return applyApiNamePeriodToPayload(base, apiName);
+  }
   const c = config as Record<string, unknown>;
-  return {
-    step1: normalizeStep1Inbound(base.step1, c.step1),
+  const payload: ReportWizardPayload = {
+    step1: normalizeStep1Inbound(base.step1, resolveStep1Patch(c)),
     step2: normalizeStep2Inbound(base.step2, c.step2),
     step3: normalizeStep3Inbound(base.step3, c.step3),
   };
+  return applyApiNamePeriodToPayload(payload, apiName);
 }
 
 function parseConfigValue(raw: unknown): unknown {
@@ -198,35 +301,48 @@ function extractApiName(row: Record<string, unknown>): {
   ar?: string;
   en?: string;
 } | undefined {
-  const bilingualFrom = (raw: unknown): { ar?: string; en?: string } | undefined => {
-    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
-    const n = raw as Record<string, unknown>;
-    const ar = typeof n.ar === "string" ? n.ar : undefined;
-    const en = typeof n.en === "string" ? n.en : undefined;
-    if (ar == null && en == null) return undefined;
-    return { ar, en };
-  };
-
   const merged =
-    bilingualFrom(row.name) ??
-    bilingualFrom(row.title) ??
-    bilingualFrom(row.template_name);
+    parseNameField(row.name) ??
+    parseNameField(row.title) ??
+    parseNameField(row.template_name) ??
+    parseNameField(row.report_name);
   if (merged) return merged;
 
-  const plain =
-    (typeof row.name === "string" && row.name.trim() !== ""
-      ? row.name.trim()
-      : null) ??
-    (typeof row.title === "string" && row.title.trim() !== ""
-      ? row.title.trim()
-      : null) ??
-    (typeof row.template_name === "string" && row.template_name.trim() !== ""
-      ? row.template_name.trim()
-      : null);
-
-  if (plain) return { ar: plain, en: plain };
+  const ar =
+    typeof row.name_ar === "string"
+      ? row.name_ar
+      : typeof row.title_ar === "string"
+        ? row.title_ar
+        : undefined;
+  const en =
+    typeof row.name_en === "string"
+      ? row.name_en
+      : typeof row.title_en === "string"
+        ? row.title_en
+        : undefined;
+  if (ar != null || en != null) return { ar, en };
 
   return undefined;
+}
+
+function extractRowPeriodHint(
+  row: Record<string, unknown>,
+): { dateFrom: string; dateTo: string } | undefined {
+  const from =
+    row.date_from ??
+    row.dateFrom ??
+    row.period_from ??
+    row.period_start ??
+    row.start_date;
+  const to =
+    row.date_to ??
+    row.dateTo ??
+    row.period_to ??
+    row.period_end ??
+    row.end_date;
+  if (typeof from !== "string" || typeof to !== "string") return undefined;
+  const range = extractDateRangeFromTexts(from, to);
+  return range ?? undefined;
 }
 
 export function normalizeReportListItem(
@@ -257,11 +373,26 @@ export function normalizeReportListItem(
     createdAt = new Date().toISOString();
   }
 
+  const apiName = extractApiName(r);
+  const rowPeriod = extractRowPeriodHint(r);
   const configRaw = parseConfigValue(
     r.config ?? r.settings ?? r.report_config ?? r.configuration,
   );
-  const payload = configToPayload(configRaw);
-  const apiName = extractApiName(r);
+  let payload = configToPayload(configRaw, apiName);
+  if (rowPeriod && payload.step1.periodType === "range") {
+    const y = Number.parseInt(rowPeriod.dateFrom.slice(0, 4), 10);
+    const mo = Number.parseInt(rowPeriod.dateFrom.slice(5, 7), 10);
+    payload = {
+      ...payload,
+      step1: {
+        ...payload.step1,
+        dateFrom: rowPeriod.dateFrom,
+        dateTo: rowPeriod.dateTo,
+        year: y,
+        month: mo,
+      },
+    };
+  }
 
   return { id, createdAt, payload, apiName };
 }

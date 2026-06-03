@@ -66,11 +66,10 @@ export default function WizardStep2({ value, onChange }: Props) {
     branchSelected ? value.branchId : undefined,
   );
   const jobTitlesQuery = useAttendanceWizardJobTitles();
-  const employeesQuery = useAttendanceWizardEmployees(
-    value.employeeScope === "select_employees" && branchSelected
-      ? value.branchId
-      : undefined,
-  );
+  const employeesQuery = useAttendanceWizardEmployees({
+    enabled: value.employeeScope === "select_employees",
+    branchId: value.branchId,
+  });
 
   const toggleContract = (id: EmployeeContractTypeId) => {
     const next = value.contractTypeIds.includes(id)
@@ -114,13 +113,20 @@ export default function WizardStep2({ value, onChange }: Props) {
                 onChange={(e) => {
                   const id = String(e.target.value);
                   const row = branchOptions.find((b) => b.id === id);
-                  onChange({
+                  const patch: Partial<ReportWizardStep2> = {
                     branchId: id,
                     branchName: row?.name,
                     managementId: STEP2_FILTER_UNSET,
                     managementName: undefined,
-                    employeeUserIds: [],
-                  });
+                  };
+                  if (
+                    branchSelected &&
+                    id !== STEP2_FILTER_UNSET &&
+                    id !== value.branchId
+                  ) {
+                    patch.employeeUserIds = [];
+                  }
+                  onChange(patch);
                 }}
               >
                 <MenuItem value={STEP2_FILTER_UNSET}>
@@ -236,17 +242,11 @@ export default function WizardStep2({ value, onChange }: Props) {
 
         {value.employeeScope === "select_employees" ? (
           <Box sx={{ mt: 2 }}>
-            {!branchSelected ? (
-              <Typography variant="caption" color="text.secondary">
-                {t("employeePickerHintBranch")}
-              </Typography>
-            ) : null}
             <Autocomplete
               multiple
               disableCloseOnSelect
               options={employeesQuery.data ?? []}
               loading={employeesQuery.isFetching}
-              disabled={!branchSelected}
               value={selectedEmployees}
               isOptionEqualToValue={(opt, val) => opt.id === val.id}
               getOptionLabel={(o) => o.name}
@@ -287,10 +287,8 @@ export default function WizardStep2({ value, onChange }: Props) {
                   }}
                 />
               )}
-              sx={{ mt: branchSelected ? 1 : 0 }}
             />
-            {branchSelected &&
-            !employeesQuery.isFetching &&
+            {!employeesQuery.isFetching &&
             (employeesQuery.data ?? []).length === 0 ? (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
                 {t("employeePickerEmpty")}

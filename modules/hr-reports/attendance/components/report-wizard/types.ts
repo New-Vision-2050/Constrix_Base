@@ -38,16 +38,20 @@ export type ReportWizardStep2 = {
   jobTitleName?: string;
 };
 
-/** Attendance metric row ids (step 3, section 1). */
+/** Attendance column ids (step 3, section 1) — sent as `config.step3.attendanceDataTypeIds`. */
 export type AttendanceDataTypeId =
-  | "attendance_days"
-  | "delays"
-  | "taken_leaves"
-  | "unpaid_leave"
-  | "absence_days"
+  | "day"
+  | "branch"
+  | "management"
+  | "official_in"
+  | "official_out"
+  | "actual_in"
+  | "actual_out"
+  | "task_in"
+  | "task_out"
+  | "delay"
   | "overtime"
-  | "sick_leaves"
-  | "early_departure";
+  | "total_hours";
 
 /** Report layout — step 3 section 2 (was pattern filters UI). */
 export type ReportDisplayModeId = "employee_per_page" | "by_day";

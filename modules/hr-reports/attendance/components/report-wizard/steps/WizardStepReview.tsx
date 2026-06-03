@@ -11,7 +11,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import {
+  attendanceDataTypeLabel,
+  resolveWizardLocale,
+} from "../attendance-data-type-labels";
 import type { ReportWizardPayload } from "../types";
 import { buildWizardPayloadSummary } from "../payload-summary";
 
@@ -44,9 +48,7 @@ export default function WizardStepReview({
   const tBranch = useTranslations(
     "HRReports.attendanceReport.wizard.employeesData.branches",
   );
-  const tAttTypes = useTranslations(
-    "HRReports.attendanceReport.wizard.attendanceData.dataTypes",
-  );
+  const locale = resolveWizardLocale(useLocale());
   const tAttendanceData = useTranslations(
     "HRReports.attendanceReport.wizard.attendanceData",
   );
@@ -120,7 +122,7 @@ export default function WizardStepReview({
                 key={id}
                 size="small"
                 variant="outlined"
-                label={tAttTypes(id)}
+                label={attendanceDataTypeLabel(id, locale)}
               />
             ))}
           </Stack>

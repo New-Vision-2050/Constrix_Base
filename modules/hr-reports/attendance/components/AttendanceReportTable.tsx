@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
-  Chip,
   MenuItem,
   Paper,
   Tooltip,
@@ -38,7 +37,6 @@ import CustomMenu from "@/components/headless/custom-menu";
 type DisplayRow = CreatedAttendanceReport & {
   summary: ReturnType<typeof buildWizardPayloadSummary>;
   createdDisplay: string;
-  /** Resolved title for the report column (API name or wizard summary). */
   reportTitle: string;
 };
 
@@ -102,7 +100,9 @@ export default function AttendanceReportTable() {
 
   const displayRows = useMemo((): DisplayRow[] => {
     return createdReports.map((r) => {
-      const summary = buildWizardPayloadSummary(r.payload, tr);
+      const summary = buildWizardPayloadSummary(r.payload, tr, {
+        apiName: r.apiName,
+      });
       const lang = (locale ?? "en").split("-")[0]?.toLowerCase() ?? "en";
       const preferAr = lang === "ar";
       const fromApi = preferAr
@@ -283,14 +283,6 @@ export default function AttendanceReportTable() {
         ),
       },
       {
-        key: "employeeStatus",
-        name: t("colEmployeeStatus"),
-        sortable: false,
-        render: (row: DisplayRow) => (
-          <span className="p-2 text-sm">{row.summary.employeeStatusLabel}</span>
-        ),
-      },
-      {
         key: "export",
         name: t("colExport"),
         sortable: false,
@@ -307,27 +299,6 @@ export default function AttendanceReportTable() {
         render: (row: DisplayRow) => (
           <span className="p-2 text-sm">{row.summary.languageLabel}</span>
         ),
-      },
-      {
-        key: "email",
-        name: t("colEmail"),
-        sortable: false,
-        render: (row: DisplayRow) => (
-          <Chip
-            size="small"
-            label={row.summary.emailLabel}
-            color="default"
-            variant={theme.palette.mode === "dark" ? "outlined" : "filled"}
-            sx={{ fontWeight: 600 }}
-          />
-        ),
-      },
-      {
-        key: "sorting",
-        name: t("colSorting"),
-        sortable: false,
-        render: (row: DisplayRow) =>
-          ellipsisCell(row.summary.sortingLabel, 220),
       },
       {
         key: "actions",
