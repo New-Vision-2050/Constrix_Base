@@ -1,11 +1,48 @@
-import { STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS } from "../components/report-wizard/constants-step3";
+import {
+  STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS,
+} from "../components/report-wizard/constants-step3";
 import type {
+  AttendanceDataTypeId,
   ReportDisplayModeId,
   ReportWizardPayload,
 } from "../components/report-wizard/types";
 
+const VALID_ATTENDANCE_DATA_TYPE_IDS = new Set<AttendanceDataTypeId>(
+  STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS,
+);
+
+/** Maps removed wizard metric ids to the new column ids. */
+const LEGACY_ATTENDANCE_DATA_TYPE_IDS: Record<string, AttendanceDataTypeId> = {
+  attendance_days: "day",
+  absence_days: "day",
+  delays: "delay",
+  overtime: "overtime",
+  early_departure: "actual_out",
+};
+
 function coerceBool(v: unknown, fallback: boolean): boolean {
   return typeof v === "boolean" ? v : fallback;
+}
+
+function normalizeAttendanceDataTypeIds(
+  raw: unknown,
+): AttendanceDataTypeId[] {
+  if (!Array.isArray(raw)) {
+    return [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS];
+  }
+
+  const out: AttendanceDataTypeId[] = [];
+  for (const item of raw) {
+    if (typeof item !== "string") continue;
+    const mapped =
+      LEGACY_ATTENDANCE_DATA_TYPE_IDS[item] ?? (item as AttendanceDataTypeId);
+    if (!VALID_ATTENDANCE_DATA_TYPE_IDS.has(mapped) || out.includes(mapped)) {
+      continue;
+    }
+    out.push(mapped);
+  }
+
+  return out.length ? out : [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS];
 }
 
 /**
@@ -22,7 +59,9 @@ export function normalizeStep3EnumFields(
     dmUnknown === "by_day" ? "by_day" : "employee_per_page";
 
   return {
-    attendanceDataTypeIds: [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS],
+    attendanceDataTypeIds: normalizeAttendanceDataTypeIds(
+      raw.attendanceDataTypeIds,
+    ),
     displayMode,
     includeEntryExitTime: coerceBool(raw.includeEntryExitTime, true),
     includeShiftName: coerceBool(raw.includeShiftName, true),

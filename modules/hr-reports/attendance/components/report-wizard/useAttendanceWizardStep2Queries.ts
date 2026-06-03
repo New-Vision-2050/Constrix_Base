@@ -28,17 +28,29 @@ function normalizeEmployeeRows(data: unknown): WizardEmployeeOption[] {
     .filter((r) => r.id.length > 0);
 }
 
-async function fetchEmployeesByBranch(branchId: string): Promise<
-  WizardEmployeeOption[]
-> {
+function resolveWizardBranchFilter(
+  branchId: string | undefined,
+): string | undefined {
+  if (!branchId || branchId === STEP2_FILTER_UNSET || branchId.trim() === "") {
+    return undefined;
+  }
+  return branchId.trim();
+}
+
+async function fetchEmployees(
+  branchId?: string,
+): Promise<WizardEmployeeOption[]> {
   const per_page = 100;
   let page = 1;
   let last_page = 1;
   const acc: WizardEmployeeOption[] = [];
 
   do {
+    const params: Record<string, unknown> = { page, per_page };
+    if (branchId) params.branch_id = branchId;
+
     const res = await apiClient.get<EmployeesResponse>("/company-users/employees", {
-      params: { branch_id: branchId, page, per_page },
+      params,
     });
     const data = res.data;
     last_page = data?.pagination?.last_page ?? 1;
@@ -106,16 +118,16 @@ export function useAttendanceWizardJobTitles() {
   });
 }
 
-export function useAttendanceWizardEmployees(branchId: string | undefined) {
-  const enabled =
-    Boolean(branchId) &&
-    branchId !== STEP2_FILTER_UNSET &&
-    String(branchId).trim().length > 0;
+export function useAttendanceWizardEmployees(options: {
+  enabled: boolean;
+  branchId: string;
+}) {
+  const branchFilter = resolveWizardBranchFilter(options.branchId);
 
   return useQuery({
-    queryKey: ["hr-attendance-wizard-employees", branchId],
-    queryFn: () => fetchEmployeesByBranch(String(branchId!).trim()),
-    enabled,
+    queryKey: ["hr-attendance-wizard-employees", branchFilter ?? "all"],
+    queryFn: () => fetchEmployees(branchFilter),
+    enabled: options.enabled,
     staleTime: 60_000,
   });
 }

@@ -30,3 +30,7 @@ export type {
 } from "./payload-summary";
 export { default as ReportCreationWizardDialog } from "./ReportCreationWizardDialog";
 export type { ReportCreationWizardDialogProps } from "./ReportCreationWizardDialog";
+export {
+  attendanceDataTypeLabel,
+  resolveWizardLocale,
+} from "./attendance-data-type-labels";

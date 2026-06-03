@@ -10,17 +10,20 @@ export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   id: AttendanceDataTypeId;
   column: "a" | "b";
 }[] = [
-  { id: "attendance_days", column: "a" },
-  { id: "delays", column: "a" },
-  { id: "taken_leaves", column: "a" },
-  { id: "unpaid_leave", column: "a" },
-  { id: "absence_days", column: "b" },
+  { id: "day", column: "a" },
+  { id: "branch", column: "a" },
+  { id: "management", column: "a" },
+  { id: "official_in", column: "a" },
+  { id: "official_out", column: "a" },
+  { id: "actual_in", column: "a" },
+  { id: "actual_out", column: "b" },
+  { id: "task_in", column: "b" },
+  { id: "task_out", column: "b" },
+  { id: "delay", column: "b" },
   { id: "overtime", column: "b" },
-  { id: "sick_leaves", column: "b" },
-  { id: "early_departure", column: "b" },
+  { id: "total_hours", column: "b" },
 ];
 
-/** This attendance wizard always includes every data type; checkboxes are read-only. */
 export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] =
   ATTENDANCE_DATA_TYPE_OPTIONS.map((o) => o.id);
 

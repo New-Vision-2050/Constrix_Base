@@ -120,7 +120,9 @@ export default function AttendanceReportDetailDialog({
 
   const summary = useMemo(() => {
     if (!detail) return null;
-    return buildWizardPayloadSummary(detail.payload, tr);
+    return buildWizardPayloadSummary(detail.payload, tr, {
+      apiName: detail.apiName,
+    });
   }, [detail, tr]);
 
   const reportTitle = useMemo(() => {

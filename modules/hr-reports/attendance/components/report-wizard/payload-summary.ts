@@ -5,6 +5,10 @@ import type {
   ReportWizardStep1,
 } from "./types";
 import { STEP2_FILTER_UNSET } from "./constants-step2";
+import {
+  ensureOrderedRange,
+} from "./step1-date-range";
+import { resolveReportPeriodLabel } from "../../utils/period-display";
 
 const MONTH_KEYS = [
   "m1",
@@ -58,8 +62,13 @@ export function formatWizardPeriod(
 ): string {
   const { periodType, year, month } = step1;
   switch (periodType) {
-    case "range":
-      return `${step1.dateFrom} – ${step1.dateTo}`;
+    case "range": {
+      const { dateFrom, dateTo } = ensureOrderedRange(
+        step1.dateFrom,
+        step1.dateTo,
+      );
+      return `${dateFrom} – ${dateTo}`;
+    }
     case "monthly":
       return `${tMonth(MONTH_KEYS[month - 1])} ${year}`;
     case "yearly":
@@ -93,9 +102,14 @@ function displayModeSummaryLabel(
     : tAtt("displayModeEmployeePerPage");
 }
 
+export type BuildWizardPayloadSummaryOptions = {
+  apiName?: { ar?: string; en?: string };
+};
+
 export function buildWizardPayloadSummary(
   payload: ReportWizardPayload,
   tr: WizardPayloadSummaryTranslators,
+  options?: BuildWizardPayloadSummaryOptions,
 ): WizardPayloadSummaryLabels {
   const { step1, step2, step3 } = payload;
 
@@ -129,7 +143,11 @@ export function buildWizardPayloadSummary(
       : (step2.branchName?.trim() || step2.branchId);
 
   return {
-    periodLabel: formatWizardPeriod(step1, tr.wizard, tr.month),
+    periodLabel: resolveReportPeriodLabel(
+      step1,
+      () => formatWizardPeriod(step1, tr.wizard, tr.month),
+      options?.apiName,
+    ),
     reportTypesLabel,
     employeeStatusLabel: employeeScopeSummaryLabel(
       step2.employeeScope,
