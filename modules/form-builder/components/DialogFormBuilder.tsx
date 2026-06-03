@@ -112,7 +112,7 @@ const DialogFormBuilder: React.FC<DialogFormBuilderProps> = ({
         }}
       >
         <DialogHeader>
-          {config.title && <DialogTitle>{config.title}</DialogTitle>}
+          {config.title && <DialogTitle style={{ textAlign: "center" }}>{config.title}</DialogTitle>}
           {config.description && (
             <DialogDescription>{config.description}</DialogDescription>
           )}

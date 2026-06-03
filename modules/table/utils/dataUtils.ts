@@ -77,3 +77,65 @@ export const processApiResponse = (result: any): TableData[] => {
   
   return tableData;
 };
+
+export type ApiPaginationMeta = {
+  page?: number;
+  next_page?: number;
+  last_page?: number;
+  result_count?: number;
+  total?: number;
+  total_count?: number;
+};
+
+/**
+ * Reads pagination metadata from common API response shapes
+ * (top-level fields or nested `pagination` object).
+ */
+export const extractPaginationMeta = (
+  result: Record<string, unknown> | null | undefined,
+  itemsPerPage: number,
+  currentPageRowCount: number,
+): { totalItems: number; totalPages: number } => {
+  const pagination = result?.pagination as ApiPaginationMeta | undefined;
+
+  const lastPageRaw =
+    result?.last_page ?? pagination?.last_page;
+  const lastPage = lastPageRaw != null ? Number(lastPageRaw) : 0;
+
+  const explicitTotal =
+    result?.total_count ??
+    result?.total ??
+    pagination?.total_count ??
+    pagination?.total;
+
+  let totalItems = 0;
+
+  if (explicitTotal != null && !Number.isNaN(Number(explicitTotal))) {
+    totalItems = Number(explicitTotal);
+  } else if (lastPage > 0) {
+    const currentPage = Number(pagination?.page ?? result?.page ?? 1);
+    if (currentPage === lastPage && currentPageRowCount > 0) {
+      totalItems = (lastPage - 1) * itemsPerPage + currentPageRowCount;
+    } else {
+      totalItems = lastPage * itemsPerPage;
+    }
+  } else {
+    const resultCount = pagination?.result_count ?? result?.result_count;
+    totalItems =
+      resultCount != null && !Number.isNaN(Number(resultCount))
+        ? Number(resultCount)
+        : currentPageRowCount;
+  }
+
+  const totalPages =
+    lastPage > 0
+      ? lastPage
+      : totalItems > 0
+        ? Math.ceil(totalItems / itemsPerPage)
+        : 1;
+
+  return {
+    totalItems: Math.max(0, totalItems),
+    totalPages: Math.max(1, totalPages),
+  };
+};

@@ -6,6 +6,7 @@ import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import {
   processApiResponse,
   extractColumnsFromData,
+  extractPaginationMeta,
 } from "@/modules/table/utils/dataUtils";
 import {
   buildRequestUrl,
@@ -132,31 +133,21 @@ export const createTableFetcher = () => {
 
       // Get data from Axios response
       const result = response.data;
-      
-      // Extract total count from Axios response headers OR response body
-      const totalCountHeader = response.headers["x-total-count"];
-      const totalCountBody = result?.result_count;
-      const totalItemsCount = totalCountBody 
-        ? parseInt(String(totalCountBody), 10) 
-        : totalCountHeader 
-        ? parseInt(totalCountHeader, 10) 
-        : 0;
-
-      // Always process the response, even if the component is unmounted
-      // This ensures the data is cached for when the user returns to this page
-      setTotalItems(totalItemsCount);
-      
-      // Use last_page from API response if available, otherwise calculate
-      const lastPageFromBody = result?.last_page;
-      const totalPages = lastPageFromBody
-        ? parseInt(String(lastPageFromBody), 10)
-        : totalItemsCount > 0
-        ? Math.ceil(totalItemsCount / itemsPerPage)
-        : Math.max(1, Math.ceil(totalItemsCount / itemsPerPage));
-      
-      setPagination(currentPage, totalPages, itemsPerPage);
 
       let tableData = processApiResponse(result);
+
+      const totalCountHeader = response.headers["x-total-count"];
+      const { totalItems: totalItemsFromBody, totalPages: totalPagesFromBody } =
+        extractPaginationMeta(result, itemsPerPage, tableData.length);
+
+      const totalItemsCount = totalCountHeader
+        ? parseInt(String(totalCountHeader), 10)
+        : totalItemsFromBody;
+
+      const totalPages = totalPagesFromBody;
+
+      setTotalItems(totalItemsCount);
+      setPagination(currentPage, totalPages, itemsPerPage);
 
       if (!isMountedRef.current) {
         // Component unmounted, but we'll still process the response
@@ -169,15 +160,23 @@ export const createTableFetcher = () => {
         return;
       }
 
-      // Fallback: if no total count was provided in headers or body, use array length
-      if (!totalCountHeader && !totalCountBody && tableData.length > 0) {
-        // Always process the response, even if the component is unmounted
+      // Fallback: unpaginated array responses (no pagination metadata)
+      const hasPaginationMeta =
+        result?.pagination != null ||
+        result?.last_page != null ||
+        result?.result_count != null ||
+        result?.total_count != null ||
+        result?.total != null;
+
+      if (!totalCountHeader && !hasPaginationMeta && tableData.length > 0) {
         setTotalItems(tableData.length);
         const calculatedTotalPages = Math.ceil(tableData.length / itemsPerPage);
         setPagination(currentPage, calculatedTotalPages, itemsPerPage);
-      } else if (!totalCountHeader && !totalCountBody && tableData.length === 0) {
-        // Always process the response, even if the component is unmounted
-        // Update pagination to show 0 items with 1 empty page instead of showing an error
+      } else if (
+        !totalCountHeader &&
+        !hasPaginationMeta &&
+        tableData.length === 0
+      ) {
         setTotalItems(0);
         setPagination(1, 1, itemsPerPage);
       }
