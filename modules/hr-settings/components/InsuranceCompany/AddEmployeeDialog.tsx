@@ -388,6 +388,40 @@ export default function AddEmployeeDialog({
     }
   };
 
+  const isStepValid = () => {
+    // Step 0: Employee Selection
+    if (currentStep === 0) {
+      return selectedEmployees.length > 0;
+    }
+
+    // Step 1: Policy Selection
+    if (currentStep === 1) {
+      for (const employee of selectedEmployees) {
+        const employeeId = employee.employee_id || employee.user_id || employee.id;
+        const data = employeeData[employeeId] || {};
+        if (!data.policyId || !data.categoryId || !data.value) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Step 2: Subscriber Data
+    if (currentStep === 2) {
+      for (const employee of selectedEmployees) {
+        const employeeId = employee.employee_id || employee.user_id || employee.id;
+        const data = employeeData[employeeId] || {};
+        if (!data.subscriptionNo) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Steps 3 and 4 are always valid
+    return true;
+  };
+
   const handleSubmit = async () => {
     if (selectedEmployees.length === 0) {
       toast.error(t("selectEmployee") || "يرجى اختيار الموظفين");
@@ -1373,7 +1407,6 @@ export default function AddEmployeeDialog({
         PaperProps={{
           sx: {
             width: { xs: "75vw", sm: "70vw", md: "60vw", lg: "50vw" },
-            height: { xs: "90vh", md: "85vh" },
             maxHeight: "95vh",
             borderRadius: 3,
             p: { xs: 3, md: 6 },
@@ -1413,8 +1446,7 @@ export default function AddEmployeeDialog({
 
           <Box
             sx={{
-              flex: 1,
-              mt: 6,
+              mt: 2,
               overflowY: "auto",
             }}
           >
@@ -1423,9 +1455,12 @@ export default function AddEmployeeDialog({
 
           <Box
             sx={{
+              borderTop: "1px solid",
+              borderColor: "divider",
               display: "flex",
               justifyContent: currentStep === 0 ? "flex-end" : "space-between",
-              pt: 6,
+              pt: 3,
+              mt: 3,
               gap: 3,
             }}
           >
@@ -1449,6 +1484,7 @@ export default function AddEmployeeDialog({
               onClick={currentStep === STEPS.length - 1 ? handleSubmit : handleNext}
               variant="contained"
               size="large"
+              disabled={!isStepValid()}
               sx={{
                 py: 2,
                 fontSize: 16,
