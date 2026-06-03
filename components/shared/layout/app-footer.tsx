@@ -18,7 +18,7 @@ function AppFooter() {
       </div>
       <FooterWave
         color={color}
-        className="absolute -z-10 xl:bottom-[-65vh] md:bottom-[-vh] md:block hidden"
+        className="absolute -z-10 bottom-0 md:block hidden"
         width="100%"
       />
     </div>
