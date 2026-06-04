@@ -127,6 +127,7 @@ export default function AddEmployeeDialog({
           name: employeeSearchQuery || undefined,
           per_page: 10,
           has_medical_insurance_subscription: isEditMode ? 1 : 0,
+          type_allowance_code: "saving",
         });
 
         let employeesList = [];
@@ -1281,7 +1282,9 @@ export default function AddEmployeeDialog({
                             onClick={() => setDependentsDialogOpen(true)}
                             variant="contained"
                             size="small"
-                            sx={{ fontSize: 12 }}
+                            disabled={employee.type_privilege === "Individual"}
+                            title={employee.type_privilege === "Individual" ? "لا يمكن إضافة عائلون للموظف الفردي" : ""}
+                            sx={{ fontSize: 12, "&.Mui-disabled": { opacity: 0.4 } }}
                           >
                             إدارة العائلون
                           </Button>
