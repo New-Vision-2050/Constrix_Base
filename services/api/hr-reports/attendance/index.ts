@@ -8,12 +8,13 @@ import type {
 import type {
   AttendanceReportDetailRaw,
   AttendanceReportMutationRaw,
+  attendanceReportListResponse,
   AttendanceReportsListRaw,
 } from "./types/response";
 
 export const AttendanceReportsApi = {
   getList: (params: ListReportsParams) =>
-    baseApi.get<AttendanceReportsListRaw>("reports", { params }),
+    baseApi.get<attendanceReportListResponse>("reports", { params }),
 
   getById: (reportId: string) =>
     baseApi.get<AttendanceReportDetailRaw>(`reports/${reportId}`),
@@ -46,6 +47,8 @@ export type {
   AttendanceReportDetailRaw,
   AttendanceReportMutationRaw,
   AttendanceReportsListRaw,
+  attendanceReport,
+  attendanceReportListResponse,
 } from "./types/response";
 
 export type { CreateReportApiBody } from "./types/request";

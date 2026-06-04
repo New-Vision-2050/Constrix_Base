@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -8,39 +8,36 @@ import {
   Paper,
   Tooltip,
   Typography,
-  useTheme,
 } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { toast } from "@/modules/table/hooks/use-toast";
 import { getErrorMessage } from "@/utils/errorHandler";
-import { AttendanceReportsApi } from "@/services/api/hr-reports/attendance";
+import {
+  AttendanceReportsApi,
+  type attendanceReport,
+} from "@/services/api/hr-reports/attendance";
 import {
   buildBilingualReportName,
   buildCreateReportApiBody,
 } from "../utils/report-api-body";
-import { parseListReportsResponse } from "../utils/normalize-report-list";
-import type { CreatedAttendanceReport } from "../types";
-import type { ReportWizardPayload } from "./report-wizard/types";
 import {
-  buildWizardPayloadSummary,
-  type WizardPayloadSummaryTranslators,
-} from "./report-wizard/payload-summary";
+  attendanceReportExportLabel,
+  attendanceReportListTitle,
+  attendanceReportPeriodLabel,
+  attendanceReportTypesLabel,
+  parseAttendanceReportListResponse,
+} from "../utils/format-attendance-report-list";
+import type { ReportWizardPayload } from "./report-wizard/types";
 import AttendanceReportDetailDialog from "./AttendanceReportDetailDialog";
 import DeleteAttendanceReportDialog from "./DeleteAttendanceReportDialog";
 import ReportCreationWizardDialog from "./report-wizard/ReportCreationWizardDialog";
 import CustomMenu from "@/components/headless/custom-menu";
 
-type DisplayRow = CreatedAttendanceReport & {
-  summary: ReturnType<typeof buildWizardPayloadSummary>;
-  createdDisplay: string;
-  reportTitle: string;
-};
-
-const HeadlessCreatedReportsTable = HeadlessTableLayout<DisplayRow>(
+const HeadlessCreatedReportsTable = HeadlessTableLayout<attendanceReport>(
   "hr-attendance-created-reports",
 );
 
@@ -48,32 +45,18 @@ export default function AttendanceReportTable() {
   const t = useTranslations("HRReports.attendanceReport.table");
   const tPage = useTranslations("HRReports.attendanceReport");
   const locale = useLocale();
-  const theme = useTheme();
   const format = useFormatter();
 
   const tDeleteConfirm = useTranslations("common.deleteConfirmation");
   const tWizard = useTranslations("HRReports.attendanceReport.wizard");
   const tRt = useTranslations("HRReports.attendanceReport.wizard.reportTypes");
   const tMonth = useTranslations("HRReports.attendanceReport.wizard.month");
-  const tEmp = useTranslations(
-    "HRReports.attendanceReport.wizard.employeesData",
-  );
-  const tBranch = useTranslations(
-    "HRReports.attendanceReport.wizard.employeesData.branches",
-  );
-  const tAttendanceData = useTranslations(
-    "HRReports.attendanceReport.wizard.attendanceData",
-  );
-  const tReview = useTranslations(
-    "HRReports.attendanceReport.wizard.reviewScreen",
-  );
 
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [createdReports, setCreatedReports] = useState<
-    CreatedAttendanceReport[]
-  >([]);
+  const [reports, setReports] = useState<attendanceReport[]>([]);
   const [listLoading, setListLoading] = useState(true);
-  const [apiTotal, setApiTotal] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [listVersion, setListVersion] = useState(0);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [detailReportId, setDetailReportId] = useState<string | null>(null);
@@ -85,67 +68,38 @@ export default function AttendanceReportTable() {
     initialLimit: 10,
   });
 
-  const tr: WizardPayloadSummaryTranslators = useMemo(
-    () => ({
-      wizard: tWizard,
-      reportTypes: tRt,
-      month: tMonth,
-      employeesData: tEmp,
-      branches: tBranch,
-      attendanceData: tAttendanceData,
-      reviewScreen: tReview,
-    }),
-    [tWizard, tRt, tMonth, tEmp, tBranch, tAttendanceData, tReview],
-  );
-
-  const displayRows = useMemo((): DisplayRow[] => {
-    return createdReports.map((r) => {
-      const summary = buildWizardPayloadSummary(r.payload, tr, {
-        apiName: r.apiName,
+  const formatCreatedAt = useCallback(
+    (iso: string) => {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      return format.dateTime(d, {
+        dateStyle: "medium",
+        timeStyle: "short",
       });
-      const lang = (locale ?? "en").split("-")[0]?.toLowerCase() ?? "en";
-      const preferAr = lang === "ar";
-      const fromApi = preferAr
-        ? (r.apiName?.ar ?? r.apiName?.en)
-        : (r.apiName?.en ?? r.apiName?.ar);
-      const reportTitle =
-        typeof fromApi === "string" && fromApi.trim() !== ""
-          ? fromApi.trim()
-          : summary.reportTypesLabel;
-      return {
-        ...r,
-        summary,
-        reportTitle,
-        createdDisplay: format.dateTime(new Date(r.createdAt), {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }),
-      };
-    });
-  }, [createdReports, tr, format, locale]);
-
-  const totalItems = apiTotal;
-  const pageSize = Math.max(1, params.limit);
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize) || 1);
+    },
+    [format],
+  );
 
   useEffect(() => {
     let cancelled = false;
     setListLoading(true);
+
     AttendanceReportsApi.getList({
       page: params.page,
       per_page: params.limit,
     })
-      .then((res) => res.data)
-      .then((raw) => {
+      .then((res) => {
         if (cancelled) return;
-        const { items, total } = parseListReportsResponse(raw);
-        setCreatedReports(items);
-        setApiTotal(total);
+        const parsed = parseAttendanceReportListResponse(res.data);
+        setReports(parsed.items);
+        setTotalItems(parsed.totalItems);
+        setTotalPages(parsed.totalPages);
       })
       .catch((err) => {
         if (cancelled) return;
-        setCreatedReports([]);
-        setApiTotal(0);
+        setReports([]);
+        setTotalItems(0);
+        setTotalPages(1);
         toast({
           variant: "destructive",
           title: t("fetchReportsErrorTitle"),
@@ -155,14 +109,13 @@ export default function AttendanceReportTable() {
       .finally(() => {
         if (!cancelled) setListLoading(false);
       });
+
     return () => {
       cancelled = true;
     };
   }, [params.page, params.limit, listVersion, t]);
 
   useEffect(() => {
-    // While loading, `apiTotal` is often still 0 so `totalPages` is 1; clamping then
-    // would wipe a legitimate URL page (e.g. ?...-p=5) before the request finishes.
     if (listLoading) return;
     if (params.page > totalPages) {
       params.setPage(totalPages);
@@ -231,6 +184,7 @@ export default function AttendanceReportTable() {
       setDeleteConfirmLoading(false);
     }
   };
+
   const ellipsisCell = (text: string, maxWidth: number) => (
     <Tooltip title={text}>
       <Typography
@@ -253,58 +207,59 @@ export default function AttendanceReportTable() {
   const columns = useMemo(
     () => [
       {
-        key: "createdDisplay",
+        key: "created_at",
         name: t("colCreated"),
         sortable: false,
-        render: (row: DisplayRow) => (
-          <span className="p-2 text-sm">{row.createdDisplay}</span>
+        render: (row: attendanceReport) => (
+          <span className="p-2 text-sm">
+            {formatCreatedAt(row.created_at || row.generated_at)}
+          </span>
         ),
       },
       {
         key: "period",
         name: t("colPeriod"),
         sortable: false,
-        render: (row: DisplayRow) => (
-          <span className="p-2 text-sm">{row.summary.periodLabel}</span>
+        render: (row: attendanceReport) => (
+          <span className="p-2 text-sm">
+            {attendanceReportPeriodLabel(row, tMonth, tWizard)}
+          </span>
         ),
       },
       {
-        key: "reportTypes",
+        key: "report_types",
         name: t("colReportTypes"),
         sortable: false,
-        render: (row: DisplayRow) => ellipsisCell(row.reportTitle, 260),
+        render: (row: attendanceReport) =>
+          ellipsisCell(
+            attendanceReportListTitle(row, locale) ||
+              attendanceReportTypesLabel(row, tRt),
+            260,
+          ),
       },
       {
         key: "branch",
         name: t("colBranch"),
         sortable: false,
-        render: (row: DisplayRow) => (
-          <span className="p-2 text-sm">{row.summary.branchLabel}</span>
+        render: (row: attendanceReport) => (
+          <span className="p-2 text-sm">{row.branch?.trim() || "—"}</span>
         ),
       },
       {
-        key: "export",
+        key: "export_format",
         name: t("colExport"),
         sortable: false,
-        render: (row: DisplayRow) => (
+        render: (row: attendanceReport) => (
           <span className="p-2 text-sm font-medium">
-            {row.summary.exportLabel}
+            {attendanceReportExportLabel(row.export_format, tWizard)}
           </span>
-        ),
-      },
-      {
-        key: "language",
-        name: t("colLanguage"),
-        sortable: false,
-        render: (row: DisplayRow) => (
-          <span className="p-2 text-sm">{row.summary.languageLabel}</span>
         ),
       },
       {
         key: "actions",
         name: t("colActions"),
         sortable: false,
-        render: (row: DisplayRow) => (
+        render: (row: attendanceReport) => (
           <CustomMenu
             renderAnchor={({ onClick }) => (
               <Button
@@ -325,7 +280,11 @@ export default function AttendanceReportTable() {
               }}
             >
               {t("viewReport")}
-              <VisibilityOutlinedIcon fontSize="small" color="primary"  className="mr-2"/>
+              <VisibilityOutlinedIcon
+                fontSize="small"
+                color="primary"
+                className="mr-2"
+              />
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -339,11 +298,19 @@ export default function AttendanceReportTable() {
         ),
       },
     ],
-    [t, theme.palette.mode, tDeleteConfirm],
+    [
+      t,
+      tDeleteConfirm,
+      tMonth,
+      tWizard,
+      tRt,
+      locale,
+      formatCreatedAt,
+    ],
   );
 
   const state = HeadlessCreatedReportsTable.useTableState({
-    data: displayRows,
+    data: reports,
     columns,
     totalPages,
     totalItems,
