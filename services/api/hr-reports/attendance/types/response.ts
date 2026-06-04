@@ -16,6 +16,32 @@ export type ReportTemplatePickRow = {
   apiName?: { ar?: string; en?: string };
   payload: ReportWizardPayload;
 };
+export type attendanceReportListResponse = {
+  code: string;
+  message: string;
+  payload: attendanceReport[];
+  pagination: {
+    last_page: number;
+    next_page: number;
+    page: number;
+    result_count: number;
+  };
+};
+export type attendanceReport = {
+  id: string;
+  status: string;
+  branch: string;
+  export_format: string;
+  generated_at: string;
+  name: string;
+  name_ar: string;
+  name_en: string;
+  period_type: string;
+  report_types: string[];
+  month: string | null;
+  year: number;
+  created_at: string;
+}
 
 export type AttendanceReportsListRaw = unknown;
 export type AttendanceReportDetailRaw = unknown;

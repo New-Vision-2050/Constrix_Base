@@ -54,7 +54,7 @@ export const AllProjectsApi = {
       { params },
     ),
 
-  getCompanyUsers: (params?: { name?: string; per_page?: number }) =>
+  getCompanyUsers: (params?: { name?: string; per_page?: number; type_allowance_code?: string; has_medical_insurance_subscription?: number }) =>
     baseApi.get(`company-users/employees`, { params }),
 
   getEntityClients: (params?: ClientParams) =>

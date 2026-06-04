@@ -40,16 +40,15 @@ export const PrivilegeItemFormConfig = ({
             name: "medical_insurance_id",
             label: tEdit("medicalInsurancePolicyNumber"),
             placeholder: tEdit("placeholders.medicalInsurancePolicyNumber"),
-            condition: (values) => {
-              // Show this field only when privilege is MedicalInsurance
-              const selectedPrivilege = privileges?.find(p => p.id === values.privilege_id);
-              const isMedicalInsurance = selectedPrivilege?.type === "MedicalInsurance" ||
-                  selectedPrivilege?.name?.includes("تأمين طبي") ||
-                  privilegeData?.privilege?.type === "MedicalInsurance" ||
-                  privilegeData?.privilege?.name?.includes("تأمين طبي") ||
-                  privilegeData?.type === "MedicalInsurance" ||
-                  privilegeData?.name?.includes("تأمين طبي");
-              return isMedicalInsurance;
+            condition: () => {
+              if (privilegeData) {
+                return privilegeData?.privilege?.type === "MedicalInsurance" ||
+                  privilegeData?.privilege?.name?.includes("تأمين طبي");
+              }
+              const selectedPrivilege = privileges?.find(p => p.id === privilegeId);
+              return selectedPrivilege?.type === "MedicalInsurance" ||
+                selectedPrivilege?.name?.includes("تأمين طبي") ||
+                false;
             },
             dynamicOptions: {
               url: `${baseURL}/medical-insurances`,
@@ -105,6 +104,12 @@ export const PrivilegeItemFormConfig = ({
               labelField: "name",
               searchParam: "name",
               totalCountHeader: "X-Total-Count",
+              transformResponse: (data: any) => {
+                const items = Array.isArray(data) ? data : (data?.payload || []);
+                return items
+                  .filter((item: any) => item?.code && item?.name && item.code !== "percentage")
+                  .map((item: any) => ({ value: item.code, label: item.name }));
+              },
             },
             validation: [
               {
@@ -118,10 +123,7 @@ export const PrivilegeItemFormConfig = ({
             label: tEdit("calculationRate"),
             type: "text",
             postfix: "%",
-            condition: (values) => {
-              if (values.type_allowance_code == null) return false;
-              return values.type_allowance_code === AllowancesTypes?.Percentage;
-            },
+            condition: () => false,
             placeholder: tEdit("placeholders.calculationRate"),
             validation: [
               {
@@ -176,7 +178,7 @@ export const PrivilegeItemFormConfig = ({
             },
             condition: (values) => {
               if (values.type_allowance_code == null) return false;
-              return values.type_allowance_code !== AllowancesTypes?.Saving;
+              return values.type_allowance_code === AllowancesTypes?.Constant;
             },
             validation: [
               {
