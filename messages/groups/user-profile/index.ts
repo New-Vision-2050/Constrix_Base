@@ -188,7 +188,10 @@ export const userProfileMessages = new MessagesGroup({
       workingHoursType: _m("Type of Working Hours", "نوع ساعات العمل"),
       weeklyWorkingHours: _m("Weekly Working Hours", "ساعات العمل الاسبوعية"),
       annualLeaveDays: _m("Annual Leave Days", "ايام الاجازات السنوية"),
-      rightToTerminateDuringProbation: _m("Right to Terminate During Probation Period", "حق الانهاء خلال فترة التجربة"),
+      rightToTerminateDuringProbation: _m(
+        "Right to Terminate During Probation Period",
+        "حق الانهاء خلال فترة التجربة",
+      ),
       commencementDate: _m("Date of Commencement", "تاريخ المباشرة"),
       workPlace: _m("Place of Work", "مكان العمل"),
       day: _m("Day", "يوم"),
@@ -196,11 +199,26 @@ export const userProfileMessages = new MessagesGroup({
       attachOffer: _m("Attach Offer", "ارفاق العرض"),
       validation: new MessagesGroup({
         numbersOnly: _m("must be numbers only", "يجب أن تكون أرقام فقط"),
-        noticePeriodGreaterThanContract: _m("Notice period must not be greater than contract duration", "فترة الاشعار يجب أن لا تكون أكبر من مدة العقد"),
-        probationPeriodGreaterThanContract: _m("Probation period must not be greater than contract duration", "فترة التجربة يجب أن لا تكون أكبر من مدة العقد"),
-        workingHoursNumbersOnly: _m("Working hours must be numbers only", "ساعات العمل يجب أن تكون أرقام فقط"),
-        annualLeaveNumbersOnly: _m("Annual leave days must be numbers only", "أيام الإجازات يجب أن تكون أرقام فقط"),
-        annualLeaveGreaterThanContract: _m("Annual leave days cannot be greater than contract duration", "عدد أيام الإجازات السنوية لا يمكن أن يكون أكبر من مدة العقد"),
+        noticePeriodGreaterThanContract: _m(
+          "Notice period must not be greater than contract duration",
+          "فترة الاشعار يجب أن لا تكون أكبر من مدة العقد",
+        ),
+        probationPeriodGreaterThanContract: _m(
+          "Probation period must not be greater than contract duration",
+          "فترة التجربة يجب أن لا تكون أكبر من مدة العقد",
+        ),
+        workingHoursNumbersOnly: _m(
+          "Working hours must be numbers only",
+          "ساعات العمل يجب أن تكون أرقام فقط",
+        ),
+        annualLeaveNumbersOnly: _m(
+          "Annual leave days must be numbers only",
+          "أيام الإجازات يجب أن تكون أرقام فقط",
+        ),
+        annualLeaveGreaterThanContract: _m(
+          "Annual leave days cannot be greater than contract duration",
+          "عدد أيام الإجازات السنوية لا يمكن أن يكون أكبر من مدة العقد",
+        ),
       }),
     }),
     jobData: new MessagesGroup({
@@ -212,7 +230,10 @@ export const userProfileMessages = new MessagesGroup({
       jobTitle: _m("Job Title", "المسمى الوظيفي"),
       jobCode: _m("Job Code", "الرقم الوظيفي"),
       attendanceConstraint: _m("Attendance Constraint", "المحدد"),
-      additionalAttendanceConstraints: _m("Additional Attendance Constraints", "محددات الحضور الإضافية"),
+      additionalAttendanceConstraints: _m(
+        "Additional Attendance Constraints",
+        "محددات الحضور الإضافية",
+      ),
       roles: _m("Roles", "الصلاحيات"),
       validation: new MessagesGroup({
         branchRequired: _m("Branch is required", "الفرع مطلوب"),
@@ -221,7 +242,10 @@ export const userProfileMessages = new MessagesGroup({
         jobTypeRequired: _m("Job Type is required", "نوع الوظيفة مطلوب"),
         jobTitleRequired: _m("Job Title is required", "المسمى الوظيفي مطلوب"),
         jobCodeRequired: _m("Job Code is required", "الرقم الوظيفي مطلوب"),
-        attendanceConstraintRequired: _m("Attendance Constraint is required", "المحدد مطلوب"),
+        attendanceConstraintRequired: _m(
+          "Attendance Constraint is required",
+          "المحدد مطلوب",
+        ),
         rolesRequired: _m("Roles are required", "الصلاحيات مطلوبة"),
       }),
     }),
@@ -238,7 +262,10 @@ export const userProfileMessages = new MessagesGroup({
       noData: _m("No basic salary data found", "لا توجد بيانات للراتب الاساسي"),
       info: new MessagesGroup({
         basicSalary: _m("Basic salary information", "معلومات الراتب الاساسي"),
-        basicSalaryAmount: _m("The total amount of basic salary", "المبلغ الاجمالي للراتب الاساسي"),
+        basicSalaryAmount: _m(
+          "The total amount of basic salary",
+          "المبلغ الاجمالي للراتب الاساسي",
+        ),
         paymentCycle: _m("Frequency of salary payments", "تكرار دفع الراتب"),
         hourlyRate: _m("Calculated rate per hour", "معدل الساعة المحسوب"),
       }),
@@ -251,17 +278,35 @@ export const userProfileMessages = new MessagesGroup({
       hourlyRate: _m("Hourly Rate", "قيمة الساعة"),
       placeholders: new MessagesGroup({
         basicSalary: _m("Enter basic salary", "ادخل الراتب الاساسي"),
-        basicSalaryAmount: _m("Enter basic salary amount", "ادخل مبلغ الراتب الاساسي"),
+        basicSalaryAmount: _m(
+          "Enter basic salary amount",
+          "ادخل مبلغ الراتب الاساسي",
+        ),
         paymentCycle: _m("Select payment cycle", "اختر دورة القبض"),
         hourlyRate: _m("Enter hourly rate", "ادخل قيمة الساعة"),
       }),
       validation: new MessagesGroup({
-        basicSalaryRequired: _m("Basic salary is required", "الراتب الاساسي مطلوب"),
-        basicSalaryAmountRequired: _m("Basic salary amount is required", "مبلغ الراتب الاساسي مطلوب"),
-        paymentCycleRequired: _m("Payment cycle is required", "دورة القبض مطلوبة"),
+        basicSalaryRequired: _m(
+          "Basic salary is required",
+          "الراتب الاساسي مطلوب",
+        ),
+        basicSalaryAmountRequired: _m(
+          "Basic salary amount is required",
+          "مبلغ الراتب الاساسي مطلوب",
+        ),
+        paymentCycleRequired: _m(
+          "Payment cycle is required",
+          "دورة القبض مطلوبة",
+        ),
         hourlyRateRequired: _m("Hourly rate is required", "قيمة الساعة مطلوبة"),
-        basicSalaryAmountInvalid: _m("Basic salary amount must be a valid number", "مبلغ الراتب الاساسي يجب أن يكون رقما صحيحا"),
-        hourlyRateInvalid: _m("Hourly rate must be a valid number", "قيمة الساعة يجب أن تكون رقما صحيحا"),
+        basicSalaryAmountInvalid: _m(
+          "Basic salary amount must be a valid number",
+          "مبلغ الراتب الاساسي يجب أن يكون رقما صحيحا",
+        ),
+        hourlyRateInvalid: _m(
+          "Hourly rate must be a valid number",
+          "قيمة الساعة يجب أن تكون رقما صحيحا",
+        ),
       }),
       paymentCycleOptions: new MessagesGroup({
         monthly: _m("Monthly", "شهري"),
@@ -273,8 +318,14 @@ export const userProfileMessages = new MessagesGroup({
       }),
       save: _m("Save", "حفظ"),
       cancel: _m("Cancel", "الغاء"),
-      saveSuccess: _m("Basic salary updated successfully", "تم تحديث الراتب الاساسي بنجاح"),
-      saveError: _m("Failed to update basic salary", "فشل في تحديث الراتب الاساسي"),
+      saveSuccess: _m(
+        "Basic salary updated successfully",
+        "تم تحديث الراتب الاساسي بنجاح",
+      ),
+      saveError: _m(
+        "Failed to update basic salary",
+        "فشل في تحديث الراتب الاساسي",
+      ),
     }),
     allowanceName: _m("Allowance Name", "أسم البدل"),
     privilegesAndAllowances: new MessagesGroup({
@@ -307,40 +358,73 @@ export const userProfileMessages = new MessagesGroup({
         title: _m("Social Insurance", "تأمين اجتماعي"),
       }),
       view: new MessagesGroup({
-        medicalInsurancePolicyNumber: _m("Medical Insurance Policy Number", "رقم البوليصة التامين الطبي"),
+        medicalInsurancePolicyNumber: _m(
+          "Medical Insurance Policy Number",
+          "رقم البوليصة التامين الطبي",
+        ),
         allowanceType: _m("Allowance Type", "نوع البدل"),
-        allowanceTypeFamily: _m("Allowance Type (Family - Individual)", "نوع البدل (عائلي - فردي)"),
-        allowanceTypeCategory: _m("Allowance Type (Constant - Percentage - Saving)", "نوع البدل (ثابت - نسبة - توفير)"),
-        calculationRate: _m("Percentage calculation rate from basic salary", "معدل حساب النسبة من اصل الراتب"),
+        allowanceTypeFamily: _m(
+          "Allowance Type (Family - Individual)",
+          "نوع البدل (عائلي - فردي)",
+        ),
+        allowanceTypeCategory: _m("Allowance Type", "نوع البدل)"),
+        calculationRate: _m(
+          "Percentage calculation rate from basic salary",
+          "معدل حساب النسبة من اصل الراتب",
+        ),
         amount: _m("Amount", "المبلغ"),
         periodUnit: _m("Period Unit", "وحدة المدة"),
         description: _m("Description", "وصف"),
       }),
       edit: new MessagesGroup({
-        medicalInsurancePolicyNumber: _m("Medical Insurance Policy Number", "رقم البوليصة التامين الطبي"),
-        allowanceType: _m("Allowance Type (Family - Individual)", "نوع البدل (عائلي - فردي)"),
-        allowanceTypeCategory: _m("Allowance Type (Constant - Percentage - Saving)", "نوع البدل (ثابت - نسبة - توفير)"),
-        calculationRate: _m("Percentage calculation rate from basic salary", "معدل حساب النسبة من اصل الراتب"),
+        medicalInsurancePolicyNumber: _m(
+          "Medical Insurance Policy Number",
+          "رقم البوليصة التامين الطبي",
+        ),
+        allowanceType: _m(
+          "Allowance Type (Family - Individual)",
+          "نوع البدل (عائلي - فردي)",
+        ),
+        allowanceTypeCategory: _m("Allowance Type", "نوع البدل"),
+        calculationRate: _m(
+          "Percentage calculation rate from basic salary",
+          "معدل حساب النسبة من اصل الراتب",
+        ),
         amount: _m("Amount", "المبلغ"),
         periodUnit: _m("Period Unit", "وحدة المدة"),
         description: _m("Description", "وصف"),
         placeholders: new MessagesGroup({
-          medicalInsurancePolicyNumber: _m("Select policy number", "اختر رقم البوليصة"),
+          medicalInsurancePolicyNumber: _m(
+            "Select policy number",
+            "اختر رقم البوليصة",
+          ),
           allowanceType: _m("Select allowance", "اختر البدل"),
           allowanceTypeCategory: _m("Select allowance", "اختر البدل"),
-          calculationRate: _m("Percentage calculation rate from basic salary", "معدل حساب النسبة من اصل الراتب"),
+          calculationRate: _m(
+            "Percentage calculation rate from basic salary",
+            "معدل حساب النسبة من اصل الراتب",
+          ),
           amount: _m("Amount", "المبلغ"),
           periodUnit: _m("Select allowance", "اختر البدل"),
           description: _m("Description", "وصف"),
         }),
         validation: new MessagesGroup({
-          medicalInsurancePolicyNumberRequired: _m("Select policy number", "اختر رقم البوليصة"),
+          medicalInsurancePolicyNumberRequired: _m(
+            "Select policy number",
+            "اختر رقم البوليصة",
+          ),
           allowanceTypeRequired: _m("Enter allowance", "ادخل البدل"),
           allowanceTypeCategoryRequired: _m("Enter allowance", "ادخل البدل"),
-          calculationRateRequired: _m("Percentage calculation rate from basic salary is required", "معدل حساب النسبة من اصل الراتب مطلوب"),
+          calculationRateRequired: _m(
+            "Percentage calculation rate from basic salary is required",
+            "معدل حساب النسبة من اصل الراتب مطلوب",
+          ),
           amountRequired: _m("Amount is required", "المبلغ مطلوب"),
           periodUnitRequired: _m("Enter allowance", "ادخل البدل"),
-          calculationRateInvalid: _m("Must enter numbers only", "يجب إدخال رقم فقط"),
+          calculationRateInvalid: _m(
+            "Must enter numbers only",
+            "يجب إدخال رقم فقط",
+          ),
           amountInvalid: _m("Must enter numbers only", "يجب إدخال رقم فقط"),
         }),
       }),
@@ -467,7 +551,10 @@ export const userProfileMessages = new MessagesGroup({
         "National ID must be between 6 and 20 characters or numbers",
         "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
       ),
-      identityNumberRequired: _m("Identity Number is required", "رقم الهوية مطلوب"),
+      identityNumberRequired: _m(
+        "Identity Number is required",
+        "رقم الهوية مطلوب",
+      ),
       identityNumberPattern: _m(
         "Identity Number must be between 6 and 20 characters or numbers",
         "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
@@ -794,8 +881,14 @@ export const userProfileMessages = new MessagesGroup({
       certificate: _m("Certificate", "الشهادات الممنوحة"),
       certificatePlaceholder: _m("Certificate", "الشهادات الممنوحة"),
       attachCertificate: _m("Attach Certificate", "ارفاق الشهادة"),
-      dateObtainCertificate: _m("Date of Obtaining Certificate", "تاريخ الحصول على الشهادة"),
-      dateEndCertificate: _m("Date of Ending Certificate", "تاريخ نهاية الشهادة"),
+      dateObtainCertificate: _m(
+        "Date of Obtaining Certificate",
+        "تاريخ الحصول على الشهادة",
+      ),
+      dateEndCertificate: _m(
+        "Date of Ending Certificate",
+        "تاريخ نهاية الشهادة",
+      ),
       createExperience: _m("Add Experience", "أضافة خبرة"),
       noData: _m("No Data Found", "لا توجد بيانات"),
       noDataSubTitle: _m("No Data Found", "لا توجد بيانات"),
@@ -823,8 +916,14 @@ export const userProfileMessages = new MessagesGroup({
       save: _m("Save", "حفظ"),
       cancel: _m("Cancel", "إلغاء"),
       institutePlaceholder: _m("Institute", "جهة الاعتماد"),
-      dateObtainCertificatePlaceholder: _m("Date of Obtaining Certificate", "تاريخ الحصول على الشهادة"),
-      dateEndCertificatePlaceholder: _m("Date of Ending Certificate", "تاريخ نهاية الشهادة"),
+      dateObtainCertificatePlaceholder: _m(
+        "Date of Obtaining Certificate",
+        "تاريخ الحصول على الشهادة",
+      ),
+      dateEndCertificatePlaceholder: _m(
+        "Date of Ending Certificate",
+        "تاريخ نهاية الشهادة",
+      ),
     }),
     certificationsData: new MessagesGroup({
       title: _m("Certifications Data", "الشهادات المهنية"),

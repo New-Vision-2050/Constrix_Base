@@ -1,6 +1,7 @@
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import CountriesTabCountriesSettingTab from "../tabs/CountriesSettings";
 import UniversitiesSettingTab from "../tabs/UniversitiesSettings";
+import AcademicSpecializationsSettingTab from "../tabs/AcademicSpecializations";
 
 export const CountriesTabs: SystemTab[] = [
   {
@@ -25,5 +26,14 @@ export const CountriesTabs: SystemTab[] = [
     id: "countries_tabs_hospitals_settings",
     title: "اعدادات المستشفيات",
     content: <>اعدادات المستشفيات</>,
+  },
+  {
+    id: "countries_tabs_academic_specializations_settings",
+    title: "التخصصات الاكاديمية",
+    content: (
+      <>
+        <AcademicSpecializationsSettingTab />
+      </>
+    ),
   },
 ];
