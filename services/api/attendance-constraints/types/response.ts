@@ -75,3 +75,17 @@ export type ConstraintLocationsListApiResponse = {
   result_count?: number;
   [key: string]: unknown;
 };
+
+/** Rules payload for GET/PATCH `/attendance/constraints/:constraintId/rules` */
+export type ConstraintRules = {
+  lateness_minutes: number;
+  early_clock_in_minutes: number;
+  max_over_time: number;
+  out_zone_minutes: number;
+  max_working_hours: number;
+};
+
+export type ConstraintRulesApiResponse = {
+  payload?: ConstraintRules | Record<string, unknown>;
+  [key: string]: unknown;
+};
