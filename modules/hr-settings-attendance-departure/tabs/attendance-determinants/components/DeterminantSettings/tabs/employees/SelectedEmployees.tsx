@@ -57,11 +57,15 @@ export default function SelectedEmployees({
       constraintId,
       params.page,
       params.limit,
+      params.search,
     ],
     queryFn: async (): Promise<ConstraintEmployeesListApiResponse> => {
       const res = await AttendanceConstraints.getEmployees(constraintId, {
         page: params.page,
         per_page: params.limit,
+        ...(params.search.trim()
+          ? { name: params.search.trim() }
+          : {}),
       });
       return res.data;
     },
@@ -214,25 +218,36 @@ export default function SelectedEmployees({
     params,
     getRowId: (row) => String(row.id ?? row.user_id ?? ""),
     loading: isLoading,
-    searchable: false,
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
     <section className="border border-border rounded-xl overflow-hidden">
-      <div className="px-4 py-3 border-b border-border flex justify-end">
-        <Button
-          className="h-9 px-4"
-          onClick={() => {
-            setAddSelectedUserId("");
-            setIsAddDialogOpen(true);
-          }}
-        >
-          اضافة
-        </Button>
-      </div>
-
       <div className="px-4 py-3">
         <SelectedEmployeesTable
+          filters={
+            <SelectedEmployeesTable.TopActions
+              state={state}
+              searchComponent={
+                <SelectedEmployeesTable.Search
+                  search={state.search}
+                  placeholder="بحث باسم الموظف"
+                />
+              }
+              customActions={
+                <Button
+                  className="h-9 px-4"
+                  onClick={() => {
+                    setAddSelectedUserId("");
+                    setIsAddDialogOpen(true);
+                  }}
+                >
+                  اضافة
+                </Button>
+              }
+            />
+          }
           table={
             <SelectedEmployeesTable.Table
               state={state}

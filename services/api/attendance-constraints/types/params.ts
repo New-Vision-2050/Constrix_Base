@@ -7,6 +7,8 @@ export type PatchConstraintBasicInfoParams = Partial<ConstraintBasicInfo>;
 export interface GetConstraintEmployeesParams {
   page?: number;
   per_page?: number;
+  /** Filter employees by name */
+  name?: string;
 }
 
 /** Query params for GET `/attendance/constraints/:constraintId/locations` */
