@@ -74,3 +74,12 @@ export interface AssignConstraintShiftsDailyBody {
 export type AssignConstraintShiftsBody =
   | AssignConstraintShiftsWeeklyBody
   | AssignConstraintShiftsDailyBody;
+
+/** Body for PATCH `/attendance/constraints/:constraintId/rules` */
+export interface PatchConstraintRulesParams {
+  lateness_minutes: number;
+  early_clock_in_minutes: number;
+  max_over_time: number;
+  out_zone_minutes: number;
+  max_working_hours: number;
+}

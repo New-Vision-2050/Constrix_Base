@@ -8,21 +8,49 @@ export const WEEK_DAYS = [
   { id: "friday", label: "الجمعة" },
 ];
 
-export const EMPLOYEE_OPTIONS = [
-  { id: "excludedJobs", value: "0 وظائف", label: "الوظائف المستثناه" },
-  { id: "workHoursCount", value: "1 س", label: "عدد ساعات العمل" },
+export type ConstraintRuleField =
+  | "max_working_hours"
+  | "early_clock_in_minutes"
+  | "out_zone_minutes"
+  | "lateness_minutes"
+  | "max_over_time";
+
+export type ConstraintRuleOption = {
+  id: ConstraintRuleField;
+  amount: number;
+  unit: string;
+  label: string;
+};
+
+export const CONSTRAINT_RULE_OPTIONS: ConstraintRuleOption[] = [
   {
-    id: "checkInBeforeShift",
-    value: "1 س",
+    id: "max_working_hours",
+    amount: 9,
+    unit: "س",
+    label: "عدد ساعات العمل",
+  },
+  {
+    id: "early_clock_in_minutes",
+    amount: 30,
+    unit: "د",
     label: "تحديد وقت تبصيم الدخول قبل بدأ الدوام",
   },
-  { id: "maxHours1", value: "1 س", label: "الحد الاقصى للساعات" },
-  { id: "outsideSite", value: "15 د", label: "خارج نطاق الموقع" },
-  { id: "gracePeriod", value: "2 س", label: "فترة السماح" },
   {
-    id: "checkOutAfterShift",
-    value: "15 د",
-    label: "تحديد وقت تبصيم الخروج بعد انتهاء الدوام",
+    id: "out_zone_minutes",
+    amount: 15,
+    unit: "د",
+    label: "خارج نطاق الموقع",
   },
-  { id: "maxHours2", value: "15 د", label: "الحد الاقصى للساعات" },
+  {
+    id: "lateness_minutes",
+    amount: 15,
+    unit: "د",
+    label: "فترة السماح",
+  },
+  {
+    id: "max_over_time",
+    amount: 4,
+    unit: "س",
+    label: "الحد الاقصى للساعات الإضافية",
+  },
 ];
