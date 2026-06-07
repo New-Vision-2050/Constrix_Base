@@ -8,7 +8,7 @@ type ResponseT = {
 };
 
 export default async function GetPrivileges(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/user_privileges/user/${userId}?type=health_insurance`);
+  const res = await apiClient.get<ResponseT>(`/user_privileges/user/${userId}`);
 
   return res.data.payload;
 }

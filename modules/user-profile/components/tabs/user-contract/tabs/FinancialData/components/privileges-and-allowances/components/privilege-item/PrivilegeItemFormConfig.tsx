@@ -26,6 +26,18 @@ export const PrivilegeItemFormConfig = ({
   const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances");
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const tEdit = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances.edit");
+
+  const isMedicalInsurance = (() => {
+    if (privilegeData) {
+      return privilegeData?.privilege?.type === "MedicalInsurance" ||
+        privilegeData?.privilege?.name?.includes("تأمين طبي");
+    }
+    const selectedPrivilege = privileges?.find(p => p.id === privilegeId);
+    return selectedPrivilege?.type === "MedicalInsurance" ||
+      selectedPrivilege?.name?.includes("تأمين طبي") ||
+      false;
+  })();
+
   const privilegeItemFormConfig: FormConfig = {
     formId: `privilege-form-${privilegeData?.id}`,
     laravelValidation: {
@@ -107,7 +119,7 @@ export const PrivilegeItemFormConfig = ({
               transformResponse: (data: any) => {
                 const items = Array.isArray(data) ? data : (data?.payload || []);
                 return items
-                  .filter((item: any) => item?.code && item?.name && item.code !== "percentage")
+                  .filter((item: any) => item?.code && item?.name && (isMedicalInsurance || item.code !== "percentage"))
                   .map((item: any) => ({ value: item.code, label: item.name }));
               },
             },
