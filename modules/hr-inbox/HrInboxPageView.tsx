@@ -17,6 +17,9 @@ import {
   type EmployeeTaskInboxListResponse,
   type EmployeeTaskInboxRow,
 } from "@/services/api/employee-tasks";
+import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
+import { hrInboxStatisticsConfig } from "@/modules/hr-inbox/components/statistics-config";
+import { HrInboxEchoSubscriber } from "@/modules/hr-inbox/components/HrInboxEchoSubscriber";
 
 const HrInboxTableLayout = HeadlessTableLayout<EmployeeTaskInboxRow>(
   "hr-employee-tasks-inbox",
@@ -56,6 +59,7 @@ function HrInboxPageView() {
   const t = useTranslations("HrInbox");
   const tLabels = useTranslations("labels");
 
+  const [refreshKey, setRefreshKey] = useState(0);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsRow, setDetailsRow] = useState<EmployeeTaskInboxRow | null>(
     null,
@@ -76,7 +80,12 @@ function HrInboxPageView() {
     initialLimit: 15,
   });
 
-  const { data: queryData, isLoading, isError, error } = useQuery({
+  const {
+    data: queryData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: [
       HR_EMPLOYEE_TASKS_INBOX_QUERY_KEY,
       params.page,
@@ -229,8 +238,13 @@ function HrInboxPageView() {
 
   return (
     <Box className="container mx-auto p-6">
+      <HrInboxEchoSubscriber onRefresh={() => setRefreshKey((k) => k + 1)} />
+      <StatisticsStoreRow
+        config={hrInboxStatisticsConfig}
+        refreshKey={refreshKey}
+      />
       <Box className="mb-8">
-        <Typography variant="h4" className="font-bold">
+        <Typography variant="h6" className="font-bold mb-2">
           {t("title")}
         </Typography>
         <Typography
@@ -246,7 +260,11 @@ function HrInboxPageView() {
         <Alert severity="error" className="mb-4">
           {t("loadError")}
           {error instanceof Error && process.env.NODE_ENV === "development" ? (
-            <Typography variant="caption" component="div" className="mt-2 font-mono">
+            <Typography
+              variant="caption"
+              component="div"
+              className="mt-2 font-mono"
+            >
               {error.message}
             </Typography>
           ) : null}
