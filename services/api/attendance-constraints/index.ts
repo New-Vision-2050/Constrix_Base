@@ -7,6 +7,7 @@ import type {
   GetConstraintEmployeesParams,
   GetConstraintLocationsParams,
   PatchConstraintBasicInfoParams,
+  PatchConstraintRulesParams,
 } from "./types/params";
 import type {
   AssignConstraintReplacementsBody,
@@ -464,6 +465,12 @@ export const AttendanceConstraintsApi = {
     body: AssignConstraintShiftsBody,
   ) =>
     baseApi.post(`attendance/constraints/${constraintId}/shifts`, body),
+
+  getRules: (constraintId: string) =>
+    baseApi.patch(`attendance/constraints/${constraintId}/rules`),
+
+  patchRules: (constraintId: string, body: PatchConstraintRulesParams) =>
+    baseApi.patch(`attendance/constraints/${constraintId}/rules`, body),
 };
 
 /** Alias preferred by determinant settings tabs (aligned with naming before `AttendanceConstraintsApi`). */
@@ -482,6 +489,7 @@ export type {
   GetConstraintEmployeesParams,
   GetConstraintLocationsParams,
   PatchConstraintBasicInfoParams,
+  PatchConstraintRulesParams,
 } from "./types/params";
 
 export type {
@@ -491,6 +499,8 @@ export type {
   ConstraintEmployeesListNormalized,
   ConstraintLocationPayload,
   ConstraintLocationsListApiResponse,
+  ConstraintRules,
+  ConstraintRulesApiResponse,
   ConstraintSelectedEmployeePayload,
   GroupedConstraintsLocations,
 } from "./types/response";

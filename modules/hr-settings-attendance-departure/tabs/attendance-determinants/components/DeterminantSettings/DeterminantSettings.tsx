@@ -38,7 +38,7 @@ export default function DeterminantSettings({
       </TabsContent>
       <TabsContent value="shifts" className="pt-2">
         <TimingSettingsSection constraintId={constraint.id} />
-        <AttendanceSettingsSection />
+        <AttendanceSettingsSection constraintId={constraint.id} />
       </TabsContent>
       <TabsContent value="employees-settings" className="pt-2">
         <SelectedEmployees constraintId={constraint.id} />

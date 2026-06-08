@@ -1,12 +1,7 @@
+import { useMemo } from "react";
+import { Autocomplete, TextField } from "@mui/material";
 import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
 interface AddEmployeeDialogProps {
@@ -29,33 +24,44 @@ export default function AddEmployeeDialog({
   isAssigning = false,
   onAssign,
 }: AddEmployeeDialogProps) {
+  const selectedEmployee = useMemo(
+    () => employees.find((employee) => employee.id === selectedEmployeeId) ?? null,
+    [employees, selectedEmployeeId],
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg">
         <DialogTitle className="text-right text-base">
           اضافة اسم الموظف
         </DialogTitle>
         <div className="space-y-4" dir="rtl">
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground text-right">
-              اسم الموظف
-            </p>
-            <Select
-              value={selectedEmployeeId}
-              onValueChange={(value: string) => onSelectedEmployeeChange(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اسم الموظف" />
-              </SelectTrigger>
-              <SelectContent>
-                {employees.map((employee) => (
-                  <SelectItem key={employee.id} value={employee.id}>
-                    {employee.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Autocomplete
+            key={isOpen ? "open" : "closed"}
+            fullWidth
+            options={employees}
+            value={selectedEmployee}
+            disabled={employees.length === 0 || isAssigning}
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            noOptionsText="لا توجد نتائج"
+            onChange={(_, newValue) =>
+              onSelectedEmployeeChange(newValue?.id ?? "")
+            }
+            slotProps={{
+              popper: {
+                disablePortal: true,
+                sx: { zIndex: (theme) => theme.zIndex.modal + 2 },
+              },
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="اسم الموظف"
+                placeholder="بحث باسم الموظف"
+              />
+            )}
+          />
 
           <Button
             type="button"
