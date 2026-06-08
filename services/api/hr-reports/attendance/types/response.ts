@@ -41,6 +41,7 @@ export type attendanceReport = {
   month: string | null;
   year: number;
   created_at: string;
+  serial_number: string;
 }
 
 export type AttendanceReportsListRaw = unknown;

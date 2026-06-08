@@ -2,19 +2,20 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import EditIcon from "@mui/icons-material/Edit";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AttendanceConstraints } from "@/services/api/attendance-constraints";
+import {
+  SectionBorderActions,
+} from "../../components/SectionBorderActions";
+import { SectionEditPinButton } from "../../components/SectionEditPinButton";
 import type { PatchConstraintRulesParams } from "@/services/api/attendance-constraints/types/params";
 import type { ConstraintRules } from "@/services/api/attendance-constraints/types/response";
 import {
   CONSTRAINT_RULE_OPTIONS,
   type ConstraintRuleField,
 } from "./timing-constants";
-import { Tooltip } from "@mui/material";
-
 const RULE_FIELDS: ConstraintRuleField[] = [
   "lateness_minutes",
   "early_clock_in_minutes",
@@ -143,41 +144,60 @@ export default function AttendanceSettingsSection({
     }));
   };
 
-  const handleEditToggle = useCallback(async () => {
-    if (!isEditing) {
-      setIsEditing(true);
-      return;
-    }
+  const handleCancel = useCallback(() => {
+    setValues(mergeRuleValues(rulesQuery.data));
+    setIsEditing(false);
+  }, [rulesQuery.data]);
 
+  const handleSave = useCallback(() => {
     patchRulesMutation.mutate(valuesToPatchBody(values));
-  }, [isEditing, patchRulesMutation, values]);
+  }, [patchRulesMutation, values]);
 
   const isBusy = rulesQuery.isLoading || patchRulesMutation.isPending;
 
-  return (
-    <section className="relative border border-border rounded-xl p-4 md:p-6">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="absolute top-3 left-3 h-9 w-9 text-primary hover:bg-primary/10"
-        onClick={handleEditToggle}
-        disabled={patchRulesMutation.isPending}
-        aria-label={isEditing ? "حفظ التعديل" : "تعديل"}
-        aria-pressed={isEditing}
-      >
-        {patchRulesMutation.isPending ? (
-          <Loader2 className="h-5 w-5 animate-spin text-primary" />
-        ) : (
-          <Tooltip title={isEditing ? "حفظ التعديل" : "تعديل"}>
-            <EditIcon
-              className={`h-9 w-9 ${isEditing ? "text-primary" : "text-muted-foreground"}`}
-            />
-          </Tooltip>
-        )}
-      </Button>
+  const sectionToolbar = rulesQuery.isLoading
+    ? null
+    : isEditing
+      ? (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-9 shrink-0"
+              disabled={patchRulesMutation.isPending}
+              onClick={handleCancel}
+            >
+              إلغاء
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              className="h-9 shrink-0 gap-2"
+              disabled={patchRulesMutation.isPending}
+              onClick={handleSave}
+            >
+              {patchRulesMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              ) : null}
+              حفظ
+            </Button>
+          </>
+        )
+      : (
+          <SectionEditPinButton
+            onClick={() => setIsEditing(true)}
+            disabled={patchRulesMutation.isPending}
+          />
+        );
 
-      <p className="text-xl font-semibold text-right mb-6">
+  return (
+    <section className="relative rounded-xl border border-primary/90 mt-4 px-5 pb-6 pt-5 shadow-sm backdrop-blur-[2px] sm:px-6 sm:pb-7 sm:pt-6">
+      {sectionToolbar != null ? (
+        <SectionBorderActions>{sectionToolbar}</SectionBorderActions>
+      ) : null}
+
+      <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground" dir="rtl">
         اعدادات تسجيل الحضور والانصراف
       </p>
 

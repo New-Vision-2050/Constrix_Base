@@ -10,7 +10,7 @@ import { DEFAULT_DAY_PERIOD_ROW } from "./timing-types";
 
 const WEEK_ID_SET = new Set<string>(WEEK_DAYS.map((d) => d.id));
 
-function to24HourHm(time: string, meridiem: "AM" | "PM"): string {
+export function to24HourHm(time: string, meridiem: "AM" | "PM"): string {
   const [hRaw, mRaw = "0"] = time.trim().split(":");
   let h = Number.parseInt(hRaw.trim(), 10);
   const m = Number.parseInt(String(mRaw).trim(), 10);

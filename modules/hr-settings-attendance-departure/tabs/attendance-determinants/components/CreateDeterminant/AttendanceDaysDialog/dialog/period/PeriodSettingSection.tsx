@@ -3,7 +3,7 @@ import {
   useAttendanceDayCxt,
 } from "../../context/AttendanceDayCxt";
 import { TimeUnits } from "@/modules/hr-settings-attendance-departure/tabs/attendance-determinants/constants/determinants";
-import InputWithSelect, { SelectOptionType } from "./InputWithSelect";
+import DurationUnitField from "./DurationUnitField";
 
 type PropsT = {
   t: (key: string) => string;
@@ -13,14 +13,6 @@ type PropsT = {
 export default function PeriodSettingSection({ t, period }: PropsT) {
   const { handleUpdateDayPeriod, isEdit } = useAttendanceDayCxt();
 
-  console.log(" PeriodSettingSection period", period);
-
-  // Convert TimeUnits to SelectOptionType
-  const timeUnitOptions: SelectOptionType[] = TimeUnits.map((unit) => ({
-    id: unit.id,
-    name: unit.name,
-  }));
-
   const sanitizeNonNegative = (value: string) => {
     if (value === "") return "";
     const numericValue = Number(value);
@@ -28,7 +20,6 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
     return String(Math.max(0, numericValue));
   };
 
-  // Handle early period change
   const handleEarlyPeriodChange = (value: string) => {
     handleUpdateDayPeriod({
       ...period,
@@ -36,7 +27,6 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
     });
   };
 
-  // Handle early period unit change
   const handleEarlyUnitChange = (value: string) => {
     handleUpdateDayPeriod({
       ...period,
@@ -44,7 +34,6 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
     });
   };
 
-  // Handle lateness period change
   const handleLatenessPeriodChange = (value: string) => {
     handleUpdateDayPeriod({
       ...period,
@@ -52,7 +41,6 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
     });
   };
 
-  // Handle lateness unit change
   const handleLatenessUnitChange = (value: string) => {
     handleUpdateDayPeriod({
       ...period,
@@ -61,32 +49,26 @@ export default function PeriodSettingSection({ t, period }: PropsT) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 p-2">
-      {/* Early period */}
-      <InputWithSelect
+    <div className="mt-4 grid grid-cols-1 gap-6 p-2 md:grid-cols-2">
+      <DurationUnitField
         label={t("earlyPeriodLabel")}
-        inputType="number"
-        inputDisabled={isEdit}
-        inputValue={period?.early_period ?? ""}
-        onInputChange={handleEarlyPeriodChange}
-        inputPlaceholder="30"
-        selectOptions={timeUnitOptions}
-        selectValue={period?.early_unit || ""}
-        onSelectChange={handleEarlyUnitChange}
-        className="transition-all hover:opacity-100 focus-within:opacity-100"
+        value={period?.early_period ?? ""}
+        unit={period?.early_unit || TimeUnits[0]?.id || "minute"}
+        unitOptions={TimeUnits}
+        placeholder="30"
+        disabled={isEdit}
+        onValueChange={handleEarlyPeriodChange}
+        onUnitChange={handleEarlyUnitChange}
       />
 
-      {/* Lateness period */}
-      <InputWithSelect
+      <DurationUnitField
         label={t("latenessPeriodLabel")}
-        inputType="number"
-        inputValue={period?.lateness_period ?? ""}
-        onInputChange={handleLatenessPeriodChange}
-        inputPlaceholder="30"
-        selectOptions={timeUnitOptions}
-        selectValue={period?.lateness_unit || ""}
-        onSelectChange={handleLatenessUnitChange}
-        className="transition-all hover:opacity-100 focus-within:opacity-100"
+        value={period?.lateness_period ?? ""}
+        unit={period?.lateness_unit || TimeUnits[0]?.id || "minute"}
+        unitOptions={TimeUnits}
+        placeholder="30"
+        onValueChange={handleLatenessPeriodChange}
+        onUnitChange={handleLatenessUnitChange}
       />
     </div>
   );

@@ -27,6 +27,33 @@ export type AttendanceDayPeriodType = {
   extends_to_next_day?: boolean;
 };
 
+export type AttendanceDaySchedulePeriod = {
+  index?: number;
+  from: string;
+  to: string;
+  early_period?: string;
+  early_unit?: string;
+  lateness_period?: string;
+  lateness_unit?: string;
+  extends_to_next_day?: boolean;
+};
+
+export type AttendanceDayEditedDay = {
+  day: string;
+  periods: AttendanceDaySchedulePeriod[];
+};
+
+export type AttendanceDaysStandaloneConfig = {
+  isOpen: boolean;
+  onClose: () => void;
+  editedDay?: AttendanceDayEditedDay | null;
+  initialSelectedDay?: string;
+  weeklySchedule?: AttendanceDayEditedDay[];
+  onSave: (dayConfig: AttendanceDayEditedDay) => void;
+  lockDaySelector?: boolean;
+  showPeriodToleranceSettings?: boolean;
+};
+
 // declare context types
 type AttendanceDayCxtType = {
   // selected day
@@ -51,6 +78,13 @@ type AttendanceDayCxtType = {
 
   // is edit
   isEdit: boolean;
+
+  lockDaySelector: boolean;
+
+  showPeriodToleranceSettings: boolean;
+
+  onSaveStandalone?: (dayConfig: AttendanceDayEditedDay) => void;
+  onCloseStandalone?: () => void;
 
   // extends to next day message
   extendsToNextDayMsg: string;
@@ -81,9 +115,29 @@ export const useAttendanceDayCxt = () => {
   return context;
 };
 
-export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
+function mapEditedPeriodsToDialogPeriods(
+  periods: AttendanceDaySchedulePeriod[] | undefined,
+): AttendanceDayPeriodType[] {
+  return (periods ?? []).map((period, index) => ({
+    index: period.index ?? index + 1,
+    start_time: period.from,
+    end_time: period.to,
+    early_period: period.early_period,
+    early_unit: period.early_unit,
+    lateness_period: period.lateness_period,
+    lateness_unit: period.lateness_unit,
+    extends_to_next_day: period.extends_to_next_day,
+  }));
+}
+
+export const AttendanceDayCxtProvider = (
+  props: React.PropsWithChildren<{
+    standaloneConfig?: AttendanceDaysStandaloneConfig;
+  }>,
+) => {
   // ** declare and define component state and variables
-  const { children } = props;
+  const { children, standaloneConfig } = props;
+  const isStandalone = Boolean(standaloneConfig);
   // ** handle side effects
   const [dayAvsilableHours, setdayAvailableHours] = useState(InitialTimeHours);
   const [selectedDay, SetSelectedDay] = useState<string>("");
@@ -175,9 +229,11 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
       `;
       SetExtendsToNextDayMsg(_message);
       // validation according next day config
-      const _weekly_schedule = useFormStore
-        ?.getState()
-        .getValue("create-determinant-form", "weekly_schedule");
+      const _weekly_schedule = isStandalone
+        ? (standaloneConfig?.weeklySchedule ?? [])
+        : useFormStore
+            ?.getState()
+            .getValue("create-determinant-form", "weekly_schedule");
       const _nextDayConfig = _weekly_schedule?.find(
         (day: any) => day.day == _nextDayName.value,
       );
@@ -238,9 +294,11 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     const nextDayName = DAYS_OF_WEEK[nextDayIndex].labelAr;
 
     // Get weekly schedule
-    const _weekly_schedule = useFormStore
-      ?.getState()
-      .getValue("create-determinant-form", "weekly_schedule");
+    const _weekly_schedule = isStandalone
+      ? (standaloneConfig?.weeklySchedule ?? [])
+      : useFormStore
+          ?.getState()
+          .getValue("create-determinant-form", "weekly_schedule");
 
     // Find next day config
     const nextDayConfig = _weekly_schedule?.find(
@@ -272,37 +330,46 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
       setNextDayHasConflict(false);
       setNextDayConflictMsg("");
     }
-  }, [selectedDay]);
+  }, [selectedDay, isStandalone, standaloneConfig?.weeklySchedule]);
 
-  // edited day
-  const _editedDay = useFormStore
-    ?.getState()
-    .getValue("create-determinant-form", "editedDay");
+  const dialogIsOpen = isStandalone
+    ? Boolean(standaloneConfig?.isOpen)
+    : Boolean(
+        useFormStore
+          ?.getState()
+          .getValue("create-determinant-form", "show_attendance_days_dialog"),
+      );
 
-  // prepare schedule data
-  const _weekly_schedule = useFormStore
-    ?.getState()
-    .getValue("create-determinant-form", "weekly_schedule");
+  const editedDay = isStandalone
+    ? (standaloneConfig?.editedDay ?? null)
+    : (useFormStore
+        ?.getState()
+        .getValue("create-determinant-form", "editedDay") as
+        | AttendanceDayEditedDay
+        | null
+        | undefined);
 
-  const _openDialog = useFormStore
-    ?.getState()
-    .getValue("create-determinant-form", "show_attendance_days_dialog");
+  const weeklyScheduleSource: AttendanceDayEditedDay[] = isStandalone
+    ? (standaloneConfig?.weeklySchedule ?? [])
+    : ((useFormStore
+        ?.getState()
+        .getValue("create-determinant-form", "weekly_schedule") ??
+        []) as AttendanceDayEditedDay[]);
 
   const usedDays: string[] = useMemo(() => {
-    if (_editedDay?.day) {
-      // When editing, exclude the edited day from usedDays so it remains selectable
+    if (editedDay?.day) {
       return (
-        _weekly_schedule
-          ?.filter((day: any) => day.day !== _editedDay.day)
-          ?.map((day: any) => day.day as string) || []
+        weeklyScheduleSource
+          ?.filter((day) => day.day !== editedDay.day)
+          ?.map((day) => day.day as string) || []
       );
     }
-    return _weekly_schedule?.map((day: any) => day.day as string) || [];
-  }, [_weekly_schedule, _editedDay]);
+    return weeklyScheduleSource?.map((day) => day.day as string) || [];
+  }, [weeklyScheduleSource, editedDay]);
 
   // Check if previous day has a period that extends to current day
   useEffect(() => {
-    if (!selectedDay || !_weekly_schedule) {
+    if (!selectedDay || !weeklyScheduleSource?.length) {
       setPreviousDayExtendedEndTime("");
       return;
     }
@@ -316,14 +383,14 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     const previousDayValue = DAYS_OF_WEEK[previousDayIndex].value;
 
     // Find previous day config in weekly schedule
-    const previousDayConfig = _weekly_schedule?.find(
-      (day: any) => day.day === previousDayValue,
+    const previousDayConfig = weeklyScheduleSource?.find(
+      (day) => day.day === previousDayValue,
     );
 
     if (previousDayConfig) {
       // Check if any period extends to next day
       const extendedPeriod = previousDayConfig.periods?.find(
-        (period: any) => period.extends_to_next_day,
+        (period) => period.extends_to_next_day,
       );
 
       if (extendedPeriod) {
@@ -335,60 +402,60 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     } else {
       setPreviousDayExtendedEndTime("");
     }
-  }, [selectedDay, _weekly_schedule]);
+  }, [selectedDay, weeklyScheduleSource]);
 
   useLayoutEffect(() => {
     // reset selected day and day periods when dialog is closed
-    if (!_openDialog) {
+    if (!dialogIsOpen) {
       SetSelectedDay("");
       SetDayPeriods([]);
       SetMinEdge("");
       SetMaxEdge("");
       setIsEdit(false);
-      useFormStore
-        ?.getState()
-        .setValue("create-determinant-form", "editedDay", null);
+      if (!isStandalone) {
+        useFormStore
+          ?.getState()
+          .setValue("create-determinant-form", "editedDay", null);
+      }
     } else {
-      if (_editedDay?.day) {
+      if (editedDay?.day) {
         setIsEdit(true);
-        const _newPeriods = (_editedDay.periods ?? []).map(
-          (period: any, index: number) => {
-            return {
-              index: index + 1,
-              start_time: period.from,
-              end_time: period.to,
-              early_period: period.early_period,
-              early_unit: period.early_unit,
-              lateness_period: period.lateness_period,
-              lateness_unit: period.lateness_unit,
-              extends_to_next_day: period.extends_to_next_day,
-            };
-          },
-        );
-        SetSelectedDay(_editedDay.day);
-        SetDayPeriods(_newPeriods);
+        SetSelectedDay(editedDay.day);
+        SetDayPeriods(mapEditedPeriodsToDialogPeriods(editedDay.periods));
+      } else if (standaloneConfig?.initialSelectedDay) {
+        setIsEdit(false);
+        SetSelectedDay(standaloneConfig.initialSelectedDay);
+        SetDayPeriods([]);
       } else {
         setIsEdit(false);
       }
     }
-  }, [_openDialog, _editedDay]);
+  }, [
+    dialogIsOpen,
+    editedDay,
+    isStandalone,
+    standaloneConfig?.initialSelectedDay,
+  ]);
 
   // ** declare and define component helper methods
   const handleDayChange = useMemo(() => {
     return (day: string) => {
-      const edited = useFormStore
-        ?.getState()
-        .getValue("create-determinant-form", "editedDay") as
-        | { day?: string }
-        | null
-        | undefined;
+      if (isStandalone && standaloneConfig?.lockDaySelector) return;
+      const edited = isStandalone
+        ? standaloneConfig?.editedDay
+        : (useFormStore
+            ?.getState()
+            .getValue("create-determinant-form", "editedDay") as
+            | { day?: string }
+            | null
+            | undefined);
       const isDev = (process.env.NEXT_PUBLIC_API_BASE_URL || "").includes(
         "dev",
       );
       if (edited?.day && !isDev) return;
       SetSelectedDay(day);
     };
-  }, []);
+  }, [isStandalone, standaloneConfig?.editedDay, standaloneConfig?.lockDaySelector]);
 
   const addMinuteToTime = (timeString?: string) => {
     if (!timeString) return "";
@@ -502,6 +569,18 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         dayAvsilableHours,
         // is edit
         isEdit,
+        lockDaySelector: Boolean(
+          isStandalone && standaloneConfig?.lockDaySelector,
+        ),
+        showPeriodToleranceSettings: isStandalone
+          ? (standaloneConfig?.showPeriodToleranceSettings ?? true)
+          : true,
+        onSaveStandalone: isStandalone
+          ? standaloneConfig?.onSave
+          : undefined,
+        onCloseStandalone: isStandalone
+          ? standaloneConfig?.onClose
+          : undefined,
         // extends to next day message
         extendsToNextDayMsg,
         // min edge in next day

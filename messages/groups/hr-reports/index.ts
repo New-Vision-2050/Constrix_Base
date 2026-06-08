@@ -54,6 +54,7 @@ export const hrReportsMessages = new MessagesGroup({
         "التقارير المُنشأة",
       ),
       colCreated: _m("Created", "تاريخ الإنشاء"),
+      colSerialNumber: _m("Serial number", "الرقم التسلسلي"),
       colPeriod: _m("Period", "الفترة"),
       colReportTypes: _m("Report types", "أنواع التقرير"),
       colBranch: _m("Branch", "الفرع"),

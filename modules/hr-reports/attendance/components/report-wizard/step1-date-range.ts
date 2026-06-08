@@ -20,12 +20,43 @@ export function defaultCalendarMonthRange(
   const y = reference.getFullYear();
   const mo = reference.getMonth() + 1;
   const from = new Date(y, mo - 1, 1);
-  const to = new Date(y, mo, 0);
+  const monthEnd = new Date(y, mo, 0);
+  const today = reference;
+  const to = monthEnd > today ? today : monthEnd;
+  return clampPastDateRange(
+    formatDateYYYYMMDD(from),
+    formatDateYYYYMMDD(to),
+    today,
+  );
+}
+
+/** Clamp both ends to today (inclusive) and keep an ordered range. */
+export function clampPastDateRange(
+  dateFrom: string,
+  dateTo: string,
+  today: Date = new Date(),
+): { dateFrom: string; dateTo: string; year: number; month: number } {
+  const todayIso = formatDateYYYYMMDD(today);
+  const clampToPastToday = (iso: string) => {
+    const t = iso.trim();
+    if (!t) return t;
+    return t > todayIso ? todayIso : t;
+  };
+
+  let from = clampToPastToday(dateFrom);
+  let to = clampToPastToday(dateTo);
+  ({ dateFrom: from, dateTo: to } = ensureOrderedRange(from, to));
+  from = clampToPastToday(from);
+  to = clampToPastToday(to);
+  ({ dateFrom: from, dateTo: to } = ensureOrderedRange(from, to));
+
+  const y = Number.parseInt(from.slice(0, 4), 10);
+  const mo = Number.parseInt(from.slice(5, 7), 10);
   return {
-    dateFrom: formatDateYYYYMMDD(from),
-    dateTo: formatDateYYYYMMDD(to),
-    year: y,
-    month: mo,
+    dateFrom: from,
+    dateTo: to,
+    year: Number.isFinite(y) ? y : today.getFullYear(),
+    month: Number.isFinite(mo) ? mo : today.getMonth() + 1,
   };
 }
 

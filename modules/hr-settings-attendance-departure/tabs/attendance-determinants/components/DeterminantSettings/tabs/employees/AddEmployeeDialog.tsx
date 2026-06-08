@@ -1,7 +1,14 @@
-import { useMemo } from "react";
-import { Autocomplete, TextField } from "@mui/material";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import {
+  Autocomplete,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
 import { Loader2 } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface AddEmployeeDialogProps {
@@ -24,21 +31,65 @@ export default function AddEmployeeDialog({
   isAssigning = false,
   onAssign,
 }: AddEmployeeDialogProps) {
+  const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) setIsAutocompleteOpen(false);
+  }, [isOpen]);
+
   const selectedEmployee = useMemo(
-    () => employees.find((employee) => employee.id === selectedEmployeeId) ?? null,
+    () =>
+      employees.find((employee) => employee.id === selectedEmployeeId) ?? null,
     [employees, selectedEmployeeId],
   );
 
+  const isExpanded = isAutocompleteOpen;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogTitle className="text-right text-base">
+    <Dialog
+      open={isOpen}
+      onClose={() => onOpenChange(false)}
+      maxWidth="lg"
+      PaperProps={{
+        sx: {
+          width: { xs: "92%", sm: "50%" },
+          maxWidth: 640,
+          minHeight: isExpanded ? "min(60vh, 520px)" : 220,
+          height: isExpanded ? "min(60vh, 520px)" : "auto",
+          transition:
+            "min-height 0.35s ease, height 0.35s ease, transform 0.35s ease",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        },
+      }}
+    >
+      <DialogContent
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          py: 2,
+          minHeight: 0,
+        }}
+        className="w-full"
+      >
+        <DialogTitle className="shrink-0 text-right text-base px-0 pt-0 pb-2">
           اضافة اسم الموظف
         </DialogTitle>
-        <div className="space-y-4" dir="rtl">
-          <Autocomplete
+
+        <div
+          className="flex min-h-0 flex-1 flex-col justify-start gap-4"
+          dir="rtl"
+        >
+          <div className="relative z-10 shrink-0">
+            <Autocomplete
             key={isOpen ? "open" : "closed"}
             fullWidth
+            open={isAutocompleteOpen}
+            onOpen={() => setIsAutocompleteOpen(true)}
+            onClose={() => setIsAutocompleteOpen(false)}
             options={employees}
             value={selectedEmployee}
             disabled={employees.length === 0 || isAssigning}
@@ -51,7 +102,17 @@ export default function AddEmployeeDialog({
             slotProps={{
               popper: {
                 disablePortal: true,
-                sx: { zIndex: (theme) => theme.zIndex.modal + 2 },
+                placement: "bottom-start",
+                sx: {
+                  zIndex: (theme) => theme.zIndex.modal + 2,
+                  position: "relative !important",
+                  transform: "none !important",
+                  width: "100%",
+                  inset: "auto !important",
+                },
+              },
+              listbox: {
+                sx: { maxHeight: "min(40vh, 280px)" },
               },
             }}
             renderInput={(params) => (
@@ -62,12 +123,15 @@ export default function AddEmployeeDialog({
               />
             )}
           />
+          </div>
 
           <Button
             type="button"
-            className="w-full gap-2"
+            className={`w-full shrink-0 gap-2 ${isExpanded ? "mt-auto" : ""}`}
             disabled={
-              !selectedEmployeeId.trim() || isAssigning || employees.length === 0
+              !selectedEmployeeId.trim() ||
+              isAssigning ||
+              employees.length === 0
             }
             onClick={onAssign}
           >
