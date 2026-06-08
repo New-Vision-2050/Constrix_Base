@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapRangePicker } from "@/components/shared/map-range-picker";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, Navigation, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type NationalAddressMapPayload = {
@@ -46,6 +46,8 @@ export default function NationalAddressMapDialog({
   const [locationLabel, setLocationLabel] = useState(DEFAULT_LOCATION);
   const [submitting, setSubmitting] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -55,7 +57,48 @@ export default function NationalAddressMapDialog({
     setLocationLabel(initialValues?.location ?? DEFAULT_LOCATION);
     setSaveError(null);
     setSubmitting(false);
+    setIsGettingLocation(false);
+    setLocationError(null);
   }, [open, initialValues]);
+
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("الموقع الجغرافي غير مدعوم في هذا المتصفح");
+      return;
+    }
+
+    setLocationError(null);
+    setIsGettingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(String(position.coords.latitude));
+        setLongitude(String(position.coords.longitude));
+        setIsGettingLocation(false);
+      },
+      (error) => {
+        let message = "فشل في الحصول على الموقع الحالي";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message = "تم رفض الإذن للوصول إلى الموقع";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message = "الموقع غير متاح";
+            break;
+          case error.TIMEOUT:
+            message = "انتهت مهلة الحصول على الموقع";
+            break;
+        }
+        setLocationError(message);
+        setIsGettingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
+    );
+  };
 
   const pin = useMemo(() => {
     const lat = Number.parseFloat(latitude.replace(",", "."));
@@ -162,6 +205,24 @@ export default function NationalAddressMapDialog({
               />
             </div>
           </div>
+
+          <Button
+            type="button"
+            variant="default"
+            className="w-full"
+            disabled={isGettingLocation || isBusy}
+            onClick={handleGetCurrentLocation}
+          >
+            <Navigation className="ms-2 h-4 w-4" aria-hidden />
+            {isGettingLocation ? "جاري تحديد الموقع..." : "تحديد الموقع الحالي"}
+          </Button>
+
+          {locationError ? (
+            <p className="text-sm text-destructive" role="alert">
+              {locationError}
+            </p>
+          ) : null}
+
           <div className="relative overflow-hidden rounded-xl border border-border bg-muted/20">
             <MapRangePicker
               onSelect={(lat, lng) => {

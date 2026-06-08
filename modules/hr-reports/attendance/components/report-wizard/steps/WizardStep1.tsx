@@ -21,20 +21,16 @@ import {
   REPORT_TYPE_OPTIONS,
   STEP1_ATTENDANCE_WIZARD_REPORT_TYPE_IDS,
 } from "../constants-step1";
-import { ensureOrderedRange } from "../step1-date-range";
+import {
+  clampPastDateRange,
+  formatDateYYYYMMDD,
+} from "../step1-date-range";
 import { useTranslations } from "next-intl";
 
 type Props = {
   value: ReportWizardStep1;
   onChange: (patch: Partial<ReportWizardStep1>) => void;
 };
-
-function yearMonthFromIso(iso: string): Pick<ReportWizardStep1, "year" | "month"> {
-  return {
-    year: Number(iso.slice(0, 4)),
-    month: Number(iso.slice(5, 7)),
-  };
-}
 
 export default function WizardStep1({ value, onChange }: Props) {
   const t = useTranslations("HRReports.attendanceReport.wizard");
@@ -52,6 +48,34 @@ export default function WizardStep1({ value, onChange }: Props) {
 
   const colA = REPORT_TYPE_OPTIONS.filter((o) => o.column === "a");
   const colB = REPORT_TYPE_OPTIONS.filter((o) => o.column === "b");
+
+  const todayIso = formatDateYYYYMMDD(new Date());
+  const periodDateFromMax =
+    value.dateTo && value.dateTo < todayIso ? value.dateTo : todayIso;
+  const periodDateToMin = value.dateFrom || todayIso;
+
+  React.useEffect(() => {
+    const clamped = clampPastDateRange(value.dateFrom, value.dateTo);
+    if (
+      clamped.dateFrom !== value.dateFrom ||
+      clamped.dateTo !== value.dateTo ||
+      clamped.year !== value.year ||
+      clamped.month !== value.month
+    ) {
+      onChange({
+        dateFrom: clamped.dateFrom,
+        dateTo: clamped.dateTo,
+        year: clamped.year,
+        month: clamped.month,
+      });
+    }
+  }, [
+    value.dateFrom,
+    value.dateTo,
+    value.year,
+    value.month,
+    onChange,
+  ]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -100,19 +124,18 @@ export default function WizardStep1({ value, onChange }: Props) {
               onChange={(e) => {
                 const v = e.target.value;
                 if (!v) return;
-                const { dateFrom, dateTo } = ensureOrderedRange(
-                  v,
-                  value.dateTo,
-                );
+                const clampedFrom = v > todayIso ? todayIso : v;
+                const clamped = clampPastDateRange(clampedFrom, value.dateTo);
                 onChange({
                   periodType: "range",
-                  dateFrom,
-                  dateTo,
-                  ...yearMonthFromIso(dateFrom),
+                  dateFrom: clamped.dateFrom,
+                  dateTo: clamped.dateTo,
+                  year: clamped.year,
+                  month: clamped.month,
                 });
               }}
               slotProps={{
-                htmlInput: { max: value.dateTo },
+                htmlInput: { max: periodDateFromMax },
                 inputLabel: { shrink: true },
               }}
             />
@@ -127,19 +150,18 @@ export default function WizardStep1({ value, onChange }: Props) {
               onChange={(e) => {
                 const v = e.target.value;
                 if (!v) return;
-                const { dateFrom, dateTo } = ensureOrderedRange(
-                  value.dateFrom,
-                  v,
-                );
+                const clampedTo = v > todayIso ? todayIso : v;
+                const clamped = clampPastDateRange(value.dateFrom, clampedTo);
                 onChange({
                   periodType: "range",
-                  dateFrom,
-                  dateTo,
-                  ...yearMonthFromIso(dateFrom),
+                  dateFrom: clamped.dateFrom,
+                  dateTo: clamped.dateTo,
+                  year: clamped.year,
+                  month: clamped.month,
                 });
               }}
               slotProps={{
-                htmlInput: { min: value.dateFrom },
+                htmlInput: { min: periodDateToMin, max: todayIso },
                 inputLabel: { shrink: true },
               }}
             />
