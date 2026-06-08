@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 interface Config {
   url: string;
   icons: React.ReactNode[];
+  transformResponse?: (payload: any) => { title: string; number: number }[];
 }
 
 const StatisticsStoreRow = ({
@@ -25,7 +26,14 @@ const StatisticsStoreRow = ({
     },
   });
 
-  const payload = data?.payload || [{}, {}, {}, {}];
+  const rawPayload = data?.payload;
+  const payload = config.transformResponse
+    ? config.transformResponse(rawPayload)
+    : Array.isArray(rawPayload)
+      ? rawPayload
+      : rawPayload && typeof rawPayload === "object"
+        ? Object.values(rawPayload)
+        : [{}, {}, {}, {}];
 
   return (
     <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 mb-6">
@@ -42,7 +50,7 @@ const StatisticsStoreRow = ({
             <h3
               className={cn(
                 "text-md ",
-                isLoading && "h-4 w-32 bg-popover rounded-md animate-pulse"
+                isLoading && "h-4 w-32 bg-popover rounded-md animate-pulse",
               )}
             >
               {item?.title}
@@ -51,7 +59,8 @@ const StatisticsStoreRow = ({
             <div
               className={cn(
                 "flex gap-3 items-center mt-1",
-                isLoading && "h-6 mt-1 w-24 bg-popover rounded-md animate-pulse"
+                isLoading &&
+                  "h-6 mt-1 w-24 bg-popover rounded-md animate-pulse",
               )}
             >
               {/* Display number or total */}
