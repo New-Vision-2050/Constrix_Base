@@ -10,10 +10,16 @@ import type {
   AssignConstraintShiftsBody,
   AssignConstraintShiftsWeeklyBody,
 } from "@/services/api/attendance-constraints/types/params";
-import AddPeriodsDialog from "./AddPeriodsDialog";
+import AttendanceDaysDialog from "../../../CreateDeterminant/AttendanceDaysDialog";
+import type { AttendanceDayEditedDay } from "../../../CreateDeterminant/AttendanceDaysDialog/context/AttendanceDayCxt";
 import DailyTimingSettings from "./daily";
 import WeeklyTimingSettings from "./weekly";
 import type { DayPeriodRow } from "./timing-types";
+import {
+  buildWeeklyScheduleForDialog,
+  dayPeriodRowsToEditedDay,
+  editedDayToDayPeriodRows,
+} from "./shift-attendance-dialog-bridge";
 import {
   buildDailyShiftsRequestBody,
   buildWeeklyShiftsRequestBody,
@@ -188,23 +194,52 @@ export default function TimingSettingsSection({
     });
   };
 
-  const dialogInitialRows = useMemo((): DayPeriodRow[] => {
-    if (!periodsDialog) return [];
+  const attendanceDialogConfig = useMemo(() => {
+    if (!periodsDialog) return null;
+
+    const weeklySchedule = buildWeeklyScheduleForDialog(
+      weeklyDays,
+      weeklyPeriodRows,
+      dayPeriodRows,
+    );
+
     if (periodsDialog.mode === "daily") {
-      return dayPeriodRows[periodsDialog.dayId] ?? [];
+      const dayId = periodsDialog.dayId;
+      const rows = dayPeriodRows[dayId] ?? [];
+      const isEdit = periodsDialog.intent === "edit" && rows.length > 0;
+
+      return {
+        editedDay: isEdit ? dayPeriodRowsToEditedDay(dayId, rows) : null,
+        initialSelectedDay: dayId,
+        weeklySchedule,
+        lockDaySelector: true,
+        showPeriodToleranceSettings: false,
+      };
     }
-    return weeklyPeriodRows;
-  }, [periodsDialog, dayPeriodRows, weeklyPeriodRows]);
 
-  const dialogTitle = useMemo(() => {
-    if (!periodsDialog) return tShifts("dialogAddPeriods");
-    return periodsDialog.intent === "edit"
-      ? tShifts("dialogEditPeriods")
-      : tShifts("dialogAddPeriods");
-  }, [periodsDialog, tShifts]);
+    const anchorDay = weeklyDays[0] ?? "sunday";
+    const isEdit =
+      periodsDialog.intent === "edit" && weeklyPeriodRows.length > 0;
 
-  const handleSavePeriods = (rows: DayPeriodRow[]) => {
+    return {
+      editedDay: isEdit
+        ? dayPeriodRowsToEditedDay(anchorDay, weeklyPeriodRows)
+        : null,
+      initialSelectedDay: anchorDay,
+      weeklySchedule,
+      lockDaySelector: true,
+      showPeriodToleranceSettings: false,
+    };
+  }, [
+    periodsDialog,
+    weeklyDays,
+    weeklyPeriodRows,
+    dayPeriodRows,
+  ]);
+
+  const handleSavePeriods = (dayConfig: AttendanceDayEditedDay) => {
     if (!periodsDialog) return;
+    const rows = editedDayToDayPeriodRows(dayConfig);
     if (periodsDialog.mode === "daily") {
       setDayPeriodRows((previous) => ({
         ...previous,
@@ -267,24 +302,19 @@ export default function TimingSettingsSection({
         </TabsContent>
       </Tabs>
 
-      <AddPeriodsDialog
-        key={
-          periodsDialog
-            ? `${periodsDialog.mode}-${
-                periodsDialog.mode === "daily"
-                  ? periodsDialog.dayId
-                  : "weekly"
-              }`
-            : "closed"
-        }
-        open={periodsDialog !== null}
-        onOpenChange={(open) => {
-          if (!open) setPeriodsDialog(null);
-        }}
-        title={dialogTitle}
-        initialRows={dialogInitialRows}
-        onSave={handleSavePeriods}
-      />
+      {periodsDialog && attendanceDialogConfig ? (
+        <AttendanceDaysDialog
+          key={`${periodsDialog.mode}-${
+            periodsDialog.mode === "daily" ? periodsDialog.dayId : "weekly"
+          }-${periodsDialog.intent}`}
+          isOpen
+          onClose={() => setPeriodsDialog(null)}
+          standaloneConfig={{
+            ...attendanceDialogConfig,
+            onSave: handleSavePeriods,
+          }}
+        />
+      ) : null}
     </>
   );
 }

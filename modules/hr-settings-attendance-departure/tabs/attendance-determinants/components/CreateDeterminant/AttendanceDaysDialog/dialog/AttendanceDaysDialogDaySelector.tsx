@@ -18,7 +18,7 @@ const AttendanceDaysDialogDaySelector: React.FC<
   );
   const locale = useLocale();
   const isArabic = locale === "ar";
-  const { usedDays, isEdit } = useAttendanceDayCxt();
+  const { usedDays, isEdit, lockDaySelector } = useAttendanceDayCxt();
 
   const isDev = (process.env.NEXT_PUBLIC_API_BASE_URL || "").includes("dev");
 
@@ -43,7 +43,7 @@ const AttendanceDaysDialogDaySelector: React.FC<
         placeholder={placeholder || t("selectDay")}
         searchPlaceholder={isArabic ? t("search") : t("search")}
         noResultsText={isArabic ? t("noResults") : t("noResults")}
-        disabled={isEdit && !isDev}
+        disabled={(isEdit && !isDev) || lockDaySelector}
       />
     </div>
   );

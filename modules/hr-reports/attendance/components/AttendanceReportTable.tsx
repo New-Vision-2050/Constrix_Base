@@ -207,6 +207,16 @@ export default function AttendanceReportTable() {
   const columns = useMemo(
     () => [
       {
+        key: "serial_number",
+        name: t("colSerialNumber"),
+        sortable: false,
+        render: (row: attendanceReport) => (
+          <span className="p-2 text-sm">
+            {row.serial_number}
+          </span>
+        ),
+      },
+      {
         key: "created_at",
         name: t("colCreated"),
         sortable: false,
