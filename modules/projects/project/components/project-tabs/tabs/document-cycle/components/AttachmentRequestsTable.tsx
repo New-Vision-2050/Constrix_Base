@@ -146,7 +146,7 @@ export default function AttachmentRequestsTable() {
   const [filterDirection, setFilterDirection] = useState<
     "" | "incoming" | "outgoing"
   >("");
-  const [filterReceiverName, setFilterReceiverName] = useState("");
+  const [filterReceiverId, setFilterReceiverId] = useState("");
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
@@ -160,7 +160,7 @@ export default function AttachmentRequestsTable() {
     type: filterType || undefined,
     endDate: filterEndDate || undefined,
     direction: filterDirection,
-    receiverName: filterReceiverName || undefined,
+    receiverId: filterReceiverId || undefined,
   });
 
   const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
@@ -348,16 +348,16 @@ export default function AttachmentRequestsTable() {
                   select
                   size="small"
                   label={t("counterpartyColumn")}
-                  value={filterReceiverName}
+                  value={filterReceiverId}
                   onChange={(e) => {
-                    setFilterReceiverName(e.target.value);
+                    setFilterReceiverId(e.target.value);
                     params.setPage(1);
                   }}
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
                   {sharedCompanies.map((company) => (
-                    <MenuItem key={company.id} value={company.name}>
+                    <MenuItem key={company.id} value={String(company.id)}>
                       {company.name}
                     </MenuItem>
                   ))}
