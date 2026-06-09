@@ -140,6 +140,7 @@ export const SubProgramsList = memo(function SubProgramsList({
                     <ListItemIcon
                       sx={{
                         minWidth: 40,
+                        overflow: "visible",
                         color:
                           isActive && isGreenTheme
                             ? "primary.contrastText"
