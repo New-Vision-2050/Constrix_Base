@@ -109,6 +109,7 @@ export interface UseAttachmentRequestsParams {
   endDate?: string;
   direction?: "" | "incoming" | "outgoing";
   receiverId?: string;
+  name?: string;
 }
 
 export const attachmentRequestsQueryKey = (
@@ -131,6 +132,7 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
     endDate,
     direction,
     receiverId,
+    name,
   } = params;
 
   return useQuery({
@@ -147,6 +149,7 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
           ? { direction }
           : {}),
         ...(receiverId ? { receiver_id: receiverId } : {}),
+        ...(name ? { name } : {}),
       });
 
       const body = res.data;
