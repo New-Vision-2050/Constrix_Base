@@ -34,10 +34,8 @@ export const hrInboxMessages = new MessagesGroup({
   ),
   approve: _m("Approve", "موافقة"),
   reject: _m("Reject", "رفض"),
-  rejectReason: _m(
-    "Rejection reason",
-    "سبب الرفض",
-  ),
+  rejectDialogTitle: _m("Reject task", "رفض المهمة"),
+  rejectReason: _m("Rejection reason", "سبب الرفض"),
   rejectReasonHelper: _m(
     "Required to reject this task.",
     "مطلوب لرفض هذه المهمة.",

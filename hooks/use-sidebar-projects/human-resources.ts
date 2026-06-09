@@ -1,5 +1,6 @@
-import { BarChart3, Inbox, LayoutDashboardIcon, UserIcon } from "lucide-react";
+import { BarChart3, LayoutDashboardIcon, UserIcon } from "lucide-react";
 import SettingsIcon from "@/public/icons/settings";
+import HrInboxIconWithCount from "@/components/icons/hr-inbox";
 import { ROUTER } from "@/router";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
@@ -57,7 +58,7 @@ export function getHumanResourcesProject({
       {
         name: t("Sidebar.Inbox"),
         url: ROUTER.HR_INBOX,
-        icon: Inbox,
+        icon: HrInboxIconWithCount,
         isActive: matchesRoute(fullPath, ROUTER.HR_INBOX),
         show:
           !isCentralCompany &&
