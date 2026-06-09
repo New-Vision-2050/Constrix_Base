@@ -6,13 +6,15 @@ import {
   Button,
   MenuItem,
   Paper,
+  Stack,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { toast } from "@/modules/table/hooks/use-toast";
 import { getErrorMessage } from "@/utils/errorHandler";
@@ -26,7 +28,6 @@ import {
 } from "../utils/report-api-body";
 import {
   attendanceReportExportLabel,
-  attendanceReportListTitle,
   attendanceReportPeriodLabel,
   attendanceReportTypesLabel,
   parseAttendanceReportListResponse,
@@ -35,6 +36,7 @@ import type { ReportWizardPayload } from "./report-wizard/types";
 import AttendanceReportDetailDialog from "./AttendanceReportDetailDialog";
 import DeleteAttendanceReportDialog from "./DeleteAttendanceReportDialog";
 import ReportCreationWizardDialog from "./report-wizard/ReportCreationWizardDialog";
+import { clampPastDateRange, formatDateYYYYMMDD } from "./report-wizard/step1-date-range";
 import CustomMenu from "@/components/headless/custom-menu";
 
 const HeadlessCreatedReportsTable = HeadlessTableLayout<attendanceReport>(
@@ -44,15 +46,17 @@ const HeadlessCreatedReportsTable = HeadlessTableLayout<attendanceReport>(
 export default function AttendanceReportTable() {
   const t = useTranslations("HRReports.attendanceReport.table");
   const tPage = useTranslations("HRReports.attendanceReport");
-  const locale = useLocale();
   const format = useFormatter();
 
   const tDeleteConfirm = useTranslations("common.deleteConfirmation");
   const tWizard = useTranslations("HRReports.attendanceReport.wizard");
   const tRt = useTranslations("HRReports.attendanceReport.wizard.reportTypes");
   const tMonth = useTranslations("HRReports.attendanceReport.wizard.month");
+  const tLabels = useTranslations("labels");
 
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [reports, setReports] = useState<attendanceReport[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
@@ -68,6 +72,11 @@ export default function AttendanceReportTable() {
     initialLimit: 10,
   });
 
+  const todayIso = formatDateYYYYMMDD(new Date());
+  const periodDateFromMax =
+    dateTo && dateTo < todayIso ? dateTo : todayIso;
+  const periodDateToMin = dateFrom || todayIso;
+
   const formatCreatedAt = useCallback(
     (iso: string) => {
       const d = new Date(iso);
@@ -80,6 +89,24 @@ export default function AttendanceReportTable() {
     [format],
   );
 
+  const listDateFilters = useMemo(() => {
+    if (!dateFrom && !dateTo) return {};
+    const clamped = clampPastDateRange(dateFrom, dateTo);
+    return {
+      ...(clamped.dateFrom ? { date_from: clamped.dateFrom } : {}),
+      ...(clamped.dateTo ? { date_to: clamped.dateTo } : {}),
+      status: "ready" as const,
+    };
+  }, [dateFrom, dateTo]);
+
+  const hasDateFilter = Boolean(dateFrom || dateTo);
+
+  const handleClearDateFilter = () => {
+    setDateFrom("");
+    setDateTo("");
+    params.setPage(1);
+  };
+
   useEffect(() => {
     let cancelled = false;
     setListLoading(true);
@@ -87,6 +114,7 @@ export default function AttendanceReportTable() {
     AttendanceReportsApi.getList({
       page: params.page,
       per_page: params.limit,
+      ...listDateFilters,
     })
       .then((res) => {
         if (cancelled) return;
@@ -113,7 +141,7 @@ export default function AttendanceReportTable() {
     return () => {
       cancelled = true;
     };
-  }, [params.page, params.limit, listVersion, t]);
+  }, [params.page, params.limit, listVersion, listDateFilters, t]);
 
   useEffect(() => {
     if (listLoading) return;
@@ -241,11 +269,7 @@ export default function AttendanceReportTable() {
         name: t("colReportTypes"),
         sortable: false,
         render: (row: attendanceReport) =>
-          ellipsisCell(
-            attendanceReportListTitle(row, locale) ||
-              attendanceReportTypesLabel(row, tRt),
-            260,
-          ),
+          ellipsisCell(attendanceReportTypesLabel(row, tRt), 260),
       },
       {
         key: "branch",
@@ -314,7 +338,6 @@ export default function AttendanceReportTable() {
       tMonth,
       tWizard,
       tRt,
-      locale,
       formatCreatedAt,
     ],
   );
@@ -329,7 +352,7 @@ export default function AttendanceReportTable() {
     getRowId: (row) => row.id,
     loading: listLoading,
     searchable: false,
-    filtered: false,
+    filtered: hasDateFilter,
   });
 
   return (
@@ -362,7 +385,72 @@ export default function AttendanceReportTable() {
                 {tPage("createAttendanceReport")}
               </Button>
             }
-          />
+          >
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              alignItems={{ xs: "stretch", sm: "center" }}
+              sx={{ mb: 1 }}
+            >
+              <TextField
+                type="date"
+                size="small"
+                label={tWizard("periodDateFrom")}
+                value={dateFrom}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (!v) {
+                    setDateFrom("");
+                    params.setPage(1);
+                    return;
+                  }
+                  const clampedFrom = v > todayIso ? todayIso : v;
+                  const clamped = clampPastDateRange(clampedFrom, dateTo);
+                  setDateFrom(clamped.dateFrom);
+                  setDateTo(clamped.dateTo);
+                  params.setPage(1);
+                }}
+                slotProps={{
+                  htmlInput: { max: periodDateFromMax },
+                  inputLabel: { shrink: true },
+                }}
+                sx={{ minWidth: 160 }}
+              />
+              <TextField
+                type="date"
+                size="small"
+                label={tWizard("periodDateTo")}
+                value={dateTo}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (!v) {
+                    setDateTo("");
+                    params.setPage(1);
+                    return;
+                  }
+                  const clampedTo = v > todayIso ? todayIso : v;
+                  const clamped = clampPastDateRange(dateFrom, clampedTo);
+                  setDateFrom(clamped.dateFrom);
+                  setDateTo(clamped.dateTo);
+                  params.setPage(1);
+                }}
+                slotProps={{
+                  htmlInput: { min: periodDateToMin, max: todayIso },
+                  inputLabel: { shrink: true },
+                }}
+                sx={{ minWidth: 160 }}
+              />
+              {hasDateFilter ? (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleClearDateFilter}
+                >
+                  {tLabels("reset")}
+                </Button>
+              ) : null}
+            </Stack>
+          </HeadlessCreatedReportsTable.TopActions>
         }
         table={
           <HeadlessCreatedReportsTable.Table
