@@ -36,7 +36,7 @@ import type { ReportWizardPayload } from "./report-wizard/types";
 import AttendanceReportDetailDialog from "./AttendanceReportDetailDialog";
 import DeleteAttendanceReportDialog from "./DeleteAttendanceReportDialog";
 import ReportCreationWizardDialog from "./report-wizard/ReportCreationWizardDialog";
-import { ensureOrderedRange } from "./report-wizard/step1-date-range";
+import { clampPastDateRange, formatDateYYYYMMDD } from "./report-wizard/step1-date-range";
 import CustomMenu from "@/components/headless/custom-menu";
 
 const HeadlessCreatedReportsTable = HeadlessTableLayout<attendanceReport>(
@@ -72,6 +72,11 @@ export default function AttendanceReportTable() {
     initialLimit: 10,
   });
 
+  const todayIso = formatDateYYYYMMDD(new Date());
+  const periodDateFromMax =
+    dateTo && dateTo < todayIso ? dateTo : todayIso;
+  const periodDateToMin = dateFrom || todayIso;
+
   const formatCreatedAt = useCallback(
     (iso: string) => {
       const d = new Date(iso);
@@ -86,10 +91,10 @@ export default function AttendanceReportTable() {
 
   const listDateFilters = useMemo(() => {
     if (!dateFrom && !dateTo) return {};
-    const ordered = ensureOrderedRange(dateFrom, dateTo);
+    const clamped = clampPastDateRange(dateFrom, dateTo);
     return {
-      ...(ordered.dateFrom ? { date_from: ordered.dateFrom } : {}),
-      ...(ordered.dateTo ? { date_to: ordered.dateTo } : {}),
+      ...(clamped.dateFrom ? { date_from: clamped.dateFrom } : {}),
+      ...(clamped.dateTo ? { date_to: clamped.dateTo } : {}),
       status: "ready" as const,
     };
   }, [dateFrom, dateTo]);
@@ -393,11 +398,20 @@ export default function AttendanceReportTable() {
                 label={tWizard("periodDateFrom")}
                 value={dateFrom}
                 onChange={(e) => {
-                  setDateFrom(e.target.value);
+                  const v = e.target.value;
+                  if (!v) {
+                    setDateFrom("");
+                    params.setPage(1);
+                    return;
+                  }
+                  const clampedFrom = v > todayIso ? todayIso : v;
+                  const clamped = clampPastDateRange(clampedFrom, dateTo);
+                  setDateFrom(clamped.dateFrom);
+                  setDateTo(clamped.dateTo);
                   params.setPage(1);
                 }}
                 slotProps={{
-                  htmlInput: { max: dateTo || undefined },
+                  htmlInput: { max: periodDateFromMax },
                   inputLabel: { shrink: true },
                 }}
                 sx={{ minWidth: 160 }}
@@ -408,11 +422,20 @@ export default function AttendanceReportTable() {
                 label={tWizard("periodDateTo")}
                 value={dateTo}
                 onChange={(e) => {
-                  setDateTo(e.target.value);
+                  const v = e.target.value;
+                  if (!v) {
+                    setDateTo("");
+                    params.setPage(1);
+                    return;
+                  }
+                  const clampedTo = v > todayIso ? todayIso : v;
+                  const clamped = clampPastDateRange(dateFrom, clampedTo);
+                  setDateFrom(clamped.dateFrom);
+                  setDateTo(clamped.dateTo);
                   params.setPage(1);
                 }}
                 slotProps={{
-                  htmlInput: { min: dateFrom || undefined },
+                  htmlInput: { min: periodDateToMin, max: todayIso },
                   inputLabel: { shrink: true },
                 }}
                 sx={{ minWidth: 160 }}
