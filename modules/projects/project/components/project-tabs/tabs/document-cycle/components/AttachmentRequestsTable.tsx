@@ -11,11 +11,13 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useAttachmentRequests } from "@/modules/projects/project/query/useAttachmentRequests";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 import {
   PROJECT_ARCHIVE_CYCLE_CREATE,
   PROJECT_ARCHIVE_CYCLE_LIST,
@@ -31,14 +33,22 @@ import AddFileDialog from "./AddFileDialog";
 import AttachmentRequestDetailDialog from "./AttachmentRequestDetailDialog";
 import { EyeIcon } from "lucide-react";
 
-const TableLayout = HeadlessTableLayout<DocumentRow>("attachment-requests-table");
+const TableLayout = HeadlessTableLayout<DocumentRow>(
+  "attachment-requests-table",
+);
 
 const filterSx = {
   flex: 1,
   "& .MuiOutlinedInput-root": { borderRadius: "8px" },
 } as const;
 
-function RequestFlowCell({ row, t }: { row: DocumentRow; t: (key: string) => string }) {
+function RequestFlowCell({
+  row,
+  t,
+}: {
+  row: DocumentRow;
+  t: (key: string) => string;
+}) {
   if (row.status === "draft") {
     return (
       <Box
@@ -111,18 +121,32 @@ export default function AttachmentRequestsTable() {
     [flatPerms],
   );
 
+  // Fetch shared companies for receiver filter dropdown
+  const { data: sharesData } = useQuery({
+    queryKey: ["project-shares", projectId],
+    queryFn: () => ProjectSharingApi.listForProject(projectId!),
+    enabled: !!projectId,
+  });
+
+  const sharedCompanies = useMemo(() => {
+    const shares = sharesData?.data?.payload ?? [];
+    return shares
+      .map((share) => share.shared_with_company)
+      .filter((c): c is NonNullable<typeof c> => !!c && !!c.name);
+  }, [sharesData]);
+
   const [addFileOpen, setAddFileOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentRow | null>(
     null,
   );
 
-  const [filterDocType, setFilterDocType] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterEndDate, setFilterEndDate] = useState("");
   const [filterDirection, setFilterDirection] = useState<
     "" | "incoming" | "outgoing"
   >("");
+  const [filterReceiverName, setFilterReceiverName] = useState("");
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
@@ -133,10 +157,10 @@ export default function AttachmentRequestsTable() {
     projectId,
     page: params.page,
     perPage: params.limit,
-    documentType: filterDocType || undefined,
     type: filterType || undefined,
     endDate: filterEndDate || undefined,
     direction: filterDirection,
+    receiverName: filterReceiverName || undefined,
   });
 
   const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
@@ -165,17 +189,13 @@ export default function AttachmentRequestsTable() {
         key: "requestFlow",
         name: t("requestFlowColumn"),
         sortable: false,
-        render: (row: DocumentRow) => (
-          <RequestFlowCell row={row} t={t} />
-        ),
+        render: (row: DocumentRow) => <RequestFlowCell row={row} t={t} />,
       },
       {
         key: "serialNumber",
         name: t("serialNumber"),
         sortable: false,
-        render: (row: DocumentRow) => (
-          <span>{row.serialNumber || row.id}</span>
-        ),
+        render: (row: DocumentRow) => <span>{row.serialNumber || row.id}</span>,
       },
       {
         key: "sender",
@@ -305,16 +325,42 @@ export default function AttachmentRequestsTable() {
                 <TextField
                   select
                   size="small"
-                  label={t("documentType")}
-                  value={filterDocType}
+                  label={t("requestDirectionFilter")}
+                  value={filterDirection}
                   onChange={(e) => {
-                    setFilterDocType(e.target.value);
+                    setFilterDirection(
+                      e.target.value as "" | "incoming" | "outgoing",
+                    );
                     params.setPage(1);
                   }}
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
-                  <MenuItem value="review">{t("type")}</MenuItem>
+                  <MenuItem value="outgoing">
+                    {t("requestTypeOutgoing")}
+                  </MenuItem>
+                  <MenuItem value="incoming">
+                    {t("requestTypeIncoming")}
+                  </MenuItem>
+                </TextField>
+
+                <TextField
+                  select
+                  size="small"
+                  label={t("counterpartyColumn")}
+                  value={filterReceiverName}
+                  onChange={(e) => {
+                    setFilterReceiverName(e.target.value);
+                    params.setPage(1);
+                  }}
+                  sx={filterSx}
+                >
+                  <MenuItem value="">{t("all")}</MenuItem>
+                  {sharedCompanies.map((company) => (
+                    <MenuItem key={company.id} value={company.name}>
+                      {company.name}
+                    </MenuItem>
+                  ))}
                 </TextField>
 
                 <TextField
@@ -332,24 +378,6 @@ export default function AttachmentRequestsTable() {
                   <MenuItem value="draft">{t("draft")}</MenuItem>
                   <MenuItem value="approved">{t("approved")}</MenuItem>
                   <MenuItem value="rejected">{t("rejected")}</MenuItem>
-                </TextField>
-
-                <TextField
-                  select
-                  size="small"
-                  label={t("requestDirectionFilter")}
-                  value={filterDirection}
-                  onChange={(e) => {
-                    setFilterDirection(
-                      e.target.value as "" | "incoming" | "outgoing",
-                    );
-                    params.setPage(1);
-                  }}
-                  sx={filterSx}
-                >
-                  <MenuItem value="">{t("all")}</MenuItem>
-                  <MenuItem value="outgoing">{t("requestTypeOutgoing")}</MenuItem>
-                  <MenuItem value="incoming">{t("requestTypeIncoming")}</MenuItem>
                 </TextField>
 
                 <TextField
@@ -382,10 +410,7 @@ export default function AttachmentRequestsTable() {
             </Stack>
           }
           table={
-            <TableLayout.Table
-              state={state}
-              loadingOptions={{ rows: 5 }}
-            />
+            <TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />
           }
           pagination={<TableLayout.Pagination state={state} />}
         />
