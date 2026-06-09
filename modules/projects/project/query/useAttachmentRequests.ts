@@ -44,9 +44,7 @@ function resolveFlow(item: AttachmentRequestWithFlow): "incoming" | "outgoing" {
 
 function resolveSenderName(item: AttachmentRequest): string {
   return (
-    item.sender_company?.name?.trim() ||
-    item.created_by?.name?.trim() ||
-    "—"
+    item.sender_company?.name?.trim() || item.created_by?.name?.trim() || "—"
   );
 }
 
@@ -58,9 +56,7 @@ function mapToDocumentRow(item: AttachmentRequestWithFlow): DocumentRow {
   const preview = item.attachments_preview ?? item.items ?? [];
   const firstFile = preview[0];
   const docCount =
-    preview.length > 0
-      ? preview.length
-      : (item.statistics?.total_items ?? 0);
+    preview.length > 0 ? preview.length : (item.statistics?.total_items ?? 0);
 
   const attachments =
     preview.length > 0
@@ -115,8 +111,9 @@ export interface UseAttachmentRequestsParams {
   receiverName?: string;
 }
 
-export const attachmentRequestsQueryKey = (params: UseAttachmentRequestsParams) =>
-  [ATTACHMENT_REQUESTS_QUERY_KEY, params] as const;
+export const attachmentRequestsQueryKey = (
+  params: UseAttachmentRequestsParams,
+) => [ATTACHMENT_REQUESTS_QUERY_KEY, params] as const;
 
 export interface AttachmentRequestsResult {
   data: DocumentRow[];
