@@ -8,10 +8,7 @@ export function useConstraintBasicInfo(constraintId: string | undefined) {
   return useQuery({
     queryKey: constraintBasicInfoQueryKey(constraintId),
     queryFn: async () => {
-      const res = await AttendanceConstraints.patchBasicInfo(
-        constraintId!,
-        {},
-      );
+      const res = await AttendanceConstraints.getBasicInfo(constraintId!);
       return res.data.payload;
     },
     enabled: Boolean(constraintId),
