@@ -467,7 +467,7 @@ export const AttendanceConstraintsApi = {
     baseApi.post(`attendance/constraints/${constraintId}/shifts`, body),
 
   getRules: (constraintId: string) =>
-    baseApi.patch(`attendance/constraints/${constraintId}/rules`),
+    baseApi.get(`attendance/constraints/${constraintId}/rules`),
 
   patchRules: (constraintId: string, body: PatchConstraintRulesParams) =>
     baseApi.patch(`attendance/constraints/${constraintId}/rules`, body),
