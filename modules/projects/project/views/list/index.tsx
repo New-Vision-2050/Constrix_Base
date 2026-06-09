@@ -341,6 +341,7 @@ function ProjectsList() {
                   onDelete={() => handleDelete(project.id)}
                   t={t}
                   tProject={tProject}
+                  locale={locale}
                 />
               ))}
             </Box>

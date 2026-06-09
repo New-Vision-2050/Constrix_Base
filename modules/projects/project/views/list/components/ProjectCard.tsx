@@ -6,8 +6,10 @@ import {
   LinearProgress,
   MenuItem,
 } from "@mui/material";
-import { EditIcon, Trash2, MoreVertical } from "lucide-react";
+import { EditIcon, Trash2, MoreVertical, Eye } from "lucide-react";
 import CustomMenu from "@/components/headless/custom-menu";
+import { Link } from "@/i18n/navigation";
+import { ROUTER } from "@/router";
 import { ProjectRow, PROJECT_STATUS_MAP } from "../columns";
 
 interface ProjectCardProps {
@@ -16,6 +18,7 @@ interface ProjectCardProps {
   onDelete: () => void;
   t: (key: string) => string;
   tProject: (key: string) => string;
+  locale: string;
 }
 
 export function ProjectCard({
@@ -24,6 +27,7 @@ export function ProjectCard({
   onDelete,
   t,
   tProject,
+  locale,
 }: ProjectCardProps) {
   const statusCfg =
     project.status !== undefined
@@ -36,10 +40,7 @@ export function ProjectCard({
     {
       labelKey: "columnRefNumber",
       value:
-        project.serial_number ??
-        project.ref_number ??
-        project.id ??
-        emptyCell,
+        project.serial_number ?? project.ref_number ?? project.id ?? emptyCell,
     },
     {
       labelKey: "columnClientName",
@@ -103,6 +104,14 @@ export function ProjectCard({
           <MenuItem onClick={onDelete}>
             <Trash2 className="w-4 h-4 ml-2" />
             {t("labels.delete")}
+          </MenuItem>
+          <MenuItem
+            component={Link}
+            href={ROUTER.PROJECT_DETAILS(String(project.id))}
+            locale={locale}
+          >
+            <Eye className="w-4 h-4 ml-2" />
+            {t("labels.show")}
           </MenuItem>
         </CustomMenu>
       </Box>
