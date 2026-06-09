@@ -111,7 +111,7 @@ export const projectMessages = new MessagesGroup({
     initialReview: _m("Initial Review", "مراجعة اولية"),
     technicalApproval: _m("Technical Approval", "اعتماد فني"),
     commercialApproval: _m("Commercial Approval", "موافقة تجارية"),
-    approve: _m("Approve", "اعتماد"),
+    approve: _m("Approve with Notes", "اعتماد بملاحظات"),
     reject: _m("Reject", "رفض"),
     requestModification: _m("Request Modification", "طلب تعديل"),
     send: _m("Send", "ارسال"),
