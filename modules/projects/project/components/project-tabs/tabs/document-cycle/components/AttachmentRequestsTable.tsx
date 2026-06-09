@@ -147,7 +147,6 @@ export default function AttachmentRequestsTable() {
     "" | "incoming" | "outgoing"
   >("");
   const [filterReceiverId, setFilterReceiverId] = useState("");
-  const [searchName, setSearchName] = useState("");
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
@@ -162,7 +161,7 @@ export default function AttachmentRequestsTable() {
     endDate: filterEndDate || undefined,
     direction: filterDirection,
     receiverId: filterReceiverId || undefined,
-    name: searchName || undefined,
+    name: params.search || undefined,
   });
 
   const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
@@ -324,17 +323,6 @@ export default function AttachmentRequestsTable() {
           filters={
             <Stack spacing={2}>
               <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
-                <TextField
-                  size="small"
-                  label={t("documentName")}
-                  value={searchName}
-                  onChange={(e) => {
-                    setSearchName(e.target.value);
-                    params.setPage(1);
-                  }}
-                  sx={filterSx}
-                />
-
                 <TextField
                   select
                   size="small"
