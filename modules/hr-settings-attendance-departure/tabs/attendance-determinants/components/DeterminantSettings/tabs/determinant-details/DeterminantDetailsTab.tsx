@@ -308,7 +308,7 @@ function resolveTimeZoneId(
   basic: ConstraintBasicInfo | undefined,
   timeZones: TimeZoneOption[],
 ): string {
-  const rawTzId = (basic as Record<string, unknown> | undefined)?.timezone_id;
+  const rawTzId = (basic as Record<string, unknown> | undefined)?.time_zone_id;
   if (rawTzId != null) {
     const id = String(rawTzId).trim();
     if (timeZones.some((t) => t.id === id)) return id;
@@ -714,7 +714,7 @@ export default function DeterminantDetailsTab({
       country_id: countryIdDraft || undefined,
       country: selectedCountry?.name,
       timezone: timeZoneIdDraft || undefined,
-      timezone_id: timeZoneIdDraft || undefined,
+      time_zone_id: timeZoneIdDraft || undefined,
       reference_time: selectedTimeZone?.label,
     } as PatchConstraintBasicInfoParams);
   }, [

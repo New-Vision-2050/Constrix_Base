@@ -409,6 +409,9 @@ export const AttendanceConstraintsApi = {
     return res.data;
   },
 
+  getBasicInfo: (constraintId: string) =>
+    baseApi.get(`attendance/constraints/${constraintId}/basic-info`),
+  
   patchBasicInfo: (constraintId: string, params: PatchConstraintBasicInfoParams) =>
     baseApi.patch(
       `attendance/constraints/${constraintId}/basic-info`,

@@ -11,7 +11,7 @@ export type GroupedConstraintsLocations = {
   additional: ConstraintCatalogRow[];
 };
 
-/** Payload merged from PATCH basic-info responses (flexible backend shape). */
+/** Payload from GET/PATCH basic-info responses (flexible backend shape). */
 export type ConstraintBasicInfo = Partial<{
   name: string;
   constraint_name: string;
