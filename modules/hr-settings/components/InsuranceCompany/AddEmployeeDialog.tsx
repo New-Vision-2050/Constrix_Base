@@ -1013,7 +1013,8 @@ export default function AddEmployeeDialog({
                   <TableRow>
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>الاسم</TableCell>
                     {isEditMode && (
-                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>البوليصة القديمة</TableCell>
+                      <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>
+                         القديمة</TableCell>
                     )}
                     <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: 14 }}>{isEditMode ? "البوليصة الجديدة" : "البوليصة"}</TableCell>
                     {isEditMode && (
