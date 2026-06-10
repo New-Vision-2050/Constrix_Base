@@ -358,10 +358,7 @@ export const userProfileMessages = new MessagesGroup({
         title: _m("Social Insurance", "تأمين اجتماعي"),
       }),
       view: new MessagesGroup({
-        medicalInsurancePolicyNumber: _m(
-          "Medical Insurance Policy Number",
-          "رقم البوليصة التامين الطبي",
-        ),
+        medicalInsurancePolicyNumber: _m("  Policy ", " البوليصة  "),
         allowanceType: _m("Allowance Type", "نوع البدل"),
         allowanceTypeFamily: _m(
           "Allowance Type (Family - Individual)",
@@ -375,6 +372,10 @@ export const userProfileMessages = new MessagesGroup({
         amount: _m("Amount", "المبلغ"),
         periodUnit: _m("Period Unit", "وحدة المدة"),
         description: _m("Description", "وصف"),
+        subscriptionNo: _m("Subscription Number", "رقم الاشتراك"),
+        subscriptionType: _m("Subscription Type", "نوع الاشتراك"),
+        familyMembersCount: _m("Family Members", "أفراد العائلة"),
+        category: _m("Insurance Category", "فئة التأمين"),
       }),
       edit: new MessagesGroup({
         medicalInsurancePolicyNumber: _m(
@@ -426,6 +427,49 @@ export const userProfileMessages = new MessagesGroup({
             "يجب إدخال رقم فقط",
           ),
           amountInvalid: _m("Must enter numbers only", "يجب إدخال رقم فقط"),
+        }),
+        subscriptions: new MessagesGroup({
+          title: _m("Subscriptions", "الاشتراكات"),
+          policy: _m("Policy", "البوليصة"),
+          category: _m("Insurance Category", "فئة التأمين"),
+          subscriptionNo: _m("Subscription Number", "رقم الاشتراك"),
+          amount: _m("Amount", "المبلغ"),
+          subscriptionType: _m("Subscription Type", "نوع الاشتراك"),
+          familyMembers: _m("Family Members", "أفراد العائلة"),
+          noFamilyMembers: _m(
+            "No family members added",
+            "لا يوجد أفراد عائلة مضافين",
+          ),
+          addMember: _m("Add Family Member", "إضافة فرد"),
+          editMember: _m("Edit Family Member", "تعديل فرد"),
+          memberName: _m("Name", "الاسم"),
+          nationalId: _m("National ID", "رقم الهوية"),
+          relation: _m("Relation", "صلة القرابة"),
+          types: new MessagesGroup({
+            individual: _m("Individual", "فردي"),
+            family: _m("Family", "عائلي"),
+          }),
+          placeholders: new MessagesGroup({
+            category: _m("Select category", "اختر الفئة"),
+            subscriptionNo: _m(
+              "Enter subscription number",
+              "ادخل رقم الاشتراك",
+            ),
+            amount: _m("Enter amount", "ادخل المبلغ"),
+            subscriptionType: _m("Select type", "اختر النوع"),
+            memberName: _m("Enter name", "ادخل الاسم"),
+            nationalId: _m("Enter national ID", "ادخل رقم الهوية"),
+            relation: _m("Enter relation", "ادخل صلة القرابة"),
+            memberAmount: _m("Enter amount", "ادخل المبلغ"),
+          }),
+          validation: new MessagesGroup({
+            subscriptionNoRequired: _m(
+              "Subscription number is required",
+              "رقم الاشتراك مطلوب",
+            ),
+            amountRequired: _m("Amount is required", "المبلغ مطلوب"),
+            amountInvalid: _m("Must enter numbers only", "يجب إدخال رقم فقط"),
+          }),
         }),
       }),
     }),

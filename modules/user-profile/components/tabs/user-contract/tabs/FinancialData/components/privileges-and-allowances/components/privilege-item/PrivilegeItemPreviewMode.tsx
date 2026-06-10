@@ -8,22 +8,45 @@ type PropsT = {
 };
 
 export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
-  const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances.view");
+  const t = useTranslations(
+    "UserProfile.nestedTabs.privilegesAndAllowances.view",
+  );
   const isSaving =
     privilegeData?.type_allowance_code === AllowancesTypes?.Saving;
-  const isPercentage =
-    privilegeData?.type_allowance_code === AllowancesTypes?.Percentage;
-  const chargeAmountValue = isPercentage?privilegeData?.charge_amount:`${privilegeData?.charge_amount} ر.س`;
-  
+  const isConstant =
+    privilegeData?.type_allowance_code === AllowancesTypes?.Constant;
+
   // Check if this privilege is medical insurance
-  const isMedicalInsurance = privilegeData?.privilege?.type === "MedicalInsurance" ||
-                             privilegeData?.privilege?.name?.includes("تأمين طبي") ||
-                             privilegeData?.type === "MedicalInsurance" ||
-                             privilegeData?.name?.includes("تأمين طبي");
+  const isMedicalInsurance =
+    privilegeData?.privilege?.type === "MedicalInsurance" ||
+    privilegeData?.privilege?.type === "health_insurance" ||
+    privilegeData?.privilege?.name?.includes("تأمين طبي");
+
+  const subscription = privilegeData?.subscriptions?.[0];
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      {/* Show Policy Number for Medical Insurance */}
+      {/* Allowance Type (عائلي / فردي) */}
+      <div className="p-2">
+        <PreviewTextField
+          label={t("allowanceType")}
+          value={privilegeData?.type_privilege?.name}
+          valid={Boolean(privilegeData?.type_privilege?.name)}
+          required
+        />
+      </div>
+
+      {/* Allowance Type Category (توفير / ثابت) */}
+      <div className="p-2">
+        <PreviewTextField
+          label={t("allowanceTypeCategory")}
+          value={privilegeData?.type_allowance?.name}
+          valid={Boolean(privilegeData?.type_allowance?.name)}
+          required
+        />
+      </div>
+
+      {/* Medical Insurance - Policy Number */}
       {isMedicalInsurance && (
         <div className="p-2">
           <PreviewTextField
@@ -35,78 +58,92 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
         </div>
       )}
 
-      {/* Add empty div to maintain 2-column grid if policy number exists */}
-      {isMedicalInsurance && (
-        <div className="p-2">
-          <PreviewTextField
-            label={t("allowanceType")}
-            value={privilegeData?.type_privilege?.name}
-            valid={Boolean(privilegeData?.type_privilege?.name)}
-            required
-          />
-        </div>
-      )}
-
-      {/* If no policy number, show first field normally */}
-      {!isMedicalInsurance && (
-        <div className="p-2">
-          <PreviewTextField
-            label={t("allowanceType")}
-            value={privilegeData?.type_privilege?.name}
-            valid={Boolean(privilegeData?.type_privilege?.name)}
-            required
-          />
-        </div>
-      )}
-
-      <div className="p-2">
-        <PreviewTextField
-          label={t("allowanceType")}
-          value={privilegeData?.type_allowance?.name}
-          valid={Boolean(privilegeData?.type_allowance?.name)}
-          required
-        />
-      </div>
-
-      {!isSaving && (
+      {/* Medical Insurance with Saving - Subscription data */}
+      {isMedicalInsurance && isSaving && subscription && (
         <>
-          <div className="p-2">
-            <PreviewTextField
-              label={t("calculationRate")}
-              value={chargeAmountValue}
-              valid={Boolean(privilegeData?.charge_amount)}
-              required
-            />
-          </div>
-          {isPercentage && (
+          {subscription.medical_insurance_category && (
             <div className="p-2">
               <PreviewTextField
-                label={t("periodUnit")}
-                value={privilegeData?.period?.name}
-                valid={Boolean(privilegeData?.period?.name)}
+                label={t("category")}
+                value={subscription.medical_insurance_category.name || "---"}
+                valid={Boolean(subscription.medical_insurance_category.name)}
                 required
               />
             </div>
           )}
+          <div className="p-2">
+            <PreviewTextField
+              label={t("subscriptionNo")}
+              value={subscription.subscription_no || "---"}
+              valid={Boolean(subscription.subscription_no)}
+              required
+            />
+          </div>
+          <div className="p-2">
+            <PreviewTextField
+              label={t("amount")}
+              value={`${subscription.amount} ر.س`}
+              valid={Boolean(subscription.amount)}
+              required
+            />
+          </div>
+          <div className="p-2">
+            <PreviewTextField
+              label={t("subscriptionType")}
+              value={
+                subscription.subscription_type === "family" ? "عائلي" : "فردي"
+              }
+              valid={Boolean(subscription.subscription_type)}
+              required
+            />
+          </div>
+          {subscription.family_members &&
+            subscription.family_members.length > 0 && (
+              <div className="p-2">
+                <PreviewTextField
+                  label={t("familyMembersCount")}
+                  value={`${subscription.family_members.length}`}
+                  valid={true}
+                  required
+                />
+              </div>
+            )}
         </>
       )}
 
-      {/* Add empty div if no period field to maintain grid */}
-      {!isSaving && !isPercentage && (
-        <div className="p-2"></div>
+      {/* Constant type - charge_amount and period */}
+      {isConstant && (
+        <>
+          <div className="p-2">
+            <PreviewTextField
+              label={t("amount")}
+              value={`${privilegeData?.charge_amount} ر.س`}
+              valid={Boolean(privilegeData?.charge_amount)}
+              required
+            />
+          </div>
+          <div className="p-2">
+            <PreviewTextField
+              label={t("periodUnit")}
+              value={privilegeData?.period?.name}
+              valid={Boolean(privilegeData?.period?.name)}
+              required
+            />
+          </div>
+        </>
       )}
 
-      <div className="p-2">
-        <PreviewTextField
-          label={t("description")}
-          value={privilegeData?.description}
-          valid={Boolean(privilegeData?.description)}
-          required
-        />
-      </div>
-
-      {/* Add empty div at the end to complete the grid */}
-      <div className="p-2"></div>
+      {/* Description - only for non-saving types */}
+      {!isSaving && (
+        <div className="p-2">
+          <PreviewTextField
+            label={t("description")}
+            value={privilegeData?.description}
+            valid={Boolean(privilegeData?.description)}
+            required
+          />
+        </div>
+      )}
     </div>
   );
 }
