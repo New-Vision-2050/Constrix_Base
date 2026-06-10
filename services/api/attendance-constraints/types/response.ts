@@ -89,3 +89,15 @@ export type ConstraintRulesApiResponse = {
   payload?: ConstraintRules | Record<string, unknown>;
   [key: string]: unknown;
 };
+
+/** Notification toggles for GET/PATCH `/attendance/constraints/:constraintId/notifications` */
+export type ConstraintNotifications = {
+  notify_late_arrival: boolean;
+  notify_unexcused_absence: boolean;
+  notify_early_departure: boolean;
+};
+
+export type ConstraintNotificationsApiResponse = {
+  payload?: ConstraintNotifications | Record<string, unknown>;
+  [key: string]: unknown;
+};
