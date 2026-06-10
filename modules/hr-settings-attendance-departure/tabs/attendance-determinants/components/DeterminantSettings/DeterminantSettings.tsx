@@ -47,7 +47,7 @@ export default function DeterminantSettings({
         <MapSettingsSection constraintId={constraint.id} />
       </TabsContent>
       <TabsContent value="notifications-settings" className="pt-2">
-        <NotificationsSettingsSection />
+        <NotificationsSettingsSection constraintId={constraint.id} />
       </TabsContent>
     </Tabs>
   );
