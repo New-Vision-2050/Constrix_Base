@@ -1,7 +1,6 @@
 import React from "react";
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFinancialDataCxt } from "../../../../context/financialDataCxt";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
@@ -14,6 +13,7 @@ type PropsT = {
   privilegeId?: string;
   onSuccess?: () => void;
   familyMembers?: any[];
+  familyMembersRef?: React.RefObject<any[]>;
   onOpenFamilyDialog?: () => void;
 };
 export const PrivilegeItemFormConfig = ({
@@ -21,6 +21,7 @@ export const PrivilegeItemFormConfig = ({
   privilegeId,
   onSuccess,
   familyMembers,
+  familyMembersRef,
   onOpenFamilyDialog,
 }: PropsT) => {
   // declare and define helper variables
@@ -265,6 +266,30 @@ export const PrivilegeItemFormConfig = ({
             label: " ",
             condition: (values) => {
               if (!isMedicalInsurance) return false;
+              if (!values.type_privilege_id) return false;
+              // Use privilegeData to detect individual vs family by ID
+              if (privilegeData?.type_privilege?.id) {
+                const savedName = (
+                  privilegeData.type_privilege.name || ""
+                ).toLowerCase();
+                const isSavedFamily =
+                  savedName.includes("عائل") || savedName.includes("family");
+                const isSavedIndividual =
+                  savedName.includes("فردي") ||
+                  savedName.includes("individual");
+                if (isSavedFamily) {
+                  // Saved is family - show only if same ID selected
+                  return (
+                    values.type_privilege_id === privilegeData.type_privilege.id
+                  );
+                }
+                if (isSavedIndividual) {
+                  // Saved is individual - show only if different ID selected (family)
+                  return (
+                    values.type_privilege_id !== privilegeData.type_privilege.id
+                  );
+                }
+              }
               return true;
             },
             render: () => {
@@ -308,21 +333,38 @@ export const PrivilegeItemFormConfig = ({
       handleRefreshPrivilegesList();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
+      // Read latest familyMembers from ref to avoid stale closure
+      const currentFamilyMembers =
+        familyMembersRef?.current || familyMembers || [];
+
+      console.log("=== DEBUG onSubmit ===");
+      console.log("isMedicalInsurance:", isMedicalInsurance);
+      console.log("type_allowance_code:", formData.type_allowance_code);
+      console.log("AllowancesTypes.Saving:", AllowancesTypes?.Saving);
+      console.log("familyMembersRef?.current:", familyMembersRef?.current);
+      console.log("familyMembers prop:", familyMembers);
+      console.log("currentFamilyMembers:", currentFamilyMembers);
+      console.log("=== END DEBUG ===");
+
       const body: Record<string, unknown> = {
-        ...formData,
         user_id: userId,
         privilege_id: privilegeId,
+        type_privilege_id: formData.type_privilege_id,
+        type_allowance_code: formData.type_allowance_code,
+        description: formData.description || "",
       };
 
       // Build subscriptions array for medical insurance with saving
+      const hasMedicalData =
+        isMedicalInsurance ||
+        formData.medical_insurance_id ||
+        currentFamilyMembers.length > 0;
       if (
-        isMedicalInsurance &&
+        hasMedicalData &&
         formData.type_allowance_code === AllowancesTypes?.Saving
       ) {
         const subscription: Record<string, unknown> = {
           medical_insurance_id: formData.medical_insurance_id,
-          medical_insurance_category_id:
-            formData["subscriptions[0].medical_insurance_category_id"],
           amount:
             parseFloat(formData["subscriptions[0].amount"] as string) || 0,
           subscription_no: formData["subscriptions[0].subscription_no"],
@@ -330,42 +372,43 @@ export const PrivilegeItemFormConfig = ({
           status: 1,
         };
 
-        if (isEdit) {
-          subscription.user_id = userId;
+        // Add medical_insurance_category_id if selected
+        if (formData["subscriptions[0].medical_insurance_category_id"]) {
+          subscription.medical_insurance_category_id =
+            formData["subscriptions[0].medical_insurance_category_id"];
         }
 
         // Add family members if available
-        if (familyMembers && familyMembers.length > 0) {
+        if (currentFamilyMembers.length > 0) {
           subscription.subscription_type = "family";
-          subscription.family_members = familyMembers.map((member) => ({
-            name: member.name,
-            national_id: member.national_id,
-            relation: member.relation,
-            amount: parseFloat(member.amount) || 0,
-            subscription_no: member.subscription_no || undefined,
-          }));
+          subscription.family_members = currentFamilyMembers.map(
+            (member: any) => ({
+              name: member.name,
+              national_id: member.national_id,
+              relation: member.relation,
+              amount: parseFloat(member.amount) || 0,
+              subscription_no: member.subscription_no || "",
+            }),
+          );
         }
 
         body.subscriptions = [subscription];
+      }
 
-        // Clean up flat subscription fields
-        delete body["subscriptions[0].medical_insurance_category_id"];
-        delete body["subscriptions[0].amount"];
-        delete body["subscriptions[0].subscription_no"];
+      // For constant type, include charge_amount and period_id
+      if (formData.type_allowance_code === AllowancesTypes?.Constant) {
+        body.charge_amount = formData.charge_amount;
+        body.period_id = formData.period_id;
       }
 
       const url = isEdit
         ? `/user_privileges/${privilegeData?.id}`
         : `/user_privileges`;
 
-      return await defaultSubmitHandler(
-        serialize(body, { indices: true }),
-        privilegeItemFormConfig,
-        {
-          url: url,
-          method: "POST",
-        },
-      );
+      return await defaultSubmitHandler(body, privilegeItemFormConfig, {
+        url: url,
+        method: "POST",
+      });
     },
   };
   return privilegeItemFormConfig;

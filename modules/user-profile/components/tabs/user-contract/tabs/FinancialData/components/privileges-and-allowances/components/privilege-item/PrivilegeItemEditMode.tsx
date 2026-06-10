@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
 import { PrivilegeItemFormConfig } from "./PrivilegeItemFormConfig";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
@@ -27,9 +27,14 @@ export default function PrivilegeItemEditMode({ privilegeData }: PropsT) {
     return [];
   });
 
+  // Use ref to always have latest familyMembers in onSubmit closure
+  const familyMembersRef = useRef(familyMembers);
+  familyMembersRef.current = familyMembers;
+
   const config = PrivilegeItemFormConfig({
     privilegeData,
     familyMembers,
+    familyMembersRef,
     onOpenFamilyDialog: () => setFamilyDialogOpen(true),
   });
 
