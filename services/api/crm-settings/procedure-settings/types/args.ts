@@ -24,6 +24,8 @@ export interface UpdateStageArgs {
 
 export interface CreateStepArgs {
   name: string;
+  action_taker_type?: string;
+  action_taker_management_hierarchy_type?: string;
   branch_id?: number;
   management_id?: number;
   action_taker_user_ids: string[];

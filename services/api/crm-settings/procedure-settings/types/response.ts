@@ -71,6 +71,8 @@ export interface ProcedureStep {
   name?: string | null;
   branch_id?: number | null;
   management_id?: number | null;
+  action_taker_type?: string | null;
+  action_taker_management_hierarchy_type?: string | null;
   action_taker_user_ids?: string[];
   concerned_management_hierarchy_ids?: string[];
   /** API may send boolean or 0/1 */

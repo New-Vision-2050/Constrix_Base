@@ -54,6 +54,16 @@ const NOTIFICATION_OPTIONS = [
   { value: "whatsapp", label: "واتساب" },
 ] as const;
 
+const ACTION_TAKER_TYPE_OPTIONS = [
+  { value: "specific_user", label: "لمستخدم محدد" },
+  { value: "management_hierarchy", label: "الهيكل التنظيمي" },
+] as const;
+
+const MANAGEMENT_HIERARCHY_TYPE_OPTIONS = [
+  { value: "branch_manager", label: "مدير الفرع" },
+  { value: "management_manager", label: "مدير الاداره" },
+] as const;
+
 // TIME_UNITS removed - now using separate day/hour inputs
 
 interface StepCardProps {
@@ -66,6 +76,8 @@ interface StepCardProps {
 
 interface StepFormData {
   stepName: string;
+  actionTakerType: string;
+  actionTakerManagementHierarchyType: string;
   branchId: string;
   managementId: string;
   actionTakerId: string;
@@ -161,6 +173,9 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
 
     return {
       stepName: serverStep.name?.trim() ?? "",
+      actionTakerType: serverStep.action_taker_type ?? "specific_user",
+      actionTakerManagementHierarchyType:
+        serverStep.action_taker_management_hierarchy_type ?? "",
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
@@ -181,6 +196,8 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
   }
   return {
     stepName: "",
+    actionTakerType: "specific_user",
+    actionTakerManagementHierarchyType: "",
     branchId: "",
     managementId: "",
     actionTakerId: "",
@@ -212,6 +229,7 @@ export default function StepCard({
   });
 
   const stepName = watch("stepName");
+  const actionTakerType = watch("actionTakerType");
   const branchId = watch("branchId");
   const actionTakerIdW = watch("actionTakerId");
   const concernedUserIdW = watch("concernedUserId");
@@ -334,7 +352,7 @@ export default function StepCard({
       : [...current, val];
 
   const onSubmit = async (data: StepFormData) => {
-    if (!data.actionTakerId) {
+    if (data.actionTakerType === "specific_user" && !data.actionTakerId) {
       toast({
         title: t("actions.save"),
         description: t("steps.selectEmployee"),
@@ -342,10 +360,27 @@ export default function StepCard({
       });
       return;
     }
+    if (
+      data.actionTakerType === "management_hierarchy" &&
+      !data.actionTakerManagementHierarchyType
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: "يرجى اختيار نوع الهيكل التنظيمي",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const body: CreateStepArgs = {
       name: data.stepName.trim(),
-      action_taker_user_ids: data.actionTakerId ? [data.actionTakerId] : [],
+      action_taker_type: data.actionTakerType,
+      action_taker_management_hierarchy_type:
+        data.actionTakerManagementHierarchyType,
+      action_taker_user_ids:
+        data.actionTakerType === "specific_user" && data.actionTakerId
+          ? [data.actionTakerId]
+          : [],
       concerned_management_hierarchy_ids: data.concernedUserId
         ? [data.concernedUserId]
         : [],
@@ -755,10 +790,63 @@ export default function StepCard({
           />
         </Box>
 
-        {/* ── الوحدة التنظيمية — 2-column grid of dropdowns ── */}
+        {/* ── نوع متخذي الإجراء ── */}
         <Box sx={{ mb: 2.5 }}>
-          <SectionLabel>الوحدة التنظيمية</SectionLabel>
-          <Grid container spacing={2}>
+          <SectionLabel>نوع متخذي الإجراء</SectionLabel>
+          <Controller
+            name="actionTakerType"
+            control={control}
+            render={({ field }) => (
+              <Box sx={{ width: "100%" }}>
+                <SearchableSelect
+                  options={ACTION_TAKER_TYPE_OPTIONS.map((o) => ({
+                    value: o.value,
+                    label: o.label,
+                  }))}
+                  value={field.value ?? "specific_user"}
+                  onChange={(v) => field.onChange(String(v))}
+                  placeholder="اختر نوع متخذي الإجراء"
+                  searchPlaceholder="البحث..."
+                  noResultsText="لا توجد نتائج"
+                  disabled={fieldsDisabled}
+                />
+              </Box>
+            )}
+          />
+        </Box>
+
+        {/* ── نوع الهيكل التنظيمي (conditional) ── */}
+        {actionTakerType === "management_hierarchy" && (
+          <Box sx={{ mb: 2.5 }}>
+            <SectionLabel>نوع الهيكل التنظيمي</SectionLabel>
+            <Controller
+              name="actionTakerManagementHierarchyType"
+              control={control}
+              render={({ field }) => (
+                <Box sx={{ width: "100%" }}>
+                  <SearchableSelect
+                    options={MANAGEMENT_HIERARCHY_TYPE_OPTIONS.map((o) => ({
+                      value: o.value,
+                      label: o.label,
+                    }))}
+                    value={field.value ?? ""}
+                    onChange={(v) => field.onChange(String(v))}
+                    placeholder="اختر نوع الهيكل التنظيمي"
+                    searchPlaceholder="البحث..."
+                    noResultsText="لا توجد نتائج"
+                    disabled={fieldsDisabled}
+                  />
+                </Box>
+              )}
+            />
+          </Box>
+        )}
+
+        {/* ── الوحدة التنظيمية — 2-column grid of dropdowns (only show if specific_user) ── */}
+        {actionTakerType === "specific_user" && (
+          <Box sx={{ mb: 2.5 }}>
+            <SectionLabel>الوحدة التنظيمية</SectionLabel>
+            <Grid container spacing={2}>
             {/* الفرع */}
             <Grid size={6}>
               <Box
@@ -819,38 +907,40 @@ export default function StepCard({
               </Box>
             </Grid>
 
-            {/* متخذي الاجراء */}
-            <Grid size={6}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  gap: 1.5,
-                }}
-              >
-                <Controller
-                  name="actionTakerId"
-                  control={control}
-                  render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={actionTakerSelectOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => field.onChange(String(v))}
-                        placeholder="متخذي الاجراء"
-                        searchPlaceholder="البحث عن اداره..."
-                        noResultsText="لا توجد نتائج"
-                        disabled={fieldsDisabled}
-                        displayLabel={
-                          fieldsDisabled ? actionTakerDisplayLabel : undefined
-                        }
-                      />
-                    </Box>
-                  )}
-                />
-              </Box>
-            </Grid>
+            {/* متخذي الاجراء (only show if specific_user) */}
+            {actionTakerType === "specific_user" && (
+              <Grid size={6}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    gap: 1.5,
+                  }}
+                >
+                  <Controller
+                    name="actionTakerId"
+                    control={control}
+                    render={({ field }) => (
+                      <Box sx={{ width: "100%" }}>
+                        <SearchableSelect
+                          options={actionTakerSelectOptions}
+                          value={field.value ?? ""}
+                          onChange={(v) => field.onChange(String(v))}
+                          placeholder="متخذي الاجراء"
+                          searchPlaceholder="البحث عن اداره..."
+                          noResultsText="لا توجد نتائج"
+                          disabled={fieldsDisabled}
+                          displayLabel={
+                            fieldsDisabled ? actionTakerDisplayLabel : undefined
+                          }
+                        />
+                      </Box>
+                    )}
+                  />
+                </Box>
+              </Grid>
+            )}
 
             {/* المعنيين بالاجراء */}
             <Grid size={6}>
@@ -884,8 +974,9 @@ export default function StepCard({
                 />
               </Box>
             </Grid>
-          </Grid>
-        </Box>
+            </Grid>
+          </Box>
+        )}
 
         {/* ── القاعدة التنظيمية — checkboxes ── */}
         <Box sx={{ mb: 2.5 }}>
