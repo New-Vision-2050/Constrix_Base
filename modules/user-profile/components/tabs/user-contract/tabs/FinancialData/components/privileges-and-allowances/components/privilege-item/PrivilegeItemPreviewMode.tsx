@@ -90,21 +90,24 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
           <div className="p-2">
             <PreviewTextField
               label={t("subscriptionType")}
-              value={subscription.subscription_type === "family" ? "عائلي" : "فردي"}
+              value={
+                subscription.subscription_type === "family" ? "عائلي" : "فردي"
+              }
               valid={Boolean(subscription.subscription_type)}
               required
             />
           </div>
-          {subscription.family_members && subscription.family_members.length > 0 && (
-            <div className="p-2">
-              <PreviewTextField
-                label={t("familyMembersCount")}
-                value={`${subscription.family_members.length}`}
-                valid={true}
-                required
-              />
-            </div>
-          )}
+          {subscription.family_members &&
+            subscription.family_members.length > 0 && (
+              <div className="p-2">
+                <PreviewTextField
+                  label={t("familyMembersCount")}
+                  value={`${subscription.family_members.length}`}
+                  valid={true}
+                  required
+                />
+              </div>
+            )}
         </>
       )}
 
