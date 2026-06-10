@@ -12,15 +12,13 @@ type PropsT = {
   privilegeData?: UserPrivilege;
   privilegeId?: string;
   onSuccess?: () => void;
-  familyMembers?: any[];
-  familyMembersRef?: React.RefObject<any[]>;
+  familyMembersRef?: React.MutableRefObject<any[]>;
   onOpenFamilyDialog?: () => void;
 };
 export const PrivilegeItemFormConfig = ({
   privilegeData,
   privilegeId,
   onSuccess,
-  familyMembers,
   familyMembersRef,
   onOpenFamilyDialog,
 }: PropsT) => {
@@ -305,7 +303,7 @@ export const PrivilegeItemFormConfig = ({
                   className:
                     "w-fit rounded-md bg-pink-600 px-3 py-2 text-white text-xs font-medium hover:bg-pink-700 transition-colors",
                 },
-                `${tEdit("subscriptions.familyMembers")} (${familyMembers?.length || 0})`,
+                `${tEdit("subscriptions.familyMembers")} (${familyMembersRef?.current?.length || 0})`,
               );
             },
           },
@@ -343,17 +341,7 @@ export const PrivilegeItemFormConfig = ({
     },
     onSubmit: async (formData: Record<string, unknown>) => {
       // Read latest familyMembers from ref to avoid stale closure
-      const currentFamilyMembers =
-        familyMembersRef?.current || familyMembers || [];
-
-      console.log("=== DEBUG onSubmit ===");
-      console.log("isMedicalInsurance:", isMedicalInsurance);
-      console.log("type_allowance_code:", formData.type_allowance_code);
-      console.log("AllowancesTypes.Saving:", AllowancesTypes?.Saving);
-      console.log("familyMembersRef?.current:", familyMembersRef?.current);
-      console.log("familyMembers prop:", familyMembers);
-      console.log("currentFamilyMembers:", currentFamilyMembers);
-      console.log("=== END DEBUG ===");
+      const currentFamilyMembers = familyMembersRef?.current || [];
 
       const body: Record<string, unknown> = {
         user_id: userId,

@@ -1,9 +1,27 @@
 "use client";
-import { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
 import { PrivilegeItemFormConfig } from "./PrivilegeItemFormConfig";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
 import FamilyMembersDialog, { FamilyMember } from "./FamilyMembersDialog";
+
+// Memoized form wrapper to prevent re-render when dialog state changes
+const PrivilegeForm = React.memo(function PrivilegeForm({
+  privilegeData,
+  familyMembersRef,
+  onOpenFamilyDialog,
+}: {
+  privilegeData?: UserPrivilege;
+  familyMembersRef: React.MutableRefObject<FamilyMember[]>;
+  onOpenFamilyDialog: () => void;
+}) {
+  const config = PrivilegeItemFormConfig({
+    privilegeData,
+    familyMembersRef,
+    onOpenFamilyDialog,
+  });
+  return <FormContent config={config} />;
+});
 
 type PropsT = {
   privilegeData: UserPrivilege;
@@ -31,16 +49,16 @@ export default function PrivilegeItemEditMode({ privilegeData }: PropsT) {
   const familyMembersRef = useRef(familyMembers);
   familyMembersRef.current = familyMembers;
 
-  const config = PrivilegeItemFormConfig({
-    privilegeData,
-    familyMembers,
-    familyMembersRef,
-    onOpenFamilyDialog: () => setFamilyDialogOpen(true),
-  });
+  // Stable callback that won't cause re-render of form
+  const onOpenFamilyDialog = useCallback(() => setFamilyDialogOpen(true), []);
 
   return (
     <div>
-      <FormContent config={config} />
+      <PrivilegeForm
+        privilegeData={privilegeData}
+        familyMembersRef={familyMembersRef}
+        onOpenFamilyDialog={onOpenFamilyDialog}
+      />
 
       <FamilyMembersDialog
         open={familyDialogOpen}
