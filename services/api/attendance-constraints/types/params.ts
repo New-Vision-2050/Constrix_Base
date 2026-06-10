@@ -83,3 +83,10 @@ export interface PatchConstraintRulesParams {
   out_zone_minutes: number;
   max_working_hours: number;
 }
+
+/** Body for PATCH `/attendance/constraints/:constraintId/notifications` */
+export interface PatchConstraintNotificationsParams {
+  notify_late_arrival: boolean;
+  notify_unexcused_absence: boolean;
+  notify_early_departure: boolean;
+}

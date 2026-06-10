@@ -7,6 +7,7 @@ import type {
   GetConstraintEmployeesParams,
   GetConstraintLocationsParams,
   PatchConstraintBasicInfoParams,
+  PatchConstraintNotificationsParams,
   PatchConstraintRulesParams,
 } from "./types/params";
 import type {
@@ -474,6 +475,18 @@ export const AttendanceConstraintsApi = {
 
   patchRules: (constraintId: string, body: PatchConstraintRulesParams) =>
     baseApi.patch(`attendance/constraints/${constraintId}/rules`, body),
+
+  getNotifications: (constraintId: string) =>
+    baseApi.get(`attendance/constraints/${constraintId}/notifications`),
+
+  patchNotifications: (
+    constraintId: string,
+    body: PatchConstraintNotificationsParams,
+  ) =>
+    baseApi.patch(
+      `attendance/constraints/${constraintId}/notifications`,
+      body,
+    ),
 };
 
 /** Alias preferred by determinant settings tabs (aligned with naming before `AttendanceConstraintsApi`). */
@@ -492,6 +505,7 @@ export type {
   GetConstraintEmployeesParams,
   GetConstraintLocationsParams,
   PatchConstraintBasicInfoParams,
+  PatchConstraintNotificationsParams,
   PatchConstraintRulesParams,
 } from "./types/params";
 
@@ -502,6 +516,8 @@ export type {
   ConstraintEmployeesListNormalized,
   ConstraintLocationPayload,
   ConstraintLocationsListApiResponse,
+  ConstraintNotifications,
+  ConstraintNotificationsApiResponse,
   ConstraintRules,
   ConstraintRulesApiResponse,
   ConstraintSelectedEmployeePayload,

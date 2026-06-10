@@ -250,7 +250,7 @@ export default function AttendanceReportTable() {
         sortable: false,
         render: (row: attendanceReport) => (
           <span className="p-2 text-sm">
-            {formatCreatedAt(row.created_at || row.generated_at)}
+            {row.created_at}
           </span>
         ),
       },
