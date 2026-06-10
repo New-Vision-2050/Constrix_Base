@@ -2,15 +2,28 @@
 import { useState } from "react";
 import {
   Dialog,
-  DialogContent,
-  DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Trash2, Pencil, Plus, X } from "lucide-react";
+  DialogContent,
+  IconButton,
+  Button,
+  TextField,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer,
+  Paper,
+  Box,
+  Typography,
+  Stack,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 
 export type FamilyMember = {
   id?: string;
@@ -37,6 +50,7 @@ export default function FamilyMembersDialog({
   const t = useTranslations(
     "UserProfile.nestedTabs.privilegesAndAllowances.edit.subscriptions",
   );
+  const isRtl = useIsRtl();
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<FamilyMember>({
@@ -94,163 +108,195 @@ export default function FamilyMembersDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{t("familyMembers")}</DialogTitle>
-        </DialogHeader>
+    <Dialog
+      open={open}
+      onClose={() => onOpenChange(false)}
+      maxWidth="md"
+      fullWidth
+      dir={isRtl ? "rtl" : "ltr"}
+    >
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography variant="h6">{t("familyMembers")}</Typography>
+        <IconButton onClick={() => onOpenChange(false)} size="small">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
+      <DialogContent dividers sx={{ maxHeight: "70vh", overflow: "auto" }}>
         {/* Table */}
-        <div className="border rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="px-4 py-3 text-start font-medium">
+        <TableContainer component={Paper} variant="outlined" sx={{ mb: 2 }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ bgcolor: "action.hover" }}>
+                <TableCell sx={{ fontWeight: 600 }}>
                   {t("memberName")}
-                </th>
-                <th className="px-4 py-3 text-start font-medium">
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>
                   {t("nationalId")}
-                </th>
-                <th className="px-4 py-3 text-start font-medium">
-                  {t("relation")}
-                </th>
-                <th className="px-4 py-3 text-start font-medium">
-                  {t("amount")}
-                </th>
-                <th className="px-4 py-3 text-start font-medium">
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t("relation")}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t("amount")}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>
                   {t("subscriptionNo")}
-                </th>
-                <th className="px-4 py-3 text-center font-medium w-24">
-                  إجراءات
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+                </TableCell>
+                <TableCell
+                  sx={{ fontWeight: 600, textAlign: "center", width: 100 }}
+                >
+                  {isRtl ? "إجراءات" : "Actions"}
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {familyMembers.map((member, index) => (
-                <tr key={member.id || index} className="border-t">
-                  <td className="px-4 py-3">{member.name}</td>
-                  <td className="px-4 py-3">{member.national_id}</td>
-                  <td className="px-4 py-3">{member.relation}</td>
-                  <td className="px-4 py-3">{member.amount}</td>
-                  <td className="px-4 py-3">{member.subscription_no || "-"}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
+                <TableRow key={member.id || index}>
+                  <TableCell>{member.name}</TableCell>
+                  <TableCell>{member.national_id}</TableCell>
+                  <TableCell>{member.relation}</TableCell>
+                  <TableCell>{member.amount}</TableCell>
+                  <TableCell>{member.subscription_no || "-"}</TableCell>
+                  <TableCell>
+                    <Stack
+                      direction="row"
+                      spacing={0.5}
+                      justifyContent="center"
+                    >
+                      <IconButton
+                        size="small"
                         onClick={() => handleEdit(index)}
                       >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive"
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
                         onClick={() => handleDelete(index)}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
               ))}
               {familyMembers.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-8 text-center text-muted-foreground"
-                  >
-                    {t("noFamilyMembers")}
-                  </td>
-                </tr>
+                <TableRow>
+                  <TableCell colSpan={6} sx={{ textAlign: "center", py: 4 }}>
+                    <Typography color="text.secondary">
+                      {t("noFamilyMembers")}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
 
         {/* Add/Edit Form */}
         {showForm ? (
-          <div className="border rounded-lg p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-medium">
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 2,
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight={500}>
                 {editingIndex !== null ? t("editMember") : t("addMember")}
-              </h4>
-              <Button variant="ghost" size="icon" onClick={resetForm}>
-                <X className="h-4 w-4" />
+              </Typography>
+              <IconButton size="small" onClick={resetForm}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
+
+            <Box
+              sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
+            >
+              <TextField
+                size="small"
+                label={t("memberName")}
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder={t("placeholders.memberName")}
+                fullWidth
+              />
+              <TextField
+                size="small"
+                label={t("nationalId")}
+                value={formData.national_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, national_id: e.target.value })
+                }
+                placeholder={t("placeholders.nationalId")}
+                fullWidth
+              />
+              <TextField
+                size="small"
+                label={t("relation")}
+                value={formData.relation}
+                onChange={(e) =>
+                  setFormData({ ...formData, relation: e.target.value })
+                }
+                placeholder={t("placeholders.relation")}
+                fullWidth
+              />
+              <TextField
+                size="small"
+                label={t("amount")}
+                value={formData.amount}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
+                placeholder={t("placeholders.memberAmount")}
+                fullWidth
+              />
+              <TextField
+                size="small"
+                label={t("subscriptionNo")}
+                value={formData.subscription_no || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, subscription_no: e.target.value })
+                }
+                placeholder={t("placeholders.subscriptionNo")}
+                fullWidth
+              />
+            </Box>
+
+            <Stack
+              direction="row"
+              spacing={1}
+              justifyContent="flex-end"
+              sx={{ mt: 2 }}
+            >
+              <Button variant="outlined" onClick={resetForm}>
+                {isRtl ? "إلغاء" : "Cancel"}
               </Button>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>{t("memberName")}</Label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  placeholder={t("placeholders.memberName")}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t("nationalId")}</Label>
-                <Input
-                  value={formData.national_id}
-                  onChange={(e) =>
-                    setFormData({ ...formData, national_id: e.target.value })
-                  }
-                  placeholder={t("placeholders.nationalId")}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t("relation")}</Label>
-                <Input
-                  value={formData.relation}
-                  onChange={(e) =>
-                    setFormData({ ...formData, relation: e.target.value })
-                  }
-                  placeholder={t("placeholders.relation")}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t("amount")}</Label>
-                <Input
-                  value={formData.amount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, amount: e.target.value })
-                  }
-                  placeholder={t("placeholders.memberAmount")}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t("subscriptionNo")}</Label>
-                <Input
-                  value={formData.subscription_no || ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      subscription_no: e.target.value,
-                    })
-                  }
-                  placeholder={t("placeholders.subscriptionNo")}
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={resetForm}>
-                إلغاء
+              <Button variant="contained" onClick={handleAdd}>
+                {editingIndex !== null
+                  ? isRtl
+                    ? "تحديث"
+                    : "Update"
+                  : isRtl
+                    ? "إضافة"
+                    : "Add"}
               </Button>
-              <Button onClick={handleAdd}>
-                {editingIndex !== null ? "تحديث" : "إضافة"}
-              </Button>
-            </div>
-          </div>
+            </Stack>
+          </Paper>
         ) : (
           <Button
-            variant="outline"
+            variant="outlined"
+            startIcon={<AddIcon />}
             onClick={() => setShowForm(true)}
-            className="w-full"
+            fullWidth
           >
-            <Plus className="h-4 w-4 me-2" />
             {t("addMember")}
           </Button>
         )}

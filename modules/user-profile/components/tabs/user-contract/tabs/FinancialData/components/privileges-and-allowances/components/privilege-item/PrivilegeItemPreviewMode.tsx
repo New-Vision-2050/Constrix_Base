@@ -8,18 +8,22 @@ type PropsT = {
 };
 
 export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
-  const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances.view");
+  const t = useTranslations(
+    "UserProfile.nestedTabs.privilegesAndAllowances.view",
+  );
   const isSaving =
     privilegeData?.type_allowance_code === AllowancesTypes?.Saving;
   const isPercentage =
     privilegeData?.type_allowance_code === AllowancesTypes?.Percentage;
-  const chargeAmountValue = isPercentage?privilegeData?.charge_amount:`${privilegeData?.charge_amount} ر.س`;
-  
+  const chargeAmountValue = isPercentage
+    ? privilegeData?.charge_amount
+    : `${privilegeData?.charge_amount} ر.س`;
+
   // Check if this privilege is medical insurance
-  const isMedicalInsurance = privilegeData?.privilege?.type === "MedicalInsurance" ||
-                             privilegeData?.privilege?.name?.includes("تأمين طبي") ||
-                             privilegeData?.type === "MedicalInsurance" ||
-                             privilegeData?.name?.includes("تأمين طبي");
+  const isMedicalInsurance =
+    privilegeData?.privilege?.type === "MedicalInsurance" ||
+    privilegeData?.privilege?.type === "health_insurance" ||
+    privilegeData?.privilege?.name?.includes("تأمين طبي");
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -92,9 +96,7 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
       )}
 
       {/* Add empty div if no period field to maintain grid */}
-      {!isSaving && !isPercentage && (
-        <div className="p-2"></div>
-      )}
+      {!isSaving && !isPercentage && <div className="p-2"></div>}
 
       <div className="p-2">
         <PreviewTextField
@@ -104,6 +106,51 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
           required
         />
       </div>
+
+      {/* Show subscription info for medical insurance with saving */}
+      {isMedicalInsurance && isSaving && privilegeData?.subscriptions?.[0] && (
+        <>
+          <div className="p-2">
+            <PreviewTextField
+              label={t("subscriptionNo")}
+              value={privilegeData.subscriptions[0].subscription_no || "---"}
+              valid={Boolean(privilegeData.subscriptions[0].subscription_no)}
+              required
+            />
+          </div>
+          <div className="p-2">
+            <PreviewTextField
+              label={t("amount")}
+              value={`${privilegeData.subscriptions[0].amount} ر.س`}
+              valid={Boolean(privilegeData.subscriptions[0].amount)}
+              required
+            />
+          </div>
+          <div className="p-2">
+            <PreviewTextField
+              label={t("subscriptionType")}
+              value={
+                privilegeData.subscriptions[0].subscription_type === "family"
+                  ? "عائلي"
+                  : "فردي"
+              }
+              valid={Boolean(privilegeData.subscriptions[0].subscription_type)}
+              required
+            />
+          </div>
+          {privilegeData.subscriptions[0].family_members &&
+            privilegeData.subscriptions[0].family_members.length > 0 && (
+              <div className="p-2">
+                <PreviewTextField
+                  label={t("familyMembersCount")}
+                  value={`${privilegeData.subscriptions[0].family_members.length}`}
+                  valid={true}
+                  required
+                />
+              </div>
+            )}
+        </>
+      )}
 
       {/* Add empty div at the end to complete the grid */}
       <div className="p-2"></div>

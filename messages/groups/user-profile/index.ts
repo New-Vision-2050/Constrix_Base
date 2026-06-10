@@ -372,6 +372,9 @@ export const userProfileMessages = new MessagesGroup({
         amount: _m("Amount", "المبلغ"),
         periodUnit: _m("Period Unit", "وحدة المدة"),
         description: _m("Description", "وصف"),
+        subscriptionNo: _m("Subscription Number", "رقم الاشتراك"),
+        subscriptionType: _m("Subscription Type", "نوع الاشتراك"),
+        familyMembersCount: _m("Family Members", "أفراد العائلة"),
       }),
       edit: new MessagesGroup({
         medicalInsurancePolicyNumber: _m(

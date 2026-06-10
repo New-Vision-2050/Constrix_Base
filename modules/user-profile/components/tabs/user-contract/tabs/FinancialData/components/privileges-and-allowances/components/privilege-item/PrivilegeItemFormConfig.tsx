@@ -312,6 +312,12 @@ export const PrivilegeItemFormConfig = ({
     ],
     initialValues: {
       ...privilegeData,
+      type_allowance_code: privilegeData?.type_allowance_code || "",
+      type_privilege_id: privilegeData?.type_privilege_id || "",
+      medical_insurance_id:
+        privilegeData?.medical_insurance_id ||
+        privilegeData?.subscriptions?.[0]?.medical_insurance_id ||
+        "",
       "subscriptions[0].medical_insurance_category_id":
         privilegeData?.subscriptions?.[0]?.medical_insurance_category_id || "",
       "subscriptions[0].amount":
