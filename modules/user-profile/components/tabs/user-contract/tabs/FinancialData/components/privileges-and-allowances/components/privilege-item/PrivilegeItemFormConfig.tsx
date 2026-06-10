@@ -259,6 +259,9 @@ export const PrivilegeItemFormConfig = ({
             label: tEdit("description"),
             type: "textarea",
             placeholder: tEdit("placeholders.description"),
+            condition: (values) => {
+              return values.type_allowance_code !== AllowancesTypes?.Saving;
+            },
           },
           {
             name: "_family_members_button",
@@ -300,7 +303,7 @@ export const PrivilegeItemFormConfig = ({
                   type: "button",
                   onClick: onOpenFamilyDialog,
                   className:
-                    "w-full rounded-lg bg-gradient-to-r from-pink-500 to-pink-600 py-2 text-center text-white text-sm font-medium hover:from-pink-600 hover:to-pink-700 transition-all col-span-2",
+                    "w-fit rounded-md bg-pink-600 px-3 py-2 text-white text-xs font-medium hover:bg-pink-700 transition-colors",
                 },
                 `${tEdit("subscriptions.familyMembers")} (${familyMembers?.length || 0})`,
               );

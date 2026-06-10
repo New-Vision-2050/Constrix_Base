@@ -375,6 +375,7 @@ export const userProfileMessages = new MessagesGroup({
         subscriptionNo: _m("Subscription Number", "رقم الاشتراك"),
         subscriptionType: _m("Subscription Type", "نوع الاشتراك"),
         familyMembersCount: _m("Family Members", "أفراد العائلة"),
+        category: _m("Insurance Category", "فئة التأمين"),
       }),
       edit: new MessagesGroup({
         medicalInsurancePolicyNumber: _m(

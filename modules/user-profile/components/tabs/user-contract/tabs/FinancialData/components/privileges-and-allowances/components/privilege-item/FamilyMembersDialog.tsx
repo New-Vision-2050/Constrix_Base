@@ -121,8 +121,9 @@ export default function FamilyMembersDialog({
           alignItems: "center",
           justifyContent: "space-between",
         }}
+        component="div"
       >
-        <Typography variant="h6">{t("familyMembers")}</Typography>
+        <Typography variant="h6" component="span">{t("familyMembers")}</Typography>
         <IconButton onClick={() => onOpenChange(false)} size="small">
           <CloseIcon />
         </IconButton>
