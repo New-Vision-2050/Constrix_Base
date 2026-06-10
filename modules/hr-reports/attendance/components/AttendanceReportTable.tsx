@@ -82,8 +82,12 @@ export default function AttendanceReportTable() {
       const d = new Date(iso);
       if (Number.isNaN(d.getTime())) return iso;
       return format.dateTime(d, {
-        dateStyle: "medium",
-        timeStyle: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
       });
     },
     [format],
@@ -250,7 +254,7 @@ export default function AttendanceReportTable() {
         sortable: false,
         render: (row: attendanceReport) => (
           <span className="p-2 text-sm">
-            {row.created_at}
+            {formatCreatedAt(row.created_at || row.generated_at)}
           </span>
         ),
       },
