@@ -25,17 +25,23 @@ export const PrivilegeItemFormConfig = ({
 
   const t = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances");
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
-  const tEdit = useTranslations("UserProfile.nestedTabs.privilegesAndAllowances.edit");
+  const tEdit = useTranslations(
+    "UserProfile.nestedTabs.privilegesAndAllowances.edit",
+  );
 
   const isMedicalInsurance = (() => {
     if (privilegeData) {
-      return privilegeData?.privilege?.type === "MedicalInsurance" ||
-        privilegeData?.privilege?.name?.includes("تأمين طبي");
+      return (
+        privilegeData?.privilege?.type === "MedicalInsurance" ||
+        privilegeData?.privilege?.name?.includes("تأمين طبي")
+      );
     }
-    const selectedPrivilege = privileges?.find(p => p.id === privilegeId);
-    return selectedPrivilege?.type === "MedicalInsurance" ||
+    const selectedPrivilege = privileges?.find((p) => p.id === privilegeId);
+    return (
+      selectedPrivilege?.type === "MedicalInsurance" ||
       selectedPrivilege?.name?.includes("تأمين طبي") ||
-      false;
+      false
+    );
   })();
 
   const privilegeItemFormConfig: FormConfig = {
@@ -54,13 +60,19 @@ export const PrivilegeItemFormConfig = ({
             placeholder: tEdit("placeholders.medicalInsurancePolicyNumber"),
             condition: () => {
               if (privilegeData) {
-                return privilegeData?.privilege?.type === "MedicalInsurance" ||
-                  privilegeData?.privilege?.name?.includes("تأمين طبي");
+                return (
+                  privilegeData?.privilege?.type === "MedicalInsurance" ||
+                  privilegeData?.privilege?.name?.includes("تأمين طبي")
+                );
               }
-              const selectedPrivilege = privileges?.find(p => p.id === privilegeId);
-              return selectedPrivilege?.type === "MedicalInsurance" ||
+              const selectedPrivilege = privileges?.find(
+                (p) => p.id === privilegeId,
+              );
+              return (
+                selectedPrivilege?.type === "MedicalInsurance" ||
                 selectedPrivilege?.name?.includes("تأمين طبي") ||
-                false;
+                false
+              );
             },
             dynamicOptions: {
               url: `${baseURL}/medical-insurances`,
@@ -76,7 +88,9 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: tEdit("validation.medicalInsurancePolicyNumberRequired"),
+                message: tEdit(
+                  "validation.medicalInsurancePolicyNumberRequired",
+                ),
               },
             ],
           },
@@ -117,9 +131,14 @@ export const PrivilegeItemFormConfig = ({
               searchParam: "name",
               totalCountHeader: "X-Total-Count",
               transformResponse: (data: any) => {
-                const items = Array.isArray(data) ? data : (data?.payload || []);
+                const items = Array.isArray(data) ? data : data?.payload || [];
                 return items
-                  .filter((item: any) => item?.code && item?.name && (isMedicalInsurance || item.code !== "percentage"))
+                  .filter(
+                    (item: any) =>
+                      item?.code &&
+                      item?.name &&
+                      (!isMedicalInsurance || item.code !== "percentage"),
+                  )
                   .map((item: any) => ({ value: item.code, label: item.name }));
               },
             },
@@ -146,7 +165,7 @@ export const PrivilegeItemFormConfig = ({
                 type: "pattern",
                 value: /^\d+(\.\d+)?$/,
                 message: tEdit("validation.calculationRateInvalid"),
-              }
+              },
             ],
           },
           {
@@ -168,7 +187,7 @@ export const PrivilegeItemFormConfig = ({
                 type: "pattern",
                 value: /^\d+(\.\d+)?$/,
                 message: tEdit("validation.amountInvalid"),
-              }
+              },
             ],
           },
           {
@@ -236,10 +255,14 @@ export const PrivilegeItemFormConfig = ({
         : `/user_privileges`;
       // const method = isEdit ? "PUT" : "POST";
 
-      return await defaultSubmitHandler(serialize(body), privilegeItemFormConfig, {
-        url: url,
-        method: "POST",
-      });
+      return await defaultSubmitHandler(
+        serialize(body),
+        privilegeItemFormConfig,
+        {
+          url: url,
+          method: "POST",
+        },
+      );
     },
   };
   return privilegeItemFormConfig;
