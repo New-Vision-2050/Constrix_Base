@@ -170,6 +170,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     const notifications: string[] = [];
     if (serverStep.notify_by_email) notifications.push("email");
     if (serverStep.notify_by_whatsapp) notifications.push("whatsapp");
+    if (serverStep.notify_by_sms) notifications.push("sms");
 
     return {
       stepName: serverStep.name?.trim() ?? "",
@@ -392,6 +393,7 @@ export default function StepCard({
       forms: data.orgTemplate === "accreditation_form" ? "accept" : "approve",
       notify_by_email: data.notifications.includes("email"),
       notify_by_whatsapp: data.notifications.includes("whatsapp"),
+      notify_by_sms: data.notifications.includes("sms"),
       ...(data.branchId ? { branch_id: Number(data.branchId) } : {}),
       ...(data.managementId
         ? { management_id: Number(data.managementId) }

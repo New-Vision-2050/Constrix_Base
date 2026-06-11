@@ -138,7 +138,7 @@ export default function SubTypeTabs() {
           variant="scrollable"
           scrollButtons="auto"
         >
-          <Tab value={WORK_PLAN_TAB} label="خطة العمل" />
+          <Tab value={WORK_PLAN_TAB} label={t("workPlan")} />
           {branches.map((branch) => (
             <Tab
               key={branch.id}
@@ -188,8 +188,7 @@ export default function SubTypeTabs() {
           />
 
           <Typography sx={{ fontSize: 15, fontWeight: 500 }}>
-            {" "}
-            سيتم اخذ الاجراءات من خطة العمل
+            {t("useWorkPlanProcedures")}
           </Typography>
         </Paper>
       )}
