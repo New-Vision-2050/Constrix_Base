@@ -28,6 +28,7 @@ import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-sett
 import { Stage } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
+import { getProcedureEditTabTitle } from "../../utils/getProcedureTabTitle";
 
 const PROCEDURE_DIALOG_ICON_IDS = [
   "person-outline",
@@ -63,6 +64,7 @@ export default function EditStageDialog({
 }: EditStageDialogProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings.stages");
   const tRoot = useTranslations("CRMSettingsModule.proceduresSettings");
+  const tc = useTranslations("CRMSettingsModule.proceduresSettings.common");
   const { toast } = useToast();
 
   const [name, setName] = useState("");
@@ -116,13 +118,13 @@ export default function EditStageDialog({
 
     const percentageValue = parseInt(durationPercentage, 10) || 0;
     const newErrors = {
-      name: !name.trim() ? "هذا الحقل مطلوب" : "",
+      name: !name.trim() ? tc("requiredField") : "",
       percentage:
         durationPercentage !== "" && percentageValue > 100
           ? t("percentageMax")
           : "",
       timeLimit:
-        !deadlineHours && !deadlineDays ? "يجب إدخال ساعات أو أيام" : "",
+        !deadlineHours && !deadlineDays ? tc("enterHoursOrDays") : "",
     };
     setErrors(newErrors);
     if (Object.values(newErrors).some(Boolean)) return;
@@ -203,18 +205,7 @@ export default function EditStageDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", pb: 1 }}>
-        {currentTabType === "contract" && "تعديل إجراءات العقود"}
-        {currentTabType === "meeting" && "تعديل إجراءات الاجتماعات"}
-        {currentTabType === "price" && "تعديل إجراءات الأسعار"}
-        {currentTabType === "employees" && "تعديل إجراءات الموظفين"}
-        {currentTabType === "client_request" && "تعديل إجراءات طلبات العملاء"}
-        {![
-          "contract",
-          "meeting",
-          "price",
-          "employees",
-          "client_request",
-        ].includes(currentTabType) && t("editStage")}
+        {getProcedureEditTabTitle(currentTabType, tRoot, t("editStage"))}
       </DialogTitle>
 
       <DialogContent>
@@ -251,10 +242,10 @@ export default function EditStageDialog({
                 />
               </Box>
               <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                الاعتماد التسلسلي
+                {t("sequentialApproval")}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                الاعتماد التسلسلي خلال الاعتماد التسلسلي للموافقة
+                {t("sequentialApprovalHint")}
               </Typography>
             </Box>
 
@@ -280,10 +271,10 @@ export default function EditStageDialog({
                 />
               </Box>
               <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                الاعتماد المتوازي
+                {t("parallelApproval")}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                الاعتماد المتوازي خلال الاعتماد المتوازي للموافقة
+                {t("parallelApprovalHint")}
               </Typography>
             </Box>
           </Box>
@@ -341,7 +332,7 @@ export default function EditStageDialog({
                 error={!!errors.timeLimit}
                 sx={{ display: "block", mb: 1 }}
               >
-                المهلة الزمنية *
+                {t("timeLimit")} *
               </FormLabel>
               <Box sx={{ display: "flex", gap: 1.5 }}>
                 <TextField
@@ -357,7 +348,7 @@ export default function EditStageDialog({
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant="caption">ساعات</Typography>
+                        <Typography variant="caption">{tc("hours")}</Typography>
                       </InputAdornment>
                     ),
                   }}
@@ -376,7 +367,7 @@ export default function EditStageDialog({
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant="caption">أيام</Typography>
+                        <Typography variant="caption">{tc("days")}</Typography>
                       </InputAdornment>
                     ),
                   }}
@@ -399,10 +390,10 @@ export default function EditStageDialog({
                 }))}
                 value={escalationUserId}
                 onChange={(val) => setEscalationUserId(String(val))}
-                placeholder="الجهة المصعد اليها"
-                searchPlaceholder="البحث عن اداره..."
-                noResultsText="لا توجد نتائج"
-                label="الجهة المصعد اليها"
+                placeholder={t("selectEscalationEntity")}
+                searchPlaceholder={tc("searchManagement")}
+                noResultsText={tc("noResults")}
+                label={t("escalationEntity")}
               />
               <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
                 الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة

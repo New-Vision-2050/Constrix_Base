@@ -73,6 +73,9 @@ export interface ProcedureStep {
   management_id?: number | null;
   action_taker_type?: string | null;
   action_taker_management_hierarchy_type?: string | null;
+  action_taker_alternative_management_hierarchy_type?: string | null;
+  action_taker_specific_procedure_type?: string | null;
+  action_taker_specific_procedure_id?: string | number | null;
   action_taker_user_ids?: string[];
   concerned_management_hierarchy_ids?: string[];
   /** API may send boolean or 0/1 */
@@ -84,9 +87,11 @@ export interface ProcedureStep {
   forms: ProcedureStepForms;
   approval_within_days?: number;
   approval_within_hours?: number;
+  skipping_period?: number;
   escalation_management_hierarchy_id?: string | null;
   notify_by_email?: boolean;
   notify_by_whatsapp?: boolean;
+  notify_by_sms?: boolean;
   /** Legacy fields */
   employee_id?: string;
   employee?: Employee;
