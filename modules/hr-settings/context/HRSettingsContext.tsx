@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Define available tabs
-type HRSettingsTabType = "employee-positions" | "departments" | "branches" | "job-titles";
+type HRSettingsTabType = "employee-positions" | "departments" | "branches" | "job-titles" | "proceduresSettings";
 
 // Define context type
 interface HRSettingsContextType {
