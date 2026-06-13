@@ -62,7 +62,7 @@ export default function AddStageDialog({
   open,
   onClose,
   onSuccess,
-  currentTabType = "client_request",
+  currentTabType = "employee_task_request",
 }: AddStageDialogProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings.stages");
 
@@ -138,6 +138,7 @@ export default function AddStageDialog({
         {currentTabType === "meeting" && "اعداد إجراءات الاجتماعات"}
         {currentTabType === "price" && "اعداد إجراءات الأسعار"}
         {currentTabType === "employees" && "اعداد إجراءات الموظفين"}
+        {currentTabType === "employee_task_request" && "اعداد إجراءات الموظفين"}
         {currentTabType === "client_request" && "اعداد إجراءات طلبات العملاء"}
         {![
           "contract",
@@ -145,6 +146,7 @@ export default function AddStageDialog({
           "price",
           "employees",
           "client_request",
+          "employee_task_request",
         ].includes(currentTabType) && "اعداد أجراءات الاعتماد"}
       </DialogTitle>
 

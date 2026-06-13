@@ -198,7 +198,7 @@ export default function EditStageDialog({
   };
 
   // Get tab type from procedure
-  const currentTabType = procedure?.type || "client_request";
+  const currentTabType = procedure?.type || "employee_task_request";
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -207,6 +207,7 @@ export default function EditStageDialog({
         {currentTabType === "meeting" && "تعديل إجراءات الاجتماعات"}
         {currentTabType === "price" && "تعديل إجراءات الأسعار"}
         {currentTabType === "employees" && "تعديل إجراءات الموظفين"}
+        {currentTabType === "employee_task_request" && "تعديل إجراءات الموظفين"}
         {currentTabType === "client_request" && "تعديل إجراءات طلبات العملاء"}
         {![
           "contract",
@@ -214,6 +215,7 @@ export default function EditStageDialog({
           "price",
           "employees",
           "client_request",
+          "employee_task_request",
         ].includes(currentTabType) && t("editStage")}
       </DialogTitle>
 
