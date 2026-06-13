@@ -17,7 +17,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { useAllEmployees } from "@/modules/hr-settings/tabs/procedures-settings/hooks/useAllEmployees";
 import {
   fetchManagementHierarchyOptions,
@@ -35,34 +35,75 @@ import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
 
-// ─── Option constants ─────────────────────────────────────────────────────────
-const ORG_BASE_OPTIONS = [
-  { value: "approve", label: "موافقه" },
-  { value: "accept", label: "قبول" },
-  { value: "view_only", label: "اطلاع" },
-  { value: "return_with_notes", label: "اعاده بملاحظات" },
-  { value: "approve_timed", label: "موافقه اليه خلال ( مده )" },
+// ─── Option value constants (labels from i18n inside component) ───────────────
+const ORG_BASE_OPTION_DEFS = [
+  { value: "approve", labelKey: "orgBase.approve" as const },
+  { value: "view_only", labelKey: "orgBase.viewOnly" as const, disabled: true },
+  {
+    value: "return_with_notes",
+    labelKey: "orgBase.returnWithNotes" as const,
+    disabled: true,
+  },
+  { value: "approve_timed", labelKey: "orgBase.approveTimed" as const },
 ] as const;
 
-const ORG_TEMPLATE_OPTIONS = [
-  { value: "approve", label: "نموذج موافقه" },
-  { value: "accreditation_form", label: "نموذج قبول" },
+const ORG_TEMPLATE_OPTION_DEFS = [
+  { value: "approve", labelKey: "orgTemplate.approve" as const },
+  { value: "accreditation_form", labelKey: "orgTemplate.accreditationForm" as const },
 ] as const;
 
-const NOTIFICATION_OPTIONS = [
-  { value: "email", label: "بريد" },
-  { value: "whatsapp", label: "واتساب" },
+const NOTIFICATION_OPTION_DEFS = [
+  { value: "email", labelKey: "notifications.email" as const },
+  { value: "whatsapp", labelKey: "notifications.whatsapp" as const },
+  { value: "sms", labelKey: "notifications.sms" as const },
 ] as const;
 
-const ACTION_TAKER_TYPE_OPTIONS = [
-  { value: "specific_user", label: "لمستخدم محدد" },
-  { value: "management_hierarchy", label: "الهيكل التنظيمي" },
+const ACTION_TAKER_TYPE_OPTION_DEFS = [
+  { value: "specific_user", labelKey: "actionTakerType.specificUser" as const },
+  {
+    value: "management_hierarchy",
+    labelKey: "actionTakerType.managementHierarchy" as const,
+  },
+  {
+    value: "Specific_procedures",
+    labelKey: "actionTakerType.specificProcedures" as const,
+  },
 ] as const;
 
-const MANAGEMENT_HIERARCHY_TYPE_OPTIONS = [
-  { value: "branch_manager", label: "مدير الفرع" },
-  { value: "management_manager", label: "مدير الاداره" },
+const MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS = [
+  { value: "project_manager", labelKey: "managementHierarchy.projectManager" as const },
+  { value: "branch_manager", labelKey: "managementHierarchy.branchManager" as const },
+  {
+    value: "management_manager",
+    labelKey: "managementHierarchy.managementManager" as const,
+  },
 ] as const;
+
+const SPECIFIC_PROCEDURE_ENTITY_OPTION_DEFS = [
+  { value: "branch", labelKey: "specificProcedureEntity.branch" as const },
+  { value: "management", labelKey: "specificProcedureEntity.management" as const },
+  { value: "job_title", labelKey: "specificProcedureEntity.jobTitle" as const },
+  { value: "job_role", labelKey: "specificProcedureEntity.jobRole" as const },
+] as const;
+
+const JOB_ROLE_OPTION_DEFS = [
+  { id: "1", labelKey: "jobRole.managementManager" as const },
+  { id: "2", labelKey: "jobRole.branchManager" as const },
+] as const;
+
+async function fetchNamedListOptions(
+  url: string,
+): Promise<ManagementHierarchyOption[]> {
+  const res = await apiClient.get(url, { params: { per_page: 200, page: 1 } });
+  const rows = res.data?.payload ?? res.data ?? [];
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .map((row: { id?: unknown; name?: unknown }) => ({
+      id: String(row.id ?? ""),
+      name: String(row.name ?? "").trim(),
+    }))
+    .filter((m) => m.id.length > 0);
+}
 
 // TIME_UNITS removed - now using separate day/hour inputs
 
@@ -77,7 +118,10 @@ interface StepCardProps {
 interface StepFormData {
   stepName: string;
   actionTakerType: string;
-  actionTakerManagementHierarchyType: string;
+  actionTakerPrimaryManagementHierarchyType: string;
+  actionTakerAlternativeManagementHierarchyType: string;
+  actionTakerSpecificProcedureType: string;
+  actionTakerSpecificProcedureId: string;
   branchId: string;
   managementId: string;
   actionTakerId: string;
@@ -175,8 +219,15 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     return {
       stepName: serverStep.name?.trim() ?? "",
       actionTakerType: serverStep.action_taker_type ?? "specific_user",
-      actionTakerManagementHierarchyType:
+      actionTakerPrimaryManagementHierarchyType:
         serverStep.action_taker_management_hierarchy_type ?? "",
+      actionTakerAlternativeManagementHierarchyType:
+        serverStep.action_taker_alternative_management_hierarchy_type ?? "",
+      actionTakerSpecificProcedureType:
+        serverStep.action_taker_specific_procedure_type ?? "",
+      actionTakerSpecificProcedureId: serverStep.action_taker_specific_procedure_id
+        ? String(serverStep.action_taker_specific_procedure_id)
+        : "",
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
@@ -198,7 +249,10 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
   return {
     stepName: "",
     actionTakerType: "specific_user",
-    actionTakerManagementHierarchyType: "",
+    actionTakerPrimaryManagementHierarchyType: "",
+    actionTakerAlternativeManagementHierarchyType: "",
+    actionTakerSpecificProcedureType: "",
+    actionTakerSpecificProcedureId: "",
     branchId: "",
     managementId: "",
     actionTakerId: "",
@@ -220,17 +274,32 @@ export default function StepCard({
   onDelete,
 }: StepCardProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings");
+  const ts = useTranslations("CRMSettingsModule.proceduresSettings.stepCard");
+  const tc = useTranslations("CRMSettingsModule.proceduresSettings.common");
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(!serverStep);
   const [isExpanded, setIsExpanded] = useState(!serverStep);
+  const [skippingPeriod, setSkippingPeriod] = useState(
+    () => String(serverStep?.skipping_period ?? 0),
+  );
 
-  const { control, handleSubmit, reset, watch } = useForm<StepFormData>({
-    defaultValues: getDefaultValues(serverStep),
-  });
+  const { control, handleSubmit, reset, watch, setValue } =
+    useForm<StepFormData>({
+      defaultValues: getDefaultValues(serverStep),
+    });
 
   const stepName = watch("stepName");
   const actionTakerType = watch("actionTakerType");
+  const actionTakerPrimaryManagementHierarchyType = watch(
+    "actionTakerPrimaryManagementHierarchyType",
+  );
+  const actionTakerAlternativeManagementHierarchyType = watch(
+    "actionTakerAlternativeManagementHierarchyType",
+  );
+  const actionTakerSpecificProcedureType = watch(
+    "actionTakerSpecificProcedureType",
+  );
   const branchId = watch("branchId");
   const actionTakerIdW = watch("actionTakerId");
   const concernedUserIdW = watch("concernedUserId");
@@ -238,6 +307,7 @@ export default function StepCard({
 
   const syncFromServer = useCallback(() => {
     reset(getDefaultValues(serverStep));
+    setSkippingPeriod(String(serverStep?.skipping_period ?? 0));
   }, [serverStep, reset]);
 
   useEffect(() => {
@@ -265,22 +335,87 @@ export default function StepCard({
       ),
   });
 
+  const { data: allManagements = [] } = useQuery<ManagementHierarchyOption[]>({
+    queryKey: ["managements", "hierarchy", "management", "all"],
+    queryFn: () =>
+      fetchManagementHierarchyOptions(
+        `${baseURL}/management_hierarchies/list?type=management`,
+      ),
+    enabled:
+      actionTakerType === "Specific_procedures" &&
+      actionTakerSpecificProcedureType === "management",
+  });
+
+  const { data: jobTitles = [] } = useQuery<ManagementHierarchyOption[]>({
+    queryKey: ["job-titles", "list"],
+    queryFn: () => fetchNamedListOptions(`${baseURL}/job_titles/list`),
+    enabled:
+      actionTakerType === "Specific_procedures" &&
+      actionTakerSpecificProcedureType === "job_title",
+  });
+ 
+  const jobRoleOptions = useMemo(
+    () =>
+      JOB_ROLE_OPTION_DEFS.map((r) => ({
+        id: r.id,
+        name: ts(`options.${r.labelKey}`),
+      })),
+    [ts],
+  );
+
+  const orgBaseOptions = useMemo(
+    () =>
+      ORG_BASE_OPTION_DEFS.map((o) => ({
+        value: o.value,
+        label: ts(`options.${o.labelKey}`),
+        disabled: "disabled" in o ? o.disabled : undefined,
+      })),
+    [ts],
+  );
+
+  const orgTemplateOptions = useMemo(
+    () =>
+      ORG_TEMPLATE_OPTION_DEFS.map((o) => ({
+        value: o.value,
+        label: ts(`options.${o.labelKey}`),
+      })),
+    [ts],
+  );
+
+  const notificationOptions = useMemo(
+    () =>
+      NOTIFICATION_OPTION_DEFS.map((o) => ({
+        value: o.value,
+        label: ts(`options.${o.labelKey}`),
+      })),
+    [ts],
+  );
+
+  const actionTakerTypeOptions = useMemo(
+    () =>
+      ACTION_TAKER_TYPE_OPTION_DEFS.map((o) => ({
+        value: o.value,
+        label: ts(`options.${o.labelKey}`),
+      })),
+    [ts],
+  );
+
   const branchSelectOptions = useMemo(
     () =>
       withEmptyOption(
         branches.map((b) => ({ value: String(b.id), label: b.name })),
-        "اختر الفرع",
+        ts("selectBranch"),
       ),
-    [branches],
+    [branches, ts],
   );
 
   const managementSelectOptions = useMemo(
     () =>
       withEmptyOption(
         managements.map((m) => ({ value: String(m.id), label: m.name })),
-        "اختر الادارة",
+        ts("selectManagement"),
       ),
-    [managements],
+    [managements, ts],
   );
 
   const employeeRows = useMemo(
@@ -300,8 +435,8 @@ export default function StepCard({
       const name = resolveActionTakerName(serverStep, id);
       if (id) rows = ensureSelectedEmployeeRow(rows, id, name);
     }
-    return withEmptyOption(rows, "متخذي الاجراء");
-  }, [employeeRows, serverStep]);
+    return withEmptyOption(rows, ts("actionTaker"));
+  }, [employeeRows, serverStep, ts]);
 
   const concernedUserSelectOptions = useMemo(() => {
     let rows = [...managementRows];
@@ -310,8 +445,8 @@ export default function StepCard({
       const name = resolveConcernedUserName(serverStep, id);
       if (id) rows = ensureSelectedEmployeeRow(rows, id, name);
     }
-    return withEmptyOption(rows, "المعنيين بالاجراء");
-  }, [managementRows, serverStep]);
+    return withEmptyOption(rows, ts("concernedUsers"));
+  }, [managementRows, serverStep, ts]);
 
   const actionTakerDisplayLabel = useMemo(() => {
     if (!fieldsDisabled || !actionTakerIdW) return undefined;
@@ -334,18 +469,86 @@ export default function StepCard({
   }, [fieldsDisabled, concernedUserIdW, serverStep, managementRows]);
 
   const escalationUserSelectOptions = useMemo(
-    () => withEmptyOption(managementRows, "اختر الجهة المصعد إليها"),
-    [managementRows],
+    () => withEmptyOption(managementRows, ts("selectEscalationEntity")),
+    [managementRows, ts],
   );
 
   const orgTemplateSelectOptions = useMemo(
-    () =>
-      ORG_TEMPLATE_OPTIONS.map((o) => ({
-        value: o.value,
-        label: o.label,
-      })),
-    [],
+    () => orgTemplateOptions,
+    [orgTemplateOptions],
   );
+
+  const primaryManagementHierarchyOptions = useMemo(
+    () =>
+      MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.filter(
+        (o) => o.value !== actionTakerAlternativeManagementHierarchyType,
+      ).map((o) => ({ value: o.value, label: ts(`options.${o.labelKey}`) })),
+    [actionTakerAlternativeManagementHierarchyType, ts],
+  );
+
+  const alternativeManagementHierarchyOptions = useMemo(
+    () =>
+      MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.filter(
+        (o) => o.value !== actionTakerPrimaryManagementHierarchyType,
+      ).map((o) => ({ value: o.value, label: ts(`options.${o.labelKey}`) })),
+    [actionTakerPrimaryManagementHierarchyType, ts],
+  );
+
+  const specificProcedureEntityOptions = useMemo(
+    () =>
+      SPECIFIC_PROCEDURE_ENTITY_OPTION_DEFS.map((o) => ({
+        value: o.value,
+        label: ts(`options.${o.labelKey}`),
+      })),
+    [ts],
+  );
+
+  const specificProcedureValuePlaceholder = useMemo(() => {
+    switch (actionTakerSpecificProcedureType) {
+      case "branch":
+        return ts("selectBranch");
+      case "management":
+        return ts("selectManagement");
+      case "job_title":
+        return ts("selectJobTitle");
+      case "job_role":
+        return ts("selectJobRole");
+      default:
+        return ts("selectValue");
+    }
+  }, [actionTakerSpecificProcedureType, ts]);
+
+  const specificProcedureValueOptions = useMemo(() => {
+    const toOptions = (
+      rows: ManagementHierarchyOption[],
+      placeholder: string,
+    ) =>
+      withEmptyOption(
+        rows.map((r) => ({ value: String(r.id), label: r.name })),
+        placeholder,
+      );
+
+    switch (actionTakerSpecificProcedureType) {
+      case "branch":
+        return toOptions(branches, ts("selectBranch"));
+      case "management":
+        return toOptions(allManagements, ts("selectManagement"));
+      case "job_title":
+        return toOptions(jobTitles, ts("selectJobTitle"));
+      case "job_role":
+        return toOptions(jobRoleOptions, ts("selectJobRole"));
+      default:
+        return withEmptyOption([], tc("select"));
+    }
+  }, [
+    actionTakerSpecificProcedureType,
+    branches,
+    allManagements,
+    jobTitles,
+    jobRoleOptions,
+    ts,
+    tc,
+  ]);
 
   const toggleArrayValue = (current: string[], val: string): string[] =>
     current.includes(val)
@@ -363,11 +566,54 @@ export default function StepCard({
     }
     if (
       data.actionTakerType === "management_hierarchy" &&
-      !data.actionTakerManagementHierarchyType
+      !data.actionTakerPrimaryManagementHierarchyType
     ) {
       toast({
         title: t("actions.save"),
-        description: "يرجى اختيار نوع الهيكل التنظيمي",
+        description: ts("validation.selectPrimaryHierarchy"),
+        variant: "destructive",
+      });
+      return;
+    }
+    if (
+      data.actionTakerType === "management_hierarchy" &&
+      data.actionTakerPrimaryManagementHierarchyType &&
+      data.actionTakerAlternativeManagementHierarchyType &&
+      data.actionTakerPrimaryManagementHierarchyType ===
+        data.actionTakerAlternativeManagementHierarchyType
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.duplicateHierarchy"),
+        variant: "destructive",
+      });
+      return;
+    }
+    if (data.actionTakerType === "Specific_procedures") {
+      if (!data.actionTakerSpecificProcedureType) {
+        toast({
+          title: t("actions.save"),
+          description: ts("validation.selectProcedureType"),
+          variant: "destructive",
+        });
+        return;
+      }
+      if (!data.actionTakerSpecificProcedureId) {
+        toast({
+          title: t("actions.save"),
+          description: ts("validation.selectValue"),
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    if (
+      data.orgBase.includes("approve_timed") &&
+      (!skippingPeriod.trim() || Number(skippingPeriod) <= 0)
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.enterSkippingPeriod"),
         variant: "destructive",
       });
       return;
@@ -377,7 +623,22 @@ export default function StepCard({
       name: data.stepName.trim(),
       action_taker_type: data.actionTakerType,
       action_taker_management_hierarchy_type:
-        data.actionTakerManagementHierarchyType,
+        data.actionTakerPrimaryManagementHierarchyType,
+      ...(data.actionTakerType === "management_hierarchy" &&
+      data.actionTakerAlternativeManagementHierarchyType
+        ? {
+            action_taker_alternative_management_hierarchy_type:
+              data.actionTakerAlternativeManagementHierarchyType,
+          }
+        : {}),
+      ...(data.actionTakerType === "Specific_procedures"
+        ? {
+            action_taker_specific_procedure_type:
+              data.actionTakerSpecificProcedureType,
+            action_taker_specific_procedure_id:
+              data.actionTakerSpecificProcedureId,
+          }
+        : {}),
       action_taker_user_ids:
         data.actionTakerType === "specific_user" && data.actionTakerId
           ? [data.actionTakerId]
@@ -403,6 +664,9 @@ export default function StepCard({
         : {}),
       approval_within_days: Number(data.deadlineDays) || 0,
       approval_within_hours: Number(data.deadlineHours) || 0,
+      ...(data.orgBase.includes("approve_timed")
+        ? { skipping_period: Number(skippingPeriod) || 0 }
+        : {}),
     };
 
     setIsSaving(true);
@@ -450,10 +714,16 @@ export default function StepCard({
     options,
     selected,
     onToggle,
+    inlineInput,
   }: {
-    options: readonly { value: string; label: string }[];
+    options: readonly { value: string; label: string; disabled?: boolean }[];
     selected: string[];
     onToggle: (val: string) => void;
+    inlineInput?: {
+      optionValue: string;
+      value: string;
+      onChange: (value: string) => void;
+    };
   }) => (
     <Box
       sx={{
@@ -462,21 +732,50 @@ export default function StepCard({
         gap: 0.5,
       }}
     >
-      {options.map((opt) => (
-        <FormControlLabel
-          key={opt.value}
-          labelPlacement="end"
-          label={opt.label}
-          control={
-            <Checkbox
-              size="small"
-              checked={selected.includes(opt.value)}
-              onChange={() => onToggle(opt.value)}
-              disabled={fieldsDisabled}
-            />
-          }
-        />
-      ))}
+      {options.map((opt) => {
+        const showInlineInput =
+          inlineInput?.optionValue === opt.value &&
+          selected.includes(opt.value);
+
+        return (
+          <FormControlLabel
+            key={opt.value}
+            labelPlacement="end"
+            label={
+              showInlineInput ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <span>{opt.label}</span>
+                  <TextField
+                    type="number"
+                    size="small"
+                    value={inlineInput.value}
+                    onChange={(e) => inlineInput.onChange(e.target.value)}
+                    disabled={fieldsDisabled}
+                    sx={{ width: 80 }}
+                    inputProps={{ min: 1, style: { textAlign: "center" } }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </Box>
+              ) : (
+                opt.label
+              )
+            }
+            control={
+              <Checkbox
+                size="small"
+                checked={selected.includes(opt.value)}
+                onChange={() => onToggle(opt.value)}
+                disabled={fieldsDisabled || opt.disabled}
+              />
+            }
+            sx={
+              opt.disabled
+                ? { opacity: 0.6, cursor: "not-allowed" }
+                : undefined
+            }
+          />
+        );
+      })}
     </Box>
   );
 
@@ -794,22 +1093,19 @@ export default function StepCard({
 
         {/* ── نوع متخذي الإجراء ── */}
         <Box sx={{ mb: 2.5 }}>
-          <SectionLabel>نوع متخذي الإجراء</SectionLabel>
+          <SectionLabel>{ts("actionTakerType")}</SectionLabel>
           <Controller
             name="actionTakerType"
             control={control}
             render={({ field }) => (
               <Box sx={{ width: "100%" }}>
                 <SearchableSelect
-                  options={ACTION_TAKER_TYPE_OPTIONS.map((o) => ({
-                    value: o.value,
-                    label: o.label,
-                  }))}
+                  options={actionTakerTypeOptions}
                   value={field.value ?? "specific_user"}
                   onChange={(v) => field.onChange(String(v))}
-                  placeholder="اختر نوع متخذي الإجراء"
-                  searchPlaceholder="البحث..."
-                  noResultsText="لا توجد نتائج"
+                  placeholder={ts("selectActionTakerType")}
+                  searchPlaceholder={tc("search")}
+                  noResultsText={tc("noResults")}
                   disabled={fieldsDisabled}
                 />
               </Box>
@@ -820,34 +1116,72 @@ export default function StepCard({
         {/* ── نوع الهيكل التنظيمي (conditional) ── */}
         {actionTakerType === "management_hierarchy" && (
           <Box sx={{ mb: 2.5 }}>
-            <SectionLabel>نوع الهيكل التنظيمي</SectionLabel>
-            <Controller
-              name="actionTakerManagementHierarchyType"
-              control={control}
-              render={({ field }) => (
-                <Box sx={{ width: "100%" }}>
-                  <SearchableSelect
-                    options={MANAGEMENT_HIERARCHY_TYPE_OPTIONS.map((o) => ({
-                      value: o.value,
-                      label: o.label,
-                    }))}
-                    value={field.value ?? ""}
-                    onChange={(v) => field.onChange(String(v))}
-                    placeholder="اختر نوع الهيكل التنظيمي"
-                    searchPlaceholder="البحث..."
-                    noResultsText="لا توجد نتائج"
-                    disabled={fieldsDisabled}
-                  />
-                </Box>
-              )}
-            />
+            <SectionLabel>{ts("managementHierarchyType")}</SectionLabel>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+                  {ts("primaryManagementHierarchy")}
+                </Typography>
+                <Controller
+                  name="actionTakerPrimaryManagementHierarchyType"
+                  control={control}
+                  render={({ field }) => (
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={primaryManagementHierarchyOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => {
+                          const next = String(v);
+                          field.onChange(next);
+                          if (
+                            next &&
+                            next === actionTakerAlternativeManagementHierarchyType
+                          ) {
+                            setValue(
+                              "actionTakerAlternativeManagementHierarchyType",
+                              "",
+                            );
+                          }
+                        }}
+                        placeholder={ts("selectPrimaryManagementHierarchy")}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
+                        disabled={fieldsDisabled}
+                      />
+                    </Box>
+                  )}
+                />
+              </Grid>
+              <Grid size={6}>
+                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+                  {ts("alternativeManagementHierarchy")}
+                </Typography>
+                <Controller
+                  name="actionTakerAlternativeManagementHierarchyType"
+                  control={control}
+                  render={({ field }) => (
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={alternativeManagementHierarchyOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => field.onChange(String(v))}
+                        placeholder={ts("selectAlternativeManagementHierarchy")}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
+                        disabled={fieldsDisabled}
+                      />
+                    </Box>
+                  )}
+                />
+              </Grid>
+            </Grid>
           </Box>
         )}
 
         {/* ── الوحدة التنظيمية — 2-column grid of dropdowns (only show if specific_user) ── */}
         {actionTakerType === "specific_user" && (
           <Box sx={{ mb: 2.5 }}>
-            <SectionLabel>الوحدة التنظيمية</SectionLabel>
+            <SectionLabel>{ts("organizationalUnit")}</SectionLabel>
             <Grid container spacing={2}>
             {/* الفرع */}
             <Grid size={6}>
@@ -868,9 +1202,9 @@ export default function StepCard({
                         options={branchSelectOptions}
                         value={field.value ?? ""}
                         onChange={(v) => field.onChange(String(v))}
-                        placeholder="اختر الفرع"
-                        searchPlaceholder="البحث..."
-                        noResultsText="لا توجد نتائج"
+                        placeholder={ts("selectBranch")}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
                         disabled={fieldsDisabled}
                       />
                     </Box>
@@ -898,9 +1232,9 @@ export default function StepCard({
                         options={managementSelectOptions}
                         value={field.value ?? ""}
                         onChange={(v) => field.onChange(String(v))}
-                        placeholder="اختر الادارة"
-                        searchPlaceholder="البحث..."
-                        noResultsText="لا توجد نتائج"
+                        placeholder={ts("selectManagement")}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
                         disabled={fieldsDisabled || !branchId}
                       />
                     </Box>
@@ -929,9 +1263,9 @@ export default function StepCard({
                           options={actionTakerSelectOptions}
                           value={field.value ?? ""}
                           onChange={(v) => field.onChange(String(v))}
-                          placeholder="متخذي الاجراء"
-                          searchPlaceholder="البحث عن اداره..."
-                          noResultsText="لا توجد نتائج"
+                          placeholder={ts("actionTaker")}
+                          searchPlaceholder={tc("searchManagement")}
+                          noResultsText={tc("noResults")}
                           disabled={fieldsDisabled}
                           displayLabel={
                             fieldsDisabled ? actionTakerDisplayLabel : undefined
@@ -963,9 +1297,9 @@ export default function StepCard({
                         options={concernedUserSelectOptions}
                         value={field.value ?? ""}
                         onChange={(v) => field.onChange(String(v))}
-                        placeholder="المعنيين بالاجراء"
-                        searchPlaceholder="البحث عن اداره..."
-                        noResultsText="لا توجد نتائج"
+                        placeholder={ts("concernedUsers")}
+                        searchPlaceholder={tc("searchManagement")}
+                        noResultsText={tc("noResults")}
                         disabled={fieldsDisabled}
                         displayLabel={
                           fieldsDisabled ? concernedUserDisplayLabel : undefined
@@ -980,19 +1314,75 @@ export default function StepCard({
           </Box>
         )}
 
+        {actionTakerType === "Specific_procedures" && (
+          <Box sx={{ mb: 2.5 }}>
+            <SectionLabel>{ts("specificProcedures")}</SectionLabel>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <Controller
+                  name="actionTakerSpecificProcedureType"
+                  control={control}
+                  render={({ field }) => (
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={specificProcedureEntityOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => {
+                          field.onChange(String(v));
+                          setValue("actionTakerSpecificProcedureId", "");
+                        }}
+                        placeholder={ts("selectType")}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
+                        disabled={fieldsDisabled}
+                      />
+                    </Box>
+                  )}
+                />
+              </Grid>
+              <Grid size={6}>
+                <Controller
+                  name="actionTakerSpecificProcedureId"
+                  control={control}
+                  render={({ field }) => (
+                    <Box sx={{ width: "100%" }}>
+                      <SearchableSelect
+                        options={specificProcedureValueOptions}
+                        value={field.value ?? ""}
+                        onChange={(v) => field.onChange(String(v))}
+                        placeholder={specificProcedureValuePlaceholder}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
+                        disabled={
+                          fieldsDisabled || !actionTakerSpecificProcedureType
+                        }
+                      />
+                    </Box>
+                  )}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+
         {/* ── القاعدة التنظيمية — checkboxes ── */}
         <Box sx={{ mb: 2.5 }}>
-          <SectionLabel>القاعدة التنظيمية</SectionLabel>
+          <SectionLabel>{ts("orgRule")}</SectionLabel>
           <Controller
             name="orgBase"
             control={control}
             render={({ field }) => (
               <CheckRow
-                options={ORG_BASE_OPTIONS}
+                options={orgBaseOptions}
                 selected={field.value}
                 onToggle={(v) =>
                   field.onChange(toggleArrayValue(field.value, v))
                 }
+                inlineInput={{
+                  optionValue: "approve_timed",
+                  value: skippingPeriod,
+                  onChange: setSkippingPeriod,
+                }}
               />
             )}
           />
@@ -1000,7 +1390,7 @@ export default function StepCard({
 
         {/* ── النماذج التنظيمية — dropdown ── */}
         <Box sx={{ mb: 2.5 }}>
-          <SectionLabel>النماذج التنظيمية</SectionLabel>
+          <SectionLabel>{ts("orgTemplates")}</SectionLabel>
           <Controller
             name="orgTemplate"
             control={control}
@@ -1010,9 +1400,9 @@ export default function StepCard({
                   options={orgTemplateSelectOptions}
                   value={field.value ?? "approve"}
                   onChange={(v) => field.onChange(String(v))}
-                  placeholder="نموذج"
-                  searchPlaceholder="البحث..."
-                  noResultsText="لا توجد نتائج"
+                  placeholder={ts("selectTemplate")}
+                  searchPlaceholder={tc("search")}
+                  noResultsText={tc("noResults")}
                   disabled={fieldsDisabled}
                 />
               </Box>
@@ -1022,13 +1412,13 @@ export default function StepCard({
 
         {/* ── الاعلامات — checkboxes ── */}
         <Box sx={{ mb: 2.5 }}>
-          <SectionLabel>الاعلامات</SectionLabel>
+          <SectionLabel>{ts("notifications")}</SectionLabel>
           <Controller
             name="notifications"
             control={control}
             render={({ field }) => (
               <CheckRow
-                options={NOTIFICATION_OPTIONS}
+                options={notificationOptions}
                 selected={field.value}
                 onToggle={(v) =>
                   field.onChange(toggleArrayValue(field.value, v))
@@ -1045,13 +1435,13 @@ export default function StepCard({
           }}
         >
           <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
-            التصعيد
+            {ts("escalation")}
           </Typography>
 
           {/* المهلة الزمنية inside التصعيد */}
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
-              المهلة الزمنية
+              {ts("timeLimit")}
             </Typography>
             <Box
               sx={{
@@ -1074,7 +1464,7 @@ export default function StepCard({
                     />
                   )}
                 />
-                <Typography variant="body2">أيام</Typography>
+                <Typography variant="body2">{tc("days")}</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Controller
@@ -1090,7 +1480,7 @@ export default function StepCard({
                     />
                   )}
                 />
-                <Typography variant="body2">ساعات</Typography>
+                <Typography variant="body2">{tc("hours")}</Typography>
               </Box>
             </Box>
           </Box>
@@ -1100,7 +1490,7 @@ export default function StepCard({
           {/* الجهة المصعد إليها */}
           <Box>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
-              الجهة المصعد إليها
+              {ts("escalationEntity")}
             </Typography>
             <Controller
               name="escalationUserId"
@@ -1112,9 +1502,9 @@ export default function StepCard({
                       options={escalationUserSelectOptions}
                       value={field.value ?? ""}
                       onChange={(v) => field.onChange(String(v))}
-                      placeholder="اختر الجهة المصعد إليها"
-                      searchPlaceholder="البحث عن اداره..."
-                      noResultsText="لا توجد نتائج"
+                      placeholder={ts("selectEscalationEntity")}
+                      searchPlaceholder={tc("searchManagement")}
+                      noResultsText={tc("noResults")}
                       disabled={fieldsDisabled}
                     />
                   </Box>
