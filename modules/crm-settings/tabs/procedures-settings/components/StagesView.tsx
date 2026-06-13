@@ -11,6 +11,7 @@ import AddStageDialog from "./dialogs/AddStageDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
+import { getProcedureSettingsTabTitle } from "../utils/getProcedureTabTitle";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import {
   Stage,
@@ -243,25 +244,14 @@ export default function StagesView({
         }}
       >
         <Typography variant="h6" fontWeight={600}>
-          {currentTabType === "contract" && "اعداد إجراءات العقود"}
-          {currentTabType === "meeting" && "اعداد إجراءات الاجتماعات"}
-          {currentTabType === "price" && "اعداد إجراءات الأسعار"}
-          {currentTabType === "employees" && "اعداد إجراءات الموظفين"}
-          {currentTabType === "client_request" && "اعداد إجراءات طلبات العملاء"}
-          {![
-            "contract",
-            "meeting",
-            "price",
-            "employees",
-            "client_request",
-          ].includes(currentTabType) && "اعداد إجراءات الطلبات"}
+          {getProcedureSettingsTabTitle(currentTabType, t)}
         </Typography>
         <Button
           variant="contained"
           onClick={handleAddStep}
           disabled={!selectedProcedureId}
         >
-          اضافة مرحلة
+          {t("steps.addStage")}
         </Button>
       </Box>
       <Grid container spacing={2}>

@@ -26,6 +26,9 @@ export interface CreateStepArgs {
   name: string;
   action_taker_type?: string;
   action_taker_management_hierarchy_type?: string;
+h  action_taker_alternative_management_hierarchy_type?: string;
+  action_taker_specific_procedure_type?: string;
+  action_taker_specific_procedure_id?: string;
   branch_id?: number;
   management_id?: number;
   action_taker_user_ids: string[];
@@ -38,7 +41,9 @@ export interface CreateStepArgs {
   forms: string; // "approve" | "accept"
   approval_within_days?: number;
   approval_within_hours?: number;
+  skipping_period?: number;
   escalation_management_hierarchy_id?: string;
   notify_by_email: boolean;
   notify_by_whatsapp: boolean;
+  notify_by_sms: boolean;
 }

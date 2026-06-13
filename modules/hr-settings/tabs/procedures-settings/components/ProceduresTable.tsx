@@ -173,6 +173,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
           forms: mapFormsUiToApi(procedure.forms),
           notify_by_email: false,
           notify_by_whatsapp: false,
+          notify_by_sms: false,
         };
 
         try {
@@ -230,6 +231,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
         forms: mapFormsUiToApi(procedureData.forms),
         notify_by_email: false,
         notify_by_whatsapp: false,
+        notify_by_sms: false,
       };
 
       try {

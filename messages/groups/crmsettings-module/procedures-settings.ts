@@ -8,6 +8,48 @@ export const proceduresSettingsMessages = new MessagesGroup({
     contracts: _m("Contracts", "العقود"),
     priceOffers: _m("Price Offers", "عرض السعر"),
     meetings: _m("Meetings", "اجتماع"),
+    workPlan: _m("Work plan", "خطة العمل"),
+    useWorkPlanProcedures: _m(
+      "Procedures will be taken from the work plan",
+      "سيتم اخذ الاجراءات من خطة العمل",
+    ),
+  }),
+  tabTitles: new MessagesGroup({
+    contract: _m("Contract procedures settings", "اعداد إجراءات العقود"),
+    meeting: _m("Meeting procedures settings", "اعداد إجراءات الاجتماعات"),
+    price: _m("Price procedures settings", "اعداد إجراءات الأسعار"),
+    priceOffer: _m("Price offer procedures settings", "اعداد إجراءات الأسعار"),
+    employees: _m("Employee procedures settings", "اعداد إجراءات الموظفين"),
+    clientRequest: _m(
+      "Client request procedures settings",
+      "اعداد إجراءات طلبات العملاء",
+    ),
+    default: _m("Request procedures settings", "اعداد إجراءات الطلبات"),
+    editContract: _m("Edit contract procedures", "تعديل إجراءات العقود"),
+    editMeeting: _m("Edit meeting procedures", "تعديل إجراءات الاجتماعات"),
+    editPrice: _m("Edit price procedures", "تعديل إجراءات الأسعار"),
+    editEmployees: _m("Edit employee procedures", "تعديل إجراءات الموظفين"),
+    editClientRequest: _m(
+      "Edit client request procedures",
+      "تعديل إجراءات طلبات العملاء",
+    ),
+    accreditation: _m(
+      "Accreditation procedures settings",
+      "اعداد أجراءات الاعتماد",
+    ),
+  }),
+  common: new MessagesGroup({
+    search: _m("Search...", "البحث..."),
+    noResults: _m("No results", "لا توجد نتائج"),
+    select: _m("Select", "اختر"),
+    days: _m("Days", "أيام"),
+    hours: _m("Hours", "ساعات"),
+    requiredField: _m("This field is required", "هذا الحقل مطلوب"),
+    enterHoursOrDays: _m(
+      "Enter hours or days",
+      "يجب إدخال ساعات أو أيام",
+    ),
+    searchManagement: _m("Search for department...", "البحث عن اداره..."),
   }),
   stages: new MessagesGroup({
     title: _m("Stages", "المراحل"),
@@ -30,6 +72,22 @@ export const proceduresSettingsMessages = new MessagesGroup({
     percentageMax: _m(
       "Percentage must not exceed 100.",
       "يجب ألا تتجاوز النسبة 100٪.",
+    ),
+    sequentialApproval: _m("Sequential approval", "الاعتماد التسلسلي"),
+    sequentialApprovalHint: _m(
+      "Sequential approval during sequential approval process",
+      "الاعتماد التسلسلي خلال الاعتماد التسلسلي للموافقة",
+    ),
+    parallelApproval: _m("Parallel approval", "الاعتماد المتوازي"),
+    parallelApprovalHint: _m(
+      "Parallel approval during parallel approval process",
+      "الاعتماد المتوازي خلال الاعتماد المتوازي للموافقة",
+    ),
+    timeLimit: _m("Time limit", "المهلة الزمنية"),
+    escalationEntity: _m("Escalation entity", "الجهة المصعد اليها"),
+    selectEscalationEntity: _m(
+      "Select escalation entity",
+      "اختر الجهة المصعد إليها",
     ),
   }),
   procedures: new MessagesGroup({
@@ -54,6 +112,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
   }),
   steps: new MessagesGroup({
     addStep: _m("Add Step", "اضافة إجراء"),
+    addStage: _m("Add stage", "اضافة مرحلة"),
     stage: _m("Stage", "المرحلة"),
     stepName: _m("Step Name", "اسم المرحلة"),
     enterStepName: _m("Enter step name", "ادخل اسم المرحلة"),
@@ -62,6 +121,113 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "No procedures yet. Add a procedure to get started.",
       "لا توجد إجراءات. أضف إجراءاً للبدء.",
     ),
+  }),
+  stepCard: new MessagesGroup({
+    actionTakerType: _m("Action taker type", "نوع متخذي الإجراء"),
+    selectActionTakerType: _m(
+      "Select action taker type",
+      "اختر نوع متخذي الإجراء",
+    ),
+    managementHierarchyType: _m(
+      "Management hierarchy type",
+      "نوع الهيكل التنظيمي",
+    ),
+    primaryManagementHierarchy: _m(
+      "Primary management hierarchy",
+      "الهيكل التنظيمي الأساسي",
+    ),
+    alternativeManagementHierarchy: _m(
+      "Alternative management hierarchy",
+      "الهيكل التنظيمي البديل",
+    ),
+    selectPrimaryManagementHierarchy: _m(
+      "Select primary management hierarchy",
+      "اختر الهيكل التنظيمي الأساسي",
+    ),
+    selectAlternativeManagementHierarchy: _m(
+      "Select alternative management hierarchy",
+      "اختر الهيكل التنظيمي البديل",
+    ),
+    organizationalUnit: _m("Organizational unit", "الوحدة التنظيمية"),
+    selectBranch: _m("Select branch", "اختر الفرع"),
+    selectManagement: _m("Select management", "اختر الادارة"),
+    actionTaker: _m("Action taker", "متخذي الاجراء"),
+    concernedUsers: _m("Concerned users", "المعنيين بالاجراء"),
+    specificProcedures: _m("Specific procedures", "اجراءات محددة"),
+    selectType: _m("Select type", "اختر النوع"),
+    selectValue: _m("Select value", "اختر القيمة"),
+    selectJobTitle: _m("Select job title", "اختر المسمى الوظيفي"),
+    selectJobRole: _m("Select job role", "اختر الدور الوظيفي"),
+    orgRule: _m("Organizational rule", "القاعدة التنظيمية"),
+    orgTemplates: _m("Organizational templates", "النماذج التنظيمية"),
+    selectTemplate: _m("Select template", "نموذج"),
+    notifications: _m("Notifications", "الاعلامات"),
+    escalation: _m("Escalation", "التصعيد"),
+    timeLimit: _m("Time limit", "المهلة الزمنية"),
+    escalationEntity: _m("Escalation entity", "الجهة المصعد إليها"),
+    selectEscalationEntity: _m(
+      "Select escalation entity",
+      "اختر الجهة المصعد إليها",
+    ),
+    options: new MessagesGroup({
+      orgBase: new MessagesGroup({
+        approve: _m("Approve", "موافقه"),
+        viewOnly: _m("View only", "اطلاع"),
+        returnWithNotes: _m("Return with notes", "اعاده بملاحظات"),
+        approveTimed: _m(
+          "Approve within period",
+          "موافقه اليه خلال ( مده )",
+        ),
+      }),
+      orgTemplate: new MessagesGroup({
+        approve: _m("Approval form", "نموذج موافقه"),
+        accreditationForm: _m("Accreditation form", "نموذج قبول"),
+      }),
+      notifications: new MessagesGroup({
+        email: _m("Email", "بريد"),
+        whatsapp: _m("WhatsApp", "واتساب"),
+        sms: _m("SMS", "رسالة نصية"),
+      }),
+      actionTakerType: new MessagesGroup({
+        specificUser: _m("Specific user", "لمستخدم محدد"),
+        managementHierarchy: _m("Management hierarchy", "الهيكل التنظيمي"),
+        specificProcedures: _m("Specific procedures", "اجراءات محددة"),
+      }),
+      managementHierarchy: new MessagesGroup({
+        projectManager: _m("Project manager", "مدير المشروع"),
+        branchManager: _m("Branch manager", "مدير الفرع"),
+        managementManager: _m("Management manager", "مدير الاداره"),
+      }),
+      specificProcedureEntity: new MessagesGroup({
+        branch: _m("Branches", "الفروع"),
+        management: _m("Managements", "الادارات"),
+        jobTitle: _m("Job title", "المسمى الوظيفي"),
+        jobRole: _m("Job role", "الدور الوظيفي"),
+      }),
+      jobRole: new MessagesGroup({
+        managementManager: _m("Management manager", "مدير الادارة"),
+        branchManager: _m("Branch manager", "مدير الفرع"),
+      }),
+    }),
+    validation: new MessagesGroup({
+      selectPrimaryHierarchy: _m(
+        "Please select primary management hierarchy",
+        "يرجى اختيار الهيكل التنظيمي الأساسي",
+      ),
+      duplicateHierarchy: _m(
+        "Cannot select the same option in both fields",
+        "لا يمكن اختيار نفس الخيار في كلا الحقلين",
+      ),
+      selectProcedureType: _m(
+        "Please select procedure type",
+        "يرجى اختيار نوع الإجراء",
+      ),
+      selectValue: _m("Please select a value", "يرجى اختيار القيمة"),
+      enterSkippingPeriod: _m(
+        "Please enter skipping period",
+        "يرجى إدخال فترة التخطي",
+      ),
+    }),
   }),
   actions: new MessagesGroup({
     add: _m("Add", "إضافة"),
