@@ -35,7 +35,7 @@ export default function CreateNewDirDialogContent({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-md w-full" dir={isRtl ? "rtl" : "ltr"}>
+      <DialogContent className="max-lg w-full" dir={isRtl ? "rtl" : "ltr"}>
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-semibold text-foreground">
             {Boolean(editedDoc) ? t("editTitle") : t("title")}

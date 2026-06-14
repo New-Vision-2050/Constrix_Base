@@ -5,5 +5,6 @@ export default function useUserJobOffersData(userId: string) {
   return useQuery({
     queryKey: [`user-job-offers-data`, userId],
     queryFn: () => GetUserJobOffersData(userId),
+    enabled: !!userId,
   });
 }

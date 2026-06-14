@@ -189,14 +189,13 @@ const FileField: React.FC<FileFieldProps> = ({
         type: value.type,
         icon: getFileIcon(value.type, 40),
       });
-    }
-    else if (value && value.mime_type) {
-        setFileInfo({
-            name: value.name,
-            size: formatFileSize(value.size ?? 0),
-            type: value.mime_type,
-            icon: getFileIcon(value.mime_type, 32),
-        });
+    } else if (value && value.mime_type) {
+      setFileInfo({
+        name: value.name,
+        size: formatFileSize(value.size ?? 0),
+        type: value.mime_type,
+        icon: getFileIcon(value.mime_type, 32),
+      });
     }
   }, [value]);
 
@@ -214,8 +213,8 @@ const FileField: React.FC<FileFieldProps> = ({
         formInstance.setError(
           field.name,
           `${t("FileTypeNotAllowed")}: ${field.fileConfig.allowedFileTypes.join(
-            ", "
-          )}`
+            ", ",
+          )}`,
         );
         return;
       }
@@ -229,7 +228,7 @@ const FileField: React.FC<FileFieldProps> = ({
           Math.round((field.fileConfig.maxFileSize / (1024 * 1024)) * 10) / 10;
         formInstance.setError(
           field.name,
-          `${t("FileSizeExceeds")} (${maxSizeMB} MB)`
+          `${t("FileSizeExceeds")} (${maxSizeMB} MB)`,
         );
         return;
       }
@@ -247,7 +246,7 @@ const FileField: React.FC<FileFieldProps> = ({
         fileInputRef.current.value = "";
       }
     },
-    [field, onChange, formInstance, t]
+    [field, onChange, formInstance, t],
   );
 
   // Handle file upload
@@ -285,7 +284,7 @@ const FileField: React.FC<FileFieldProps> = ({
               } else {
                 formInstance.setError(
                   field.name,
-                  `${t("UploadSuccessful")} ${t("UploadFailed")}`
+                  `${t("UploadSuccessful")} ${t("UploadFailed")}`,
                 );
               }
             } catch (error) {
@@ -294,7 +293,7 @@ const FileField: React.FC<FileFieldProps> = ({
           } else {
             formInstance.setError(
               field.name,
-              `${t("UploadFailed")} (${xhr.status})`
+              `${t("UploadFailed")} (${xhr.status})`,
             );
           }
           setIsUploading(false);
@@ -315,7 +314,7 @@ const FileField: React.FC<FileFieldProps> = ({
             Object.entries(field.fileConfig.uploadHeaders).forEach(
               ([key, value]) => {
                 xhr.setRequestHeader(key, value);
-              }
+              },
             );
           }
         } else {
@@ -328,16 +327,16 @@ const FileField: React.FC<FileFieldProps> = ({
         setIsUploading(false);
       }
     },
-    [field, onChange, formInstance, t]
+    [field, onChange, formInstance, t],
   );
 
   // Handle downloading the file
   const handleDownload = useCallback(() => {
     if (!value) return;
-    
-    if (typeof value === 'string') {
+
+    if (typeof value === "string") {
       // If value is a URL string, create a download link
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = value;
       link.download = getFileName(value);
       document.body.appendChild(link);
@@ -346,7 +345,7 @@ const FileField: React.FC<FileFieldProps> = ({
     } else if (value instanceof File) {
       // If value is a File object, create a blob URL and download it
       const url = URL.createObjectURL(value);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = value.name;
       document.body.appendChild(link);
@@ -355,13 +354,21 @@ const FileField: React.FC<FileFieldProps> = ({
       URL.revokeObjectURL(url);
     } else if (value && value.mime_type) {
       // For FileObject, we need to check if it has a URL property or if it's stored elsewhere
-      
+
       // Check if the FileObject has any property that might contain a URL
       // Common properties that might contain URLs
-      const possibleUrlProps = ['url', 'path', 'src', 'href', 'link', 'fileUrl', 'downloadUrl'];
-      
+      const possibleUrlProps = [
+        "url",
+        "path",
+        "src",
+        "href",
+        "link",
+        "fileUrl",
+        "downloadUrl",
+      ];
+
       let fileUrl = null;
-      
+
       // Check if any of these properties exist on the file object
       for (const prop of possibleUrlProps) {
         if ((value as any)[prop]) {
@@ -369,10 +376,10 @@ const FileField: React.FC<FileFieldProps> = ({
           break;
         }
       }
-      
+
       // If we found a URL property, use it
       if (fileUrl) {
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = fileUrl;
         link.download = value.name;
         document.body.appendChild(link);
@@ -380,7 +387,10 @@ const FileField: React.FC<FileFieldProps> = ({
         document.body.removeChild(link);
       } else {
         // If we can't determine how to download the file, log an error
-        console.error('Unable to download file: No URL available for FileObject', value);
+        console.error(
+          "Unable to download file: No URL available for FileObject",
+          value,
+        );
       }
     }
   }, [value]);
@@ -404,7 +414,7 @@ const FileField: React.FC<FileFieldProps> = ({
         className={cn(
           "flex flex-col",
           field.width ? field.width : "w-full",
-          field.containerClassName
+          field.containerClassName,
         )}
       >
         {/* Hidden file input */}
@@ -423,14 +433,14 @@ const FileField: React.FC<FileFieldProps> = ({
             <div
               className={cn(
                 "relative border rounded-md p-4",
-                showError ? "border-destructive" : "border-input"
+                showError ? "border-destructive" : "border-input",
               )}
             >
-              <div className="flex items-center">
+              <div className="flex items-center overflow-hidden">
                 <div className="flex-shrink-0 mr-3">{fileInfo.icon}</div>
-                <div className="flex-grow min-w-0">
+                <div className="flex-grow min-w-0 overflow-hidden">
                   <p className="font-medium text-sm truncate">
-                    {fileInfo.name}
+                    {fileInfo.name.slice(0, 30)}
                   </p>
                   {fileInfo.size && (
                     <p className="text-xs text-muted-foreground">
@@ -468,7 +478,7 @@ const FileField: React.FC<FileFieldProps> = ({
           <div
             className={cn(
               "flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 mb-4 cursor-pointer hover:bg-muted/50 transition-colors",
-              showError ? "border-destructive" : "border-input"
+              showError ? "border-destructive" : "border-input",
             )}
             onClick={handleUploadClick}
             style={{
@@ -492,7 +502,7 @@ const FileField: React.FC<FileFieldProps> = ({
               <p className="text-xs text-muted-foreground">
                 {t("MaxSize")}:{" "}
                 {Math.round(
-                  (field.fileConfig.maxFileSize / (1024 * 1024)) * 10
+                  (field.fileConfig.maxFileSize / (1024 * 1024)) * 10,
                 ) / 10}{" "}
                 MB
               </p>

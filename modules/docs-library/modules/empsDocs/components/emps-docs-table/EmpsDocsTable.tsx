@@ -1,4 +1,5 @@
 import { Pagination } from "@/components/shared/Pagination";
+import { useTranslations } from "next-intl";
 import { useEmpsDocsCxt } from "../../contexts/emps-docs-cxt";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { TableHeader } from "./components/TableHeader";
@@ -11,6 +12,7 @@ import { TableRow } from "./components/TableRow";
 export const EmpsDocsTable = () => {
   const { docs, isLoadingDocs, docsPagination, setPage, setLimit } =
     useEmpsDocsCxt();
+  const t = useTranslations("docs-library.publicDocs.table");
 
   if (isLoadingDocs) {
     return <LoadingSpinner />;
@@ -19,7 +21,7 @@ export const EmpsDocsTable = () => {
   const allDocuments = [...(docs?.folders || []), ...(docs?.files || [])];
 
   return (
-    <div className="bg-sidebar rounded-lg overflow-hidden">
+    <div className="bg-sidebar rounded-lg">
       <div className="overflow-x-auto">
         <table className="w-full">
           <TableHeader />
@@ -40,7 +42,7 @@ export const EmpsDocsTable = () => {
 
       {allDocuments.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
-          No documents found
+          {t("noDocuments")}
         </div>
       )}
 

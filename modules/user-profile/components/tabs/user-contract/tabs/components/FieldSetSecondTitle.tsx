@@ -38,12 +38,14 @@ export default function FieldSetSecondTitle(props: PropsT) {
 
   return (
     <div className="flex items-center justify-center gap-1">
-      {!!settingsBtn && !settingsBtn?.disabledEdit && (
-        <IconBtnDropdown
-          icon={settingsBtn?.icon ?? <SettingsIcon />}
-          items={settingsBtn?.items ?? []}
-        />
-      )}
+      {!!settingsBtn &&
+        !settingsBtn?.disabledEdit &&
+        settingsBtn.items.length > 0 && (
+          <IconBtnDropdown
+            icon={settingsBtn?.icon ?? <SettingsIcon />}
+            items={settingsBtn?.items ?? []}
+          />
+        )}
       {!!dropdownItems && (
         <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
           <DropdownMenuTrigger asChild>
