@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { useTranslations } from "next-intl";
 import HorizontalSwitch from "@/modules/projects/settings/components/horizontal-switch";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
@@ -12,6 +13,7 @@ interface RolesAndPermissionsContentProps {
 }
 
 function RolesAndPermissionsContent({ projectTypeId }: RolesAndPermissionsContentProps) {
+    const t = useTranslations("projectSettings.projectTypes.rolesAndPermissions");
     const queryClient = useQueryClient();
 
     const { data, isLoading, error } = useQuery({
@@ -49,18 +51,18 @@ function RolesAndPermissionsContent({ projectTypeId }: RolesAndPermissionsConten
     };
 
     if (!projectTypeId) {
-        return <div className="w-full">الرجاء اختيار نوع مشروع</div>;
+        return <div className="w-full">{t("selectProjectType")}</div>;
     }
 
     if (isLoading) {
-        return <div className="w-full">جاري التحميل...</div>;
+        return <div className="w-full">{t("loading")}</div>;
     }
 
     return (
         <div className="w-full">
             <Box className="flex justify-between items-center mb-6">
                 <Typography variant="h5" fontWeight="bold">
-                    الصلاحيات والأدوار
+                    {t("sectionTitle")}
                 </Typography>
             </Box>
 
@@ -68,7 +70,7 @@ function RolesAndPermissionsContent({ projectTypeId }: RolesAndPermissionsConten
                 <HorizontalSwitch
                     checked={data?.is_all_data_visible === 1}
                     onChange={handleSwitchChange}
-                    label="إظهار جميع بيانات الخاصة بالصلاحيات والأدوار"
+                    label={t("showAllData")}
                     disabled={updateMutation.isPending}
                 />
             </div>
