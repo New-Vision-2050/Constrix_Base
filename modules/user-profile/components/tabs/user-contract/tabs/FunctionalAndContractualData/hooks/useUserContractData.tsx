@@ -5,5 +5,6 @@ export default function useUserContractData(userId: string) {
   return useQuery({
     queryKey: [`user-contract-data`, userId],
     queryFn: () => GetUserContractData(userId),
+    enabled: !!userId,
   });
 }
