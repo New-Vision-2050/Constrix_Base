@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
@@ -39,6 +40,10 @@ export default function SelectedEmployees({
 }: {
   constraintId: string;
 }) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.selectedEmployees",
+  );
+
   const queryClient = useQueryClient();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -112,7 +117,7 @@ export default function SelectedEmployees({
     () => [
       {
         key: "name",
-        name: "اسم الموظف",
+        name: t("columnName"),
         sortable: false,
         render: (row: ConstraintSelectedEmployeePayload) => (
           <span>{row.name ?? row.full_name ?? row.user?.name ?? "—"}</span>
@@ -120,7 +125,7 @@ export default function SelectedEmployees({
       },
       {
         key: "email",
-        name: "البريد الالكتروني",
+        name: t("columnEmail"),
         sortable: false,
         render: (row: ConstraintSelectedEmployeePayload) => (
           <span>{row.email ?? row.user?.email ?? "—"}</span>
@@ -128,7 +133,7 @@ export default function SelectedEmployees({
       },
       {
         key: "phone",
-        name: "رقم الجوال",
+        name: t("columnPhone"),
         sortable: false,
         render: (row: ConstraintSelectedEmployeePayload) => (
           <span>
@@ -142,7 +147,7 @@ export default function SelectedEmployees({
       },
       {
         key: "project",
-        name: "المشروع",
+        name: t("columnProject"),
         sortable: false,
         render: (row: ConstraintSelectedEmployeePayload) => (
           <span>
@@ -158,12 +163,12 @@ export default function SelectedEmployees({
       },
       {
         key: "status",
-        name: "الحاله",
+        name: t("columnStatus"),
         sortable: false,
         render: (row: ConstraintSelectedEmployeePayload) => (
           <span
             className={
-              row.status === "نشط" ||
+              row.status === t("statusActive") ||
               row.status?.toLowerCase() === "active" ||
               row.is_active === 1 ||
               row.is_active === true
@@ -174,40 +179,40 @@ export default function SelectedEmployees({
             {row.status ??
               row.state ??
               (row.is_active === 1 || row.is_active === true
-                ? "نشط"
+                ? t("statusActive")
                 : row.is_active === 0 || row.is_active === false
-                  ? "غير نشط"
+                  ? t("statusInactive")
                   : "—")}
           </span>
         ),
       },
       {
         key: "actions",
-        name: "الاجراء",
+        name: t("columnActions"),
         sortable: false,
         render: (row: ConstraintSelectedEmployeePayload) => (
           <CustomMenu
             renderAnchor={({ onClick }) => (
               <Button className="h-8 px-4 gap-1" onClick={onClick}>
-                اجراء
+                {t("actionLabel")}
                 <ChevronDown className="h-4 w-4" />
               </Button>
             )}
           >
-            <MenuItem disabled>عرض</MenuItem>
+            <MenuItem disabled>{t("viewAction")}</MenuItem>
             <MenuItem
               onClick={() => {
                 setSelectedEmployee(String(row.id ?? row.user_id ?? ""));
                 setIsEditDialogOpen(true);
               }}
             >
-              تعديل
+              {t("editAction")}
             </MenuItem>
           </CustomMenu>
         ),
       },
     ],
-    [],
+    [t],
   );
 
   const state = SelectedEmployeesTable.useTableState({
@@ -232,7 +237,7 @@ export default function SelectedEmployees({
               searchComponent={
                 <SelectedEmployeesTable.Search
                   search={state.search}
-                  placeholder="بحث باسم الموظف"
+                  placeholder={t("searchPlaceholder")}
                 />
               }
               customActions={
@@ -243,7 +248,7 @@ export default function SelectedEmployees({
                     setIsAddDialogOpen(true);
                   }}
                 >
-                  اضافة
+                  {t("addButton")}
                 </Button>
               }
             />
