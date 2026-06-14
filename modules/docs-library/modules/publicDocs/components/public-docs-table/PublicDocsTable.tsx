@@ -1,4 +1,5 @@
 import { Pagination } from "@/components/shared/Pagination";
+import { useTranslations } from "next-intl";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 import DirectoryPasswordDialog from "./components/DirectoryPasswordDialog";
 import { LoadingSpinner } from "./components/LoadingSpinner";
@@ -12,6 +13,7 @@ import { TableRow } from "./components/TableRow";
 export const PublicDocsTable = () => {
   const { docs, isLoadingDocs, docsPagination, setPage, setLimit } =
     usePublicDocsCxt();
+  const t = useTranslations("docs-library.publicDocs.table");
 
   if (isLoadingDocs) {
     return <LoadingSpinner />;
@@ -26,11 +28,7 @@ export const PublicDocsTable = () => {
           <TableHeader />
           <tbody className="divide-y divide-border">
             {(docs?.folders || []).map((document) => (
-              <TableRow
-                key={document.id}
-                document={document}
-                isFolder={true}
-              />
+              <TableRow key={document.id} document={document} isFolder={true} />
             ))}
             {(docs?.files || []).map((document) => (
               <TableRow
@@ -45,7 +43,7 @@ export const PublicDocsTable = () => {
 
       {allDocuments.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
-          No documents found
+          {t("noDocuments")}
         </div>
       )}
 
