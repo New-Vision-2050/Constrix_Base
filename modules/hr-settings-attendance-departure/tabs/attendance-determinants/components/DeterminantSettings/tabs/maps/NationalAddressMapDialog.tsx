@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +23,6 @@ export type NationalAddressMapPayload = {
 
 const DEFAULT_COORD = "25.325348647861";
 const DEFAULT_RADIUS = "1000";
-const DEFAULT_LOCATION = "مركز العمل الرئيسي";
 
 type NationalAddressMapDialogProps = {
   open: boolean;
@@ -40,10 +40,14 @@ export default function NationalAddressMapDialog({
   onSave,
   savePending = false,
 }: NationalAddressMapDialogProps) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.maps",
+  );
+
   const [longitude, setLongitude] = useState(DEFAULT_COORD);
   const [latitude, setLatitude] = useState(DEFAULT_COORD);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
-  const [locationLabel, setLocationLabel] = useState(DEFAULT_LOCATION);
+  const [locationLabel, setLocationLabel] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
@@ -54,7 +58,7 @@ export default function NationalAddressMapDialog({
     setLongitude(initialValues?.longitude ?? DEFAULT_COORD);
     setLatitude(initialValues?.latitude ?? DEFAULT_COORD);
     setRadius(initialValues?.radius ?? DEFAULT_RADIUS);
-    setLocationLabel(initialValues?.location ?? DEFAULT_LOCATION);
+    setLocationLabel(initialValues?.location ?? t("defaultLocation"));
     setSaveError(null);
     setSubmitting(false);
     setIsGettingLocation(false);
@@ -63,7 +67,7 @@ export default function NationalAddressMapDialog({
 
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setLocationError("الموقع الجغرافي غير مدعوم في هذا المتصفح");
+      setLocationError(t("geolocationNotSupported"));
       return;
     }
 
@@ -77,16 +81,16 @@ export default function NationalAddressMapDialog({
         setIsGettingLocation(false);
       },
       (error) => {
-        let message = "فشل في الحصول على الموقع الحالي";
+        let message = t("geolocationFailed");
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message = "تم رفض الإذن للوصول إلى الموقع";
+            message = t("permissionDenied");
             break;
           case error.POSITION_UNAVAILABLE:
-            message = "الموقع غير متاح";
+            message = t("locationUnavailable");
             break;
           case error.TIMEOUT:
-            message = "انتهت مهلة الحصول على الموقع";
+            message = t("locationTimeout");
             break;
         }
         setLocationError(message);
@@ -134,7 +138,7 @@ export default function NationalAddressMapDialog({
       );
       onOpenChange(false);
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : "حدث خطأ أثناء الحفظ.");
+      setSaveError(e instanceof Error ? e.message : t("saveError"));
     } finally {
       setSubmitting(false);
     }
@@ -155,24 +159,24 @@ export default function NationalAddressMapDialog({
           type="button"
           onClick={() => onOpenChange(false)}
           className="absolute start-4 top-4 z-50 rounded-sm opacity-80 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring"
-          aria-label="إغلاق"
+          aria-label={t("mapDialogClose")}
         >
           <X className="h-5 w-5" />
         </button>
 
         <div className="px-4 pt-10 sm:px-0 sm:pt-2">
           <DialogTitle className="text-center text-lg font-semibold leading-snug">
-            اظهار احداثيات موقع العنوان الوطني
+            {t("mapDialogTitle")}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            تحديد خط الطول وخط العرض ونصف القطر على الخريطة
+            {t("mapDialogDescription")}
           </DialogDescription>
         </div>
 
         <div className="space-y-4 px-4 pb-4 pt-4 sm:px-0">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm">خط الطول</label>
+              <label className="text-sm">{t("longitudeLabel")}</label>
               <Input
                 variant="secondary"
                 dir="ltr"
@@ -183,7 +187,7 @@ export default function NationalAddressMapDialog({
               />
             </div>
             <div>
-              <label className="text-sm">خط العرض</label>
+              <label className="text-sm">{t("latitudeLabel")}</label>
               <Input
                 variant="secondary"
                 dir="ltr"
@@ -194,14 +198,14 @@ export default function NationalAddressMapDialog({
               />
             </div>
             <div>
-              <label className="text-sm">نصف القطر</label>
+              <label className="text-sm">{t("radiusLabel")}</label>
               <Input
                 variant="secondary"
                 dir="ltr"
                 inputClassName="text-end font-mono text-sm"
                 value={radius}
                 onChange={(e) => setRadius(e.target.value)}
-                placeholder="دائرة نصف القطر"
+                placeholder={t("radiusPlaceholder")}
               />
             </div>
           </div>
@@ -214,7 +218,7 @@ export default function NationalAddressMapDialog({
             onClick={handleGetCurrentLocation}
           >
             <Navigation className="ms-2 h-4 w-4" aria-hidden />
-            {isGettingLocation ? "جاري تحديد الموقع..." : "تحديد الموقع الحالي"}
+            {isGettingLocation ? t("gettingLocation") : t("getCurrentLocation")}
           </Button>
 
           {locationError ? (
@@ -237,7 +241,7 @@ export default function NationalAddressMapDialog({
             />
 
             <div className="pointer-events-none absolute bottom-3 start-3 z-[5] max-w-[min(90%,260px)] rounded-md bg-black/65 px-3 py-2 text-[11px] leading-snug text-white backdrop-blur-sm">
-              حالة النطاق الجغرافي: انت خارج المنطقة
+              {t("zoneStatus")}
             </div>
 
             <div className="pointer-events-none absolute bottom-3 end-3 z-[5] flex max-w-[min(92%,300px)] gap-2 rounded-lg border border-red-900/40 bg-red-950/90 p-3 text-[11px] leading-snug text-red-50 shadow-lg backdrop-blur-sm">
@@ -247,11 +251,10 @@ export default function NationalAddressMapDialog({
               />
               <div className="space-y-1 text-right">
                 <p className="font-semibold text-amber-100">
-                  تنبيه: خروج خارج الحدود المسموحة ({radiusMeters} متر)
+                  {t("outOfBoundsTitle", { radius: radiusMeters })}
                 </p>
                 <p className="text-red-100/95">
-                  يرجى العودة الى النطاق الجغرافي المحدد فورا لضمان استمرارية
-                  الخدمة
+                  {t("outOfBoundsText")}
                 </p>
               </div>
             </div>
@@ -273,14 +276,14 @@ export default function NationalAddressMapDialog({
               onClick={() => void handleSave()}
               disabled={isBusy}
             >
-              {isBusy ? "جاري الحفظ…" : "حفظ"}
+              {isBusy ? t("savingText") : t("save")}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              الغاء
+              {t("cancelButton")}
             </Button>
           </div>
         </div>

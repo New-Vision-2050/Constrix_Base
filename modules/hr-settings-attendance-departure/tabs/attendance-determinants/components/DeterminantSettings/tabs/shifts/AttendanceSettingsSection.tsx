@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -91,6 +92,10 @@ export default function AttendanceSettingsSection({
 }: {
   constraintId: string;
 }) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.workPeriods",
+  );
+
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [values, setValues] = useState<Record<ConstraintRuleField, number>>(
@@ -119,11 +124,11 @@ export default function AttendanceSettingsSection({
       queryClient.invalidateQueries({
         queryKey: ["constraint-rules", constraintId],
       });
-      toast.success("تم حفظ إعدادات تسجيل الحضور والانصراف");
+      toast.success(t("saveSuccess"));
       setIsEditing(false);
     },
     onError: () => {
-      toast.error("فشل حفظ إعدادات تسجيل الحضور والانصراف");
+      toast.error(t("saveError"));
     },
   });
 
@@ -168,7 +173,7 @@ export default function AttendanceSettingsSection({
               disabled={patchRulesMutation.isPending}
               onClick={handleCancel}
             >
-              إلغاء
+              {t("cancel")}
             </Button>
             <Button
               type="button"
@@ -180,7 +185,7 @@ export default function AttendanceSettingsSection({
               {patchRulesMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
               ) : null}
-              حفظ
+              {t("save")}
             </Button>
           </>
         )
@@ -198,7 +203,7 @@ export default function AttendanceSettingsSection({
       ) : null}
 
       <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground" dir="rtl">
-        اعدادات تسجيل الحضور والانصراف
+        {t("attendanceSettingsTitle")}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -220,15 +225,15 @@ export default function AttendanceSettingsSection({
                   className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-right outline-none focus:border-primary disabled:opacity-50"
                 />
                 <span className="text-lg font-semibold text-primary">
-                  {option.unit}
+                  {t(`${option.id}_unit`)}
                 </span>
               </div>
             ) : (
               <p className="text-3xl font-semibold text-primary leading-none">
-                {rulesQuery.isLoading ? "—" : `${option.amount} ${option.unit}`}
+                {rulesQuery.isLoading ? "—" : `${option.amount} ${t(`${option.id}_unit`)}`}
               </p>
             )}
-            <p className="text-sm text-muted-foreground mt-3">{option.label}</p>
+            <p className="text-sm text-muted-foreground mt-3">{t(`${option.id}_label`)}</p>
           </div>
         ))}
       </div>

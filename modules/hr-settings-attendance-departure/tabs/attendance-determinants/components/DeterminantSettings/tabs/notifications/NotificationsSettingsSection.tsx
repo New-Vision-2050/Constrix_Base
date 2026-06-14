@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ban, Clock3, DoorOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -17,32 +18,6 @@ import {
 
 type NotificationKey = keyof ConstraintNotifications;
 
-const ROWS: {
-  key: NotificationKey;
-  label: string;
-  hint: string;
-  icon: typeof Clock3;
-}[] = [
-  {
-    key: "notify_late_arrival",
-    label: "اشعار عند التأخير عن الموعد",
-    hint: "تنبيه عند تجاوز وقت الحضور المحدد للموظف",
-    icon: Clock3,
-  },
-  {
-    key: "notify_unexcused_absence",
-    label: "إشعار عند الغياب غير المبرر",
-    hint: "تنبيه عند تسجيل غياب دون إذن أو عذر مقبول",
-    icon: Ban,
-  },
-  {
-    key: "notify_early_departure",
-    label: "إشعار عند الخروج المبكر",
-    hint: "تنبيه عند مغادرة العمل قبل انتهاء وقت الدوام",
-    icon: DoorOpen,
-  },
-];
-
 const DEFAULT_VALUES: ConstraintNotifications = {
   notify_late_arrival: false,
   notify_unexcused_absence: false,
@@ -54,6 +29,34 @@ export default function NotificationsSettingsSection({
 }: {
   constraintId: string;
 }) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.notifications",
+  );
+
+  const ROWS = useMemo(
+    () => [
+      {
+        key: "notify_late_arrival" as NotificationKey,
+        label: t("lateArrivalLabel"),
+        hint: t("lateArrivalHint"),
+        icon: Clock3,
+      },
+      {
+        key: "notify_unexcused_absence" as NotificationKey,
+        label: t("unexcusedAbsenceLabel"),
+        hint: t("unexcusedAbsenceHint"),
+        icon: Ban,
+      },
+      {
+        key: "notify_early_departure" as NotificationKey,
+        label: t("earlyDepartureLabel"),
+        hint: t("earlyDepartureHint"),
+        icon: DoorOpen,
+      },
+    ],
+    [t],
+  );
+
   const queryClient = useQueryClient();
   const notificationsQuery = useConstraintNotifications(constraintId);
   const [values, setValues] = useState<ConstraintNotifications>(DEFAULT_VALUES);
@@ -73,10 +76,10 @@ export default function NotificationsSettingsSection({
       queryClient.invalidateQueries({
         queryKey: constraintNotificationsQueryKey(constraintId),
       });
-      toast.success("تم حفظ إعدادات الاشعارات");
+      toast.success(t("saveSuccess"));
     },
     onError: () => {
-      toast.error("فشل حفظ إعدادات الاشعارات");
+      toast.error(t("saveError"));
     },
   });
 
@@ -98,7 +101,7 @@ export default function NotificationsSettingsSection({
     <div className="w-full">
       <section className="rounded-xl border border-primary/90 px-4 pb-5 pt-9 shadow-sm backdrop-blur-[2px]">
         <h2 className="px-3 pb-5 text-sm font-semibold tracking-tight text-foreground">
-          اعدادات الاشعارات
+          {t("sectionTitle")}
         </h2>
 
         {isLoading ? (
