@@ -28,6 +28,7 @@ import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-sett
 import { Stage } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
+import { getProcedureEditTabTitle } from "../../utils/getProcedureTabTitle";
 
 const PROCEDURE_DIALOG_ICON_IDS = [
   "person-outline",
@@ -61,8 +62,9 @@ export default function EditStageDialog({
   onSuccess,
   onDeleted,
 }: EditStageDialogProps) {
-  const t = useTranslations("CRMSettingsModule.proceduresSettings.stages");
-  const tRoot = useTranslations("CRMSettingsModule.proceduresSettings");
+  const t = useTranslations("hr-settings.proceduresSettings.stages");
+  const tRoot = useTranslations("hr-settings.proceduresSettings");
+  const tc = useTranslations("hr-settings.proceduresSettings.common");
   const { toast } = useToast();
 
   const [name, setName] = useState("");
@@ -203,20 +205,11 @@ export default function EditStageDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", pb: 1 }}>
-        {currentTabType === "contract" && "تعديل إجراءات العقود"}
-        {currentTabType === "meeting" && "تعديل إجراءات الاجتماعات"}
-        {currentTabType === "price" && "تعديل إجراءات الأسعار"}
-        {currentTabType === "employees" && "تعديل إجراءات الموظفين"}
-        {currentTabType === "employee_task_request" && "تعديل إجراءات الموظفين"}
-        {currentTabType === "client_request" && "تعديل إجراءات طلبات العملاء"}
-        {![
-          "contract",
-          "meeting",
-          "price",
-          "employees",
-          "client_request",
-          "employee_task_request",
-        ].includes(currentTabType) && t("editStage")}
+        {getProcedureEditTabTitle(
+          currentTabType,
+          tRoot,
+          t("editStage"),
+        )}
       </DialogTitle>
 
       <DialogContent>
