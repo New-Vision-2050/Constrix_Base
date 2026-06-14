@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Autocomplete,
   Dialog,
@@ -31,6 +32,10 @@ export default function AddEmployeeDialog({
   isAssigning = false,
   onAssign,
 }: AddEmployeeDialogProps) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.selectedEmployees",
+  );
+
   const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
 
   useEffect(() => {
@@ -76,7 +81,7 @@ export default function AddEmployeeDialog({
         className="w-full"
       >
         <DialogTitle className="shrink-0 text-right text-base px-0 pt-0 pb-2">
-          اضافة اسم الموظف
+          {t("addDialogTitle")}
         </DialogTitle>
 
         <div
@@ -95,7 +100,7 @@ export default function AddEmployeeDialog({
             disabled={employees.length === 0 || isAssigning}
             getOptionLabel={(option) => option.name}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            noOptionsText="لا توجد نتائج"
+            noOptionsText={t("noResults")}
             onChange={(_, newValue) =>
               onSelectedEmployeeChange(newValue?.id ?? "")
             }
@@ -118,8 +123,8 @@ export default function AddEmployeeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="اسم الموظف"
-                placeholder="بحث باسم الموظف"
+                label={t("employeeNameLabel")}
+                placeholder={t("searchPlaceholder")}
               />
             )}
           />
@@ -138,7 +143,7 @@ export default function AddEmployeeDialog({
             {isAssigning ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : null}
-            إضافة
+            {t("addDialogButton")}
           </Button>
         </div>
       </DialogContent>
