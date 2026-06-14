@@ -21,7 +21,7 @@ export const EmpsDocsTable = () => {
   const allDocuments = [...(docs?.folders || []), ...(docs?.files || [])];
 
   return (
-    <div className="bg-sidebar rounded-lg overflow-hidden">
+    <div className="bg-sidebar rounded-lg">
       <div className="overflow-x-auto">
         <table className="w-full">
           <TableHeader />
