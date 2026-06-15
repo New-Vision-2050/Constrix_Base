@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { WEEK_DAYS } from "../timing-constants";
 import type { DayPeriodRow } from "../timing-types";
-import { shiftPeriodLabel } from "../timing-types";
 
 type WeeklyTimingSettingsProps = {
   weeklyDays: string[];
@@ -17,6 +17,17 @@ type WeeklyTimingSettingsProps = {
   assignWeeklyShiftsError?: string | null;
 };
 
+const PERIOD_KEYS = [
+  "periodFirst",
+  "periodSecond",
+  "periodThird",
+  "periodFourth",
+  "periodFifth",
+  "periodSixth",
+  "periodSeventh",
+  "periodEighth",
+] as const;
+
 export default function WeeklyTimingSettings({
   weeklyDays,
   periodRows,
@@ -26,11 +37,15 @@ export default function WeeklyTimingSettings({
   assignWeeklyShiftsPending,
   assignWeeklyShiftsError,
 }: WeeklyTimingSettingsProps) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.workPeriods",
+  );
+
   const hasPeriods = periodRows.length > 0;
 
   return (
     <div className="border border-border rounded-xl px-3 py-4 md:px-4 md:py-5">
-      <p className="text-right text-lg font-semibold mb-3">فترات الدوام</p>
+      <p className="text-right text-lg font-semibold mb-3">{t("shiftsTitle")}</p>
 
       <div className="border border-border rounded-lg px-3 py-4 space-y-4">
         <div className="flex items-center justify-between gap-6 flex-wrap">
@@ -46,7 +61,7 @@ export default function WeeklyTimingSettings({
                   onCheckedChange={() => onToggleDay(day.id)}
                   className="border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
-                <span>{day.label}</span>
+                <span>{t(day.id)}</span>
               </label>
             );
           })}
@@ -60,7 +75,7 @@ export default function WeeklyTimingSettings({
             onClick={() => onOpenPeriodsDialog("add")}
           >
             <Plus className="h-4 w-4" />
-            اضافة الفترات
+            {t("addPeriods")}
           </Button>
         ) : (
           <div className="flex flex-col gap-4 lg:flex-row bg-background p-2 rounded-lg lg:items-stretch lg:justify-between lg:gap-6">
@@ -71,15 +86,15 @@ export default function WeeklyTimingSettings({
                   className="border border-border rounded-lg p-3"
                 >
                   <p className="text-xs text-muted-foreground mb-2 text-right">
-                    {shiftPeriodLabel(idx)}
+                    {PERIOD_KEYS[idx] ? t(PERIOD_KEYS[idx]) : String(idx + 1)}
                   </p>
                   <p className="text-sm text-right tabular-nums">
-                    من {row.from} {row.fromMeridiem} — الى {row.to}{" "}
+                    {t("from")} {row.from} {row.fromMeridiem} — {t("to")} {row.to}{" "}
                     {row.toMeridiem}
                     {row.endsNextDay ? (
                       <span className="text-muted-foreground">
                         {" "}
-                        — اليوم التالي
+                        — {t("nextDay")}
                       </span>
                     ) : null}
                   </p>
@@ -95,7 +110,7 @@ export default function WeeklyTimingSettings({
                 onClick={() => onOpenPeriodsDialog("edit")}
               >
                 <Pencil className="h-4 w-4" />
-                تعديل الفترات
+                {t("editPeriods")}
               </Button>
             </div>
           </div>
@@ -119,7 +134,7 @@ export default function WeeklyTimingSettings({
           }
           onClick={onAssignWeeklyShifts}
         >
-          {assignWeeklyShiftsPending ? "جاري التعيين…" : "تعيين دوام الأسبوع"}
+          {assignWeeklyShiftsPending ? t("assigning") : t("assignWeekly")}
         </Button>
       </div>
     </div>

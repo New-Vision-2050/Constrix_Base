@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2, Check, ChevronsUpDown } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -232,16 +233,16 @@ function LookupSearchSelect({
   value,
   onChange,
   placeholder,
-  searchPlaceholder = "البحث...",
-  emptyText = "لا توجد نتائج",
+  searchPlaceholder,
+  emptyText,
   disabled = false,
 }: {
   options: LookupOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
-  searchPlaceholder?: string;
-  emptyText?: string;
+  searchPlaceholder: string;
+  emptyText: string;
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -467,6 +468,9 @@ export default function DeterminantDetailsTab({
 }: {
   constraint: Constraint;
 }) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.determinantDetails",
+  );
   const {
     data: basicInfo,
     isLoading,
@@ -748,7 +752,7 @@ export default function DeterminantDetailsTab({
           disabled={isSavingBasicInfo}
           onClick={() => setEditingBasics(false)}
         >
-          إلغاء
+          {t("cancel")}
         </Button>
         <Button
           type="button"
@@ -765,7 +769,7 @@ export default function DeterminantDetailsTab({
           {isSavingBasicInfo ? (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
           ) : null}
-          حفظ
+          {t("save")}
         </Button>
       </>
     ) : (
@@ -786,7 +790,7 @@ export default function DeterminantDetailsTab({
           disabled={isSavingBasicInfo}
           onClick={() => setEditingCountry(false)}
         >
-          إلغاء
+          {t("cancel")}
         </Button>
         <Button
           type="button"
@@ -800,7 +804,7 @@ export default function DeterminantDetailsTab({
           {isSavingBasicInfo ? (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
           ) : null}
-          حفظ
+          {t("save")}
         </Button>
       </>
     ) : (
@@ -812,7 +816,7 @@ export default function DeterminantDetailsTab({
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-8">
-      <DetailsSection title="بيانات المحدد" actions={basicsToolbar}>
+      <DetailsSection title={t("sectionBasics")} actions={basicsToolbar}>
         <div
           dir="rtl"
           className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2 md:items-start"
@@ -827,12 +831,12 @@ export default function DeterminantDetailsTab({
             <>
               <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2">
                 <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  اسم المحدد
+                  {t("determinantName")}
                 </label>
                 <TextField
                   hiddenLabel
                   fullWidth
-                  label="اسم المحدد"
+                  label={t("determinantName")}
                   variant="outlined"
                   disabled={showSkeletonRows || !editingBasics}
                   value={
@@ -852,7 +856,7 @@ export default function DeterminantDetailsTab({
               </div>
               <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2">
                 <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  نظام المحدد
+                  {t("determinantSystem")}
                 </label>
                 {editingBasics ? (
                   constraintTypeQuery.isPending ? (
@@ -867,7 +871,7 @@ export default function DeterminantDetailsTab({
                         dir="rtl"
                         className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
                       >
-                        <SelectValue placeholder="اختر النظام" />
+                        <SelectValue placeholder={t("selectSystem")} />
                       </SelectTrigger>
                       <SelectContent dir="rtl">
                         {constraintTypeOption ? (
@@ -898,7 +902,7 @@ export default function DeterminantDetailsTab({
               </div>
               <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2 md:col-span-2">
                 <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  الفرع
+                  {t("branch")}
                 </label>
                 {editingBasics ? (
                   branchesLookupQuery.isPending ? (
@@ -956,7 +960,7 @@ export default function DeterminantDetailsTab({
         </div>
       </DetailsSection>
 
-      <DetailsSection title="محدد الدول" actions={countryToolbar}>
+      <DetailsSection title={t("sectionCountry")} actions={countryToolbar}>
         <div
           dir="rtl"
           className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 md:items-start"
@@ -970,13 +974,13 @@ export default function DeterminantDetailsTab({
             <>
               <div className="relative flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2 sm:col-span-1">
                 <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  اسم الدولة
+                  {t("countryName")}
                 </label>
                 {countriesQuery.isPending ? (
                   <Skeleton className="h-12 w-full rounded-md" />
                 ) : countriesQuery.isError ? (
                   <div className="flex h-12 items-center rounded-md border border-destructive/40 bg-background/80 px-3 text-sm text-destructive">
-                    تعذر تحميل قائمة الدول
+                    {t("loadCountriesError")}
                   </div>
                 ) : (
                   <LookupSearchSelect
@@ -986,33 +990,35 @@ export default function DeterminantDetailsTab({
                       setCountryIdDraft(nextId);
                       setTimeZoneIdDraft("");
                     }}
-                    placeholder="اختر الدولة"
-                    searchPlaceholder="البحث عن دولة..."
+                    placeholder={t("selectCountry")}
+                    searchPlaceholder={t("searchCountry")}
+                    emptyText={t("noResults")}
                     disabled={showSkeletonRows || !editingCountry}
                   />
                 )}
               </div>
               <div className="relative flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2 sm:col-span-1">
                 <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  التوقيت الزمني
+                  {t("timezone")}
                 </label>
                 {!activeCountryId ? (
                   <div className="flex h-12 items-center rounded-md border border-border bg-background/80 px-3 text-sm text-muted-foreground">
-                    اختر الدولة أولاً
+                    {t("selectCountryFirst")}
                   </div>
                 ) : timeZonesQuery.isPending ? (
                   <Skeleton className="h-12 w-full rounded-md" />
                 ) : timeZonesQuery.isError ? (
                   <div className="flex h-12 items-center rounded-md border border-destructive/40 bg-background/80 px-3 text-sm text-destructive">
-                    تعذر تحميل التوقيتات الزمنية
+                    {t("loadTimezonesError")}
                   </div>
                 ) : (
                   <LookupSearchSelect
                     options={timeZoneOptions}
                     value={activeTimeZoneId}
                     onChange={setTimeZoneIdDraft}
-                    placeholder="اختر التوقيت الزمني"
-                    searchPlaceholder="البحث عن توقيت..."
+                    placeholder={t("selectTimezone")}
+                    searchPlaceholder={t("searchTimezone")}
+                    emptyText={t("noResults")}
                     disabled={showSkeletonRows || !editingCountry}
                   />
                 )}
