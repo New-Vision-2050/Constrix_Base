@@ -129,4 +129,9 @@ export interface GetAttachmentRequestsListResponse {
     last_page: number;
     result_count: number;
   };
+  /** Top-level pagination fields returned by the API */
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
 }
