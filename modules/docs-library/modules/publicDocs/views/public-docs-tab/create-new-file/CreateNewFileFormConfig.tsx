@@ -35,7 +35,9 @@ export function getCreateNewFileFormConfig(
       parent_id: isEdit ? editedDoc?.parent_id : folderScopeId,
       // password: editedDoc?.password,
       start_date: editedDoc?.start_date ?? new Date().toISOString(),
-      end_date: editedDoc?.end_date ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      end_date:
+        editedDoc?.end_date ??
+        new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       access_type: editedDoc?.access_type ?? "public",
       user_ids: editedDoc?.users?.map((usr) => usr.id) ?? [],
       file: editedDoc?.file ?? null,

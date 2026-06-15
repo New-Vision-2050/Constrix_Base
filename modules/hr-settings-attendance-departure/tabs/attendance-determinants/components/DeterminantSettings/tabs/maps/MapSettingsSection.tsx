@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import { Button } from "@/components/ui/button";
@@ -212,6 +213,10 @@ export default function MapSettingsSection({
 }: {
   constraintId: string;
 }) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.maps",
+  );
+
   const queryClient = useQueryClient();
 
   const [rows, setRows] = useState<MapLocationRow[]>([]);
@@ -336,7 +341,7 @@ export default function MapSettingsSection({
           });
           setEditingRowId(null);
         } catch (err) {
-          throw unwrapLocationApiError(err, "فشل تحديث الموقع.");
+          throw unwrapLocationApiError(err, t("updateLocationError"));
         }
         return;
       }
@@ -346,7 +351,7 @@ export default function MapSettingsSection({
           locations: [item],
         });
       } catch (err) {
-        throw unwrapLocationApiError(err, "فشل إنشاء الموقع.");
+        throw unwrapLocationApiError(err, t("createLocationError"));
       }
     },
     [editingRowId, createLocationsMutation, updateLocationMutation],
@@ -371,7 +376,7 @@ export default function MapSettingsSection({
       setPendingDeleteRow(null);
     } catch (e) {
       setDeleteErrorMessage(
-        unwrapLocationApiError(e, "فشل حذف الموقع.").message,
+        unwrapLocationApiError(e, t("deleteLocationError")).message,
       );
     }
   }, [pendingDeleteRow, deleteLocationMutation]);
@@ -380,7 +385,7 @@ export default function MapSettingsSection({
     () => [
       {
         key: "longitude",
-        name: "خطوط الطول",
+        name: t("columnLongitude"),
         sortable: false,
         render: (row: MapLocationRow) => (
           <span className="p-2 text-sm tabular-nums">{row.longitude}</span>
@@ -388,7 +393,7 @@ export default function MapSettingsSection({
       },
       {
         key: "latitude",
-        name: "خطوط العرض",
+        name: t("columnLatitude"),
         sortable: false,
         render: (row: MapLocationRow) => (
           <span className="p-2 text-sm tabular-nums">{row.latitude}</span>
@@ -396,7 +401,7 @@ export default function MapSettingsSection({
       },
       {
         key: "location",
-        name: "الموقع",
+        name: t("columnLocation"),
         sortable: false,
         render: (row: MapLocationRow) => (
           <span className="p-2 text-sm">{row.location}</span>
@@ -404,7 +409,7 @@ export default function MapSettingsSection({
       },
       {
         key: "actions",
-        name: "الاجراء",
+        name: t("columnActions"),
         sortable: false,
         render: (row: MapLocationRow) => (
           <div className="flex justify-center p-2">
@@ -416,7 +421,7 @@ export default function MapSettingsSection({
                   size="sm"
                   className="min-w-[100px] gap-1"
                 >
-                  اجراء
+                  {t("actionLabel")}
                   <ChevronDown className="h-4 w-4 opacity-90" />
                 </Button>
               </DropdownMenuTrigger>
@@ -425,13 +430,13 @@ export default function MapSettingsSection({
                   className="justify-end"
                   onSelect={() => openEditMap(row)}
                 >
-                  تعديل
+                  {t("editAction")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="justify-end text-destructive focus:text-destructive"
                   onSelect={() => openDeleteConfirm(row)}
                 >
-                  حذف
+                  {t("deleteAction")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -439,7 +444,7 @@ export default function MapSettingsSection({
         ),
       },
     ],
-    [openDeleteConfirm, openEditMap],
+    [openDeleteConfirm, openEditMap, t],
   );
 
   const state = MapLocationsTable.useTableState({
@@ -463,7 +468,7 @@ export default function MapSettingsSection({
             state={state}
             customActions={
               <Button type="button" variant="default" onClick={openAddMap}>
-                اضافة
+                {t("addButton")}
               </Button>
             }
           />
@@ -498,9 +503,9 @@ export default function MapSettingsSection({
       >
         <DialogContent dir="rtl" className="max-w-md sm:max-w-md">
           <DialogHeader className="text-right sm:text-right">
-            <DialogTitle>تأكيد الحذف</DialogTitle>
+            <DialogTitle>{t("confirmDeleteTitle")}</DialogTitle>
             <DialogDescription className="text-right">
-              هل أنت متأكد من حذف هذا الموقع؟ لا يمكن التراجع عن هذا الإجراء.
+              {t("confirmDeleteDescription")}
               {pendingDeleteRow ? (
                 <span className="mt-2 block font-medium text-foreground">
                   «{pendingDeleteRow.location}»
@@ -520,7 +525,7 @@ export default function MapSettingsSection({
               disabled={deleteLocationMutation.isPending}
               onClick={() => void confirmDeleteLocation()}
             >
-              {deleteLocationMutation.isPending ? "جاري الحذف…" : "حذف"}
+              {deleteLocationMutation.isPending ? t("deleting") : t("delete")}
             </Button>
             <Button
               type="button"
@@ -528,7 +533,7 @@ export default function MapSettingsSection({
               disabled={deleteLocationMutation.isPending}
               onClick={closeDeleteConfirm}
             >
-              إلغاء
+              {t("cancel")}
             </Button>
           </DialogFooter>
         </DialogContent>

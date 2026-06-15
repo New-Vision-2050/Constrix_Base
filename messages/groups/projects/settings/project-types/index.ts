@@ -113,4 +113,52 @@ export const projectTypesMessages = new MessagesGroup({
     ),
     loading: _m("Loading...", "جاري التحميل..."),
   }),
+  team: new MessagesGroup({
+    sectionTitle: _m("Cadre", "الكادر"),
+    showAllData: _m(
+      "Show all cadre data",
+      "إظهار جميع بيانات الخاصة بالكادر",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
+  documentCycle: new MessagesGroup({
+    sectionTitle: _m("Document Cycle", "دورة الوثائق"),
+    showAllData: _m(
+      "Show all document cycle data",
+      "إظهار جميع البيانات الخاصة بدورة الوثائق",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
+  rolesAndPermissions: new MessagesGroup({
+    sectionTitle: _m("Roles and Permissions", "الصلاحيات والأدوار"),
+    showAllData: _m(
+      "Show all roles and permissions data",
+      "إظهار جميع بيانات الخاصة بالصلاحيات والأدوار",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
+  projectSharing: new MessagesGroup({
+    sectionTitle: _m("Project Sharing", "مشاركة المشروع"),
+    showAllData: _m(
+      "Show all project sharing data",
+      "إظهار جميع بيانات الخاصة بمشاركة المشروع",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
 });

@@ -12,7 +12,7 @@ import { useMemo } from "react";
 
 function timeAgo(updatedTime: Date, currentTime: Date) {
   const diffInMinutes = Math.floor(
-    (currentTime.getTime() - updatedTime.getTime()) / 60000
+    (currentTime.getTime() - updatedTime.getTime()) / 60000,
   );
   if (diffInMinutes < 60) {
     return `${diffInMinutes} دقيقة`;
@@ -31,15 +31,15 @@ export default function ItemDetails() {
   const { selectedDocument } = usePublicDocsCxt();
   const isDirectory = useMemo(
     () => !Boolean(selectedDocument?.is_file),
-    [selectedDocument]
+    [selectedDocument],
   );
   const { data: itemLogs, isLoading } = useDocActivityLogs(
     selectedDocument?.id ?? "",
-    isDirectory ? "folder" : "file"
+    isDirectory ? "folder" : "file",
   );
 
   return (
-    <div className="h-full bg-sidebar flex flex-col shadow-[5px_5px_5px_5px_#00000066,_-5px_-5px_5px_5px_#00000066] rounded-lg">
+    <div className="h-full bg-sidebar flex flex-col shadow-lg rounded-lg relative z-10">
       {/* Details Header */}
       <ItemDetailsHeader title={selectedDocument?.name ?? "_"} />
 
@@ -55,9 +55,7 @@ export default function ItemDetails() {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12 space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-muted-foreground text-sm">
-                {t("loading")}
-              </p>
+              <p className="text-muted-foreground text-sm">{t("loading")}</p>
             </div>
           ) : itemLogs && itemLogs.length > 0 ? (
             /* Activity Sections */

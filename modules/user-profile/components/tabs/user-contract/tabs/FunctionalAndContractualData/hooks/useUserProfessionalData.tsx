@@ -5,5 +5,6 @@ export default function useProfessionalData(userId: string) {
   return useQuery({
     queryKey: [`user-professional-data`, userId],
     queryFn: () => GetProfessionalData(userId),
+    enabled: !!userId,
   });
 }

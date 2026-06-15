@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -32,11 +33,6 @@ import {
 import { CloseOutlined } from "@mui/icons-material";
 
 type ConstraintSection = "main" | "sub";
-
-const CONSTRAINT_SECTIONS: { id: ConstraintSection; title: string }[] = [
-  { id: "main", title: "المحددات الرئيسية" },
-  { id: "sub", title: "المحددات الفرعية" },
-];
 
 /** Shared with invalidateQueries after assign-constraint succeeds. */
 const EMPLOYEE_CONSTRAINT_LOCATIONS_QUERY_KEY =
@@ -113,6 +109,18 @@ export default function EditEmployeeDialog({
   userId,
   constraintId,
 }: EditEmployeeDialogProps) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.selectedEmployees",
+  );
+
+  const CONSTRAINT_SECTIONS = useMemo(
+    () => [
+      { id: "main" as ConstraintSection, title: t("sectionMain") },
+      { id: "sub" as ConstraintSection, title: t("sectionSub") },
+    ],
+    [t],
+  );
+
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedKeysList, setSelectedKeysList] = useState<string[]>([]);
   const [replacementByKey, setReplacementByKey] = useState<
@@ -145,7 +153,7 @@ export default function EditEmployeeDialog({
           queryKey: ["constraint-employees", trimmedConstraint],
         });
       }
-      toast.success("تم حفظ التعديلات بنجاح");
+      toast.success(t("saveSuccess"));
       onClose();
     },
     onError: (error: unknown) => {
@@ -163,7 +171,7 @@ export default function EditEmployeeDialog({
                 "string"
             ? String((raw as { description: string }).description)
             : null;
-      toast.error(msg ?? "تعذر حفظ التعديلات");
+      toast.error(msg ?? t("saveError"));
     },
   });
 
@@ -192,7 +200,7 @@ export default function EditEmployeeDialog({
 
   const handleSaveAssignments = () => {
     if (!employeeUserId) {
-      toast.error("لم يتم ربط موظف");
+      toast.error(t("noEmployeeLinkedError"));
       return;
     }
     const replacements = buildConstraintReplacements(
@@ -200,7 +208,7 @@ export default function EditEmployeeDialog({
       replacementByKey,
     );
     if (replacements.length === 0) {
-      toast.info("لم يتم تغيير أي محدد");
+      toast.info(t("noChanges"));
       onClose();
       return;
     }
@@ -300,22 +308,22 @@ export default function EditEmployeeDialog({
     <>
       {isError && employeeUserId && !isLoading && (
         <p className="text-sm text-destructive text-right px-1">
-          تعذر تحميل المحددات.
+          {t("loadingError")}
         </p>
       )}
       {isLoading && employeeUserId && (
         <p className="text-sm text-muted-foreground text-right px-1">
-          جاري التحميل…
+          {t("loading")}
         </p>
       )}
       {!employeeUserId && (
         <p className="text-xs text-muted-foreground text-right px-1">
-          لم يتم ربط موظف.
+          {t("noEmployeeLinked")}
         </p>
       )}
       {!isLoading && !isError && employeeUserId && pool.length === 0 && (
         <p className="text-sm text-muted-foreground text-right px-1">
-          لا توجد محددات
+          {t("noDeterminants")}
         </p>
       )}
     </>
@@ -326,13 +334,13 @@ export default function EditEmployeeDialog({
       <DialogContent className="max-w-2xl p-6">
         <DialogHeader className="gap-3 space-y-0 text-right sm:text-right">
           <DialogTitle className="text-center text-lg font-semibold leading-snug">
-            تعديل الموظف المحدد
+            {t("dialogTitle")}
           </DialogTitle>
           <button
             type="button"
             onClick={onClose}
             className="shrink-0 rounded-sm text-muted-foreground opacity-80 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 absolute top-4 left-4"
-            aria-label="إغلاق"
+            aria-label={t("close")}
           >
             <CloseOutlined className="h-5 w-5 cursor-pointer" />
           </button>
@@ -341,17 +349,17 @@ export default function EditEmployeeDialog({
           <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <span className={stepClassName(1)}>1</span>
-              <span>المحددات الحالية</span>
+              <span>{t("stepCurrentDeterminants")}</span>
             </div>
             <div className="w-16 h-px bg-border" />
             <div className="flex items-center gap-2">
               <span className={stepClassName(2)}>2</span>
-              <span>تعديل المحددات</span>
+              <span>{t("stepEditDeterminants")}</span>
             </div>
             <div className="w-16 h-px bg-border" />
             <div className="flex items-center gap-2">
               <span className={stepClassName(3)}>3</span>
-              <span>تأكيد وربط المحدد</span>
+              <span>{t("stepConfirmLink")}</span>
             </div>
           </div>
 
@@ -422,12 +430,12 @@ export default function EditEmployeeDialog({
                       <div className="space-y-3 max-h-[min(40vh,280px)] overflow-y-auto pe-1">
                         {catalogLoading && (
                           <p className="text-sm text-muted-foreground text-right px-1">
-                            جاري تحميل قائمة المحددات…
+                            {t("loadingCatalog")}
                           </p>
                         )}
                         {catalogError && !catalogLoading && (
                           <p className="text-sm text-destructive text-right px-1">
-                            تعذر تحميل قائمة المحددات للاستبدال.
+                            {t("catalogError")}
                           </p>
                         )}
                         {statusMessages(pool)}
@@ -436,7 +444,7 @@ export default function EditEmployeeDialog({
                             k.startsWith(`${id}:`),
                           ) && (
                             <p className="text-sm text-muted-foreground text-right px-1">
-                              لم يتم اختيار محددات من هذا القسم في الخطوة الأولى
+                              {t("noSectionSelections")}
                             </p>
                           )}
                         {pool.map((row: ConstraintCatalogRow) => {
@@ -496,13 +504,13 @@ export default function EditEmployeeDialog({
             <div className="space-y-4" dir="rtl">
               {selectedKeysList.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-right px-1">
-                  لم يتم اختيار أي محدد للعرض.
+                  {t("noSelectionsForDisplay")}
                 </p>
               ) : (
                 <>
                   <div className="grid grid-cols-2 gap-4 text-sm font-medium border-b border-border pb-2">
-                    <p className="text-right">قبل</p>
-                    <p className="text-right">بعد</p>
+                    <p className="text-right">{t("before")}</p>
+                    <p className="text-right">{t("after")}</p>
                   </div>
 
                   <div className="space-y-2 max-h-[min(50vh,360px)] overflow-y-auto pe-1">
@@ -551,7 +559,7 @@ export default function EditEmployeeDialog({
                 onClick={goToPreviousStep}
               >
                 <ChevronRight className="h-4 w-4" />
-                السابق
+                {t("previous")}
               </Button>}
             </div>
             {currentStep < 3 ? (
@@ -561,7 +569,7 @@ export default function EditEmployeeDialog({
                   className="px-8"
                   onClick={goToNextStep}
                 >
-                  التالي
+                  {t("next")}
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
               </div>
@@ -574,8 +582,8 @@ export default function EditEmployeeDialog({
                   onClick={handleSaveAssignments}
                 >
                   {assignReplacementsMutation.isPending
-                    ? "جاري الحفظ…"
-                    : "حفظ"}
+                    ? t("saving")
+                    : t("save")}
                 </Button>
               </div>
             )}
