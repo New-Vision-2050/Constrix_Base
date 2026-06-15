@@ -234,7 +234,10 @@ export const projectMessages = new MessagesGroup({
     selectCompanyRequired: _m("Please select a company", "يرجى اختيار شركة"),
     selectEmployeeRequired: _m("Please select an employee", "يرجى اختيار موظف"),
     selectRoleRequired: _m("Please select a role", "يرجى اختيار دور"),
-    inviteSentTitle: _m("Invitation sent successfully", "تم أرسال الدعوة بنجاح"),
+    inviteSentTitle: _m(
+      "Invitation sent successfully",
+      "تم أرسال الدعوة بنجاح",
+    ),
     inviteSentBody: _m(
       "The sharing invitation has been sent to the project manager at the selected company successfully. You can track its status from the table.",
       "تم إرسال دعوة المشاركة الي مدير المشروع بالشركة المحددة بنجاح يمكنك متابعه حالتها من الجدول",

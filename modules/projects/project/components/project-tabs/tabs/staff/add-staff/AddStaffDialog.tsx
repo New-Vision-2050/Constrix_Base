@@ -160,9 +160,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
       setSubmitted(true);
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(
-        error?.response?.data?.message ?? t("staff.assignError"),
-      );
+      toast.error(error?.response?.data?.message ?? t("staff.assignError"));
     },
   });
 
@@ -338,7 +336,9 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
             {loadingRoles ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} />
-                <Typography variant="body2">{t("staff.loadingRoles")}</Typography>
+                <Typography variant="body2">
+                  {t("staff.loadingRoles")}
+                </Typography>
               </Box>
             ) : (
               <Autocomplete
@@ -481,7 +481,11 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
           pt: 1,
         }}
       >
-        <IconButton onClick={handleClose} aria-label={t("staff.close")} disabled={pending}>
+        <IconButton
+          onClick={handleClose}
+          aria-label={t("staff.close")}
+          disabled={pending}
+        >
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>

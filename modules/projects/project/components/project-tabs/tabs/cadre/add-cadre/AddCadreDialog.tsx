@@ -42,7 +42,11 @@ import type { ProjectRoleListItem } from "@/services/api/projects/project-roles/
 export const cadreEmployeesNotInProjectQueryKey = (projectId: string) =>
   ["cadre-employees-not-in-project", projectId] as const;
 
-const STEP_KEYS = ["stepSelectEmployee", "stepSelectRole", "stepReviewAndSend"] as const;
+const STEP_KEYS = [
+  "stepSelectEmployee",
+  "stepSelectRole",
+  "stepReviewAndSend",
+] as const;
 
 export interface AddCadreDialogProps {
   open: boolean;
@@ -141,9 +145,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
       setSubmitted(true);
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(
-        error?.response?.data?.message ?? t("staff.assignError"),
-      );
+      toast.error(error?.response?.data?.message ?? t("staff.assignError"));
     },
   });
 
@@ -280,7 +282,9 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
             {loadingRoles ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} />
-                <Typography variant="body2">{t("staff.loadingRoles")}</Typography>
+                <Typography variant="body2">
+                  {t("staff.loadingRoles")}
+                </Typography>
               </Box>
             ) : (
               <Autocomplete
@@ -384,7 +388,11 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
           pt: 1,
         }}
       >
-        <IconButton onClick={handleClose} aria-label={t("staff.close")} disabled={pending}>
+        <IconButton
+          onClick={handleClose}
+          aria-label={t("staff.close")}
+          disabled={pending}
+        >
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
