@@ -46,15 +46,15 @@ import type { ProjectRoleListItem } from "@/services/api/projects/project-roles/
 export const employeesNotInProjectQueryKey = (projectId: string) =>
   ["employees-not-in-project", projectId] as const;
 
-const STEPS = [
-  "البحث عن شركة",
-  "أختيار موظف",
-  "اختيار الدور",
-  "المراجعة والارسال",
-];
+const STEP_KEYS = [
+  "stepSearchCompany",
+  "stepSelectEmployee",
+  "stepSelectRole",
+  "stepReviewAndSend",
+] as const;
 
 export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
-  const tProject = useTranslations("project");
+  const t = useTranslations("project");
   const { projectId } = useProject();
   const queryClient = useQueryClient();
 
@@ -160,9 +160,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
       setSubmitted(true);
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(
-        error?.response?.data?.message ?? tProject("staff.assignError"),
-      );
+      toast.error(error?.response?.data?.message ?? t("staff.assignError"));
     },
   });
 
@@ -173,15 +171,15 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
 
   const handleNext = () => {
     if (activeStep === 0 && !selectedCompany) {
-      toast.error("يرجى اختيار شركة");
+      toast.error(t("staff.selectCompanyRequired"));
       return;
     }
     if (activeStep === 1 && !selectedEmployee) {
-      toast.error("يرجى اختيار موظف");
+      toast.error(t("staff.selectEmployeeRequired"));
       return;
     }
     if (activeStep === 2 && !selectedRole) {
-      toast.error("يرجى اختيار دور");
+      toast.error(t("staff.selectRoleRequired"));
       return;
     }
     setActiveStep((s) => s + 1);
@@ -231,15 +229,14 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
             </Box>
           </Box>
           <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-            تم أرسال الدعوة بنجاح
+            {t("staff.inviteSentTitle")}
           </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
             sx={{ mb: 4, maxWidth: 400, mx: "auto" }}
           >
-            تم إرسال دعوة المشاركة الي مدير المشروع بالشركة المحددة بنجاح يمكنك
-            متابعه حالتها من الجدول
+            {t("staff.inviteSentBody")}
           </Typography>
           <Stack
             direction="row"
@@ -252,10 +249,10 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               color="secondary"
               onClick={handleInviteAnother}
             >
-              دعوة دعوة أخري
+              {t("staff.inviteAnother")}
             </Button>
             <Button variant="outlined" onClick={handleClose}>
-              العودة الي القائمة
+              {t("staff.backToList")}
             </Button>
           </Stack>
         </DialogContent>
@@ -280,8 +277,8 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="اختيار الشركة"
-                  placeholder="ابحث عن شركة"
+                  label={t("staff.selectCompanyLabel")}
+                  placeholder={t("staff.searchCompanyPlaceholder")}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -314,8 +311,8 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="اختيار موظف"
-                  placeholder="ابحث عن موظف"
+                  label={t("staff.selectEmployeeLabel")}
+                  placeholder={t("staff.searchEmployeePlaceholder")}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -339,7 +336,9 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
             {loadingRoles ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} />
-                <Typography variant="body2">جاري تحميل الأدوار...</Typography>
+                <Typography variant="body2">
+                  {t("staff.loadingRoles")}
+                </Typography>
               </Box>
             ) : (
               <Autocomplete
@@ -353,8 +352,8 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="اختيار الدور"
-                    placeholder="ابحث عن دور"
+                    label={t("staff.selectRoleLabel")}
+                    placeholder={t("staff.searchRolePlaceholder")}
                   />
                 )}
               />
@@ -371,7 +370,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "اسم الشركة",
+                label: t("staff.companyName"),
                 value: selectedCompany.name,
               },
               {
@@ -380,7 +379,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "معرف الشركة",
+                label: t("staff.companyId"),
                 value: selectedCompany.serial_number ?? "—",
               },
               {
@@ -389,7 +388,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "البريد الالكتروني",
+                label: t("staff.companyEmail"),
                 value: selectedCompany.email ?? "—",
               },
             ]
@@ -403,7 +402,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "اسم الموظف",
+                label: t("staff.employeeName"),
                 value: selectedEmployee.name,
               },
             ]
@@ -421,21 +420,21 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
-                معلومات الشركة
+                {t("staff.companyInfo")}
               </Typography>
               <InfoRows rows={companyRows} />
 
               <Divider sx={{ my: 2.5 }} />
 
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
-                معلومات الموظف
+                {t("staff.employeeInfo")}
               </Typography>
               <InfoRows rows={employeeRows} />
 
               <Divider sx={{ my: 2.5 }} />
 
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
-                الصلاحيات المختارة
+                {t("staff.selectedPermissions")}
               </Typography>
               {selectedRole ? (
                 <Chip
@@ -460,7 +459,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
               icon={<InfoOutlined fontSize="inherit" />}
               variant="outlined"
             >
-              يرجى مراجعة البيانات والصلاحيات قبل إرسال الدعوة
+              {t("staff.reviewAlert")}
             </Alert>
           </Box>
         );
@@ -482,19 +481,23 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
           pt: 1,
         }}
       >
-        <IconButton onClick={handleClose} aria-label="إغلاق" disabled={pending}>
+        <IconButton
+          onClick={handleClose}
+          aria-label={t("staff.close")}
+          disabled={pending}
+        >
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
-          اضافة صاحب مصلحة
+          {t("staff.addStakeholder")}
         </DialogTitle>
       </Box>
 
       <DialogContent sx={{ p: 3, pt: 2 }}>
         <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-          {STEPS.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
+          {STEP_KEYS.map((key) => (
+            <Step key={key}>
+              <StepLabel>{t(`staff.${key}`)}</StepLabel>
             </Step>
           ))}
         </Stepper>
@@ -519,7 +522,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                 onClick={handleClose}
                 disabled={pending}
               >
-                إلغاء
+                {t("staff.cancel")}
               </Button>
               <Button
                 variant="contained"
@@ -527,7 +530,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                 onClick={handleNext}
                 disabled={pending || !selectedCompany}
               >
-                التالي
+                {t("staff.next")}
               </Button>
             </>
           ) : activeStep === 3 ? (
@@ -537,14 +540,14 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                 onClick={handleBack}
                 variant="outlined"
               >
-                تراجع
+                {t("staff.back")}
               </Button>
               <Button
                 variant="outlined"
                 onClick={handleClose}
                 disabled={pending}
               >
-                إلغاء
+                {t("staff.cancel")}
               </Button>
               <Button
                 variant="contained"
@@ -559,7 +562,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                   )
                 }
               >
-                {pending ? "جاري الإرسال…" : "أرسال الدعوة"}
+                {pending ? t("staff.sending") : t("staff.sendInvite")}
               </Button>
             </>
           ) : (
@@ -569,14 +572,14 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                 onClick={handleBack}
                 variant="outlined"
               >
-                تراجع
+                {t("staff.back")}
               </Button>
               <Button
                 variant="contained"
                 onClick={handleNext}
                 disabled={pending}
               >
-                التالي
+                {t("staff.next")}
               </Button>
             </>
           )}

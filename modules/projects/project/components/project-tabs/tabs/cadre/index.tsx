@@ -251,7 +251,7 @@ export default function CadreTab() {
                     variant="contained"
                     onClick={() => setOpenAddCadre(true)}
                   >
-                    اضافة كادر
+                    {t("cadre.addCadre")}
                   </Button>
                 ) : undefined
               }
