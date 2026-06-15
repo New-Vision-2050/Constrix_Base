@@ -155,10 +155,15 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
       const body = res.data;
       const rows = attachmentRequestsListFromBody(body);
 
+      const totalPages =
+        body.last_page ?? body.pagination?.last_page ?? 1;
+      const totalItems =
+        body.total ?? body.pagination?.result_count ?? rows.length;
+
       return {
         data: rows.map((r) => mapToDocumentRow(r as AttachmentRequestWithFlow)),
-        totalPages: body.pagination?.last_page ?? 1,
-        totalItems: body.pagination?.result_count ?? rows.length,
+        totalPages,
+        totalItems,
       };
     },
     enabled: !!projectId,
