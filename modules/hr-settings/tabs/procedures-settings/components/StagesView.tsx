@@ -32,6 +32,7 @@ import {
 } from "@/services/api/crm-settings/procedure-settings/types/response";
 
 interface StagesViewProps {
+  parentId?: string;
   currentTabType?: string;
   branchId?: number;
 }
@@ -41,7 +42,7 @@ export interface StagesViewRef {
 }
 
 const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesView(
-  { currentTabType = "employee_task_request", branchId },
+  { parentId, currentTabType = "employee_task", branchId },
   ref,
 ) {
   const t = useTranslations("hr-settings.proceduresSettings");
@@ -49,14 +50,15 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
   const queryClient = useQueryClient();
 
   const { data: stagesResponse, refetch } = useQuery<GetStagesResponse>({
-    queryKey: ["procedure-settings", "stages", currentTabType, branchId],
+    queryKey: ["procedure-settings", "stages", parentId, branchId],
     queryFn: async () => {
-      const response = await ProcedureSettingsApi.getStages(
-        currentTabType,
+      const response = await ProcedureSettingsApi.getStages({
+        parentId: parentId!,
         branchId,
-      );
+      });
       return response.data;
     },
+    enabled: !!parentId,
   });
 
   const workFlowId = stagesResponse?.payload?.id ?? "";
@@ -117,7 +119,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
     deadline_hours: number;
     escalation_management_hierarchy_id: string;
   }) => {
-    if (!workFlowId) {
+    if (!workFlowId || !parentId) {
       toast({
         title: t("actions.add"),
         description: t("messages.error"),
@@ -128,6 +130,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
     try {
       await ProcedureSettingsApi.createStage({
         ...payload,
+        parent_id: parentId!,
         work_flow_id: workFlowId,
       });
       await refetch();

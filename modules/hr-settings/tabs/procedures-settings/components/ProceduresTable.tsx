@@ -89,7 +89,7 @@ export interface ProceduresTableRef {
 const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
   ({ stageId, stageName: _stageName }, ref) => {
     void _stageName; // Reserved for future use
-    const t = useTranslations("CRMSettingsModule.proceduresSettings");
+    const t = useTranslations("hr-settings.proceduresSettings");
     const { toast } = useToast();
     const queryClient = useQueryClient();
 
@@ -210,7 +210,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       if (!procedureData.employee_id) {
         toast({
           title: t("actions.add"),
-          description: "Please select an employee.",
+          description: t("steps.selectEmployee"),
           variant: "destructive",
         });
         return;
@@ -287,7 +287,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       <div className="space-y-4">
         <div className="mb-4">
           <Typography variant="h6" fontWeight={500}>
-            {t("procedures.title") || "Procedures"}
+            {t("procedures.title")}
           </Typography>
         </div>
         <TableContainer sx={{ backgroundColor: "transparent" }}>
@@ -327,7 +327,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
                       displayEmpty
                       sx={{ minWidth: 150 }}
                     >
-                      <MenuItem value="">اختر اسم الموظف</MenuItem>
+                      <MenuItem value="">{t("steps.selectEmployee")}</MenuItem>
                       {employeesData.map((employee) => (
                         <MenuItem key={employee.id} value={employee.id}>
                           {employee.name}

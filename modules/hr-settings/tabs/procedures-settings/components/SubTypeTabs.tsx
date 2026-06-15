@@ -3,6 +3,7 @@
 import {
   Box,
   Checkbox,
+  CircularProgress,
   IconButton,
   Paper,
   Tab,
@@ -20,9 +21,16 @@ import {
 } from "@/utils/fetchDropdownOptions";
 import { baseURL } from "@/config/axios-config";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
+import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
 import { GetStagesResponse } from "@/services/api/crm-settings/procedure-settings/types/response";
+import { useToast } from "@/modules/table/hooks/use-toast";
+import { mapTaskActionToCreateInternalProcedure, mapTaskActionToUpdateInternalProcedure, resolveProcedureSettingId } from "../utils/mapTaskActionToInternalProcedure";
+import { mapInternalProcedureToFormValues } from "../utils/mapInternalProcedureToFormValues";
 import StagesView, { type StagesViewRef } from "./StagesView";
 import AddTaskActionDialog, {
+  INTERNAL_PROCEDURE_TYPE,
+  INTERNAL_PROCEDURES_QUERY_TYPE,
   type TaskActionFormValues,
 } from "./dialogs/AddTaskActionDialog";
 
@@ -30,11 +38,14 @@ interface OuterTab {
   id: number;
   name: string;
   type: string;
-  config?: TaskActionFormValues;
 }
 
 const DEFAULT_OUTER_TABS: OuterTab[] = [
-  { id: 0, name: "workMissionStart", type: "employee_task_request" },
+  {
+    id: 0,
+    name: "workMissionStart",
+    type: INTERNAL_PROCEDURE_TYPE,
+  },
 ];
 
 const WORK_PLAN_TAB = "work_plan";
@@ -43,10 +54,14 @@ export default function SubTypeTabs() {
   const t = useTranslations("hr-settings.proceduresSettings");
   const ts = useTranslations("hr-settings.proceduresSettings.subTabs");
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const stagesViewRef = useRef<StagesViewRef>(null);
 
-  const [outerTabs, setOuterTabs] = useState<OuterTab[]>(DEFAULT_OUTER_TABS);
-  const [selectedOuter, setSelectedOuter] = useState<number>(0);
+  const [outerTabs] = useState<OuterTab[]>(DEFAULT_OUTER_TABS);
+  const [selectedOuter] = useState<number>(0);
+  const [selectedProcedureId, setSelectedProcedureId] = useState<string | null>(
+    null,
+  );
   const [selectedInner, setSelectedInner] = useState<string>(WORK_PLAN_TAB);
   const [isUpdating, setIsUpdating] = useState(false);
   const [taskActionDialogOpen, setTaskActionDialogOpen] = useState(false);
@@ -56,12 +71,9 @@ export default function SubTypeTabs() {
   const [dialogInitialValues, setDialogInitialValues] = useState<
     Partial<TaskActionFormValues> | undefined
   >(undefined);
+  const [editingProcedure, setEditingProcedure] =
+    useState<InternalProcedure | null>(null);
 
-  const getCurrentTabType = () =>
-    outerTabs.find((tab) => tab.id === selectedOuter)?.type ??
-    "employee_task_request";
-
-  const currentTabType = getCurrentTabType();
   const activeOuterTab = outerTabs.find((tab) => tab.id === selectedOuter);
 
   const resolveTabLabel = useCallback(
@@ -70,13 +82,42 @@ export default function SubTypeTabs() {
     [ts],
   );
 
+  const {
+    data: internalProcedures = [],
+    isLoading: isLoadingInternalProcedures,
+    refetch: refetchInternalProcedures,
+  } = useQuery({
+    queryKey: ["internal-procedures", INTERNAL_PROCEDURES_QUERY_TYPE],
+    queryFn: () =>
+      InternalProcedureSettingsApi.getInternalProcedures(
+        INTERNAL_PROCEDURES_QUERY_TYPE,
+      ),
+  });
+
+  const rootProcedure = useMemo(
+    () => internalProcedures.find((procedure) => !procedure.parent_id) ?? null,
+    [internalProcedures],
+  );
+
+  const childProcedures = useMemo(() => {
+    if (!rootProcedure) {
+      return internalProcedures.filter((procedure) => !!procedure.parent_id);
+    }
+    return internalProcedures.filter(
+      (procedure) => procedure.parent_id === rootProcedure.id,
+    );
+  }, [internalProcedures, rootProcedure]);
+
+  const stagesParentId =
+    selectedProcedureId ?? rootProcedure?.id ?? undefined;
+
   const existingActions = useMemo(
     () =>
-      outerTabs.map((tab) => ({
-        id: String(tab.id),
-        name: resolveTabLabel(tab),
+      internalProcedures.map((procedure) => ({
+        id: procedure.id,
+        name: procedure.name,
       })),
-    [outerTabs, resolveTabLabel],
+    [internalProcedures],
   );
 
   const { data: branches = [] } = useQuery<ManagementHierarchyOption[]>({
@@ -89,11 +130,14 @@ export default function SubTypeTabs() {
 
   const { data: workflowResponse, refetch: refetchWorkflow } =
     useQuery<GetStagesResponse>({
-      queryKey: ["procedure-settings", "stages", currentTabType, undefined],
+      queryKey: ["procedure-settings", "stages", stagesParentId, undefined],
       queryFn: async () => {
-        const response = await ProcedureSettingsApi.getStages(currentTabType);
+        const response = await ProcedureSettingsApi.getStages({
+          parentId: stagesParentId!,
+        });
         return response.data;
       },
+      enabled: !!stagesParentId,
     });
 
   const branchUsesWorkPlan = useMemo(() => {
@@ -116,14 +160,14 @@ export default function SubTypeTabs() {
       await ProcedureSettingsApi.updateWorkFlow(
         Number(branchId),
         checked,
-        currentTabType,
+        INTERNAL_PROCEDURE_TYPE,
       );
       await refetchWorkflow();
       await queryClient.invalidateQueries({
         queryKey: [
           "procedure-settings",
           "stages",
-          currentTabType,
+          stagesParentId,
           Number(branchId),
         ],
       });
@@ -134,85 +178,161 @@ export default function SubTypeTabs() {
     }
   };
 
-  const getTaskActionInitialValues = useCallback(
-    (tab: OuterTab): Partial<TaskActionFormValues> => {
-      if (tab.config) return tab.config;
-      return {
-        name: resolveTabLabel(tab),
-        formConditions: ["employee_on_duty"],
-      };
-    },
-    [resolveTabLabel],
-  );
-
   const openAddTaskDialog = useCallback(() => {
     setTaskActionDialogMode("add");
     setDialogInitialValues(undefined);
+    setEditingProcedure(null);
     setTaskActionDialogOpen(true);
   }, []);
 
-  const openEditTaskDialog = useCallback(() => {
-    if (!activeOuterTab) return;
-    setTaskActionDialogMode("edit");
-    setDialogInitialValues(getTaskActionInitialValues(activeOuterTab));
-    setTaskActionDialogOpen(true);
-  }, [activeOuterTab, getTaskActionInitialValues]);
+  const openEditProcedureDialog = useCallback(
+    (procedure: InternalProcedure | null) => {
+      if (!procedure) return;
+      setSelectedProcedureId(procedure.id);
+      setTaskActionDialogMode("edit");
+      setEditingProcedure(procedure);
+      setDialogInitialValues(mapInternalProcedureToFormValues(procedure));
+      setTaskActionDialogOpen(true);
+    },
+    [],
+  );
 
   const handleSaveTaskAction = useCallback(
-    (values: TaskActionFormValues) => {
+    async (values: TaskActionFormValues) => {
       if (taskActionDialogMode === "edit") {
-        setOuterTabs((prev) =>
-          prev.map((tab) =>
-            tab.id === selectedOuter
-              ? {
-                  ...tab,
-                  name: values.name.trim(),
-                  config: values,
-                }
-              : tab,
-          ),
-        );
+        if (!editingProcedure) return;
+
+        try {
+          const procedureSettingId = resolveProcedureSettingId(editingProcedure);
+          await InternalProcedureSettingsApi.updateInternalProcedure(
+            procedureSettingId,
+            editingProcedure.id,
+            mapTaskActionToUpdateInternalProcedure(values, {
+              sortOrder: editingProcedure.sort_order ?? 1,
+              parentId: editingProcedure.parent_id ?? null,
+              isActive: editingProcedure.is_active ?? true,
+            }),
+          );
+
+          await refetchInternalProcedures();
+          await queryClient.invalidateQueries({
+            queryKey: ["procedure-settings", "stages", editingProcedure.id],
+          });
+
+          toast({
+            title: t("actions.edit"),
+            description: t("messages.procedureUpdated"),
+            variant: "default",
+          });
+        } catch (error) {
+          console.error("Error updating internal procedure:", error);
+          toast({
+            title: t("actions.edit"),
+            description: t("messages.error"),
+            variant: "destructive",
+          });
+          throw error;
+        }
         return;
       }
 
-      let newTabId = 0;
-      setOuterTabs((prev) => {
-        newTabId = prev.reduce((max, tab) => Math.max(max, tab.id), 0) + 1;
-        const slug = values.name
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "_")
-          .replace(/[^\w\u0600-\u06FF_]/g, "");
+      try {
+        const sortOrder = childProcedures.length + 1;
+        const created = await InternalProcedureSettingsApi.createInternalProcedure(
+          mapTaskActionToCreateInternalProcedure(values, {
+            sortOrder,
+            parentId: rootProcedure?.id ?? null,
+          }),
+        );
 
-        return [
-          ...prev,
-          {
-            id: newTabId,
-            name: values.name.trim(),
-            type: `employee_task_${slug || newTabId}`,
-            config: values,
-          },
-        ];
-      });
-      setSelectedOuter(newTabId);
-      setSelectedInner(WORK_PLAN_TAB);
+        await refetchInternalProcedures();
+        setSelectedProcedureId(created.id);
+        setSelectedInner(WORK_PLAN_TAB);
+
+        await queryClient.invalidateQueries({
+          queryKey: ["procedure-settings", "stages", created.id],
+        });
+
+        toast({
+          title: t("actions.add"),
+          description: t("messages.procedureAdded"),
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error creating internal procedure:", error);
+        toast({
+          title: t("actions.add"),
+          description: t("messages.error"),
+          variant: "destructive",
+        });
+        throw error;
+      }
     },
-    [taskActionDialogMode, selectedOuter],
+    [
+      taskActionDialogMode,
+      editingProcedure,
+      childProcedures.length,
+      rootProcedure?.id,
+      refetchInternalProcedures,
+      queryClient,
+      t,
+      toast,
+    ],
   );
 
   const showStagesView =
     selectedInner === WORK_PLAN_TAB ||
     branchUsesWorkPlan[selectedInner] === false;
 
+  const isProcedureSelected = (procedureId?: string | null) =>
+    stagesParentId === procedureId;
+
+  const renderProcedureChip = (
+    procedure: InternalProcedure | null,
+    fallbackLabel: string,
+    onSelect: () => void,
+  ) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 0.5,
+        cursor: procedure ? "pointer" : "default",
+        px: 1,
+        py: 0.5,
+        borderRadius: 1,
+        bgcolor:
+          procedure && isProcedureSelected(procedure.id)
+            ? "action.selected"
+            : "transparent",
+      }}
+      onClick={() => {
+        if (procedure) onSelect();
+      }}
+    >
+      <Typography variant="subtitle1" fontWeight={600}>
+        {procedure?.name ?? fallbackLabel}
+      </Typography>
+      {procedure && (
+        <IconButton
+          size="small"
+          aria-label={t("stages.editStage")}
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditProcedureDialog(procedure);
+          }}
+        >
+          <Settings sx={{ fontSize: 22 }} />
+        </IconButton>
+      )}
+    </Box>
+  );
+
   return (
     <div className="space-y-4">
       <Paper>
         <Tabs
           value={selectedOuter}
-          onChange={(_, val: number) => {
-            setSelectedOuter(val);
-            setSelectedInner(WORK_PLAN_TAB);
-          }}
           variant="scrollable"
           scrollButtons="auto"
         >
@@ -234,24 +354,44 @@ export default function SubTypeTabs() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              gap: 2,
+              flexDirection: "row-reverse",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <Typography variant="subtitle1" fontWeight={600}>
-                {resolveTabLabel(activeOuterTab)}
-              </Typography>
-              <IconButton
-                size="small"
-                aria-label={t("stages.editStage")}
-                onClick={openEditTaskDialog}
-              >
-                <Settings sx={{ fontSize: 22 }} />
-              </IconButton>
-            </Box>
             <PlusIcon
-              className="h-5 w-5 cursor-pointer text-primary rounded-full"
+              className="h-5 w-5 shrink-0 cursor-pointer text-primary rounded-full"
               onClick={openAddTaskDialog}
             />
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                flexWrap: "wrap",
+                justifyContent: "flex-start",
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              {isLoadingInternalProcedures ? (
+                <CircularProgress size={20} />
+              ) : (
+                <>
+                  {renderProcedureChip(
+                    rootProcedure,
+                    resolveTabLabel(activeOuterTab),
+                    () => setSelectedProcedureId(null),
+                  )}
+
+                  {childProcedures.map((child) =>
+                    renderProcedureChip(child, child.name, () =>
+                      setSelectedProcedureId(child.id),
+                    ),
+                  )}
+                </>
+              )}
+            </Box>
           </Paper>
 
           <Paper>
@@ -290,7 +430,8 @@ export default function SubTypeTabs() {
           {showStagesView ? (
             <StagesView
               ref={stagesViewRef}
-              currentTabType={currentTabType}
+              parentId={stagesParentId}
+              currentTabType={INTERNAL_PROCEDURE_TYPE}
               branchId={
                 selectedInner !== WORK_PLAN_TAB
                   ? Number(selectedInner)
@@ -326,7 +467,7 @@ export default function SubTypeTabs() {
         existingActions={existingActions.filter(
           (action) =>
             taskActionDialogMode === "add" ||
-            action.id !== String(selectedOuter),
+            action.id !== editingProcedure?.id,
         )}
         initialValues={dialogInitialValues}
         onSave={handleSaveTaskAction}

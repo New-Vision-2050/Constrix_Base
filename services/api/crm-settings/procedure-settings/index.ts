@@ -3,10 +3,33 @@ import { CreateStageArgs, UpdateStageArgs, CreateStepArgs } from "./types/args";
 import { GetStagesResponse, GetStepsResponse } from "./types/response";
 
 export const ProcedureSettingsApi = {
-  getStages: (type: string, branchId?: number) => {
-    const params = new URLSearchParams({ type });
-    if (branchId != null) {
-      params.append("branch_id", String(branchId));
+  getStages: (
+    typeOrOptions:
+      | string
+      | { type?: string; parentId?: string; branchId?: number },
+    branchId?: number,
+  ) => {
+    let type: string | undefined;
+    let parentId: string | undefined;
+    let branch: number | undefined;
+
+    if (typeof typeOrOptions === "string") {
+      type = typeOrOptions;
+      branch = branchId;
+    } else {
+      type = typeOrOptions.type;
+      parentId = typeOrOptions.parentId;
+      branch = typeOrOptions.branchId;
+    }
+
+    const params = new URLSearchParams();
+    if (parentId) {
+      params.append("parent_id", parentId);
+    } else if (type) {
+      params.append("type", type);
+    }
+    if (branch != null) {
+      params.append("branch_id", String(branch));
     }
     return baseApi.get<GetStagesResponse>(`procedure-settings?${params}`);
   },

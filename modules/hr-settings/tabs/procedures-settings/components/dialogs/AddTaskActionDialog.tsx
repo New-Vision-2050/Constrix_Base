@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -12,32 +13,21 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import SearchableSelect from "@/components/shared/SearchableSelect";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
 
-const MODEL_OPTION_DEFS = [
-  { id: "task_time_setting", labelKey: "taskTimeSetting" as const },
-  { id: "cancel_task", labelKey: "cancelTask" as const },
-  { id: "confirm_location", labelKey: "confirmLocation" as const },
-  { id: "confirm_task_location", labelKey: "confirmTaskLocation" as const },
-  { id: "select_other_employee", labelKey: "selectOtherEmployee" as const },
-  { id: "send_and_approve", labelKey: "sendAndApprove" as const },
-] as const;
-
-const FORM_CONDITION_DEFS = [
-  { id: "employee_on_duty", labelKey: "employeeOnDuty" as const },
-  { id: "employee_off_duty", labelKey: "employeeOffDuty" as const },
-  { id: "works_all_branches", labelKey: "worksAllBranches" as const },
-  { id: "works_all_branches_alt", labelKey: "worksAllBranches" as const },
-  { id: "task_duration", labelKey: "taskDuration" as const },
-] as const;
+export const INTERNAL_PROCEDURE_TYPE = "employee_task" as const;
+export const INTERNAL_PROCEDURES_QUERY_TYPE = "employee_task" as const;
 
 export interface TaskActionFormValues {
   name: string;
   modelId: string;
-  formConditions: string[];
-  orderActionId: string;
+  formConditions: Record<string, boolean | number>;
+  appearBefore: string;
+  appearAfter: string;
 }
 
 interface AddTaskActionDialogProps {
@@ -46,15 +36,26 @@ interface AddTaskActionDialogProps {
   onClose: () => void;
   existingActions: { id: string; name: string }[];
   initialValues?: Partial<TaskActionFormValues>;
-  onSave: (values: TaskActionFormValues) => void;
+  onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
 
 const defaultValues: TaskActionFormValues = {
   name: "",
   modelId: "",
-  formConditions: ["employee_on_duty"],
-  orderActionId: "",
+  formConditions: {},
+  appearBefore: "",
+  appearAfter: "",
 };
+
+function normalizeFormConditions(
+  value: string[] | Record<string, boolean | number> | undefined,
+): Record<string, boolean | number> {
+  if (!value) return {};
+  if (Array.isArray(value)) {
+    return Object.fromEntries(value.map((key) => [key, true]));
+  }
+  return value;
+}
 
 export default function AddTaskActionDialog({
   open,
@@ -66,27 +67,46 @@ export default function AddTaskActionDialog({
 }: AddTaskActionDialogProps) {
   const t = useTranslations("hr-settings.proceduresSettings.taskActionDialog");
   const tc = useTranslations("hr-settings.proceduresSettings.common");
+  const locale = useLocale();
 
   const [form, setForm] = useState<TaskActionFormValues>(defaultValues);
   const [nameError, setNameError] = useState("");
+  const [modelError, setModelError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setForm({
       ...defaultValues,
       ...initialValues,
-      formConditions: initialValues?.formConditions ?? ["employee_on_duty"],
+      formConditions: normalizeFormConditions(initialValues?.formConditions),
     });
     setNameError("");
+    setModelError("");
   }, [open, initialValues]);
+
+  const { data: forms = [], isLoading: isFormsLoading } = useQuery({
+    queryKey: ["internal_procedure_setting_forms", locale],
+    queryFn: () =>
+      InternalProcedureSettingsApi.getInternalProcedureSettingForms(locale),
+    enabled: open,
+  });
+
+  const { data: formConditionOptions = [], isLoading: isConditionsLoading } =
+    useQuery({
+      queryKey: ["forms_conditions", form.modelId, locale],
+      queryFn: () =>
+        InternalProcedureSettingsApi.getFormsConditions(form.modelId, locale),
+      enabled: open && !!form.modelId,
+    });
 
   const modelOptions = useMemo(
     () =>
-      MODEL_OPTION_DEFS.map((item) => ({
-        value: item.id,
-        label: t(`models.${item.labelKey}`),
+      forms.map((item) => ({
+        value: item.key,
+        label: item.name,
       })),
-    [t],
+    [forms],
   );
 
   const actionOrderOptions = useMemo(
@@ -101,31 +121,58 @@ export default function AddTaskActionDialog({
     [existingActions, t],
   );
 
-  const toggleFormCondition = (conditionId: string) => {
-    setForm((prev) => ({
-      ...prev,
-      formConditions: prev.formConditions.includes(conditionId)
-        ? prev.formConditions.filter((id) => id !== conditionId)
-        : [...prev.formConditions, conditionId],
-    }));
+  const toggleBoolFormCondition = (conditionKey: string) => {
+    setForm((prev) => {
+      const next = { ...prev.formConditions };
+      if (next[conditionKey]) {
+        delete next[conditionKey];
+      } else {
+        next[conditionKey] = true;
+      }
+      return { ...prev, formConditions: next };
+    });
   };
 
-  const handleSave = () => {
+  const setIntFormCondition = (conditionKey: string, rawValue: string) => {
+    setForm((prev) => {
+      const next = { ...prev.formConditions };
+      if (rawValue === "") {
+        delete next[conditionKey];
+      } else {
+        const parsed = parseInt(rawValue, 10);
+        if (!Number.isNaN(parsed)) {
+          next[conditionKey] = parsed;
+        }
+      }
+      return { ...prev, formConditions: next };
+    });
+  };
+
+  const handleSave = async () => {
     if (!form.name.trim()) {
       setNameError(tc("requiredField"));
       return;
     }
-    onSave({
-      ...form,
-      name: form.name.trim(),
-    });
-    onClose();
+    if (!form.modelId) {
+      setModelError(tc("requiredField"));
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await onSave({
+        ...form,
+        name: form.name.trim(),
+      });
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ textAlign: "start", fontWeight: 700, pb: 1 }}>
-        {t("title")}
+        {mode === "edit" ? t("editTitle") : t("title")}
       </DialogTitle>
 
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>
@@ -140,6 +187,7 @@ export default function AddTaskActionDialog({
           fullWidth
           size="small"
           required
+          disabled={isSaving}
           error={!!nameError}
           helperText={nameError}
         />
@@ -147,69 +195,146 @@ export default function AddTaskActionDialog({
         <SearchableSelect
           options={modelOptions}
           value={form.modelId}
-          onChange={(value) =>
-            setForm((prev) => ({ ...prev, modelId: String(value) }))
+          onChange={(value) => {
+            setForm((prev) => ({
+              ...prev,
+              modelId: String(value),
+              formConditions: {},
+            }));
+            if (modelError) setModelError("");
+          }}
+          placeholder={
+            isFormsLoading ? t("loadingConditions") : t("selectModels")
           }
-          placeholder={t("selectModels")}
-          searchPlaceholder={tc("search")}
           noResultsText={tc("noResults")}
           label={t("modelsLabel")}
           required
+          disabled={isFormsLoading || isSaving}
+          searchable={false}
+          error={modelError}
         />
 
         <Box>
           <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
             {t("formConditions")}
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-            {FORM_CONDITION_DEFS.map((condition) => (
-              <FormControlLabel
-                key={condition.id}
-                labelPlacement="start"
-                sx={{
-                  m: 0,
-                  width: "100%",
-                  justifyContent: "space-between",
-                }}
-                label={
-                  <Typography variant="body2">
-                    {t(`conditions.${condition.labelKey}`)}
-                  </Typography>
+          {!form.modelId ? null : isConditionsLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+              <CircularProgress size={24} />
+              <Typography variant="body2" sx={{ ml: 1.5 }}>
+                {t("loadingConditions")}
+              </Typography>
+            </Box>
+          ) : formConditionOptions.length === 0 ? (
+            <Typography variant="body2" color="text.secondary">
+              {t("noConditions")}
+            </Typography>
+          ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+              {formConditionOptions.map((condition) => {
+                const conditionKey = condition.key;
+                const isIntCondition = condition.type === "int";
+
+                if (isIntCondition) {
+                  const intValue = form.formConditions[conditionKey];
+                  return (
+                    <Box
+                      key={conditionKey}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 2,
+                      }}
+                    >
+                      <Typography variant="body2">{condition.name}</Typography>
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={intValue ?? ""}
+                        onChange={(e) =>
+                          setIntFormCondition(conditionKey, e.target.value)
+                        }
+                        inputProps={{ min: 0, step: 1 }}
+                        sx={{ width: 120 }}
+                      />
+                    </Box>
+                  );
                 }
-                control={
-                  <Checkbox
-                    checked={form.formConditions.includes(condition.id)}
-                    onChange={() => toggleFormCondition(condition.id)}
-                    size="small"
+
+                return (
+                  <FormControlLabel
+                    key={conditionKey}
+                    labelPlacement="start"
+                    sx={{
+                      m: 0,
+                      width: "100%",
+                      justifyContent: "space-between",
+                    }}
+                    label={
+                      <Typography variant="body2">{condition.name}</Typography>
+                    }
+                    control={
+                      <Checkbox
+                        checked={!!form.formConditions[conditionKey]}
+                        onChange={() => toggleBoolFormCondition(conditionKey)}
+                        size="small"
+                      />
+                    }
                   />
-                }
-              />
-            ))}
-          </Box>
+                );
+              })}
+            </Box>
+          )}
         </Box>
 
         <Box>
           <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
             {t("actionOrder")}
           </Typography>
-          <SearchableSelect
-            options={actionOrderOptions}
-            value={form.orderActionId}
-            onChange={(value) =>
-              setForm((prev) => ({
-                ...prev,
-                orderActionId: String(value),
-              }))
-            }
-            placeholder={t("selectAction")}
-            searchPlaceholder={tc("search")}
-            noResultsText={tc("noResults")}
-            label={t("appearsBeforeAfter")}
-            required
-          />
+          <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <SearchableSelect
+                options={actionOrderOptions}
+                value={form.appearBefore}
+                onChange={(value) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    appearBefore: String(value),
+                  }))
+                }
+                placeholder={t("selectAction")}
+                searchPlaceholder={tc("search")}
+                noResultsText={tc("noResults")}
+                label={t("appearBefore")}
+              />
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <SearchableSelect
+                options={actionOrderOptions}
+                value={form.appearAfter}
+                onChange={(value) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    appearAfter: String(value),
+                  }))
+                }
+                placeholder={t("selectAction")}
+                searchPlaceholder={tc("search")}
+                noResultsText={tc("noResults")}
+                label={t("appearAfter")}
+              />
+            </Box>
+          </Box>
         </Box>
 
-        <Button variant="contained" fullWidth onClick={handleSave} sx={{ mt: 1 }}>
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={handleSave}
+          disabled={isSaving}
+          sx={{ mt: 1 }}
+        >
           {t("save")}
         </Button>
       </DialogContent>

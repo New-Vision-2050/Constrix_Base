@@ -273,9 +273,9 @@ export default function StepCard({
   onSaved,
   onDelete,
 }: StepCardProps) {
-  const t = useTranslations("CRMSettingsModule.proceduresSettings");
-  const ts = useTranslations("CRMSettingsModule.proceduresSettings.stepCard");
-  const tc = useTranslations("CRMSettingsModule.proceduresSettings.common");
+  const t = useTranslations("hr-settings.proceduresSettings");
+  const ts = useTranslations("hr-settings.proceduresSettings.stepCard");
+  const tc = useTranslations("hr-settings.proceduresSettings.common");
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(!serverStep);
@@ -1514,7 +1514,7 @@ export default function StepCard({
                       color="text.secondary"
                       sx={{ mt: 0.5, display: "block", textAlign: "end" }}
                     >
-                      الجهة المصعد إليها محول الاعتماد
+                      {ts("escalationEntitySelectedHint")}
                     </Typography>
                   )}
                 </>

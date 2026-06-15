@@ -38,6 +38,8 @@ interface SearchableSelectProps {
   defaultValue?: string | number;
   /** Shown in the trigger when set (e.g. read-only label from API). */
   displayLabel?: string;
+  /** When false, hides the search input in the dropdown. Defaults to true. */
+  searchable?: boolean;
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -55,6 +57,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   name,
   error,
   displayLabel: displayLabelProp,
+  searchable = true,
 }) => {
   const theme = useTheme();
   const locale = useLocale();
@@ -176,34 +179,36 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
           }}
         >
           {/* Search input */}
-          <Box sx={{ p: 1.5, borderBottom: 1, borderColor: "divider" }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder={searchPlaceholder}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              autoFocus
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon
-                      sx={{ color: "text.secondary", fontSize: 20 }}
-                    />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  bgcolor: "background.default",
-                },
-              }}
-            />
-          </Box>
+          {searchable && (
+            <Box sx={{ p: 1.5, borderBottom: 1, borderColor: "divider" }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                autoFocus
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon
+                        sx={{ color: "text.secondary", fontSize: 20 }}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "background.default",
+                  },
+                }}
+              />
+            </Box>
+          )}
 
           {/* Options */}
-          <Box sx={{ maxHeight: 180, overflowY: "auto" }}>
+          <Box sx={{ maxHeight: searchable ? 180 : 240, overflowY: "auto" }}>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <Box

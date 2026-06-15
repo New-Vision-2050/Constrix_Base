@@ -2,6 +2,7 @@ export interface CreateStageArgs {
   name: string;
   type: string;
   execute_type: string;
+  parent_id: string; //"parent-uuid-here",
   icon: string;
   percentage: number;
   deadline_days: number;
