@@ -27,7 +27,6 @@ import {
   Send as SendIcon,
   CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
-import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -43,7 +42,7 @@ import type { ProjectRoleListItem } from "@/services/api/projects/project-roles/
 export const cadreEmployeesNotInProjectQueryKey = (projectId: string) =>
   ["cadre-employees-not-in-project", projectId] as const;
 
-const STEPS = ["اختيار موظف", "اختيار الدور", "المراجعة والارسال"];
+const STEP_KEYS = ["stepSelectEmployee", "stepSelectRole", "stepReviewAndSend"] as const;
 
 export interface AddCadreDialogProps {
   open: boolean;
@@ -51,7 +50,7 @@ export interface AddCadreDialogProps {
 }
 
 export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
-  const tProject = useTranslations("project");
+  const t = useTranslations("project");
   const { projectId } = useProject();
   const queryClient = useQueryClient();
   const { data: authCompanyData } = useCurrentAuthCompany();
@@ -143,7 +142,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
       toast.error(
-        error?.response?.data?.message ?? tProject("staff.assignError"),
+        error?.response?.data?.message ?? t("staff.assignError"),
       );
     },
   });
@@ -155,11 +154,11 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
 
   const handleNext = () => {
     if (activeStep === 0 && !selectedEmployee) {
-      toast.error("يرجى اختيار موظف");
+      toast.error(t("cadre.selectEmployeeRequired"));
       return;
     }
     if (activeStep === 1 && !selectedRole) {
-      toast.error("يرجى اختيار دور");
+      toast.error(t("cadre.selectRoleRequired"));
       return;
     }
     setActiveStep((s) => s + 1);
@@ -208,14 +207,14 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
             </Box>
           </Box>
           <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-            تم اضافة الكادر بنجاح
+            {t("cadre.addedSuccessTitle")}
           </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
             sx={{ mb: 4, maxWidth: 400, mx: "auto" }}
           >
-            تم إضافة الموظف للمشروع بنجاح يمكنك متابعة حالته من الجدول
+            {t("cadre.addedSuccessBody")}
           </Typography>
           <Stack
             direction="row"
@@ -228,10 +227,10 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
               color="secondary"
               onClick={handleInviteAnother}
             >
-              اضافة كادر آخر
+              {t("cadre.addAnother")}
             </Button>
             <Button variant="outlined" onClick={handleClose}>
-              العودة الي القائمة
+              {t("staff.backToList")}
             </Button>
           </Stack>
         </DialogContent>
@@ -256,8 +255,8 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="اختيار موظف"
-                  placeholder="ابحث عن موظف"
+                  label={t("staff.selectEmployeeLabel")}
+                  placeholder={t("staff.searchEmployeePlaceholder")}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -281,7 +280,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
             {loadingRoles ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} />
-                <Typography variant="body2">جاري تحميل الأدوار...</Typography>
+                <Typography variant="body2">{t("staff.loadingRoles")}</Typography>
               </Box>
             ) : (
               <Autocomplete
@@ -295,8 +294,8 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="اختيار الدور"
-                    placeholder="ابحث عن دور"
+                    label={t("staff.selectRoleLabel")}
+                    placeholder={t("staff.searchRolePlaceholder")}
                   />
                 )}
               />
@@ -313,7 +312,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
                     sx={{ fontSize: 22, color: "text.secondary" }}
                   />
                 ),
-                label: "اسم الموظف",
+                label: t("staff.employeeName"),
                 value: selectedEmployee.name,
               },
             ]
@@ -331,14 +330,14 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
-                معلومات الموظف
+                {t("staff.employeeInfo")}
               </Typography>
               <InfoRows rows={employeeRows} />
 
               <Divider sx={{ my: 2.5 }} />
 
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700 }}>
-                الصلاحيات المختارة
+                {t("staff.selectedPermissions")}
               </Typography>
               {selectedRole ? (
                 <Chip
@@ -363,7 +362,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
               icon={<InfoOutlined fontSize="inherit" />}
               variant="outlined"
             >
-              يرجى مراجعة البيانات والصلاحيات قبل الإضافة
+              {t("cadre.reviewAlertCadre")}
             </Alert>
           </Box>
         );
@@ -385,19 +384,19 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
           pt: 1,
         }}
       >
-        <IconButton onClick={handleClose} aria-label="إغلاق" disabled={pending}>
+        <IconButton onClick={handleClose} aria-label={t("staff.close")} disabled={pending}>
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
-          اضافة كادر
+          {t("cadre.addCadre")}
         </DialogTitle>
       </Box>
 
       <DialogContent sx={{ p: 3, pt: 2 }}>
         <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-          {STEPS.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
+          {STEP_KEYS.map((key) => (
+            <Step key={key}>
+              <StepLabel>{t(`cadre.${key}`)}</StepLabel>
             </Step>
           ))}
         </Stepper>
@@ -422,7 +421,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
                 onClick={handleClose}
                 disabled={pending}
               >
-                إلغاء
+                {t("staff.cancel")}
               </Button>
               <Button
                 variant="contained"
@@ -430,7 +429,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
                 onClick={handleNext}
                 disabled={pending || !selectedEmployee}
               >
-                التالي
+                {t("staff.next")}
               </Button>
             </>
           ) : activeStep === 2 ? (
@@ -440,14 +439,14 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
                 onClick={handleBack}
                 variant="outlined"
               >
-                تراجع
+                {t("staff.back")}
               </Button>
               <Button
                 variant="outlined"
                 onClick={handleClose}
                 disabled={pending}
               >
-                إلغاء
+                {t("staff.cancel")}
               </Button>
               <Button
                 variant="contained"
@@ -462,7 +461,7 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
                   )
                 }
               >
-                {pending ? "جاري الإرسال…" : "إضافة الكادر"}
+                {pending ? t("staff.sending") : t("cadre.submitAdd")}
               </Button>
             </>
           ) : (
@@ -472,14 +471,14 @@ export default function AddCadreDialog({ open, setOpen }: AddCadreDialogProps) {
                 onClick={handleBack}
                 variant="outlined"
               >
-                تراجع
+                {t("staff.back")}
               </Button>
               <Button
                 variant="contained"
                 onClick={handleNext}
                 disabled={pending}
               >
-                التالي
+                {t("staff.next")}
               </Button>
             </>
           )}

@@ -258,7 +258,7 @@ export default function StaffTab() {
                     variant="contained"
                     onClick={() => setAddStaffOpen(true)}
                   >
-                    اضافة صاحب مصلحة
+                    {t("staff.addStakeholder")}
                   </Button>
                 ) : undefined
               }
