@@ -826,12 +826,7 @@ export default function DeterminantDetailsTab({
           ) : (
             <>
               <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2">
-                <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  اسم المحدد
-                </label>
                 <TextField
-                  hiddenLabel
-                  fullWidth
                   label="اسم المحدد"
                   variant="outlined"
                   disabled={showSkeletonRows || !editingBasics}
@@ -845,7 +840,7 @@ export default function DeterminantDetailsTab({
                       alignItems: "center",
                     },
                     "& .MuiInputBase-input": {
-                      textAlign: "right",
+                      textAlign: "left",
                     },
                   }}
                 />
@@ -864,12 +859,11 @@ export default function DeterminantDetailsTab({
                       disabled={Boolean(constraintTypeOption)}
                     >
                       <SelectTrigger
-                        dir="rtl"
                         className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
                       >
                         <SelectValue placeholder="اختر النظام" />
                       </SelectTrigger>
-                      <SelectContent dir="rtl">
+                      <SelectContent >
                         {constraintTypeOption ? (
                           <SelectItem value={constraintTypeOption.code}>
                             {constraintTypeOption.name}
@@ -883,12 +877,12 @@ export default function DeterminantDetailsTab({
                 ) : (
                   <Select value={viewTypeSelectValue} disabled>
                     <SelectTrigger
-                      dir="rtl"
+
                       className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
                     >
                       <SelectValue placeholder={typeDisplayName} />
                     </SelectTrigger>
-                    <SelectContent dir="rtl">
+                    <SelectContent >
                       <SelectItem value={viewTypeSelectValue}>
                         {typeDisplayName}
                       </SelectItem>
@@ -940,12 +934,12 @@ export default function DeterminantDetailsTab({
                 ) : (
                   <Select value={branchText} disabled>
                     <SelectTrigger
-                      dir="rtl"
+
                       className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
                     >
                       <SelectValue placeholder={branchText} />
                     </SelectTrigger>
-                    <SelectContent dir="rtl">
+                    <SelectContent >
                       <SelectItem value={branchText}>{branchText}</SelectItem>
                     </SelectContent>
                   </Select>
