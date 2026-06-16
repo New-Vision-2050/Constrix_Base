@@ -1,0 +1,128 @@
+import { baseApi } from "@/config/axios/instances/base";
+import {
+  FormConditionOption,
+  FormsConditionApiItem,
+  GetFormsConditionsResponse,
+  GetInternalProcedureSettingFormsResponse,
+  InternalProcedureSettingFormApiItem,
+  InternalProcedureSettingFormOption,
+  CreateInternalProcedureResponse,
+  UpdateInternalProcedureResponse,
+  InternalProcedure,
+  GetInternalProceduresResponse,
+} from "./types/response";
+import {
+  CreateInternalProcedureArgs,
+  UpdateInternalProcedureArgs,
+} from "./types/args";
+
+function resolveLabel(
+  item: { label_ar?: string; label_en?: string; name?: string },
+  locale = "ar",
+): string {
+  const labelAr = item.label_ar ?? item.name ?? "";
+  if (locale === "ar") return labelAr;
+  return item.label_en ?? labelAr;
+}
+
+function mapFormsConditionItem(
+  item: FormsConditionApiItem,
+  locale = "ar",
+): FormConditionOption {
+  return {
+    id: item.key,
+    key: item.key,
+    type: item.type,
+    name: resolveLabel(item, locale),
+    label_ar: item.label_ar,
+    label_en: item.label_en,
+  };
+}
+
+function mapInternalProcedureSettingFormItem(
+  item: InternalProcedureSettingFormApiItem,
+  locale = "ar",
+): InternalProcedureSettingFormOption | null {
+  const id =
+    item.id != null
+      ? String(item.id)
+      : item.key != null
+        ? String(item.key)
+        : null;
+  const label_ar = item.label_ar ?? item.name;
+
+  if (!id || !label_ar) return null;
+
+  return {
+    id,
+    key: item.key ?? id,
+    type: item.type ?? "",
+    name: resolveLabel({ label_ar, label_en: item.label_en, name: item.name }, locale),
+    label_ar,
+    label_en: item.label_en,
+  };
+}
+
+export const InternalProcedureSettingsApi = {
+  /** Lists available forms (النماذج) for the action dialog. */
+  getInternalProcedureSettingForms: async (
+    locale = "ar",
+  ): Promise<InternalProcedureSettingFormOption[]> => {
+    const response = await baseApi.get<GetInternalProcedureSettingFormsResponse>(
+      "admin/internal_procedure_setting_forms",
+    );
+    const payload = response.data?.payload ?? [];
+    return payload
+      .map((item) => mapInternalProcedureSettingFormItem(item, locale))
+      .filter((item): item is InternalProcedureSettingFormOption => item != null);
+  },
+
+  /** Lists form conditions for the selected form. */
+  getFormsConditions: async (
+    internalProcedureSettingFormId: string,
+    locale = "ar",
+  ): Promise<FormConditionOption[]> => {
+    const response = await baseApi.get<GetFormsConditionsResponse>(
+      "admin/forms_conditions",
+      {
+        params: {
+          internal_procedure_setting_form_id: internalProcedureSettingFormId,
+        },
+      },
+    );
+    const payload = response.data?.payload ?? [];
+    return payload.map((item) => mapFormsConditionItem(item, locale));
+  },
+
+  createInternalProcedure: async (
+    args: CreateInternalProcedureArgs,
+  ): Promise<InternalProcedure> => {
+    const response = await baseApi.post<CreateInternalProcedureResponse>(
+      "procedure-settings/internal-procedures",
+      args,
+    );
+    return response.data.payload;
+  },
+
+  getInternalProcedures: async (
+    type: string,
+  ): Promise<InternalProcedure[]> => {
+    const response = await baseApi.get<GetInternalProceduresResponse>(
+      "procedure-settings/internal-procedures",
+      { params: { type } },
+    );
+    return response.data?.payload ?? [];
+  },
+
+  updateInternalProcedure: async (
+    procedureSettingId: string,
+    internalProcedureId: string,
+    args: UpdateInternalProcedureArgs,
+  ): Promise<InternalProcedure> => {
+    const response = await baseApi.put<UpdateInternalProcedureResponse>(
+      `procedure-settings/${procedureSettingId}/internal-procedures/${internalProcedureId}`,
+      args,
+    );
+    return response.data.payload;
+  },
+};

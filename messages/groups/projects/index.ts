@@ -138,6 +138,7 @@ export const projectMessages = new MessagesGroup({
     attachFile: _m("Attach File", "ارفاق ملف"),
     notes: _m("Notes", "ملاحظات"),
     save: _m("Save", "حفظ"),
+    saveWithNotes: _m("Save with notes", "حفظ بملاحظات"),
     saveViewerChangesSuccess: _m(
       "Document changes saved",
       "تم حفظ تغييرات المستند",
@@ -145,6 +146,14 @@ export const projectMessages = new MessagesGroup({
     saveViewerChangesError: _m(
       "Could not save document changes",
       "تعذر حفظ تغييرات المستند",
+    ),
+    approveWithNotesSuccess: _m(
+      "Approved with notes",
+      "تم الاعتماد بملاحظات",
+    ),
+    approveWithNotesError: _m(
+      "Could not approve with notes",
+      "تعذر الاعتماد بملاحظات",
     ),
     cancel: _m("Cancel", "الغاء"),
     all: _m("All", "الكل"),

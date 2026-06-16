@@ -1,15 +1,27 @@
 "use client";
 
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Delete, Edit, Settings } from "@mui/icons-material";
-import { useState, useEffect, useMemo } from "react";
+import {
+  forwardRef,
+  useState,
+  useEffect,
+  useMemo,
+  useImperativeHandle,
+} from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import AddStageDialog from "./dialogs/AddStageDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
-import StepCard from "./StepCard";
+import HrStepCard from "./HrStepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { getProcedureSettingsTabTitle } from "../utils/getProcedureTabTitle";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
@@ -21,30 +33,35 @@ import {
 } from "@/services/api/crm-settings/procedure-settings/types/response";
 
 interface StagesViewProps {
+  parentId?: string;
   currentTabType?: string;
   branchId?: number;
 }
 
-export default function StagesView({
-  currentTabType = "employee_task_request",
-  branchId,
-}: StagesViewProps) {
-  const t = useTranslations("CRMSettingsModule.proceduresSettings");
+export interface StagesViewRef {
+  openAddProcedureDialog: () => void;
+}
+
+const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesView(
+  { parentId, currentTabType = "employee_task", branchId },
+  ref,
+) {
+  const t = useTranslations("hr-settings.proceduresSettings");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: stagesResponse, refetch } = useQuery<GetStagesResponse>({
-    queryKey: ["procedure-settings", "stages", currentTabType, branchId],
+    queryKey: ["procedure-settings", "stages", parentId, branchId],
     queryFn: async () => {
-      const response = await ProcedureSettingsApi.getStages(
-        currentTabType,
+      const response = await ProcedureSettingsApi.getStages({
+        parentId: parentId!,
         branchId,
-      );
+      });
       return response.data;
     },
+    enabled: !!parentId,
   });
 
-  // Extract work_flow_id and stages from the new response structure
   const workFlowId = stagesResponse?.payload?.id ?? "";
   const procedures = useMemo(() => {
     const payload = stagesResponse?.payload;
@@ -62,6 +79,10 @@ export default function StagesView({
     {},
   );
   const [pendingDraftKeys, setPendingDraftKeys] = useState<string[]>([]);
+
+  useImperativeHandle(ref, () => ({
+    openAddProcedureDialog: () => setAddDialogOpen(true),
+  }));
 
   useEffect(() => {
     if (!procedures.length) {
@@ -89,8 +110,6 @@ export default function StagesView({
     ? stepsResponse.payload
     : [];
 
-  // --- Procedure CRUD ---
-
   const handleCreateProcedure = async (payload: {
     name: string;
     type: string;
@@ -101,7 +120,7 @@ export default function StagesView({
     deadline_hours: number;
     escalation_management_hierarchy_id: string;
   }) => {
-    if (!workFlowId) {
+    if (!workFlowId || !parentId) {
       toast({
         title: t("actions.add"),
         description: t("messages.error"),
@@ -112,6 +131,7 @@ export default function StagesView({
     try {
       await ProcedureSettingsApi.createStage({
         ...payload,
+        parent_id: parentId!,
         work_flow_id: workFlowId,
       });
       await refetch();
@@ -129,39 +149,6 @@ export default function StagesView({
       });
     }
   };
-
-  // const handleDeleteProcedure = async (
-  //   e: React.MouseEvent,
-  //   procedureId: string,
-  // ) => {
-  //   e.stopPropagation();
-  //   try {
-  //     await ProcedureSettingsApi.deleteStage(procedureId);
-  //     setDraftStepKeys((prev) => {
-  //       const next = { ...prev };
-  //       delete next[procedureId];
-  //       return next;
-  //     });
-  //     queryClient.removeQueries({
-  //       queryKey: ["procedure-steps", procedureId],
-  //     });
-  //     await refetch();
-  //     toast({
-  //       title: t("actions.delete"),
-  //       description: t("messages.procedureDeleted"),
-  //       variant: "default",
-  //     });
-  //   } catch (error) {
-  //     console.error("Error deleting procedure:", error);
-  //     toast({
-  //       title: t("actions.delete"),
-  //       description: t("messages.error"),
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
-  // --- Step management ---
 
   const handleAddStep = () => {
     const key = crypto.randomUUID();
@@ -235,17 +222,14 @@ export default function StagesView({
 
   return (
     <Box>
-      {/* Header */}
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
+          mb: 2,
         }}
       >
-        <Typography variant="h6" fontWeight={600}>
-          {getProcedureSettingsTabTitle(currentTabType, t)}
-        </Typography>
         <Button
           variant="contained"
           onClick={handleAddStep}
@@ -254,8 +238,8 @@ export default function StagesView({
           {t("steps.addStage")}
         </Button>
       </Box>
+
       <Grid container spacing={2}>
-        {/* Right sidebar - Procedures list */}
         <Grid size={3}>
           <Box>
             {procedures.map((procedure: Stage) => (
@@ -278,7 +262,7 @@ export default function StagesView({
                 <Box
                   sx={{
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "center", 
                     gap: 1,
                   }}
                 >
@@ -315,12 +299,10 @@ export default function StagesView({
           </Box>
         </Grid>
 
-        {/* Left content - Steps */}
         <Grid size={9}>
           <Box className="space-y-4">
-            {/* Pending draft steps (added before any procedure was selected) */}
             {pendingDraftKeys.map((draftKey, index) => (
-              <StepCard
+              <HrStepCard
                 key={`pending-${draftKey}`}
                 procedureSettingId={selectedProcedureId ?? ""}
                 serverStep={null}
@@ -341,9 +323,8 @@ export default function StagesView({
                 }
               />
             ))}
-            {/* Saved steps from server */}
             {serverSteps.map((step, index) => (
-              <StepCard
+              <HrStepCard
                 key={`server-${step.id}`}
                 procedureSettingId={selectedProcedureId!}
                 serverStep={step}
@@ -354,10 +335,8 @@ export default function StagesView({
                 }
               />
             ))}
-
-            {/* Draft (unsaved) steps */}
             {currentDraftKeys.map((draftKey, index) => (
-              <StepCard
+              <HrStepCard
                 key={`draft-${draftKey}`}
                 procedureSettingId={selectedProcedureId!}
                 serverStep={null}
@@ -371,7 +350,7 @@ export default function StagesView({
           </Box>
         </Grid>
       </Grid>
-      {/* Add Procedure Dialog */}
+
       <AddStageDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
@@ -409,4 +388,6 @@ export default function StagesView({
       />
     </Box>
   );
-}
+});
+
+export default StagesView;
