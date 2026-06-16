@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
@@ -280,6 +280,7 @@ function DetailMain({
   onApprove,
   onReject,
   onRequestModification,
+  canApproveWithNotes,
 }: {
   document: DocumentRow;
   t: (key: string) => string;
@@ -291,6 +292,7 @@ function DetailMain({
   onApprove?: () => void;
   onReject?: () => void;
   onRequestModification?: () => void;
+  canApproveWithNotes?: boolean;
 }) {
   const statusDisplay = approvalStatusLabel(document.approvalStatus, t);
   const submissionDisplay = formatDisplayDate(document.submissionDate);
@@ -429,7 +431,7 @@ function DetailMain({
             <Button
               variant="contained"
               color="secondary"
-              disabled={true}
+              disabled={!canApproveWithNotes || actionPending}
               onClick={runModification}
             >
               {t("requestModification")}
@@ -551,6 +553,59 @@ export default function AttachmentRequestDetailDialog({
 
   const [fileViewerOpen, setFileViewerOpen] = useState(false);
   const [activeFile, setActiveFile] = useState<DocumentAttachment | null>(null);
+  const [itemsWithSavedNotes, setItemsWithSavedNotes] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  useEffect(() => {
+    if (!open) {
+      setItemsWithSavedNotes(new Set());
+    }
+  }, [open]);
+
+  useEffect(() => {
+    setItemsWithSavedNotes(new Set());
+  }, [document?.id]);
+
+  const approveWithNotesMutation = useMutation({
+    mutationFn: async (itemIds: string[]) => {
+      for (const item_id of itemIds) {
+        await AttachmentRequestsApi.respondToItem({
+          item_id,
+          action: "approve",
+        });
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY],
+      });
+      toast.success(t("approveWithNotesSuccess"));
+      setItemsWithSavedNotes(new Set());
+      onClose();
+    },
+    onError: (error: unknown) => {
+      const msg = isAxiosError(error)
+        ? (error.response?.data as { message?: string } | undefined)?.message
+        : undefined;
+      toast.error(msg?.trim() ? msg : t("approveWithNotesError"));
+    },
+  });
+
+  const handleAnnotationsSaved = (itemId: string) => {
+    setItemsWithSavedNotes((prev) => new Set(prev).add(itemId));
+  };
+
+  const handleApproveWithNotes = () => {
+    if (onRequestModification) {
+      onRequestModification();
+      return;
+    }
+    if (itemsWithSavedNotes.size === 0 || !document) return;
+    approveWithNotesMutation.mutate([...itemsWithSavedNotes]);
+  };
+
+  const canApproveWithNotes = itemsWithSavedNotes.size > 0;
 
   const approveMutation = useMutation({
     mutationFn: (requestId: string) =>
@@ -605,7 +660,10 @@ export default function AttachmentRequestDetailDialog({
   };
 
   const actionPending =
-    actionPendingProp || approveMutation.isPending || declineMutation.isPending;
+    actionPendingProp ||
+    approveMutation.isPending ||
+    declineMutation.isPending ||
+    approveWithNotesMutation.isPending;
 
   if (!document) return null;
 
@@ -678,7 +736,8 @@ export default function AttachmentRequestDetailDialog({
                 actionPending={actionPending}
                 onApprove={handleApprove}
                 onReject={handleReject}
-                onRequestModification={onRequestModification}
+                onRequestModification={handleApproveWithNotes}
+                canApproveWithNotes={canApproveWithNotes}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 3.5 }}>
@@ -697,6 +756,7 @@ export default function AttachmentRequestDetailDialog({
         document={document}
         activeFile={activeFile}
         isIncoming={variant === "incoming"}
+        onAnnotationsSaved={handleAnnotationsSaved}
       />
     </>
   );
