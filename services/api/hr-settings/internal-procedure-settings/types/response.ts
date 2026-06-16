@@ -47,7 +47,7 @@ export interface InternalProcedure {
   type: string;
   form: string;
   parent_id?: string | null;
-  conditions?: InternalProcedureConditionArg[];
+  conditions?: InternalProcedureConditionArg[] | Record<string, boolean | number>;
   appears_before_id?: string | null;
   appears_after_id?: string | null;
   sort_order?: number;
@@ -66,4 +66,10 @@ export interface GetInternalProceduresResponse {
   code: string;
   message: string | null;
   payload: InternalProcedure[];
+}
+
+export interface GetInternalProcedureResponse {
+  code: string;
+  message: string | null;
+  payload: InternalProcedure;
 }

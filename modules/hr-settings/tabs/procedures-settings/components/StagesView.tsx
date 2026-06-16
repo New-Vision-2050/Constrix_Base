@@ -36,6 +36,7 @@ interface StagesViewProps {
   parentId?: string;
   currentTabType?: string;
   branchId?: number;
+  workFlowId?: string;
 }
 
 export interface StagesViewRef {
@@ -43,7 +44,7 @@ export interface StagesViewRef {
 }
 
 const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesView(
-  { parentId, currentTabType = "employee_task", branchId },
+  { parentId, currentTabType = "employee_task", branchId, workFlowId: workFlowIdProp },
   ref,
 ) {
   const t = useTranslations("hr-settings.proceduresSettings");
@@ -55,6 +56,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
     queryFn: async () => {
       const response = await ProcedureSettingsApi.getStages({
         parentId: parentId!,
+        type: currentTabType,
         branchId,
       });
       return response.data;
@@ -62,12 +64,30 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
     enabled: !!parentId,
   });
 
-  const workFlowId = stagesResponse?.payload?.id ?? "";
   const procedures = useMemo(() => {
     const payload = stagesResponse?.payload;
     const stages = payload?.["procedure-settings"];
     return Array.isArray(stages) ? stages : [];
   }, [stagesResponse]);
+
+  const workFlowId = useMemo(() => {
+    const payloadId = stagesResponse?.payload?.id;
+    if (payloadId) return payloadId;
+
+    const procedureWithWorkflow = procedures.find(
+      (procedure) => procedure.work_flow_id || procedure.work_flow?.id,
+    );
+    const procedureWorkFlowId =
+      procedureWithWorkflow?.work_flow_id ??
+      procedureWithWorkflow?.work_flow?.id;
+
+    if (procedureWorkFlowId) return procedureWorkFlowId;
+
+    // Work plan tab only — branch workflows come from the branch-specific fetch above
+    if (!branchId && workFlowIdProp) return workFlowIdProp;
+
+    return "";
+  }, [branchId, workFlowIdProp, stagesResponse, procedures]);
 
   const [selectedProcedureId, setSelectedProcedureId] = useState<string | null>(
     null,
@@ -120,7 +140,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
     deadline_hours: number;
     escalation_management_hierarchy_id: string;
   }) => {
-    if (!workFlowId || !parentId) {
+    if (!parentId || !workFlowId) {
       toast({
         title: t("actions.add"),
         description: t("messages.error"),
@@ -131,7 +151,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
     try {
       await ProcedureSettingsApi.createStage({
         ...payload,
-        parent_id: parentId!,
+        parent_id: parentId,
         work_flow_id: workFlowId,
       });
       await refetch();
@@ -292,6 +312,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
               startIcon={<AddIcon />}
               fullWidth
               onClick={() => setAddDialogOpen(true)}
+              disabled={!parentId || !workFlowId}
               sx={{ justifyContent: "flex-start", mt: 2 }}
             >
               {t("procedures.addProcedureName")}
