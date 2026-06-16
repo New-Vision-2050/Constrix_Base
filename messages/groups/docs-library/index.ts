@@ -47,6 +47,10 @@ export const docsLibraryMessages = new MessagesGroup({
     documentType: _m("Document Type", "نوع المستند"),
     type: _m("Type", "النوع"),
     endDate: _m("End Date", "تاريخ النهاية"),
+    all: _m("All", "الكل"),
+    name: _m("Name", "الاسم"),
+    referenceNumber: _m("Number", "الرقم"),
+    favorite: _m("Favorite", "المفضلة"),
   }),
   shareDialog: new MessagesGroup({
     title: _m("Share", ""),
