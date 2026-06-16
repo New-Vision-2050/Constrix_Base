@@ -1,5 +1,6 @@
 import { _m, MessagesGroup } from "../../types";
 import { hrSettingsInsuranceMessages } from "./insurance";
+import { hrProceduresSettingsMessages } from "./procedures-settings";
 
 export const hrSettingsMessages = new MessagesGroup({
   tabs: new MessagesGroup({
@@ -9,8 +10,12 @@ export const hrSettingsMessages = new MessagesGroup({
     service: _m("Service", "الخدمة"),
     insuranceCompany: _m("Medical insurance", "التامين الطبي"),
     contractManagement: _m("Contract Management", "ادارة عقد العمل"),
-    proceduresSettings: _m("Procedures Settings", "اعدادات الإجراءات")
+    proceduresSettings: _m(
+      "Procedures and Settings",
+      "الاجراءات والاعدادات",
+    ),
   }),
+  proceduresSettings: hrProceduresSettingsMessages,
   insurance: new MessagesGroup({
     addPolicy: _m("Add Policy", "إضافة بوليصة"),
     policyNumber: _m("Policy Number", "رقم البوليصة"),

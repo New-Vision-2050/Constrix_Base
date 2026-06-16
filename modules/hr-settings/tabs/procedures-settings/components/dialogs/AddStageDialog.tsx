@@ -25,6 +25,7 @@ import {
 } from "@/utils/fetchDropdownOptions";
 import { APP_ICONS } from "@/constants/icons";
 import SearchableSelect from "@/components/shared/SearchableSelect";
+import { getProcedureSettingsTabTitle } from "../../utils/getProcedureTabTitle";
 
 const PROCEDURE_DIALOG_ICON_IDS = [
   "person-outline",
@@ -64,7 +65,9 @@ export default function AddStageDialog({
   onSuccess,
   currentTabType = "employee_task_request",
 }: AddStageDialogProps) {
-  const t = useTranslations("CRMSettingsModule.proceduresSettings.stages");
+  const t = useTranslations("hr-settings.proceduresSettings.stages");
+  const tRoot = useTranslations("hr-settings.proceduresSettings");
+  const tc = useTranslations("hr-settings.proceduresSettings.common");
 
   const [name, setName] = useState("");
   const [sequentialApproval, setSequentialApproval] = useState(true);
@@ -91,13 +94,13 @@ export default function AddStageDialog({
   const handleSubmit = () => {
     const percentageValue = parseInt(durationPercentage) || 0;
     const newErrors = {
-      name: !name.trim() ? "هذا الحقل مطلوب" : "",
+      name: !name.trim() ? tc("requiredField") : "",
       percentage:
         durationPercentage !== "" && percentageValue > 100
           ? t("percentageMax")
           : "",
       timeLimit:
-        !deadlineHours && !deadlineDays ? "يجب إدخال ساعات أو أيام" : "",
+        !deadlineHours && !deadlineDays ? tc("enterHoursOrDays") : "",
     };
     setErrors(newErrors);
     if (Object.values(newErrors).some(Boolean)) return;
@@ -134,20 +137,7 @@ export default function AddStageDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", pb: 1 }}>
-        {currentTabType === "contract" && "اعداد إجراءات العقود"}
-        {currentTabType === "meeting" && "اعداد إجراءات الاجتماعات"}
-        {currentTabType === "price" && "اعداد إجراءات الأسعار"}
-        {currentTabType === "employees" && "اعداد إجراءات الموظفين"}
-        {currentTabType === "employee_task_request" && "اعداد إجراءات الموظفين"}
-        {currentTabType === "client_request" && "اعداد إجراءات طلبات العملاء"}
-        {![
-          "contract",
-          "meeting",
-          "price",
-          "employees",
-          "client_request",
-          "employee_task_request",
-        ].includes(currentTabType) && "اعداد أجراءات الاعتماد"}
+        {getProcedureSettingsTabTitle(currentTabType, tRoot)}
       </DialogTitle>
 
       <DialogContent>
@@ -184,10 +174,7 @@ export default function AddStageDialog({
                 />
               </Box>
               <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                الاعتماد التسلسلي
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                الاعتماد التسلسلي خلال الاعتماد التسلسلي للموافقة
+                {t("sequentialApproval")}
               </Typography>
             </Box>
 
@@ -213,10 +200,7 @@ export default function AddStageDialog({
                 />
               </Box>
               <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                الاعتماد المتوازي
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                الاعتماد المتوازي خلال الاعتماد المتوازي للموافقة
+                {t("parallelApproval")}
               </Typography>
             </Box>
           </Box>
@@ -274,7 +258,7 @@ export default function AddStageDialog({
                 error={!!errors.timeLimit}
                 sx={{ display: "block", mb: 1 }}
               >
-                المهلة الزمنية *
+                {t("timeLimit")} *
               </FormLabel>
               <Box sx={{ display: "flex", gap: 1.5 }}>
                 <TextField
@@ -289,7 +273,7 @@ export default function AddStageDialog({
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <Typography variant="caption">ساعات</Typography>
+                        <Typography variant="caption">{tc("hours")}</Typography>
                       </InputAdornment>
                     ),
                   }}
@@ -307,7 +291,7 @@ export default function AddStageDialog({
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <Typography variant="caption">أيام</Typography>
+                        <Typography variant="caption">{tc("days")}</Typography>
                       </InputAdornment>
                     ),
                   }}
@@ -330,13 +314,13 @@ export default function AddStageDialog({
                 }))}
                 value={escalationUserId}
                 onChange={(val) => setEscalationUserId(String(val))}
-                placeholder="الجهة المصعد اليها"
-                searchPlaceholder="البحث عن اداره..."
-                noResultsText="لا توجد نتائج"
-                label="الجهة المصعد اليها"
+                placeholder={t("selectEscalationEntity")}
+                searchPlaceholder={tc("searchManagement")}
+                noResultsText={tc("noResults")}
+                label={t("escalationEntity")}
               />
               <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
-                الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة
+                {t("escalationEntityHint")}
               </FormHelperText>
             </Box>
           </Box>
@@ -345,7 +329,7 @@ export default function AddStageDialog({
 
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1.5 }}>
         <Button onClick={handleClose} variant="outlined" sx={{ flex: 1 }}>
-          {t("cancel")}
+          {tRoot("actions.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -353,7 +337,7 @@ export default function AddStageDialog({
           disabled={!name.trim() || (!deadlineHours && !deadlineDays)}
           sx={{ flex: 1 }}
         >
-          {t("save")}
+          {tRoot("actions.save")}
         </Button>
       </DialogActions>
     </Dialog>
