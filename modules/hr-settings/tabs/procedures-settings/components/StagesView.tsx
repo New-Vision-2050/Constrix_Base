@@ -23,6 +23,7 @@ import AddStageDialog from "./dialogs/AddStageDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
 import HrStepCard from "./HrStepCard";
 import { APP_ICONS } from "@/constants/icons";
+import { getProcedureSettingsTabTitle } from "../utils/getProcedureTabTitle";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import {
   Stage,
