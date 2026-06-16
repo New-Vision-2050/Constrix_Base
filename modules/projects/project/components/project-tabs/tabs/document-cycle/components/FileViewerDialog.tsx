@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useCallback,
@@ -133,12 +133,14 @@ const layout = {
   previewToolbar: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     px: 2,
     py: 1,
     borderBottom: 1,
     borderColor: "divider",
     minHeight: 48,
+    gap: 1,
+    flexWrap: "wrap",
   },
   previewStage: {
     flex: 1,
@@ -181,6 +183,8 @@ type FileViewerDialogProps = {
   onSaveAnnotatedDocument?: (
     payload: SaveAnnotatedDocumentPayload,
   ) => void | Promise<void>;
+  /** Called after annotated media is saved — used to enable “Approve with notes”. */
+  onAnnotationsSaved?: (itemId: string) => void;
 };
 
 type ViewerBufferState = {
@@ -267,6 +271,7 @@ export default function FileViewerDialog({
   activeFile,
   isIncoming,
   onSaveAnnotatedDocument,
+  onAnnotationsSaved,
 }: FileViewerDialogProps) {
   const t = useTranslations("project.documentCycle");
   const queryClient = useQueryClient();
@@ -357,8 +362,11 @@ export default function FileViewerDialog({
         queryClient.invalidateQueries({
           queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["file-viewer-buffer", activeFile.id],
+        });
         toast.success(t("saveViewerChangesSuccess"));
-        onClose();
+        onAnnotationsSaved?.(activeFile.id);
       }
     } catch (e: unknown) {
       toast.error(
@@ -373,10 +381,10 @@ export default function FileViewerDialog({
     activeFile,
     viewer.canExport,
     onSaveAnnotatedDocument,
+    onAnnotationsSaved,
     replaceMediaMutation,
     queryClient,
     t,
-    onClose,
   ]);
 
   if (!document || !activeFile) return null;
@@ -561,18 +569,6 @@ export default function FileViewerDialog({
                     ✓ {t("approve")}
                   </Button>
                   <Button
-                    className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-                    onClick={handleSaveAnnotatedDocument}
-                    disabled={
-                      !viewer.canExport ||
-                      saveExportBusy ||
-                      respondBusy
-                    }
-                  >
-                    <Save className="w-4 h-4 me-1 inline" />
-                    {t("save")}
-                  </Button>
-                  <Button
                     className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
                     onClick={handleReject}
                     disabled={respondBusy}
@@ -585,7 +581,22 @@ export default function FileViewerDialog({
 
             <Box sx={layout.previewColumn}>
               <Box sx={layout.previewToolbar}>
-                <Box sx={{ display: "flex", gap: 1 }}>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                  {showWorkflow && (
+                    <Button
+                      className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+                      size="sm"
+                      onClick={handleSaveAnnotatedDocument}
+                      disabled={
+                        !viewer.canExport ||
+                        saveExportBusy ||
+                        respondBusy
+                      }
+                    >
+                      <Save className="w-4 h-4 me-1" />
+                      {t("saveWithNotes")}
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
