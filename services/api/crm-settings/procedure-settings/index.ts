@@ -25,7 +25,8 @@ export const ProcedureSettingsApi = {
     const params = new URLSearchParams();
     if (parentId) {
       params.append("parent_id", parentId);
-    } else if (type) {
+    }
+    if (type) {
       params.append("type", type);
     }
     if (branch != null) {

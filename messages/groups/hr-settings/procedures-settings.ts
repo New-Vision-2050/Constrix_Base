@@ -3,8 +3,7 @@ import { _m, MessagesGroup } from "../../types";
 export const hrProceduresSettingsMessages = new MessagesGroup({
   title: _m("Procedures and Settings", "الاجراءات والاعدادات"),
   subTabs: new MessagesGroup({
-    workMissionStart: _m("Start of work mission", "بداية مهمة العمل"),
-    employeeTaskRequests: _m("Employee Task Requests", "مهمات العمل"),
+    workTasks: _m("Work Tasks", "مهام العمل"),
     workPlan: _m("Work plan", "خطة العمل"),
     useWorkPlanProcedures: _m(
       "Procedures will be taken from the work plan",

@@ -8,7 +8,7 @@ export interface CreateStageArgs {
   deadline_days: number;
   deadline_hours: number;
   escalation_management_hierarchy_id: string;
-  work_flow_id: string;
+  work_flow_id?: string;
 }
 
 export interface UpdateStageArgs {
