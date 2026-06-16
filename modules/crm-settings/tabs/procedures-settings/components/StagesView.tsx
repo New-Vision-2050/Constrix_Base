@@ -21,36 +21,58 @@ import {
 } from "@/services/api/crm-settings/procedure-settings/types/response";
 
 interface StagesViewProps {
+  parentId?: string;
   currentTabType?: string;
   branchId?: number;
+  workFlowId?: string;
 }
 
 export default function StagesView({
+  parentId,
   currentTabType = "client_request",
   branchId,
+  workFlowId: workFlowIdProp,
 }: StagesViewProps) {
   const t = useTranslations("CRMSettingsModule.proceduresSettings");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: stagesResponse, refetch } = useQuery<GetStagesResponse>({
-    queryKey: ["procedure-settings", "stages", currentTabType, branchId],
+    queryKey: ["procedure-settings", "stages", parentId, branchId],
     queryFn: async () => {
-      const response = await ProcedureSettingsApi.getStages(
-        currentTabType,
+      const response = await ProcedureSettingsApi.getStages({
+        parentId: parentId!,
+        type: currentTabType,
         branchId,
-      );
+      });
       return response.data;
     },
+    enabled: !!parentId,
   });
 
-  // Extract work_flow_id and stages from the new response structure
-  const workFlowId = stagesResponse?.payload?.id ?? "";
   const procedures = useMemo(() => {
     const payload = stagesResponse?.payload;
     const stages = payload?.["procedure-settings"];
     return Array.isArray(stages) ? stages : [];
   }, [stagesResponse]);
+
+  const workFlowId = useMemo(() => {
+    const payloadId = stagesResponse?.payload?.id;
+    if (payloadId) return payloadId;
+
+    const procedureWithWorkflow = procedures.find(
+      (procedure) => procedure.work_flow_id || procedure.work_flow?.id,
+    );
+    const procedureWorkFlowId =
+      procedureWithWorkflow?.work_flow_id ??
+      procedureWithWorkflow?.work_flow?.id;
+
+    if (procedureWorkFlowId) return procedureWorkFlowId;
+
+    if (!branchId && workFlowIdProp) return workFlowIdProp;
+
+    return "";
+  }, [branchId, workFlowIdProp, stagesResponse, procedures]);
 
   const [selectedProcedureId, setSelectedProcedureId] = useState<string | null>(
     null,
@@ -101,7 +123,7 @@ export default function StagesView({
     deadline_hours: number;
     escalation_management_hierarchy_id: string;
   }) => {
-    if (!workFlowId) {
+    if (!parentId || !workFlowId) {
       toast({
         title: t("actions.add"),
         description: t("messages.error"),
@@ -112,6 +134,7 @@ export default function StagesView({
     try {
       await ProcedureSettingsApi.createStage({
         ...payload,
+        parent_id: parentId,
         work_flow_id: workFlowId,
       });
       await refetch();
@@ -308,6 +331,7 @@ export default function StagesView({
               startIcon={<AddIcon />}
               fullWidth
               onClick={() => setAddDialogOpen(true)}
+              disabled={!parentId || !workFlowId}
               sx={{ justifyContent: "flex-start", mt: 2 }}
             >
               {t("procedures.addProcedureName")}

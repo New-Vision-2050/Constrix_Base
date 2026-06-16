@@ -32,10 +32,8 @@ export interface TaskActionFormValues {
 
 interface AddTaskActionDialogProps {
   open: boolean;
-  mode: "add" | "edit";
   onClose: () => void;
   existingActions: { id: string; name: string }[];
-  initialValues?: Partial<TaskActionFormValues>;
   onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
 
@@ -47,22 +45,10 @@ const defaultValues: TaskActionFormValues = {
   appearAfter: "",
 };
 
-function normalizeFormConditions(
-  value: string[] | Record<string, boolean | number> | undefined,
-): Record<string, boolean | number> {
-  if (!value) return {};
-  if (Array.isArray(value)) {
-    return Object.fromEntries(value.map((key) => [key, true]));
-  }
-  return value;
-}
-
 export default function AddTaskActionDialog({
   open,
-  mode,
   onClose,
   existingActions,
-  initialValues,
   onSave,
 }: AddTaskActionDialogProps) {
   const t = useTranslations("hr-settings.proceduresSettings.taskActionDialog");
@@ -76,14 +62,10 @@ export default function AddTaskActionDialog({
 
   useEffect(() => {
     if (!open) return;
-    setForm({
-      ...defaultValues,
-      ...initialValues,
-      formConditions: normalizeFormConditions(initialValues?.formConditions),
-    });
+    setForm(defaultValues);
     setNameError("");
     setModelError("");
-  }, [open, initialValues]);
+  }, [open]);
 
   const { data: forms = [], isLoading: isFormsLoading } = useQuery({
     queryKey: ["internal_procedure_setting_forms", locale],
@@ -172,7 +154,7 @@ export default function AddTaskActionDialog({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ textAlign: "start", fontWeight: 700, pb: 1 }}>
-        {mode === "edit" ? t("editTitle") : t("title")}
+        {t("title")}
       </DialogTitle>
 
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>

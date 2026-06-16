@@ -10,6 +10,7 @@ import {
   UpdateInternalProcedureResponse,
   InternalProcedure,
   GetInternalProceduresResponse,
+  GetInternalProcedureResponse,
 } from "./types/response";
 import {
   CreateInternalProcedureArgs,
@@ -79,14 +80,14 @@ export const InternalProcedureSettingsApi = {
 
   /** Lists form conditions for the selected form. */
   getFormsConditions: async (
-    internalProcedureSettingFormId: string,
+    formType: string,
     locale = "ar",
   ): Promise<FormConditionOption[]> => {
     const response = await baseApi.get<GetFormsConditionsResponse>(
       "admin/forms_conditions",
       {
         params: {
-          internal_procedure_setting_form_id: internalProcedureSettingFormId,
+          type: formType,
         },
       },
     );
@@ -114,6 +115,15 @@ export const InternalProcedureSettingsApi = {
     return response.data?.payload ?? [];
   },
 
+  getInternalProcedure: async (
+    procedureSettingId: string,
+  ): Promise<InternalProcedure> => {
+    const response = await baseApi.get<GetInternalProcedureResponse>(
+      `procedure-settings/${procedureSettingId}`,
+    );
+    return response.data.payload;
+  },
+
   updateInternalProcedure: async (
     procedureSettingId: string,
     internalProcedureId: string,
@@ -124,5 +134,14 @@ export const InternalProcedureSettingsApi = {
       args,
     );
     return response.data.payload;
+  },
+
+  deleteInternalProcedure: async (
+    procedureSettingId: string,
+    internalProcedureId: string,
+  ): Promise<void> => {
+    await baseApi.delete(
+      `procedure-settings/${procedureSettingId}/internal-procedures/${internalProcedureId}`,
+    );
   },
 };
