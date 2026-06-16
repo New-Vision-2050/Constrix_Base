@@ -6,8 +6,10 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { serialize } from "object-to-formdata";
 import { DocumentT } from "../../../types/Directory";
 
+type TranslateFn = ReturnType<typeof useTranslations>;
+
 export function getCreateNewFileFormConfig(
-  t: ReturnType<typeof useTranslations>,
+  t: TranslateFn,
   onSuccessFn: () => void,
   editedDoc?: DocumentT,
   parentId?: string,
@@ -51,6 +53,23 @@ export function getCreateNewFileFormConfig(
             label: t("name"),
             type: "text",
             placeholder: t("namePlaceholder"),
+            required: true,
+            validation: [
+              {
+                type: "required" as const,
+                message: t("validation.nameRequired"),
+              },
+              {
+                type: "minLength" as const,
+                value: 2,
+                message: t("validation.nameMinLength"),
+              },
+              {
+                type: "maxLength" as const,
+                value: 255,
+                message: t("validation.nameMaxLength"),
+              },
+            ],
           },
           // reference_number
           {
@@ -58,6 +77,13 @@ export function getCreateNewFileFormConfig(
             label: t("reference_number"),
             type: "text",
             placeholder: t("reference_numberPlaceholder"),
+            validation: [
+              {
+                type: "maxLength" as const,
+                value: 100,
+                message: t("validation.referenceNumberMaxLength"),
+              },
+            ],
           },
           // parent_id
           {
@@ -80,6 +106,13 @@ export function getCreateNewFileFormConfig(
             label: t("createdAt"),
             type: "date",
             placeholder: t("createdAtPlaceholder"),
+            required: true,
+            validation: [
+              {
+                type: "required" as const,
+                message: t("validation.startDateRequired"),
+              },
+            ],
             maxDate: {
               formId: formId,
               field: "end_date",
@@ -91,6 +124,13 @@ export function getCreateNewFileFormConfig(
             label: t("endDate"),
             type: "date",
             placeholder: t("endDatePlaceholder"),
+            required: true,
+            validation: [
+              {
+                type: "required" as const,
+                message: t("validation.endDateRequired"),
+              },
+            ],
             minDate: {
               formId: formId,
               field: "start_date",
@@ -138,6 +178,15 @@ export function getCreateNewFileFormConfig(
             name: "file",
             label: t("file"),
             isMulti: false,
+            required: !isEdit,
+            validation: isEdit
+              ? []
+              : [
+                  {
+                    type: "required" as const,
+                    message: t("validation.fileRequired"),
+                  },
+                ],
             fileConfig: {
               showThumbnails: true,
               allowedFileTypes: [
