@@ -40,7 +40,7 @@ const OFFICE_EXTENSIONS = new Set([
 const CAD_EXTENSIONS = new Set(["dwg", "dxf", "dwf", "dwt"]);
 
 function getLicenseKey(): string {
-  return "VISIONDIMENSIONS:PWS:Vision Dimensions-ecom::B+2:7CE04C724CC5EB0A8D4EF8FF37431BF7906BFFB30002533C55AAEDD826BD";
+  return process.env.NEXT_PUBLIC_PDFTRON_LICENSE_KEY?.trim() ?? "";
 }
 
 function getExtensionFromFileName(name: string | undefined): string | undefined {
