@@ -818,7 +818,7 @@ export default function DeterminantDetailsTab({
     <div className="flex w-full min-w-0 flex-col gap-8">
       <DetailsSection title={t("sectionBasics")} actions={basicsToolbar}>
         <div
-          dir="rtl"
+
           className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2 md:items-start"
         >
           {showSkeletonRows ? (
@@ -849,7 +849,7 @@ export default function DeterminantDetailsTab({
                       alignItems: "center",
                     },
                     "& .MuiInputBase-input": {
-                      textAlign: "right",
+                      textAlign: "left",
                     },
                   }}
                 />
@@ -868,12 +868,12 @@ export default function DeterminantDetailsTab({
                       disabled={Boolean(constraintTypeOption)}
                     >
                       <SelectTrigger
-                        dir="rtl"
+
                         className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
                       >
                         <SelectValue placeholder={t("selectSystem")} />
                       </SelectTrigger>
-                      <SelectContent dir="rtl">
+                      <SelectContent >
                         {constraintTypeOption ? (
                           <SelectItem value={constraintTypeOption.code}>
                             {constraintTypeOption.name}
@@ -887,12 +887,12 @@ export default function DeterminantDetailsTab({
                 ) : (
                   <Select value={viewTypeSelectValue} disabled>
                     <SelectTrigger
-                      dir="rtl"
+
                       className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
                     >
                       <SelectValue placeholder={typeDisplayName} />
                     </SelectTrigger>
-                    <SelectContent dir="rtl">
+                    <SelectContent >
                       <SelectItem value={viewTypeSelectValue}>
                         {typeDisplayName}
                       </SelectItem>
@@ -944,12 +944,12 @@ export default function DeterminantDetailsTab({
                 ) : (
                   <Select value={branchText} disabled>
                     <SelectTrigger
-                      dir="rtl"
+
                       className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
                     >
                       <SelectValue placeholder={branchText} />
                     </SelectTrigger>
-                    <SelectContent dir="rtl">
+                    <SelectContent >
                       <SelectItem value={branchText}>{branchText}</SelectItem>
                     </SelectContent>
                   </Select>
@@ -962,7 +962,7 @@ export default function DeterminantDetailsTab({
 
       <DetailsSection title={t("sectionCountry")} actions={countryToolbar}>
         <div
-          dir="rtl"
+
           className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 md:items-start"
         >
           {showSkeletonRows ? (
