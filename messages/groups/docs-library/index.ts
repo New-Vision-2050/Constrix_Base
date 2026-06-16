@@ -47,6 +47,10 @@ export const docsLibraryMessages = new MessagesGroup({
     documentType: _m("Document Type", "نوع المستند"),
     type: _m("Type", "النوع"),
     endDate: _m("End Date", "تاريخ النهاية"),
+    all: _m("All", "الكل"),
+    name: _m("Name", "الاسم"),
+    referenceNumber: _m("Number", "الرقم"),
+    favorite: _m("Favorite", "المفضلة"),
   }),
   shareDialog: new MessagesGroup({
     title: _m("Share", ""),
@@ -218,6 +222,7 @@ export const docsLibraryMessages = new MessagesGroup({
     }),
     createNewFileDialog: new MessagesGroup({
       title: _m("Create New File", "إنشاء ملف جديد"),
+      editTitle: _m("Edit File", "تعديل الملف"),
       name: _m("Name", "اسم الملف"),
       namePlaceholder: _m("Enter name", "ادخل اسم الملف"),
       reference_number: _m("Reference Number", "رقم المرجع"),
@@ -240,6 +245,24 @@ export const docsLibraryMessages = new MessagesGroup({
       submitButtonText: _m("Save", "حفظ"),
       cancelButtonText: _m("Cancel", "الغاء"),
       resetButtonText: _m("Reset", "مسح"),
+      validation: new MessagesGroup({
+        nameRequired: _m("File name is required", "اسم الملف مطلوب"),
+        nameMinLength: _m(
+          "Name must be at least 2 characters",
+          "يجب أن يكون الاسم حرفين على الأقل",
+        ),
+        nameMaxLength: _m(
+          "Name must not exceed 255 characters",
+          "يجب ألا يتجاوز الاسم 255 حرفاً",
+        ),
+        referenceNumberMaxLength: _m(
+          "Reference number must not exceed 100 characters",
+          "يجب ألا يتجاوز رقم المرجع 100 حرفاً",
+        ),
+        fileRequired: _m("File attachment is required", "مرفق الملف مطلوب"),
+        startDateRequired: _m("Start date is required", "تاريخ البداية مطلوب"),
+        endDateRequired: _m("End date is required", "تاريخ الانتهاء مطلوب"),
+      }),
     }),
   }),
 });
