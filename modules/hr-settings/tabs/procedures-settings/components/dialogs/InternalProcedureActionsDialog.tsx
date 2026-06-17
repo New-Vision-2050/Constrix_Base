@@ -8,13 +8,14 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
 
 interface InternalProcedureActionsDialogProps {
   open: boolean;
   procedure: InternalProcedure | null;
   isDeleting?: boolean;
+  canDelete?: boolean;
   onClose: () => void;
   onEdit: (procedure: InternalProcedure) => void;
   onDelete: (procedure: InternalProcedure) => void;
@@ -24,11 +25,12 @@ export default function InternalProcedureActionsDialog({
   open,
   procedure,
   isDeleting = false,
+  canDelete = true,
   onClose,
   onEdit,
   onDelete,
 }: InternalProcedureActionsDialogProps) {
-  const t = useTranslations("hr-settings.proceduresSettings");
+  const { t } = useProceduresSettingsTranslations();
 
   if (!procedure) return null;
 
@@ -49,15 +51,17 @@ export default function InternalProcedureActionsDialog({
         >
           {t("actions.edit")}
         </Button>
-        <Button
-          onClick={() => onDelete(procedure)}
-          variant="contained"
-          color="error"
-          disabled={isDeleting}
-          sx={{ flex: 1 }}
-        >
-          {t("actions.delete")}
-        </Button>
+        {canDelete ? (
+          <Button
+            onClick={() => onDelete(procedure)}
+            variant="contained"
+            color="error"
+            disabled={isDeleting}
+            sx={{ flex: 1 }}
+          >
+            {t("actions.delete")}
+          </Button>
+        ) : null}
       </DialogActions>
     </Dialog>
   );

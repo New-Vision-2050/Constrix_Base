@@ -1,7 +1,6 @@
 import type { CreateInternalProcedureArgs } from "@/services/api/hr-settings/internal-procedure-settings/types/args";
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
-import type { TaskActionFormValues } from "../components/dialogs/AddTaskActionDialog";
-import { INTERNAL_PROCEDURE_TYPE } from "../components/dialogs/AddTaskActionDialog";
+import type { TaskActionFormValues } from "../types";
 
 /** Maps snake_case condition keys to API PascalCase (e.g. apply_to_all_branches → ApplyToAllBranches). */
 export function toApiConditionKey(key: string): string {
@@ -33,6 +32,7 @@ function mapTaskActionConditions(
 function buildInternalProcedurePayload(
   values: TaskActionFormValues,
   options: {
+    procedureType: string;
     sortOrder: number;
     parentId?: string | null;
     isActive?: boolean;
@@ -40,7 +40,7 @@ function buildInternalProcedurePayload(
 ): CreateInternalProcedureArgs {
   return {
     name: values.name.trim(),
-    type: INTERNAL_PROCEDURE_TYPE,
+    type: options.procedureType,
     form: values.modelId,
     parent_id: options.parentId ?? null,
     conditions: mapTaskActionConditions(values.formConditions),
@@ -53,7 +53,11 @@ function buildInternalProcedurePayload(
 
 export function mapTaskActionToCreateInternalProcedure(
   values: TaskActionFormValues,
-  options: { sortOrder: number; parentId?: string | null },
+  options: {
+    procedureType: string;
+    sortOrder: number;
+    parentId?: string | null;
+  },
 ): CreateInternalProcedureArgs {
   return buildInternalProcedurePayload(values, options);
 }
@@ -61,6 +65,7 @@ export function mapTaskActionToCreateInternalProcedure(
 export function mapTaskActionToUpdateInternalProcedure(
   values: TaskActionFormValues,
   options: {
+    procedureType: string;
     sortOrder: number;
     parentId?: string | null;
     isActive?: boolean;
@@ -73,4 +78,34 @@ export function resolveProcedureSettingId(
   procedure: Pick<InternalProcedure, "id" | "parent_id">,
 ): string {
   return procedure.parent_id ?? procedure.id;
+}
+
+/** The first internal procedure (lowest sort_order child, or root if none). */
+export function getPrimaryInternalProcedure(
+  procedures: InternalProcedure[],
+): InternalProcedure | null {
+  if (!procedures.length) return null;
+
+  const root = procedures.find((procedure) => !procedure.parent_id) ?? null;
+  const children = root
+    ? procedures.filter((procedure) => procedure.parent_id === root.id)
+    : procedures.filter((procedure) => !!procedure.parent_id);
+
+  if (children.length > 0) {
+    return [...children].sort(
+      (a, b) =>
+        (a.sort_order ?? Number.MAX_SAFE_INTEGER) -
+        (b.sort_order ?? Number.MAX_SAFE_INTEGER),
+    )[0];
+  }
+
+  return root;
+}
+
+export function isPrimaryInternalProcedure(
+  procedure: InternalProcedure,
+  procedures: InternalProcedure[],
+): boolean {
+  const primary = getPrimaryInternalProcedure(procedures);
+  return !!primary && primary.id === procedure.id;
 }

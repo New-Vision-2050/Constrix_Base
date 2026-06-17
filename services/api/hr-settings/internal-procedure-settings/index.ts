@@ -16,6 +16,7 @@ import {
   CreateInternalProcedureArgs,
   UpdateInternalProcedureArgs,
 } from "./types/args";
+import { normalizeInternalProcedure } from "./normalize";
 
 function resolveLabel(
   item: { label_ar?: string; label_en?: string; name?: string },
@@ -121,7 +122,11 @@ export const InternalProcedureSettingsApi = {
     const response = await baseApi.get<GetInternalProcedureResponse>(
       `procedure-settings/${procedureSettingId}`,
     );
-    return response.data.payload;
+    const payload = response.data?.payload;
+    if (!payload || typeof payload !== "object") {
+      throw new Error("Invalid internal procedure response");
+    }
+    return normalizeInternalProcedure(payload as unknown as Record<string, unknown>);
   },
 
   updateInternalProcedure: async (

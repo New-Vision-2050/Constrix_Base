@@ -1514,7 +1514,7 @@ export default function StepCard({
                       color="text.secondary"
                       sx={{ mt: 0.5, display: "block", textAlign: "end" }}
                     >
-                      الجهة المصعد إليها محول الاعتماد
+                      {ts("escalationEntitySelectedHint")}
                     </Typography>
                   )}
                 </>

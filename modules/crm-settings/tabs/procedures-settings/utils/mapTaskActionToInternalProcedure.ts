@@ -70,3 +70,8 @@ export function resolveProcedureSettingId(
 ): string {
   return procedure.parent_id ?? procedure.id;
 }
+
+export {
+  getPrimaryInternalProcedure,
+  isPrimaryInternalProcedure,
+} from "@/modules/hr-settings/tabs/procedures-settings/utils/mapTaskActionToInternalProcedure";
