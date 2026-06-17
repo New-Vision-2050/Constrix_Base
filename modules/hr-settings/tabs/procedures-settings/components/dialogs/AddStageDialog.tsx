@@ -15,7 +15,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
 import { useQuery } from "@tanstack/react-query";
 import { baseURL } from "@/config/axios-config";
 import IconPicker from "@/components/shared/icon-picker";
@@ -63,11 +63,9 @@ export default function AddStageDialog({
   open,
   onClose,
   onSuccess,
-  currentTabType = "employee_task_request",
+  currentTabType,
 }: AddStageDialogProps) {
-  const t = useTranslations("hr-settings.proceduresSettings.stages");
-  const tRoot = useTranslations("hr-settings.proceduresSettings");
-  const tc = useTranslations("hr-settings.proceduresSettings.common");
+  const { t: tRoot, tStages: t, tc } = useProceduresSettingsTranslations();
 
   const [name, setName] = useState("");
   const [sequentialApproval, setSequentialApproval] = useState(true);

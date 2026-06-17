@@ -1,6 +1,20 @@
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
-import type { TaskActionFormValues } from "../components/dialogs/AddTaskActionDialog";
+import { normalizeInternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/normalize";
+import type { TaskActionFormValues } from "../types";
 import { fromApiConditionKey } from "./mapTaskActionToInternalProcedure";
+
+function coerceConditionValue(value: unknown): boolean | number | undefined {
+  if (typeof value === "boolean" || typeof value === "number") return value;
+  if (typeof value === "string") {
+    if (value === "true") return true;
+    if (value === "false") return false;
+    const parsed = parseInt(value, 10);
+    if (!Number.isNaN(parsed) && String(parsed) === value.trim()) {
+      return parsed;
+    }
+  }
+  return undefined;
+}
 
 function findConditionValue(
   conditions: Record<string, boolean | number>,
@@ -46,15 +60,19 @@ function normalizeProcedureConditionsToForm(
 
   if (Array.isArray(conditions)) {
     conditions.forEach((condition) => {
-      formConditions[fromApiConditionKey(condition.key)] = condition.value;
+      const coerced = coerceConditionValue(condition.value);
+      if (coerced !== undefined) {
+        formConditions[fromApiConditionKey(condition.key)] = coerced;
+      }
     });
     return formConditions;
   }
 
   if (typeof conditions === "object") {
     Object.entries(conditions).forEach(([key, value]) => {
-      if (typeof value === "boolean" || typeof value === "number") {
-        formConditions[fromApiConditionKey(key)] = value;
+      const coerced = coerceConditionValue(value);
+      if (coerced !== undefined) {
+        formConditions[fromApiConditionKey(key)] = coerced;
       }
     });
   }
@@ -63,13 +81,15 @@ function normalizeProcedureConditionsToForm(
 }
 
 export function mapInternalProcedureToFormValues(
-  procedure: InternalProcedure,
+  procedure: InternalProcedure | Record<string, unknown>,
 ): TaskActionFormValues {
+  const normalized = normalizeInternalProcedure(procedure);
+
   return {
-    name: procedure.name,
-    modelId: procedure.form,
-    formConditions: normalizeProcedureConditionsToForm(procedure.conditions),
-    appearBefore: procedure.appears_before_id ?? "",
-    appearAfter: procedure.appears_after_id ?? "",
+    name: normalized.name,
+    modelId: normalized.form,
+    formConditions: normalizeProcedureConditionsToForm(normalized.conditions),
+    appearBefore: normalized.appears_before_id ?? "",
+    appearAfter: normalized.appears_after_id ?? "",
   };
 }

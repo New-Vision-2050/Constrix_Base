@@ -3,8 +3,13 @@
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
   IconButton,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -15,13 +20,16 @@ import {
   useEffect,
   useMemo,
   useImperativeHandle,
+  useCallback,
 } from "react";
 import { useTranslations } from "next-intl";
+import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import CustomMenu from "@/components/headless/custom-menu";
 import AddStageDialog from "./dialogs/AddStageDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
-import HrStepCard from "./HrStepCard";
+import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { getProcedureSettingsTabTitle } from "../utils/getProcedureTabTitle";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
@@ -44,10 +52,11 @@ export interface StagesViewRef {
 }
 
 const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesView(
-  { parentId, currentTabType = "employee_task", branchId, workFlowId: workFlowIdProp },
+  { parentId, currentTabType, branchId, workFlowId: workFlowIdProp },
   ref,
 ) {
-  const t = useTranslations("hr-settings.proceduresSettings");
+  const { t } = useProceduresSettingsTranslations();
+  const tConfirm = useTranslations("common.deleteConfirmation");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -95,6 +104,9 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [procedureToEdit, setProcedureToEdit] = useState<Stage | null>(null);
+  const [procedureToDelete, setProcedureToDelete] = useState<Stage | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeletingProcedure, setIsDeletingProcedure] = useState(false);
   const [draftStepKeys, setDraftStepKeys] = useState<Record<string, string[]>>(
     {},
   );
@@ -220,6 +232,54 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
     }
   };
 
+  const closeDeleteConfirm = useCallback(() => {
+    setDeleteConfirmOpen(false);
+    setProcedureToDelete(null);
+  }, []);
+
+  const handleDeleteProcedure = useCallback(
+    async (procedure: Stage) => {
+      setIsDeletingProcedure(true);
+      try {
+        await ProcedureSettingsApi.deleteStage(procedure.id);
+        setDraftStepKeys((prev) => {
+          const next = { ...prev };
+          delete next[procedure.id];
+          return next;
+        });
+        queryClient.removeQueries({
+          queryKey: ["procedure-steps", procedure.id],
+        });
+        if (selectedProcedureId === procedure.id) {
+          setSelectedProcedureId(null);
+        }
+        closeDeleteConfirm();
+        await refetch();
+        toast({
+          title: t("actions.delete"),
+          description: t("messages.procedureDeleted"),
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error deleting procedure:", error);
+        toast({
+          title: t("actions.delete"),
+          description: t("messages.error"),
+          variant: "destructive",
+        });
+      } finally {
+        setIsDeletingProcedure(false);
+      }
+    },
+    [closeDeleteConfirm, queryClient, refetch, selectedProcedureId, t, toast],
+  );
+
+  const confirmDeleteProcedure = useCallback(() => {
+    if (procedureToDelete) {
+      void handleDeleteProcedure(procedureToDelete);
+    }
+  }, [procedureToDelete, handleDeleteProcedure]);
+
   const getIconComponent = (iconName: string) => {
     const matchedIcon = APP_ICONS.find((icon) => icon.id === iconName);
     if (matchedIcon) {
@@ -290,18 +350,43 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
                   <Typography variant="subtitle2" fontWeight={500}>
                     {procedure.name}
                   </Typography>
-                  <IconButton
-                    size="small"
-                    sx={{ ml: "auto" }}
-                    aria-label={t("stages.editStage")}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setProcedureToEdit(procedure);
-                      setEditDialogOpen(true);
-                    }}
+                  <CustomMenu
+                    renderAnchor={({ onClick }) => (
+                      <IconButton
+                        size="small"
+                        sx={{ ml: "auto" }}
+                        aria-label={t("stages.editStage")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onClick(e);
+                        }}
+                      >
+                        <Settings sx={{ fontSize: 24 }} />
+                      </IconButton>
+                    )}
                   >
-                    <Settings sx={{ fontSize: 24 }} />
-                  </IconButton>
+                    <MenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProcedureToEdit(procedure);
+                        setEditDialogOpen(true);
+                      }}
+                    >
+                      <Edit fontSize="small" sx={{ mr: 1 }} />
+                      {t("actions.edit")}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProcedureToDelete(procedure);
+                        setDeleteConfirmOpen(true);
+                      }}
+                      sx={{ color: "error.main" }}
+                    >
+                      <Delete fontSize="small" sx={{ mr: 1 }} />
+                      {t("actions.delete")}
+                    </MenuItem>
+                  </CustomMenu>
                 </Box>
               </Box>
             ))}
@@ -323,7 +408,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
         <Grid size={9}>
           <Box className="space-y-4">
             {pendingDraftKeys.map((draftKey, index) => (
-              <HrStepCard
+              <StepCard
                 key={`pending-${draftKey}`}
                 procedureSettingId={selectedProcedureId ?? ""}
                 serverStep={null}
@@ -345,7 +430,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
               />
             ))}
             {serverSteps.map((step, index) => (
-              <HrStepCard
+              <StepCard
                 key={`server-${step.id}`}
                 procedureSettingId={selectedProcedureId!}
                 serverStep={step}
@@ -357,7 +442,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
               />
             ))}
             {currentDraftKeys.map((draftKey, index) => (
-              <HrStepCard
+              <StepCard
                 key={`draft-${draftKey}`}
                 procedureSettingId={selectedProcedureId!}
                 serverStep={null}
@@ -407,6 +492,41 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
           }
         }}
       />
+
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={closeDeleteConfirm}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: "start" }}>
+          {t("actions.delete")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {tConfirm("defaultMessage")}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1.5 }}>
+          <Button
+            onClick={closeDeleteConfirm}
+            variant="outlined"
+            disabled={isDeletingProcedure}
+            sx={{ flex: 1 }}
+          >
+            {t("actions.cancel")}
+          </Button>
+          <Button
+            onClick={confirmDeleteProcedure}
+            variant="contained"
+            color="error"
+            disabled={isDeletingProcedure}
+            sx={{ flex: 1 }}
+          >
+            {t("actions.delete")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 });

@@ -326,7 +326,7 @@ export default function AddStageDialog({
                 label={t("escalationEntity")}
               />
               <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
-                الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة
+                {t("escalationEntityHint")}
               </FormHelperText>
             </Box>
           </Box>

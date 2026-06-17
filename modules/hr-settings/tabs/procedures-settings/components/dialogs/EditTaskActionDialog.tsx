@@ -13,7 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
+import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
 import { useQuery } from "@tanstack/react-query";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
@@ -22,6 +23,7 @@ import {
   alignFormConditionsToOptionKeys,
   mapInternalProcedureToFormValues,
 } from "../../utils/mapInternalProcedureToFormValues";
+import { normalizeInternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/normalize";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
 import type { TaskActionFormValues } from "./AddTaskActionDialog";
 
@@ -30,6 +32,7 @@ interface EditTaskActionDialogProps {
   onClose: () => void;
   procedure: InternalProcedure | null;
   existingActions: { id: string; name: string }[];
+  lockFormModel?: boolean;
   onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
 
@@ -46,10 +49,10 @@ export default function EditTaskActionDialog({
   onClose,
   procedure,
   existingActions,
+  lockFormModel = false,
   onSave,
 }: EditTaskActionDialogProps) {
-  const t = useTranslations("hr-settings.proceduresSettings.taskActionDialog");
-  const tc = useTranslations("hr-settings.proceduresSettings.common");
+  const { tTaskAction: t, tc } = useProceduresSettingsTranslations();
   const locale = useLocale();
 
   const [form, setForm] = useState<TaskActionFormValues>(defaultValues);
@@ -58,6 +61,12 @@ export default function EditTaskActionDialog({
   const [isSaving, setIsSaving] = useState(false);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
   const conditionsAlignedRef = useRef(false);
+  const lockedFormFieldsRef = useRef<
+    Pick<TaskActionFormValues, "modelId" | "formConditions">
+  >({
+    modelId: "",
+    formConditions: {},
+  });
 
   const procedureSettingId = procedure?.id;
 
@@ -65,11 +74,13 @@ export default function EditTaskActionDialog({
     data: fetchedProcedure,
     isLoading: isProcedureLoading,
     isError: isProcedureError,
+    isFetching: isProcedureFetching,
   } = useQuery({
     queryKey: ["internal-procedure", procedureSettingId],
     queryFn: () =>
       InternalProcedureSettingsApi.getInternalProcedure(procedureSettingId!),
     enabled: open && !!procedureSettingId,
+    placeholderData: procedure ?? undefined,
   });
 
   const { data: forms = [], isLoading: isFormsLoading } = useQuery({
@@ -96,6 +107,14 @@ export default function EditTaskActionDialog({
     [forms],
   );
 
+  const modelDisplayLabel = useMemo(() => {
+    if (!lockFormModel || !form.modelId) return undefined;
+    return (
+      modelOptions.find((option) => option.value === form.modelId)?.label ??
+      form.modelId
+    );
+  }, [lockFormModel, form.modelId, modelOptions]);
+
   const actionOrderOptions = useMemo(
     () =>
       withEmptyOption(
@@ -115,21 +134,29 @@ export default function EditTaskActionDialog({
       setModelError("");
       setIsFormInitialized(false);
       conditionsAlignedRef.current = false;
+      return;
     }
-  }, [open]);
 
-  useEffect(() => {
-    if (!open || !fetchedProcedure || isFormInitialized) return;
+    if (!procedure) return;
 
-    const initialValues = mapInternalProcedureToFormValues(fetchedProcedure);
+    const source = fetchedProcedure ?? normalizeInternalProcedure(procedure);
+    const initialValues = mapInternalProcedureToFormValues(source);
+
     setForm({
       ...defaultValues,
       ...initialValues,
     });
+    if (lockFormModel) {
+      lockedFormFieldsRef.current = {
+        modelId: initialValues.modelId,
+        formConditions: { ...initialValues.formConditions },
+      };
+    }
     setNameError("");
     setModelError("");
+    conditionsAlignedRef.current = false;
     setIsFormInitialized(true);
-  }, [open, fetchedProcedure, isFormInitialized]);
+  }, [open, procedure, fetchedProcedure, lockFormModel]);
 
   useEffect(() => {
     if (
@@ -141,15 +168,32 @@ export default function EditTaskActionDialog({
       return;
     }
 
-    setForm((prev) => ({
-      ...prev,
-      formConditions: alignFormConditionsToOptionKeys(
+    setForm((prev) => {
+      const alignedConditions = alignFormConditionsToOptionKeys(
         prev.formConditions,
         formConditionOptions.map((condition) => condition.key),
-      ),
-    }));
+      );
+
+      if (lockFormModel) {
+        lockedFormFieldsRef.current = {
+          modelId: prev.modelId,
+          formConditions: alignedConditions,
+        };
+      }
+
+      return {
+        ...prev,
+        formConditions: alignedConditions,
+      };
+    });
     conditionsAlignedRef.current = true;
-  }, [isFormInitialized, isConditionsLoading, form.modelId, formConditionOptions]);
+  }, [
+    isFormInitialized,
+    isConditionsLoading,
+    form.modelId,
+    formConditionOptions,
+    lockFormModel,
+  ]);
 
   const toggleBoolFormCondition = (conditionKey: string) => {
     setForm((prev) => {
@@ -189,9 +233,16 @@ export default function EditTaskActionDialog({
     }
     setIsSaving(true);
     try {
+      const lockedFields = lockFormModel ? lockedFormFieldsRef.current : null;
       await onSave({
         ...form,
         name: form.name.trim(),
+        ...(lockedFields
+          ? {
+              modelId: lockedFields.modelId,
+              formConditions: lockedFields.formConditions,
+            }
+          : {}),
       });
       onClose();
     } finally {
@@ -200,8 +251,13 @@ export default function EditTaskActionDialog({
   };
 
   const isLoading =
-    isProcedureLoading || isFormsLoading || (isFormInitialized && isConditionsLoading);
-  const isFormReady = isFormInitialized && !isConditionsLoading;
+    isProcedureLoading ||
+    isProcedureFetching ||
+    isFormsLoading ||
+    !isFormInitialized ||
+    (!!form.modelId && isConditionsLoading);
+  const isFormReady =
+    isFormInitialized && (!form.modelId || !isConditionsLoading);
 
   if (!procedure) return null;
 
@@ -212,11 +268,11 @@ export default function EditTaskActionDialog({
       </DialogTitle>
 
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>
-        {isProcedureLoading ? (
+        {isProcedureLoading && !isFormInitialized ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <CircularProgress size={28} />
           </Box>
-        ) : isProcedureError ? (
+        ) : isProcedureError && !procedure ? (
           <Typography variant="body2" color="error">
             {tc("noResults")}
           </Typography>
@@ -259,7 +315,10 @@ export default function EditTaskActionDialog({
               noResultsText={tc("noResults")}
               label={t("modelsLabel")}
               required
-              disabled={!isFormReady || isFormsLoading || isSaving}
+              disabled={
+                !isFormReady || isFormsLoading || isSaving || lockFormModel
+              }
+              displayLabel={lockFormModel ? modelDisplayLabel : undefined}
               searchable={false}
               error={modelError}
             />
@@ -307,7 +366,7 @@ export default function EditTaskActionDialog({
                             }
                             inputProps={{ min: 0, step: 1 }}
                             sx={{ width: 120 }}
-                            disabled={isSaving}
+                            disabled={isSaving || lockFormModel}
                           />
                         </Box>
                       );
@@ -330,7 +389,7 @@ export default function EditTaskActionDialog({
                             checked={!!form.formConditions[conditionKey]}
                             onChange={() => toggleBoolFormCondition(conditionKey)}
                             size="small"
-                            disabled={isSaving}
+                            disabled={isSaving || lockFormModel}
                           />
                         }
                       />

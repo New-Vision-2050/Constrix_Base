@@ -13,22 +13,20 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
+import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
+import type { TaskActionFormValues } from "../../types";
 
+export type { TaskActionFormValues };
+
+/** @deprecated Pass `outerTabs` to `ProceduresSettingsView` instead. */
 export const INTERNAL_PROCEDURE_TYPE = "employee_task" as const;
+/** @deprecated Pass `outerTabs` to `ProceduresSettingsView` instead. */
 export const INTERNAL_PROCEDURES_QUERY_TYPE = "employee_task" as const;
-
-export interface TaskActionFormValues {
-  name: string;
-  modelId: string;
-  formConditions: Record<string, boolean | number>;
-  appearBefore: string;
-  appearAfter: string;
-}
 
 interface AddTaskActionDialogProps {
   open: boolean;
@@ -51,8 +49,7 @@ export default function AddTaskActionDialog({
   existingActions,
   onSave,
 }: AddTaskActionDialogProps) {
-  const t = useTranslations("hr-settings.proceduresSettings.taskActionDialog");
-  const tc = useTranslations("hr-settings.proceduresSettings.common");
+  const { tTaskAction: t, tc } = useProceduresSettingsTranslations();
   const locale = useLocale();
 
   const [form, setForm] = useState<TaskActionFormValues>(defaultValues);

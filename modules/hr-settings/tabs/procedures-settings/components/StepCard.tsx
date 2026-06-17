@@ -15,7 +15,7 @@ import {
 import { Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useTranslations } from "next-intl";
+import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useAllEmployees } from "@/modules/hr-settings/tabs/procedures-settings/hooks/useAllEmployees";
@@ -273,9 +273,7 @@ export default function StepCard({
   onSaved,
   onDelete,
 }: StepCardProps) {
-  const t = useTranslations("hr-settings.proceduresSettings");
-  const ts = useTranslations("hr-settings.proceduresSettings.stepCard");
-  const tc = useTranslations("hr-settings.proceduresSettings.common");
+  const { t, tStepCard: ts, tc } = useProceduresSettingsTranslations();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(!serverStep);
