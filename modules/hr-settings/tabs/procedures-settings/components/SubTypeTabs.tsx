@@ -216,20 +216,6 @@ export default function SubTypeTabs() {
       if (isPrimaryInternalProcedure(procedure, internalProcedures)) {
         return;
       }
-    },
-    [
-      refetchInternalProcedures,
-      queryClient,
-      selectedProcedureId,
-      closeProcedureActionsDialog,
-      t,
-      toast,
-    ],
-  );
-
-  const handleEditTaskAction = useCallback(
-    async (values: TaskActionFormValues) => {
-      if (!editingProcedure) return;
 
       setIsDeletingProcedure(true);
       try {
