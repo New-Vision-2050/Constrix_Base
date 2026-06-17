@@ -89,6 +89,10 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "Select escalation entity",
       "اختر الجهة المصعد إليها",
     ),
+    escalationEntityHint: _m(
+      "The escalation entity is the accreditation routing source after 18 hours",
+      "الجهة المصعد اليها المصدر الاعتماد محول الاعتماد 18 ساعة",
+    ),
   }),
   procedures: new MessagesGroup({
     title: _m("Procedures", "الإجراءات"),
@@ -168,6 +172,10 @@ export const proceduresSettingsMessages = new MessagesGroup({
     selectEscalationEntity: _m(
       "Select escalation entity",
       "اختر الجهة المصعد إليها",
+    ),
+    escalationEntitySelectedHint: _m(
+      "Escalation entity accreditation routing",
+      "الجهة المصعد إليها محول الاعتماد",
     ),
     options: new MessagesGroup({
       orgBase: new MessagesGroup({
@@ -253,5 +261,21 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "تم حذف الإجراء بنجاح",
     ),
     error: _m("Something went wrong", "حدث خطأ ما"),
+  }),
+  taskActionDialog: new MessagesGroup({
+    title: _m("Action details", "تفاصيل الاجراء"),
+    editTitle: _m("Edit action", "تعديل الاجراء"),
+    actionName: _m("Action name", "اسم الاجراء"),
+    actionNamePlaceholder: _m("Enter action name", "ادخل اسم الاجراء"),
+    modelsLabel: _m("Models", "النماذج"),
+    selectModels: _m("Select models", "اختيار النماذج"),
+    formConditions: _m("Form conditions", "شروط النماذج"),
+    actionOrder: _m("Action order", "ترتيب الاجراء"),
+    appearBefore: _m("Appears before", "يظهر قبل"),
+    appearAfter: _m("Appears after", "يظهر بعد"),
+    selectAction: _m("Select action", "اختيار الاجراء"),
+    loadingConditions: _m("Loading conditions...", "جاري تحميل الشروط..."),
+    noConditions: _m("No conditions for this form", "لا توجد شروط لهذا النموذج"),
+    save: _m("Save", "حفظ"),
   }),
 });

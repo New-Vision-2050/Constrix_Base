@@ -287,7 +287,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
       <div className="space-y-4">
         <div className="mb-4">
           <Typography variant="h6" fontWeight={500}>
-            {t("procedures.title") || "Procedures"}
+            {t("procedures.title")}
           </Typography>
         </div>
         <TableContainer sx={{ backgroundColor: "transparent" }}>
@@ -327,7 +327,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
                       displayEmpty
                       sx={{ minWidth: 150 }}
                     >
-                      <MenuItem value="">اختر اسم الموظف</MenuItem>
+                      <MenuItem value="">{t("steps.selectEmployee")}</MenuItem>
                       {employeesData.map((employee) => (
                         <MenuItem key={employee.id} value={employee.id}>
                           {employee.name}

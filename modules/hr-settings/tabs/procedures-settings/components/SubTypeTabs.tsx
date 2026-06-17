@@ -2,19 +2,26 @@
 
 import {
   Box,
+  Button,
   Checkbox,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
+  MenuItem,
   Paper,
   Tab,
   Tabs,
   Typography,
 } from "@mui/material";
-import { Settings } from "@mui/icons-material";
+import { Delete, Edit, Settings } from "@mui/icons-material";
 import { PlusIcon } from "lucide-react";
 import { useState, useMemo, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import CustomMenu from "@/components/headless/custom-menu";
 import {
   fetchManagementHierarchyOptions,
   type ManagementHierarchyOption,
@@ -25,45 +32,31 @@ import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/interna
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
 import { GetStagesResponse } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import { useProceduresSettings } from "../context/ProceduresSettingsContext";
+import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
 import {
   mapTaskActionToCreateInternalProcedure,
   mapTaskActionToUpdateInternalProcedure,
   resolveProcedureSettingId,
+  isPrimaryInternalProcedure,
 } from "../utils/mapTaskActionToInternalProcedure";
+import type { TaskActionFormValues } from "../types";
 import StagesView, { type StagesViewRef } from "./StagesView";
-import AddTaskActionDialog, {
-  INTERNAL_PROCEDURE_TYPE,
-  INTERNAL_PROCEDURES_QUERY_TYPE,
-  type TaskActionFormValues,
-} from "./dialogs/AddTaskActionDialog";
+import AddTaskActionDialog from "./dialogs/AddTaskActionDialog";
 import EditTaskActionDialog from "./dialogs/EditTaskActionDialog";
-import InternalProcedureActionsDialog from "./dialogs/InternalProcedureActionsDialog";
-
-interface OuterTab {
-  id: number;
-  name: string;
-  type: string;
-}
-
-const DEFAULT_OUTER_TABS: OuterTab[] = [
-  {
-    id: 0,
-    name: "workTasks",
-    type: INTERNAL_PROCEDURE_TYPE,
-  },
-];
 
 const WORK_PLAN_TAB = "work_plan";
 
 export default function SubTypeTabs() {
-  const t = useTranslations("hr-settings.proceduresSettings");
-  const ts = useTranslations("hr-settings.proceduresSettings.subTabs");
+  const { outerTabs } = useProceduresSettings();
+  const { t, ts } = useProceduresSettingsTranslations();
+  const tConfirm = useTranslations("common.deleteConfirmation");
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const stagesViewRef = useRef<StagesViewRef>(null);
 
-  const [outerTabs] = useState<OuterTab[]>(DEFAULT_OUTER_TABS);
-  const [selectedOuter] = useState<number>(0);
+  const defaultOuterTabId = outerTabs[0]?.id ?? 0;
+  const [selectedOuter, setSelectedOuter] = useState<number>(defaultOuterTabId);
   const [selectedProcedureId, setSelectedProcedureId] = useState<string | null>(
     null,
   );
@@ -74,28 +67,25 @@ export default function SubTypeTabs() {
     useState(false);
   const [editingProcedure, setEditingProcedure] =
     useState<InternalProcedure | null>(null);
-  const [actionsDialogOpen, setActionsDialogOpen] = useState(false);
-  const [actionsDialogProcedure, setActionsDialogProcedure] =
+  const [procedureToDelete, setProcedureToDelete] =
     useState<InternalProcedure | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [isDeletingProcedure, setIsDeletingProcedure] = useState(false);
 
-  const activeOuterTab = outerTabs.find((tab) => tab.id === selectedOuter);
+  const activeOuterTab =
+    outerTabs.find((tab) => tab.id === selectedOuter) ?? outerTabs[0];
 
-  const resolveTabLabel = useCallback(
-    (tab: OuterTab) => (tab.name === "workTasks" ? ts("workTasks") : tab.name),
-    [ts],
-  );
+  const currentTabType = activeOuterTab?.type ?? outerTabs[0]?.type ?? "";
 
   const {
     data: internalProcedures = [],
     isLoading: isLoadingInternalProcedures,
     refetch: refetchInternalProcedures,
   } = useQuery({
-    queryKey: ["internal-procedures", INTERNAL_PROCEDURES_QUERY_TYPE],
+    queryKey: ["internal-procedures", currentTabType],
     queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedures(
-        INTERNAL_PROCEDURES_QUERY_TYPE,
-      ),
+      InternalProcedureSettingsApi.getInternalProcedures(currentTabType),
+    enabled: !!currentTabType,
   });
 
   const rootProcedure = useMemo(
@@ -139,7 +129,7 @@ export default function SubTypeTabs() {
       queryFn: async () => {
         const response = await ProcedureSettingsApi.getStages({
           parentId: stagesParentId!,
-          type: INTERNAL_PROCEDURE_TYPE,
+          type: currentTabType,
         });
         return response.data;
       },
@@ -184,7 +174,7 @@ export default function SubTypeTabs() {
       await ProcedureSettingsApi.updateWorkFlow(
         Number(branchId),
         checked,
-        INTERNAL_PROCEDURE_TYPE,
+        currentTabType,
       );
       await refetchWorkflow();
       await queryClient.invalidateQueries({
@@ -216,29 +206,17 @@ export default function SubTypeTabs() {
     [],
   );
 
-  const openProcedureActionsDialog = useCallback(
-    (procedure: InternalProcedure) => {
-      setActionsDialogProcedure(procedure);
-      setActionsDialogOpen(true);
-    },
-    [],
-  );
-
-  const closeProcedureActionsDialog = useCallback(() => {
-    setActionsDialogOpen(false);
-    setActionsDialogProcedure(null);
+  const closeDeleteConfirm = useCallback(() => {
+    setDeleteConfirmOpen(false);
+    setProcedureToDelete(null);
   }, []);
-
-  const handleActionsEdit = useCallback(
-    (procedure: InternalProcedure) => {
-      closeProcedureActionsDialog();
-      openEditProcedureDialog(procedure);
-    },
-    [closeProcedureActionsDialog, openEditProcedureDialog],
-  );
 
   const handleDeleteProcedure = useCallback(
     async (procedure: InternalProcedure) => {
+      if (isPrimaryInternalProcedure(procedure, internalProcedures)) {
+        return;
+      }
+
       setIsDeletingProcedure(true);
       try {
         const procedureSettingId = resolveProcedureSettingId(procedure);
@@ -256,7 +234,7 @@ export default function SubTypeTabs() {
           setSelectedProcedureId(null);
         }
 
-        closeProcedureActionsDialog();
+        closeDeleteConfirm();
 
         toast({
           title: t("actions.delete"),
@@ -278,11 +256,18 @@ export default function SubTypeTabs() {
       refetchInternalProcedures,
       queryClient,
       selectedProcedureId,
-      closeProcedureActionsDialog,
+      internalProcedures,
+      closeDeleteConfirm,
       t,
       toast,
     ],
   );
+
+  const confirmDeleteProcedure = useCallback(() => {
+    if (procedureToDelete) {
+      void handleDeleteProcedure(procedureToDelete);
+    }
+  }, [procedureToDelete, handleDeleteProcedure]);
 
   const handleEditTaskAction = useCallback(
     async (values: TaskActionFormValues) => {
@@ -294,6 +279,7 @@ export default function SubTypeTabs() {
           procedureSettingId,
           editingProcedure.id,
           mapTaskActionToUpdateInternalProcedure(values, {
+            procedureType: currentTabType,
             sortOrder: editingProcedure.sort_order ?? 1,
             parentId: editingProcedure.parent_id ?? null,
             isActive: editingProcedure.is_active ?? true,
@@ -320,7 +306,7 @@ export default function SubTypeTabs() {
         throw error;
       }
     },
-    [editingProcedure, refetchInternalProcedures, queryClient, t, toast],
+    [editingProcedure, currentTabType, refetchInternalProcedures, queryClient, t, toast],
   );
 
   const handleAddTaskAction = useCallback(
@@ -330,6 +316,7 @@ export default function SubTypeTabs() {
         const created =
           await InternalProcedureSettingsApi.createInternalProcedure(
             mapTaskActionToCreateInternalProcedure(values, {
+              procedureType: currentTabType,
               sortOrder,
               parentId: rootProcedure?.id ?? null,
             }),
@@ -360,6 +347,7 @@ export default function SubTypeTabs() {
     },
     [
       childProcedures.length,
+      currentTabType,
       rootProcedure?.id,
       refetchInternalProcedures,
       queryClient,
@@ -378,7 +366,13 @@ export default function SubTypeTabs() {
   const renderProcedureChip = (
     procedure: InternalProcedure,
     onSelect: () => void,
-  ) => (
+  ) => {
+    const isProtected = isPrimaryInternalProcedure(
+      procedure,
+      internalProcedures,
+    );
+
+    return (
     <Box
       sx={{
         display: "flex",
@@ -397,32 +391,63 @@ export default function SubTypeTabs() {
       <Typography variant="subtitle1" fontWeight={600}>
         {procedure.name}
       </Typography>
-      <IconButton
-        size="small"
-        aria-label={t("stages.editStage")}
-        onClick={(e) => {
-          e.stopPropagation();
-          openProcedureActionsDialog(procedure);
-        }}
+      <CustomMenu
+        renderAnchor={({ onClick }) => (
+          <IconButton
+            size="small"
+            aria-label={t("stages.editStage")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(e);
+            }}
+          >
+            <Settings sx={{ fontSize: 22 }} />
+          </IconButton>
+        )}
       >
-        <Settings sx={{ fontSize: 22 }} />
-      </IconButton>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditProcedureDialog(procedure);
+          }}
+        >
+          <Edit fontSize="small" sx={{ mr: 1 }} />
+          {t("actions.edit")}
+        </MenuItem>
+        {!isProtected ? (
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              setProcedureToDelete(procedure);
+              setDeleteConfirmOpen(true);
+            }}
+            sx={{ color: "error.main" }}
+          >
+            <Delete fontSize="small" sx={{ mr: 1 }} />
+            {t("actions.delete")}
+          </MenuItem>
+        ) : null}
+      </CustomMenu>
     </Box>
-  );
+    );
+  };
 
   return (
     <div className="space-y-4">
       <Paper>
-        <Tabs value={selectedOuter} variant="scrollable" scrollButtons="auto">
-          <Tab
-            key={0}
-            value={0}
-            label={resolveTabLabel({
-              id: 0,
-              name: "workTasks",
-              type: INTERNAL_PROCEDURE_TYPE,
-            })}
-          />
+        <Tabs
+          value={selectedOuter}
+          onChange={(_, val: number) => {
+            setSelectedOuter(val);
+            setSelectedProcedureId(null);
+            setSelectedInner(WORK_PLAN_TAB);
+          }}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          {outerTabs.map((tab) => (
+            <Tab key={tab.id} value={tab.id} label={ts(tab.name)} />
+          ))}
         </Tabs>
       </Paper>
 
@@ -508,7 +533,7 @@ export default function SubTypeTabs() {
               workFlowId={
                 selectedInner === WORK_PLAN_TAB ? workFlowId : undefined
               }
-              currentTabType={INTERNAL_PROCEDURE_TYPE}
+              currentTabType={currentTabType}
               branchId={
                 selectedInner !== WORK_PLAN_TAB
                   ? Number(selectedInner)
@@ -537,14 +562,40 @@ export default function SubTypeTabs() {
         </>
       )}
 
-      <InternalProcedureActionsDialog
-        open={actionsDialogOpen}
-        procedure={actionsDialogProcedure}
-        isDeleting={isDeletingProcedure}
-        onClose={closeProcedureActionsDialog}
-        onEdit={handleActionsEdit}
-        onDelete={handleDeleteProcedure}
-      />
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={closeDeleteConfirm}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: "start" }}>
+          {t("actions.delete")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {tConfirm("defaultMessage")}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1.5 }}>
+          <Button
+            onClick={closeDeleteConfirm}
+            variant="outlined"
+            disabled={isDeletingProcedure}
+            sx={{ flex: 1 }}
+          >
+            {t("actions.cancel")}
+          </Button>
+          <Button
+            onClick={confirmDeleteProcedure}
+            variant="contained"
+            color="error"
+            disabled={isDeletingProcedure}
+            sx={{ flex: 1 }}
+          >
+            {t("actions.delete")}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <AddTaskActionDialog
         open={taskActionDialogOpen}
@@ -560,6 +611,14 @@ export default function SubTypeTabs() {
           setEditingProcedure(null);
         }}
         procedure={editingProcedure}
+        lockFormModel={
+          editingProcedure
+            ? isPrimaryInternalProcedure(
+                editingProcedure,
+                internalProcedures,
+              )
+            : false
+        }
         existingActions={existingActions.filter(
           (action) => action.id !== editingProcedure?.id,
         )}

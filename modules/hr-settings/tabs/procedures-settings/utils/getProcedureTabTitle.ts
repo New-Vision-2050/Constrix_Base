@@ -5,6 +5,7 @@ const SETTINGS_TAB_TITLE_KEYS: Record<string, string> = {
   price_offer: "priceOffer",
   employees: "employees",
   client_request: "clientRequest",
+  employee_task: "employees",
   employee_task_request: "employees",
 };
 
@@ -15,6 +16,7 @@ const EDIT_TAB_TITLE_KEYS: Record<string, string> = {
   price_offer: "editPrice",
   employees: "editEmployees",
   client_request: "editClientRequest",
+  employee_task: "editEmployees",
   employee_task_request: "editEmployees",
 };
 
