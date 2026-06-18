@@ -109,3 +109,30 @@ export function isPrimaryInternalProcedure(
   const primary = getPrimaryInternalProcedure(procedures);
   return !!primary && primary.id === procedure.id;
 }
+
+export function getLastInternalProcedure(
+  procedures: InternalProcedure[],
+): InternalProcedure | null {
+  if (!procedures.length) return null;
+
+  const root = procedures.find((p) => !p.parent_id) ?? null;
+  const children = root
+    ? procedures.filter((p) => p.parent_id === root.id)
+    : procedures.filter((p) => !!p.parent_id);
+
+  if (children.length > 0) {
+    return [...children].sort(
+      (a, b) => (b.sort_order ?? 0) - (a.sort_order ?? 0),
+    )[0];
+  }
+
+  return root;
+}
+
+export function isLastInternalProcedure(
+  procedure: InternalProcedure,
+  procedures: InternalProcedure[],
+): boolean {
+  const last = getLastInternalProcedure(procedures);
+  return !!last && last.id === procedure.id;
+}

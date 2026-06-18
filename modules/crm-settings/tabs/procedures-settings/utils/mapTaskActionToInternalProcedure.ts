@@ -74,4 +74,6 @@ export function resolveProcedureSettingId(
 export {
   getPrimaryInternalProcedure,
   isPrimaryInternalProcedure,
+  getLastInternalProcedure,
+  isLastInternalProcedure,
 } from "@/modules/hr-settings/tabs/procedures-settings/utils/mapTaskActionToInternalProcedure";
