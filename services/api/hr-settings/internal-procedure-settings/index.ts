@@ -68,10 +68,16 @@ function mapInternalProcedureSettingFormItem(
 export const InternalProcedureSettingsApi = {
   /** Lists available forms (النماذج) for the action dialog. */
   getInternalProcedureSettingForms: async (
+    type: string,
     locale = "ar",
   ): Promise<InternalProcedureSettingFormOption[]> => {
     const response = await baseApi.get<GetInternalProcedureSettingFormsResponse>(
       "admin/internal_procedure_setting_forms",
+      {
+        params: {
+          type,
+        },
+      },
     );
     const payload = response.data?.payload ?? [];
     return payload

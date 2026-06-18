@@ -31,6 +31,7 @@ export const INTERNAL_PROCEDURES_QUERY_TYPE = "employee_task" as const;
 interface AddTaskActionDialogProps {
   open: boolean;
   onClose: () => void;
+  procedureType: string;
   existingActions: { id: string; name: string }[];
   onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
@@ -46,6 +47,7 @@ const defaultValues: TaskActionFormValues = {
 export default function AddTaskActionDialog({
   open,
   onClose,
+  procedureType,
   existingActions,
   onSave,
 }: AddTaskActionDialogProps) {
@@ -65,10 +67,13 @@ export default function AddTaskActionDialog({
   }, [open]);
 
   const { data: forms = [], isLoading: isFormsLoading } = useQuery({
-    queryKey: ["internal_procedure_setting_forms", locale],
+    queryKey: ["internal_procedure_setting_forms", procedureType, locale],
     queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedureSettingForms(locale),
-    enabled: open,
+      InternalProcedureSettingsApi.getInternalProcedureSettingForms(
+        procedureType,
+        locale,
+      ),
+    enabled: open && !!procedureType,
   });
 
   const { data: formConditionOptions = [], isLoading: isConditionsLoading } =
