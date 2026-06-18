@@ -33,6 +33,7 @@ export const ROUTER = {
   ROLES: "/roles",
   PERMISSIONS: "/permissions",
   AttendanceDeparture: "/attendance-departure",
+  AttendancePresence: "/attendance-presence",
   Powers: "/powers",
   Programs: "/programs",
   Bouquet: "/bouquet",
