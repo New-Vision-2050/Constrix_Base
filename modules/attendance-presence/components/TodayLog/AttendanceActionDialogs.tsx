@@ -7,13 +7,18 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import InfoIcon from "@/public/icons/info";
-import { LocationWork } from "@/services/api/user-attendance";
+import { LocationWork, WorkPeriodConstraint } from "@/services/api/user-attendance";
 import {
   useClockInMutation,
   useClockOutMutation,
 } from "../../hooks/useAttendanceActions";
 import { useCurrentDateTime } from "../../hooks/useCurrentDateTime";
-import { getLateMinutes, useFormattedNow } from "../../utils/attendance";
+import {
+  getEarlyClockInMinutes,
+  getLateMinutes,
+  isBeforeEarlyClockInWindow,
+  useFormattedNow,
+} from "../../utils/attendance";
 import {
   GeolocationRequestError,
   getDistanceKilometers,
@@ -46,8 +51,7 @@ type DialogStep =
   | "clock-out-success";
 
 interface AttendanceActionDialogsProps {
-  isClockOut: boolean;
-  startTime: string;
+  workPeriod: WorkPeriodConstraint;
   locationWork: LocationWork;
   disabled?: boolean;
 }
@@ -68,8 +72,7 @@ function getApiErrorMessage(error: unknown) {
 }
 
 export default function AttendanceActionDialogs({
-  isClockOut,
-  startTime,
+  workPeriod,
   locationWork,
   disabled = false,
 }: AttendanceActionDialogsProps) {
@@ -78,6 +81,9 @@ export default function AttendanceActionDialogs({
   const now = useCurrentDateTime();
   const { timeParts, fullDate } = useFormattedNow(now);
 
+  const isClockOut = workPeriod.can_clock_out;
+  const startTime = workPeriod.start_time;
+
   const [step, setStep] = useState<DialogStep>("closed");
   const [userCoords, setUserCoords] = useState<{
     latitude: number;
@@ -85,6 +91,7 @@ export default function AttendanceActionDialogs({
   } | null>(null);
   const [distanceKm, setDistanceKm] = useState(0);
   const [lateMinutes, setLateMinutes] = useState(0);
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
 
   const clockInMutation = useClockInMutation();
   const clockOutMutation = useClockOutMutation();
@@ -136,6 +143,16 @@ export default function AttendanceActionDialogs({
   const startAttendanceFlow = useCallback(async () => {
     if (disabled) return;
 
+    if (!isClockOut && isBeforeEarlyClockInWindow(now, workPeriod)) {
+      toast.error(
+        t("earlyClockInBlocked", {
+          minutes: getEarlyClockInMinutes(workPeriod.early_clock_in_rules),
+        }),
+      );
+      return;
+    }
+
+    setIsFetchingLocation(true);
     try {
       const position = await requestCurrentLocation();
       await proceedWithLocation(
@@ -149,8 +166,10 @@ export default function AttendanceActionDialogs({
       }
 
       toast.error(t("attendanceActionError"));
+    } finally {
+      setIsFetchingLocation(false);
     }
-  }, [disabled, proceedWithLocation, t]);
+  }, [disabled, isClockOut, now, proceedWithLocation, t, workPeriod]);
 
   const handleConfirm = async () => {
     if (!userCoords) return;
@@ -212,7 +231,8 @@ export default function AttendanceActionDialogs({
     <>
       <Button
         className="w-full h-11"
-        disabled={disabled}
+        disabled={disabled || isFetchingLocation}
+        loading={isFetchingLocation}
         onClick={startAttendanceFlow}
       >
         {isClockOut ? (
@@ -223,7 +243,11 @@ export default function AttendanceActionDialogs({
         {buttonLabel}
       </Button>
 
-      <AttendanceDialogShell open={step === "location-permission"} onClose={reset}>
+      <AttendanceDialogShell
+        open={step === "location-permission"}
+        onClose={reset}
+        title={t("enableLocationTitle")}
+      >
         <div className="flex justify-center mb-5">
           <InfoIcon />
         </div>
@@ -235,7 +259,11 @@ export default function AttendanceActionDialogs({
         </p>
       </AttendanceDialogShell>
 
-      <AttendanceDialogShell open={step === "out-of-location"} onClose={reset}>
+      <AttendanceDialogShell
+        open={step === "out-of-location"}
+        onClose={reset}
+        title={t("currentLocationTitle")}
+      >
         <div className="flex justify-center mb-5">
           <InfoIcon />
         </div>
@@ -266,7 +294,11 @@ export default function AttendanceActionDialogs({
         </div>
       </AttendanceDialogShell>
 
-      <AttendanceDialogShell open={step === "clock-in-confirm"} onClose={reset}>
+      <AttendanceDialogShell
+        open={step === "clock-in-confirm"}
+        onClose={reset}
+        title={t("confirmClockInTitle")}
+      >
         <div className="flex justify-center mb-5">
           <InfoIcon />
         </div>
@@ -289,7 +321,11 @@ export default function AttendanceActionDialogs({
         </div>
       </AttendanceDialogShell>
 
-      <AttendanceDialogShell open={step === "clock-in-success"} onClose={reset}>
+      <AttendanceDialogShell
+        open={step === "clock-in-success"}
+        onClose={reset}
+        title={t("clockInSuccessTitle")}
+      >
         <AttendanceDialogIcon variant="success">
           <Check className="text-primary-foreground" size={28} strokeWidth={3} />
         </AttendanceDialogIcon>
@@ -311,7 +347,11 @@ export default function AttendanceActionDialogs({
         <AttendanceDialogDate label={fullDate} />
       </AttendanceDialogShell>
 
-      <AttendanceDialogShell open={step === "clock-out-confirm"} onClose={reset}>
+      <AttendanceDialogShell
+        open={step === "clock-out-confirm"}
+        onClose={reset}
+        title={t("confirmClockOutTitle")}
+      >
         <div className="flex justify-center mb-5">
           <InfoIcon />
         </div>
@@ -329,7 +369,11 @@ export default function AttendanceActionDialogs({
         </div>
       </AttendanceDialogShell>
 
-      <AttendanceDialogShell open={step === "clock-out-success"} onClose={reset}>
+      <AttendanceDialogShell
+        open={step === "clock-out-success"}
+        onClose={reset}
+        title={t("clockOutSuccessTitle")}
+      >
         <AttendanceDialogIcon variant="success">
           <Check className="text-primary-foreground" size={28} strokeWidth={3} />
         </AttendanceDialogIcon>

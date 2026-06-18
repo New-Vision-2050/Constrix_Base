@@ -95,6 +95,10 @@ export const attendancePresenceMessages = new MessagesGroup({
     "Attendance registration is not available right now",
     "تسجيل الحضور غير متاح حالياً",
   ),
+  earlyClockInBlocked: _m(
+    "You can clock in up to {minutes} minutes before shift start",
+    "يمكنك تسجيل الحضور قبل بداية الفترة بـ {minutes} دقيقة فقط",
+  ),
 
   // Work log
   workLog: _m("Work Log", "سجل الدوام"),

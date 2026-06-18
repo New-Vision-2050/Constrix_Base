@@ -37,6 +37,7 @@ export type {
   AttendanceRecord,
   WorkPeriodConstraint,
   LocationWork,
+  EarlyClockInRules,
   UserConstraintTodayPayload,
   UserConstraintTodayResponse,
 } from "./types/constraint-response";

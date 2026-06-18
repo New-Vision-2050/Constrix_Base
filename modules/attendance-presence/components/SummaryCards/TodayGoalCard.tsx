@@ -2,43 +2,29 @@
 
 import { useMemo } from "react";
 import { Target } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useAttendancePresence } from "../../context/AttendancePresenceContext";
-import { MOCK_WORK_PERIODS } from "../../constants/mock-data";
-import { useCurrentDateTime } from "../../hooks/useCurrentDateTime";
-import { useUserAttendanceCalendar } from "../../hooks/useUserAttendanceCalendar";
-import { parseDurationFormatted } from "../../utils/time";
+import { useLocale, useTranslations } from "next-intl";
+import { useUserConstraintToday } from "../../hooks/useAttendanceActions";
+import { getActiveWorkPeriod } from "../../utils/attendance";
 import SummaryCardShell from "./SummaryCardShell";
-
-function getTodayDateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
 
 export default function TodayGoalCard() {
   const t = useTranslations("AttendancePresence");
-  const now = useCurrentDateTime();
-  const { activePeriod } = useAttendancePresence();
+  const locale = useLocale();
+  const { data } = useUserConstraintToday();
 
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
-  const { data } = useUserAttendanceCalendar(month, year);
-
-  const currentPeriod = MOCK_WORK_PERIODS.find((period) => period.id === activePeriod);
-  const goalHours = currentPeriod?.goalHours ?? 9;
-
-  const completedHours = useMemo(() => {
-    const todayKey = getTodayDateKey(now);
-    const todayDay = data?.days.find((day) => day.date === todayKey);
-    const workedMinutes = parseDurationFormatted(todayDay?.duration_formatted);
-
-    return Math.round((workedMinutes / 60) * 10) / 10;
-  }, [data?.days, now]);
-
+  const activePeriod = getActiveWorkPeriod(data?.work_rules.all_work_periods);
+  const goalHours = activePeriod?.total_work_hours ?? 9;
+  const completedHours = activePeriod?.total_hours_present ?? 0;
   const progress = goalHours > 0 ? Math.min(1, completedHours / goalHours) : 0;
+
+  const completedLabel = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }).format(completedHours),
+    [completedHours, locale],
+  );
 
   return (
     <SummaryCardShell
@@ -48,7 +34,7 @@ export default function TodayGoalCard() {
         <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>{t("hoursCompleted")}</span>
           <span dir="ltr">
-            {completedHours.toFixed(1)} / {goalHours.toFixed(1)}
+            {completedLabel} / {goalHours.toFixed(1)}
           </span>
         </div>
       }

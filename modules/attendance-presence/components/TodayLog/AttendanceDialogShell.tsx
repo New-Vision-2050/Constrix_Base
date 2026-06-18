@@ -5,12 +5,14 @@ import { X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useAttendanceDirection } from "../../utils/direction";
 
 interface AttendanceDialogShellProps {
   open: boolean;
   onClose: () => void;
+  title: string;
   children: React.ReactNode;
   className?: string;
 }
@@ -18,6 +20,7 @@ interface AttendanceDialogShellProps {
 export default function AttendanceDialogShell({
   open,
   onClose,
+  title,
   children,
   className = "",
 }: AttendanceDialogShellProps) {
@@ -29,6 +32,7 @@ export default function AttendanceDialogShell({
         className={`bg-sidebar border-border max-w-md w-[calc(100%-2rem)] p-6 sm:rounded-2xl ${className}`}
         withCrossButton={false}
       >
+        <DialogTitle className="sr-only">{title}</DialogTitle>
         <button
           type="button"
           onClick={onClose}

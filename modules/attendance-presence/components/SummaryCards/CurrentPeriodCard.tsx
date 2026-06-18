@@ -1,12 +1,11 @@
 "use client";
 
 import { ChevronDown, LayoutList } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useAttendancePresence } from "../../context/AttendancePresenceContext";
-import { MOCK_WORK_PERIODS } from "../../constants/mock-data";
-import { useCurrentDateTime } from "../../hooks/useCurrentDateTime";
+import { useUserConstraintToday } from "../../hooks/useAttendanceActions";
 import { useAttendanceDirection } from "../../utils/direction";
-import { getShiftRemainingMinutes } from "../../utils/time";
+import { formatApiTime, getActiveWorkPeriod } from "../../utils/attendance";
 import { StatusDot } from "../shared/StatusDot";
 import { STATUS_HEX_COLORS } from "../../utils/status-colors";
 import SummaryCardShell from "./SummaryCardShell";
@@ -14,22 +13,24 @@ import SummaryCardShell from "./SummaryCardShell";
 const PERIOD_LABEL_KEYS = ["period1", "period2", "period3"] as const;
 
 function PeriodDots({
+  count,
   activeIndex,
   onSelect,
 }: {
+  count: number;
   activeIndex: number;
-  onSelect: (id: string) => void;
+  onSelect: (index: number) => void;
 }) {
   const t = useTranslations("AttendancePresence");
 
   return (
     <div className="flex flex-col items-center justify-center gap-1.5 py-1">
-      {MOCK_WORK_PERIODS.map((period, index) => (
+      {Array.from({ length: count }, (_, index) => (
         <button
-          key={period.id}
+          key={index}
           type="button"
-          aria-label={t(PERIOD_LABEL_KEYS[index])}
-          onClick={() => onSelect(period.id)}
+          aria-label={t(PERIOD_LABEL_KEYS[index] ?? "period1")}
+          onClick={() => onSelect(index)}
           className={`rounded-full transition-colors ${
             index === activeIndex
               ? "size-2 bg-muted-foreground"
@@ -43,16 +44,23 @@ function PeriodDots({
 
 export default function CurrentPeriodCard() {
   const t = useTranslations("AttendancePresence");
+  const locale = useLocale();
   const { isRtl } = useAttendanceDirection();
-  const now = useCurrentDateTime();
   const { activePeriod, setActivePeriod } = useAttendancePresence();
+  const { data } = useUserConstraintToday();
 
-  const currentPeriod = MOCK_WORK_PERIODS.find((period) => period.id === activePeriod);
-  const periodIndex = MOCK_WORK_PERIODS.findIndex((period) => period.id === activePeriod);
+  const apiPeriods = data?.work_rules.all_work_periods ?? [];
+  const activeApiPeriod = getActiveWorkPeriod(apiPeriods);
+  const periodIndex = Math.max(
+    0,
+    Number.parseInt(activePeriod.replace("period-", ""), 10) - 1,
+  );
+  const currentPeriod = apiPeriods[periodIndex] ?? activeApiPeriod;
+  const isShiftActive = Boolean(currentPeriod?.is_active);
 
-  const isActive = currentPeriod
-    ? getShiftRemainingMinutes(now, currentPeriod) > 0
-    : false;
+  const timeRange = currentPeriod
+    ? `${formatApiTime(currentPeriod.start_time, locale).display} - ${formatApiTime(currentPeriod.end_time, locale).display}`
+    : "—";
 
   return (
     <SummaryCardShell
@@ -70,41 +78,43 @@ export default function CurrentPeriodCard() {
           <>
             <div className="flex-1 min-w-0">
               <p className="text-lg font-semibold text-primary mb-1">
-                {periodIndex >= 0 ? t(PERIOD_LABEL_KEYS[periodIndex]) : t("period1")}
+                {t(PERIOD_LABEL_KEYS[periodIndex] ?? "period1")}
               </p>
               <div className="flex items-center gap-2">
-                {isActive ? (
+                {isShiftActive ? (
                   <StatusDot dotColor={STATUS_HEX_COLORS.present} className="shrink-0" />
                 ) : null}
                 <p className="text-sm text-foreground" dir="ltr">
-                  {currentPeriod
-                    ? `${currentPeriod.startTime} - ${currentPeriod.endTime}`
-                    : "—"}
+                  {timeRange}
                 </p>
               </div>
             </div>
-            <PeriodDots
-              activeIndex={periodIndex}
-              onSelect={setActivePeriod}
-            />
+            {apiPeriods.length > 1 ? (
+              <PeriodDots
+                count={apiPeriods.length}
+                activeIndex={periodIndex}
+                onSelect={(index) => setActivePeriod(`period-${index + 1}`)}
+              />
+            ) : null}
           </>
         ) : (
           <>
-            <PeriodDots
-              activeIndex={periodIndex}
-              onSelect={setActivePeriod}
-            />
+            {apiPeriods.length > 1 ? (
+              <PeriodDots
+                count={apiPeriods.length}
+                activeIndex={periodIndex}
+                onSelect={(index) => setActivePeriod(`period-${index + 1}`)}
+              />
+            ) : null}
             <div className="flex-1 min-w-0">
               <p className="text-lg font-semibold text-primary mb-1">
-                {periodIndex >= 0 ? t(PERIOD_LABEL_KEYS[periodIndex]) : t("period1")}
+                {t(PERIOD_LABEL_KEYS[periodIndex] ?? "period1")}
               </p>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-foreground" dir="ltr">
-                  {currentPeriod
-                    ? `${currentPeriod.startTime} - ${currentPeriod.endTime}`
-                    : "—"}
+                  {timeRange}
                 </p>
-                {isActive ? (
+                {isShiftActive ? (
                   <StatusDot dotColor={STATUS_HEX_COLORS.present} className="shrink-0" />
                 ) : null}
               </div>
