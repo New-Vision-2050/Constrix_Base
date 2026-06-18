@@ -49,6 +49,7 @@ export const sidebarMessages = new MessagesGroup({
     "Attendance and Departure",
     "الحضور والانصراف اليومي",
   ),
+  AttendancePresence: _m("Attendance & Presence", "الحضور والتواجد"),
   Reports: _m("Reports", "التقارير"),
   ProgramManagement: _m("Program Management", "ادارة البرامج"),
   Roles: _m("Roles", "الادوار"),
