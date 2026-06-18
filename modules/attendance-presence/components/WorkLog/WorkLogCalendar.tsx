@@ -9,7 +9,6 @@ import { StatusDot } from "../shared/StatusDot";
 import {
   buildCalendarGrid,
   CALENDAR_LEGEND_ITEMS,
-  formatMonthYear,
   shouldShowHours,
   shouldShowStatusLabel,
 } from "../../utils/calendar";
@@ -24,21 +23,14 @@ export default function WorkLogCalendar() {
   const statusT = useTranslations("AttendancePresence.status");
   const weekdaysT = useTranslations("AttendancePresence.weekdays");
   const locale = useLocale();
-  const { dir, PrevIcon, NextIcon, isRtl } = useAttendanceDirection();
-  const { selectedMonth, setSelectedMonth } = useAttendancePresence();
+  const { dir, isRtl } = useAttendanceDirection();
+  const { selectedMonth } = useAttendancePresence();
 
   const month = selectedMonth.getMonth() + 1;
   const year = selectedMonth.getFullYear();
   const { data, isLoading, isError } = useUserAttendanceCalendar(month, year);
 
   const calendarDays = buildCalendarGrid(data?.days ?? []);
-  const monthLabel = formatMonthYear(selectedMonth, locale);
-
-  const changeMonth = (delta: number) => {
-    setSelectedMonth(
-      new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + delta, 1),
-    );
-  };
 
   if (isLoading) {
     return (
@@ -58,26 +50,6 @@ export default function WorkLogCalendar() {
 
   return (
     <div className="flex flex-col gap-4" dir={dir}>
-      <div className="flex items-center gap-2 text-foreground">
-          <button
-            type="button"
-            onClick={() => changeMonth(-1)}
-            className="p-1 text-muted-foreground hover:text-foreground"
-            aria-label="Previous month"
-          >
-            <PrevIcon size={18} />
-          </button>
-          <span className="font-medium">{monthLabel}</span>
-          <button
-            type="button"
-            onClick={() => changeMonth(1)}
-            className="p-1 text-muted-foreground hover:text-foreground"
-            aria-label="Next month"
-          >
-            <NextIcon size={18} />
-          </button>
-        </div>
-
       <div className="grid grid-cols-7 gap-2">
         {WEEKDAY_KEYS.map((key) => (
           <div
