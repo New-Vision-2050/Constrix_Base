@@ -30,6 +30,7 @@ import type { TaskActionFormValues } from "./AddTaskActionDialog";
 interface EditTaskActionDialogProps {
   open: boolean;
   onClose: () => void;
+  procedureType: string;
   procedure: InternalProcedure | null;
   existingActions: { id: string; name: string }[];
   lockFormModel?: boolean;
@@ -47,6 +48,7 @@ const defaultValues: TaskActionFormValues = {
 export default function EditTaskActionDialog({
   open,
   onClose,
+  procedureType,
   procedure,
   existingActions,
   lockFormModel = false,
@@ -79,10 +81,13 @@ export default function EditTaskActionDialog({
   });
 
   const { data: forms = [], isLoading: isFormsLoading } = useQuery({
-    queryKey: ["internal_procedure_setting_forms", locale],
+    queryKey: ["internal_procedure_setting_forms", procedureType, locale],
     queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedureSettingForms(locale),
-    enabled: open,
+      InternalProcedureSettingsApi.getInternalProcedureSettingForms(
+        procedureType,
+        locale,
+      ),
+    enabled: open && !!procedureType,
   });
 
   const { data: formConditionOptions = [], isLoading: isConditionsLoading } =

@@ -600,6 +600,7 @@ export default function SubTypeTabs() {
       <AddTaskActionDialog
         open={taskActionDialogOpen}
         onClose={() => setTaskActionDialogOpen(false)}
+        procedureType={currentTabType}
         existingActions={existingActions}
         onSave={handleAddTaskAction}
       />
@@ -610,6 +611,7 @@ export default function SubTypeTabs() {
           setEditTaskActionDialogOpen(false);
           setEditingProcedure(null);
         }}
+        procedureType={currentTabType}
         procedure={editingProcedure}
         lockFormModel={
           editingProcedure
