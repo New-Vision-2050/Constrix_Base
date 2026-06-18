@@ -61,12 +61,7 @@ export default function EditTaskActionDialog({
   const [isSaving, setIsSaving] = useState(false);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
   const conditionsAlignedRef = useRef(false);
-  const lockedFormFieldsRef = useRef<
-    Pick<TaskActionFormValues, "modelId" | "formConditions">
-  >({
-    modelId: "",
-    formConditions: {},
-  });
+  const lockedModelIdRef = useRef("");
 
   const procedureSettingId = procedure?.id;
 
@@ -147,10 +142,7 @@ export default function EditTaskActionDialog({
       ...initialValues,
     });
     if (lockFormModel) {
-      lockedFormFieldsRef.current = {
-        modelId: initialValues.modelId,
-        formConditions: { ...initialValues.formConditions },
-      };
+      lockedModelIdRef.current = initialValues.modelId;
     }
     setNameError("");
     setModelError("");
@@ -174,13 +166,6 @@ export default function EditTaskActionDialog({
         formConditionOptions.map((condition) => condition.key),
       );
 
-      if (lockFormModel) {
-        lockedFormFieldsRef.current = {
-          modelId: prev.modelId,
-          formConditions: alignedConditions,
-        };
-      }
-
       return {
         ...prev,
         formConditions: alignedConditions,
@@ -192,7 +177,6 @@ export default function EditTaskActionDialog({
     isConditionsLoading,
     form.modelId,
     formConditionOptions,
-    lockFormModel,
   ]);
 
   const toggleBoolFormCondition = (conditionKey: string) => {
@@ -233,16 +217,10 @@ export default function EditTaskActionDialog({
     }
     setIsSaving(true);
     try {
-      const lockedFields = lockFormModel ? lockedFormFieldsRef.current : null;
       await onSave({
         ...form,
         name: form.name.trim(),
-        ...(lockedFields
-          ? {
-              modelId: lockedFields.modelId,
-              formConditions: lockedFields.formConditions,
-            }
-          : {}),
+        ...(lockFormModel ? { modelId: lockedModelIdRef.current } : {}),
       });
       onClose();
     } finally {
@@ -366,7 +344,7 @@ export default function EditTaskActionDialog({
                             }
                             inputProps={{ min: 0, step: 1 }}
                             sx={{ width: 120 }}
-                            disabled={isSaving || lockFormModel}
+                            disabled={isSaving}
                           />
                         </Box>
                       );
@@ -389,7 +367,7 @@ export default function EditTaskActionDialog({
                             checked={!!form.formConditions[conditionKey]}
                             onChange={() => toggleBoolFormCondition(conditionKey)}
                             size="small"
-                            disabled={isSaving || lockFormModel}
+                            disabled={isSaving}
                           />
                         }
                       />
