@@ -67,9 +67,10 @@ export const attendancePresenceMessages = new MessagesGroup({
     "في انتظار الموافقة على صلاحيات الموقع لتسجيل الحضور.",
   ),
   currentLocationTitle: _m("My current location", "موقعي الحالي"),
+  meLabel: _m("Me", "أنا"),
   outOfLocationMessage: _m(
-    "Sorry, you are {distance} km away from {location}",
-    "عفوا انت تبعد {distance} كيلو متر من موقع الحضور",
+    "Sorry, you are <bold>{distance} km</bold> away from the attendance location",
+    "عفوا انت تبعد <bold>{distance} كيلو متر</bold> من موقع الحضور",
   ),
   requestWorkMission: _m("Request work mission", "طلب مهمة عمل"),
   confirmClockInTitle: _m(

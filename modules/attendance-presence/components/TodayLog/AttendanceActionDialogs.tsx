@@ -7,7 +7,10 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import InfoIcon from "@/public/icons/info";
-import { LocationWork, WorkPeriodConstraint } from "@/services/api/user-attendance";
+import {
+  LocationWork,
+  WorkPeriodConstraint,
+} from "@/services/api/user-attendance";
 import {
   useClockInMutation,
   useClockOutMutation,
@@ -36,9 +39,7 @@ import { STATUS_HEX_COLORS } from "../../utils/status-colors";
 
 const AttendanceLocationMap = dynamic(() => import("./AttendanceLocationMap"), {
   ssr: false,
-  loading: () => (
-    <div className="h-52 rounded-xl bg-muted animate-pulse" />
-  ),
+  loading: () => <div className="h-52 rounded-xl bg-muted animate-pulse" />,
 });
 
 type DialogStep =
@@ -214,12 +215,12 @@ export default function AttendanceActionDialogs({
 
   const outOfLocationButtons = (
     <>
-      <Button className="min-w-32" onClick={reset}>
+      <Button className="min-w-[120px] h-10 rounded-full" onClick={reset}>
         {t("back")}
       </Button>
       <Button
         variant="outline"
-        className="min-w-32"
+        className="min-w-[140px] h-10 rounded-full border-border"
         onClick={() => setStep("closed")}
       >
         {t("requestWorkMission")}
@@ -248,7 +249,7 @@ export default function AttendanceActionDialogs({
         onClose={reset}
         title={t("enableLocationTitle")}
       >
-        <div className="flex justify-center mb-5">
+        <div className="flex justify-center mb-2">
           <InfoIcon />
         </div>
         <h3 className="text-center text-xl font-semibold text-foreground mb-2">
@@ -263,17 +264,20 @@ export default function AttendanceActionDialogs({
         open={step === "out-of-location"}
         onClose={reset}
         title={t("currentLocationTitle")}
+        className="max-w-[620px]"
       >
-        <div className="flex justify-center mb-5">
+        <div className="flex justify-center mb-2">
           <InfoIcon />
         </div>
-        <h3 className="text-center text-xl font-semibold text-foreground mb-2">
+        <h3 className="text-center text-xl font-semibold text-foreground ">
           {t("currentLocationTitle")}
         </h3>
-        <p className="text-center text-sm text-muted-foreground mb-4">
-          {t("outOfLocationMessage", {
+        <p className="text-center text-sm text-muted-foreground leading-relaxed px-1">
+          {t.rich("outOfLocationMessage", {
             distance: distanceKm.toFixed(1),
-            location: locationWork.name,
+            bold: (chunks) => (
+              <span className="font-semibold text-foreground">{chunks}</span>
+            ),
           })}
         </p>
         {userCoords ? (
@@ -283,11 +287,12 @@ export default function AttendanceActionDialogs({
             userLat={userCoords.latitude}
             userLng={userCoords.longitude}
             radius={locationWork.radius}
+            userLabel={t("meLabel")}
           />
         ) : null}
         <div
-          className={`mt-6 flex items-center justify-center gap-3 ${
-            isRtl ? "flex-row" : "flex-row-reverse"
+          className={`mt-5 flex items-center gap-3 ${
+            isRtl ? "flex-row justify-end" : "flex-row-reverse justify-end"
           }`}
         >
           {outOfLocationButtons}
@@ -327,7 +332,11 @@ export default function AttendanceActionDialogs({
         title={t("clockInSuccessTitle")}
       >
         <AttendanceDialogIcon variant="success">
-          <Check className="text-primary-foreground" size={28} strokeWidth={3} />
+          <Check
+            className="text-primary-foreground"
+            size={28}
+            strokeWidth={3}
+          />
         </AttendanceDialogIcon>
         <h3 className="text-center text-xl font-semibold text-foreground mb-3">
           {t("clockInSuccessTitle")}
@@ -335,10 +344,7 @@ export default function AttendanceActionDialogs({
         {lateMinutes > 0 ? (
           <div className="flex justify-center mb-3">
             <span className="inline-flex items-center gap-2 rounded-full border border-chart-4/40 bg-chart-4/10 px-3 py-1 text-sm text-chart-4">
-              <StatusDot
-                dotColor={STATUS_HEX_COLORS.late}
-                className="size-2"
-              />
+              <StatusDot dotColor={STATUS_HEX_COLORS.late} className="size-2" />
               {t("lateByMinutes", { minutes: lateMinutes })}
             </span>
           </div>
@@ -375,7 +381,11 @@ export default function AttendanceActionDialogs({
         title={t("clockOutSuccessTitle")}
       >
         <AttendanceDialogIcon variant="success">
-          <Check className="text-primary-foreground" size={28} strokeWidth={3} />
+          <Check
+            className="text-primary-foreground"
+            size={28}
+            strokeWidth={3}
+          />
         </AttendanceDialogIcon>
         <h3 className="text-center text-xl font-semibold text-foreground mb-3">
           {t("clockOutSuccessTitle")}

@@ -2,11 +2,7 @@
 
 import React from "react";
 import { X } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useAttendanceDirection } from "../../utils/direction";
 
 interface AttendanceDialogShellProps {
