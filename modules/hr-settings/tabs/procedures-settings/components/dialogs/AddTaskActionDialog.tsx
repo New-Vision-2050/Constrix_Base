@@ -33,6 +33,8 @@ interface AddTaskActionDialogProps {
   onClose: () => void;
   procedureType: string;
   existingActions: { id: string; name: string }[];
+  excludeFromAppearAfter?: string[];
+  excludeFromAppearBefore?: string[];
   onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
 
@@ -49,6 +51,8 @@ export default function AddTaskActionDialog({
   onClose,
   procedureType,
   existingActions,
+  excludeFromAppearAfter = [],
+  excludeFromAppearBefore = [],
   onSave,
 }: AddTaskActionDialogProps) {
   const { tTaskAction: t, tc } = useProceduresSettingsTranslations();
@@ -93,16 +97,26 @@ export default function AddTaskActionDialog({
     [forms],
   );
 
-  const actionOrderOptions = useMemo(
+  const appearBeforeOptions = useMemo(
     () =>
       withEmptyOption(
-        existingActions.map((action) => ({
-          value: action.id,
-          label: action.name,
-        })),
+        existingActions
+          .filter((a) => !excludeFromAppearBefore.includes(a.id))
+          .map((action) => ({ value: action.id, label: action.name })),
         t("selectAction"),
       ),
-    [existingActions, t],
+    [existingActions, excludeFromAppearBefore, t],
+  );
+
+  const appearAfterOptions = useMemo(
+    () =>
+      withEmptyOption(
+        existingActions
+          .filter((a) => !excludeFromAppearAfter.includes(a.id))
+          .map((action) => ({ value: action.id, label: action.name })),
+        t("selectAction"),
+      ),
+    [existingActions, excludeFromAppearAfter, t],
   );
 
   const toggleBoolFormCondition = (conditionKey: string) => {
@@ -279,7 +293,7 @@ export default function AddTaskActionDialog({
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <SearchableSelect
-                options={actionOrderOptions}
+                options={appearBeforeOptions}
                 value={form.appearBefore}
                 onChange={(value) =>
                   setForm((prev) => ({
@@ -295,7 +309,7 @@ export default function AddTaskActionDialog({
             </Box>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <SearchableSelect
-                options={actionOrderOptions}
+                options={appearAfterOptions}
                 value={form.appearAfter}
                 onChange={(value) =>
                   setForm((prev) => ({

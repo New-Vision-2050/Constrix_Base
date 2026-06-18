@@ -34,6 +34,10 @@ interface EditTaskActionDialogProps {
   procedure: InternalProcedure | null;
   existingActions: { id: string; name: string }[];
   lockFormModel?: boolean;
+  hideAppearAfter?: boolean;
+  hideAppearBefore?: boolean;
+  excludeFromAppearAfter?: string[];
+  excludeFromAppearBefore?: string[];
   onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
 
@@ -52,6 +56,10 @@ export default function EditTaskActionDialog({
   procedure,
   existingActions,
   lockFormModel = false,
+  hideAppearAfter = false,
+  hideAppearBefore = false,
+  excludeFromAppearAfter = [],
+  excludeFromAppearBefore = [],
   onSave,
 }: EditTaskActionDialogProps) {
   const { tTaskAction: t, tc } = useProceduresSettingsTranslations();
@@ -115,16 +123,26 @@ export default function EditTaskActionDialog({
     );
   }, [lockFormModel, form.modelId, modelOptions]);
 
-  const actionOrderOptions = useMemo(
+  const appearBeforeOptions = useMemo(
     () =>
       withEmptyOption(
-        existingActions.map((action) => ({
-          value: action.id,
-          label: action.name,
-        })),
+        existingActions
+          .filter((a) => !excludeFromAppearBefore.includes(a.id))
+          .map((action) => ({ value: action.id, label: action.name })),
         t("selectAction"),
       ),
-    [existingActions, t],
+    [existingActions, excludeFromAppearBefore, t],
+  );
+
+  const appearAfterOptions = useMemo(
+    () =>
+      withEmptyOption(
+        existingActions
+          .filter((a) => !excludeFromAppearAfter.includes(a.id))
+          .map((action) => ({ value: action.id, label: action.name })),
+        t("selectAction"),
+      ),
+    [existingActions, excludeFromAppearAfter, t],
   );
 
   useEffect(() => {
@@ -382,47 +400,53 @@ export default function EditTaskActionDialog({
               )}
             </Box>
 
-            <Box>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
-                {t("actionOrder")}
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <SearchableSelect
-                    options={actionOrderOptions}
-                    value={form.appearBefore}
-                    onChange={(value) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        appearBefore: String(value),
-                      }))
-                    }
-                    placeholder={t("selectAction")}
-                    searchPlaceholder={tc("search")}
-                    noResultsText={tc("noResults")}
-                    label={t("appearBefore")}
-                    disabled={!isFormReady || isSaving}
-                  />
-                </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <SearchableSelect
-                    options={actionOrderOptions}
-                    value={form.appearAfter}
-                    onChange={(value) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        appearAfter: String(value),
-                      }))
-                    }
-                    placeholder={t("selectAction")}
-                    searchPlaceholder={tc("search")}
-                    noResultsText={tc("noResults")}
-                    label={t("appearAfter")}
-                    disabled={!isFormReady || isSaving}
-                  />
+            {(!hideAppearBefore || !hideAppearAfter) && (
+              <Box>
+                <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
+                  {t("actionOrder")}
+                </Typography>
+                <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                  {!hideAppearBefore && (
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <SearchableSelect
+                        options={appearBeforeOptions}
+                        value={form.appearBefore}
+                        onChange={(value) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            appearBefore: String(value),
+                          }))
+                        }
+                        placeholder={t("selectAction")}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
+                        label={t("appearBefore")}
+                        disabled={!isFormReady || isSaving}
+                      />
+                    </Box>
+                  )}
+                  {!hideAppearAfter && (
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <SearchableSelect
+                        options={appearAfterOptions}
+                        value={form.appearAfter}
+                        onChange={(value) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            appearAfter: String(value),
+                          }))
+                        }
+                        placeholder={t("selectAction")}
+                        searchPlaceholder={tc("search")}
+                        noResultsText={tc("noResults")}
+                        label={t("appearAfter")}
+                        disabled={!isFormReady || isSaving}
+                      />
+                    </Box>
+                  )}
                 </Box>
               </Box>
-            </Box>
+            )}
 
             <Button
               variant="contained"

@@ -38,7 +38,10 @@ import {
   mapTaskActionToCreateInternalProcedure,
   mapTaskActionToUpdateInternalProcedure,
   resolveProcedureSettingId,
+  getPrimaryInternalProcedure,
   isPrimaryInternalProcedure,
+  getLastInternalProcedure,
+  isLastInternalProcedure,
 } from "../utils/mapTaskActionToInternalProcedure";
 import type { TaskActionFormValues } from "../types";
 import StagesView, { type StagesViewRef } from "./StagesView";
@@ -112,6 +115,16 @@ export default function SubTypeTabs() {
         id: procedure.id,
         name: procedure.name,
       })),
+    [internalProcedures],
+  );
+
+  const primaryProcedureId = useMemo(
+    () => getPrimaryInternalProcedure(internalProcedures)?.id ?? null,
+    [internalProcedures],
+  );
+
+  const lastProcedureId = useMemo(
+    () => getLastInternalProcedure(internalProcedures)?.id ?? null,
     [internalProcedures],
   );
 
@@ -371,6 +384,8 @@ export default function SubTypeTabs() {
       procedure,
       internalProcedures,
     );
+    const isLast = isLastInternalProcedure(procedure, internalProcedures);
+    const canDelete = !isProtected && !isLast;
 
     return (
     <Box
@@ -414,7 +429,7 @@ export default function SubTypeTabs() {
           <Edit fontSize="small" sx={{ mr: 1 }} />
           {t("actions.edit")}
         </MenuItem>
-        {!isProtected ? (
+        {canDelete ? (
           <MenuItem
             onClick={(e) => {
               e.stopPropagation();
@@ -602,6 +617,8 @@ export default function SubTypeTabs() {
         onClose={() => setTaskActionDialogOpen(false)}
         procedureType={currentTabType}
         existingActions={existingActions}
+        excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
+        excludeFromAppearBefore={primaryProcedureId ? [primaryProcedureId] : []}
         onSave={handleAddTaskAction}
       />
 
@@ -615,15 +632,25 @@ export default function SubTypeTabs() {
         procedure={editingProcedure}
         lockFormModel={
           editingProcedure
-            ? isPrimaryInternalProcedure(
-                editingProcedure,
-                internalProcedures,
-              )
+            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures) ||
+              isLastInternalProcedure(editingProcedure, internalProcedures)
+            : false
+        }
+        hideAppearAfter={
+          editingProcedure
+            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures)
+            : false
+        }
+        hideAppearBefore={
+          editingProcedure
+            ? isLastInternalProcedure(editingProcedure, internalProcedures)
             : false
         }
         existingActions={existingActions.filter(
           (action) => action.id !== editingProcedure?.id,
         )}
+        excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
+        excludeFromAppearBefore={primaryProcedureId ? [primaryProcedureId] : []}
         onSave={handleEditTaskAction}
       />
     </div>
