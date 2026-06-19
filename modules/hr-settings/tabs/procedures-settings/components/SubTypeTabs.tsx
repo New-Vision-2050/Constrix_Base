@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   Box,
   Button,
@@ -498,11 +499,13 @@ export default function SubTypeTabs() {
                 <CircularProgress size={20} />
               ) : (
                 <>
-                  {childProcedures.map((procedure) =>
-                    renderProcedureChip(procedure, () =>
-                      setSelectedProcedureId(procedure.id),
-                    ),
-                  )}
+                  {childProcedures.map((procedure) => (
+                    <React.Fragment key={procedure.id}>
+                      {renderProcedureChip(procedure, () =>
+                        setSelectedProcedureId(procedure.id),
+                      )}
+                    </React.Fragment>
+                  ))}
                 </>
               )}
             </Box>

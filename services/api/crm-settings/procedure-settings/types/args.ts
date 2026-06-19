@@ -27,9 +27,12 @@ export interface CreateStepArgs {
   name: string;
   action_taker_type?: string;
   action_taker_management_hierarchy_type?: string;
-  action_taker_alternative_management_hierarchy_type?: string;
-  action_taker_specific_procedure_type?: string;
-  action_taker_specific_procedure_id?: string;
+  /** Array of fallback hierarchy types; validated server-side */
+  action_taker_alternative_management_hierarchy_type?: string[];
+  /** Parallel array with action_taker_specific_procedure_id */
+  action_taker_specific_procedure_type?: string[];
+  /** Parallel array with action_taker_specific_procedure_type */
+  action_taker_specific_procedure_id?: string[];
   branch_id?: number;
   management_id?: number;
   action_taker_user_ids: string[];

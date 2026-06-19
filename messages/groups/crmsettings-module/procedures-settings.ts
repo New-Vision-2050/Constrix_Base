@@ -200,11 +200,13 @@ export const proceduresSettingsMessages = new MessagesGroup({
         specificUser: _m("Specific user", "لمستخدم محدد"),
         managementHierarchy: _m("Management hierarchy", "الهيكل التنظيمي"),
         specificProcedures: _m("Specific procedures", "اجراءات محددة"),
+        himself: _m("Himself", "نفسه"),
       }),
       managementHierarchy: new MessagesGroup({
         projectManager: _m("Project manager", "مدير المشروع"),
         branchManager: _m("Branch manager", "مدير الفرع"),
         managementManager: _m("Management manager", "مدير الاداره"),
+        deputyManager: _m("Deputy manager", "نائب المدير"),
       }),
       specificProcedureEntity: new MessagesGroup({
         branch: _m("Branches", "الفروع"),
@@ -217,6 +219,12 @@ export const proceduresSettingsMessages = new MessagesGroup({
         branchManager: _m("Branch manager", "مدير الفرع"),
       }),
     }),
+    addAlternativeHierarchy: _m(
+      "Add alternative",
+      "إضافة بديل",
+    ),
+    addSpecificProcedureRow: _m("Add row", "إضافة سطر"),
+    removeSpecificProcedureRow: _m("Remove", "إزالة"),
     validation: new MessagesGroup({
       selectPrimaryHierarchy: _m(
         "Please select primary management hierarchy",

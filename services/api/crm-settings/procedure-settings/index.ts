@@ -64,7 +64,7 @@ export const ProcedureSettingsApi = {
     stepId: number,
     args: CreateStepArgs,
   ) =>
-    baseApi.put(
+    baseApi.post(
       `procedure-settings/${procedureSettingId}/steps/${stepId}`,
       args,
     ),

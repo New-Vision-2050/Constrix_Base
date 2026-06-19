@@ -6,13 +6,15 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
+  Chip,
   Divider,
   FormControlLabel,
   Grid,
+  IconButton,
   TextField,
   Typography,
 } from "@mui/material";
-import { Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
+import { Add, Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
@@ -65,9 +67,10 @@ const ACTION_TAKER_TYPE_OPTION_DEFS = [
     labelKey: "actionTakerType.managementHierarchy" as const,
   },
   {
-    value: "Specific_procedures",
+    value: "specific_procedures",
     labelKey: "actionTakerType.specificProcedures" as const,
   },
+  { value: "himself", labelKey: "actionTakerType.himself" as const },
 ] as const;
 
 const MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS = [
@@ -77,6 +80,7 @@ const MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS = [
     value: "management_manager",
     labelKey: "managementHierarchy.managementManager" as const,
   },
+  { value: "deputy_manager", labelKey: "managementHierarchy.deputyManager" as const },
 ] as const;
 
 const SPECIFIC_PROCEDURE_ENTITY_OPTION_DEFS = [
@@ -115,13 +119,17 @@ interface StepCardProps {
   onDelete: () => void;
 }
 
+interface SpecificProcedureRow {
+  type: string;
+  id: string;
+}
+
 interface StepFormData {
   stepName: string;
   actionTakerType: string;
   actionTakerPrimaryManagementHierarchyType: string;
-  actionTakerAlternativeManagementHierarchyType: string;
-  actionTakerSpecificProcedureType: string;
-  actionTakerSpecificProcedureId: string;
+  actionTakerAlternativeManagementHierarchyTypes: string[];
+  actionTakerSpecificProcedureRows: SpecificProcedureRow[];
   branchId: string;
   managementId: string;
   actionTakerId: string;
@@ -132,6 +140,29 @@ interface StepFormData {
   deadlineDays: string;
   deadlineHours: string;
   escalationUserId: string;
+}
+
+function toStringArray(val: string | string[] | null | undefined): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val.filter(Boolean);
+  return [val];
+}
+
+function normalizeSpecificProcedureRows(step: ProcedureStep): SpecificProcedureRow[] {
+  if (step.action_taker_specific_procedures?.length) {
+    return step.action_taker_specific_procedures.map((r) => ({
+      type: r.type ?? "",
+      id: String(r.id ?? ""),
+    }));
+  }
+  const types = toStringArray(step.action_taker_specific_procedure_type);
+  const ids = toStringArray(
+    typeof step.action_taker_specific_procedure_id === "number"
+      ? String(step.action_taker_specific_procedure_id)
+      : step.action_taker_specific_procedure_id,
+  );
+  if (!types.length) return [{ type: "", id: "" }];
+  return types.map((t, i) => ({ type: t, id: ids[i] ?? "" }));
 }
 
 function firstActionTakerUserId(step: ProcedureStep | null): string {
@@ -216,18 +247,16 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     if (serverStep.notify_by_whatsapp) notifications.push("whatsapp");
     if (serverStep.notify_by_sms) notifications.push("sms");
 
+    const actionTakerType = serverStep.action_taker_type ?? "specific_user";
     return {
       stepName: serverStep.name?.trim() ?? "",
-      actionTakerType: serverStep.action_taker_type ?? "specific_user",
+      actionTakerType,
       actionTakerPrimaryManagementHierarchyType:
         serverStep.action_taker_management_hierarchy_type ?? "",
-      actionTakerAlternativeManagementHierarchyType:
-        serverStep.action_taker_alternative_management_hierarchy_type ?? "",
-      actionTakerSpecificProcedureType:
-        serverStep.action_taker_specific_procedure_type ?? "",
-      actionTakerSpecificProcedureId: serverStep.action_taker_specific_procedure_id
-        ? String(serverStep.action_taker_specific_procedure_id)
-        : "",
+      actionTakerAlternativeManagementHierarchyTypes: toStringArray(
+        serverStep.action_taker_alternative_management_hierarchy_type,
+      ),
+      actionTakerSpecificProcedureRows: normalizeSpecificProcedureRows(serverStep),
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
@@ -236,8 +265,10 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       concernedUserId: firstConcernedUserId(serverStep),
       orgBase: base.length ? base : ["approve"],
       orgTemplate:
-        formsKindToStepCardUi(parseProcedureStepFormsKind(serverStep)) ===
-        "accept"
+        actionTakerType === "himself"
+          ? "approve"
+          : formsKindToStepCardUi(parseProcedureStepFormsKind(serverStep)) ===
+            "accept"
           ? "accreditation_form"
           : "approve",
       notifications,
@@ -250,9 +281,8 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     stepName: "",
     actionTakerType: "specific_user",
     actionTakerPrimaryManagementHierarchyType: "",
-    actionTakerAlternativeManagementHierarchyType: "",
-    actionTakerSpecificProcedureType: "",
-    actionTakerSpecificProcedureId: "",
+    actionTakerAlternativeManagementHierarchyTypes: [],
+    actionTakerSpecificProcedureRows: [{ type: "", id: "" }],
     branchId: "",
     managementId: "",
     actionTakerId: "",
@@ -292,11 +322,11 @@ export default function StepCard({
   const actionTakerPrimaryManagementHierarchyType = watch(
     "actionTakerPrimaryManagementHierarchyType",
   );
-  const actionTakerAlternativeManagementHierarchyType = watch(
-    "actionTakerAlternativeManagementHierarchyType",
+  const actionTakerAlternativeManagementHierarchyTypes = watch(
+    "actionTakerAlternativeManagementHierarchyTypes",
   );
-  const actionTakerSpecificProcedureType = watch(
-    "actionTakerSpecificProcedureType",
+  const actionTakerSpecificProcedureRows = watch(
+    "actionTakerSpecificProcedureRows",
   );
   const branchId = watch("branchId");
   const actionTakerIdW = watch("actionTakerId");
@@ -333,6 +363,11 @@ export default function StepCard({
       ),
   });
 
+  const specificProcedureTypes = useMemo(
+    () => actionTakerSpecificProcedureRows.map((r) => r.type),
+    [actionTakerSpecificProcedureRows],
+  );
+
   const { data: allManagements = [] } = useQuery<ManagementHierarchyOption[]>({
     queryKey: ["managements", "hierarchy", "management", "all"],
     queryFn: () =>
@@ -340,16 +375,16 @@ export default function StepCard({
         `${baseURL}/management_hierarchies/list?type=management`,
       ),
     enabled:
-      actionTakerType === "Specific_procedures" &&
-      actionTakerSpecificProcedureType === "management",
+      actionTakerType === "specific_procedures" &&
+      specificProcedureTypes.includes("management"),
   });
 
   const { data: jobTitles = [] } = useQuery<ManagementHierarchyOption[]>({
     queryKey: ["job-titles", "list"],
     queryFn: () => fetchNamedListOptions(`${baseURL}/job_titles/list`),
     enabled:
-      actionTakerType === "Specific_procedures" &&
-      actionTakerSpecificProcedureType === "job_title",
+      actionTakerType === "specific_procedures" &&
+      specificProcedureTypes.includes("job_title"),
   });
  
   const jobRoleOptions = useMemo(
@@ -479,17 +514,18 @@ export default function StepCard({
   const primaryManagementHierarchyOptions = useMemo(
     () =>
       MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.filter(
-        (o) => o.value !== actionTakerAlternativeManagementHierarchyType,
+        (o) => !actionTakerAlternativeManagementHierarchyTypes.includes(o.value),
       ).map((o) => ({ value: o.value, label: ts(`options.${o.labelKey}`) })),
-    [actionTakerAlternativeManagementHierarchyType, ts],
+    [actionTakerAlternativeManagementHierarchyTypes, ts],
   );
 
-  const alternativeManagementHierarchyOptions = useMemo(
+  const allManagementHierarchyOptions = useMemo(
     () =>
-      MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.filter(
-        (o) => o.value !== actionTakerPrimaryManagementHierarchyType,
-      ).map((o) => ({ value: o.value, label: ts(`options.${o.labelKey}`) })),
-    [actionTakerPrimaryManagementHierarchyType, ts],
+      MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.map((o) => ({
+        value: o.value,
+        label: ts(`options.${o.labelKey}`),
+      })),
+    [ts],
   );
 
   const specificProcedureEntityOptions = useMemo(
@@ -501,52 +537,41 @@ export default function StepCard({
     [ts],
   );
 
-  const specificProcedureValuePlaceholder = useMemo(() => {
-    switch (actionTakerSpecificProcedureType) {
-      case "branch":
-        return ts("selectBranch");
-      case "management":
-        return ts("selectManagement");
-      case "job_title":
-        return ts("selectJobTitle");
-      case "job_role":
-        return ts("selectJobRole");
-      default:
-        return ts("selectValue");
-    }
-  }, [actionTakerSpecificProcedureType, ts]);
+  const getSpecificProcedureValueOptions = useCallback(
+    (type: string) => {
+      const toOptions = (rows: ManagementHierarchyOption[], placeholder: string) =>
+        withEmptyOption(
+          rows.map((r) => ({ value: String(r.id), label: r.name })),
+          placeholder,
+        );
+      switch (type) {
+        case "branch":
+          return toOptions(branches, ts("selectBranch"));
+        case "management":
+          return toOptions(allManagements, ts("selectManagement"));
+        case "job_title":
+          return toOptions(jobTitles, ts("selectJobTitle"));
+        case "job_role":
+          return toOptions(jobRoleOptions, ts("selectJobRole"));
+        default:
+          return withEmptyOption([], tc("select"));
+      }
+    },
+    [branches, allManagements, jobTitles, jobRoleOptions, ts, tc],
+  );
 
-  const specificProcedureValueOptions = useMemo(() => {
-    const toOptions = (
-      rows: ManagementHierarchyOption[],
-      placeholder: string,
-    ) =>
-      withEmptyOption(
-        rows.map((r) => ({ value: String(r.id), label: r.name })),
-        placeholder,
-      );
-
-    switch (actionTakerSpecificProcedureType) {
-      case "branch":
-        return toOptions(branches, ts("selectBranch"));
-      case "management":
-        return toOptions(allManagements, ts("selectManagement"));
-      case "job_title":
-        return toOptions(jobTitles, ts("selectJobTitle"));
-      case "job_role":
-        return toOptions(jobRoleOptions, ts("selectJobRole"));
-      default:
-        return withEmptyOption([], tc("select"));
-    }
-  }, [
-    actionTakerSpecificProcedureType,
-    branches,
-    allManagements,
-    jobTitles,
-    jobRoleOptions,
-    ts,
-    tc,
-  ]);
+  const getSpecificProcedureValuePlaceholder = useCallback(
+    (type: string) => {
+      switch (type) {
+        case "branch": return ts("selectBranch");
+        case "management": return ts("selectManagement");
+        case "job_title": return ts("selectJobTitle");
+        case "job_role": return ts("selectJobRole");
+        default: return ts("selectValue");
+      }
+    },
+    [ts],
+  );
 
   const toggleArrayValue = (current: string[], val: string): string[] =>
     current.includes(val)
@@ -573,33 +598,14 @@ export default function StepCard({
       });
       return;
     }
-    if (
-      data.actionTakerType === "management_hierarchy" &&
-      data.actionTakerPrimaryManagementHierarchyType &&
-      data.actionTakerAlternativeManagementHierarchyType &&
-      data.actionTakerPrimaryManagementHierarchyType ===
-        data.actionTakerAlternativeManagementHierarchyType
-    ) {
-      toast({
-        title: t("actions.save"),
-        description: ts("validation.duplicateHierarchy"),
-        variant: "destructive",
-      });
-      return;
-    }
-    if (data.actionTakerType === "Specific_procedures") {
-      if (!data.actionTakerSpecificProcedureType) {
+    if (data.actionTakerType === "specific_procedures") {
+      const validRows = data.actionTakerSpecificProcedureRows.filter(
+        (r) => r.type && r.id,
+      );
+      if (validRows.length === 0) {
         toast({
           title: t("actions.save"),
           description: ts("validation.selectProcedureType"),
-          variant: "destructive",
-        });
-        return;
-      }
-      if (!data.actionTakerSpecificProcedureId) {
-        toast({
-          title: t("actions.save"),
-          description: ts("validation.selectValue"),
           variant: "destructive",
         });
         return;
@@ -617,24 +623,33 @@ export default function StepCard({
       return;
     }
 
+    const validSpecificRows = data.actionTakerSpecificProcedureRows.filter(
+      (r) => r.type && r.id,
+    );
+    const formsValue =
+      data.actionTakerType === "himself"
+        ? "approve"
+        : data.orgTemplate === "accreditation_form"
+        ? "accept"
+        : "approve";
+
     const body: CreateStepArgs = {
       name: data.stepName.trim(),
       action_taker_type: data.actionTakerType,
-      action_taker_management_hierarchy_type:
-        data.actionTakerPrimaryManagementHierarchyType,
+      ...(data.actionTakerType === "management_hierarchy"
+        ? { action_taker_management_hierarchy_type: data.actionTakerPrimaryManagementHierarchyType }
+        : {}),
       ...(data.actionTakerType === "management_hierarchy" &&
-      data.actionTakerAlternativeManagementHierarchyType
+      data.actionTakerAlternativeManagementHierarchyTypes.length > 0
         ? {
             action_taker_alternative_management_hierarchy_type:
-              data.actionTakerAlternativeManagementHierarchyType,
+              data.actionTakerAlternativeManagementHierarchyTypes,
           }
         : {}),
-      ...(data.actionTakerType === "Specific_procedures"
+      ...(data.actionTakerType === "specific_procedures" && validSpecificRows.length > 0
         ? {
-            action_taker_specific_procedure_type:
-              data.actionTakerSpecificProcedureType,
-            action_taker_specific_procedure_id:
-              data.actionTakerSpecificProcedureId,
+            action_taker_specific_procedure_type: validSpecificRows.map((r) => r.type),
+            action_taker_specific_procedure_id: validSpecificRows.map((r) => r.id),
           }
         : {}),
       action_taker_user_ids:
@@ -649,7 +664,7 @@ export default function StepCard({
       is_view_only: data.orgBase.includes("view_only"),
       is_return_with_notes: data.orgBase.includes("return_with_notes"),
       requires_approval_within_period: data.orgBase.includes("approve_timed"),
-      forms: data.orgTemplate === "accreditation_form" ? "accept" : "approve",
+      forms: formsValue,
       notify_by_email: data.notifications.includes("email"),
       notify_by_whatsapp: data.notifications.includes("whatsapp"),
       notify_by_sms: data.notifications.includes("sms"),
@@ -1131,13 +1146,12 @@ export default function StepCard({
                         onChange={(v) => {
                           const next = String(v);
                           field.onChange(next);
-                          if (
-                            next &&
-                            next === actionTakerAlternativeManagementHierarchyType
-                          ) {
+                          if (next) {
                             setValue(
-                              "actionTakerAlternativeManagementHierarchyType",
-                              "",
+                              "actionTakerAlternativeManagementHierarchyTypes",
+                              actionTakerAlternativeManagementHierarchyTypes.filter(
+                                (a) => a !== next,
+                              ),
                             );
                           }
                         }}
@@ -1155,21 +1169,60 @@ export default function StepCard({
                   {ts("alternativeManagementHierarchy")}
                 </Typography>
                 <Controller
-                  name="actionTakerAlternativeManagementHierarchyType"
+                  name="actionTakerAlternativeManagementHierarchyTypes"
                   control={control}
-                  render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={alternativeManagementHierarchyOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => field.onChange(String(v))}
-                        placeholder={ts("selectAlternativeManagementHierarchy")}
-                        searchPlaceholder={tc("search")}
-                        noResultsText={tc("noResults")}
-                        disabled={fieldsDisabled}
-                      />
-                    </Box>
-                  )}
+                  render={({ field }) => {
+                    const selected: string[] = field.value ?? [];
+                    const availableOptions = allManagementHierarchyOptions.filter(
+                      (o) =>
+                        o.value !== actionTakerPrimaryManagementHierarchyType &&
+                        !selected.includes(o.value),
+                    );
+                    return (
+                      <Box>
+                        {selected.length > 0 && (
+                          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
+                            {selected.map((val) => {
+                              const label =
+                                allManagementHierarchyOptions.find((o) => o.value === val)
+                                  ?.label ?? val;
+                              return (
+                                <Chip
+                                  key={val}
+                                  label={label}
+                                  size="small"
+                                  onDelete={
+                                    fieldsDisabled
+                                      ? undefined
+                                      : () =>
+                                          field.onChange(
+                                            selected.filter((v) => v !== val),
+                                          )
+                                  }
+                                />
+                              );
+                            })}
+                          </Box>
+                        )}
+                        {!fieldsDisabled && availableOptions.length > 0 && (
+                          <SearchableSelect
+                            options={availableOptions}
+                            value=""
+                            onChange={(v) => {
+                              const next = String(v);
+                              if (next && !selected.includes(next)) {
+                                field.onChange([...selected, next]);
+                              }
+                            }}
+                            placeholder={ts("selectAlternativeManagementHierarchy")}
+                            searchPlaceholder={tc("search")}
+                            noResultsText={tc("noResults")}
+                            disabled={fieldsDisabled}
+                          />
+                        )}
+                      </Box>
+                    );
+                  }}
                 />
               </Grid>
             </Grid>
@@ -1312,54 +1365,108 @@ export default function StepCard({
           </Box>
         )}
 
-        {actionTakerType === "Specific_procedures" && (
+        {actionTakerType === "specific_procedures" && (
           <Box sx={{ mb: 2.5 }}>
             <SectionLabel>{ts("specificProcedures")}</SectionLabel>
-            <Grid container spacing={2}>
-              <Grid size={6}>
-                <Controller
-                  name="actionTakerSpecificProcedureType"
-                  control={control}
-                  render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={specificProcedureEntityOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => {
-                          field.onChange(String(v));
-                          setValue("actionTakerSpecificProcedureId", "");
-                        }}
-                        placeholder={ts("selectType")}
-                        searchPlaceholder={tc("search")}
-                        noResultsText={tc("noResults")}
-                        disabled={fieldsDisabled}
-                      />
-                    </Box>
-                  )}
-                />
-              </Grid>
-              <Grid size={6}>
-                <Controller
-                  name="actionTakerSpecificProcedureId"
-                  control={control}
-                  render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={specificProcedureValueOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => field.onChange(String(v))}
-                        placeholder={specificProcedureValuePlaceholder}
-                        searchPlaceholder={tc("search")}
-                        noResultsText={tc("noResults")}
-                        disabled={
-                          fieldsDisabled || !actionTakerSpecificProcedureType
-                        }
-                      />
-                    </Box>
-                  )}
-                />
-              </Grid>
-            </Grid>
+            <Controller
+              name="actionTakerSpecificProcedureRows"
+              control={control}
+              render={({ field }) => {
+                const rows: SpecificProcedureRow[] =
+                  field.value?.length ? field.value : [{ type: "", id: "" }];
+                const updateRow = (
+                  idx: number,
+                  key: keyof SpecificProcedureRow,
+                  val: string,
+                ) => {
+                  const next = rows.map((r, i) =>
+                    i === idx ? { ...r, [key]: val, ...(key === "type" ? { id: "" } : {}) } : r,
+                  );
+                  field.onChange(next);
+                };
+                const addRow = () =>
+                  field.onChange([...rows, { type: "", id: "" }]);
+                const removeRow = (idx: number) =>
+                  field.onChange(rows.filter((_, i) => i !== idx));
+
+                return (
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                    {rows.map((row, idx) => (
+                      <Grid container spacing={2} key={idx} alignItems="center">
+                        <Grid size={5}>
+                          <SearchableSelect
+                            options={specificProcedureEntityOptions}
+                            value={row.type}
+                            onChange={(v) => updateRow(idx, "type", String(v))}
+                            placeholder={ts("selectType")}
+                            searchPlaceholder={tc("search")}
+                            noResultsText={tc("noResults")}
+                            disabled={fieldsDisabled}
+                          />
+                        </Grid>
+                        <Grid size={5}>
+                          <SearchableSelect
+                            options={getSpecificProcedureValueOptions(row.type)}
+                            value={row.id}
+                            onChange={(v) => updateRow(idx, "id", String(v))}
+                            placeholder={getSpecificProcedureValuePlaceholder(row.type)}
+                            searchPlaceholder={tc("search")}
+                            noResultsText={tc("noResults")}
+                            disabled={fieldsDisabled || !row.type}
+                          />
+                        </Grid>
+                        {!fieldsDisabled && rows.length > 1 && (
+                          <Grid size={2}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => removeRow(idx)}
+                              aria-label={ts("removeSpecificProcedureRow")}
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Grid>
+                        )}
+                      </Grid>
+                    ))}
+                    {!fieldsDisabled && (
+                      <Box>
+                        <Box
+                          component="span"
+                          role="button"
+                          tabIndex={0}
+                          onClick={addRow}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              addRow();
+                            }
+                          }}
+                          sx={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            border: 1,
+                            borderColor: "primary.main",
+                            color: "primary.main",
+                            fontSize: "0.8rem",
+                            cursor: "pointer",
+                            userSelect: "none",
+                            "&:hover": { bgcolor: "action.hover" },
+                          }}
+                        >
+                          <Add fontSize="small" />
+                          {ts("addSpecificProcedureRow")}
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                );
+              }}
+            />
           </Box>
         )}
 
@@ -1392,19 +1499,28 @@ export default function StepCard({
           <Controller
             name="orgTemplate"
             control={control}
-            render={({ field }) => (
-              <Box sx={{ width: "100%" }}>
-                <SearchableSelect
-                  options={orgTemplateSelectOptions}
-                  value={field.value ?? "approve"}
-                  onChange={(v) => field.onChange(String(v))}
-                  placeholder={ts("selectTemplate")}
-                  searchPlaceholder={tc("search")}
-                  noResultsText={tc("noResults")}
-                  disabled={fieldsDisabled}
-                />
-              </Box>
-            )}
+            render={({ field }) => {
+              const isHimself = actionTakerType === "himself";
+              const availableTemplateOptions = isHimself
+                ? orgTemplateSelectOptions.filter((o) => o.value === "approve")
+                : orgTemplateSelectOptions;
+              if (isHimself && field.value !== "approve") {
+                field.onChange("approve");
+              }
+              return (
+                <Box sx={{ width: "100%" }}>
+                  <SearchableSelect
+                    options={availableTemplateOptions}
+                    value={isHimself ? "approve" : (field.value ?? "approve")}
+                    onChange={(v) => field.onChange(String(v))}
+                    placeholder={ts("selectTemplate")}
+                    searchPlaceholder={tc("search")}
+                    noResultsText={tc("noResults")}
+                    disabled={fieldsDisabled || isHimself}
+                  />
+                </Box>
+              );
+            }}
           />
         </Box>
 

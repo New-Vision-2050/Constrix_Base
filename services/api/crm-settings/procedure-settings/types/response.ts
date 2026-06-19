@@ -73,9 +73,14 @@ export interface ProcedureStep {
   management_id?: number | null;
   action_taker_type?: string | null;
   action_taker_management_hierarchy_type?: string | null;
-  action_taker_alternative_management_hierarchy_type?: string | null;
-  action_taker_specific_procedure_type?: string | null;
-  action_taker_specific_procedure_id?: string | number | null;
+  /** May be a legacy scalar string or the new array form */
+  action_taker_alternative_management_hierarchy_type?: string | string[] | null;
+  /** May be a legacy scalar string or the new array form */
+  action_taker_specific_procedure_type?: string | string[] | null;
+  /** May be a legacy scalar or the new array form */
+  action_taker_specific_procedure_id?: string | number | string[] | null;
+  /** Convenience field from API (read-only, use for display) */
+  action_taker_specific_procedures?: { type: string; id: string }[] | null;
   action_taker_user_ids?: string[];
   concerned_management_hierarchy_ids?: string[];
   /** API may send boolean or 0/1 */
