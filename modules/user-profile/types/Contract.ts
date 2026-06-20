@@ -27,4 +27,8 @@ export type Contract = {
   probation_period_unit: { id: string; name: string };
   right_terminate: { id: string; name: string };
   type_working_hour: { id: string; name: string };
+  stakeholder_id?: string;
+  stakeholder?: { id: string; name: string };
+  employment_name?: string;
+  registration_number?: string;
 };

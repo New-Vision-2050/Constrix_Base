@@ -51,13 +51,20 @@ export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
                         ],
                     },
                     {
-                        name: "employment_name",
+                        name: "stakeholder_id",
                         label: tContractual("employerName"),
-                        type: "text",
+                        type: "select",
                         placeholder: tContractual("employerName"),
+                        dynamicOptions: {
+                            url: `${baseURL}/stakeholders`,
+                            valueField: "id",
+                            labelField: "name",
+                            searchParam: "name",
+                            enableServerSearch: true,
+                        },
                         validation: [
                             {
-                                type: "text",
+                                type: "required",
                                 message: tContractual("employerName") + " " + t("required"),
                             },
                         ],
@@ -80,7 +87,7 @@ export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
         ],
         initialValues: {
             contractual_relationship_type_id: contract?.contractual_relationship_type_id,
-            employment_name: contract?.employment_name,
+            stakeholder_id: contract?.stakeholder_id,
             registration_number: contract?.registration_number,
             status: contract?.status?.id,
             description: contract?.description,
@@ -103,7 +110,7 @@ export const ContractualRelationshipFormConfig = ({contract}: PropsT) => {
         onSubmit: async (formData: Record<string, unknown>) => {
             const body = {
                 contractual_relationship_type_id: formData.contractual_relationship_type_id,
-                employment_name: formData.employment_name,
+                stakeholder_id: formData.stakeholder_id,
                 registration_number: formData.registration_number,
                 user_id: userId,
             };
