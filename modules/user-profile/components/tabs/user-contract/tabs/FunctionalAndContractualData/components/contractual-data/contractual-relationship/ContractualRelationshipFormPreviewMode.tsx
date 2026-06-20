@@ -22,8 +22,8 @@ export default function ContractualRelationshipFormPreviewMode({ contract }: Pro
       <div className="p-2">
         <PreviewTextField
           label={tContractual("employerName")}
-          value={contract?.employment_name ?? ""}
-          valid={Boolean(contract?.employment_name)}
+          value={contract?.stakeholder?.name ?? contract?.stakeholder_id ?? ""}
+          valid={Boolean(contract?.stakeholder_id)}
         />
       </div>
 
