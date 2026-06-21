@@ -168,7 +168,7 @@ export const InternalProcedureSettingsApi = {
     internalProcedureId: string,
     args: UpdateInternalProcedureArgs,
   ): Promise<InternalProcedure> => {
-    const response = await baseApi.put<UpdateInternalProcedureResponse>(
+    const response = await baseApi.post<UpdateInternalProcedureResponse>(
       `procedure-settings/${procedureSettingId}/internal-procedures/${internalProcedureId}`,
       args,
     );
