@@ -1,4 +1,51 @@
 import type { InternalProcedure } from "./types/response";
+import type { RichInternalProcedureCondition } from "./types/args";
+
+export function coerceBoolean(value: unknown, fallback = false): boolean {
+  if (typeof value === "boolean") return value;
+  if (value === 1 || value === "1" || value === "true") return true;
+  if (value === 0 || value === "0" || value === "false") return false;
+  return fallback;
+}
+
+function normalizeRichConditions(
+  conditions: unknown[],
+): RichInternalProcedureCondition[] {
+  return conditions.map((item) => {
+    const record = item as Record<string, unknown>;
+    return {
+      key: String(record.key ?? ""),
+      is_active: coerceBoolean(record.is_active, false),
+      sort_order:
+        typeof record.sort_order === "number" ? record.sort_order : 0,
+      settings:
+        record.settings && typeof record.settings === "object"
+          ? (record.settings as RichInternalProcedureCondition["settings"])
+          : {},
+    };
+  });
+}
+
+function normalizeProcedureConditions(
+  conditions: unknown,
+): InternalProcedure["conditions"] {
+  if (!conditions) return undefined;
+
+  if (Array.isArray(conditions)) {
+    const isRich = conditions.some(
+      (item) =>
+        item != null &&
+        typeof item === "object" &&
+        "is_active" in item &&
+        "sort_order" in item,
+    );
+    if (isRich) {
+      return normalizeRichConditions(conditions);
+    }
+  }
+
+  return conditions as InternalProcedure["conditions"];
+}
 
 function resolveOptionalId(value: unknown): string | null {
   if (value == null || value === "") return null;
@@ -9,6 +56,27 @@ function resolveOptionalId(value: unknown): string | null {
     return id != null && String(id).length > 0 ? String(id) : null;
   }
   return null;
+}
+
+function resolveOptionalIdArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (item == null || item === "") return null;
+        if (typeof item === "string" || typeof item === "number") {
+          return String(item);
+        }
+        if (typeof item === "object" && "id" in item) {
+          const id = (item as { id?: unknown }).id;
+          return id != null && String(id).length > 0 ? String(id) : null;
+        }
+        return null;
+      })
+      .filter((item): item is string => item != null);
+  }
+
+  const singleId = resolveOptionalId(value);
+  return singleId ? [singleId] : [];
 }
 
 function resolveFormId(raw: Record<string, unknown>): string {
@@ -68,7 +136,15 @@ export function normalizeInternalProcedure(
     type: String(data.type ?? ""),
     form: resolveFormId(data),
     parent_id: resolveOptionalId(data.parent_id),
-    conditions: data.conditions as InternalProcedure["conditions"],
+    conditions: normalizeProcedureConditions(data.conditions),
+    appears_before_ids: resolveOptionalIdArray(
+      data.appears_before_ids ??
+        data.appears_before_id ??
+        data.appears_before,
+    ),
+    appears_after_ids: resolveOptionalIdArray(
+      data.appears_after_ids ?? data.appears_after_id ?? data.appears_after,
+    ),
     appears_before_id: resolveOptionalId(
       data.appears_before_id ?? data.appears_before,
     ),
@@ -77,7 +153,6 @@ export function normalizeInternalProcedure(
     ),
     sort_order:
       typeof data.sort_order === "number" ? data.sort_order : undefined,
-    is_active:
-      typeof data.is_active === "boolean" ? data.is_active : undefined,
+    is_active: coerceBoolean(data.is_active, true),
   };
 }

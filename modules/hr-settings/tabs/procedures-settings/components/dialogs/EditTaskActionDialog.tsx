@@ -3,12 +3,11 @@
 import {
   Box,
   Button,
-  Checkbox,
   CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material";
@@ -19,13 +18,13 @@ import { useQuery } from "@tanstack/react-query";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
-import {
-  alignFormConditionsToOptionKeys,
-  mapInternalProcedureToFormValues,
-} from "../../utils/mapInternalProcedureToFormValues";
 import { normalizeInternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/normalize";
-import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
-import type { TaskActionFormValues } from "./AddTaskActionDialog";
+import FormConditionsTable from "../FormConditionsTable";
+import {
+  buildInitialConditionsFromDefinitions,
+  mergeConditionsWithDefinitions,
+} from "../../utils/conditionFormUtils";
+import type { TaskActionFormValues } from "../../types";
 
 interface EditTaskActionDialogProps {
   open: boolean;
@@ -38,15 +37,17 @@ interface EditTaskActionDialogProps {
   hideAppearBefore?: boolean;
   excludeFromAppearAfter?: string[];
   excludeFromAppearBefore?: string[];
+  disableIsActiveSwitch?: boolean;
   onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
 
 const defaultValues: TaskActionFormValues = {
   name: "",
   modelId: "",
-  formConditions: {},
-  appearBefore: "",
-  appearAfter: "",
+  conditions: [],
+  appearBeforeIds: [],
+  appearAfterIds: [],
+  isActive: true,
 };
 
 export default function EditTaskActionDialog({
@@ -60,6 +61,7 @@ export default function EditTaskActionDialog({
   hideAppearBefore = false,
   excludeFromAppearAfter = [],
   excludeFromAppearBefore = [],
+  disableIsActiveSwitch = false,
   onSave,
 }: EditTaskActionDialogProps) {
   const { tTaskAction: t, tc } = useProceduresSettingsTranslations();
@@ -70,7 +72,7 @@ export default function EditTaskActionDialog({
   const [modelError, setModelError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
-  const conditionsAlignedRef = useRef(false);
+  const conditionsSyncedRef = useRef(false);
   const lockedModelIdRef = useRef("");
 
   const procedureSettingId = procedure?.id;
@@ -98,9 +100,9 @@ export default function EditTaskActionDialog({
     enabled: open && !!procedureType,
   });
 
-  const { data: formConditionOptions = [], isLoading: isConditionsLoading } =
+  const { data: conditionDefinitions = [], isLoading: isConditionsLoading } =
     useQuery({
-      queryKey: ["forms_conditions", form.modelId, locale],
+      queryKey: ["procedure-settings-forms-conditions", form.modelId, locale],
       queryFn: () =>
         InternalProcedureSettingsApi.getFormsConditions(form.modelId, locale),
       enabled: open && !!form.modelId,
@@ -125,24 +127,18 @@ export default function EditTaskActionDialog({
 
   const appearBeforeOptions = useMemo(
     () =>
-      withEmptyOption(
-        existingActions
-          .filter((a) => !excludeFromAppearBefore.includes(a.id))
-          .map((action) => ({ value: action.id, label: action.name })),
-        t("selectAction"),
-      ),
-    [existingActions, excludeFromAppearBefore, t],
+      existingActions
+        .filter((a) => !excludeFromAppearBefore.includes(a.id))
+        .map((action) => ({ value: action.id, label: action.name })),
+    [existingActions, excludeFromAppearBefore],
   );
 
   const appearAfterOptions = useMemo(
     () =>
-      withEmptyOption(
-        existingActions
-          .filter((a) => !excludeFromAppearAfter.includes(a.id))
-          .map((action) => ({ value: action.id, label: action.name })),
-        t("selectAction"),
-      ),
-    [existingActions, excludeFromAppearAfter, t],
+      existingActions
+        .filter((a) => !excludeFromAppearAfter.includes(a.id))
+        .map((action) => ({ value: action.id, label: action.name })),
+    [existingActions, excludeFromAppearAfter],
   );
 
   useEffect(() => {
@@ -151,25 +147,30 @@ export default function EditTaskActionDialog({
       setNameError("");
       setModelError("");
       setIsFormInitialized(false);
-      conditionsAlignedRef.current = false;
+      conditionsSyncedRef.current = false;
       return;
     }
 
     if (!procedure) return;
 
     const source = fetchedProcedure ?? normalizeInternalProcedure(procedure);
-    const initialValues = mapInternalProcedureToFormValues(source);
 
-    setForm({
+    setForm((prev) => ({
       ...defaultValues,
-      ...initialValues,
-    });
+      name: source.name,
+      modelId: source.form,
+      appearBeforeIds: source.appears_before_ids ?? [],
+      appearAfterIds: source.appears_after_ids ?? [],
+      isActive: source.is_active ?? true,
+      conditions: prev.conditions,
+    }));
+
     if (lockFormModel) {
-      lockedModelIdRef.current = initialValues.modelId;
+      lockedModelIdRef.current = source.form;
     }
     setNameError("");
     setModelError("");
-    conditionsAlignedRef.current = false;
+    conditionsSyncedRef.current = false;
     setIsFormInitialized(true);
   }, [open, procedure, fetchedProcedure, lockFormModel]);
 
@@ -178,56 +179,38 @@ export default function EditTaskActionDialog({
       !isFormInitialized ||
       isConditionsLoading ||
       !form.modelId ||
-      conditionsAlignedRef.current
+      conditionsSyncedRef.current ||
+      conditionDefinitions.length === 0
     ) {
       return;
     }
 
+    const source = fetchedProcedure ?? (procedure ? normalizeInternalProcedure(procedure) : null);
+
     setForm((prev) => {
-      const alignedConditions = alignFormConditionsToOptionKeys(
-        prev.formConditions,
-        formConditionOptions.map((condition) => condition.key),
+      const storedConditions = source?.conditions;
+      const initialConditions = buildInitialConditionsFromDefinitions(
+        conditionDefinitions,
+        storedConditions,
       );
 
       return {
         ...prev,
-        formConditions: alignedConditions,
+        conditions: mergeConditionsWithDefinitions(
+          initialConditions,
+          conditionDefinitions,
+        ),
       };
     });
-    conditionsAlignedRef.current = true;
+    conditionsSyncedRef.current = true;
   }, [
     isFormInitialized,
     isConditionsLoading,
     form.modelId,
-    formConditionOptions,
+    conditionDefinitions,
+    fetchedProcedure,
+    procedure,
   ]);
-
-  const toggleBoolFormCondition = (conditionKey: string) => {
-    setForm((prev) => {
-      const next = { ...prev.formConditions };
-      if (next[conditionKey]) {
-        delete next[conditionKey];
-      } else {
-        next[conditionKey] = true;
-      }
-      return { ...prev, formConditions: next };
-    });
-  };
-
-  const setIntFormCondition = (conditionKey: string, rawValue: string) => {
-    setForm((prev) => {
-      const next = { ...prev.formConditions };
-      if (rawValue === "") {
-        delete next[conditionKey];
-      } else {
-        const parsed = parseInt(rawValue, 10);
-        if (!Number.isNaN(parsed)) {
-          next[conditionKey] = parsed;
-        }
-      }
-      return { ...prev, formConditions: next };
-    });
-  };
 
   const handleSave = async () => {
     if (!form.name.trim()) {
@@ -260,10 +243,21 @@ export default function EditTaskActionDialog({
   const isFormReady =
     isFormInitialized && (!form.modelId || !isConditionsLoading);
 
+  const conditionTableLabels = useMemo(
+    () => ({
+      sortOrder: t("conditionsTable.sortOrder"),
+      status: t("conditionsTable.status"),
+      condition: t("conditionsTable.condition"),
+      conditionType: t("conditionsTable.conditionType"),
+      settings: t("conditionsTable.settings"),
+    }),
+    [t],
+  );
+
   if (!procedure) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", fontWeight: 700, pb: 1 }}>
         {t("editTitle")}
       </DialogTitle>
@@ -279,21 +273,34 @@ export default function EditTaskActionDialog({
           </Typography>
         ) : (
           <>
-            <TextField
-              label={t("actionName")}
-              placeholder={t("actionNamePlaceholder")}
-              value={form.name}
-              onChange={(e) => {
-                setForm((prev) => ({ ...prev, name: e.target.value }));
-                if (nameError) setNameError("");
-              }}
-              fullWidth
-              size="small"
-              required
-              disabled={!isFormReady || isSaving}
-              error={!!nameError}
-              helperText={nameError}
-            />
+            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5 }}>
+              <TextField
+                label={t("actionName")}
+                placeholder={t("actionNamePlaceholder")}
+                value={form.name}
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, name: e.target.value }));
+                  if (nameError) setNameError("");
+                }}
+                fullWidth
+                size="small"
+                required
+                disabled={!isFormReady || isSaving}
+                error={!!nameError}
+                helperText={nameError}
+                sx={{ flex: 1, minWidth: 0 }}
+              />
+              <Switch
+                checked={form.isActive}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, isActive: e.target.checked }))
+                }
+                disabled={!isFormReady || isSaving || disableIsActiveSwitch}
+                color="secondary"
+                sx={{ mt: 0.5, flexShrink: 0 }}
+                inputProps={{ "aria-label": t("isActive") }}
+              />
+            </Box>
 
             <SearchableSelect
               options={modelOptions}
@@ -301,11 +308,11 @@ export default function EditTaskActionDialog({
               onChange={(value) => {
                 setForm((prev) => {
                   if (prev.modelId === String(value)) return prev;
-                  conditionsAlignedRef.current = false;
+                  conditionsSyncedRef.current = false;
                   return {
                     ...prev,
                     modelId: String(value),
-                    formConditions: {},
+                    conditions: [],
                   };
                 });
                 if (modelError) setModelError("");
@@ -335,68 +342,20 @@ export default function EditTaskActionDialog({
                     {t("loadingConditions")}
                   </Typography>
                 </Box>
-              ) : formConditionOptions.length === 0 ? (
+              ) : conditionDefinitions.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   {t("noConditions")}
                 </Typography>
               ) : (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                  {formConditionOptions.map((condition) => {
-                    const conditionKey = condition.key;
-                    const isIntCondition = condition.type === "int";
-
-                    if (isIntCondition) {
-                      const intValue = form.formConditions[conditionKey];
-                      return (
-                        <Box
-                          key={conditionKey}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: 2,
-                          }}
-                        >
-                          <Typography variant="body2">{condition.name}</Typography>
-                          <TextField
-                            type="number"
-                            size="small"
-                            value={intValue ?? ""}
-                            onChange={(e) =>
-                              setIntFormCondition(conditionKey, e.target.value)
-                            }
-                            inputProps={{ min: 0, step: 1 }}
-                            sx={{ width: 120 }}
-                            disabled={isSaving}
-                          />
-                        </Box>
-                      );
-                    }
-
-                    return (
-                      <FormControlLabel
-                        key={conditionKey}
-                        labelPlacement="start"
-                        sx={{
-                          m: 0,
-                          width: "100%",
-                          justifyContent: "space-between",
-                        }}
-                        label={
-                          <Typography variant="body2">{condition.name}</Typography>
-                        }
-                        control={
-                          <Checkbox
-                            checked={!!form.formConditions[conditionKey]}
-                            onChange={() => toggleBoolFormCondition(conditionKey)}
-                            size="small"
-                            disabled={isSaving}
-                          />
-                        }
-                      />
-                    );
-                  })}
-                </Box>
+                <FormConditionsTable
+                  definitions={conditionDefinitions}
+                  conditions={form.conditions}
+                  onChange={(conditions) =>
+                    setForm((prev) => ({ ...prev, conditions }))
+                  }
+                  disabled={isSaving}
+                  labels={conditionTableLabels}
+                />
               )}
             </Box>
 
@@ -409,12 +368,13 @@ export default function EditTaskActionDialog({
                   {!hideAppearBefore && (
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <SearchableSelect
+                        multiple
                         options={appearBeforeOptions}
-                        value={form.appearBefore}
+                        value={form.appearBeforeIds}
                         onChange={(value) =>
                           setForm((prev) => ({
                             ...prev,
-                            appearBefore: String(value),
+                            appearBeforeIds: value.map(String),
                           }))
                         }
                         placeholder={t("selectAction")}
@@ -428,12 +388,13 @@ export default function EditTaskActionDialog({
                   {!hideAppearAfter && (
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <SearchableSelect
+                        multiple
                         options={appearAfterOptions}
-                        value={form.appearAfter}
+                        value={form.appearAfterIds}
                         onChange={(value) =>
                           setForm((prev) => ({
                             ...prev,
-                            appearAfter: String(value),
+                            appearAfterIds: value.map(String),
                           }))
                         }
                         placeholder={t("selectAction")}

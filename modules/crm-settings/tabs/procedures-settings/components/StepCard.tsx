@@ -29,8 +29,6 @@ import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-sett
 import { ProcedureStep } from "@/services/api/crm-settings/procedure-settings/types/response";
 import {
   coerceStepBoolean,
-  formsKindToStepCardUi,
-  parseProcedureStepFormsKind,
 } from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
 import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import { useToast } from "@/modules/table/hooks/use-toast";
@@ -51,7 +49,6 @@ const ORG_BASE_OPTION_DEFS = [
 
 const ORG_TEMPLATE_OPTION_DEFS = [
   { value: "approve", labelKey: "orgTemplate.approve" as const },
-  { value: "accreditation_form", labelKey: "orgTemplate.accreditationForm" as const },
 ] as const;
 
 const NOTIFICATION_OPTION_DEFS = [
@@ -265,12 +262,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       concernedUserId: firstConcernedUserId(serverStep),
       orgBase: base.length ? base : ["approve"],
       orgTemplate:
-        actionTakerType === "himself"
-          ? "approve"
-          : formsKindToStepCardUi(parseProcedureStepFormsKind(serverStep)) ===
-            "accept"
-          ? "accreditation_form"
-          : "approve",
+        actionTakerType === "himself" ? "approve" : "approve",
       notifications,
       deadlineDays: String(serverStep.approval_within_days || 0),
       deadlineHours: String(serverStep.approval_within_hours || 0),
@@ -629,11 +621,7 @@ export default function StepCard({
       (r) => r.type && r.id,
     );
     const formsValue =
-      data.actionTakerType === "himself"
-        ? "approve"
-        : data.orgTemplate === "accreditation_form"
-        ? "accept"
-        : "approve";
+      data.actionTakerType === "himself" ? "approve" : "approve";
 
     const body: CreateStepArgs = {
       name: data.stepName.trim(),
@@ -1506,19 +1494,30 @@ export default function StepCard({
               const availableTemplateOptions = isHimself
                 ? orgTemplateSelectOptions.filter((o) => o.value === "approve")
                 : orgTemplateSelectOptions;
+              const selectedTemplateValue = isHimself
+                ? "approve"
+                : (field.value ?? "approve");
+              const selectedTemplateLabel = availableTemplateOptions.find(
+                (option) => option.value === selectedTemplateValue,
+              )?.label;
+
               if (isHimself && field.value !== "approve") {
                 field.onChange("approve");
               }
+
               return (
                 <Box sx={{ width: "100%" }}>
                   <SearchableSelect
                     options={availableTemplateOptions}
-                    value={isHimself ? "approve" : (field.value ?? "approve")}
+                    value={selectedTemplateValue}
                     onChange={(v) => field.onChange(String(v))}
                     placeholder={ts("selectTemplate")}
                     searchPlaceholder={tc("search")}
                     noResultsText={tc("noResults")}
                     disabled={fieldsDisabled || isHimself}
+                    displayLabel={
+                      fieldsDisabled ? selectedTemplateLabel : undefined
+                    }
                   />
                 </Box>
               );

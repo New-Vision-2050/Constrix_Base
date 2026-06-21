@@ -267,6 +267,14 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
     loadingConditions: _m("Loading conditions...", "جاري تحميل الشروط..."),
     noConditions: _m("No conditions for this form", "لا توجد شروط لهذا النموذج"),
     save: _m("Save", "حفظ"),
+    isActive: _m("Active", "نشط"),
+    conditionsTable: new MessagesGroup({
+      sortOrder: _m("Order", "ترتيب"),
+      status: _m("Status", "الحالة"),
+      condition: _m("Condition", "الشرط"),
+      conditionType: _m("Condition type", "نوع الشرط"),
+      settings: _m("Condition settings", "إعدادات الشرط"),
+    }),
     models: new MessagesGroup({
       taskTimeSetting: _m(
         "Work task time setting",

@@ -3,22 +3,21 @@
 import {
   Box,
   Button,
-  Checkbox,
   CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
-import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
 import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
+import FormConditionsTable from "../FormConditionsTable";
+import { buildInitialConditionsFromDefinitions } from "../../utils/conditionFormUtils";
 import type { TaskActionFormValues } from "../../types";
 
 export type { TaskActionFormValues };
@@ -41,9 +40,10 @@ interface AddTaskActionDialogProps {
 const defaultValues: TaskActionFormValues = {
   name: "",
   modelId: "",
-  formConditions: {},
-  appearBefore: "",
-  appearAfter: "",
+  conditions: [],
+  appearBeforeIds: [],
+  appearAfterIds: [],
+  isActive: true,
 };
 
 export default function AddTaskActionDialog({
@@ -62,9 +62,13 @@ export default function AddTaskActionDialog({
   const [nameError, setNameError] = useState("");
   const [modelError, setModelError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const conditionsModelRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      conditionsModelRef.current = null;
+      return;
+    }
     setForm(defaultValues);
     setNameError("");
     setModelError("");
@@ -80,13 +84,28 @@ export default function AddTaskActionDialog({
     enabled: open && !!procedureType,
   });
 
-  const { data: formConditionOptions = [], isLoading: isConditionsLoading } =
+  const { data: conditionDefinitions = [], isLoading: isConditionsLoading } =
     useQuery({
-      queryKey: ["forms_conditions", form.modelId, locale],
+      queryKey: ["procedure-settings-forms-conditions", form.modelId, locale],
       queryFn: () =>
         InternalProcedureSettingsApi.getFormsConditions(form.modelId, locale),
       enabled: open && !!form.modelId,
     });
+
+  useEffect(() => {
+    if (!form.modelId) {
+      conditionsModelRef.current = null;
+      return;
+    }
+    if (isConditionsLoading || conditionDefinitions.length === 0) return;
+    if (conditionsModelRef.current === form.modelId) return;
+
+    conditionsModelRef.current = form.modelId;
+    setForm((prev) => ({
+      ...prev,
+      conditions: buildInitialConditionsFromDefinitions(conditionDefinitions),
+    }));
+  }, [form.modelId, conditionDefinitions, isConditionsLoading]);
 
   const modelOptions = useMemo(
     () =>
@@ -99,52 +118,19 @@ export default function AddTaskActionDialog({
 
   const appearBeforeOptions = useMemo(
     () =>
-      withEmptyOption(
-        existingActions
-          .filter((a) => !excludeFromAppearBefore.includes(a.id))
-          .map((action) => ({ value: action.id, label: action.name })),
-        t("selectAction"),
-      ),
-    [existingActions, excludeFromAppearBefore, t],
+      existingActions
+        .filter((a) => !excludeFromAppearBefore.includes(a.id))
+        .map((action) => ({ value: action.id, label: action.name })),
+    [existingActions, excludeFromAppearBefore],
   );
 
   const appearAfterOptions = useMemo(
     () =>
-      withEmptyOption(
-        existingActions
-          .filter((a) => !excludeFromAppearAfter.includes(a.id))
-          .map((action) => ({ value: action.id, label: action.name })),
-        t("selectAction"),
-      ),
-    [existingActions, excludeFromAppearAfter, t],
+      existingActions
+        .filter((a) => !excludeFromAppearAfter.includes(a.id))
+        .map((action) => ({ value: action.id, label: action.name })),
+    [existingActions, excludeFromAppearAfter],
   );
-
-  const toggleBoolFormCondition = (conditionKey: string) => {
-    setForm((prev) => {
-      const next = { ...prev.formConditions };
-      if (next[conditionKey]) {
-        delete next[conditionKey];
-      } else {
-        next[conditionKey] = true;
-      }
-      return { ...prev, formConditions: next };
-    });
-  };
-
-  const setIntFormCondition = (conditionKey: string, rawValue: string) => {
-    setForm((prev) => {
-      const next = { ...prev.formConditions };
-      if (rawValue === "") {
-        delete next[conditionKey];
-      } else {
-        const parsed = parseInt(rawValue, 10);
-        if (!Number.isNaN(parsed)) {
-          next[conditionKey] = parsed;
-        }
-      }
-      return { ...prev, formConditions: next };
-    });
-  };
 
   const handleSave = async () => {
     if (!form.name.trim()) {
@@ -167,8 +153,19 @@ export default function AddTaskActionDialog({
     }
   };
 
+  const conditionTableLabels = useMemo(
+    () => ({
+      sortOrder: t("conditionsTable.sortOrder"),
+      status: t("conditionsTable.status"),
+      condition: t("conditionsTable.condition"),
+      conditionType: t("conditionsTable.conditionType"),
+      settings: t("conditionsTable.settings"),
+    }),
+    [t],
+  );
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", fontWeight: 700, pb: 1 }}>
         {t("title")}
       </DialogTitle>
@@ -194,10 +191,11 @@ export default function AddTaskActionDialog({
           options={modelOptions}
           value={form.modelId}
           onChange={(value) => {
+            conditionsModelRef.current = null;
             setForm((prev) => ({
               ...prev,
               modelId: String(value),
-              formConditions: {},
+              conditions: [],
             }));
             if (modelError) setModelError("");
           }}
@@ -223,66 +221,20 @@ export default function AddTaskActionDialog({
                 {t("loadingConditions")}
               </Typography>
             </Box>
-          ) : formConditionOptions.length === 0 ? (
+          ) : conditionDefinitions.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
               {t("noConditions")}
             </Typography>
           ) : (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-              {formConditionOptions.map((condition) => {
-                const conditionKey = condition.key;
-                const isIntCondition = condition.type === "int";
-
-                if (isIntCondition) {
-                  const intValue = form.formConditions[conditionKey];
-                  return (
-                    <Box
-                      key={conditionKey}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 2,
-                      }}
-                    >
-                      <Typography variant="body2">{condition.name}</Typography>
-                      <TextField
-                        type="number"
-                        size="small"
-                        value={intValue ?? ""}
-                        onChange={(e) =>
-                          setIntFormCondition(conditionKey, e.target.value)
-                        }
-                        inputProps={{ min: 0, step: 1 }}
-                        sx={{ width: 120 }}
-                      />
-                    </Box>
-                  );
-                }
-
-                return (
-                  <FormControlLabel
-                    key={conditionKey}
-                    labelPlacement="start"
-                    sx={{
-                      m: 0,
-                      width: "100%",
-                      justifyContent: "space-between",
-                    }}
-                    label={
-                      <Typography variant="body2">{condition.name}</Typography>
-                    }
-                    control={
-                      <Checkbox
-                        checked={!!form.formConditions[conditionKey]}
-                        onChange={() => toggleBoolFormCondition(conditionKey)}
-                        size="small"
-                      />
-                    }
-                  />
-                );
-              })}
-            </Box>
+            <FormConditionsTable
+              definitions={conditionDefinitions}
+              conditions={form.conditions}
+              onChange={(conditions) =>
+                setForm((prev) => ({ ...prev, conditions }))
+              }
+              disabled={isSaving}
+              labels={conditionTableLabels}
+            />
           )}
         </Box>
 
@@ -293,12 +245,13 @@ export default function AddTaskActionDialog({
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <SearchableSelect
+                multiple
                 options={appearBeforeOptions}
-                value={form.appearBefore}
+                value={form.appearBeforeIds}
                 onChange={(value) =>
                   setForm((prev) => ({
                     ...prev,
-                    appearBefore: String(value),
+                    appearBeforeIds: value.map(String),
                   }))
                 }
                 placeholder={t("selectAction")}
@@ -309,12 +262,13 @@ export default function AddTaskActionDialog({
             </Box>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <SearchableSelect
+                multiple
                 options={appearAfterOptions}
-                value={form.appearAfter}
+                value={form.appearAfterIds}
                 onChange={(value) =>
                   setForm((prev) => ({
                     ...prev,
-                    appearAfter: String(value),
+                    appearAfterIds: value.map(String),
                   }))
                 }
                 placeholder={t("selectAction")}
