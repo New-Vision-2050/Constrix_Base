@@ -1,24 +1,8 @@
 import type { CreateInternalProcedureArgs } from "@/services/api/hr-settings/internal-procedure-settings/types/args";
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
-import type { TaskActionFormValues } from "@/modules/hr-settings/tabs/procedures-settings/components/dialogs/AddTaskActionDialog";
-
-/** Maps snake_case condition keys to API PascalCase (e.g. apply_to_all_branches → ApplyToAllBranches). */
-export function toApiConditionKey(key: string): string {
-  return key
-    .split("_")
-    .filter(Boolean)
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join("");
-}
-
-function mapTaskActionConditions(
-  formConditions: TaskActionFormValues["formConditions"],
-): CreateInternalProcedureArgs["conditions"] {
-  return Object.entries(formConditions).map(([key, value]) => ({
-    key: toApiConditionKey(key),
-    value,
-  }));
-}
+import { coerceBoolean } from "@/services/api/hr-settings/internal-procedure-settings/normalize";
+import type { TaskActionFormValues } from "@/modules/hr-settings/tabs/procedures-settings/types";
+import { mapConditionsToApiPayload } from "@/modules/hr-settings/tabs/procedures-settings/utils/conditionFormUtils";
 
 function buildInternalProcedurePayload(
   values: TaskActionFormValues,
@@ -34,11 +18,11 @@ function buildInternalProcedurePayload(
     type: options.procedureType,
     form: values.modelId,
     parent_id: options.parentId ?? null,
-    conditions: mapTaskActionConditions(values.formConditions),
-    appears_before_id: values.appearBefore.trim() || null,
-    appears_after_id: values.appearAfter.trim() || null,
+    conditions: mapConditionsToApiPayload(values.conditions),
+    appears_before_ids: values.appearBeforeIds.filter(Boolean),
+    appears_after_ids: values.appearAfterIds.filter(Boolean),
     sort_order: options.sortOrder,
-    is_active: options.isActive ?? true,
+    is_active: coerceBoolean(values.isActive ?? options.isActive, true),
   };
 }
 
@@ -73,6 +57,7 @@ export function resolveProcedureSettingId(
 
 export {
   getPrimaryInternalProcedure,
+  getSortedChildInternalProcedures,
   isPrimaryInternalProcedure,
   getLastInternalProcedure,
   isLastInternalProcedure,

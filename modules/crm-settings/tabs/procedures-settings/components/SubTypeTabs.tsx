@@ -37,6 +37,7 @@ import {
   mapTaskActionToUpdateInternalProcedure,
   resolveProcedureSettingId,
   getPrimaryInternalProcedure,
+  getSortedChildInternalProcedures,
   isPrimaryInternalProcedure,
   getLastInternalProcedure,
   isLastInternalProcedure,
@@ -106,14 +107,10 @@ export default function SubTypeTabs() {
     [internalProcedures],
   );
 
-  const childProcedures = useMemo(() => {
-    if (!rootProcedure) {
-      return internalProcedures.filter((procedure) => !!procedure.parent_id);
-    }
-    return internalProcedures.filter(
-      (procedure) => procedure.parent_id === rootProcedure.id,
-    );
-  }, [internalProcedures, rootProcedure]);
+  const childProcedures = useMemo(
+    () => getSortedChildInternalProcedures(internalProcedures),
+    [internalProcedures],
+  );
 
   const defaultProcedureId = childProcedures[0]?.id ?? null;
   const activeProcedureId = selectedProcedureId ?? defaultProcedureId;
@@ -304,7 +301,6 @@ export default function SubTypeTabs() {
             procedureType: currentTabType,
             sortOrder: editingProcedure.sort_order ?? 1,
             parentId: editingProcedure.parent_id ?? null,
-            isActive: editingProcedure.is_active ?? true,
           }),
         );
 
@@ -656,6 +652,12 @@ export default function SubTypeTabs() {
         )}
         excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
         excludeFromAppearBefore={primaryProcedureId ? [primaryProcedureId] : []}
+        disableIsActiveSwitch={
+          editingProcedure
+            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures) ||
+              isLastInternalProcedure(editingProcedure, internalProcedures)
+            : false
+        }
         onSave={handleEditTaskAction}
       />
     </div>

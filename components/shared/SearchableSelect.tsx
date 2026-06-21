@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useLocale } from "next-intl";
 import {
   Box,
+  Checkbox,
   Typography,
   InputAdornment,
   TextField,
@@ -22,10 +23,8 @@ function valuesMatch(a: string | number, b: string | number): boolean {
   return String(a) === String(b);
 }
 
-interface SearchableSelectProps {
+interface SearchableSelectBaseProps {
   options: Option[];
-  value: string | number;
-  onChange: (value: string | number) => void;
   placeholder?: string;
   searchPlaceholder?: string;
   noResultsText?: string;
@@ -36,11 +35,25 @@ interface SearchableSelectProps {
   name?: string;
   error?: string;
   defaultValue?: string | number;
-  /** Shown in the trigger when set (e.g. read-only label from API). */
   displayLabel?: string;
-  /** When false, hides the search input in the dropdown. Defaults to true. */
   searchable?: boolean;
 }
+
+interface SingleSearchableSelectProps extends SearchableSelectBaseProps {
+  multiple?: false;
+  value: string | number;
+  onChange: (value: string | number) => void;
+}
+
+interface MultipleSearchableSelectProps extends SearchableSelectBaseProps {
+  multiple: true;
+  value: Array<string | number>;
+  onChange: (value: Array<string | number>) => void;
+}
+
+type SearchableSelectProps =
+  | SingleSearchableSelectProps
+  | MultipleSearchableSelectProps;
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
   options,
@@ -58,6 +71,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   error,
   displayLabel: displayLabelProp,
   searchable = true,
+  multiple = false,
 }) => {
   const theme = useTheme();
   const locale = useLocale();
@@ -67,23 +81,84 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((opt) => valuesMatch(opt.value, value));
+  const selectedValues = useMemo(
+    () => (multiple ? (Array.isArray(value) ? value : []) : []),
+    [multiple, value],
+  );
+
+  const selectedOption = !multiple
+    ? options.find((opt) => valuesMatch(opt.value, value as string | number))
+    : undefined;
+
   const defaultValueOption = defaultValue
     ? options.find((opt) => valuesMatch(opt.value, defaultValue))
     : undefined;
 
   const displayTrim = displayLabelProp?.trim();
-  const mainLabel =
-    displayTrim ||
-    selectedOption?.label ||
-    defaultValueOption?.label ||
-    placeholder;
+
+  const mainLabel = useMemo(() => {
+    if (displayTrim) return displayTrim;
+
+    if (multiple) {
+      if (selectedValues.length === 0) return placeholder;
+      return selectedValues
+        .map(
+          (selectedValue) =>
+            options.find((opt) => valuesMatch(opt.value, selectedValue))?.label,
+        )
+        .filter(Boolean)
+        .join(isRtl ? "، " : ", ");
+    }
+
+    return (
+      selectedOption?.label || defaultValueOption?.label || placeholder
+    );
+  }, [
+    displayTrim,
+    multiple,
+    selectedValues,
+    options,
+    isRtl,
+    placeholder,
+    selectedOption,
+    defaultValueOption,
+  ]);
 
   const filteredOptions = searchTerm
     ? options.filter((opt) =>
         opt.label.toLowerCase().includes(searchTerm.toLowerCase()),
       )
     : options;
+
+  const isOptionSelected = (optionValue: string | number) => {
+    if (multiple) {
+      return selectedValues.some((selectedValue) =>
+        valuesMatch(selectedValue, optionValue),
+      );
+    }
+    return valuesMatch(value as string | number, optionValue);
+  };
+
+  const handleOptionClick = (optionValue: string | number) => {
+    if (multiple) {
+      const currentValues = Array.isArray(value) ? [...value] : [];
+      const existingIndex = currentValues.findIndex((item) =>
+        valuesMatch(item, optionValue),
+      );
+
+      const nextValues =
+        existingIndex >= 0
+          ? currentValues.filter((_, index) => index !== existingIndex)
+          : [...currentValues, optionValue];
+
+      (onChange as MultipleSearchableSelectProps["onChange"])(nextValues);
+      return;
+    }
+
+    (onChange as SingleSearchableSelectProps["onChange"])(optionValue);
+    setIsOpen(false);
+    setSearchTerm("");
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -100,6 +175,10 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const hasSelection = multiple
+    ? selectedValues.length > 0
+    : Boolean(displayTrim || selectedOption);
 
   return (
     <Box ref={dropdownRef} className={className} sx={{ position: "relative" }}>
@@ -120,7 +199,6 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </FormLabel>
       )}
 
-      {/* Selected value display / trigger */}
       <Box
         onClick={() => !disabled && setIsOpen(!isOpen)}
         sx={{
@@ -135,6 +213,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
           borderRadius: 1,
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.7 : 1,
+          minHeight: 44,
           "&:hover": {
             borderColor: disabled ? "divider" : "primary.main",
           },
@@ -145,9 +224,11 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             flex: 1,
             overflow: "hidden",
             textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            color:
-              displayTrim || selectedOption ? "text.primary" : "text.secondary",
+            whiteSpace: multiple ? "normal" : "nowrap",
+            display: "-webkit-box",
+            WebkitLineClamp: multiple ? 2 : 1,
+            WebkitBoxOrient: "vertical",
+            color: hasSelection ? "text.primary" : "text.secondary",
           }}
         >
           {mainLabel}
@@ -157,11 +238,12 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             color: "text.secondary",
             transition: "transform 0.2s",
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            flexShrink: 0,
+            ml: 1,
           }}
         />
       </Box>
 
-      {/* Dropdown */}
       {isOpen && (
         <Paper
           elevation={8}
@@ -178,7 +260,6 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             overflow: "hidden",
           }}
         >
-          {/* Search input */}
           {searchable && (
             <Box sx={{ p: 1.5, borderBottom: 1, borderColor: "divider" }}>
               <TextField
@@ -207,37 +288,47 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             </Box>
           )}
 
-          {/* Options */}
           <Box sx={{ maxHeight: searchable ? 180 : 240, overflowY: "auto" }}>
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => (
-                <Box
-                  key={`${String(option.value)}-${option.label}`}
-                  onClick={() => {
-                    onChange(option.value);
-                    setIsOpen(false);
-                    setSearchTerm("");
-                  }}
-                  sx={{
-                    px: 2,
-                    py: 1.5,
-                    cursor: "pointer",
-                    bgcolor: valuesMatch(option.value, value)
-                      ? "primary.main"
-                      : "transparent",
-                    color: valuesMatch(option.value, value)
-                      ? "primary.contrastText"
-                      : "text.primary",
-                    "&:hover": {
-                      bgcolor: valuesMatch(option.value, value)
-                        ? "primary.dark"
-                        : "action.hover",
-                    },
-                  }}
-                >
-                  <Typography variant="body2">{option.label}</Typography>
-                </Box>
-              ))
+              filteredOptions.map((option) => {
+                const selected = isOptionSelected(option.value);
+
+                return (
+                  <Box
+                    key={`${String(option.value)}-${option.label}`}
+                    onClick={() => handleOptionClick(option.value)}
+                    sx={{
+                      px: multiple ? 1 : 2,
+                      py: 1.5,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      bgcolor: !multiple && selected
+                        ? "primary.main"
+                        : "transparent",
+                      color: !multiple && selected
+                        ? "primary.contrastText"
+                        : "text.primary",
+                      "&:hover": {
+                        bgcolor: !multiple && selected
+                          ? "primary.dark"
+                          : "action.hover",
+                      },
+                    }}
+                  >
+                    {multiple && (
+                      <Checkbox
+                        checked={selected}
+                        size="small"
+                        sx={{ p: 0.5 }}
+                        tabIndex={-1}
+                      />
+                    )}
+                    <Typography variant="body2">{option.label}</Typography>
+                  </Box>
+                );
+              })
             ) : (
               <Box sx={{ px: 2, py: 1.5 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -249,7 +340,6 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </Paper>
       )}
 
-      {/* Error message */}
       {error && (
         <FormHelperText
           error
