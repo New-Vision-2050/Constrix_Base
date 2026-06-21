@@ -109,6 +109,8 @@ export const attendancePresenceMessages = new MessagesGroup({
 
   // Work log
   workLog: _m("Work Log", "سجل الدوام"),
+  pickerYear: _m("Year", "السنة"),
+  pickerMonth: _m("Month", "الشهر"),
   calendarView: _m("Calendar View", "عرض التقويم"),
   tableView: _m("Table View", "عرض الجدول"),
   delay: _m("Delay", "التأخير"),
