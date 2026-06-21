@@ -43,6 +43,14 @@ export function formatMonthYear(date: Date, locale: string) {
   }).format(date);
 }
 
+export function formatMonthYearFromParts(
+  month: number,
+  year: number,
+  locale: string,
+) {
+  return formatMonthYear(new Date(year, month - 1, 1), locale);
+}
+
 export interface SummaryLegendItem {
   key: keyof UserAttendanceCalendarSummary;
   dotColor: string;

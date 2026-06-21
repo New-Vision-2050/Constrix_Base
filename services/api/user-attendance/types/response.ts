@@ -26,6 +26,7 @@ export interface UserAttendanceCalendarSummary {
   leave_count: number;
   off_count: number;
   required_count: number;
+  total_work_hours: number;
 }
 
 export interface UserAttendanceCalendarData {
