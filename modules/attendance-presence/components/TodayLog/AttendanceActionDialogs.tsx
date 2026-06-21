@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { Check, LogIn, LogOut } from "lucide-react";
+import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,11 @@ import AttendanceDialogShell, {
   AttendanceDialogIcon,
   AttendanceDialogTime,
 } from "./AttendanceDialogShell";
+import {
+  CheckInActionIcon,
+  CheckOutActionIcon,
+  TodayLogActionButtonContent,
+} from "./TodayLogUi";
 import { useAttendanceDirection } from "../../utils/direction";
 import { StatusDot } from "../shared/StatusDot";
 import { STATUS_HEX_COLORS } from "../../utils/status-colors";
@@ -231,17 +236,15 @@ export default function AttendanceActionDialogs({
   return (
     <>
       <Button
-        className="w-full h-11"
+        className="h-12 w-full rounded-xl border-0 bg-[#FF2D78] text-base font-medium text-white hover:bg-[#FF2D78]/90"
         disabled={disabled || isFetchingLocation}
         loading={isFetchingLocation}
         onClick={startAttendanceFlow}
       >
-        {isClockOut ? (
-          <LogOut size={18} className="me-2" />
-        ) : (
-          <LogIn size={18} className="me-2" />
-        )}
-        {buttonLabel}
+        <TodayLogActionButtonContent
+          label={buttonLabel}
+          icon={isClockOut ? <CheckOutActionIcon /> : <CheckInActionIcon />}
+        />
       </Button>
 
       <AttendanceDialogShell

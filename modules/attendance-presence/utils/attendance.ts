@@ -1,7 +1,7 @@
 import { useLocale } from "next-intl";
 import { WorkPeriodConstraint } from "@/services/api/user-attendance";
 import { formatCurrentTimeParts } from "./time";
-import { formatFullDate } from "./i18n";
+import { formatFullDate, localizeWesternDigits } from "./i18n";
 import {
   getShiftElapsedMinutes,
   getShiftRemainingMinutes,
@@ -14,10 +14,13 @@ export function formatApiTime(time: string, locale: string) {
   date.setHours(hours, minutes, 0, 0);
 
   const parts = formatCurrentTimeParts(date, locale);
+  const localizedTime = localizeWesternDigits(parts.time, locale);
 
   return {
     ...parts,
-    display: parts.period ? `${parts.time} ${parts.period}` : parts.time,
+    display: parts.period
+      ? `${localizedTime} ${parts.period}`
+      : localizedTime,
   };
 }
 
