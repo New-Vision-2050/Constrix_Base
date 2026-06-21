@@ -14,7 +14,11 @@ import { cn } from "@/lib/utils";
 import { AttendanceReportStatus } from "../../types/reports";
 import { REPORTS_COLORS } from "./reports-theme";
 
-export function ReportStatusBadge({ status }: { status: AttendanceReportStatus }) {
+export function ReportStatusBadge({
+  status,
+}: {
+  status: AttendanceReportStatus;
+}) {
   const t = useTranslations("AttendancePresence.reports.reportStatus");
 
   if (status === "approved") {
@@ -43,13 +47,14 @@ export function ReportActionButton() {
   const t = useTranslations("AttendancePresence.reports");
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={false}>
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
           variant="outline"
+          disabled
           className={cn(
-            "h-8 gap-1.5 rounded-md border px-3 text-xs font-normal text-white hover:text-white",
+            "  h-8 gap-1.5 rounded-md border px-3 text-xs font-normal text-white hover:text-white",
           )}
           style={{
             backgroundColor: REPORTS_COLORS.actionButton,
