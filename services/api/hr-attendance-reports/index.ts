@@ -11,6 +11,7 @@ export const HrAttendanceReportsApi = {
 
 export type {
   EmployeeAttendanceMonthlyReportApi,
+  EmployeeAttendanceReportsPagination,
   EmployeeAttendanceReportsPayload,
   EmployeeAttendanceReportsResponse,
   EmployeeAttendanceReportStatus,
