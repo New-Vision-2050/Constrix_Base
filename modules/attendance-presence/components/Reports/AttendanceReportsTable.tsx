@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Box } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { cn } from "@/lib/utils";
+import { useEmployeeAttendanceReports } from "../../hooks/useEmployeeAttendanceReports";
 import { AttendanceMonthlyReportRow } from "../../types/reports";
 import { formatMonthYearFromParts } from "../../utils/calendar";
 import { useAttendanceDirection } from "../../utils/direction";
 import { formatLocalizedValue } from "../../utils/i18n";
+import { mapMonthlyReports } from "../../utils/reports-mapper";
 import { ReportActionButton, ReportStatusBadge } from "./ReportTableCells";
 
 const TableLayout = HeadlessTableLayout<AttendanceMonthlyReportRow>(
@@ -48,30 +50,40 @@ function CellValue({
 }
 
 interface AttendanceReportsTableProps {
-  records: AttendanceMonthlyReportRow[];
-  loading?: boolean;
+  employeeId: string;
 }
 
 export default function AttendanceReportsTable({
-  records,
-  loading = false,
+  employeeId,
 }: AttendanceReportsTableProps) {
   const t = useTranslations("AttendancePresence.reports");
+  const tRoot = useTranslations("AttendancePresence");
   const locale = useLocale();
   const { dir } = useAttendanceDirection();
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
-    initialLimit: 5,
+    initialLimit: 12,
   });
 
-  const paginatedData = useMemo(() => {
-    const start = (params.page - 1) * params.limit;
-    return records.slice(start, start + params.limit);
-  }, [records, params.page, params.limit]);
+  const { data, isLoading, isError } = useEmployeeAttendanceReports(employeeId, {
+    page: params.page,
+    per_page: params.limit,
+  });
 
-  const totalItems = records.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
+  const records = useMemo(
+    () => (data ? mapMonthlyReports(data) : []),
+    [data],
+  );
+
+  const pagination = data?.monthly_reports.pagination;
+  const totalItems = pagination?.total ?? records.length;
+  const totalPages = pagination?.last_page ?? 1;
+
+  useEffect(() => {
+    params.setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when employee changes
+  }, [employeeId]);
 
   const columns = useMemo(
     () => [
@@ -208,15 +220,23 @@ export default function AttendanceReportsTable({
   );
 
   const state = TableLayout.useTableState({
-    data: paginatedData,
+    data: records,
     columns,
     totalPages,
     totalItems,
     params,
-    loading,
+    loading: isLoading,
     selectable: false,
     getRowId: (row) => row.id,
   });
+
+  if (isError) {
+    return (
+      <Box dir={dir} sx={{ py: 2 }}>
+        <span className="text-sm text-destructive">{tRoot("loadError")}</span>
+      </Box>
+    );
+  }
 
   return (
     <Box dir={dir} sx={{ overflowX: "auto" }}>
@@ -227,7 +247,7 @@ export default function AttendanceReportsTable({
         pagination={
           <TableLayout.Pagination
             state={state}
-            pageSizeOptions={[5, 10, 25]}
+            pageSizeOptions={[12, 24, 48]}
           />
         }
       />

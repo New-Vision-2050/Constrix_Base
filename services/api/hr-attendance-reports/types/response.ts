@@ -5,6 +5,7 @@ export interface EmployeeAttendanceMonthlyReportApi {
   days_in_month: number;
   required_attendance_days: number;
   used_leaves: number;
+  earned_leave_days: number;
   month_holidays: number;
   required_hours: number;
   actual_attendance_days: number;
@@ -16,6 +17,13 @@ export interface EmployeeAttendanceMonthlyReportApi {
   delays: number;
   overtime: number;
   status: EmployeeAttendanceReportStatus;
+}
+
+export interface EmployeeAttendanceReportsPagination {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
 }
 
 export interface EmployeeAttendanceReportsPayload {
@@ -41,6 +49,7 @@ export interface EmployeeAttendanceReportsPayload {
   };
   monthly_reports: {
     data: EmployeeAttendanceMonthlyReportApi[];
+    pagination?: EmployeeAttendanceReportsPagination;
   };
 }
 

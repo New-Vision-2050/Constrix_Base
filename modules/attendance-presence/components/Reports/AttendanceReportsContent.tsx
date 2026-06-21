@@ -5,12 +5,9 @@ import { Alert, Box, CircularProgress } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { useUserConstraintToday } from "../../hooks/useAttendanceActions";
-import { useAttendanceDirection } from "../../utils/direction";
 import { useEmployeeAttendanceReports } from "../../hooks/useEmployeeAttendanceReports";
-import {
-  mapContractSummaryCards,
-  mapMonthlyReports,
-} from "../../utils/reports-mapper";
+import { useAttendanceDirection } from "../../utils/direction";
+import { mapContractSummaryCards } from "../../utils/reports-mapper";
 import AttendanceReportsTable from "./AttendanceReportsTable";
 import ContractSummaryCards from "./ContractSummaryCards";
 
@@ -25,15 +22,13 @@ export default function AttendanceReportsContent() {
   } = useUserConstraintToday();
   const employeeId = authUserId ?? constraintData?.user_id;
   const isResolvingEmployeeId = !employeeId && isConstraintLoading;
-  const { data, isLoading, isError } = useEmployeeAttendanceReports(employeeId);
+  const { data, isLoading, isError } = useEmployeeAttendanceReports(employeeId, {
+    page: 1,
+    per_page: 12,
+  });
 
   const contractCards = useMemo(
     () => (data ? mapContractSummaryCards(data) : []),
-    [data],
-  );
-
-  const monthlyReports = useMemo(
-    () => (data ? mapMonthlyReports(data) : []),
     [data],
   );
 
@@ -56,7 +51,7 @@ export default function AttendanceReportsContent() {
   return (
     <div className="flex flex-col gap-4" dir={dir}>
       <ContractSummaryCards cards={contractCards} />
-      <AttendanceReportsTable records={monthlyReports} loading={isLoading} />
+      <AttendanceReportsTable employeeId={employeeId} />
     </div>
   );
 }

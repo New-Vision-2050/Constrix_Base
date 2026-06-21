@@ -39,7 +39,7 @@ export function mapMonthlyReports(
       year,
       monthDays: row.days_in_month,
       requiredAttendance: row.required_attendance_days,
-      accruedLeaves: row.leave_balance_used,
+      accruedLeaves: row.earned_leave_days,
       monthHolidays: row.month_holidays,
       requiredHours: row.required_hours,
       achievedAttendance: row.actual_attendance_days,
