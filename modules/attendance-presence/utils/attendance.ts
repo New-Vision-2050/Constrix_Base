@@ -18,9 +18,7 @@ export function formatApiTime(time: string, locale: string) {
 
   return {
     ...parts,
-    display: parts.period
-      ? `${localizedTime} ${parts.period}`
-      : localizedTime,
+    display: parts.period ? `${localizedTime} ${parts.period}` : localizedTime,
   };
 }
 
@@ -51,16 +49,18 @@ export function getActiveAttendance<
   );
 }
 
-export function getActiveWorkPeriod<
-  T extends { is_active: boolean },
->(periods: T[] | undefined) {
+export function getActiveWorkPeriod<T extends { is_active: boolean }>(
+  periods: T[] | undefined,
+) {
   return periods?.find((period) => period.is_active);
 }
 
-export function toShiftPeriod(period: Pick<
-  WorkPeriodConstraint,
-  "start_time" | "end_time" | "extends_to_next_day"
->) {
+export function toShiftPeriod(
+  period: Pick<
+    WorkPeriodConstraint,
+    "start_time" | "end_time" | "extends_to_next_day"
+  >,
+) {
   const [startHours, startMinutes] = period.start_time.split(":").map(Number);
   const [endHours, endMinutes] = period.end_time.split(":").map(Number);
 
@@ -71,7 +71,10 @@ export function toShiftPeriod(period: Pick<
   };
 }
 
-export function getPeriodShiftProgress(now: Date, period: WorkPeriodConstraint) {
+export function getPeriodShiftProgress(
+  now: Date,
+  period: WorkPeriodConstraint,
+) {
   const shift = toShiftPeriod(period);
   const totalMinutes = getShiftTotalMinutes(shift);
   const remainingMinutes = getShiftRemainingMinutes(now, shift);
@@ -101,7 +104,9 @@ export function getAttendanceActionState(period?: WorkPeriodConstraint) {
   };
 }
 
-export function getEarlyClockInMinutes(rules?: WorkPeriodConstraint["early_clock_in_rules"]) {
+export function getEarlyClockInMinutes(
+  rules?: WorkPeriodConstraint["early_clock_in_rules"],
+) {
   if (!rules?.prevent_early_clock_in) return 0;
 
   if (rules.early_unit === "hour") {

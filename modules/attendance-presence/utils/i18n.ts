@@ -30,7 +30,18 @@ export function formatFullDate(date: Date, locale: string) {
   }).format(date);
 }
 
-const EASTERN_ARABIC_DIGITS = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+const EASTERN_ARABIC_DIGITS = [
+  "٠",
+  "١",
+  "٢",
+  "٣",
+  "٤",
+  "٥",
+  "٦",
+  "٧",
+  "٨",
+  "٩",
+];
 
 export function localizeWesternDigits(value: string, locale: string) {
   if (locale !== "ar") return value;

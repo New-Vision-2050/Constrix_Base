@@ -20,7 +20,10 @@ export const attendancePresenceMessages = new MessagesGroup({
   // Summary cards
   totalWorkHours: _m("Total Work Hours", "المجموع الكلي لساعات العمل"),
   thisMonth: _m("This month", "هذا الشهر"),
-  hoursAndMinutes: _m("{hours} hours {minutes} minutes", "{hours} ساعات {minutes} دقيقة"),
+  hoursAndMinutes: _m(
+    "{hours} hours {minutes} minutes",
+    "{hours} ساعات {minutes} دقيقة",
+  ),
   todayGoal: _m("Today's Goal", "هدف اليوم"),
   hours: _m("hours", "ساعات"),
   hoursCompleted: _m("hours completed", "تم انجاز ساعات"),
@@ -55,7 +58,10 @@ export const attendancePresenceMessages = new MessagesGroup({
   registerAttendance: _m("Register Attendance", "تسجيل حضور"),
   registerDeparture: _m("Register Departure", "تسجيل انصراف"),
   requestPermission: _m("Request Permission", "طلب اذن"),
-  todayGoalLabel: _m("Today's Goal: {hours} hours", "هدف اليوم : {hours} ساعات"),
+  todayGoalLabel: _m(
+    "Today's Goal: {hours} hours",
+    "هدف اليوم : {hours} ساعات",
+  ),
 
   // Attendance dialogs
   confirm: _m("Confirm", "تأكيد"),
