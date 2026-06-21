@@ -43,6 +43,35 @@ export function formatMonthYear(date: Date, locale: string) {
   }).format(date);
 }
 
+export function formatMonthYearFromParts(
+  month: number,
+  year: number,
+  locale: string,
+) {
+  return formatMonthYear(new Date(year, month - 1, 1), locale);
+}
+
+export function buildYearOptions(selectedYear: number) {
+  const currentYear = new Date().getFullYear();
+  const startYear = Math.min(currentYear - 25, selectedYear - 8);
+  const endYear = Math.max(currentYear + 10, selectedYear + 8);
+  const years: number[] = [];
+
+  for (let year = endYear; year >= startYear; year -= 1) {
+    years.push(year);
+  }
+
+  return years;
+}
+
+export function getLocalizedMonthNames(locale: string, style: "long" | "short" = "short") {
+  return Array.from({ length: 12 }, (_, monthIndex) =>
+    new Intl.DateTimeFormat(locale, { month: style }).format(
+      new Date(2000, monthIndex, 1),
+    ),
+  );
+}
+
 export interface SummaryLegendItem {
   key: keyof UserAttendanceCalendarSummary;
   dotColor: string;

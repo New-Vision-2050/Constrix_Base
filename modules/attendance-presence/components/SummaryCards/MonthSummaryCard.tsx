@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useAttendancePresence } from "../../context/AttendancePresenceContext";
 import { useUserAttendanceCalendar } from "../../hooks/useUserAttendanceCalendar";
 import { formatMonthYear, MONTH_SUMMARY_ITEMS } from "../../utils/calendar";
+import { formatLocalizedNumber } from "../../utils/i18n";
 import { getDotColorStyles } from "../../utils/status-colors";
 import { StatusDot } from "../shared/StatusDot";
 import SummaryCardShell from "./SummaryCardShell";
@@ -17,7 +18,7 @@ export default function MonthSummaryCard() {
 
   const month = selectedMonth.getMonth() + 1;
   const year = selectedMonth.getFullYear();
-  const { data } = useUserAttendanceCalendar(month, year);
+  const { data, isLoading } = useUserAttendanceCalendar(month, year);
   const monthLabel = formatMonthYear(selectedMonth, locale);
 
   return (
@@ -42,7 +43,11 @@ export default function MonthSummaryCard() {
               >
                 {statusT(item.labelKey)}
               </span>
-              <span className="text-sm font-semibold text-foreground">{count}</span>
+              <span className="text-sm font-semibold text-foreground">
+                {isLoading && !data
+                  ? "—"
+                  : formatLocalizedNumber(count, locale)}
+              </span>
             </div>
           );
         })}

@@ -9,6 +9,7 @@ import AttendanceWorkLogContent, {
   ATTENDANCE_PRESENCE_MAIN_TAB_ICONS,
   PlaceholderContent,
 } from "./AttendanceWorkLogContent";
+import AttendanceReportsContent from "./Reports/AttendanceReportsContent";
 
 const tabsRowSx = (indicatorColor: string) =>
   ({
@@ -57,7 +58,7 @@ export default function AttendancePresenceTabs() {
           {
             id: "attendance-presence-reports",
             title: t("attendanceReports"),
-            content: <PlaceholderContent messageKey="underDevelopment" />,
+            content: <AttendanceReportsContent />,
           },
           {
             id: "attendance-presence-approvals",

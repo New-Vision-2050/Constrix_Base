@@ -33,6 +33,14 @@ export function formatDurationHoursMinutes(totalMinutes: number) {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+export function splitDecimalHours(totalHours: number) {
+  const safeHours = Math.max(0, totalHours);
+  const hours = Math.floor(safeHours);
+  const minutes = Math.round((safeHours - hours) * 60);
+
+  return { hours, minutes };
+}
+
 export function parseDurationFormatted(value: string | null | undefined) {
   if (!value) return 0;
 

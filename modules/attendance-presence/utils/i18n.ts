@@ -48,3 +48,33 @@ export function localizeWesternDigits(value: string, locale: string) {
 
   return value.replace(/\d/g, (digit) => EASTERN_ARABIC_DIGITS[Number(digit)]);
 }
+
+export function formatLocalizedNumber(
+  value: number,
+  locale: string,
+  options?: Intl.NumberFormatOptions,
+) {
+  return new Intl.NumberFormat(locale, options).format(value);
+}
+
+export function formatLocalizedValue(
+  value: string | number,
+  locale: string,
+) {
+  if (typeof value === "number") {
+    return formatLocalizedNumber(value, locale);
+  }
+
+  return localizeWesternDigits(value, locale);
+}
+
+export function formatElapsedDurationLabel(
+  totalMinutes: number,
+  hoursShort: string,
+) {
+  const hours = Math.floor(Math.max(0, totalMinutes) / 60);
+  const minutes = Math.max(0, totalMinutes) % 60;
+  const time = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+
+  return `${time} ${hoursShort}`;
+}
