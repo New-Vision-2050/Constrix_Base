@@ -10,15 +10,18 @@ import { useUserConstraintToday } from "../../hooks/useAttendanceActions";
 import { useCurrentDateTime } from "../../hooks/useCurrentDateTime";
 import { useAttendanceDirection } from "../../utils/direction";
 import {
+  buildWorkPeriodTabs,
   formatApiTime,
   getActiveAttendance,
   getActiveWorkPeriod,
   getAttendanceActionState,
   getLatestAttendanceRecord,
   getPeriodShiftProgress,
+  getWorkPeriodByTabId,
 } from "../../utils/attendance";
 import { formatDurationHoursMinutes } from "../../utils/time";
 import AttendanceActionDialogs from "./AttendanceActionDialogs";
+import HappyHolidayScreen from "./HappyHolidayScreen";
 import {
   CheckInActionIcon,
   CheckOutActionIcon,
@@ -113,29 +116,34 @@ export default function TodayLogPanel() {
   const now = useCurrentDateTime();
   const { data: constraintData, isLoading } = useUserConstraintToday();
 
-  const apiPeriods = constraintData?.work_rules.all_work_periods ?? [];
+  const workRules = constraintData?.work_rules;
+  const isHoliday = Boolean(workRules?.is_holiday);
+  const apiPeriods = workRules?.all_work_periods ?? [];
   const activeApiPeriod = getActiveWorkPeriod(apiPeriods);
 
+  const periods = useMemo(
+    () => buildWorkPeriodTabs(apiPeriods, (key, values) => t(key as "period1", values)),
+    [apiPeriods, t],
+  );
+
   useEffect(() => {
+    if (isHoliday || apiPeriods.length === 0) return;
+
     const activeIndex = apiPeriods.findIndex((period) => period.is_active);
     if (activeIndex >= 0) {
       setActivePeriod(`period-${activeIndex + 1}`);
+      return;
     }
-  }, [apiPeriods, setActivePeriod]);
 
-  const periods = useMemo(
-    () => [
-      { id: "period-1", label: t("period1"), apiIndex: 0 },
-      { id: "period-2", label: t("period2"), apiIndex: 1 },
-      { id: "period-3", label: t("period3"), apiIndex: 2 },
-    ],
-    [t],
-  );
+    const currentIndex =
+      Number.parseInt(activePeriod.replace("period-", ""), 10) - 1;
+    if (currentIndex < 0 || currentIndex >= apiPeriods.length) {
+      setActivePeriod("period-1");
+    }
+  }, [activePeriod, apiPeriods, isHoliday, setActivePeriod]);
 
   const selectedApiPeriod =
-    apiPeriods[
-      periods.find((period) => period.id === activePeriod)?.apiIndex ?? 0
-    ] ?? activeApiPeriod;
+    getWorkPeriodByTabId(apiPeriods, activePeriod) ?? activeApiPeriod;
 
   const actionPeriod = activeApiPeriod ?? selectedApiPeriod;
   const { showButton, isClockOut, canPerform } =
@@ -230,145 +238,156 @@ export default function TodayLogPanel() {
         {t("todayLog")}
       </h3>
 
-      <div className="mb-5 flex border-b border-border/80">
-        {periods.map((period) => {
-          const isActive = activePeriod === period.id;
-          const isAvailable =
-            apiPeriods.length === 0 || period.apiIndex < apiPeriods.length;
-
-          return (
-            <button
-              key={period.id}
-              type="button"
-              disabled={!isAvailable}
-              onClick={() => isAvailable && setActivePeriod(period.id)}
-              className={cn(
-                "relative flex-1 px-1 py-2.5 text-xs transition-colors sm:text-sm",
-                isActive
-                  ? "font-medium text-[#FF2D78]"
-                  : "text-muted-foreground hover:text-foreground",
-                !isAvailable &&
-                  "cursor-not-allowed opacity-40 hover:text-muted-foreground",
-              )}
-            >
-              {period.label}
-              {isActive ? (
-                <span className="absolute inset-x-2 bottom-0 h-1 rounded-full bg-[#FF2D78]" />
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
-
-      <div
-        className="mb-4 rounded-2xl px-4 py-6"
-        style={{ backgroundColor: TODAY_LOG_COLORS.card }}
-      >
-        <CircularProgress
-          minutes={elapsedMinutes}
-          hoursShort={t("hoursShort")}
-          subtitle={t("timeElapsed")}
-          progress={progress}
-          isRtl={isRtl}
+      {isLoading ? (
+        <div className="flex min-h-[320px] items-center justify-center text-sm text-muted-foreground">
+          {t("loading")}
+        </div>
+      ) : isHoliday ? (
+        <HappyHolidayScreen
+          title={t("happyHoliday")}
+          message={t("happyHolidayMessage")}
+          reason={workRules?.reason}
         />
-      </div>
+      ) : (
+        <>
+          {periods.length > 0 ? (
+            <div className="mb-5 flex border-b border-border/80">
+              {periods.map((period) => {
+                const isActive = activePeriod === period.id;
 
-      <p className="mb-5 text-center text-sm text-foreground">
-        {t("todayGoalLabel", { hours: goalHours.toFixed(1) })}
-      </p>
-
-      <div className="mb-5 grid grid-cols-3 gap-2">
-        {statItems.map((item) => (
-          <StatItem
-            key={item.key}
-            icon={item.icon}
-            label={item.label}
-            value={item.value}
-          />
-        ))}
-      </div>
-
-      <div
-        className="mb-4 overflow-hidden rounded-xl text-sm"
-        style={{ backgroundColor: `${TODAY_LOG_COLORS.card}99` }}
-      >
-        <div
-          className="grid grid-cols-4 text-xs text-muted-foreground"
-          style={{ backgroundColor: TODAY_LOG_COLORS.card }}
-        >
-          {tableColumns.map((column) => (
-            <div key={column.key} className="p-2.5 text-center">
-              {column.label}
+                return (
+                  <button
+                    key={period.id}
+                    type="button"
+                    onClick={() => setActivePeriod(period.id)}
+                    className={cn(
+                      "relative flex-1 px-1 py-2.5 text-xs transition-colors sm:text-sm",
+                      isActive
+                        ? "font-medium text-[#FF2D78]"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {period.label}
+                    {isActive ? (
+                      <span className="absolute inset-x-2 bottom-0 h-1 rounded-full bg-[#FF2D78]" />
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-4 text-xs text-foreground">
-          <div className="p-2.5 text-center">{t("today")}</div>
-          <div
-            className={cn(
-              "p-2.5 text-center",
-              highlightTableValues &&
-                cn("font-medium", TODAY_LOG_ACCENTS.highlight),
-            )}
-            dir="ltr"
-          >
-            {clockInDisplay}
-          </div>
-          <div className="p-2.5 text-center text-muted-foreground" dir="ltr">
-            {clockOutDisplay}
-          </div>
-          <div
-            className={cn(
-              "p-2.5 text-center",
-              highlightTableValues &&
-                cn("font-medium", TODAY_LOG_ACCENTS.highlight),
-            )}
-            dir="ltr"
-          >
-            {workedMinutes > 0 ? workedHoursLabel : "--:--"}
-          </div>
-        </div>
-      </div>
+          ) : null}
 
-      <div className="space-y-2.5">
-        {showButton &&
-        actionPeriod &&
-        constraintData?.work_rules.location_work ? (
-          <AttendanceActionDialogs
-            workPeriod={actionPeriod}
-            locationWork={constraintData.work_rules.location_work}
-            disabled={!canPerform}
-          />
-        ) : showButton ? (
-          <Button
-            className="h-12 w-full rounded-xl border-0 bg-[#FF2D78] text-base font-medium text-white hover:bg-[#FF2D78]/90"
-            disabled
+          <div
+            className="mb-4 rounded-2xl px-4 py-6"
+            style={{ backgroundColor: TODAY_LOG_COLORS.card }}
           >
-            <TodayLogActionButtonContent
-              label={
-                isClockOut ? t("registerDeparture") : t("registerAttendance")
-              }
-              icon={isClockOut ? <CheckOutActionIcon /> : <CheckInActionIcon />}
+            <CircularProgress
+              minutes={elapsedMinutes}
+              hoursShort={t("hoursShort")}
+              subtitle={t("timeElapsed")}
+              progress={progress}
+              isRtl={isRtl}
             />
-          </Button>
-        ) : null}
-        {!isLoading && !showButton ? (
-          <p className="text-center text-xs text-muted-foreground">
-            {constraintData?.work_rules.reason ?? t("cannotRegisterNow")}
+          </div>
+
+          <p className="mb-5 text-center text-sm text-foreground">
+            {t("todayGoalLabel", { hours: goalHours.toFixed(1) })}
           </p>
-        ) : null}
-        <Button
-          variant="outline"
-          className="h-11 w-full rounded-xl border-border/60 bg-[#1C1C35] text-foreground hover:bg-[#1C1C35]/90"
-          loading={isRequestingPermission}
-          onClick={handleRequestPermission}
-        >
-          <TodayLogActionButtonContent
-            label={t("requestPermission")}
-            icon={<RequestPermissionIcon />}
-          />
-        </Button>
-      </div>
+
+          <div className="mb-5 grid grid-cols-3 gap-2">
+            {statItems.map((item) => (
+              <StatItem
+                key={item.key}
+                icon={item.icon}
+                label={item.label}
+                value={item.value}
+              />
+            ))}
+          </div>
+
+          <div
+            className="mb-4 overflow-hidden rounded-xl text-sm"
+            style={{ backgroundColor: `${TODAY_LOG_COLORS.card}99` }}
+          >
+            <div
+              className="grid grid-cols-4 text-xs text-muted-foreground"
+              style={{ backgroundColor: TODAY_LOG_COLORS.card }}
+            >
+              {tableColumns.map((column) => (
+                <div key={column.key} className="p-2.5 text-center">
+                  {column.label}
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-4 text-xs text-foreground">
+              <div className="p-2.5 text-center">{t("today")}</div>
+              <div
+                className={cn(
+                  "p-2.5 text-center",
+                  highlightTableValues &&
+                    cn("font-medium", TODAY_LOG_ACCENTS.highlight),
+                )}
+                dir="ltr"
+              >
+                {clockInDisplay}
+              </div>
+              <div className="p-2.5 text-center text-muted-foreground" dir="ltr">
+                {clockOutDisplay}
+              </div>
+              <div
+                className={cn(
+                  "p-2.5 text-center",
+                  highlightTableValues &&
+                    cn("font-medium", TODAY_LOG_ACCENTS.highlight),
+                )}
+                dir="ltr"
+              >
+                {workedMinutes > 0 ? workedHoursLabel : "--:--"}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2.5">
+            {showButton &&
+            actionPeriod &&
+            workRules?.location_work ? (
+              <AttendanceActionDialogs
+                workPeriod={actionPeriod}
+                locationWork={workRules.location_work}
+                disabled={!canPerform}
+              />
+            ) : showButton ? (
+              <Button
+                className="h-12 w-full rounded-xl border-0 bg-[#FF2D78] text-base font-medium text-white hover:bg-[#FF2D78]/90"
+                disabled
+              >
+                <TodayLogActionButtonContent
+                  label={
+                    isClockOut ? t("registerDeparture") : t("registerAttendance")
+                  }
+                  icon={isClockOut ? <CheckOutActionIcon /> : <CheckInActionIcon />}
+                />
+              </Button>
+            ) : null}
+            {!isLoading && !showButton ? (
+              <p className="text-center text-xs text-muted-foreground">
+                {workRules?.reason ?? t("cannotRegisterNow")}
+              </p>
+            ) : null}
+            <Button
+              variant="outline"
+              className="h-11 w-full rounded-xl border-border/60 bg-[#1C1C35] text-foreground hover:bg-[#1C1C35]/90"
+              loading={isRequestingPermission}
+              onClick={handleRequestPermission}
+            >
+              <TodayLogActionButtonContent
+                label={t("requestPermission")}
+                icon={<RequestPermissionIcon />}
+              />
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
