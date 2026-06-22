@@ -86,7 +86,9 @@ export default function CurrentPeriodCard() {
     >
       {isHoliday ? (
         <div className="py-2 text-center">
-          <p className="text-lg font-semibold text-[#FF2D78]">{t("happyHoliday")}</p>
+          <p className="text-lg font-semibold text-[#FF2D78]">
+            {t("happyHoliday")}
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {workRules?.reason || t("happyHolidayMessage")}
           </p>

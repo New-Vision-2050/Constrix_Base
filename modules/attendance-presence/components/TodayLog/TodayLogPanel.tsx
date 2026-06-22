@@ -122,7 +122,10 @@ export default function TodayLogPanel() {
   const activeApiPeriod = getActiveWorkPeriod(apiPeriods);
 
   const periods = useMemo(
-    () => buildWorkPeriodTabs(apiPeriods, (key, values) => t(key as "period1", values)),
+    () =>
+      buildWorkPeriodTabs(apiPeriods, (key, values) =>
+        t(key as "period1", values),
+      ),
     [apiPeriods, t],
   );
 
@@ -246,7 +249,7 @@ export default function TodayLogPanel() {
         <HappyHolidayScreen
           title={t("happyHoliday")}
           message={t("happyHolidayMessage")}
-          reason={workRules?.reason}
+          // reason={workRules?.reason}
         />
       ) : (
         <>
@@ -331,7 +334,10 @@ export default function TodayLogPanel() {
               >
                 {clockInDisplay}
               </div>
-              <div className="p-2.5 text-center text-muted-foreground" dir="ltr">
+              <div
+                className="p-2.5 text-center text-muted-foreground"
+                dir="ltr"
+              >
                 {clockOutDisplay}
               </div>
               <div
@@ -348,9 +354,7 @@ export default function TodayLogPanel() {
           </div>
 
           <div className="space-y-2.5">
-            {showButton &&
-            actionPeriod &&
-            workRules?.location_work ? (
+            {showButton && actionPeriod && workRules?.location_work ? (
               <AttendanceActionDialogs
                 workPeriod={actionPeriod}
                 locationWork={workRules.location_work}
@@ -363,9 +367,13 @@ export default function TodayLogPanel() {
               >
                 <TodayLogActionButtonContent
                   label={
-                    isClockOut ? t("registerDeparture") : t("registerAttendance")
+                    isClockOut
+                      ? t("registerDeparture")
+                      : t("registerAttendance")
                   }
-                  icon={isClockOut ? <CheckOutActionIcon /> : <CheckInActionIcon />}
+                  icon={
+                    isClockOut ? <CheckOutActionIcon /> : <CheckInActionIcon />
+                  }
                 />
               </Button>
             ) : null}

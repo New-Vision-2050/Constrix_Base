@@ -13,7 +13,14 @@ function HolidayIcon() {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      <circle cx="36" cy="36" r="34" stroke="#FF2D78" strokeWidth="2" opacity="0.35" />
+      <circle
+        cx="36"
+        cy="36"
+        r="34"
+        stroke="#FF2D78"
+        strokeWidth="2"
+        opacity="0.35"
+      />
       <path
         d="M36 18C27.2 18 20 25.2 20 34C20 44 36 54 36 54C36 54 52 44 52 34C52 25.2 44.8 18 36 18Z"
         fill="#FF2D78"
