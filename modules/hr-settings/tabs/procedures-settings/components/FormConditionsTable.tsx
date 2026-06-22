@@ -6,6 +6,7 @@ import {
   CheckCircleOutline,
   HowToRegOutlined,
   LocationOnOutlined,
+  WorkOutline,
 } from "@mui/icons-material";
 import {
   Box,
@@ -17,7 +18,10 @@ import {
 } from "@mui/material";
 import { alpha, useTheme, type Theme } from "@mui/material/styles";
 import type { SvgIconComponent } from "@mui/icons-material";
-import type { FormConditionOption } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
+import type {
+  ConditionSettingSchemaOption,
+  FormConditionOption,
+} from "@/services/api/hr-settings/internal-procedure-settings/types/response";
 import type { TaskActionConditionFormValue } from "../types";
 
 interface FormConditionsTableProps {
@@ -96,6 +100,7 @@ function buildCategoryThemes(theme: Theme): Record<string, CategoryTheme> {
     attendance: buildCategoryTheme(theme, info, HowToRegOutlined),
     task_status: buildCategoryTheme(theme, palette.secondary.main, CheckCircleOutline),
     open_task: buildCategoryTheme(theme, error, AssignmentOutlined),
+    shift: buildCategoryTheme(theme, palette.warning.main, WorkOutline),
   };
 }
 
@@ -170,6 +175,168 @@ function updateConditionSetting(
   });
 }
 
+function isSettingFieldVisible(
+  field: ConditionSettingSchemaOption,
+  settings: Record<string, string | number | boolean>,
+): boolean {
+  if (!field.visibleWhen) return true;
+  return settings[field.visibleWhen.key] === field.visibleWhen.value;
+}
+
+function findPrimarySelectField(
+  schema: ConditionSettingSchemaOption[],
+): ConditionSettingSchemaOption | undefined {
+  return schema.find((field) => field.type === "select");
+}
+
+function getSettingsPanelFields(
+  schema: ConditionSettingSchemaOption[],
+  settings: Record<string, string | number | boolean>,
+): ConditionSettingSchemaOption[] {
+  const primarySelect = findPrimarySelectField(schema);
+
+  return schema.filter((field) => {
+    if (primarySelect && field.key === primarySelect.key) return false;
+    return isSettingFieldVisible(field, settings);
+  });
+}
+
+function renderSettingField(
+  field: ConditionSettingSchemaOption,
+  value: string | number | boolean,
+  fieldDisabled: boolean,
+  compactFieldSx: ReturnType<typeof getCompactFieldSx>,
+  onValueChange: (value: string | number | boolean) => void,
+) {
+  if (field.type === "int") {
+    const isMinuteField =
+      field.key.includes("minute") || field.label.includes("دقيقة");
+
+    if (isMinuteField) {
+      return (
+        <TextField
+          key={field.key}
+          select
+          label={field.label}
+          size="small"
+          value={String(value)}
+          onChange={(event) => {
+            const parsed = parseInt(event.target.value, 10);
+            onValueChange(Number.isNaN(parsed) ? 0 : parsed);
+          }}
+          disabled={fieldDisabled}
+          sx={compactFieldSx}
+        >
+          {[0, 5, 10, 15, 30, 45, 60].map((minute) => (
+            <MenuItem key={minute} value={String(minute)}>
+              {minute}
+            </MenuItem>
+          ))}
+        </TextField>
+      );
+    }
+
+    return (
+      <TextField
+        key={field.key}
+        label={field.label}
+        type="number"
+        size="small"
+        value={value ?? field.default ?? 0}
+        onChange={(event) => {
+          const parsed = parseInt(event.target.value, 10);
+          onValueChange(Number.isNaN(parsed) ? 0 : parsed);
+        }}
+        disabled={fieldDisabled}
+        inputProps={{ min: 0, step: 1 }}
+        sx={compactFieldSx}
+      />
+    );
+  }
+
+  if (field.type === "bool") {
+    return (
+      <Box
+        key={field.key}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1,
+          px: 0.5,
+        }}
+      >
+        <Typography variant="caption" color="text.secondary">
+          {field.label}
+        </Typography>
+        <Switch
+          checked={Boolean(value)}
+          onChange={(event) => onValueChange(event.target.checked)}
+          disabled={fieldDisabled}
+          size="small"
+          color="success"
+        />
+      </Box>
+    );
+  }
+
+  if (field.type === "select") {
+    return (
+      <TextField
+        key={field.key}
+        select
+        label={field.label}
+        size="small"
+        value={String(value ?? field.default ?? field.options?.[0]?.value ?? "")}
+        onChange={(event) => onValueChange(event.target.value)}
+        disabled={fieldDisabled}
+        sx={compactFieldSx}
+      >
+        {(field.options ?? []).map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </TextField>
+    );
+  }
+
+  if (field.type === "time") {
+    return (
+      <TextField
+        key={field.key}
+        label={field.label}
+        type="time"
+        size="small"
+        value={String(value ?? field.default ?? "08:00")}
+        onChange={(event) => onValueChange(event.target.value)}
+        disabled={fieldDisabled}
+        sx={compactFieldSx}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <AccessTimeOutlined sx={{ fontSize: 18, color: "text.secondary" }} />
+            </InputAdornment>
+          ),
+        }}
+        inputProps={{ step: 60 }}
+      />
+    );
+  }
+
+  return (
+    <TextField
+      key={field.key}
+      label={field.label}
+      size="small"
+      value={String(value)}
+      onChange={(event) => onValueChange(event.target.value)}
+      disabled={fieldDisabled}
+      sx={compactFieldSx}
+    />
+  );
+}
+
 function SettingsPanel({
   definition,
   condition,
@@ -189,8 +356,12 @@ function SettingsPanel({
   const fieldDisabled = disabled || !condition.isActive;
   const panelSx = getSettingsPanelSx(theme);
   const compactFieldSx = getCompactFieldSx(theme);
+  const panelFields = getSettingsPanelFields(
+    definition.settingsSchema,
+    condition.settings,
+  );
 
-  if (definition.settingsSchema.length === 0) {
+  if (panelFields.length === 0) {
     return (
       <Box
         sx={{
@@ -209,8 +380,14 @@ function SettingsPanel({
     );
   }
 
-  const timeFields = definition.settingsSchema.filter((field) => field.type === "time");
-  const otherFields = definition.settingsSchema.filter((field) => field.type !== "time");
+  const timeFields = panelFields.filter((field) => field.type === "time");
+  const otherFields = panelFields.filter((field) => field.type !== "time");
+
+  const handleSettingChange = (settingKey: string, value: string | number | boolean) => {
+    onChange(
+      updateConditionSetting(conditions, conditionIndex, settingKey, value),
+    );
+  };
 
   return (
     <Box
@@ -233,35 +410,15 @@ function SettingsPanel({
             gap: 1,
           }}
         >
-          {timeFields.map((field) => (
-            <TextField
-              key={field.key}
-              label={field.label}
-              type="time"
-              size="small"
-              value={String(condition.settings[field.key] ?? field.default ?? "08:00")}
-              onChange={(event) =>
-                onChange(
-                  updateConditionSetting(
-                    conditions,
-                    conditionIndex,
-                    field.key,
-                    event.target.value,
-                  ),
-                )
-              }
-              disabled={fieldDisabled}
-              sx={compactFieldSx}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <AccessTimeOutlined sx={{ fontSize: 18, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-              inputProps={{ step: 60 }}
-            />
-          ))}
+          {timeFields.map((field) =>
+            renderSettingField(
+              field,
+              condition.settings[field.key] ?? field.default ?? "08:00",
+              fieldDisabled,
+              compactFieldSx,
+              (value) => handleSettingChange(field.key, value),
+            ),
+          )}
         </Box>
       )}
 
@@ -276,125 +433,15 @@ function SettingsPanel({
             gap: 1,
           }}
         >
-          {otherFields.map((field) => {
-            const value = condition.settings[field.key] ?? field.default ?? "";
-
-            if (field.type === "int") {
-              const isMinuteField =
-                field.key.includes("minute") || field.label.includes("دقيقة");
-
-              if (isMinuteField) {
-                return (
-                  <TextField
-                    key={field.key}
-                    select
-                    label={field.label}
-                    size="small"
-                    value={String(value)}
-                    onChange={(event) => {
-                      const parsed = parseInt(event.target.value, 10);
-                      onChange(
-                        updateConditionSetting(
-                          conditions,
-                          conditionIndex,
-                          field.key,
-                          Number.isNaN(parsed) ? 0 : parsed,
-                        ),
-                      );
-                    }}
-                    disabled={fieldDisabled}
-                    sx={compactFieldSx}
-                  >
-                    {[0, 5, 10, 15, 30, 45, 60].map((minute) => (
-                      <MenuItem key={minute} value={String(minute)}>
-                        {minute}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                );
-              }
-
-              return (
-                <TextField
-                  key={field.key}
-                  label={field.label}
-                  type="number"
-                  size="small"
-                  value={value ?? field.default ?? 0}
-                  onChange={(event) => {
-                    const parsed = parseInt(event.target.value, 10);
-                    onChange(
-                      updateConditionSetting(
-                        conditions,
-                        conditionIndex,
-                        field.key,
-                        Number.isNaN(parsed) ? 0 : parsed,
-                      ),
-                    );
-                  }}
-                  disabled={fieldDisabled}
-                  inputProps={{ min: 0, step: 1 }}
-                  sx={compactFieldSx}
-                />
-              );
-            }
-
-            if (field.type === "bool") {
-              return (
-                <Box
-                  key={field.key}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 1,
-                    px: 0.5,
-                  }}
-                >
-                  <Typography variant="caption" color="text.secondary">
-                    {field.label}
-                  </Typography>
-                  <Switch
-                    checked={Boolean(value)}
-                    onChange={(event) =>
-                      onChange(
-                        updateConditionSetting(
-                          conditions,
-                          conditionIndex,
-                          field.key,
-                          event.target.checked,
-                        ),
-                      )
-                    }
-                    disabled={fieldDisabled}
-                    size="small"
-                    color="success"
-                  />
-                </Box>
-              );
-            }
-
-            return (
-              <TextField
-                key={field.key}
-                label={field.label}
-                size="small"
-                value={String(value)}
-                onChange={(event) =>
-                  onChange(
-                    updateConditionSetting(
-                      conditions,
-                      conditionIndex,
-                      field.key,
-                      event.target.value,
-                    ),
-                  )
-                }
-                disabled={fieldDisabled}
-                sx={compactFieldSx}
-              />
-            );
-          })}
+          {otherFields.map((field) =>
+            renderSettingField(
+              field,
+              condition.settings[field.key] ?? field.default ?? "",
+              fieldDisabled,
+              compactFieldSx,
+              (value) => handleSettingChange(field.key, value),
+            ),
+          )}
         </Box>
       )}
     </Box>
@@ -480,6 +527,8 @@ export default function FormConditionsTable({
           rowIndex,
         );
         const CategoryIcon = categoryTheme.icon;
+        const primarySelectField = findPrimarySelectField(definition.settingsSchema);
+        const compactFieldSx = getCompactFieldSx(theme);
 
         return (
           <Box
@@ -551,14 +600,49 @@ export default function FormConditionsTable({
               </Typography>
             </Box>
 
-            <Typography
-              variant="body2"
-              fontWeight={600}
-              color="text.primary"
-              sx={{ ...COL.condition, textAlign: "right" }}
-            >
-              {definition.name}
-            </Typography>
+            <Box sx={{ ...COL.condition, minWidth: 0 }}>
+              {primarySelectField ? (
+                <TextField
+                  select
+                  size="small"
+                  fullWidth
+                  value={String(
+                    condition.settings[primarySelectField.key] ??
+                      primarySelectField.default ??
+                      primarySelectField.options?.[0]?.value ??
+                      "",
+                  )}
+                  onChange={(event) =>
+                    onChange(
+                      updateConditionSetting(
+                        conditions,
+                        conditionIndex,
+                        primarySelectField.key,
+                        event.target.value,
+                      ),
+                    )
+                  }
+                  disabled={disabled || !condition.isActive}
+                  sx={compactFieldSx}
+                  label={definition.name}
+                >
+                  {(primarySelectField.options ?? []).map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              ) : (
+                <Typography
+                  variant="body2"
+                  fontWeight={600}
+                  color="text.primary"
+                  sx={{ textAlign: "right" }}
+                >
+                  {definition.name}
+                </Typography>
+              )}
+            </Box>
 
             <Box sx={COL.settings}>
               <SettingsPanel
