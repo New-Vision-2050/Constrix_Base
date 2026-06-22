@@ -3,12 +3,25 @@ import type {
   RichInternalProcedureCondition,
 } from "./args";
 
+export interface ConditionSettingSchemaSelectOptionApiItem {
+  value: string;
+  label_ar: string;
+  label_en?: string;
+}
+
+export interface ConditionSettingSchemaVisibleWhenApiItem {
+  key: string;
+  value: string | number | boolean;
+}
+
 export interface ConditionSettingSchemaApiItem {
   key: string;
   type: string;
   label_ar: string;
   label_en?: string;
   default?: string | number | boolean;
+  options?: ConditionSettingSchemaSelectOptionApiItem[];
+  visible_when?: ConditionSettingSchemaVisibleWhenApiItem;
 }
 
 /** Item from GET /procedure-settings/forms-conditions */
@@ -30,6 +43,18 @@ export interface GetFormsConditionsResponse {
   data?: FormsConditionApiItem[];
 }
 
+export interface ConditionSettingSchemaSelectOption {
+  value: string;
+  label: string;
+  label_ar: string;
+  label_en?: string;
+}
+
+export interface ConditionSettingSchemaVisibleWhen {
+  key: string;
+  value: string | number | boolean;
+}
+
 export interface ConditionSettingSchemaOption {
   key: string;
   type: string;
@@ -37,6 +62,8 @@ export interface ConditionSettingSchemaOption {
   label_ar: string;
   label_en?: string;
   default?: string | number | boolean;
+  options?: ConditionSettingSchemaSelectOption[];
+  visibleWhen?: ConditionSettingSchemaVisibleWhen;
 }
 
 /** Normalized condition definition for UI */

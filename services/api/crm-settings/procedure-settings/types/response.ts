@@ -75,6 +75,12 @@ export interface ProcedureStep {
   action_taker_management_hierarchy_type?: string | null;
   /** May be a legacy scalar string or the new array form */
   action_taker_alternative_management_hierarchy_type?: string | string[] | null;
+  action_taker_management_hierarchies?:
+    | {
+        action_taker_management_hierarchy_type?: string | null;
+        is_Deputy_Director?: boolean | number | null;
+      }[]
+    | null;
   /** May be a legacy scalar string or the new array form */
   action_taker_specific_procedure_type?: string | string[] | null;
   /** May be a legacy scalar or the new array form */

@@ -6,7 +6,6 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
-  Chip,
   Divider,
   FormControlLabel,
   Grid,
@@ -77,7 +76,6 @@ const MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS = [
     value: "management_manager",
     labelKey: "managementHierarchy.managementManager" as const,
   },
-  { value: "deputy_manager", labelKey: "managementHierarchy.deputyManager" as const },
 ] as const;
 
 const SPECIFIC_PROCEDURE_ENTITY_OPTION_DEFS = [
@@ -121,11 +119,15 @@ interface SpecificProcedureRow {
   id: string;
 }
 
+interface ManagementHierarchyRow {
+  type: string;
+  isDeputyDirector: boolean;
+}
+
 interface StepFormData {
   stepName: string;
   actionTakerType: string;
-  actionTakerPrimaryManagementHierarchyType: string;
-  actionTakerAlternativeManagementHierarchyTypes: string[];
+  actionTakerManagementHierarchyRows: ManagementHierarchyRow[];
   actionTakerSpecificProcedureRows: SpecificProcedureRow[];
   branchId: string;
   managementId: string;
@@ -160,6 +162,57 @@ function normalizeSpecificProcedureRows(step: ProcedureStep): SpecificProcedureR
   );
   if (!types.length) return [{ type: "", id: "" }];
   return types.map((t, i) => ({ type: t, id: ids[i] ?? "" }));
+}
+
+function dedupeManagementHierarchyRows(
+  rows: ManagementHierarchyRow[],
+): ManagementHierarchyRow[] {
+  const seen = new Set<string>();
+  const deduped: ManagementHierarchyRow[] = [];
+  for (const row of rows) {
+    if (!row.type) {
+      deduped.push(row);
+      continue;
+    }
+    if (seen.has(row.type)) continue;
+    seen.add(row.type);
+    deduped.push(row);
+  }
+  return deduped.slice(0, MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.length);
+}
+
+function normalizeManagementHierarchyRows(
+  step: ProcedureStep,
+): ManagementHierarchyRow[] {
+  if (step.action_taker_management_hierarchies?.length) {
+    return dedupeManagementHierarchyRows(
+      step.action_taker_management_hierarchies.map((row) => ({
+        type: row.action_taker_management_hierarchy_type ?? "",
+        isDeputyDirector: coerceStepBoolean(row.is_Deputy_Director),
+      })),
+    );
+  }
+
+  const rows: ManagementHierarchyRow[] = [];
+  const primary = step.action_taker_management_hierarchy_type ?? "";
+  if (primary) {
+    rows.push({
+      type: primary === "deputy_manager" ? "" : primary,
+      isDeputyDirector: primary === "deputy_manager",
+    });
+  }
+
+  for (const alt of toStringArray(
+    step.action_taker_alternative_management_hierarchy_type,
+  )) {
+    rows.push({
+      type: alt === "deputy_manager" ? "" : alt,
+      isDeputyDirector: alt === "deputy_manager",
+    });
+  }
+
+  if (!rows.length) return [{ type: "", isDeputyDirector: false }];
+  return dedupeManagementHierarchyRows(rows);
 }
 
 function firstActionTakerUserId(step: ProcedureStep | null): string {
@@ -248,11 +301,8 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     return {
       stepName: serverStep.name?.trim() ?? "",
       actionTakerType,
-      actionTakerPrimaryManagementHierarchyType:
-        serverStep.action_taker_management_hierarchy_type ?? "",
-      actionTakerAlternativeManagementHierarchyTypes: toStringArray(
-        serverStep.action_taker_alternative_management_hierarchy_type,
-      ),
+      actionTakerManagementHierarchyRows:
+        normalizeManagementHierarchyRows(serverStep),
       actionTakerSpecificProcedureRows: normalizeSpecificProcedureRows(serverStep),
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
@@ -272,8 +322,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
   return {
     stepName: "",
     actionTakerType: "specific_user",
-    actionTakerPrimaryManagementHierarchyType: "",
-    actionTakerAlternativeManagementHierarchyTypes: [],
+    actionTakerManagementHierarchyRows: [{ type: "", isDeputyDirector: false }],
     actionTakerSpecificProcedureRows: [{ type: "", id: "" }],
     branchId: "",
     managementId: "",
@@ -306,19 +355,13 @@ export default function StepCard({
     () => String(serverStep?.skipping_period ?? 0),
   );
 
-  const { control, handleSubmit, reset, watch, setValue } =
+  const { control, handleSubmit, reset, watch } =
     useForm<StepFormData>({
       defaultValues: getDefaultValues(serverStep),
     });
 
   const stepName = watch("stepName");
   const actionTakerType = watch("actionTakerType");
-  const actionTakerPrimaryManagementHierarchyType = watch(
-    "actionTakerPrimaryManagementHierarchyType",
-  );
-  const actionTakerAlternativeManagementHierarchyTypes = watch(
-    "actionTakerAlternativeManagementHierarchyTypes",
-  );
   const actionTakerSpecificProcedureRows = watch(
     "actionTakerSpecificProcedureRows",
   );
@@ -505,15 +548,7 @@ export default function StepCard({
     [orgTemplateOptions],
   );
 
-  const primaryManagementHierarchyOptions = useMemo(
-    () =>
-      MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.filter(
-        (o) => !actionTakerAlternativeManagementHierarchyTypes.includes(o.value),
-      ).map((o) => ({ value: o.value, label: ts(`options.${o.labelKey}`) })),
-    [actionTakerAlternativeManagementHierarchyTypes, ts],
-  );
-
-  const allManagementHierarchyOptions = useMemo(
+  const managementHierarchySelectOptions = useMemo(
     () =>
       MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.map((o) => ({
         value: o.value,
@@ -583,11 +618,11 @@ export default function StepCard({
     }
     if (
       data.actionTakerType === "management_hierarchy" &&
-      !data.actionTakerPrimaryManagementHierarchyType
+      !data.actionTakerManagementHierarchyRows.some((row) => row.type)
     ) {
       toast({
         title: t("actions.save"),
-        description: ts("validation.selectPrimaryHierarchy"),
+        description: ts("validation.selectManagementHierarchy"),
         variant: "destructive",
       });
       return;
@@ -623,17 +658,20 @@ export default function StepCard({
     const formsValue =
       data.actionTakerType === "himself" ? "approve" : "approve";
 
+    const validManagementHierarchyRows = data.actionTakerManagementHierarchyRows.filter(
+      (row) => row.type,
+    );
     const body: CreateStepArgs = {
       name: data.stepName.trim(),
       action_taker_type: data.actionTakerType,
-      ...(data.actionTakerType === "management_hierarchy"
-        ? { action_taker_management_hierarchy_type: data.actionTakerPrimaryManagementHierarchyType }
-        : {}),
       ...(data.actionTakerType === "management_hierarchy" &&
-      data.actionTakerAlternativeManagementHierarchyTypes.length > 0
+      validManagementHierarchyRows.length > 0
         ? {
-            action_taker_alternative_management_hierarchy_type:
-              data.actionTakerAlternativeManagementHierarchyTypes,
+            action_taker_management_hierarchies:
+              validManagementHierarchyRows.map((row) => ({
+                action_taker_management_hierarchy_type: row.type,
+                is_Deputy_Director: row.isDeputyDirector,
+              })),
           }
         : {}),
       ...(data.actionTakerType === "specific_procedures" && validSpecificRows.length > 0
@@ -1120,102 +1158,137 @@ export default function StepCard({
         {actionTakerType === "management_hierarchy" && (
           <Box sx={{ mb: 2.5 }}>
             <SectionLabel>{ts("managementHierarchyType")}</SectionLabel>
-            <Grid container spacing={2}>
-              <Grid size={6}>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
-                  {ts("primaryManagementHierarchy")}
-                </Typography>
-                <Controller
-                  name="actionTakerPrimaryManagementHierarchyType"
-                  control={control}
-                  render={({ field }) => (
-                    <Box sx={{ width: "100%" }}>
-                      <SearchableSelect
-                        options={primaryManagementHierarchyOptions}
-                        value={field.value ?? ""}
-                        onChange={(v) => {
-                          const next = String(v);
-                          field.onChange(next);
-                          if (next) {
-                            setValue(
-                              "actionTakerAlternativeManagementHierarchyTypes",
-                              actionTakerAlternativeManagementHierarchyTypes.filter(
-                                (a) => a !== next,
-                              ),
-                            );
-                          }
-                        }}
-                        placeholder={ts("selectPrimaryManagementHierarchy")}
-                        searchPlaceholder={tc("search")}
-                        noResultsText={tc("noResults")}
-                        disabled={fieldsDisabled}
-                      />
-                    </Box>
-                  )}
-                />
-              </Grid>
-              <Grid size={6}>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
-                  {ts("alternativeManagementHierarchy")}
-                </Typography>
-                <Controller
-                  name="actionTakerAlternativeManagementHierarchyTypes"
-                  control={control}
-                  render={({ field }) => {
-                    const selected: string[] = field.value ?? [];
-                    const availableOptions = allManagementHierarchyOptions.filter(
-                      (o) =>
-                        o.value !== actionTakerPrimaryManagementHierarchyType &&
-                        !selected.includes(o.value),
-                    );
-                    return (
-                      <Box>
-                        {selected.length > 0 && (
-                          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-                            {selected.map((val) => {
-                              const label =
-                                allManagementHierarchyOptions.find((o) => o.value === val)
-                                  ?.label ?? val;
-                              return (
-                                <Chip
-                                  key={val}
-                                  label={label}
-                                  size="small"
-                                  onDelete={
-                                    fieldsDisabled
-                                      ? undefined
-                                      : () =>
-                                          field.onChange(
-                                            selected.filter((v) => v !== val),
-                                          )
-                                  }
-                                />
-                              );
-                            })}
-                          </Box>
-                        )}
-                        {!fieldsDisabled && availableOptions.length > 0 && (
+            <Controller
+              name="actionTakerManagementHierarchyRows"
+              control={control}
+              render={({ field }) => {
+                const rows: ManagementHierarchyRow[] = field.value?.length
+                  ? field.value
+                  : [{ type: "", isDeputyDirector: false }];
+                const maxRows = MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS.length;
+                const getRowOptions = (idx: number) => {
+                  const selectedElsewhere = rows
+                    .filter((_, i) => i !== idx)
+                    .map((r) => r.type)
+                    .filter(Boolean);
+                  return managementHierarchySelectOptions.filter(
+                    (option) =>
+                      option.value === rows[idx]?.type ||
+                      !selectedElsewhere.includes(option.value),
+                  );
+                };
+                const canAddRow = rows.length < maxRows;
+                const updateRow = (
+                  idx: number,
+                  key: keyof ManagementHierarchyRow,
+                  val: string | boolean,
+                ) => {
+                  const next = rows.map((row, i) =>
+                    i === idx ? { ...row, [key]: val } : row,
+                  );
+                  field.onChange(next);
+                };
+                const addRow = () => {
+                  if (!canAddRow) return;
+                  field.onChange([...rows, { type: "", isDeputyDirector: false }]);
+                };
+                const removeRow = (idx: number) =>
+                  field.onChange(rows.filter((_, i) => i !== idx));
+
+                return (
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                    {rows.map((row, idx) => (
+                      <Grid container spacing={2} key={idx} alignItems="center">
+                        <Grid size={5}>
+                          <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+                            {ts("options.actionTakerType.managementHierarchy")}
+                          </Typography>
                           <SearchableSelect
-                            options={availableOptions}
-                            value=""
-                            onChange={(v) => {
-                              const next = String(v);
-                              if (next && !selected.includes(next)) {
-                                field.onChange([...selected, next]);
-                              }
-                            }}
-                            placeholder={ts("selectAlternativeManagementHierarchy")}
+                            options={getRowOptions(idx)}
+                            value={row.type}
+                            onChange={(v) => updateRow(idx, "type", String(v))}
+                            placeholder={ts("selectManagementHierarchy")}
                             searchPlaceholder={tc("search")}
                             noResultsText={tc("noResults")}
                             disabled={fieldsDisabled}
                           />
+                        </Grid>
+                        <Grid size={3}>
+                          <FormControlLabel
+                            sx={{ m: 0, mt: 3.5 }}
+                            control={
+                              <Checkbox
+                                checked={row.isDeputyDirector}
+                                onChange={(e) =>
+                                  updateRow(idx, "isDeputyDirector", e.target.checked)
+                                }
+                                disabled={fieldsDisabled}
+                              />
+                            }
+                            label={ts("options.managementHierarchy.deputyManager")}
+                          />
+                        </Grid>
+                        {!fieldsDisabled && (
+                          <Grid size={4}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                mt: 3.5,
+                              }}
+                            >
+                              {idx === rows.length - 1 && canAddRow && (
+                                <Box
+                                  component="span"
+                                  role="button"
+                                  tabIndex={0}
+                                  onClick={addRow}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      addRow();
+                                    }
+                                  }}
+                                  sx={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    border: 1,
+                                    borderColor: "primary.main",
+                                    color: "primary.main",
+                                    fontSize: "0.8rem",
+                                    cursor: "pointer",
+                                    userSelect: "none",
+                                    "&:hover": { bgcolor: "action.hover" },
+                                  }}
+                                >
+                                  <Add fontSize="small" />
+                                  {ts("addSpecificProcedureRow")}
+                                </Box>
+                              )}
+                              {rows.length > 1 && (
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => removeRow(idx)}
+                                  aria-label={ts("removeSpecificProcedureRow")}
+                                >
+                                  <Delete fontSize="small" />
+                                </IconButton>
+                              )}
+                            </Box>
+                          </Grid>
                         )}
-                      </Box>
-                    );
-                  }}
-                />
-              </Grid>
-            </Grid>
+                      </Grid>
+                    ))}
+                  </Box>
+                );
+              }}
+            />
           </Box>
         )}
 

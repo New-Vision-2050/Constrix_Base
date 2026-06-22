@@ -202,12 +202,20 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
       "إضافة بديل",
     ),
     addSpecificProcedureRow: _m("Add row", "إضافة سطر"),
+    selectManagementHierarchy: _m(
+      "Select management hierarchy",
+      "اختر الهيكل التنظيمي",
+    ),
     removeSpecificProcedureRow: _m("Remove", "إزالة"),
     validation: new MessagesGroup({
       selectEmployees: _m("Please select employees", "يرجى اختيار الموظفين"),
       selectPrimaryHierarchy: _m(
         "Please select primary management hierarchy",
         "يرجى اختيار الهيكل التنظيمي الأساسي",
+      ),
+      selectManagementHierarchy: _m(
+        "Please select management hierarchy",
+        "يرجى اختيار الهيكل التنظيمي",
       ),
       duplicateHierarchy: _m(
         "Cannot select the same option in both fields",

@@ -41,6 +41,24 @@ function mapSettingSchemaItem(
     label_en: item.label_en,
     label: locale === "ar" ? labelAr : item.label_en ?? labelAr,
     default: item.default,
+    options: (item.options ?? []).map((option) => {
+      const optionLabelAr = option.label_ar ?? option.value;
+      return {
+        value: option.value,
+        label_ar: optionLabelAr,
+        label_en: option.label_en,
+        label:
+          locale === "ar"
+            ? optionLabelAr
+            : option.label_en ?? optionLabelAr,
+      };
+    }),
+    visibleWhen: item.visible_when
+      ? {
+          key: item.visible_when.key,
+          value: item.visible_when.value,
+        }
+      : undefined,
   };
 }
 
