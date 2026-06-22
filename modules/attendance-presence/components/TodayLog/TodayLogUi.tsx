@@ -3,19 +3,28 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
+export const TODAY_LOG_SURFACES = {
+  card: "bg-popover",
+  cardMuted: "bg-popover/60",
+} as const;
+
+/** Inline-style fallbacks using existing theme CSS variables */
 export const TODAY_LOG_COLORS = {
-  magenta: "#FF2D78",
-  yellow: "#FFD700",
-  green: "#4CAF50",
-  track: "#2A2A45",
-  card: "#1C1C35",
+  card: "hsl(var(--popover))",
+  primary: "hsl(var(--primary))",
+  chart4: "hsl(var(--chart-4))",
 } as const;
 
 export const TODAY_LOG_ACCENTS = {
-  checkIn: "text-[#FF2D78]",
-  checkOut: "text-[#FFD700]",
-  workHours: "text-[#4CAF50]",
-  highlight: "text-[#FFD700]",
+  checkIn: "text-primary",
+  checkOut: "text-chart-4",
+  workHours: "text-chart-2",
+  highlight: "text-chart-4",
+} as const;
+
+export const TODAY_LOG_PROGRESS = {
+  track: "text-muted/40",
+  progress: "text-primary",
 } as const;
 
 export function TodayLogActionButtonContent({
@@ -34,7 +43,7 @@ export function TodayLogActionButtonContent({
         className,
       )}
     >
-      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white">
+      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-foreground">
         {icon}
       </span>
       <span className="text-center">{label}</span>

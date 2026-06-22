@@ -453,13 +453,19 @@ export const AttendanceConstraintsApi = {
     ),
 
   updateLocation: (
+    constraintId: string,
     locationId: string,
     body: ConstraintLocationCreateItem,
   ) =>
-    baseApi.put(`attendance/constraints/locations/${locationId}`, body),
+    baseApi.put(
+      `attendance/constraints/${constraintId}/locations/${locationId}`,
+      body,
+    ),
 
-  deleteLocation: (locationId: string) =>
-    baseApi.delete(`attendance/constraints/locations/${locationId}`),
+  deleteLocation: (constraintId: string, locationId: string) =>
+    baseApi.delete(
+      `attendance/constraints/${constraintId}/locations/${locationId}`,
+    ),
 
   getShifts: (constraintId: string) =>
     baseApi.get(`attendance/constraints/${constraintId}/shifts`),
