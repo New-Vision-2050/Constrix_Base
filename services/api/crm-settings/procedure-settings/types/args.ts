@@ -23,12 +23,19 @@ export interface UpdateStageArgs {
   work_flow_id?: string;
 }
 
+export interface ActionTakerManagementHierarchyItem {
+  action_taker_management_hierarchy_type: string;
+  is_Deputy_Director: boolean;
+}
+
 export interface CreateStepArgs {
   name: string;
   action_taker_type?: string;
+  /** @deprecated use action_taker_management_hierarchies */
   action_taker_management_hierarchy_type?: string;
-  /** Array of fallback hierarchy types; validated server-side */
+  /** @deprecated use action_taker_management_hierarchies */
   action_taker_alternative_management_hierarchy_type?: string[];
+  action_taker_management_hierarchies?: ActionTakerManagementHierarchyItem[];
   /** Parallel array with action_taker_specific_procedure_id */
   action_taker_specific_procedure_type?: string[];
   /** Parallel array with action_taker_specific_procedure_type */

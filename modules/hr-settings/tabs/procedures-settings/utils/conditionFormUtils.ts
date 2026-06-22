@@ -39,6 +39,9 @@ function buildDefaultSettings(
       settings[field.key] = "08:00";
     } else if (field.type === "bool") {
       settings[field.key] = false;
+    } else if (field.type === "select") {
+      settings[field.key] =
+        field.default ?? field.options?.[0]?.value ?? "";
     } else {
       settings[field.key] = "";
     }
