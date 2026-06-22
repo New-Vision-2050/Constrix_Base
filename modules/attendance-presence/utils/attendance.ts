@@ -135,3 +135,37 @@ export function getLatestAttendanceRecord(period?: WorkPeriodConstraint) {
 
   return period.attendance.at(-1);
 }
+
+const PERIOD_LABEL_KEYS = ["period1", "period2", "period3"] as const;
+
+export interface WorkPeriodTabItem {
+  id: string;
+  apiIndex: number;
+  label: string;
+}
+
+export function buildWorkPeriodTabs(
+  periods: WorkPeriodConstraint[],
+  translate: (key: string, values?: { number: number }) => string,
+): WorkPeriodTabItem[] {
+  return periods.map((_, index) => ({
+    id: `period-${index + 1}`,
+    apiIndex: index,
+    label:
+      index < PERIOD_LABEL_KEYS.length
+        ? translate(PERIOD_LABEL_KEYS[index])
+        : translate("periodNumber", { number: index + 1 }),
+  }));
+}
+
+export function getWorkPeriodByTabId(
+  periods: WorkPeriodConstraint[],
+  activePeriodId: string,
+) {
+  const tabIndex = Math.max(
+    0,
+    Number.parseInt(activePeriodId.replace("period-", ""), 10) - 1,
+  );
+
+  return periods[tabIndex];
+}

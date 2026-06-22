@@ -46,6 +46,12 @@ export const attendancePresenceMessages = new MessagesGroup({
   period1: _m("First Period", "الفترة الأولى"),
   period2: _m("Second Period", "الفترة الثانية"),
   period3: _m("Third Period", "الفترة الثالثة"),
+  periodNumber: _m("Period {number}", "الفترة {number}"),
+  happyHoliday: _m("Happy Holiday", "عطلة سعيدة"),
+  happyHolidayMessage: _m(
+    "Enjoy your day off!",
+    "استمتع بيوم عطلتك!",
+  ),
   timeRemaining: _m("Time Remaining", "الوقت المتبقي"),
   timeElapsed: _m("Time Elapsed", "الوقت المنقضي"),
   checkIn: _m("Check-in", "الحضور"),
