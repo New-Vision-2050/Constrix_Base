@@ -11,6 +11,8 @@ import {
   InternalProcedure,
   GetInternalProceduresResponse,
   GetInternalProcedureResponse,
+  ConditionSettingSchemaApiItem,
+  ConditionSettingSchemaOption,
 } from "./types/response";
 import {
   CreateInternalProcedureArgs,
@@ -27,17 +29,41 @@ function resolveLabel(
   return item.label_en ?? labelAr;
 }
 
+function mapSettingSchemaItem(
+  item: ConditionSettingSchemaApiItem,
+  locale = "ar",
+): ConditionSettingSchemaOption {
+  const labelAr = item.label_ar ?? "";
+  return {
+    key: item.key,
+    type: item.type,
+    label_ar: labelAr,
+    label_en: item.label_en,
+    label: locale === "ar" ? labelAr : item.label_en ?? labelAr,
+    default: item.default,
+  };
+}
+
 function mapFormsConditionItem(
   item: FormsConditionApiItem,
   locale = "ar",
 ): FormConditionOption {
+  const categoryLabelAr = item.category_label_ar ?? "";
   return {
     id: item.key,
     key: item.key,
     type: item.type,
+    category: item.category ?? "",
+    categoryLabel:
+      locale === "ar"
+        ? categoryLabelAr
+        : item.category_label_en ?? categoryLabelAr,
     name: resolveLabel(item, locale),
     label_ar: item.label_ar,
     label_en: item.label_en,
+    settingsSchema: (item.settings_schema ?? []).map((schemaItem) =>
+      mapSettingSchemaItem(schemaItem, locale),
+    ),
   };
 }
 
@@ -85,20 +111,20 @@ export const InternalProcedureSettingsApi = {
       .filter((item): item is InternalProcedureSettingFormOption => item != null);
   },
 
-  /** Lists form conditions for the selected form. */
+  /** Lists form condition definitions for the selected form. */
   getFormsConditions: async (
     formType: string,
     locale = "ar",
   ): Promise<FormConditionOption[]> => {
     const response = await baseApi.get<GetFormsConditionsResponse>(
-      "admin/forms_conditions",
+      "procedure-settings/forms-conditions",
       {
         params: {
           type: formType,
         },
       },
     );
-    const payload = response.data?.payload ?? [];
+    const payload = response.data?.payload ?? response.data?.data ?? [];
     return payload.map((item) => mapFormsConditionItem(item, locale));
   },
 
@@ -109,7 +135,7 @@ export const InternalProcedureSettingsApi = {
       "procedure-settings/internal-procedures",
       args,
     );
-    return response.data.payload;
+    return normalizeInternalProcedure(response.data.payload);
   },
 
   getInternalProcedures: async (
@@ -119,7 +145,9 @@ export const InternalProcedureSettingsApi = {
       "procedure-settings/internal-procedures",
       { params: { type } },
     );
-    return response.data?.payload ?? [];
+    return (response.data?.payload ?? []).map((item) =>
+      normalizeInternalProcedure(item),
+    );
   },
 
   getInternalProcedure: async (
@@ -140,11 +168,11 @@ export const InternalProcedureSettingsApi = {
     internalProcedureId: string,
     args: UpdateInternalProcedureArgs,
   ): Promise<InternalProcedure> => {
-    const response = await baseApi.put<UpdateInternalProcedureResponse>(
+    const response = await baseApi.post<UpdateInternalProcedureResponse>(
       `procedure-settings/${procedureSettingId}/internal-procedures/${internalProcedureId}`,
       args,
     );
-    return response.data.payload;
+    return normalizeInternalProcedure(response.data.payload);
   },
 
   deleteInternalProcedure: async (

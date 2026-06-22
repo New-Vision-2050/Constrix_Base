@@ -14,10 +14,18 @@ export interface ProceduresSettingsViewProps {
   translationNamespace?: string;
 }
 
+export interface TaskActionConditionFormValue {
+  key: string;
+  isActive: boolean;
+  sortOrder: number;
+  settings: Record<string, string | number | boolean>;
+}
+
 export interface TaskActionFormValues {
   name: string;
   modelId: string;
-  formConditions: Record<string, boolean | number>;
-  appearBefore: string;
-  appearAfter: string;
+  conditions: TaskActionConditionFormValue[];
+  appearBeforeIds: string[];
+  appearAfterIds: string[];
+  isActive: boolean;
 }
