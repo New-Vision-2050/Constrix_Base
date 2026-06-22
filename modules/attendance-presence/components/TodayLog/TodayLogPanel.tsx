@@ -30,7 +30,8 @@ import {
   ElapsedTimeDisplay,
   RequestPermissionIcon,
   TODAY_LOG_ACCENTS,
-  TODAY_LOG_COLORS,
+  TODAY_LOG_PROGRESS,
+  TODAY_LOG_SURFACES,
   TodayLogActionButtonContent,
   WorkHoursStatIcon,
 } from "./TodayLogUi";
@@ -61,7 +62,8 @@ function CircularProgress({
           cy="70"
           r={radius}
           fill="none"
-          stroke={TODAY_LOG_COLORS.track}
+          className={TODAY_LOG_PROGRESS.track}
+          stroke="currentColor"
           strokeWidth="10"
         />
         <circle
@@ -69,7 +71,8 @@ function CircularProgress({
           cy="70"
           r={radius}
           fill="none"
-          stroke={TODAY_LOG_COLORS.magenta}
+          className={TODAY_LOG_PROGRESS.progress}
+          stroke="currentColor"
           strokeWidth="10"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -266,13 +269,13 @@ export default function TodayLogPanel() {
                     className={cn(
                       "relative flex-1 px-1 py-2.5 text-xs transition-colors sm:text-sm",
                       isActive
-                        ? "font-medium text-[#FF2D78]"
+                        ? "font-medium text-primary"
                         : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     {period.label}
                     {isActive ? (
-                      <span className="absolute inset-x-2 bottom-0 h-1 rounded-full bg-[#FF2D78]" />
+                      <span className="absolute inset-x-2 bottom-0 h-1 rounded-full bg-primary" />
                     ) : null}
                   </button>
                 );
@@ -280,10 +283,7 @@ export default function TodayLogPanel() {
             </div>
           ) : null}
 
-          <div
-            className="mb-4 rounded-2xl px-4 py-6"
-            style={{ backgroundColor: TODAY_LOG_COLORS.card }}
-          >
+          <div className={cn("mb-4 rounded-2xl px-4 py-6", TODAY_LOG_SURFACES.card)}>
             <CircularProgress
               minutes={elapsedMinutes}
               hoursShort={t("hoursShort")}
@@ -309,12 +309,16 @@ export default function TodayLogPanel() {
           </div>
 
           <div
-            className="mb-4 overflow-hidden rounded-xl text-sm"
-            style={{ backgroundColor: `${TODAY_LOG_COLORS.card}99` }}
+            className={cn(
+              "mb-4 overflow-hidden rounded-xl text-sm",
+              TODAY_LOG_SURFACES.cardMuted,
+            )}
           >
             <div
-              className="grid grid-cols-4 text-xs text-muted-foreground"
-              style={{ backgroundColor: TODAY_LOG_COLORS.card }}
+              className={cn(
+                "grid grid-cols-4 text-xs text-muted-foreground",
+                TODAY_LOG_SURFACES.card,
+              )}
             >
               {tableColumns.map((column) => (
                 <div key={column.key} className="p-2.5 text-center">
@@ -362,7 +366,7 @@ export default function TodayLogPanel() {
               />
             ) : showButton ? (
               <Button
-                className="h-12 w-full rounded-xl border-0 bg-[#FF2D78] text-base font-medium text-white hover:bg-[#FF2D78]/90"
+                className="h-12 w-full rounded-xl border-0 bg-primary text-base font-medium text-primary-foreground hover:bg-primary/90"
                 disabled
               >
                 <TodayLogActionButtonContent
@@ -384,7 +388,7 @@ export default function TodayLogPanel() {
             ) : null}
             <Button
               variant="outline"
-              className="h-11 w-full rounded-xl border-border/60 bg-[#1C1C35] text-foreground hover:bg-[#1C1C35]/90"
+              className="h-11 w-full rounded-xl border-border/60 bg-popover text-foreground hover:bg-popover/90"
               loading={isRequestingPermission}
               onClick={handleRequestPermission}
             >

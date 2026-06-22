@@ -283,7 +283,12 @@ export default function MapSettingsSection({
     mutationFn: (vars: {
       locationId: string;
       body: ConstraintLocationCreateItem;
-    }) => AttendanceConstraints.updateLocation(vars.locationId, vars.body),
+    }) =>
+      AttendanceConstraints.updateLocation(
+        constraintId,
+        vars.locationId,
+        vars.body,
+      ),
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: ["constraint-locations", constraintId],
@@ -292,7 +297,7 @@ export default function MapSettingsSection({
 
   const deleteLocationMutation = useMutation({
     mutationFn: (locationId: string) =>
-      AttendanceConstraints.deleteLocation(locationId),
+      AttendanceConstraints.deleteLocation(constraintId, locationId),
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: ["constraint-locations", constraintId],
