@@ -648,8 +648,16 @@ export default function SubTypeTabs() {
             : false
         }
         existingActions={existingActions}
-        excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
-        excludeFromAppearBefore={primaryProcedureId ? [primaryProcedureId] : []}
+        excludeFromAppearAfter={
+          lastProcedureId && editingProcedure?.id !== lastProcedureId
+            ? [lastProcedureId]
+            : []
+        }
+        excludeFromAppearBefore={
+          primaryProcedureId && editingProcedure?.id !== primaryProcedureId
+            ? [primaryProcedureId]
+            : []
+        }
         disableIsActiveSwitch={
           editingProcedure
             ? isPrimaryInternalProcedure(editingProcedure, internalProcedures) ||

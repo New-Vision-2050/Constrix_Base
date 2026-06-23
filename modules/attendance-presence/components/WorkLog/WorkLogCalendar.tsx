@@ -24,10 +24,10 @@ const CALENDAR_STATUS_CLASSES: Record<
   { cell: string; dayNumber: string; label: string; dot: string }
 > = {
   off: {
-    cell: "bg-muted/25 border-border/60",
-    dayNumber: "text-muted-foreground",
-    label: "text-muted-foreground",
-    dot: "bg-muted-foreground",
+    cell: "bg-secondary/45 border-secondary-foreground/20",
+    dayNumber: "text-foreground/80",
+    label: "text-secondary-foreground",
+    dot: "bg-secondary-foreground/75",
   },
   absent: {
     cell: "bg-destructive/15 border-destructive/25",
@@ -64,7 +64,7 @@ const CALENDAR_STATUS_CLASSES: Record<
 const LEGEND_DOT_CLASS: Record<string, string> = {
   late: "bg-chart-3",
   absent: "bg-destructive",
-  holiday: "bg-muted-foreground",
+  holiday: "bg-secondary-foreground/75",
   required: "bg-chart-1",
 };
 
