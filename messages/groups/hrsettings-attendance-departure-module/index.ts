@@ -179,7 +179,7 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
       columnName: _m("Employee Name", "اسم الموظف"),
       columnEmail: _m("Email", "البريد الالكتروني"),
       columnPhone: _m("Phone Number", "رقم الجوال"),
-      columnProject: _m("Project", "المشروع"),
+      columnProject: _m("Projects", "المشاريع"),
       columnStatus: _m("Status", "الحاله"),
       columnActions: _m("Actions", "الاجراء"),
       statusActive: _m("Active", "نشط"),

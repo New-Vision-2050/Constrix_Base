@@ -1,5 +1,4 @@
-
-'use client';
+"use client";
 import { baseURL } from "@/config/axios-config";
 import AttendanceStatusBadge from "../components/AttendanceDepartureTable/AttendanceStatusBadge";
 import ApproverBadge from "../components/AttendanceDepartureTable/ApproverBadge";
@@ -14,7 +13,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 export const getAttendanceDepartureTableConfig = (
   t: (key: string) => string,
   companyCreatedAt: Date,
-  can: (permission: string) => boolean 
+  can: (permission: string) => boolean,
 ) => {
   return {
     url: `${baseURL}/attendance/team`,

@@ -147,10 +147,7 @@ export const projectMessages = new MessagesGroup({
       "Could not save document changes",
       "تعذر حفظ تغييرات المستند",
     ),
-    approveWithNotesSuccess: _m(
-      "Approved with notes",
-      "تم الاعتماد بملاحظات",
-    ),
+    approveWithNotesSuccess: _m("Approved with notes", "تم الاعتماد بملاحظات"),
     approveWithNotesError: _m(
       "Could not approve with notes",
       "تعذر الاعتماد بملاحظات",
@@ -235,6 +232,18 @@ export const projectMessages = new MessagesGroup({
     assignError: _m("Could not assign employees", "تعذر تعيين الموظفين"),
     roleAssignSuccess: _m("Role updated", "تم تحديث الدور"),
     roleAssignError: _m("Could not update role", "تعذر تحديث الدور"),
+    mapView: _m("Map", "الخريطة"),
+    tableView: _m("Table", "الجدول"),
+    mapPlaceholder: _m(
+      "Map data will appear here when the backend is ready",
+      "ستظهر بيانات الخريطة هنا عند اكتمال الربط مع الخادم",
+    ),
+    noAttendance: _m("No attendance", "لا يوجد حضور"),
+    columns: new MessagesGroup({
+      approver: _m("Approved By", "المحدد المعتمد"),
+      employeeStatus: _m("Employee Status", "حالة الموظف"),
+      attendanceStatus: _m("Attendance Status", "حالة الحضور"),
+    }),
     addStakeholder: _m("Add stakeholder", "اضافة صاحب مصلحة"),
     stepSearchCompany: _m("Search for company", "البحث عن شركة"),
     stepSelectEmployee: _m("Select employee", "أختيار موظف"),
