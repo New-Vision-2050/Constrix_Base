@@ -13,6 +13,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import { Map } from "@mui/icons-material";
 import { EditIcon, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -42,6 +43,9 @@ import { useCanAssignProjectStaffRoles } from "@/modules/projects/project/hooks/
 import type { Employee } from "../staff/types";
 import AddCadreDialog from "./add-cadre/AddCadreDialog";
 import StaffRoleSelect from "../staff/StaffRoleSelect";
+import { getProjectEmployeeAttendanceColumns } from "../staff/shared/projectEmployeeAttendanceColumns";
+import { ProjectStaffMap } from "../staff/shared/ProjectStaffMap";
+import { ProjectStaffAttendanceShell } from "../staff/shared/ProjectStaffAttendanceShell";
 
 const CadreTableLayout = HeadlessTableLayout<Employee>("cadre");
 
@@ -54,6 +58,7 @@ export default function CadreTab() {
   const companyId = authCompanyData?.payload?.id;
 
   const [openAddCadre, setOpenAddCadre] = useState(false);
+  const [view, setView] = useState<"table" | "map">("table");
   const [employeeToRemove, setEmployeeToRemove] = useState<Employee | null>(
     null,
   );
@@ -142,6 +147,7 @@ export default function CadreTab() {
           />
         ),
       },
+      ...getProjectEmployeeAttendanceColumns(t),
     ],
     [t, projectId, canChangeStaffRole],
   );
@@ -239,32 +245,50 @@ export default function CadreTab() {
   }
 
   return (
-    <>
-      <Box sx={{ p: 3 }}>
-        <CadreTableLayout
-          filters={
-            <CadreTableLayout.TopActions
-              state={state}
-              customActions={
-                canCreate ? (
-                  <Button
-                    variant="contained"
-                    onClick={() => setOpenAddCadre(true)}
-                  >
-                    {t("cadre.addCadre")}
-                  </Button>
-                ) : undefined
-              }
-            ></CadreTableLayout.TopActions>
-          }
-          table={
-            <CadreTableLayout.Table
-              state={state}
-              loadingOptions={{ rows: 5 }}
-            />
-          }
-          pagination={<CadreTableLayout.Pagination state={state} />}
-        />
+    <ProjectStaffAttendanceShell>
+      <>
+        <Box sx={{ p: 3 }}>
+        {view === "map" ? (
+          <ProjectStaffMap
+            projectId={projectId}
+            companyId={companyId}
+            onBackToTable={() => setView("table")}
+          />
+        ) : (
+          <CadreTableLayout
+            filters={
+              <CadreTableLayout.TopActions
+                state={state}
+                customActions={
+                  <>
+                    <Button
+                      variant="contained"
+                      startIcon={<Map />}
+                      onClick={() => setView("map")}
+                    >
+                      {t("staff.mapView")}
+                    </Button>
+                    {canCreate ? (
+                      <Button
+                        variant="contained"
+                        onClick={() => setOpenAddCadre(true)}
+                      >
+                        {t("cadre.addCadre")}
+                      </Button>
+                    ) : null}
+                  </>
+                }
+              ></CadreTableLayout.TopActions>
+            }
+            table={
+              <CadreTableLayout.Table
+                state={state}
+                loadingOptions={{ rows: 5 }}
+              />
+            }
+            pagination={<CadreTableLayout.Pagination state={state} />}
+          />
+        )}
       </Box>
       <AddCadreDialog open={openAddCadre} setOpen={setOpenAddCadre} />
 
@@ -308,6 +332,7 @@ export default function CadreTab() {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+      </>
+    </ProjectStaffAttendanceShell>
   );
 }

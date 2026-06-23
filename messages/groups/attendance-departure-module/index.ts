@@ -215,6 +215,8 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
       }),
       attendanceStatus: new MessagesGroup({
         title: _m("Attendance Approver Details", "بيانات محدد الحضور"),
+        loading: _m("Loading attendance data...", "جاري تحميل بيانات الحضور..."),
+        unspecified: _m("Not specified", "غير محدد"),
         attendance: _m("Check-in", "الحضور"),
         departure: _m("Check-out", "الانصراف"),
         period: _m("Period", "الفترة"),

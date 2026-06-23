@@ -43,6 +43,7 @@ export type ConstraintSelectedEmployeePayload = {
     phone?: string;
     mobile?: string;
   };
+  projects?: { id: string; name: string }[];
   project?: string | { name?: string };
   branch?: string | { name?: string };
   status?: string;

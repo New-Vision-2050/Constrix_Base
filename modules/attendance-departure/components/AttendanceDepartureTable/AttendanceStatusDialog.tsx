@@ -18,6 +18,7 @@ const AttendanceStatusDialog: React.FC = () => {
     isAttendanceStatusDialogOpen,
     closeAttendanceStatusDialog,
     constraintDetails,
+    constraintDetailsLoading,
   } = useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table.dialogs.attendanceStatus");
   
@@ -28,7 +29,7 @@ const AttendanceStatusDialog: React.FC = () => {
   // Get work periods using helper function with translation support and hours information
   const periodsList = convertToPeriodType(DUMMY_WORK_PERIODS, t, dummyActualHours, dummyDeductedHours);
   
-  if (!constraintDetails) return null;
+  if (!isAttendanceStatusDialogOpen) return null;
 
   return (
     <DialogContainer 
@@ -36,7 +37,15 @@ const AttendanceStatusDialog: React.FC = () => {
       onClose={closeAttendanceStatusDialog}
       title={t("title")}
     >
-      {/* Dialog content with theme-aware styling using Tailwind's dark mode */}
+      {constraintDetailsLoading ? (
+        <div className="flex justify-center py-12 text-muted-foreground">
+          {t("loading")}
+        </div>
+      ) : !constraintDetails ? (
+        <div className="flex justify-center py-12 text-muted-foreground">
+          {t("unspecified")}
+        </div>
+      ) : (
       <div className="flex flex-col gap-6 text-foreground bg-background p-6 rounded-lg border border-border">
         
         {/* Constraint Name and System */}
@@ -131,6 +140,7 @@ const AttendanceStatusDialog: React.FC = () => {
           })
         }
       </div>
+      )}
     </DialogContainer>
   );
 };

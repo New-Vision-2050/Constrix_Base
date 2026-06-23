@@ -13,6 +13,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import { Map } from "@mui/icons-material";
 import { EditIcon, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -43,6 +44,9 @@ import AddStaffDialog, {
   employeesNotInProjectQueryKey,
 } from "./add-staff/AddStaffDialog";
 import StaffRoleSelect from "./StaffRoleSelect";
+import { getProjectEmployeeAttendanceColumns } from "./shared/projectEmployeeAttendanceColumns";
+import { ProjectStaffMap } from "./shared/ProjectStaffMap";
+import { ProjectStaffAttendanceShell } from "./shared/ProjectStaffAttendanceShell";
 
 const StaffTableLayout = HeadlessTableLayout<Employee>("staff");
 
@@ -52,6 +56,7 @@ export default function StaffTab() {
   const { projectId } = useProject();
   const queryClient = useQueryClient();
   const [openStaff, setAddStaffOpen] = useState(false);
+  const [view, setView] = useState<"table" | "map">("table");
   const [employeeToRemove, setEmployeeToRemove] = useState<Employee | null>(
     null,
   );
@@ -149,6 +154,7 @@ export default function StaffTab() {
           />
         ),
       },
+      ...getProjectEmployeeAttendanceColumns(t),
     ],
     [t, projectId, canChangeStaffRole],
   );
@@ -246,32 +252,49 @@ export default function StaffTab() {
   }
 
   return (
-    <>
-      <Box sx={{ p: 3 }}>
-        <StaffTableLayout
-          filters={
-            <StaffTableLayout.TopActions
-              state={state}
-              customActions={
-                canCreate ? (
-                  <Button
-                    variant="contained"
-                    onClick={() => setAddStaffOpen(true)}
-                  >
-                    {t("staff.addStakeholder")}
-                  </Button>
-                ) : undefined
-              }
-            ></StaffTableLayout.TopActions>
-          }
-          table={
-            <StaffTableLayout.Table
-              state={state}
-              loadingOptions={{ rows: 5 }}
-            />
-          }
-          pagination={<StaffTableLayout.Pagination state={state} />}
-        />
+    <ProjectStaffAttendanceShell>
+      <>
+        <Box sx={{ p: 3 }}>
+        {view === "map" ? (
+          <ProjectStaffMap
+            projectId={projectId}
+            onBackToTable={() => setView("table")}
+          />
+        ) : (
+          <StaffTableLayout
+            filters={
+              <StaffTableLayout.TopActions
+                state={state}
+                customActions={
+                  <>
+                    <Button
+                      variant="contained"
+                      startIcon={<Map />}
+                      onClick={() => setView("map")}
+                    >
+                      {t("staff.mapView")}
+                    </Button>
+                    {canCreate ? (
+                      <Button
+                        variant="contained"
+                        onClick={() => setAddStaffOpen(true)}
+                      >
+                        {t("staff.addStakeholder")}
+                      </Button>
+                    ) : null}
+                  </>
+                }
+              ></StaffTableLayout.TopActions>
+            }
+            table={
+              <StaffTableLayout.Table
+                state={state}
+                loadingOptions={{ rows: 5 }}
+              />
+            }
+            pagination={<StaffTableLayout.Pagination state={state} />}
+          />
+        )}
       </Box>
       <AddStaffDialog open={openStaff} setOpen={setAddStaffOpen} />
 
@@ -315,6 +338,7 @@ export default function StaffTab() {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+      </>
+    </ProjectStaffAttendanceShell>
   );
 }
