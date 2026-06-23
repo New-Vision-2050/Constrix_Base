@@ -1,12 +1,22 @@
 "use client";
 import dynamic from "next/dynamic";
 import "./working-time-chart.css";
+import { useUserDashboardCxt } from "@/modules/dashboard/context/user-dashboard-cxt";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function WorkingTimeCardChart() {
-  // declare and define component state and variables
-  const totalHours = "231h";
+  const { overview } = useUserDashboardCxt();
+
+  const attendance = overview?.attendance;
+  const workedHours = attendance?.worked?.hours ?? 0;
+  const totalHours = `${workedHours}h`;
+  const donut = attendance?.donut ?? [{ key: "worked", value: 0 }, { key: "remaining", value: 1 }];
+  const series = donut.map((d) => d.value);
+  const labels = donut.map((d) => d.key);
+
+  const safeSeriesTotal = series.reduce((a, b) => a + b, 0);
+  const safeSeries = safeSeriesTotal === 0 ? series.map((_, i) => (i === 1 ? 1 : 0)) : series;
 
   // declare chart options
   const options = {
@@ -16,7 +26,7 @@ export default function WorkingTimeCardChart() {
     legend: { show: false },
     tooltip: { theme: "dark" },
     dataLabels: { enabled: false },
-    labels: ["36%", "56%"],
+    labels,
     plotOptions: {
       pie: {
         customScale: 0.9,
@@ -50,7 +60,7 @@ export default function WorkingTimeCardChart() {
         height={110}
         width={110}
         options={options}
-        series={[35, 65]}
+        series={safeSeries}
       />
     </div>
   );
