@@ -129,6 +129,17 @@ export const UsersConfigV2 = (options?: {
       {
         key: "residence",
         label: tSubTable("ResidenceNumber"),
+        render: (_: unknown, row: UserTableRow) => {
+          const identity = row.identity;
+          if (identity == null || identity === "") return "—";
+          if (typeof identity === "object") {
+            const identityValue = (identity as { identity?: string }).identity;
+            return identityValue != null && identityValue !== ""
+              ? identityValue
+              : "—";
+          }
+          return String(identity);
+        },
       },
       {
         key: "email",
@@ -189,6 +200,8 @@ export const UsersConfigV2 = (options?: {
         key: "end_date",
         label: tSubTable("ContractEndDate"),
         sortable: true,
+        render: (value: unknown) =>
+          value != null && value !== "" ? String(value) : "—",
       },
       {
         key: "user-type",
@@ -237,7 +250,12 @@ export const UsersConfigV2 = (options?: {
       // Extended attribute columns
       { key: "phone_code", label: tSubTable("PhoneCode") },
       { key: "nickname", label: tSubTable("Nickname") },
-      { key: "birthdate_gregorian", label: tSubTable("BirthdateGregorian") },
+      {
+        key: "birthdate_gregorian",
+        label: tSubTable("BirthdateGregorian"),
+        render: (value: unknown) =>
+          value != null && value !== "" ? String(value) : "—",
+      },
       { key: "birthdate_hijri", label: tSubTable("BirthdateHijri") },
       { key: "nationality", label: tSubTable("Nationality") },
       { key: "address", label: tSubTable("Address") },
@@ -249,12 +267,84 @@ export const UsersConfigV2 = (options?: {
       { key: "department", label: tSubTable("Department") },
       { key: "job_type", label: tSubTable("JobType") },
       { key: "job_code", label: tSubTable("JobCode") },
-      { key: "attendance_constraint", label: tSubTable("AttendanceConstraint") },
-      { key: "identity", label: tSubTable("Identity") },
+      {
+        key: "attendance_constraint",
+        label: tSubTable("AttendanceConstraint"),
+        render: (value: unknown) => {
+          const getItemLabel = (item: unknown): string => {
+            if (item == null) return "";
+            if (typeof item === "string") return item;
+            if (typeof item === "object") {
+              const obj = item as {
+                id?: string;
+                constraint_name?: string;
+                name?: string;
+              };
+              return obj.constraint_name ?? obj.name ?? "";
+            }
+            return String(item);
+          };
+
+          if (value == null) return "—";
+
+          if (Array.isArray(value)) {
+            const items = value.map(getItemLabel).filter(Boolean);
+            if (items.length === 0) return "—";
+            return (
+              <div className="flex flex-col items-start">
+                {items.map((label, index) => (
+                  <p key={index} className="line-clamp-1 h-5">
+                    {label}
+                  </p>
+                ))}
+              </div>
+            );
+          }
+
+          const label = getItemLabel(value);
+          return label || "—";
+        },
+      },
       { key: "passport", label: tSubTable("Passport") },
       { key: "border_number", label: tSubTable("BorderNumber") },
       { key: "work_permit", label: tSubTable("WorkPermit") },
-      { key: "whatsapp", label: tSubTable("Whatsapp") },
+      {
+        key: "whatsapp",
+        label: tSubTable("Whatsapp"),
+        render: (value: unknown) => {
+          if (value == null || value === "") return "—";
+          const link = String(value);
+          const href = link.startsWith("http")
+            ? link
+            : link.startsWith("wa.me")
+              ? `https://${link}`
+              : `https://wa.me/${link.replace(/\D/g, "")}`;
+          return (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-primary hover:opacity-80 whitespace-nowrap"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {link}
+            </a>
+          );
+        },
+      },
+      {
+        key: "bank_account",
+        label: tSubTable("BankAccount"),
+        render: (value: unknown) => {
+          if (value == null || value === "") return "—";
+          if (typeof value === "string") return value;
+          if (typeof value === "object") {
+            const account = value as { account_number?: string; iban?: string };
+            return account.account_number ?? account.iban ?? "—";
+          }
+          return "—";
+        },
+      },
       { key: "linkedin", label: tSubTable("Linkedin") },
       { key: "facebook", label: tSubTable("Facebook") },
       { key: "instagram", label: tSubTable("Instagram") },
