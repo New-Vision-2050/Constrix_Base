@@ -9,12 +9,16 @@ import useUserProfileData from "../hooks/useUserProfileData";
 import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
 import useUserPersonalData from "@/modules/user-profile/components/tabs/user-contract/tabs/PersonalData/hooks/useUserPersonalData";
 import { PersonalUserDataSectionT } from "@/modules/user-profile/components/tabs/user-contract/tabs/PersonalData/api/get-personal-data";
+import useDashboardOverview from "../hooks/useDashboardOverview";
+import { DashboardOverviewT } from "../api/fetch-dashboard-overview";
 
 // declare context types
 type UserDashboardCxtType = {
   isLoading: boolean;
   user: UserProfileData | undefined;
   userPersonalData: PersonalUserDataSectionT | undefined;
+  overview: DashboardOverviewT | undefined;
+  isOverviewLoading: boolean;
 };
 
 export const UserDashboardCxt = createContext<UserDashboardCxtType>(
@@ -42,6 +46,8 @@ export const UserDashboardCxtProvider = ({
 
   const { data: userPersonalData } = useUserPersonalData();
 
+  const { data: overview, isLoading: isOverviewLoading } = useDashboardOverview();
+
   // ** handle side effects
 
   // ** declare and define component helper methods
@@ -55,6 +61,9 @@ export const UserDashboardCxtProvider = ({
         isLoading,
 
         userPersonalData,
+
+        overview,
+        isOverviewLoading,
       }}
     >
       {children}
