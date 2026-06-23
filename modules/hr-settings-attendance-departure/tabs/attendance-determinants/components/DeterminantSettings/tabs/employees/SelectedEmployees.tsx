@@ -35,6 +35,33 @@ function payloadToRows(
   return [];
 }
 
+function formatEmployeeProjects(
+  row: ConstraintSelectedEmployeePayload,
+): string {
+  const projects = row.projects?.filter((p) => p?.name?.trim());
+  if (projects && projects.length > 0) {
+    return projects.map((p) => p.name.trim()).join("، ");
+  }
+
+  if (typeof row.project === "string" && row.project.trim()) {
+    return row.project.trim();
+  }
+
+  if (row.project && typeof row.project === "object" && row.project.name?.trim()) {
+    return row.project.name.trim();
+  }
+
+  if (typeof row.branch === "string" && row.branch.trim()) {
+    return row.branch.trim();
+  }
+
+  if (row.branch && typeof row.branch === "object" && row.branch.name?.trim()) {
+    return row.branch.name.trim();
+  }
+
+  return "—";
+}
+
 export default function SelectedEmployees({
   constraintId,
 }: {
@@ -146,19 +173,11 @@ export default function SelectedEmployees({
         ),
       },
       {
-        key: "project",
+        key: "projects",
         name: t("columnProject"),
         sortable: false,
         render: (row: ConstraintSelectedEmployeePayload) => (
-          <span>
-            {typeof row.project === "string"
-              ? row.project
-              : (row.project?.name ??
-                (typeof row.branch === "string"
-                  ? row.branch
-                  : row.branch?.name) ??
-                "—")}
-          </span>
+          <span className="text-foreground">{formatEmployeeProjects(row)}</span>
         ),
       },
       {

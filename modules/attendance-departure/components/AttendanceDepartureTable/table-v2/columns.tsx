@@ -16,7 +16,7 @@ const getNestedValue = (obj: any, path: string): any => {
  * Column configuration for the attendance table
  */
 export const getAttendanceColumns = (
-  t: (key: string) => string
+  t: (key: string) => string,
 ): ColumnDef<AttendanceStatusRecord>[] => [
   {
     key: "user.name",

@@ -228,6 +228,25 @@ export interface ProjectEmployee {
   /** When present, employee’s project role (`GET projects/{id}/roles`). */
   project_role_id?: string | null;
   project_role?: ProjectEmployeeProjectRole | null;
+  attendance?: {
+    /** Attendance record id for `/attendance/{id}/applied-attendance` */
+    id?: string | null;
+    attendance_id?: string | null;
+    applied_attendance_id?: string | null;
+    employee_status?: string | null;
+    status?: string | null;
+    is_absent?: number;
+    is_late?: number;
+    is_holiday?: number;
+    day_status?: string | { status?: string; reason?: string } | null;
+    work_date?: string | null;
+    clock_in_time?: string | null;
+    attendance_constraint_id?: string | null;
+    attendance_constraint?: {
+      id: string;
+      constraint_name: string;
+    } | null;
+  } | null;
 }
 
 export type GetProjectEmployeesResponse = ApiResponse<ProjectEmployee[]>;
@@ -238,4 +257,6 @@ export interface EmployeeNotInProject {
   name: string;
 }
 
-export type GetEmployeesNotInProjectResponse = ApiResponse<EmployeeNotInProject[]>;
+export type GetEmployeesNotInProjectResponse = ApiResponse<
+  EmployeeNotInProject[]
+>;
