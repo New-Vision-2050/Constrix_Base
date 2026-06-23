@@ -88,7 +88,10 @@ export const GetPersonalDataSections = (props: PropsT) => {
   const { user, userDataStatus } = useUserProfileCxt();
   const t = useTranslations("UserProfile.tabs.verticalLists.personalList");
 
-  const identity = user?.country?.id === user?.branch?.country_id;
+  const identity =
+    user?.country?.id != null &&
+    user?.user_professional_data?.branch?.country_id != null &&
+    String(user.country.id) === String(user.user_professional_data.branch.country_id);
 
   return PersonalDataSections(t)
     ?.filter((ele) => {
