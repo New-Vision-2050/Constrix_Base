@@ -8,7 +8,10 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function PersonalDataSection() {
   const { user } = useUserProfileCxt();
-  const identity = user?.country?.id === user?.company?.country_id;
+  const identity =
+    user?.country?.id != null &&
+    user?.user_professional_data?.branch?.country_id != null &&
+    String(user.country.id) === String(user.user_professional_data.branch.country_id);
 
   return (
     <div className="flex flex-col gap-6">

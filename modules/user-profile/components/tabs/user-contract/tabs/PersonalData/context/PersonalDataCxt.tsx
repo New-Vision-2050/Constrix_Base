@@ -15,7 +15,6 @@ import { UserIdentityInformationT } from "../api/get-identity-data";
 import { PersonalDataSections } from "../constants/PersonalDataSections";
 import { useTranslations } from "next-intl";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
 
 // declare context types
 type PersonalDataTabCxtType = {
@@ -83,29 +82,34 @@ export const PersonalDataTabCxtProvider = ({
     isLoading: userIdentityDataLoading,
     refetch: refetchIdentityData,
   } = useUserIdentityData(userId);
-  const { verticalSection, setVerticalSection } = useUserProfileCxt();
-  const sections = PersonalDataSections(t);
+  const { verticalSection, setVerticalSection, user } = useUserProfileCxt();
+  const allSections = PersonalDataSections(t);
+
+  const isSameCountry =
+    user?.country?.id != null &&
+    user?.user_professional_data?.branch?.country_id != null &&
+    String(user.country.id) === String(user.user_professional_data.branch.country_id);
+
+  const sections = allSections.filter((s) => {
+    if (s.id === "contract-tab-iqama-data-section") return !isSameCountry;
+    return true;
+  });
+
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
 
   useEffect(() => {
-    console.log("verticalSection changed:", verticalSection);
-    console.log(
-      "available sections:",
-      sections.map((s) => s.id),
-    );
-
     if (verticalSection) {
       const section = sections.find((s) => s.id === verticalSection);
-      console.log("found section:", section);
       if (section) {
         setActiveSection(section);
       } else {
         setActiveSection(sections[0]);
+        setVerticalSection(sections[0]?.id ?? "");
       }
     } else {
       setActiveSection(sections[0]);
     }
-  }, [verticalSection]);
+  }, [verticalSection, isSameCountry]);
 
   // ** declare and define component helper methods
   const handleRefreshIdentityData = () => {
