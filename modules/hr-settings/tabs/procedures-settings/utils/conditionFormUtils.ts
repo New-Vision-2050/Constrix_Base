@@ -4,7 +4,7 @@ import type {
   FormConditionOption,
   InternalProcedureConditions,
 } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
-import type { TaskActionConditionFormValue } from "../types";
+import type { TaskActionConditionFormValue, MapPolygon } from "../types";
 
 export interface ConditionFormGroup {
   key: string;
@@ -34,8 +34,8 @@ function isRichConditionArray(
 
 function buildDefaultSettings(
   schema: FormConditionOption["settingsSchema"],
-): Record<string, string | number | boolean> {
-  const settings: Record<string, string | number | boolean> = {};
+): Record<string, string | number | boolean | MapPolygon[]> {
+  const settings: Record<string, string | number | boolean | MapPolygon[]> = {};
   schema.forEach((field) => {
     if (field.default !== undefined) {
       settings[field.key] = field.default;
@@ -48,6 +48,8 @@ function buildDefaultSettings(
     } else if (field.type === "select") {
       settings[field.key] =
         field.default ?? field.options?.[0]?.value ?? "";
+    } else if (field.type === "map_polygons") {
+      settings[field.key] = [];
     } else {
       settings[field.key] = "";
     }

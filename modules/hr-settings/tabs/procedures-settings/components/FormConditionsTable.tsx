@@ -24,7 +24,8 @@ import type {
   ConditionSettingSchemaOption,
   FormConditionOption,
 } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
-import type { TaskActionConditionFormValue } from "../types";
+import type { TaskActionConditionFormValue, MapPolygon } from "../types";
+import MapPolygonDrawer from "@/components/shared/MapPolygonDrawer";
 
 interface FormConditionsTableProps {
   definitions: FormConditionOption[];
@@ -165,7 +166,7 @@ function updateConditionSetting(
   conditions: TaskActionConditionFormValue[],
   index: number,
   settingKey: string,
-  value: string | number | boolean,
+  value: string | number | boolean | MapPolygon[],
 ): TaskActionConditionFormValue[] {
   return conditions.map((condition, conditionIndex) => {
     if (conditionIndex !== index) return condition;
@@ -181,7 +182,7 @@ function updateConditionSetting(
 
 function isSettingFieldVisible(
   field: ConditionSettingSchemaOption,
-  settings: Record<string, string | number | boolean>,
+  settings: Record<string, string | number | boolean | MapPolygon[]>,
 ): boolean {
   if (!field.visibleWhen) return true;
   return settings[field.visibleWhen.key] === field.visibleWhen.value;
@@ -195,7 +196,7 @@ function findPrimarySelectField(
 
 function getSettingsPanelFields(
   schema: ConditionSettingSchemaOption[],
-  settings: Record<string, string | number | boolean>,
+  settings: Record<string, string | number | boolean | MapPolygon[]>,
 ): ConditionSettingSchemaOption[] {
   const primarySelect = findPrimarySelectField(schema);
 
@@ -207,10 +208,10 @@ function getSettingsPanelFields(
 
 function renderSettingField(
   field: ConditionSettingSchemaOption,
-  value: string | number | boolean,
+  value: string | number | boolean | MapPolygon[],
   fieldDisabled: boolean,
   compactFieldSx: ReturnType<typeof getCompactFieldSx>,
-  onValueChange: (value: string | number | boolean) => void,
+  onValueChange: (value: string | number | boolean | MapPolygon[]) => void,
 ) {
   if (field.type === "int") {
     const isMinuteField =
@@ -328,6 +329,20 @@ function renderSettingField(
     );
   }
 
+  if (field.type === "map_polygons") {
+    const polygons = Array.isArray(value) ? (value as MapPolygon[]) : [];
+    return (
+      <MapPolygonDrawer
+        key={field.key}
+        polygons={polygons}
+        onChange={(newPolygons) => onValueChange(newPolygons)}
+        disabled={fieldDisabled}
+        height={200}
+        label={field.label}
+      />
+    );
+  }
+
   return (
     <TextField
       key={field.key}
@@ -385,12 +400,28 @@ function SettingsPanel({
   }
 
   const timeFields = panelFields.filter((field) => field.type === "time");
-  const otherFields = panelFields.filter((field) => field.type !== "time");
+  const mapFields = panelFields.filter((field) => field.type === "map_polygons");
+  const otherFields = panelFields.filter(
+    (field) => field.type !== "time" && field.type !== "map_polygons",
+  );
 
-  const handleSettingChange = (settingKey: string, value: string | number | boolean) => {
+  const handleSettingChange = (settingKey: string, value: string | number | boolean | MapPolygon[]) => {
     onChange(
       updateConditionSetting(conditions, conditionIndex, settingKey, value),
     );
+  };
+
+  const resolveFieldValue = (
+    field: ConditionSettingSchemaOption,
+  ): string | number | boolean | MapPolygon[] => {
+    const raw = condition.settings[field.key];
+    if (raw !== undefined && raw !== null) return raw;
+    if (field.default !== undefined) return field.default;
+    if (field.type === "time") return "08:00";
+    if (field.type === "map_polygons") return [] as MapPolygon[];
+    if (field.type === "int") return 0;
+    if (field.type === "bool") return false;
+    return "";
   };
 
   return (
@@ -417,7 +448,7 @@ function SettingsPanel({
           {timeFields.map((field) =>
             renderSettingField(
               field,
-              condition.settings[field.key] ?? field.default ?? "08:00",
+              resolveFieldValue(field),
               fieldDisabled,
               compactFieldSx,
               (value) => handleSettingChange(field.key, value),
@@ -440,13 +471,23 @@ function SettingsPanel({
           {otherFields.map((field) =>
             renderSettingField(
               field,
-              condition.settings[field.key] ?? field.default ?? "",
+              resolveFieldValue(field),
               fieldDisabled,
               compactFieldSx,
               (value) => handleSettingChange(field.key, value),
             ),
           )}
         </Box>
+      )}
+
+      {mapFields.map((field) =>
+        renderSettingField(
+          field,
+          resolveFieldValue(field),
+          fieldDisabled,
+          compactFieldSx,
+          (value) => handleSettingChange(field.key, value),
+        ),
       )}
     </Box>
   );
