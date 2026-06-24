@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Map } from "lucide-react";
 import HeadlessTableLayout from "@/components/headless/table";
 import type { ColumnDef } from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
@@ -17,6 +17,15 @@ import type {
   ConstraintSelectedEmployeePayload,
 } from "@/services/api/attendance-constraints/types/response";
 import { useCompanyEmployees } from "@/modules/company-profile/query/useCompanyEmployees";
+import { getConstraintEmployeeAttendanceColumns } from "./shared/constraintEmployeeAttendanceColumns";
+import { ConstraintEmployeesAttendanceShell } from "./shared/ConstraintEmployeesAttendanceShell";
+import { ConstraintEmployeesMap } from "./shared/ConstraintEmployeesMap";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const SelectedEmployeesTable =
   HeadlessTableLayout<ConstraintSelectedEmployeePayload>(
@@ -30,7 +39,9 @@ function payloadToRows(
   if (raw == null) return [];
   if (Array.isArray(raw)) return raw;
   if (typeof raw === "object") {
-    return Object.values(raw as Record<string, ConstraintSelectedEmployeePayload>);
+    return Object.values(
+      raw as Record<string, ConstraintSelectedEmployeePayload>,
+    );
   }
   return [];
 }
@@ -40,14 +51,21 @@ function formatEmployeeProjects(
 ): string {
   const projects = row.projects?.filter((p) => p?.name?.trim());
   if (projects && projects.length > 0) {
-    return projects.map((p) => p.name.trim()).join("، ");
+    return projects
+      .map((p) => p.name.trim())
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }))
+      .join("، ");
   }
 
   if (typeof row.project === "string" && row.project.trim()) {
     return row.project.trim();
   }
 
-  if (row.project && typeof row.project === "object" && row.project.name?.trim()) {
+  if (
+    row.project &&
+    typeof row.project === "object" &&
+    row.project.name?.trim()
+  ) {
     return row.project.name.trim();
   }
 
@@ -62,6 +80,38 @@ function formatEmployeeProjects(
   return "—";
 }
 
+const PROJECTS_DISPLAY_MAX_LENGTH = 30;
+
+function ProjectsCell({ text }: { text: string }) {
+  if (!text || text === "—") {
+    return <span className="text-foreground">—</span>;
+  }
+
+  const isTruncated = text.length > PROJECTS_DISPLAY_MAX_LENGTH;
+  const displayText = isTruncated
+    ? `${text.slice(0, PROJECTS_DISPLAY_MAX_LENGTH)}…`
+    : text;
+
+  if (!isTruncated) {
+    return <span className="text-foreground">{displayText}</span>;
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="text-foreground cursor-default truncate max-w-[150px] inline-block">
+            {displayText}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs whitespace-pre-wrap">
+          {text}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export default function SelectedEmployees({
   constraintId,
 }: {
@@ -72,6 +122,7 @@ export default function SelectedEmployees({
   );
 
   const queryClient = useQueryClient();
+  const [view, setView] = useState<"table" | "map">("table");
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -95,9 +146,7 @@ export default function SelectedEmployees({
       const res = await AttendanceConstraints.getEmployees(constraintId, {
         page: params.page,
         per_page: params.limit,
-        ...(params.search.trim()
-          ? { name: params.search.trim() }
-          : {}),
+        ...(params.search.trim() ? { name: params.search.trim() } : {}),
       });
       return res.data;
     },
@@ -108,6 +157,20 @@ export default function SelectedEmployees({
   const { data: companyEmployees = [] } = useCompanyEmployees();
 
   const rows = useMemo(() => payloadToRows(apiBody), [apiBody]);
+
+  const sortedRows = useMemo(() => {
+    if (params.sortBy !== "projects") return rows;
+
+    const direction = params.sortDirection === "desc" ? -1 : 1;
+    return [...rows].sort((a, b) => {
+      const comparison = formatEmployeeProjects(a).localeCompare(
+        formatEmployeeProjects(b),
+        undefined,
+        { sensitivity: "base" },
+      );
+      return comparison * direction;
+    });
+  }, [rows, params.sortBy, params.sortDirection]);
 
   const totalPages = apiBody?.pagination?.last_page ?? 1;
   const totalItems = apiBody?.pagination?.result_count ?? 0;
@@ -175,36 +238,12 @@ export default function SelectedEmployees({
       {
         key: "projects",
         name: t("columnProject"),
-        sortable: false,
+        sortable: true,
         render: (row: ConstraintSelectedEmployeePayload) => (
-          <span className="text-foreground">{formatEmployeeProjects(row)}</span>
+          <ProjectsCell text={formatEmployeeProjects(row)} />
         ),
       },
-      {
-        key: "status",
-        name: t("columnStatus"),
-        sortable: false,
-        render: (row: ConstraintSelectedEmployeePayload) => (
-          <span
-            className={
-              row.status === t("statusActive") ||
-              row.status?.toLowerCase() === "active" ||
-              row.is_active === 1 ||
-              row.is_active === true
-                ? "text-emerald-500"
-                : undefined
-            }
-          >
-            {row.status ??
-              row.state ??
-              (row.is_active === 1 || row.is_active === true
-                ? t("statusActive")
-                : row.is_active === 0 || row.is_active === false
-                  ? t("statusInactive")
-                  : "—")}
-          </span>
-        ),
-      },
+      ...getConstraintEmployeeAttendanceColumns(t),
       {
         key: "actions",
         name: t("columnActions"),
@@ -235,7 +274,7 @@ export default function SelectedEmployees({
   );
 
   const state = SelectedEmployeesTable.useTableState({
-    data: rows,
+    data: sortedRows,
     columns,
     totalPages,
     totalItems,
@@ -247,63 +286,81 @@ export default function SelectedEmployees({
   });
 
   return (
-    <section className="border border-border rounded-xl overflow-hidden">
-      <div className="px-4 py-3">
-        <SelectedEmployeesTable
-          filters={
-            <SelectedEmployeesTable.TopActions
-              state={state}
-              searchComponent={
-                <SelectedEmployeesTable.Search
-                  search={state.search}
-                  placeholder={t("searchPlaceholder")}
+    <ConstraintEmployeesAttendanceShell>
+      <section className="border border-border rounded-xl overflow-hidden">
+        <div className="px-4 py-3">
+          {view === "map" ? (
+            <ConstraintEmployeesMap
+              constraintId={constraintId}
+              onBackToTable={() => setView("table")}
+            />
+          ) : (
+            <SelectedEmployeesTable
+              filters={
+                <SelectedEmployeesTable.TopActions
+                  state={state}
+                  searchComponent={
+                    <SelectedEmployeesTable.Search
+                      search={state.search}
+                      placeholder={t("searchPlaceholder")}
+                    />
+                  }
+                  customActions={
+                    <>
+                      <Button
+                        className="h-9 gap-2"
+                        onClick={() => setView("map")}
+                      >
+                        <Map className="h-4 w-4" />
+                        {t("mapView")}
+                      </Button>
+                      <Button
+                        className="h-9 px-4"
+                        onClick={() => {
+                          setAddSelectedUserId("");
+                          setIsAddDialogOpen(true);
+                        }}
+                      >
+                        {t("addButton")}
+                      </Button>
+                    </>
+                  }
                 />
               }
-              customActions={
-                <Button
-                  className="h-9 px-4"
-                  onClick={() => {
-                    setAddSelectedUserId("");
-                    setIsAddDialogOpen(true);
-                  }}
-                >
-                  {t("addButton")}
-                </Button>
+              table={
+                <SelectedEmployeesTable.Table
+                  state={state}
+                  loadingOptions={{ rows: 5 }}
+                />
               }
+              pagination={<SelectedEmployeesTable.Pagination state={state} />}
             />
-          }
-          table={
-            <SelectedEmployeesTable.Table
-              state={state}
-              loadingOptions={{ rows: 5 }}
-            />
-          }
-          pagination={<SelectedEmployeesTable.Pagination state={state} />}
+          )}
+        </div>
+
+        <AddEmployeeDialog
+          isOpen={isAddDialogOpen}
+          onOpenChange={(open) => {
+            setIsAddDialogOpen(open);
+            if (!open) setAddSelectedUserId("");
+          }}
+          selectedEmployeeId={addSelectedUserId}
+          onSelectedEmployeeChange={setAddSelectedUserId}
+          employees={employeesAvailableToAssign}
+          isAssigning={assignMutation.isPending}
+          onAssign={() => assignMutation.mutate(addSelectedUserId)}
         />
-      </div>
 
-      <AddEmployeeDialog
-        isOpen={isAddDialogOpen}
-        onOpenChange={(open) => {
-          setIsAddDialogOpen(open);
-          if (!open) setAddSelectedUserId("");
-        }}
-        selectedEmployeeId={addSelectedUserId}
-        onSelectedEmployeeChange={setAddSelectedUserId}
-        employees={employeesAvailableToAssign}
-        isAssigning={assignMutation.isPending}
-        onAssign={() => assignMutation.mutate(addSelectedUserId)}
-      />
-
-      <EditEmployeeDialog
-        isOpen={isEditDialogOpen}
-        onClose={() => {
-          setIsEditDialogOpen(false);
-          setSelectedEmployee("");
-        }}
-        userId={selectedEmployee}
-        constraintId={constraintId}
-      />
-    </section>
+        <EditEmployeeDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false);
+            setSelectedEmployee("");
+          }}
+          userId={selectedEmployee}
+          constraintId={constraintId}
+        />
+      </section>
+    </ConstraintEmployeesAttendanceShell>
   );
 }
