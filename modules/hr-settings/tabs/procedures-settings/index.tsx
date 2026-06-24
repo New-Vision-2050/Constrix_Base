@@ -16,4 +16,14 @@ export type {
   ProceduresSettingsOuterTab,
   ProceduresSettingsViewProps,
   TaskActionFormValues,
+  TaskActionConditionFormValue,
 } from "./types";
+export { default as FormConditionsSection } from "./components/FormConditionsSection";
+export { default as FormConditionsTable } from "./components/FormConditionsTable";
+export {
+  buildInitialConditionsFromDefinitions,
+  groupDefinitionsByFormGroup,
+  mapConditionsToApiPayload,
+  mergeConditionsWithDefinitions,
+} from "./utils/conditionFormUtils";
+export type { ConditionFormGroup } from "./utils/conditionFormUtils";

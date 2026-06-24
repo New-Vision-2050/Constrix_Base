@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
-import FormConditionsTable from "../FormConditionsTable";
+import FormConditionsSection from "../FormConditionsSection";
 import { buildInitialConditionsFromDefinitions } from "../../utils/conditionFormUtils";
 import type { TaskActionFormValues } from "../../types";
 
@@ -226,13 +226,14 @@ export default function AddTaskActionDialog({
               {t("noConditions")}
             </Typography>
           ) : (
-            <FormConditionsTable
+            <FormConditionsSection
               definitions={conditionDefinitions}
               conditions={form.conditions}
               onChange={(conditions) =>
                 setForm((prev) => ({ ...prev, conditions }))
               }
               disabled={isSaving}
+              defaultGroupLabel={t("formConditions")}
               labels={conditionTableLabels}
             />
           )}

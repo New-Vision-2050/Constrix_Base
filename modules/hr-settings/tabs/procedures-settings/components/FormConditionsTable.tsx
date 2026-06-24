@@ -3,9 +3,11 @@
 import {
   AccessTimeOutlined,
   AssignmentOutlined,
+  AttachFileOutlined,
   CheckCircleOutline,
   HowToRegOutlined,
   LocationOnOutlined,
+  ScheduleOutlined,
   WorkOutline,
 } from "@mui/icons-material";
 import {
@@ -101,6 +103,8 @@ function buildCategoryThemes(theme: Theme): Record<string, CategoryTheme> {
     task_status: buildCategoryTheme(theme, palette.secondary.main, CheckCircleOutline),
     open_task: buildCategoryTheme(theme, error, AssignmentOutlined),
     shift: buildCategoryTheme(theme, palette.warning.main, WorkOutline),
+    duration: buildCategoryTheme(theme, info, ScheduleOutlined),
+    attachment: buildCategoryTheme(theme, palette.text.secondary, AttachFileOutlined),
   };
 }
 
