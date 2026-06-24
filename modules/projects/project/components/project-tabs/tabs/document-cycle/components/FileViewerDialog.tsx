@@ -340,7 +340,7 @@ export default function FileViewerDialog({
     });
   }, [activeFile, notesPayload, respondMutation]);
 
-  const handleSaveAnnotatedDocument = useCallback(async () => {
+  const handleSaveWithNotesAndApprove = useCallback(async () => {
     if (!activeFile || !viewer.canExport || !apryseRef.current) return;
     setSavePending(true);
     try {
@@ -365,9 +365,12 @@ export default function FileViewerDialog({
         queryClient.invalidateQueries({
           queryKey: ["file-viewer-buffer", activeFile.id],
         });
-        toast.success(t("saveViewerChangesSuccess"));
-        onAnnotationsSaved?.(activeFile.id);
       }
+      await respondMutation.mutateAsync({
+        item_id: activeFile.id,
+        action: "approve",
+        notes: notesPayload,
+      });
     } catch (e: unknown) {
       toast.error(
         axiosErrorMessage(e)?.trim() ||
@@ -380,9 +383,10 @@ export default function FileViewerDialog({
   }, [
     activeFile,
     viewer.canExport,
+    notesPayload,
     onSaveAnnotatedDocument,
-    onAnnotationsSaved,
     replaceMediaMutation,
+    respondMutation,
     queryClient,
     t,
   ]);
@@ -562,16 +566,26 @@ export default function FileViewerDialog({
                   }}
                 >
                   <Button
+                    className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+                    onClick={handleSaveWithNotesAndApprove}
+                    disabled={
+                      !viewer.canExport || saveExportBusy || respondBusy
+                    }
+                  >
+                    <Save className="w-4 h-4 me-1" />
+                    {t("saveWithNotes")}
+                  </Button>
+                  <Button
                     className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
                     onClick={handleApprove}
-                    disabled={respondBusy}
+                    disabled={respondBusy || saveExportBusy}
                   >
                     ✓ {t("approve")}
                   </Button>
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
                     onClick={handleReject}
-                    disabled={respondBusy}
+                    disabled={respondBusy || saveExportBusy}
                   >
                     ✕ {t("reject")}
                   </Button>
@@ -582,21 +596,6 @@ export default function FileViewerDialog({
             <Box sx={layout.previewColumn}>
               <Box sx={layout.previewToolbar}>
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                  {showWorkflow && (
-                    <Button
-                      className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-                      size="sm"
-                      onClick={handleSaveAnnotatedDocument}
-                      disabled={
-                        !viewer.canExport ||
-                        saveExportBusy ||
-                        respondBusy
-                      }
-                    >
-                      <Save className="w-4 h-4 me-1" />
-                      {t("saveWithNotes")}
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="sm"
