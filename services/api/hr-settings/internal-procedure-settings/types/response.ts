@@ -33,6 +33,9 @@ export interface FormsConditionApiItem {
   category_label_en?: string;
   label_ar: string;
   label_en?: string;
+  form_group?: string;
+  form_group_label_ar?: string;
+  form_group_label_en?: string;
   settings_schema: ConditionSettingSchemaApiItem[];
 }
 
@@ -76,6 +79,10 @@ export interface FormConditionOption {
   name: string;
   label_ar: string;
   label_en?: string;
+  formGroup?: string;
+  formGroupLabel?: string;
+  formGroupLabelAr?: string;
+  formGroupLabelEn?: string;
   settingsSchema: ConditionSettingSchemaOption[];
 }
 
