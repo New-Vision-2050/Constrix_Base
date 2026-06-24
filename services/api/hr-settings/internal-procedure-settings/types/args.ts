@@ -6,11 +6,18 @@ export interface ConditionSettingSchemaItem {
   default?: string | number | boolean;
 }
 
+export interface MapPolygonPoint {
+  lat: number;
+  lng: number;
+}
+
+export type MapPolygon = MapPolygonPoint[];
+
 export interface RichInternalProcedureCondition {
   key: string;
   is_active: boolean;
   sort_order: number;
-  settings: Record<string, string | number | boolean>;
+  settings: Record<string, string | number | boolean | MapPolygon[]>;
 }
 
 /** @deprecated Legacy flat condition entry */

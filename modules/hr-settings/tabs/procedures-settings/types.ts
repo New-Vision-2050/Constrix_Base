@@ -14,11 +14,18 @@ export interface ProceduresSettingsViewProps {
   translationNamespace?: string;
 }
 
+export interface MapPolygonPoint {
+  lat: number;
+  lng: number;
+}
+
+export type MapPolygon = MapPolygonPoint[];
+
 export interface TaskActionConditionFormValue {
   key: string;
   isActive: boolean;
   sortOrder: number;
-  settings: Record<string, string | number | boolean>;
+  settings: Record<string, string | number | boolean | MapPolygon[]>;
 }
 
 export interface TaskActionFormValues {
