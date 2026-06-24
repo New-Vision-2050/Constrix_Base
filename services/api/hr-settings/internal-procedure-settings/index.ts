@@ -67,6 +67,7 @@ function mapFormsConditionItem(
   locale = "ar",
 ): FormConditionOption {
   const categoryLabelAr = item.category_label_ar ?? "";
+  const formGroupLabelAr = item.form_group_label_ar ?? "";
   return {
     id: item.key,
     key: item.key,
@@ -79,6 +80,13 @@ function mapFormsConditionItem(
     name: resolveLabel(item, locale),
     label_ar: item.label_ar,
     label_en: item.label_en,
+    formGroup: item.form_group,
+    formGroupLabelAr,
+    formGroupLabelEn: item.form_group_label_en,
+    formGroupLabel:
+      locale === "ar"
+        ? formGroupLabelAr
+        : item.form_group_label_en ?? formGroupLabelAr,
     settingsSchema: (item.settings_schema ?? []).map((schemaItem) =>
       mapSettingSchemaItem(schemaItem, locale),
     ),

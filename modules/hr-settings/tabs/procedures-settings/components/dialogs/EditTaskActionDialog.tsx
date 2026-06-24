@@ -19,7 +19,7 @@ import SearchableSelect from "@/components/shared/SearchableSelect";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
 import { normalizeInternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/normalize";
-import FormConditionsTable from "../FormConditionsTable";
+import FormConditionsSection from "../FormConditionsSection";
 import {
   buildInitialConditionsFromDefinitions,
   mergeConditionsWithDefinitions,
@@ -347,13 +347,14 @@ export default function EditTaskActionDialog({
                   {t("noConditions")}
                 </Typography>
               ) : (
-                <FormConditionsTable
+                <FormConditionsSection
                   definitions={conditionDefinitions}
                   conditions={form.conditions}
                   onChange={(conditions) =>
                     setForm((prev) => ({ ...prev, conditions }))
                   }
                   disabled={isSaving}
+                  defaultGroupLabel={t("formConditions")}
                   labels={conditionTableLabels}
                 />
               )}

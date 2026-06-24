@@ -6,6 +6,12 @@ import type {
 } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
 import type { TaskActionConditionFormValue } from "../types";
 
+export interface ConditionFormGroup {
+  key: string;
+  label: string;
+  definitions: FormConditionOption[];
+}
+
 function normalizeConditionKey(key: string): string {
   if (key.includes("_")) return key;
   return key
@@ -192,4 +198,52 @@ export function mergeConditionsWithDefinitions(
 
     return mapLegacyValueToFormRow(definition, undefined, index + 1);
   });
+}
+
+export function groupDefinitionsByFormGroup(
+  definitions: FormConditionOption[],
+  defaultLabel: string,
+): ConditionFormGroup[] {
+  const groups: ConditionFormGroup[] = [];
+  const groupMap = new Map<string, ConditionFormGroup>();
+
+  for (const definition of definitions) {
+    const key = definition.formGroup?.trim() || "default";
+    const label =
+      definition.formGroupLabel?.trim() ||
+      definition.formGroupLabelAr?.trim() ||
+      (key === "default" ? defaultLabel : key);
+
+    let group = groupMap.get(key);
+    if (!group) {
+      group = { key, label, definitions: [] };
+      groupMap.set(key, group);
+      groups.push(group);
+    }
+
+    group.definitions.push(definition);
+  }
+
+  return groups;
+}
+
+export function filterConditionsForDefinitions(
+  conditions: TaskActionConditionFormValue[],
+  definitions: FormConditionOption[],
+): TaskActionConditionFormValue[] {
+  const keys = new Set(definitions.map((definition) => definition.key));
+  return conditions.filter((condition) => keys.has(condition.key));
+}
+
+export function mergeGroupConditionChanges(
+  allConditions: TaskActionConditionFormValue[],
+  groupDefinitions: FormConditionOption[],
+  updatedGroupConditions: TaskActionConditionFormValue[],
+): TaskActionConditionFormValue[] {
+  const groupKeys = new Set(groupDefinitions.map((definition) => definition.key));
+  const otherConditions = allConditions.filter(
+    (condition) => !groupKeys.has(condition.key),
+  );
+
+  return [...otherConditions, ...updatedGroupConditions];
 }
