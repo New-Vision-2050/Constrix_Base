@@ -28,6 +28,27 @@ export type ConstraintBasicInfo = Partial<{
   country: string;
 }>;
 
+export type ConstraintEmployeeAttendanceSummary = {
+  id?: string;
+  constraint_name?: string;
+};
+
+/** Attendance snapshot on a constraint employee list row (flexible API shape). */
+export type ConstraintEmployeeAttendance = {
+  id?: string | null;
+  attendance_id?: string | null;
+  employee_status?: string | null;
+  status?: string | null;
+  is_absent?: number;
+  is_late?: number;
+  is_holiday?: number;
+  day_status?: string | { status?: string; reason?: string } | null;
+  work_date?: string | null;
+  clock_in_time?: string | null;
+  attendance_constraint_id?: string | null;
+  attendance_constraint?: ConstraintEmployeeAttendanceSummary | null;
+};
+
 /** One row inside constraint employees API list payloads (normalized in UI parsers). */
 export type ConstraintSelectedEmployeePayload = {
   id?: string;
@@ -49,6 +70,12 @@ export type ConstraintSelectedEmployeePayload = {
   status?: string;
   state?: string;
   is_active?: number | boolean;
+  attendance?: ConstraintEmployeeAttendance | null;
+  employee_status?: string | null;
+  day_status?: string | { status?: string; reason?: string } | null;
+  is_absent?: number;
+  is_late?: number;
+  is_holiday?: number;
 };
 
 export type ConstraintEmployeesListApiResponse = {
