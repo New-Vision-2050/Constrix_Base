@@ -15,7 +15,7 @@ import {
   TextField,
   CircularProgress,
 } from "@mui/material";
-import { X, Download, Printer, Bold, Italic, List, Save } from "lucide-react";
+import { X, Download, Printer, Bold, Italic, List } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -559,31 +559,30 @@ export default function FileViewerDialog({
                 <Box
                   sx={{
                     display: "flex",
-                    flexWrap: "wrap",
+                    flexWrap: "nowrap",
                     gap: 1,
                     justifyContent: "center",
                     pt: 0,
                   }}
                 >
                   <Button
-                    className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-                    onClick={handleSaveWithNotesAndApprove}
-                    disabled={
-                      !viewer.canExport || saveExportBusy || respondBusy
-                    }
-                  >
-                    <Save className="w-4 h-4 me-1" />
-                    {t("saveWithNotes")}
-                  </Button>
-                  <Button
-                    className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
+                    className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 whitespace-nowrap"
                     onClick={handleApprove}
                     disabled={respondBusy || saveExportBusy}
                   >
                     ✓ {t("approve")}
                   </Button>
                   <Button
-                    className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
+                    className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 whitespace-nowrap"
+                    onClick={handleSaveWithNotesAndApprove}
+                    disabled={
+                      !viewer.canExport || saveExportBusy || respondBusy
+                    }
+                  >
+                    ✓ {t("requestModification")}
+                  </Button>
+                  <Button
+                    className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 whitespace-nowrap"
                     onClick={handleReject}
                     disabled={respondBusy || saveExportBusy}
                   >
