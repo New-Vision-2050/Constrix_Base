@@ -14,6 +14,7 @@ import {
     UpdateArchiveLibrarySettingsArgs,
     UpdateRolesAndPermissionsSettingsArgs,
     UpdateProjectSharingSettingsArgs,
+    UpdateMaintenanceAndEmergenciesSettingsArgs,
 } from "./types/args";
 import {
     CreateSecondLevelProjectTypeResponse,
@@ -41,6 +42,8 @@ import {
     UpdateRolesAndPermissionsSettingsResponse,
     GetProjectSharingSettingsResponse,
     UpdateProjectSharingSettingsResponse,
+    GetMaintenanceAndEmergenciesSettingsResponse,
+    UpdateMaintenanceAndEmergenciesSettingsResponse,
 } from "./types/response";
 
 export const ProjectTypesApi = {
@@ -191,6 +194,18 @@ export const ProjectTypesApi = {
     ) =>
         baseApi.put<UpdateProjectSharingSettingsResponse>(
             `project-types/${projectTypeId}/project-sharing-settings`,
+            args,
+        ),
+    getMaintenanceAndEmergenciesSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetMaintenanceAndEmergenciesSettingsResponse>(
+            `project-types/${projectTypeId}/maintenance-emergency-settings`,
+        ),
+    updateMaintenanceAndEmergenciesSettings: (
+        projectTypeId: number | string,
+        args: UpdateMaintenanceAndEmergenciesSettingsArgs,
+    ) =>
+        baseApi.put<UpdateMaintenanceAndEmergenciesSettingsResponse>(
+            `project-types/${projectTypeId}/maintenance-emergency-settings`,
             args,
         ),
 };

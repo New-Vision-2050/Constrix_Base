@@ -94,3 +94,7 @@ export interface UpdateRolesAndPermissionsSettingsArgs {
 export interface UpdateProjectSharingSettingsArgs {
     is_all_data_visible?: 0 | 1;
 }
+
+export interface UpdateMaintenanceAndEmergenciesSettingsArgs {
+    is_shown?: 0 | 1;
+}

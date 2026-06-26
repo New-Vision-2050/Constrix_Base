@@ -95,6 +95,14 @@ export interface ContractSetting {
   updated_at: string;
 }
 
+export interface MaintenanceEmergencySetting {
+  id: number;
+  project_type_id: number;
+  is_shown: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ProjectPermissions {
   project_data_setting: ProjectDataSetting | null;
   attachment_contract_setting: AttachmentSetting | null;
@@ -106,6 +114,7 @@ export interface ProjectPermissions {
   archive_library_setting: ContractSetting | null;
   roles_and_permissions_setting: ContractSetting | null;
   project_sharing_setting: ContractSetting | null;
+  maintenance_emergency_setting: MaintenanceEmergencySetting | null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────

@@ -1,0 +1,953 @@
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  MenuItem,
+  Paper,
+  Stack,
+  Step,
+  StepLabel,
+  Stepper,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { MapRangePicker } from "@/components/shared/map-range-picker";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import {
+  useCreateProjectNotificationMutation,
+  useProjectNotificationDetail,
+  useUpdateProjectNotificationMutation,
+} from "@/modules/projects/project/query/useProjectNotificationMutations";
+import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
+import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications/types/response";
+import ProjectNotificationMap from "./ProjectNotificationMap";
+import {
+  EMPTY_FORM,
+  NOTIFICATION_TYPE_OPTIONS,
+  SEVERITY_OPTIONS,
+  WORK_TYPE_OPTIONS,
+  type WizardFormData,
+  type WizardFormErrors,
+  type WizardStep,
+} from "./types";
+import { notificationToWizardForm } from "./normalize";
+import { buildCreatePayload, buildUpdatePayload } from "./buildPayload";
+import { validateStep, firstStepWithError } from "./validate";
+
+interface CreateNotificationWizardProps {
+  open: boolean;
+  onClose: () => void;
+  mode?: "create" | "edit";
+  notificationId?: string | null;
+}
+
+const STEP_COUNT = 5;
+
+export default function CreateNotificationWizard({
+  open,
+  onClose,
+  mode = "create",
+  notificationId,
+}: CreateNotificationWizardProps) {
+  const t = useTranslations("project.maintenanceEmergency.notifications");
+  const { projectId } = useProject();
+
+  const { data: existingNotification, isLoading: isLoadingDetail } =
+    useProjectNotificationDetail(
+      projectId,
+      mode === "edit" ? notificationId ?? undefined : undefined,
+    );
+
+  const [step, setStep] = useState<WizardStep>(1);
+  const [data, setData] = useState<WizardFormData>(EMPTY_FORM);
+  const [errors, setErrors] = useState<WizardFormErrors>({});
+  const [confirmed, setConfirmed] = useState({
+    dataReviewed: false,
+    readyToSend: false,
+  });
+
+  const createMutation = useCreateProjectNotificationMutation();
+  const updateMutation = useUpdateProjectNotificationMutation();
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
+  const employeeQuery = useProjectNotificationEmployees({
+    projectId,
+    latitude: data.task_latitude ?? undefined,
+    longitude: data.task_longitude ?? undefined,
+    enabled: step === 4,
+  });
+
+  const employees = useMemo(() => {
+    const list = employeeQuery.data ?? [];
+    return [...list].sort((a, b) => a.distance_meters - b.distance_meters);
+  }, [employeeQuery.data]);
+
+  useEffect(() => {
+    if (!open) {
+      setStep(1);
+      setData(EMPTY_FORM);
+      setErrors({});
+      setConfirmed({ dataReviewed: false, readyToSend: false });
+      return;
+    }
+
+    if (mode === "edit" && existingNotification) {
+      setData(notificationToWizardForm(existingNotification));
+    } else if (mode === "create") {
+      setData(EMPTY_FORM);
+    }
+  }, [open, mode, existingNotification]);
+
+  useEffect(() => {
+    if (employees.length > 0 && data.assigned_user_id) {
+      const selected = employees.find((e) => e.user_id === data.assigned_user_id);
+      if (selected) {
+        setData((prev) => ({
+          ...prev,
+          selected_distance_meters: selected.distance_meters,
+        }));
+      }
+    }
+  }, [employees, data.assigned_user_id]);
+
+  function updateField<K extends keyof WizardFormData>(
+    field: K,
+    value: WizardFormData[K],
+  ) {
+    setData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  }
+
+  function handleNext() {
+    const validation = validateStep(step, data);
+    if (!validation.valid) {
+      setErrors(validation.errors);
+      return;
+    }
+    if (step < STEP_COUNT) {
+      setStep((prev) => ((prev + 1) as WizardStep));
+    }
+  }
+
+  function handleBack() {
+    if (step > 1) {
+      setStep((prev) => ((prev - 1) as WizardStep));
+    }
+  }
+
+  function handleApiError(error: unknown) {
+    const axiosError = error as {
+      response?: {
+        status?: number;
+        data?: {
+          message?: {
+            validations?: { field: string; errors: string[] }[];
+            description?: string;
+          };
+          payload?: { field: string; errors: string[] }[];
+        };
+      };
+    };
+
+    if (axiosError.response?.status === 422) {
+      const validations =
+        axiosError.response.data?.message?.validations ??
+        axiosError.response.data?.payload ??
+        [];
+      const fieldErrors: WizardFormErrors = Object.fromEntries(
+        validations.map(({ field, errors }) => [field, errors?.[0]]),
+      );
+      setErrors(fieldErrors);
+      const errorStep = firstStepWithError(fieldErrors);
+      if (errorStep) setStep(errorStep);
+      toast.error(t("createdError"));
+    } else {
+      toast.error(
+        axiosError.response?.data?.message?.description ?? t("createdError"),
+      );
+    }
+  }
+
+  async function handleSubmit() {
+    if (!projectId) return;
+
+    const validation = validateStep(4, data);
+    if (!validation.valid) {
+      setErrors(validation.errors);
+      setStep(4);
+      return;
+    }
+
+    try {
+      if (mode === "edit" && notificationId) {
+        await updateMutation.mutateAsync(
+          buildUpdatePayload(notificationId, projectId, data),
+        );
+        toast.success(t("updatedSuccess"));
+      } else {
+        await createMutation.mutateAsync(buildCreatePayload(projectId, data));
+        toast.success(t("createdSuccess"));
+      }
+      onClose();
+    } catch (error) {
+      handleApiError(error);
+    }
+  }
+
+  const steps = [
+    t("step1"),
+    t("step2"),
+    t("step3"),
+    t("step4"),
+    t("step5"),
+  ];
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pr: 6,
+        }}
+      >
+        <span>
+          {mode === "edit" ? t("wizardEdit") : t("wizard")}
+        </span>
+        <IconButton
+          onClick={onClose}
+          disabled={isSubmitting}
+          aria-label={t("cancel")}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
+          <Close />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        {mode === "edit" && isLoadingDetail ? (
+          <Box sx={{ py: 8, textAlign: "center" }}>
+            <Typography color="text.secondary">{t("loading")}</Typography>
+          </Box>
+        ) : (
+          <>
+            <Stepper activeStep={step - 1} alternativeLabel sx={{ mb: 4 }}>
+              {steps.map((label, index) => (
+                <Step key={index}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            {step === 1 && (
+              <Step1Form data={data} errors={errors} onChange={updateField} t={t} />
+            )}
+            {step === 2 && (
+              <Step2Form data={data} errors={errors} onChange={updateField} t={t} />
+            )}
+            {step === 3 && (
+              <Step3Form data={data} errors={errors} onChange={updateField} t={t} />
+            )}
+            {step === 4 && (
+              <Step4Form
+                data={data}
+                errors={errors}
+                employees={employees}
+                isLoading={employeeQuery.isLoading}
+                onChange={updateField}
+                t={t}
+              />
+            )}
+            {step === 5 && (
+              <Step5Form
+                data={data}
+                employees={employees}
+                confirmed={confirmed}
+                onChangeConfirmed={(value) => setConfirmed(value)}
+                t={t}
+              />
+            )}
+          </>
+        )}
+      </DialogContent>
+
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button onClick={onClose} disabled={isSubmitting}>
+          {t("cancel")}
+        </Button>
+        <Box sx={{ flex: 1 }} />
+        {step > 1 && (
+          <Button onClick={handleBack} disabled={isSubmitting}>
+            {t("previous")}
+          </Button>
+        )}
+        {step < STEP_COUNT && (
+          <Button variant="contained" onClick={handleNext}>
+            {t("next")}
+          </Button>
+        )}
+        {step === STEP_COUNT && (
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={
+              isSubmitting || !confirmed.dataReviewed || !confirmed.readyToSend
+            }
+          >
+            {isSubmitting
+              ? t("loading")
+              : mode === "edit"
+                ? t("update")
+                : t("send")}
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ============================================================================
+// Step 1: Notification Info
+// ============================================================================
+
+function Step1Form({
+  data,
+  errors,
+  onChange,
+  t,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("type")}
+          value={data.notification_type}
+          onChange={(e) => onChange("notification_type", e.target.value)}
+          error={Boolean(errors.notification_type)}
+          helperText={errors.notification_type}
+        >
+          {NOTIFICATION_TYPE_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {t(`types.${option.label}`)}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("severity")}
+          value={data.severity}
+          onChange={(e) => onChange("severity", e.target.value)}
+          error={Boolean(errors.severity)}
+          helperText={errors.severity}
+        >
+          {SEVERITY_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {t(`severities.${option.label}`)}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("magdy_number")}
+          value={data.magdy_number}
+          onChange={(e) => onChange("magdy_number", e.target.value)}
+          error={Boolean(errors.magdy_number)}
+          helperText={errors.magdy_number}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("workType")}
+          value={data.work_type}
+          onChange={(e) => onChange("work_type", e.target.value)}
+          error={Boolean(errors.work_type)}
+          helperText={errors.work_type}
+        >
+          {WORK_TYPE_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {t(`workTypes.${option.label}`)}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          size="small"
+          label={t("description")}
+          value={data.work_description}
+          onChange={(e) => onChange("work_description", e.target.value)}
+          error={Boolean(errors.work_description)}
+          helperText={errors.work_description}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          type="date"
+          label={t("taskDate")}
+          value={data.task_date}
+          onChange={(e) => onChange("task_date", e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          type="number"
+          label={t("durationHours")}
+          value={data.duration_hours}
+          onChange={(e) => onChange("duration_hours", Number(e.target.value))}
+          inputProps={{ min: 1 }}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={2}
+          size="small"
+          label={t("notes")}
+          value={data.notes}
+          onChange={(e) => onChange("notes", e.target.value)}
+        />
+      </Grid>
+    </Grid>
+  );
+}
+
+// ============================================================================
+// Step 2: Contractor Info
+// ============================================================================
+
+function Step2Form({
+  data,
+  errors,
+  onChange,
+  t,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("contractor")}
+          value={data.contractor_name}
+          onChange={(e) => onChange("contractor_name", e.target.value)}
+          error={Boolean(errors.contractor_name)}
+          helperText={errors.contractor_name}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("contractorNumber")}
+          value={data.contractor_number}
+          onChange={(e) => onChange("contractor_number", e.target.value)}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("contractorTechnicalNumber")}
+          value={data.contractor_technical_number}
+          onChange={(e) => onChange("contractor_technical_number", e.target.value)}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("contractorCategory")}
+          value={data.contractor_category}
+          onChange={(e) => onChange("contractor_category", e.target.value)}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("contractorMobile")}
+          value={data.contractor_mobile}
+          onChange={(e) => onChange("contractor_mobile", e.target.value)}
+          error={Boolean(errors.contractor_mobile)}
+          helperText={errors.contractor_mobile}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          size="small"
+          label={t("contractorNotes")}
+          value={data.contractor_notes}
+          onChange={(e) => onChange("contractor_notes", e.target.value)}
+        />
+      </Grid>
+    </Grid>
+  );
+}
+
+// ============================================================================
+// Step 3: Location
+// ============================================================================
+
+function Step3Form({
+  data,
+  errors,
+  onChange,
+  t,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: (key: string) => string;
+}) {
+  const center = useMemo(
+    () => ({
+      lat: data.task_latitude ?? 24.7136,
+      lng: data.task_longitude ?? 46.6753,
+    }),
+    [data.task_latitude, data.task_longitude],
+  );
+
+  const currentPin = useMemo(
+    () =>
+      data.task_latitude != null && data.task_longitude != null
+        ? { lat: data.task_latitude, lng: data.task_longitude }
+        : undefined,
+    [data.task_latitude, data.task_longitude],
+  );
+
+  function onSelect(lat: number, lng: number) {
+    onChange("task_latitude", lat);
+    onChange("task_longitude", lng);
+    onChange("location_link", `https://maps.google.com/?q=${lat},${lng}`);
+  }
+
+  function parseLink() {
+    const url = data.location_link;
+    const match = url.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (match) {
+      onSelect(parseFloat(match[1]), parseFloat(match[2]));
+      toast.success(t("locationConfirmed"));
+    } else {
+      toast.error(t("invalidLocationLink"));
+    }
+  }
+
+  function dropPinAtCenter() {
+    onSelect(center.lat, center.lng);
+  }
+
+  return (
+    <Stack spacing={2}>
+      <MapRangePicker
+        onSelect={onSelect}
+        currentPin={currentPin}
+        radius={data.location_radius}
+        center={center}
+        height="350px"
+      />
+
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            label={t("latitude")}
+            value={data.task_latitude ?? ""}
+            onChange={(e) =>
+              onChange("task_latitude", e.target.value === "" ? null : parseFloat(e.target.value))
+            }
+            error={Boolean(errors.task_latitude)}
+            helperText={errors.task_latitude}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            label={t("longitude")}
+            value={data.task_longitude ?? ""}
+            onChange={(e) =>
+              onChange("task_longitude", e.target.value === "" ? null : parseFloat(e.target.value))
+            }
+            error={Boolean(errors.task_longitude)}
+            helperText={errors.task_longitude}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            label={t("locationRadius")}
+            value={data.location_radius}
+            onChange={(e) => onChange("location_radius", Number(e.target.value))}
+            error={Boolean(errors.location_radius)}
+            helperText={errors.location_radius}
+            inputProps={{ min: 1 }}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 8 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t("repairPoint")}
+            value={data.repair_point}
+            onChange={(e) => onChange("repair_point", e.target.value)}
+            error={Boolean(errors.repair_point)}
+            helperText={errors.repair_point}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Stack direction="row" spacing={1} sx={{ height: "100%" }}>
+            <Button variant="outlined" onClick={dropPinAtCenter}>
+              {t("dropPin")}
+            </Button>
+          </Stack>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 8 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t("locationLink")}
+            value={data.location_link}
+            onChange={(e) => onChange("location_link", e.target.value)}
+            placeholder={t("parseLinkPlaceholder")}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Button variant="outlined" onClick={parseLink} fullWidth>
+            {t("parseLink")}
+          </Button>
+        </Grid>
+      </Grid>
+    </Stack>
+  );
+}
+
+// ============================================================================
+// Step 4: Assign to Employee
+// ============================================================================
+
+function Step4Form({
+  data,
+  errors,
+  employees,
+  isLoading,
+  onChange,
+  t,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  employees: ProjectNotificationEmployee[];
+  isLoading: boolean;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: (key: string) => string;
+}) {
+  const center = useMemo(
+    () => ({
+      lat: data.task_latitude ?? 24.7136,
+      lng: data.task_longitude ?? 46.6753,
+    }),
+    [data.task_latitude, data.task_longitude],
+  );
+
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "available":
+      case "available_far":
+        return "success";
+      case "busy":
+        return "warning";
+      case "no_location":
+        return "error";
+      default:
+        return "textSecondary";
+    }
+  };
+
+  return (
+    <Grid container spacing={2} sx={{ height: "500px" }}>
+      <Grid size={{ xs: 12, md: 7 }} sx={{ height: "100%" }}>
+        <ProjectNotificationMap
+          center={center}
+          radius={data.location_radius}
+          employees={employees}
+          selectedUserId={data.assigned_user_id}
+          onSelectEmployee={(userId) => onChange("assigned_user_id", userId)}
+          height="100%"
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 5 }} sx={{ height: "100%", overflow: "auto" }}>
+        <Paper variant="outlined" sx={{ p: 2, height: "100%" }}>
+          <Typography variant="subtitle2" gutterBottom>
+            {t("employees")}
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+
+          {isLoading ? (
+            <Typography color="text.secondary">{t("loading")}</Typography>
+          ) : employees.length === 0 ? (
+            <Typography color="text.secondary">{t("noLocation")}</Typography>
+          ) : (
+            <Stack spacing={1}>
+              {employees.map((employee) => (
+                <Box
+                  key={employee.user_id}
+                  onClick={() => onChange("assigned_user_id", employee.user_id)}
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 1,
+                    border: "1px solid",
+                    borderColor:
+                      data.assigned_user_id === employee.user_id
+                        ? "primary.main"
+                        : "divider",
+                    bgcolor:
+                      data.assigned_user_id === employee.user_id
+                        ? "action.selected"
+                        : "background.paper",
+                    cursor: "pointer",
+                    transition: "0.15s",
+                    "&:hover": { bgcolor: "action.hover" },
+                  }}
+                >
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <input
+                      type="radio"
+                      checked={data.assigned_user_id === employee.user_id}
+                      onChange={() => onChange("assigned_user_id", employee.user_id)}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ marginInlineEnd: 8 }}
+                    />
+                    <Box flex={1}>
+                      <Typography variant="body2" fontWeight={600}>
+                        {employee.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {employee.distance_label}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="caption"
+                      color={statusColor(employee.status)}
+                      fontWeight={600}
+                    >
+                      {employee.status_label}
+                    </Typography>
+                  </Stack>
+                  {employee.last_update && (
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {t("lastUpdate")}: {employee.last_update}
+                    </Typography>
+                  )}
+                </Box>
+              ))}
+            </Stack>
+          )}
+
+          {errors.assigned_user_id && (
+            <Typography color="error" variant="caption">
+              {errors.assigned_user_id}
+            </Typography>
+          )}
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+}
+
+// ============================================================================
+// Step 5: Confirm & Send
+// ============================================================================
+
+function Step5Form({
+  data,
+  employees,
+  confirmed,
+  onChangeConfirmed,
+  t,
+}: {
+  data: WizardFormData;
+  employees: ProjectNotificationEmployee[];
+  confirmed: { dataReviewed: boolean; readyToSend: boolean };
+  onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
+  t: (key: string) => string;
+}) {
+  const selectedEmployee = employees.find((e) => e.user_id === data.assigned_user_id);
+
+  return (
+    <Stack spacing={3}>
+      <SummaryCard
+        title={t("summaryNotification")}
+        rows={[
+          { label: t("type"), value: data.notification_type },
+          { label: t("severity"), value: data.severity },
+          { label: t("magdy_number"), value: data.magdy_number },
+          { label: t("description"), value: data.work_description },
+        ]}
+      />
+
+      <SummaryCard
+        title={t("summaryContractor")}
+        rows={[
+          { label: t("contractor"), value: data.contractor_name },
+          { label: t("contractorNumber"), value: data.contractor_number },
+          { label: t("contractorMobile"), value: data.contractor_mobile },
+        ]}
+      />
+
+      <SummaryCard
+        title={t("summaryLocation")}
+        rows={[
+          {
+            label: t("coordinates"),
+            value: `${data.task_latitude ?? ""}, ${data.task_longitude ?? ""}`,
+          },
+          { label: t("repairPoint"), value: data.repair_point },
+          { label: t("locationRadius"), value: `${data.location_radius} ${t("meters")}` },
+        ]}
+      />
+
+      <SummaryCard
+        title={t("summaryAssignment")}
+        rows={[
+          { label: t("employeeName"), value: selectedEmployee?.name ?? "-" },
+          {
+            label: t("distance"),
+            value: selectedEmployee?.distance_label ?? "-",
+          },
+          {
+            label: t("employeeStatus"),
+            value: selectedEmployee?.status_label ?? "-",
+          },
+        ]}
+      />
+
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={confirmed.dataReviewed}
+              onChange={(e) =>
+                onChangeConfirmed({ ...confirmed, dataReviewed: e.target.checked })
+              }
+            />
+          }
+          label={t("confirmData")}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={confirmed.readyToSend}
+              onChange={(e) =>
+                onChangeConfirmed({ ...confirmed, readyToSend: e.target.checked })
+              }
+            />
+          }
+          label={t("readyToSend")}
+        />
+      </Paper>
+    </Stack>
+  );
+}
+
+function SummaryCard({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: { label: string; value: React.ReactNode }[];
+}) {
+  return (
+    <Paper variant="outlined" sx={{ p: 2 }}>
+      <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+        {title}
+      </Typography>
+      <Grid container spacing={1}>
+        {rows.map((row, index) => (
+          <Grid size={{ xs: 12, sm: 6 }} key={index}>
+            <Typography variant="caption" color="text.secondary" display="block">
+              {row.label}
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>
+              {row.value || "-"}
+            </Typography>
+          </Grid>
+        ))}
+      </Grid>
+    </Paper>
+  );
+}

@@ -172,3 +172,17 @@ export interface GetProjectSharingSettingsResponse extends ApiBaseResponse<Proje
 
 export interface UpdateProjectSharingSettingsResponse extends ApiBaseResponse<ProjectSharingSettings> {
 }
+
+export interface MaintenanceAndEmergenciesSettings {
+    id: number;
+    project_type_id: number;
+    is_shown: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetMaintenanceAndEmergenciesSettingsResponse extends ApiBaseResponse<MaintenanceAndEmergenciesSettings> {
+}
+
+export interface UpdateMaintenanceAndEmergenciesSettingsResponse extends ApiBaseResponse<MaintenanceAndEmergenciesSettings> {
+}

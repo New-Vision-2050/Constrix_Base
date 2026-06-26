@@ -14,6 +14,7 @@ export const commonMessages = new MessagesGroup({
     retry: _m("Retry", "إعادة المحاولة"),
   }),
   cancel: _m("Cancel", "إلغاء"),
+  close: _m("Close", "إغلاق"),
   save: _m("Save", "حفظ"),
   confirm: _m("Confirm", "تاكيد"),
   noCountryCode: _m("No country code found", "لا يوجد رمز الدولة"),

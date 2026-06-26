@@ -12,6 +12,7 @@ export const SCHEMA_IDS = {
   documentCycle: 9,
   rolesAndPermissions: 10,
   projectSharing: 11,
+  maintenanceAndEmergencies: 12,
 } as const;
 
 export interface ProjectSettingsTab {
@@ -33,6 +34,7 @@ export const TAB_SCHEMA_ID_MAP: Record<string, number> = {
   "document-cycle": SCHEMA_IDS.documentCycle,
   "roles-and-permissions": SCHEMA_IDS.rolesAndPermissions,
   "project-sharing": SCHEMA_IDS.projectSharing,
+  "maintenance-and-emergencies": SCHEMA_IDS.maintenanceAndEmergencies,
 };
 
 /** Reverse map: schema_id → tab value (for pre-filling from API schemas) */
@@ -55,5 +57,6 @@ export function useProjectSettingsTabs(): ProjectSettingsTab[] {
     { name: t("financial"), value: "financial", schema_id: SCHEMA_IDS.financial },
     { name: t("contractManagement"), value: "contract-management", schema_id: SCHEMA_IDS.contractManagement },
     { name: t("documentCycle"), value: "document-cycle", schema_id: SCHEMA_IDS.documentCycle },
+    { name: t("maintenanceAndEmergencies"), value: "maintenance-and-emergencies", schema_id: SCHEMA_IDS.maintenanceAndEmergencies },
   ];
 }
