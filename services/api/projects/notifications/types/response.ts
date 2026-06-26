@@ -34,6 +34,8 @@ export interface ProjectNotificationEmployee {
   last_update?: string | null;
   location?: ProjectNotificationLocation | null;
   attendance?: Record<string, unknown> | null;
+  branch?: string | null;
+  branch_id?: string | number | null;
 }
 
 export interface ProjectNotification {
@@ -91,3 +93,48 @@ export interface ProjectNotificationDeleteResponse {
   code?: string;
   message?: string;
 }
+
+/** Alias for mobile task list responses (same shape as dashboard list). */
+export type ProjectNotificationMyTasksResponse = ProjectNotificationsListResponse;
+
+/** Alias for mobile inbox list responses. */
+export type ProjectNotificationMyInboxResponse = ProjectNotificationsListResponse;
+
+export interface ProjectNotificationInboxCounts {
+  pending?: number;
+  approved?: number;
+  in_progress?: number;
+  completed?: number;
+  rejected?: number;
+  cancelled?: number;
+  total?: number;
+}
+
+export interface ProjectNotificationMyInboxCountsResponse
+  extends ApiBaseResponse<ProjectNotificationInboxCounts> {}
+
+export interface ProjectNotificationFilterOption {
+  value: string;
+  label: string;
+}
+
+export interface ProjectNotificationFilters {
+  statuses?: ProjectNotificationFilterOption[];
+  projects?: ProjectNotificationFilterOption[];
+  duration?: {
+    min?: number;
+    max?: number;
+  };
+}
+
+export interface ProjectNotificationFiltersResponse
+  extends ApiBaseResponse<ProjectNotificationFilters> {}
+
+export interface ProjectNotificationAvailableAction {
+  form: string;
+  label?: string;
+  internal_procedure_setting_id?: string;
+}
+
+export interface ProjectNotificationAvailableActionsResponse
+  extends ApiBaseResponse<ProjectNotificationAvailableAction[]> {}

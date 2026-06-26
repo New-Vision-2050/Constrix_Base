@@ -10,6 +10,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Grid,
   MenuItem,
   Stack,
   TextField,
@@ -319,7 +320,7 @@ export default function ProjectNotificationsView() {
                 </Button>
               )}
             >
-              <MenuItem onClick={() => setViewTarget(notification)}>
+              <MenuItem onClick={() => setViewTarget(row)}>
                 <Eye className="w-4 h-4 me-2" />
                 {t("view")}
               </MenuItem>
@@ -327,7 +328,7 @@ export default function ProjectNotificationsView() {
                 <MenuItem
                   onClick={() => {
                     setWizardMode("edit");
-                    setEditTargetId(notification.id);
+                    setEditTargetId(row.id);
                     setWizardOpen(true);
                   }}
                 >

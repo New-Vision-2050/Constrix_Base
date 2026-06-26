@@ -4,13 +4,19 @@ import type {
   ProjectNotificationsEmployeesLocationsArgs,
   ProjectNotificationsExportArgs,
   ProjectNotificationsListArgs,
+  ProjectNotificationsMobileListArgs,
   ProjectNotificationMobileActionArgs,
   ProjectNotificationRejectArgs,
   UpdateProjectNotificationArgs,
 } from "./types/args";
 import type {
+  ProjectNotificationAvailableActionsResponse,
   ProjectNotificationDeleteResponse,
   ProjectNotificationEmployeesLocationsResponse,
+  ProjectNotificationFiltersResponse,
+  ProjectNotificationMyInboxCountsResponse,
+  ProjectNotificationMyInboxResponse,
+  ProjectNotificationMyTasksResponse,
   ProjectNotificationSingleResponse,
   ProjectNotificationsListResponse,
 } from "./types/response";
@@ -74,10 +80,17 @@ export const ProjectNotificationsApi = {
     ),
 
   getAvailableActions: (id: string) =>
-    baseApi.get<ProjectNotificationSingleResponse>(
+    baseApi.get<ProjectNotificationAvailableActionsResponse>(
       `projects/notifications/${encodeURIComponent(id)}/available-actions`,
     ),
 
+  confirmReceive: (id: string, args: ProjectNotificationMobileActionArgs) =>
+    baseApi.post<ProjectNotificationSingleResponse>(
+      `projects/notifications/${encodeURIComponent(id)}/confirm-receive`,
+      args,
+    ),
+
+  /** Legacy alias for confirmReceive. Prefer confirmReceive. */
   startTask: (id: string, args: ProjectNotificationMobileActionArgs) =>
     baseApi.post<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}/start`,
@@ -94,5 +107,27 @@ export const ProjectNotificationsApi = {
     baseApi.post<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}/end`,
       args,
+    ),
+
+  myTasks: (args?: ProjectNotificationsMobileListArgs) =>
+    baseApi.get<ProjectNotificationMyTasksResponse>(
+      "projects/notifications/my-tasks",
+      { params: args },
+    ),
+
+  myInbox: (args?: ProjectNotificationsMobileListArgs) =>
+    baseApi.get<ProjectNotificationMyInboxResponse>(
+      "projects/notifications/my-inbox",
+      { params: args },
+    ),
+
+  myInboxCounts: () =>
+    baseApi.get<ProjectNotificationMyInboxCountsResponse>(
+      "projects/notifications/my-inbox-counts",
+    ),
+
+  getFilters: () =>
+    baseApi.get<ProjectNotificationFiltersResponse>(
+      "projects/notifications/filters",
     ),
 };

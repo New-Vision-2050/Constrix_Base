@@ -14,6 +14,12 @@ export interface ProjectNotificationsListArgs {
   search?: string;
 }
 
+/** Mobile list endpoints do not require project_id; backend filters by current employee. */
+export interface ProjectNotificationsMobileListArgs
+  extends Omit<ProjectNotificationsListArgs, "project_id"> {
+  project_id?: string;
+}
+
 export interface ProjectNotificationsExportArgs {
   project_id: string;
   status?: string;

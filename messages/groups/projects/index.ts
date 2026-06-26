@@ -524,6 +524,10 @@ export const projectMessages = new MessagesGroup({
       parseLink: _m("Parse link", "رابط من جوال"),
       parseLinkPlaceholder: _m("Paste Google Maps link", "الصق رابط Google Maps"),
       invalidLocationLink: _m("Invalid location link", "رابط موقع غير صالح"),
+      locationOutsideAllowedZone: _m(
+        "Location is outside the allowed zone",
+        "الموقع خارج المنطقة المسموح بها",
+      ),
       employees: _m("Employees", "الموظفين"),
       loading: _m("Loading...", "جاري التحميل..."),
       employeeName: _m("Employee Name", "اسم الموظف"),
@@ -534,6 +538,15 @@ export const projectMessages = new MessagesGroup({
       busy: _m("Busy", "مشغول"),
       offline: _m("Offline", "غير متصل"),
       noLocation: _m("No Location", "لا يوجد موقع"),
+      filterByStatus: _m("Filter by status", "تصفية بالحالة"),
+      searchByName: _m("Search by name", "بحث بالاسم"),
+      allStatuses: _m("All statuses", "كل الحالات"),
+      allBranches: _m("All branches", "كل الفروع"),
+      noEmployeesMatch: _m(
+        "No employees match the filters",
+        "لا يوجد موظفين مطابقين للتصفية",
+      ),
+      branch: _m("Branch", "الفرع"),
       availableFar: _m("Available - Far", "متاح - بعيد"),
       contractorNumber: _m("Contractor Number", "رقم المقاول"),
       contractorTechnicalNumber: _m(

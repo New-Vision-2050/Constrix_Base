@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
@@ -25,7 +26,6 @@ import {
 import { Close } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { MapRangePicker } from "@/components/shared/map-range-picker";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import {
   useCreateProjectNotificationMutation,
@@ -35,6 +35,7 @@ import {
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
 import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications/types/response";
 import ProjectNotificationMap from "./ProjectNotificationMap";
+import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 import {
   EMPTY_FORM,
   NOTIFICATION_TYPE_OPTIONS,
@@ -47,6 +48,8 @@ import {
 import { notificationToWizardForm } from "./normalize";
 import { buildCreatePayload, buildUpdatePayload } from "./buildPayload";
 import { validateStep, firstStepWithError } from "./validate";
+import { useProjectNotificationLocationPolygons } from "./useProjectNotificationLocationPolygons";
+import { isPointInAnyPolygon } from "./utils";
 
 interface CreateNotificationWizardProps {
   open: boolean;
@@ -95,6 +98,16 @@ export default function CreateNotificationWizard({
     const list = employeeQuery.data ?? [];
     return [...list].sort((a, b) => a.distance_meters - b.distance_meters);
   }, [employeeQuery.data]);
+
+  const locationPolygons = useProjectNotificationLocationPolygons(projectId);
+
+  const isInsideAllowedZone = useMemo(() => {
+    if (data.task_latitude == null || data.task_longitude == null) return true;
+    return isPointInAnyPolygon(
+      { lat: data.task_latitude, lng: data.task_longitude },
+      locationPolygons,
+    );
+  }, [data.task_latitude, data.task_longitude, locationPolygons]);
 
   useEffect(() => {
     if (!open) {
@@ -263,7 +276,14 @@ export default function CreateNotificationWizard({
               <Step2Form data={data} errors={errors} onChange={updateField} t={t} />
             )}
             {step === 3 && (
-              <Step3Form data={data} errors={errors} onChange={updateField} t={t} />
+              <Step3Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                polygons={locationPolygons}
+                isInsideAllowedZone={isInsideAllowedZone}
+              />
             )}
             {step === 4 && (
               <Step4Form
@@ -273,6 +293,7 @@ export default function CreateNotificationWizard({
                 isLoading={employeeQuery.isLoading}
                 onChange={updateField}
                 t={t}
+                polygons={locationPolygons}
               />
             )}
             {step === 5 && (
@@ -557,11 +578,15 @@ function Step3Form({
   errors,
   onChange,
   t,
+  polygons,
+  isInsideAllowedZone,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: (key: string) => string;
+  polygons: MapPolygon[];
+  isInsideAllowedZone: boolean;
 }) {
   const center = useMemo(
     () => ({
@@ -571,25 +596,21 @@ function Step3Form({
     [data.task_latitude, data.task_longitude],
   );
 
-  const currentPin = useMemo(
-    () =>
-      data.task_latitude != null && data.task_longitude != null
-        ? { lat: data.task_latitude, lng: data.task_longitude }
-        : undefined,
-    [data.task_latitude, data.task_longitude],
-  );
-
-  function onSelect(lat: number, lng: number) {
+  function setLocation(lat: number, lng: number) {
     onChange("task_latitude", lat);
     onChange("task_longitude", lng);
     onChange("location_link", `https://maps.google.com/?q=${lat},${lng}`);
+  }
+
+  function onPinMoved(lat: number, lng: number) {
+    setLocation(lat, lng);
   }
 
   function parseLink() {
     const url = data.location_link;
     const match = url.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
     if (match) {
-      onSelect(parseFloat(match[1]), parseFloat(match[2]));
+      setLocation(parseFloat(match[1]), parseFloat(match[2]));
       toast.success(t("locationConfirmed"));
     } else {
       toast.error(t("invalidLocationLink"));
@@ -597,18 +618,25 @@ function Step3Form({
   }
 
   function dropPinAtCenter() {
-    onSelect(center.lat, center.lng);
+    setLocation(center.lat, center.lng);
+    toast.success(t("locationConfirmed"));
   }
 
   return (
     <Stack spacing={2}>
-      <MapRangePicker
-        onSelect={onSelect}
-        currentPin={currentPin}
-        radius={data.location_radius}
+      <ProjectNotificationMap
         center={center}
+        radius={data.location_radius}
         height="350px"
+        interactivePin
+        showEmployees={false}
+        polygons={polygons}
+        onPinMoved={onPinMoved}
       />
+
+      {polygons.length > 0 && !isInsideAllowedZone && (
+        <Alert severity="error">{t("locationOutsideAllowedZone")}</Alert>
+      )}
 
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -707,6 +735,7 @@ function Step4Form({
   isLoading,
   onChange,
   t,
+  polygons,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
@@ -714,6 +743,7 @@ function Step4Form({
   isLoading: boolean;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: (key: string) => string;
+  polygons: MapPolygon[];
 }) {
   const center = useMemo(
     () => ({
@@ -722,6 +752,45 @@ function Step4Form({
     }),
     [data.task_latitude, data.task_longitude],
   );
+
+  const [statusFilter, setStatusFilter] = useState("");
+  const [nameFilter, setNameFilter] = useState("");
+  const [branchFilter, setBranchFilter] = useState("");
+
+  const statusOptions = [
+    {
+      value: "",
+      label: t("allStatuses", { defaultValue: "All statuses" }),
+    },
+    { value: "available", label: t("available", { defaultValue: "Available" }) },
+    { value: "busy", label: t("busy", { defaultValue: "Busy" }) },
+    { value: "no_location", label: t("noLocation", { defaultValue: "No Location" }) },
+    { value: "offline", label: t("offline", { defaultValue: "Offline" }) },
+  ];
+
+  const branchOptions = useMemo(() => {
+    const branches = new Set<string>();
+    employees.forEach((e) => {
+      if (e.branch) branches.add(e.branch);
+    });
+    return [
+      {
+        value: "",
+        label: t("allBranches", { defaultValue: "All branches" }),
+      },
+      ...Array.from(branches).map((b) => ({ value: b, label: b })),
+    ];
+  }, [employees, t]);
+
+  const filteredEmployees = useMemo(() => {
+    return employees.filter((employee) => {
+      const matchesStatus = !statusFilter || employee.status === statusFilter;
+      const matchesName =
+        !nameFilter || employee.name.toLowerCase().includes(nameFilter.toLowerCase());
+      const matchesBranch = !branchFilter || employee.branch === branchFilter;
+      return matchesStatus && matchesName && matchesBranch;
+    });
+  }, [employees, statusFilter, nameFilter, branchFilter]);
 
   const statusColor = (status: string) => {
     switch (status) {
@@ -743,10 +812,12 @@ function Step4Form({
         <ProjectNotificationMap
           center={center}
           radius={data.location_radius}
-          employees={employees}
+          employees={filteredEmployees}
           selectedUserId={data.assigned_user_id}
           onSelectEmployee={(userId) => onChange("assigned_user_id", userId)}
           height="100%"
+          polygons={polygons}
+          showPolyline
         />
       </Grid>
 
@@ -755,15 +826,60 @@ function Step4Form({
           <Typography variant="subtitle2" gutterBottom>
             {t("employees")}
           </Typography>
+
+          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+            <TextField
+              select
+              size="small"
+              label={t("filterByStatus")}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              sx={{ minWidth: 130 }}
+            >
+              {statusOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              size="small"
+              label={t("searchByName", { defaultValue: "Search by name" })}
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              sx={{ flex: 1 }}
+            />
+
+            {branchOptions.length > 1 && (
+              <TextField
+                select
+                size="small"
+                label={t("branch", { defaultValue: "Branch" })}
+                value={branchFilter}
+                onChange={(e) => setBranchFilter(e.target.value)}
+                sx={{ minWidth: 130 }}
+              >
+                {branchOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          </Stack>
+
           <Divider sx={{ mb: 2 }} />
 
           {isLoading ? (
             <Typography color="text.secondary">{t("loading")}</Typography>
-          ) : employees.length === 0 ? (
-            <Typography color="text.secondary">{t("noLocation")}</Typography>
+          ) : filteredEmployees.length === 0 ? (
+            <Typography color="text.secondary">
+              {t("noEmployeesMatch", { defaultValue: "No employees match the filters" })}
+            </Typography>
           ) : (
             <Stack spacing={1}>
-              {employees.map((employee) => (
+              {filteredEmployees.map((employee) => (
                 <Box
                   key={employee.user_id}
                   onClick={() => onChange("assigned_user_id", employee.user_id)}
@@ -811,6 +927,11 @@ function Step4Form({
                   {employee.last_update && (
                     <Typography variant="caption" color="text.secondary" display="block">
                       {t("lastUpdate")}: {employee.last_update}
+                    </Typography>
+                  )}
+                  {employee.branch && (
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {t("branch", { defaultValue: "Branch" })}: {employee.branch}
                     </Typography>
                   )}
                 </Box>
@@ -879,7 +1000,19 @@ function Step5Form({
           { label: t("repairPoint"), value: data.repair_point },
           { label: t("locationRadius"), value: `${data.location_radius} ${t("meters")}` },
         ]}
-      />
+      >
+        {data.task_latitude != null && data.task_longitude != null && (
+          <Box sx={{ mt: 2, height: 160 }}>
+            <ProjectNotificationMap
+              center={{ lat: data.task_latitude, lng: data.task_longitude }}
+              radius={data.location_radius}
+              height="160px"
+              showEmployees={false}
+              interactivePin={false}
+            />
+          </Box>
+        )}
+      </SummaryCard>
 
       <SummaryCard
         title={t("summaryAssignment")}
@@ -927,9 +1060,11 @@ function Step5Form({
 function SummaryCard({
   title,
   rows,
+  children,
 }: {
   title: string;
   rows: { label: string; value: React.ReactNode }[];
+  children?: React.ReactNode;
 }) {
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
@@ -948,6 +1083,7 @@ function SummaryCard({
           </Grid>
         ))}
       </Grid>
+      {children}
     </Paper>
   );
 }

@@ -66,6 +66,7 @@ const ACTION_TAKER_TYPE_OPTION_DEFS = [
     value: "specific_procedures",
     labelKey: "actionTakerType.specificProcedures" as const,
   },
+  { value: "assigned_user", labelKey: "actionTakerType.assignedUser" as const },
   { value: "himself", labelKey: "actionTakerType.himself" as const },
 ] as const;
 
@@ -1563,18 +1564,19 @@ export default function StepCard({
             name="orgTemplate"
             control={control}
             render={({ field }) => {
-              const isHimself = actionTakerType === "himself";
-              const availableTemplateOptions = isHimself
+              const isHimselfOrAssigned =
+                actionTakerType === "himself" || actionTakerType === "assigned_user";
+              const availableTemplateOptions = isHimselfOrAssigned
                 ? orgTemplateSelectOptions.filter((o) => o.value === "approve")
                 : orgTemplateSelectOptions;
-              const selectedTemplateValue = isHimself
+              const selectedTemplateValue = isHimselfOrAssigned
                 ? "approve"
                 : (field.value ?? "approve");
               const selectedTemplateLabel = availableTemplateOptions.find(
                 (option) => option.value === selectedTemplateValue,
               )?.label;
 
-              if (isHimself && field.value !== "approve") {
+              if (isHimselfOrAssigned && field.value !== "approve") {
                 field.onChange("approve");
               }
 
@@ -1587,7 +1589,7 @@ export default function StepCard({
                     placeholder={ts("selectTemplate")}
                     searchPlaceholder={tc("search")}
                     noResultsText={tc("noResults")}
-                    disabled={fieldsDisabled || isHimself}
+                    disabled={fieldsDisabled || isHimselfOrAssigned}
                     displayLabel={
                       fieldsDisabled ? selectedTemplateLabel : undefined
                     }
