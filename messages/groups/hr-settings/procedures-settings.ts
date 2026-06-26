@@ -4,6 +4,10 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
   title: _m("Procedures and Settings", "الاجراءات والاعدادات"),
   subTabs: new MessagesGroup({
     workTasks: _m("Work Tasks", "مهام العمل"),
+    maintenanceEmergencyTasks: _m(
+      "Maintenance and Emergency Tasks",
+      "مهام الصيانة والطوارئ",
+    ),
     workPlan: _m("Work plan", "خطة العمل"),
     useWorkPlanProcedures: _m(
       "Procedures will be taken from the work plan",

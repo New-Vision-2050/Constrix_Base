@@ -29,7 +29,7 @@ export default function WorkPanelSettingsView() {
       title: t("taskDistributionSettings"),
       icon: <ClipboardList className="w-8 h-8" />,
       url: "/work-panel-settings/task-distribution",
-      disabled: true,
+      disabled: false,
     },
     {
       id: "time-planning",

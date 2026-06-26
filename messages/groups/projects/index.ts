@@ -525,6 +525,7 @@ export const projectMessages = new MessagesGroup({
       parseLinkPlaceholder: _m("Paste Google Maps link", "الصق رابط Google Maps"),
       invalidLocationLink: _m("Invalid location link", "رابط موقع غير صالح"),
       employees: _m("Employees", "الموظفين"),
+      loading: _m("Loading...", "جاري التحميل..."),
       employeeName: _m("Employee Name", "اسم الموظف"),
       lastUpdate: _m("Last Update", "آخر تحديث"),
       selectEmployee: _m("Select employee", "اختر موظف"),
