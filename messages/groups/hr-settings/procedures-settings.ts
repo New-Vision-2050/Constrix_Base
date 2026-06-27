@@ -177,6 +177,7 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
         email: _m("Email", "بريد"),
         whatsapp: _m("WhatsApp", "واتساب"),
         sms: _m("SMS", "رسالة نصية"),
+        push: _m("Push Notification", "إشعار التطبيق"),
       }),
       actionTakerType: new MessagesGroup({
         specificUser: _m("Specific user", "لمستخدم محدد"),

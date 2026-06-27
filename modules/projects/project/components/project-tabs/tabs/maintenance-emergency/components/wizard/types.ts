@@ -6,7 +6,7 @@ export interface WizardFormData {
   // Step 1
   notification_type: string;
   severity: string;
-  magdy_number: string;
+  feeder_number: string;
   work_type: string;
   work_description: string;
   task_date: string;
@@ -14,8 +14,10 @@ export interface WizardFormData {
   notes: string;
 
   // Step 2
+  contractor_id: string;
   contractor_name: string;
   contractor_number: string;
+  contractor_technical_name: string;
   contractor_technical_number: string;
   contractor_category: string;
   contractor_notes: string;
@@ -41,15 +43,17 @@ export interface WizardFormErrors {
 export const EMPTY_FORM: WizardFormData = {
   notification_type: "",
   severity: "",
-  magdy_number: "",
+  feeder_number: "",
   work_type: "",
   work_description: "",
   task_date: new Date().toISOString().split("T")[0],
   duration_hours: 4,
   notes: "",
 
+  contractor_id: "",
   contractor_name: "",
   contractor_number: "",
+  contractor_technical_name: "",
   contractor_technical_number: "",
   contractor_category: "",
   contractor_notes: "",

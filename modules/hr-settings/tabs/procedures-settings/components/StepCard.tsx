@@ -54,6 +54,7 @@ const NOTIFICATION_OPTION_DEFS = [
   { value: "email", labelKey: "notifications.email" as const },
   { value: "whatsapp", labelKey: "notifications.whatsapp" as const },
   { value: "sms", labelKey: "notifications.sms" as const },
+  { value: "push", labelKey: "notifications.push" as const },
 ] as const;
 
 const ACTION_TAKER_TYPE_OPTION_DEFS = [
@@ -297,6 +298,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     if (serverStep.notify_by_email) notifications.push("email");
     if (serverStep.notify_by_whatsapp) notifications.push("whatsapp");
     if (serverStep.notify_by_sms) notifications.push("sms");
+    if (serverStep.notify_by_push) notifications.push("push");
 
     const actionTakerType = serverStep.action_taker_type ?? "specific_user";
     return {
@@ -695,6 +697,7 @@ export default function StepCard({
       notify_by_email: data.notifications.includes("email"),
       notify_by_whatsapp: data.notifications.includes("whatsapp"),
       notify_by_sms: data.notifications.includes("sms"),
+      notify_by_push: data.notifications.includes("push"),
       ...(data.branchId ? { branch_id: Number(data.branchId) } : {}),
       ...(data.managementId
         ? { management_id: Number(data.managementId) }

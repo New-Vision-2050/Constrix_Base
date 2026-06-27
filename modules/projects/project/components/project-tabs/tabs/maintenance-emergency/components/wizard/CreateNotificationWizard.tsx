@@ -20,6 +20,12 @@ import {
   Step,
   StepLabel,
   Stepper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
@@ -33,6 +39,7 @@ import {
   useUpdateProjectNotificationMutation,
 } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
+import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications/types/response";
 import ProjectNotificationMap from "./ProjectNotificationMap";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
@@ -357,7 +364,7 @@ function Step1Form({
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useTranslations>;
 }) {
   return (
     <Grid container spacing={2}>
@@ -403,11 +410,11 @@ function Step1Form({
         <TextField
           fullWidth
           size="small"
-          label={t("magdy_number")}
-          value={data.magdy_number}
-          onChange={(e) => onChange("magdy_number", e.target.value)}
-          error={Boolean(errors.magdy_number)}
-          helperText={errors.magdy_number}
+          label={t("feeder_number", { defaultValue: "Feeder number" })}
+          value={data.feeder_number}
+          onChange={(e) => onChange("feeder_number", e.target.value)}
+          error={Boolean(errors.feeder_number)}
+          helperText={errors.feeder_number}
         />
       </Grid>
 
@@ -496,20 +503,41 @@ function Step2Form({
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useTranslations>;
 }) {
+  const contractorsQuery = useProjectNotificationContractors();
+  const contractors = contractorsQuery.data ?? [];
+
+  function handleContractorChange(contractorId: string) {
+    const selected = contractors.find((c) => c.id === contractorId);
+    onChange("contractor_id", contractorId);
+    onChange("contractor_name", selected?.name ?? "");
+    onChange("contractor_number", selected?.number ?? "");
+  }
+
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
+          select
           fullWidth
           size="small"
           label={t("contractor")}
-          value={data.contractor_name}
-          onChange={(e) => onChange("contractor_name", e.target.value)}
+          value={data.contractor_id}
+          onChange={(e) => handleContractorChange(e.target.value)}
           error={Boolean(errors.contractor_name)}
           helperText={errors.contractor_name}
-        />
+          disabled={contractorsQuery.isLoading}
+        >
+          <MenuItem value="">
+            {t("chooseContractor", { defaultValue: "Choose contractor" })}
+          </MenuItem>
+          {contractors.map((contractor) => (
+            <MenuItem key={contractor.id} value={contractor.id}>
+              {contractor.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </Grid>
 
       <Grid size={{ xs: 12, md: 6 }}>
@@ -518,7 +546,17 @@ function Step2Form({
           size="small"
           label={t("contractorNumber")}
           value={data.contractor_number}
-          onChange={(e) => onChange("contractor_number", e.target.value)}
+          InputProps={{ readOnly: true }}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("contractorTechnicalName", { defaultValue: "Contractor technical name" })}
+          value={data.contractor_technical_name}
+          onChange={(e) => onChange("contractor_technical_name", e.target.value)}
         />
       </Grid>
 
@@ -584,7 +622,7 @@ function Step3Form({
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useTranslations>;
   polygons: MapPolygon[];
   isInsideAllowedZone: boolean;
 }) {
@@ -744,7 +782,7 @@ function Step4Form({
   employees: ProjectNotificationEmployee[];
   isLoading: boolean;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useTranslations>;
   polygons: MapPolygon[];
 }) {
   const center = useMemo(
@@ -798,15 +836,17 @@ function Step4Form({
     switch (status) {
       case "available":
       case "available_far":
-        return "success";
+        return "#22c55e";
       case "busy":
-        return "warning";
+        return "#f97316";
       case "no_location":
-        return "error";
+        return "#ef4444";
       default:
-        return "textSecondary";
+        return "#6b7280";
     }
   };
+
+  const statusLabel = (employee: ProjectNotificationEmployee) => employee.status_label;
 
   return (
     <Grid container spacing={2} sx={{ height: "500px" }}>
@@ -882,69 +922,99 @@ function Step4Form({
               {t("noEmployeesMatch", { defaultValue: "No employees match the filters" })}
             </Typography>
           ) : (
-            <Stack spacing={1}>
-              {filteredEmployees.map((employee) => (
-                <Box
-                  key={employee.user_id}
-                  onClick={() => onChange("assigned_user_id", employee.user_id)}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: 1,
-                    border: "1px solid",
-                    borderColor:
-                      data.assigned_user_id === employee.user_id
-                        ? "primary.main"
-                        : "divider",
-                    bgcolor:
-                      data.assigned_user_id === employee.user_id
-                        ? "action.selected"
-                        : "background.paper",
-                    cursor: "pointer",
-                    transition: "0.15s",
-                    "&:hover": { bgcolor: "action.hover" },
-                  }}
-                >
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <input
-                      type="radio"
-                      checked={data.assigned_user_id === employee.user_id}
-                      onChange={() => onChange("assigned_user_id", employee.user_id)}
-                      onClick={(e) => e.stopPropagation()}
-                      style={{ marginInlineEnd: 8 }}
-                    />
-                    <Box flex={1}>
-                      <Typography variant="body2" fontWeight={600}>
-                        {employee.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {employee.distance_label}
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="caption"
-                      color={statusColor(employee.status)}
-                      fontWeight={600}
-                    >
-                      {employee.status_label}
-                    </Typography>
-                  </Stack>
-                  {employee.last_update && (
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      {t("lastUpdate")}: {employee.last_update}
-                    </Typography>
-                  )}
-                  {employee.branch && (
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      {t("branch", { defaultValue: "Branch" })}: {employee.branch}
-                    </Typography>
-                  )}
-                </Box>
-              ))}
-            </Stack>
+            <TableContainer component={Box} sx={{ border: "1px solid", borderColor: "divider" }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: "action.hover" }}>
+                    <TableCell align="center" sx={{ fontWeight: 700 }}>
+                      {t("assignment", { defaultValue: "Assign" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("employeeName", { defaultValue: "Employee name" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("employeeStatus", { defaultValue: "Status" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("distance", { defaultValue: "Distance" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("currentLocation", { defaultValue: "Current location" })}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredEmployees.map((employee) => {
+                    const isSelected = data.assigned_user_id === employee.user_id;
+                    const hasLocation =
+                      employee.location?.latitude != null &&
+                      employee.location?.longitude != null;
+                    return (
+                      <TableRow
+                        key={employee.user_id}
+                        onClick={() => onChange("assigned_user_id", employee.user_id)}
+                        sx={{
+                          cursor: "pointer",
+                          bgcolor: isSelected ? "action.selected" : "background.paper",
+                          "&:hover": { bgcolor: "action.hover" },
+                        }}
+                      >
+                        <TableCell align="center">
+                          <input
+                            type="radio"
+                            checked={isSelected}
+                            onChange={() => onChange("assigned_user_id", employee.user_id)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={600}>
+                            {employee.name}
+                          </Typography>
+                          {employee.branch && (
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              {employee.branch}
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Box
+                              sx={{
+                                width: 10,
+                                height: 10,
+                                borderRadius: "50%",
+                                bgcolor: statusColor(employee.status),
+                              }}
+                            />
+                            <Typography variant="body2">{statusLabel(employee)}</Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">{employee.distance_label}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          {hasLocation ? (
+                            <Typography variant="caption" color="text.secondary">
+                              {employee.location?.latitude?.toFixed(4)},{" "}
+                              {employee.location?.longitude?.toFixed(4)}
+                            </Typography>
+                          ) : (
+                            <Typography variant="caption" color="text.secondary">
+                              {t("noLocation", { defaultValue: "No location" })}
+                            </Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
 
           {errors.assigned_user_id && (
-            <Typography color="error" variant="caption">
+            <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
               {errors.assigned_user_id}
             </Typography>
           )}
@@ -969,7 +1039,7 @@ function Step5Form({
   employees: ProjectNotificationEmployee[];
   confirmed: { dataReviewed: boolean; readyToSend: boolean };
   onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const selectedEmployee = employees.find((e) => e.user_id === data.assigned_user_id);
 
@@ -980,7 +1050,7 @@ function Step5Form({
         rows={[
           { label: t("type"), value: data.notification_type },
           { label: t("severity"), value: data.severity },
-          { label: t("magdy_number"), value: data.magdy_number },
+          { label: t("feeder_number", { defaultValue: "Feeder number" }), value: data.feeder_number },
           { label: t("description"), value: data.work_description },
         ]}
       />
@@ -990,6 +1060,7 @@ function Step5Form({
         rows={[
           { label: t("contractor"), value: data.contractor_name },
           { label: t("contractorNumber"), value: data.contractor_number },
+          { label: t("contractorTechnicalName", { defaultValue: "Contractor technical name" }), value: data.contractor_technical_name },
           { label: t("contractorMobile"), value: data.contractor_mobile },
         ]}
       />
