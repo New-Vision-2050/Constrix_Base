@@ -10,6 +10,7 @@ import {
   Shield,
   Users,
   UsersRound,
+  Wrench,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -27,8 +28,10 @@ import {
   hasAnyRolesTabPermission,
   hasAnyStaffTabPermission,
   hasAnyShareTabPermission,
+  hasAnyMaintenanceTabPermission,
 } from "@/modules/projects/project/utils/projectMyPermissions";
 import ShareTab from "../tabs/share";
+import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 
@@ -83,6 +86,8 @@ function passesProjectTypeVisibility(
       return permissions.attachment_cycle_setting?.is_all_data_visible === 1;
     case "project-tab-attachments":
       return permissions.archive_library_setting?.is_all_data_visible === 1;
+    case "project-tab-maintenance":
+      return permissions.maintenance_emergency_setting?.is_shown === 1;
     default:
       return true;
   }
@@ -107,6 +112,8 @@ function passesFlatPermission(
       return hasAnyRolesTabPermission(flatPerms);
     case "project-tab-share":
       return hasAnyShareTabPermission(flatPerms);
+    case "project-tab-maintenance":
+      return hasAnyMaintenanceTabPermission(flatPerms);
     default:
       return true;
   }
@@ -149,6 +156,12 @@ export function useProjectTabsList(): SystemTab[] {
       title: tProject("tabs.documentCycle"),
       icon: <FolderSyncIconWithCount />,
       content: <DocumentCycleTab />,
+    };
+    const maintenanceTab: SystemTab = {
+      id: "project-tab-maintenance",
+      title: tProject("tabs.maintenanceAndEmergencies"),
+      icon: <Wrench className="w-4 h-4" />,
+      content: <MaintenanceEmergencyTab />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
 
@@ -206,6 +219,18 @@ export function useProjectTabsList(): SystemTab[] {
       )
     ) {
       topLevel.push(documentCycleTab);
+    }
+
+    if (
+      shouldShowTopLevelTab(
+        "project-tab-maintenance",
+        permissions,
+        projectId,
+        flatPermissionsFetched,
+        flatPerms,
+      )
+    ) {
+      topLevel.push(maintenanceTab);
     }
 
     return topLevel;

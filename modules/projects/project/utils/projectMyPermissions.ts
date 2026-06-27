@@ -105,3 +105,28 @@ export function hasAnyShareTabPermission(
     return p.submodule === "share";
   });
 }
+
+/** True if the user has any project permission for the maintenance & emergencies tab. */
+export function hasAnyMaintenanceTabPermission(
+  flat: ProjectMyPermissionFlatItem[] | undefined,
+): boolean {
+  if (!flat?.length) return false;
+  return flat.some((p) => {
+    const k = p.permission_key ?? "";
+    const name = p.name ?? "";
+    if (k.startsWith("PROJECT_NOTIFICATION_") || name.startsWith("PROJECT_NOTIFICATION_")) return true;
+    if (k.startsWith("PROJECT_MAINTENANCE_") || name.startsWith("PROJECT_MAINTENANCE_")) return true;
+    if (k.startsWith("PROJECT_EMERGENCY_") || name.startsWith("PROJECT_EMERGENCY_")) return true;
+    const sm = p.submodule ?? "";
+    return (
+      sm === "maintenance" ||
+      sm === "notification" ||
+      sm === "maintenance-emergency" ||
+      sm === "maintenance_emergency" ||
+      sm === "maintenance_and_emergency" ||
+      sm === "maintenance-emergencies" ||
+      sm === "maintenance_emergencies" ||
+      sm === "maintenance_and_emergencies"
+    );
+  });
+}

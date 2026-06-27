@@ -7,6 +7,7 @@ import type {
   UpdateAttachmentCycleSettingsArgs,
   UpdateRolesAndPermissionsSettingsArgs,
   UpdateProjectSharingSettingsArgs,
+  UpdateMaintenanceAndEmergenciesSettingsArgs,
 } from "@/services/api/projects/project-types/types/args";
 import type {
   ArchiveLibrarySettings,
@@ -16,6 +17,7 @@ import type {
   EmployeeContractSettings,
   RolesAndPermissionsSettings,
   ProjectSharingSettings,
+  MaintenanceAndEmergenciesSettings,
 } from "@/services/api/projects/project-types/types/response";
 
 export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
@@ -26,6 +28,7 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
   "roles-and-permissions",
   "project-sharing",
   "document-cycle",
+  "maintenance-and-emergencies",
 ]);
 
 /** Tabs grouped under «أصحاب المصلحة» in schema settings (not attachments / document-cycle). */
@@ -57,6 +60,7 @@ export function getTabBulkCheckboxState(
     attachmentCycle: AttachmentCycleSettings | null | undefined;
     rolesAndPermissions: RolesAndPermissionsSettings | null | undefined;
     projectSharing: ProjectSharingSettings | null | undefined;
+    maintenanceAndEmergencies: MaintenanceAndEmergenciesSettings | null | undefined;
   },
 ): { checked: boolean; indeterminate: boolean } | null {
   if (!BULK_TOGGLE_SUPPORTED_TABS.has(tabValue)) return null;
@@ -117,6 +121,15 @@ export function getTabBulkCheckboxState(
 
   if (tabValue === "project-sharing") {
     const v = data.projectSharing?.is_all_data_visible;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "maintenance-and-emergencies") {
+    const v = data.maintenanceAndEmergencies?.is_shown;
     if (v === undefined) return null;
     return {
       checked: isTruthySetting(v),
@@ -230,6 +243,16 @@ export async function bulkToggleTabSettings(
         is_all_data_visible: v,
       };
       await ProjectTypesApi.updateProjectSharingSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "maintenance-and-emergencies": {
+      const payload: UpdateMaintenanceAndEmergenciesSettingsArgs = {
+        is_shown: v,
+      };
+      await ProjectTypesApi.updateMaintenanceAndEmergenciesSettings(
         projectTypeId,
         payload,
       );

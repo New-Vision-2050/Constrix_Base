@@ -49,6 +49,7 @@ import DocumentCycleView from "../document-cycle";
 import WorkOrdersView from "../work-orders";
 import FinancialView from "../financial";
 import ContractManagementView from "../contract-management";
+import MaintenanceAndEmergenciesView from "../maintenance-and-emergencies";
 import { SettingsTabItemProps } from "../../types";
 import type { ProjectSettingsTab } from "../../../../constants/current-tabs";
 import { APP_ICONS } from "@/constants/icons";
@@ -83,6 +84,8 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
       return <FinancialView {...props} />;
     case "contract-management":
       return <ContractManagementView {...props} />;
+    case "maintenance-and-emergencies":
+      return <MaintenanceAndEmergenciesView {...props} />;
     default:
       return null;
   }
@@ -319,6 +322,28 @@ export default function SchemaLevelTabs({
     retry: false,
   });
 
+  const maintenanceAndEmergenciesSettingsQuery = useQuery({
+    queryKey: ["maintenance-emergency-settings", thirdLevelId],
+    queryFn: async () => {
+      try {
+        const response = await ProjectTypesApi.getMaintenanceAndEmergenciesSettings(
+          thirdLevelId!,
+        );
+        return response.data.payload;
+      } catch (error) {
+        console.error(
+          "Failed to fetch maintenance-and-emergencies settings:",
+          error,
+        );
+        return null;
+      }
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "maintenance-and-emergencies"),
+    retry: false,
+  });
+
   const bulkSettingsData = useMemo(
     () => ({
       dataSettings: dataSettingsQuery.data,
@@ -328,6 +353,7 @@ export default function SchemaLevelTabs({
       attachmentCycle: attachmentCycleSettingsQuery.data,
       rolesAndPermissions: rolesAndPermissionsSettingsQuery.data,
       projectSharing: projectSharingSettingsQuery.data,
+      maintenanceAndEmergencies: maintenanceAndEmergenciesSettingsQuery.data,
     }),
     [
       dataSettingsQuery.data,
@@ -337,6 +363,7 @@ export default function SchemaLevelTabs({
       attachmentCycleSettingsQuery.data,
       rolesAndPermissionsSettingsQuery.data,
       projectSharingSettingsQuery.data,
+      maintenanceAndEmergenciesSettingsQuery.data,
     ],
   );
 
@@ -356,6 +383,8 @@ export default function SchemaLevelTabs({
         return rolesAndPermissionsSettingsQuery.isLoading;
       case "project-sharing":
         return projectSharingSettingsQuery.isLoading;
+      case "maintenance-and-emergencies":
+        return maintenanceAndEmergenciesSettingsQuery.isLoading;
       default:
         return false;
     }
@@ -397,6 +426,9 @@ export default function SchemaLevelTabs({
       });
       await queryClient.invalidateQueries({
         queryKey: ["project-sharing-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["maintenance-emergency-settings", thirdLevelId],
       });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -531,6 +563,9 @@ export default function SchemaLevelTabs({
       });
       await queryClient.invalidateQueries({
         queryKey: ["project-sharing-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["maintenance-emergency-settings", thirdLevelId],
       });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };

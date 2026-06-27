@@ -12,12 +12,6 @@ export interface ConditionFormGroup {
   definitions: FormConditionOption[];
 }
 
-export interface ConditionFormGroup {
-  key: string;
-  label: string;
-  definitions: FormConditionOption[];
-}
-
 function normalizeConditionKey(key: string): string {
   if (key.includes("_")) return key;
   return key

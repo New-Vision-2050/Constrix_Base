@@ -200,6 +200,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
         specificUser: _m("Specific user", "لمستخدم محدد"),
         managementHierarchy: _m("Management hierarchy", "الهيكل التنظيمي"),
         specificProcedures: _m("Specific procedures", "اجراءات محددة"),
+        assignedUser: _m("Assigned user", "الموظف المُسند"),
         himself: _m("Himself", "نفسه"),
       }),
       managementHierarchy: new MessagesGroup({

@@ -4,6 +4,10 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
   title: _m("Procedures and Settings", "الاجراءات والاعدادات"),
   subTabs: new MessagesGroup({
     workTasks: _m("Work Tasks", "مهام العمل"),
+    maintenanceEmergencyTasks: _m(
+      "Maintenance and Emergency Tasks",
+      "مهام الصيانة والطوارئ",
+    ),
     workPlan: _m("Work plan", "خطة العمل"),
     useWorkPlanProcedures: _m(
       "Procedures will be taken from the work plan",
@@ -178,6 +182,7 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
         specificUser: _m("Specific user", "لمستخدم محدد"),
         managementHierarchy: _m("Management hierarchy", "الهيكل التنظيمي"),
         specificProcedures: _m("Specific procedures", "اجراءات محددة"),
+        assignedUser: _m("Assigned user", "الموظف المُسند"),
         himself: _m("Himself", "نفسه"),
       }),
       managementHierarchy: new MessagesGroup({

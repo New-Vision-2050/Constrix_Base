@@ -14,6 +14,10 @@ export const projectTypesMessages = new MessagesGroup({
     financial: _m("Financial", "المالية"),
     contractManagement: _m("Contract Management", "ادارة العقد"),
     documentCycle: _m("Document Cycle", "دورة الوثائق"),
+    maintenanceAndEmergencies: _m(
+      "Maintenance & Emergencies",
+      "الصيانة والطوارئ",
+    ),
   }),
   add: _m("Add", "اضافة"),
   addProjectType: new MessagesGroup({
@@ -154,6 +158,18 @@ export const projectTypesMessages = new MessagesGroup({
     showAllData: _m(
       "Show all project sharing data",
       "إظهار جميع بيانات الخاصة بمشاركة المشروع",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
+  maintenanceAndEmergencies: new MessagesGroup({
+    sectionTitle: _m("Maintenance & Emergencies", "الصيانة والطوارئ"),
+    showAllData: _m(
+      "Show all maintenance and emergencies data",
+      "إظهار جميع البيانات الخاصة بالصيانة والطوارئ",
     ),
     selectProjectType: _m(
       "Please select a project type",
