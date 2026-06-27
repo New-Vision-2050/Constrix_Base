@@ -632,6 +632,8 @@ function Step3Form({
         showEmployees={false}
         polygons={polygons}
         onPinMoved={onPinMoved}
+        showPin={data.task_latitude != null && data.task_longitude != null}
+        showControls
       />
 
       {polygons.length > 0 && !isInsideAllowedZone && (
@@ -818,6 +820,8 @@ function Step4Form({
           height="100%"
           polygons={polygons}
           showPolyline
+          showPin={data.task_latitude != null && data.task_longitude != null}
+          showEmployees
         />
       </Grid>
 
@@ -1009,6 +1013,7 @@ function Step5Form({
               height="160px"
               showEmployees={false}
               interactivePin={false}
+              showPin={data.task_latitude != null && data.task_longitude != null}
             />
           </Box>
         )}

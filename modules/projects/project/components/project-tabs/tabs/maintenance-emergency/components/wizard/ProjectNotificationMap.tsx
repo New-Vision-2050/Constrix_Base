@@ -3,8 +3,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import type { Libraries } from "@react-google-maps/api";
-import { Box, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
+import { MyLocation, Search } from "@mui/icons-material";
 import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications/types/response";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 
@@ -24,6 +34,10 @@ interface ProjectNotificationMapProps {
   showEmployees?: boolean;
   /** Draw a polyline from the selected employee to the notification pin. */
   showPolyline?: boolean;
+  /** Show the notification pin marker. */
+  showPin?: boolean;
+  /** Show map search and current-location controls. */
+  showControls?: boolean;
 }
 
 const libraries: Libraries = ["places"];
@@ -51,6 +65,8 @@ export default function ProjectNotificationMap({
   interactivePin = false,
   showEmployees = true,
   showPolyline = false,
+  showPin = true,
+  showControls = false,
 }: ProjectNotificationMapProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const { isLoaded } = useJsApiLoader({
@@ -67,6 +83,16 @@ export default function ProjectNotificationMap({
   const polylineRef = useRef<google.maps.Polyline | null>(null);
   const clickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const dragEndListenerRef = useRef<google.maps.MapsEventListener | null>(null);
+  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
+  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+  const searchTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOptions, setSearchOptions] = useState<
+    { label: string; lat: number; lng: number }[]
+  >([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   const activeCenter = center || DEFAULT_CENTER;
 
@@ -80,7 +106,128 @@ export default function ProjectNotificationMap({
   );
 
   useEffect(() => {
+    if (!isLoaded || !window.google?.maps?.places) return;
+    autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
+    searchTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [isLoaded]);
+
+  const handleSearch = useCallback(
+    (_event: React.SyntheticEvent, value: string) => {
+      setSearchQuery(value);
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      if (!value || value.length < 2 || !autocompleteServiceRef.current) {
+        setSearchOptions([]);
+        setSearchLoading(false);
+        return;
+      }
+      setSearchLoading(true);
+      searchTimeoutRef.current = setTimeout(() => {
+        autocompleteServiceRef.current!.getPlacePredictions(
+          {
+            input: value,
+            sessionToken: searchTokenRef.current || undefined,
+          },
+          (predictions, status) => {
+            if (
+              status !== window.google.maps.places.PlacesServiceStatus.OK ||
+              !predictions
+            ) {
+              setSearchOptions([]);
+              setSearchLoading(false);
+              return;
+            }
+            if (!placesServiceRef.current) {
+              placesServiceRef.current = new window.google.maps.places.PlacesService(
+                document.createElement("div"),
+              );
+            }
+            Promise.all(
+              predictions.slice(0, 5).map(
+                (prediction) =>
+                  new Promise<{ label: string; lat: number; lng: number } | null>(
+                    (resolve) => {
+                      placesServiceRef.current!.getDetails(
+                        {
+                          placeId: prediction.place_id,
+                          fields: ["geometry"],
+                          sessionToken: searchTokenRef.current || undefined,
+                        },
+                        (place, detailStatus) => {
+                          if (
+                            detailStatus ===
+                              window.google.maps.places.PlacesServiceStatus.OK &&
+                            place?.geometry?.location
+                          ) {
+                            resolve({
+                              label: prediction.description,
+                              lat: place.geometry.location.lat(),
+                              lng: place.geometry.location.lng(),
+                            });
+                          } else {
+                            resolve(null);
+                          }
+                        },
+                      );
+                    },
+                  ),
+              ),
+            ).then((results) => {
+              setSearchOptions(results.filter(Boolean) as { label: string; lat: number; lng: number }[]);
+              setSearchLoading(false);
+            });
+          },
+        );
+      }, 350);
+    },
+    [],
+  );
+
+  const handleSelect = useCallback(
+    (_event: React.SyntheticEvent, option: { label: string; lat: number; lng: number } | null) => {
+      if (!option) return;
+      movePin(option.lat, option.lng);
+      mapInstance?.panTo({ lat: option.lat, lng: option.lng });
+      setSearchQuery("");
+      setSearchOptions([]);
+      searchTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
+    },
+    [mapInstance, movePin],
+  );
+
+  const handleGetCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert(t("geolocationNotSupported", { defaultValue: "Geolocation is not supported by your browser" }));
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        movePin(latitude, longitude);
+        mapInstance?.panTo({ lat: latitude, lng: longitude });
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        alert(t("geolocationDenied", { defaultValue: "Could not get your location" }));
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+    );
+  }, [mapInstance, movePin, t]);
+
+  useEffect(() => {
     if (!isLoaded || !mapInstance) return;
+
+    if (!showPin) {
+      notificationMarkerRef.current?.setMap(null);
+      notificationMarkerRef.current = null;
+      dragEndListenerRef.current?.remove();
+      dragEndListenerRef.current = null;
+      return;
+    }
 
     if (!notificationMarkerRef.current) {
       notificationMarkerRef.current = new window.google.maps.Marker({
@@ -112,7 +259,7 @@ export default function ProjectNotificationMap({
     }
 
     mapInstance.panTo(activeCenter);
-  }, [isLoaded, mapInstance, activeCenter, t, interactivePin, movePin]);
+  }, [isLoaded, mapInstance, activeCenter, t, interactivePin, movePin, showPin]);
 
   useEffect(() => {
     if (!isLoaded || !mapInstance) return;
@@ -135,6 +282,12 @@ export default function ProjectNotificationMap({
   useEffect(() => {
     if (!isLoaded || !mapInstance) return;
 
+    if (!showPin) {
+      circleRef.current?.setMap(null);
+      circleRef.current = null;
+      return;
+    }
+
     if (!circleRef.current) {
       circleRef.current = new window.google.maps.Circle({
         map: mapInstance,
@@ -150,7 +303,7 @@ export default function ProjectNotificationMap({
       circleRef.current.setCenter(activeCenter);
       circleRef.current.setRadius(radius);
     }
-  }, [isLoaded, mapInstance, activeCenter, radius]);
+  }, [isLoaded, mapInstance, activeCenter, radius, showPin]);
 
   useEffect(() => {
     if (!isLoaded || !mapInstance) return;
@@ -273,7 +426,71 @@ export default function ProjectNotificationMap({
   }
 
   return (
-    <Box sx={{ height, borderRadius: 2, overflow: "hidden" }}>
+    <Box sx={{ height, borderRadius: 2, overflow: "hidden", position: "relative" }}>
+      {showControls && (
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            position: "absolute",
+            top: 12,
+            left: 12,
+            right: 12,
+            zIndex: 10,
+            bgcolor: "background.paper",
+            borderRadius: 1,
+            p: 0.5,
+            boxShadow: 1,
+          }}
+        >
+          <Autocomplete
+            size="small"
+            sx={{ flex: 1 }}
+            value={null}
+            blurOnSelect
+            options={searchOptions}
+            getOptionLabel={(o) => (typeof o === "string" ? o : o.label)}
+            inputValue={searchQuery}
+            onInputChange={handleSearch}
+            onChange={handleSelect}
+            loading={searchLoading}
+            noOptionsText={t("searchNoResults", { defaultValue: "No results" })}
+            filterOptions={(x) => x}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder={t("searchMap", { defaultValue: "Search map" })}
+                size="small"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search fontSize="small" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <>
+                      {searchLoading ? (
+                        <CircularProgress size={16} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
+          <IconButton
+            size="small"
+            onClick={handleGetCurrentLocation}
+            title={t("myLocation", { defaultValue: "My location" })}
+            disabled={locating}
+            sx={{ bgcolor: "background.paper" }}
+          >
+            {locating ? <CircularProgress size={18} /> : <MyLocation />}
+          </IconButton>
+        </Stack>
+      )}
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
         center={activeCenter}

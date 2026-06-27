@@ -528,6 +528,17 @@ export const projectMessages = new MessagesGroup({
         "Location is outside the allowed zone",
         "الموقع خارج المنطقة المسموح بها",
       ),
+      searchMap: _m("Search map", "البحث في الخريطة"),
+      searchNoResults: _m("No results", "لا توجد نتائج"),
+      myLocation: _m("My location", "موقعي الحالي"),
+      geolocationNotSupported: _m(
+        "Geolocation is not supported by your browser",
+        "المتصفح لا يدعم تحديد الموقع",
+      ),
+      geolocationDenied: _m(
+        "Could not get your location",
+        "تعذر الحصول على موقعك",
+      ),
       employees: _m("Employees", "الموظفين"),
       loading: _m("Loading...", "جاري التحميل..."),
       employeeName: _m("Employee Name", "اسم الموظف"),
