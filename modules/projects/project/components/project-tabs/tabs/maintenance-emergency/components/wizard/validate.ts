@@ -10,20 +10,6 @@ export function validateStep(
     if (!data.notification_type?.trim()) {
       errors.notification_type = "required";
     }
-    if (!data.severity?.trim()) {
-      errors.severity = "required";
-    }
-    if (!data.magdy_number?.trim()) {
-      errors.magdy_number = "required";
-    }
-    if (!data.work_type?.trim()) {
-      errors.work_type = "required";
-    }
-    if (!data.work_description?.trim()) {
-      errors.work_description = "required";
-    } else if (data.work_description.trim().length < 10) {
-      errors.work_description = "minLength";
-    }
   }
 
   if (step === 2) {
@@ -71,7 +57,7 @@ export function validateStep(
 
 export function firstStepWithError(errors: WizardFormErrors): 1 | 2 | 3 | 4 | 5 | null {
   const stepFields: Record<1 | 2 | 3 | 4 | 5, string[]> = {
-    1: ["notification_type", "severity", "magdy_number", "work_type", "work_description"],
+    1: ["notification_type"],
     2: ["contractor_name", "contractor_mobile"],
     3: ["task_latitude", "task_longitude", "location_radius", "repair_point"],
     4: ["assigned_user_id"],

@@ -11,6 +11,7 @@ import type {
 } from "./types/args";
 import type {
   ProjectNotificationAvailableActionsResponse,
+  ProjectNotificationContractorsResponse,
   ProjectNotificationDeleteResponse,
   ProjectNotificationEmployeesLocationsResponse,
   ProjectNotificationFiltersResponse,
@@ -23,6 +24,7 @@ import type {
 
 export type {
   ProjectNotification,
+  ProjectNotificationContractor,
   ProjectNotificationEmployee,
   ProjectNotificationUser,
   ProjectNotificationLocation,
@@ -70,6 +72,11 @@ export const ProjectNotificationsApi = {
     baseApi.post<Blob>("projects/notifications/export", args, {
       responseType: "blob",
     }),
+
+  getContractors: () =>
+    baseApi.get<ProjectNotificationContractorsResponse>(
+      "projects/notifications/contractors",
+    ),
 
   getEmployeesWithLocations: (
     args: ProjectNotificationsEmployeesLocationsArgs,

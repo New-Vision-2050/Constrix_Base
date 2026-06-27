@@ -24,6 +24,14 @@ export interface ProjectNotificationLocation {
   source?: string | null;
 }
 
+export interface ProjectNotificationContractor {
+  id: string;
+  name: string;
+  number: string;
+  mobile?: string | null;
+  notes?: string | null;
+}
+
 export interface ProjectNotificationEmployee {
   user_id: string;
   name: string;
@@ -44,11 +52,13 @@ export interface ProjectNotification {
   notification_number: string | null;
   notification_type: string;
   severity: NotificationSeverity;
-  magdy_number: string;
+  feeder_number: string;
   work_type: string;
   work_description: string;
+  contractor_id?: string | null;
   contractor_name: string;
   contractor_number?: string | null;
+  contractor_technical_name?: string | null;
   contractor_technical_number?: string | null;
   contractor_category?: string | null;
   contractor_notes?: string | null;
@@ -85,6 +95,9 @@ export interface ProjectNotificationsListResponse
 
 export interface ProjectNotificationSingleResponse
   extends ApiBaseResponse<ProjectNotification[]> {}
+
+export interface ProjectNotificationContractorsResponse
+  extends ApiBaseResponse<ProjectNotificationContractor[]> {}
 
 export interface ProjectNotificationEmployeesLocationsResponse
   extends ApiBaseResponse<ProjectNotificationEmployee[]> {}
