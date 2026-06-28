@@ -43,8 +43,8 @@ function ProjectsList() {
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
-  const [deletingProjectId, setDeletingProjectId] = useState<number | null>(
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(
     null,
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -64,13 +64,13 @@ function ProjectsList() {
     initialLimit: 10,
   });
 
-  const handleEdit = useCallback((projectId: number) => {
-    setEditingProjectId(projectId);
+  const handleEdit = useCallback((projectId: string | number) => {
+    setEditingProjectId(String(projectId));
     setDrawerOpen(true);
   }, []);
 
-  const handleDelete = useCallback((projectId: number) => {
-    setDeletingProjectId(projectId);
+  const handleDelete = useCallback((projectId: string | number) => {
+    setDeletingProjectId(String(projectId));
     setDeleteDialogOpen(true);
   }, []);
 
