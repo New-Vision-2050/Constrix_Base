@@ -19,8 +19,12 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useMemo } from "react";
 import { CreateProjectFormValues } from "../validation/projectForm.schema";
+import {
+  ProjectEditSelections,
+  withSelectedOption,
+} from "../utils/mapProjectToForm";
 
-type OptionItem = { id: number; name: string; isCreateButton?: boolean };
+type OptionItem = { id: number | string; name: string; isCreateButton?: boolean };
 type ManagementItem = OptionItem & {
   manager?: {
     id: string;
@@ -47,7 +51,7 @@ interface ProjectFormFieldsProps {
   companyUsersData?: OptionItem[];
   entityClientsData?: OptionItem[];
   individualClientsData?: OptionItem[];
-  currentManager?: { id: number; name: string } | null;
+  editSelections?: ProjectEditSelections | null;
   onSearchChange?: (fieldName: string, searchValue: string) => void;
 }
 
@@ -67,11 +71,73 @@ export function ProjectFormFields({
   companyUsersData,
   entityClientsData,
   individualClientsData,
-  currentManager,
+  editSelections,
   onSearchChange,
 }: ProjectFormFieldsProps) {
   const t = useTranslations();
   const router = useRouter();
+
+  const projectTypesOptions = useMemo(
+    () =>
+      withSelectedOption(projectTypesData, editSelections?.projectType ?? null),
+    [projectTypesData, editSelections?.projectType],
+  );
+
+  const subProjectTypesOptions = useMemo(
+    () =>
+      withSelectedOption(
+        subProjectTypesData,
+        editSelections?.subProjectType ?? null,
+      ),
+    [subProjectTypesData, editSelections?.subProjectType],
+  );
+
+  const subSubProjectTypesOptions = useMemo(
+    () =>
+      withSelectedOption(
+        subSubProjectTypesData,
+        editSelections?.subSubProjectType ?? null,
+      ),
+    [subSubProjectTypesData, editSelections?.subSubProjectType],
+  );
+
+  const branchesOptions = useMemo(
+    () => withSelectedOption(branchesData, editSelections?.branch ?? null),
+    [branchesData, editSelections?.branch],
+  );
+
+  const managementsOptions = useMemo(
+    () =>
+      withSelectedOption(managementsData, editSelections?.management ?? null),
+    [managementsData, editSelections?.management],
+  );
+
+  const companyUsersOptions = useMemo(() => {
+    const managerSeed = editSelections?.manager
+      ? { id: editSelections.manager.id, name: editSelections.manager.name }
+      : null;
+    return withSelectedOption(companyUsersData, managerSeed);
+  }, [companyUsersData, editSelections?.manager]);
+
+  const entityClientsOptions = useMemo(() => {
+    if (editSelections?.projectOwner) {
+      return withSelectedOption(entityClientsData, editSelections.projectOwner);
+    }
+    return entityClientsData ?? [];
+  }, [entityClientsData, editSelections?.projectOwner]);
+
+  const individualClientsOptions = useMemo(() => {
+    if (
+      editSelections?.projectOwner &&
+      editSelections.projectOwner.type === "individual"
+    ) {
+      return withSelectedOption(
+        individualClientsData,
+        editSelections.projectOwner,
+      );
+    }
+    return individualClientsData ?? [];
+  }, [individualClientsData, editSelections?.projectOwner]);
 
   const filterOptions = createFilterOptions({
     matchFrom: 'any',
@@ -82,27 +148,14 @@ export function ProjectFormFields({
     router.push("/create-client/clients?action=create");
   };
 
-  // Filter company users by management_id and include currentManager if editing
-  const filteredCompanyUsers = useMemo(() => {
-    const users = companyUsersData || [];
-    
-    // If we have a currentManager from editing, ensure it's in the list
-    if (currentManager) {
-      const hasCurrentManager = users.some(u => u.id === currentManager.id);
-      if (!hasCurrentManager) {
-        return [currentManager, ...users];
-      }
-    }
-    
-    return users;
-  }, [companyUsersData, currentManager]);
-
   // Filter clients based on client type
   const filteredClients = useMemo(() => {
-    if (!watchOwnerType || watchOwnerType === "individual") return individualClientsData || [];
-    if (watchOwnerType === "company") return entityClientsData || [];
-    return individualClientsData || [];
-  }, [watchOwnerType, individualClientsData, entityClientsData]);
+    if (!watchOwnerType || watchOwnerType === "individual") {
+      return individualClientsOptions;
+    }
+    if (watchOwnerType === "company") return entityClientsOptions;
+    return individualClientsOptions;
+  }, [watchOwnerType, individualClientsOptions, entityClientsOptions]);
 
   return (
     <>
@@ -110,12 +163,12 @@ export function ProjectFormFields({
         name="project_type_id"
         control={control}
         render={({ field }) => {
-          const selectedOption = projectTypesData?.find(
+          const selectedOption = projectTypesOptions?.find(
             (type) => String(type.id) === field.value
           );
           return (
             <Autocomplete
-              options={projectTypesData || []}
+              options={projectTypesOptions || []}
               getOptionLabel={(option) => option.name}
               filterOptions={filterOptions}
               value={selectedOption || null}
@@ -139,12 +192,12 @@ export function ProjectFormFields({
         name="sub_project_type_id"
         control={control}
         render={({ field }) => {
-          const selectedOption = subProjectTypesData?.find(
+          const selectedOption = subProjectTypesOptions?.find(
             (type) => String(type.id) === field.value
           );
           return (
             <Autocomplete
-              options={subProjectTypesData || []}
+              options={subProjectTypesOptions || []}
               getOptionLabel={(option) => option.name}
               filterOptions={filterOptions}
               value={selectedOption || null}
@@ -170,12 +223,12 @@ export function ProjectFormFields({
         name="sub_sub_project_type_id"
         control={control}
         render={({ field }) => {
-          const selectedOption = subSubProjectTypesData?.find(
+          const selectedOption = subSubProjectTypesOptions?.find(
             (type) => String(type.id) === field.value
           );
           return (
             <Autocomplete
-              options={subSubProjectTypesData || []}
+              options={subSubProjectTypesOptions || []}
               getOptionLabel={(option) => option.name}
               filterOptions={filterOptions}
               value={selectedOption || null}
@@ -214,12 +267,12 @@ export function ProjectFormFields({
         name="branch_id"
         control={control}
         render={({ field }) => {
-          const selectedOption = branchesData?.find(
+          const selectedOption = branchesOptions?.find(
             (branch) => String(branch.id) === field.value
           );
           return (
             <Autocomplete
-              options={branchesData || []}
+              options={branchesOptions || []}
               getOptionLabel={(option) => option.name}
               filterOptions={filterOptions}
               value={selectedOption || null}
@@ -243,12 +296,12 @@ export function ProjectFormFields({
         name="management_id"
         control={control}
         render={({ field }) => {
-          const selectedOption = managementsData?.find(
+          const selectedOption = managementsOptions?.find(
             (mgmt) => String(mgmt.id) === field.value
           );
           return (
             <Autocomplete
-              options={managementsData || []}
+              options={managementsOptions || []}
               getOptionLabel={(option) => option.name}
               filterOptions={filterOptions}
               value={selectedOption || null}
@@ -274,7 +327,7 @@ export function ProjectFormFields({
         name="manager_id"
         control={control}
         render={() => {
-          const selected = managementsData?.find(
+          const selected = managementsOptions?.find(
             (m) => String(m.id) === watchManagementId,
           );
           return (
@@ -292,14 +345,16 @@ export function ProjectFormFields({
         name="manager_id"
         control={control}
         render={({ field }) => {
-          const selectedOption = filteredCompanyUsers?.find(
+          const selectedOption = companyUsersOptions?.find(
             (user) => String(user.id) === field.value
           );
           return (
             <Autocomplete
-              options={filteredCompanyUsers || []}
+              options={companyUsersOptions || []}
               getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) =>
+                String(option.id) === String(value.id)
+              }
               filterOptions={filterOptions}
               value={selectedOption || null}
               onChange={(_, option) => field.onChange(option ? String(option.id) : "")}
@@ -360,12 +415,12 @@ export function ProjectFormFields({
           name="project_owner_id"
           control={control}
           render={({ field }) => {
-            const selectedOption = entityClientsData?.find(
+            const selectedOption = entityClientsOptions?.find(
               (client) => String(client.id) === field.value
             );
             return (
               <Autocomplete
-                options={entityClientsData || []}
+                options={entityClientsOptions || []}
                 getOptionLabel={(option) => option.name}
                 isOptionEqualToValue={(option, value) => option.id === value?.id}
                 value={selectedOption || null}
@@ -426,12 +481,12 @@ export function ProjectFormFields({
           name="project_owner_id"
           control={control}
           render={({ field }) => {
-            const selectedOption = individualClientsData?.find(
+            const selectedOption = individualClientsOptions?.find(
               (client) => String(client.id) === field.value
             );
             return (
               <Autocomplete
-                options={individualClientsData || []}
+                options={individualClientsOptions || []}
                 getOptionLabel={(option) => option.name}
                 isOptionEqualToValue={(option, value) => option.id === value?.id}
                 value={selectedOption || null}

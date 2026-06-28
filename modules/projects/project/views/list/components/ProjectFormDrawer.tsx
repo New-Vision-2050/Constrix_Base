@@ -21,24 +21,16 @@ import {
   CreateProjectSchema,
   CreateProjectFormValues,
 } from "../validation/projectForm.schema";
-
-type ManagementItem = {
-  id: number;
-  name: string;
-  manager?: {
-    id: string;
-    registration_form_id: number | null;
-    name: string;
-    email: string;
-    phone_code: string;
-    phone: string;
-  };
-};
+import {
+  mapProjectToEditSelections,
+  mapProjectToFormValues,
+  type ProjectEditSelections,
+} from "../utils/mapProjectToForm";
 
 interface ProjectFormDrawerProps {
   open: boolean;
   onClose: () => void;
-  editingProjectId: number | null;
+  editingProjectId: string | null;
   queryKey: string;
   onSaved?: () => void;
 }
@@ -52,7 +44,9 @@ export function ProjectFormDrawer({
 }: ProjectFormDrawerProps) {
   const t = useTranslations();
   const queryClient = useQueryClient();
-  const [currentManager, setCurrentManager] = useState<{ id: number; name: string } | null>(null);
+  const [editSelections, setEditSelections] =
+    useState<ProjectEditSelections | null>(null);
+  const [isLoadingProject, setIsLoadingProject] = useState(false);
 
   const {
     control,
@@ -84,7 +78,6 @@ export function ProjectFormDrawer({
     watchBranchId,
   );
 
-  // Reset management and manager when branch changes
   useEffect(() => {
     if (watchBranchId && !editingProjectId) {
       setValue("management_id", "");
@@ -92,28 +85,31 @@ export function ProjectFormDrawer({
     }
   }, [watchBranchId, setValue, editingProjectId]);
 
-  // Auto-select management director based on chosen management
-  // Only runs when managementsData is loaded to avoid overwriting with empty string
   useEffect(() => {
-    const managements = formData?.managementsData as
-      | ManagementItem[]
-      | undefined;
+    if (editingProjectId) return;
+
+    const managements = formData?.managementsData;
     if (!managements || managements.length === 0) return;
     if (!watchManagementId) {
       setValue("manager_id", "");
       return;
     }
+
     const selected = managements.find(
       (m) => String(m.id) === watchManagementId,
     );
-    console.log("selected", selected?.manager?.id);
     const managerId = selected?.manager?.id ? String(selected.manager.id) : "";
     setValue("manager_id", managerId);
-  }, [watchManagementId, formData?.managementsData, setValue]);
+  }, [
+    editingProjectId,
+    watchManagementId,
+    formData?.managementsData,
+    setValue,
+  ]);
 
-  // Reset form to defaults when opening for new project
   useEffect(() => {
     if (open && !editingProjectId) {
+      setEditSelections(null);
       reset({
         status: 1,
         project_owner_type: undefined,
@@ -131,47 +127,36 @@ export function ProjectFormDrawer({
   }, [open, editingProjectId, reset]);
 
   useEffect(() => {
-    if (editingProjectId) {
-      AllProjectsApi.show(editingProjectId).then((response) => {
-        const project = response.data.payload;
-        if (project.manager) {
-          setCurrentManager({ id: Number(project.manager.id), name: project.manager.name });
-        } else {
-          setCurrentManager(null);
-        }
-        reset({
-          project_type_id: project.project_type?.id
-            ? String(project.project_type.id)
-            : undefined,
-          sub_project_type_id: project.sub_project_type?.id
-            ? String(project.sub_project_type.id)
-            : undefined,
-          sub_sub_project_type_id: project.sub_sub_project_type?.id
-            ? String(project.sub_sub_project_type.id)
-            : undefined,
-          name: project.name,
-          branch_id: project.branch?.id ? String(project.branch.id) : undefined,
-          management_id: project.management?.id
-            ? String(project.management.id)
-            : undefined,
-          manager_id: project.manager_id
-            ? String(project.manager_id)
-            : undefined,
-          responsible_employee_id: project.responsible_employee?.id
-            ? String(project.responsible_employee.id)
-            : undefined,
-          project_owner_id: project.project_owner_id,
-          project_owner_type: project.project_owner_type,
-          status: project.status ?? 1,
-        });
-      });
-    } else {
-      setCurrentManager(null);
+    if (!open || !editingProjectId) {
+      if (!editingProjectId) {
+        setEditSelections(null);
+      }
+      return;
     }
-  }, [editingProjectId, reset]);
+
+    let cancelled = false;
+    setIsLoadingProject(true);
+
+    AllProjectsApi.show(editingProjectId)
+      .then((response) => {
+        if (cancelled) return;
+        const project = response.data.payload;
+        setEditSelections(mapProjectToEditSelections(project));
+        reset(mapProjectToFormValues(project));
+      })
+      .catch((error) => {
+        console.error("Error loading project:", error);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingProject(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, editingProjectId, reset]);
 
   const onSubmit = async (data: CreateProjectFormValues) => {
-    console.log("data", data);
     try {
       const apiData: CreateProjectData = {
         project_type_id: Number(data.project_type_id),
@@ -205,6 +190,7 @@ export function ProjectFormDrawer({
   };
 
   const handleClose = () => {
+    setEditSelections(null);
     onClose();
     reset();
   };
@@ -239,43 +225,49 @@ export function ProjectFormDrawer({
         </Button>
       </Box>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-      >
-        <ProjectFormFields
-          control={control}
-          errors={errors}
-          watchProjectTypeId={watchProjectTypeId}
-          watchSubProjectTypeId={watchSubProjectTypeId}
-          watchBranchId={watchBranchId}
-          watchManagementId={watchManagementId}
-          watchOwnerType={watchOwnerType}
-          currentManager={currentManager}
-          {...formData}
-        />
-
-        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? <CircularProgress size={24} /> : t("project.save")}
-          </Button>
-          <Button
-            type="button"
-            variant="outlined"
-            onClick={handleClose}
-            fullWidth
-          >
-            {t("project.cancel")}
-          </Button>
+      {isLoadingProject ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+          <CircularProgress />
         </Box>
-      </Box>
+      ) : (
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
+          <ProjectFormFields
+            control={control}
+            errors={errors}
+            watchProjectTypeId={watchProjectTypeId}
+            watchSubProjectTypeId={watchSubProjectTypeId}
+            watchBranchId={watchBranchId}
+            watchManagementId={watchManagementId}
+            watchOwnerType={watchOwnerType}
+            editSelections={editSelections}
+            {...formData}
+          />
+
+          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? <CircularProgress size={24} /> : t("project.save")}
+            </Button>
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={handleClose}
+              fullWidth
+            >
+              {t("project.cancel")}
+            </Button>
+          </Box>
+        </Box>
+      )}
     </Drawer>
   );
 }
