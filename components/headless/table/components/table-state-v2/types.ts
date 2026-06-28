@@ -108,6 +108,7 @@ export type TableStateV2<TRow> = {
     isRowSelected: (row: TRow) => boolean;
     toggleRow: (row: TRow) => void;
     isRowFromOtherPage: (row: TRow) => boolean;
+    getRowKey: (row: TRow) => string;
   };
 
   // Actions
