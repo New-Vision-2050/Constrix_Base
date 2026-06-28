@@ -19,7 +19,7 @@ import {
   fetchBranchOptions,
   fetchManagementOptions,
 } from "./api";
-import { usePaginatedConstraintOptions } from "./usePaginatedConstraintOptions";
+import { PaginatedConstraintAutocomplete } from "./PaginatedConstraintAutocomplete";
 import { useAttendance } from "@/modules/attendance-departure/context/AttendanceContext";
 import { syncTableFiltersToContext } from "./syncTableFiltersToContext";
 
@@ -60,13 +60,6 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
     staleTime: 5 * 60 * 1000,
   });
 
-  const {
-    options: constraintsOptions,
-    isLoading: constraintsLoading,
-    isFetchingNextPage: constraintsFetchingNextPage,
-    listboxSlotProps: constraintsListboxSlotProps,
-  } = usePaginatedConstraintOptions();
-
   const branchValue = useMemo(
     () =>
       branches.find((b) => b.id === String(filters.branch_id ?? "")) ?? null,
@@ -78,14 +71,6 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
       managements.find((m) => m.id === String(filters.management_id ?? "")) ??
       null,
     [managements, filters.management_id],
-  );
-
-  const constraintValue = useMemo(
-    () =>
-      constraintsOptions.find(
-        (c) => c.id === String(filters.constraint_id ?? ""),
-      ) ?? null,
-    [constraintsOptions, filters.constraint_id],
   );
 
   const handleMapClick = () => {
@@ -204,46 +189,15 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             )}
           />
 
-          <Autocomplete
-            fullWidth
-            size="small"
-            loading={constraintsLoading || constraintsFetchingNextPage}
-            options={constraintsOptions}
-            filterOptions={(options) => options}
-            getOptionLabel={(option) => option.name}
-            getOptionKey={(option) => option.id}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={constraintValue}
-            slotProps={{
-              listbox: constraintsListboxSlotProps,
-            }}
-            ListboxProps={{
-              onScroll: constraintsListboxSlotProps.onScroll,
-              style: { maxHeight: 280, overflow: "auto" },
-            }}
-            onChange={(_, value) =>
+          <PaginatedConstraintAutocomplete
+            selectedId={filters.constraint_id}
+            placeholder={t("constraintPlaceholder")}
+            onChange={(value) =>
               onFilterChange({
                 ...filters,
-                constraint_id: value?.id != null ? String(value.id) : "",
+                constraint_id: value?.id ?? "",
               })
             }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder={t("constraintPlaceholder")}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {constraintsLoading || constraintsFetchingNextPage ? (
-                        <CircularProgress color="inherit" size={16} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
           />
 
           <TextField

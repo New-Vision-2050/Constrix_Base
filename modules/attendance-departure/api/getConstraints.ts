@@ -63,7 +63,7 @@ function parseConstraintsPagination(
     return {
       currentPage,
       lastPage,
-      hasMore: currentPage < lastPage,
+      hasMore: requestedPage < lastPage,
     };
   }
 

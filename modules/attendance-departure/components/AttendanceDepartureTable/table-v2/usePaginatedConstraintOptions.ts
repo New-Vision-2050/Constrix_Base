@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { CONSTRAINTS_PER_PAGE } from "@/modules/attendance-departure/api/getConstraints";
 import { fetchConstraintsPage } from "./api";
@@ -17,8 +17,8 @@ export function usePaginatedConstraintOptions() {
     queryKey: ["attendance-filter-constraints", CONSTRAINTS_PER_PAGE],
     queryFn: ({ pageParam }) => fetchConstraintsPage(pageParam),
     initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.currentPage + 1 : undefined,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      lastPage.hasMore ? lastPageParam + 1 : undefined,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -38,32 +38,12 @@ export function usePaginatedConstraintOptions() {
     return merged;
   }, [data]);
 
-  const handleListboxScroll = useCallback(
-    (event: React.UIEvent<HTMLElement>) => {
-      const listbox = event.currentTarget;
-      const nearBottom =
-        listbox.scrollTop + listbox.clientHeight >= listbox.scrollHeight - 32;
-
-      if (nearBottom && hasNextPage && !isFetchingNextPage) {
-        void fetchNextPage();
-      }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage],
-  );
-
-  const listboxSlotProps = useMemo(
-    () => ({
-      onScroll: handleListboxScroll,
-      sx: { maxHeight: 280, overflow: "auto" },
-    }),
-    [handleListboxScroll],
-  );
-
   return {
     options,
     isLoading,
     isFetchingNextPage,
-    listboxSlotProps,
+    fetchNextPage,
+    hasNextPage: hasNextPage ?? false,
     loadedPages: data?.pages.length ?? 0,
   };
 }
