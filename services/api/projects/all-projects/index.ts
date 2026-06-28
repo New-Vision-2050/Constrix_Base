@@ -23,15 +23,16 @@ export const AllProjectsApi = {
   list: (params?: ProjectParams) =>
     baseApi.get<ListProjectsResponse>("projects", { params }),
 
-  show: (id: number) => baseApi.get<ShowProjectResponse>(`projects/${id}`),
+  show: (id: string | number) =>
+    baseApi.get<ShowProjectResponse>(`projects/${id}`),
 
   create: (data: CreateProjectData) =>
     baseApi.post<CreateProjectResponse>("projects", data),
 
-  update: (id: number, data: UpdateProjectData) =>
+  update: (id: string | number, data: UpdateProjectData) =>
     baseApi.put<UpdateProjectResponse>(`projects/${id}`, data),
 
-  delete: (id: number) =>
+  delete: (id: string | number) =>
     baseApi.delete<DeleteProjectResponse>(`projects/${id}`),
 
   getProjectTypes: () =>

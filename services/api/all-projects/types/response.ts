@@ -129,14 +129,14 @@ export interface ProjectDetails {
   sub_project_type_id: number;
   sub_sub_project_type_id: number;
   manager_id: string | null;
-  branch_id: number | null;
+  branch_id: number | string | null;
   project_owner_type: string | null;
   project_owner_id: string | null;
   contract_id: string | null;
   client_id: string | null;
   project_classification_id: number | null;
   cost_center_branch_id: number | null;
-  management_id: number | null;
+  management_id: number | string | null;
   currency_id: number | null;
   project_value: string;
   status: number;
@@ -159,7 +159,7 @@ export interface ProjectDetails {
 }
 
 export interface ProjectListItem {
-  id: number;
+  id: string;
   name: string;
   serial_number: string;
   status: number;
