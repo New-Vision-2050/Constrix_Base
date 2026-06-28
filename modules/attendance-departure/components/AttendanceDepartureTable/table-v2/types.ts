@@ -36,5 +36,6 @@ export interface DropdownOption {
 export interface AttendanceFiltersProps {
   filters: AttendanceFilterParams;
   onFilterChange: (filters: AttendanceFilterParams) => void;
+  onSearch: () => void;
   onReset: () => void;
 }

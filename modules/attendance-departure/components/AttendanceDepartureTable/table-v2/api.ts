@@ -1,6 +1,49 @@
-import axios from "axios";
-import { apiClient, baseURL } from "@/config/axios-config";
-import { AttendanceApiResponse, AttendanceFilterParams } from "./types";
+import { apiClient } from "@/config/axios-config";
+import getHierarchies from "@/modules/attendance-departure/api/getHierarchies";
+import getConstraints from "@/modules/attendance-departure/api/getConstraints";
+import {
+  AttendanceApiResponse,
+  AttendanceFilterParams,
+  DropdownOption,
+} from "./types";
+import { normalizeAttendanceFilters } from "./syncTableFiltersToContext";
+
+/**
+ * Maps UI filters to `/attendance/team` query params.
+ * Matches legacy TableBuilder column search keys (`search_text`, `sort`, `order`).
+ */
+function mapFiltersToQueryParams(
+  filters?: AttendanceFilterParams,
+): Record<string, string> {
+  if (!filters) return {};
+
+  const normalized = normalizeAttendanceFilters(filters);
+  const params: Record<string, string> = {};
+
+  if (normalized.search_text) {
+    params.search_text = normalized.search_text;
+  }
+  if (normalized.branch_id) {
+    params.branch_id = normalized.branch_id;
+  }
+  if (normalized.management_id) {
+    params.management_id = normalized.management_id;
+  }
+  if (normalized.constraint_id) {
+    params.constraint_id = normalized.constraint_id;
+  }
+  if (normalized.attendance_status) {
+    params.attendance_status = normalized.attendance_status;
+  }
+  if (normalized.start_date) {
+    params.start_date = normalized.start_date;
+  }
+  if (normalized.end_date) {
+    params.end_date = normalized.end_date;
+  }
+
+  return params;
+}
 
 /**
  * Fetches attendance data from the API with pagination, sorting, and filters
@@ -10,29 +53,21 @@ export const fetchAttendanceData = async (
   limit: number,
   sortBy?: string,
   sortDirection?: "asc" | "desc",
-  filters?: AttendanceFilterParams
+  filters?: AttendanceFilterParams,
 ): Promise<AttendanceApiResponse> => {
-  const params: any = {
+  const params: Record<string, string | number> = {
     page,
     per_page: limit,
   };
 
-  // Add sorting parameters
   if (sortBy) {
-    params.sort_by = sortBy;
-    params.sort_direction = sortDirection || "asc";
+    params.sort = sortBy;
+    params.order = sortDirection || "asc";
   }
 
-  // Add filter parameters
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) {
-        params[key] = value;
-      }
-    });
-  }
+  Object.assign(params, mapFiltersToQueryParams(filters));
 
-  const response = await apiClient.get(`${baseURL}/attendance/team`, { params });
+  const response = await apiClient.get("/attendance/team", { params });
 
   return {
     data: response.data.payload || [],
@@ -41,19 +76,20 @@ export const fetchAttendanceData = async (
   };
 };
 
-/**
- * Fetches dropdown options for filters
- */
-export const fetchDropdownOptions = async (
-  url: string,
-  searchParam?: string,
-  searchValue?: string
-): Promise<any[]> => {
-  const params: any = { per_page: 10 };
-  if (searchParam && searchValue) {
-    params[searchParam] = searchValue;
-  }
+export async function fetchBranchOptions(): Promise<DropdownOption[]> {
+  const payload = await getHierarchies("branch");
+  return payload.map((item) => ({ id: String(item.id), name: item.name }));
+}
 
-  const response = await apiClient.get(url, { params });
-  return response.data.payload || [];
-};
+export async function fetchManagementOptions(): Promise<DropdownOption[]> {
+  const payload = await getHierarchies("management");
+  return payload.map((item) => ({ id: String(item.id), name: item.name }));
+}
+
+export async function fetchConstraintOptions(): Promise<DropdownOption[]> {
+  const payload = await getConstraints();
+  return payload.map((item) => ({
+    id: String(item.id),
+    name: item.constraint_name,
+  }));
+}

@@ -190,6 +190,7 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
         isRowSelected,
         toggleRow,
         isRowFromOtherPage,
+        getRowKey: getRowIdentifier,
       },
       actions: {
         onExport: onExport ? handleExport : undefined,
