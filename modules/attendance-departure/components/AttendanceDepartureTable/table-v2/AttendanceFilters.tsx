@@ -15,10 +15,7 @@ import { Search, Refresh, Map } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { AttendanceFiltersProps, DropdownOption } from "./types";
-import {
-  fetchBranchOptions,
-  fetchManagementOptions,
-} from "./api";
+import { fetchBranchOptions, fetchManagementOptions } from "./api";
 import { PaginatedConstraintAutocomplete } from "./PaginatedConstraintAutocomplete";
 import { useAttendance } from "@/modules/attendance-departure/context/AttendanceContext";
 import { syncTableFiltersToContext } from "./syncTableFiltersToContext";
@@ -245,7 +242,11 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
         </Box>
 
         <Stack direction="row" spacing={2} justifyContent="flex-end">
-          <Button variant="contained" startIcon={<Map />} onClick={handleMapClick}>
+          <Button
+            variant="contained"
+            startIcon={<Map />}
+            onClick={handleMapClick}
+          >
             {t("mapView")}
           </Button>
           <Button variant="outlined" startIcon={<Refresh />} onClick={onReset}>
