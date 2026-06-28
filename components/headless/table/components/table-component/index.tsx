@@ -68,6 +68,9 @@ export function createTableComponent<TRow>() {
       isUsingState && props.state.table.selectable
         ? props.state.selection
         : null;
+    const getRowKeyFromState = isUsingState
+      ? props.state.selection.getRowKey
+      : undefined;
     const handleColumnSort = (columnKey: string, sortable?: boolean) => {
       if (sortable && handleSort) {
         handleSort(columnKey);
@@ -76,7 +79,14 @@ export function createTableComponent<TRow>() {
 
     // Selection helpers
     const getRowId = (row: TRow, index: number): string | number => {
+      if (getRowKeyFromState) {
+        return getRowKeyFromState(row);
+      }
       return selectable?.getRowId ? selectable.getRowId(row) : index;
+    };
+
+    const getRowKey = (row: TRow, index: number): string | number => {
+      return getRowId(row, index);
     };
 
     const isRowSelected = (row: TRow, index: number): boolean => {
@@ -306,7 +316,7 @@ export function createTableComponent<TRow>() {
                       stateSelection?.isRowFromOtherPage(row) || false;
                     return (
                       <TableRow
-                        key={index}
+                        key={getRowKey(row, index)}
                         hover
                         selected={selected}
                         sx={{

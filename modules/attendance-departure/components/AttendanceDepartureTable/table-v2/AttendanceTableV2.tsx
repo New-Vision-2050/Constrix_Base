@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useMemo } from "react";
+
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Box, Button, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
@@ -10,29 +11,59 @@ import { getAttendanceColumns } from "./columns";
 import { fetchAttendanceData } from "./api";
 import { useAttendance } from "../../../context/AttendanceContext";
 import { AttendanceFilterParams } from "./types";
-import { ActionsColumn } from "./ActionsColumn";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { ColumnDef } from "@/components/headless/table";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
+import {
+  attendanceFiltersQueryKey,
+  defaultAttendanceFilters,
+  normalizeAttendanceFilters,
+  syncTableFiltersToContext,
+} from "./syncTableFiltersToContext";
 
-// Create typed table instance
 const AttendanceTable = HeadlessTableLayout<AttendanceStatusRecord>();
+const SEARCH_DEBOUNCE_MS = 400;
+
+function getAttendanceRowId(row: AttendanceStatusRecord): string {
+  return `${row.user?.id ?? "unknown"}-${row.work_date}-${row.id}`;
+}
 
 /**
  * Main attendance table component using headless table pattern
  */
 export const AttendanceTableV2: React.FC = () => {
   const t = useTranslations("AttendanceDepartureModule.Table");
-  const { setStartDate, setEndDate } = useAttendance();
+  const attendanceContext = useAttendance();
   const { can } = usePermissions();
 
-  // Filter state
-  const [filters, setFilters] = useState<AttendanceFilterParams>({
-    start_date: new Date().toISOString().split("T")[0],
-    end_date: new Date().toISOString().split("T")[0],
-  });
+  const [filters, setFilters] = useState<AttendanceFilterParams>(() =>
+    defaultAttendanceFilters(),
+  );
+  /** When true, search uses live input instead of debounced value (Search button / Enter). */
+  const [searchImmediate, setSearchImmediate] = useState(false);
 
-  // STEP 1: useTableParams hook
+  const debouncedSearchText = useDebouncedValue(
+    filters.search_text ?? "",
+    SEARCH_DEBOUNCE_MS,
+  );
+
+  const queryFilters = useMemo(() => {
+    const searchText = searchImmediate
+      ? (filters.search_text ?? "")
+      : debouncedSearchText;
+
+    return normalizeAttendanceFilters({
+      ...filters,
+      search_text: searchText,
+    });
+  }, [filters, debouncedSearchText, searchImmediate]);
+
+  const queryFiltersKey = useMemo(
+    () => attendanceFiltersQueryKey(queryFilters),
+    [queryFilters],
+  );
+
   const params = AttendanceTable.useTableParams({
     initialPage: 1,
     initialLimit: 10,
@@ -40,19 +71,28 @@ export const AttendanceTableV2: React.FC = () => {
     initialSortDirection: "asc",
   });
 
-  // STEP 2: Fetch data with React Query
-  const {
-    data: apiData,
-    isLoading,
-    refetch,
-  } = useQuery({
+  useEffect(() => {
+    syncTableFiltersToContext(queryFilters, attendanceContext);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync when query filters change
+  }, [queryFilters]);
+
+  useEffect(() => {
+    if (
+      searchImmediate &&
+      debouncedSearchText === (filters.search_text ?? "")
+    ) {
+      setSearchImmediate(false);
+    }
+  }, [searchImmediate, debouncedSearchText, filters.search_text]);
+
+  const { data: apiData, isLoading, refetch } = useQuery({
     queryKey: [
       "attendance",
       params.page,
       params.limit,
       params.sortBy,
       params.sortDirection,
-      filters,
+      ...queryFiltersKey,
     ],
     queryFn: () =>
       fetchAttendanceData(
@@ -60,7 +100,7 @@ export const AttendanceTableV2: React.FC = () => {
         params.limit,
         params.sortBy,
         params.sortDirection,
-        filters,
+        queryFilters,
       ),
   });
 
@@ -68,10 +108,8 @@ export const AttendanceTableV2: React.FC = () => {
   const totalPages = apiData?.totalPages || 1;
   const totalItems = apiData?.totalItems || 0;
 
-  // Check delete permission
   const canDelete = can(PERMISSIONS.attendance.attendance_departure.delete);
 
-  // Define columns with actions column
   const columns = useMemo<ColumnDef<AttendanceStatusRecord>[]>(() => {
     const baseColumns = getAttendanceColumns(t);
 
@@ -82,12 +120,7 @@ export const AttendanceTableV2: React.FC = () => {
           key: "actions",
           name: t("columns.actions") || "Actions",
           sortable: false,
-          render: (row) => (
-            // <ActionsColumn
-            //   row={row}
-            //   onRefetch={refetch}
-            //   canDelete={canDelete}
-            // />
+          render: () => (
             <Button size="small" disabled>
               {t("action")}
             </Button>
@@ -97,36 +130,40 @@ export const AttendanceTableV2: React.FC = () => {
     }
 
     return baseColumns;
-  }, [t, canDelete, refetch]);
+  }, [t, canDelete]);
 
-  // STEP 3: useTableState hook
   const state = AttendanceTable.useTableState({
     data,
     columns,
     totalPages,
     totalItems,
     params,
-    getRowId: (row: AttendanceStatusRecord) => row.id,
+    getRowId: getAttendanceRowId,
     loading: isLoading,
-    filtered: Object.values(filters).some((v) => v !== undefined && v !== ""),
+    filtered: queryFiltersKey.some((value) => value !== ""),
   });
 
-  // Handle filter changes
-  const handleFilterChange = (newFilters: AttendanceFilterParams) => {
-    setFilters(newFilters);
+  const handleFilterChange = useCallback(
+    (next: AttendanceFilterParams) => {
+      setFilters(next);
+      params.setPage(1);
+    },
+    [params],
+  );
+
+  const handleSearchNow = useCallback(() => {
+    setSearchImmediate(true);
     params.setPage(1);
+    refetch();
+  }, [params, refetch]);
 
-    // Update context dates
-    if (newFilters.start_date) setStartDate(new Date(newFilters.start_date));
-    if (newFilters.end_date) setEndDate(new Date(newFilters.end_date));
-  };
-
-  // Reset filters
-  const handleResetFilters = () => {
-    const today = new Date().toISOString().split("T")[0];
-    setFilters({ start_date: today, end_date: today });
+  const handleResetFilters = useCallback(() => {
+    const defaults = defaultAttendanceFilters();
+    setSearchImmediate(false);
+    setFilters(defaults);
+    syncTableFiltersToContext(defaults, attendanceContext);
     params.reset();
-  };
+  }, [attendanceContext, params]);
 
   return (
     <Box sx={{ p: 2 }}>
@@ -136,6 +173,7 @@ export const AttendanceTableV2: React.FC = () => {
             <AttendanceFilters
               filters={filters}
               onFilterChange={handleFilterChange}
+              onSearch={handleSearchNow}
               onReset={handleResetFilters}
             />
           </Stack>

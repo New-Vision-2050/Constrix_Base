@@ -1,5 +1,6 @@
 "use client";
-import React, { useMemo, useState } from "react";
+
+import React, { useMemo } from "react";
 import {
   Box,
   TextField,
@@ -8,15 +9,19 @@ import {
   Autocomplete,
   Typography,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import { Search, Refresh, Map } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
-import { AttendanceFiltersProps, DropdownOption } from "./types";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDropdownOptions } from "./api";
-import { baseURL } from "@/config/axios-config";
-import { Constraint } from "@/modules/attendance-departure/api/getConstraints";
+import { AttendanceFiltersProps, DropdownOption } from "./types";
+import {
+  fetchBranchOptions,
+  fetchConstraintOptions,
+  fetchManagementOptions,
+} from "./api";
 import { useAttendance } from "@/modules/attendance-departure/context/AttendanceContext";
+import { syncTableFiltersToContext } from "./syncTableFiltersToContext";
 
 /**
  * Filters component for attendance table search functionality
@@ -24,49 +29,84 @@ import { useAttendance } from "@/modules/attendance-departure/context/Attendance
 export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
   filters,
   onFilterChange,
+  onSearch,
   onReset,
 }) => {
   const t = useTranslations("AttendanceDepartureModule.Table.filters");
-  const [searchInput, setSearchInput] = useState("");
+  const {
+    toggleView,
+    setStartDate,
+    setEndDate,
+    setSearchText,
+    setSelectedBranch,
+    setSelectedDepartment,
+    setSelectedApprover,
+    setSelectedAttendanceStatus,
+  } = useAttendance();
 
-  const { toggleView } = useAttendance();
-
-  // Fetch branches for dropdown
-  const { data: branches = [] } = useQuery<DropdownOption[]>({
-    queryKey: ["branches"],
-    queryFn: () =>
-      fetchDropdownOptions(`${baseURL}/management_hierarchies/list`),
+  const { data: branches = [], isLoading: branchesLoading } = useQuery<
+    DropdownOption[]
+  >({
+    queryKey: ["attendance-filter-branches"],
+    queryFn: fetchBranchOptions,
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch managements for dropdown
-  const { data: managements = [] } = useQuery<DropdownOption[]>({
-    queryKey: ["managements"],
-    queryFn: () =>
-      fetchDropdownOptions(
-        `${baseURL}/management_hierarchies/list?type=management`
-      ),
+  const { data: managements = [], isLoading: managementsLoading } = useQuery<
+    DropdownOption[]
+  >({
+    queryKey: ["attendance-filter-managements"],
+    queryFn: fetchManagementOptions,
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch constraints for dropdown
-  const { data: constraints = [] } = useQuery<Constraint[]>({
-    queryKey: ["constraints"],
-    queryFn: () => fetchDropdownOptions(`${baseURL}/attendance/constraints`),
-  });
-  const constraintsOptions = useMemo(
-    () => constraints?.map((c) => ({ id: c.id, name: c.constraint_name })),
-    [constraints]
+  const { data: constraintsOptions = [], isLoading: constraintsLoading } =
+    useQuery<DropdownOption[]>({
+      queryKey: ["attendance-filter-constraints"],
+      queryFn: fetchConstraintOptions,
+      staleTime: 5 * 60 * 1000,
+    });
+
+  const branchValue = useMemo(
+    () =>
+      branches.find((b) => b.id === String(filters.branch_id ?? "")) ?? null,
+    [branches, filters.branch_id],
   );
 
-  const handleSearchClick = () => {
-    onFilterChange({ ...filters, search_text: searchInput });
+  const managementValue = useMemo(
+    () =>
+      managements.find((m) => m.id === String(filters.management_id ?? "")) ??
+      null,
+    [managements, filters.management_id],
+  );
+
+  const constraintValue = useMemo(
+    () =>
+      constraintsOptions.find(
+        (c) => c.id === String(filters.constraint_id ?? ""),
+      ) ?? null,
+    [constraintsOptions, filters.constraint_id],
+  );
+
+  const handleMapClick = () => {
+    syncTableFiltersToContext(filters, {
+      setStartDate,
+      setEndDate,
+      setSearchText,
+      setSelectedBranch,
+      setSelectedDepartment,
+      setSelectedApprover,
+      setSelectedAttendanceStatus,
+    });
+    onSearch();
+    toggleView("map");
   };
 
   return (
     <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
       <Stack spacing={2}>
-        {/* search title */}
         <Typography variant="h6">{t("searchTitle")}</Typography>
-        {/* Grid layout for filters - 3 items per row on md+, 1 item on mobile */}
+
         <Box
           sx={{
             display: "grid",
@@ -77,71 +117,127 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             gap: 2,
           }}
         >
-          {/* Search text field */}
           <TextField
             fullWidth
             size="small"
             variant="outlined"
             placeholder={t("searchPlaceholder")}
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
+            value={filters.search_text ?? ""}
+            onChange={(e) =>
+              onFilterChange({ ...filters, search_text: e.target.value })
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSearch();
+            }}
             InputProps={{
-              startAdornment: <Search sx={{ mr: 1, color: "text.secondary" }} />,
+              startAdornment: (
+                <Search sx={{ mr: 1, color: "text.secondary" }} />
+              ),
             }}
           />
 
-          {/* Branch filter */}
           <Autocomplete
             fullWidth
             size="small"
+            loading={branchesLoading}
             options={branches}
             getOptionLabel={(option) => option.name}
-            value={branches.find((b) => b.id === filters.branch_id) || null}
+            getOptionKey={(option) => option.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={branchValue}
             onChange={(_, value) =>
-              onFilterChange({ ...filters, branch_id: value?.id || "" })
+              onFilterChange({
+                ...filters,
+                branch_id: value?.id != null ? String(value.id) : "",
+              })
             }
             renderInput={(params) => (
-              <TextField {...params} placeholder={t("branchPlaceholder")} />
+              <TextField
+                {...params}
+                placeholder={t("branchPlaceholder")}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {branchesLoading ? (
+                        <CircularProgress color="inherit" size={16} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
             )}
           />
 
-          {/* Management filter */}
           <Autocomplete
             fullWidth
             size="small"
+            loading={managementsLoading}
             options={managements}
             getOptionLabel={(option) => option.name}
-            value={
-              managements.find((m) => m.id === filters.management_id) || null
-            }
+            getOptionKey={(option) => option.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={managementValue}
             onChange={(_, value) =>
-              onFilterChange({ ...filters, management_id: value?.id || "" })
+              onFilterChange({
+                ...filters,
+                management_id: value?.id != null ? String(value.id) : "",
+              })
             }
             renderInput={(params) => (
-              <TextField {...params} placeholder={t("managementPlaceholder")} />
+              <TextField
+                {...params}
+                placeholder={t("managementPlaceholder")}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {managementsLoading ? (
+                        <CircularProgress color="inherit" size={16} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
             )}
           />
 
-          {/* Constraint filter */}
           <Autocomplete
             fullWidth
             size="small"
+            loading={constraintsLoading}
             options={constraintsOptions}
             getOptionLabel={(option) => option.name}
-            value={
-              constraintsOptions.find((c) => c.id === filters.constraint_id) ||
-              null
-            }
+            getOptionKey={(option) => option.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={constraintValue}
             onChange={(_, value) =>
-              onFilterChange({ ...filters, constraint_id: value?.id || "" })
+              onFilterChange({
+                ...filters,
+                constraint_id: value?.id != null ? String(value.id) : "",
+              })
             }
             renderInput={(params) => (
-              <TextField {...params} placeholder={t("constraintPlaceholder")} />
+              <TextField
+                {...params}
+                placeholder={t("constraintPlaceholder")}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {constraintsLoading ? (
+                        <CircularProgress color="inherit" size={16} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
             )}
           />
 
-          {/* Attendance status */}
           <TextField
             fullWidth
             select
@@ -163,7 +259,6 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             <MenuItem value="present">{t("statusPresent")}</MenuItem>
           </TextField>
 
-          {/* Start Date filter */}
           <TextField
             type="date"
             size="small"
@@ -175,7 +270,6 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             InputLabelProps={{ shrink: true }}
           />
 
-          {/* End Date filter */}
           <TextField
             type="date"
             size="small"
@@ -188,24 +282,15 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
           />
         </Box>
 
-        {/* Action buttons */}
         <Stack direction="row" spacing={2} justifyContent="flex-end">
-          <Button
-            variant="contained"
-            startIcon={<Map />}
-            onClick={() => toggleView("map")}
-          >
+          <Button variant="contained" startIcon={<Map />} onClick={handleMapClick}>
             {t("mapView")}
           </Button>
           <Button variant="outlined" startIcon={<Refresh />} onClick={onReset}>
-            {t("reset") || "Reset"}
+            {t("reset")}
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<Search />}
-            onClick={handleSearchClick}
-          >
-            {t("search") || "Search"}
+          <Button variant="contained" startIcon={<Search />} onClick={onSearch}>
+            {t("search")}
           </Button>
         </Stack>
       </Stack>
