@@ -20,6 +20,7 @@ import {
   fetchConstraintOptions,
   fetchManagementOptions,
 } from "./api";
+import { CONSTRAINTS_PER_PAGE } from "@/modules/attendance-departure/api/getConstraints";
 import { useAttendance } from "@/modules/attendance-departure/context/AttendanceContext";
 import { syncTableFiltersToContext } from "./syncTableFiltersToContext";
 
@@ -62,7 +63,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
 
   const { data: constraintsOptions = [], isLoading: constraintsLoading } =
     useQuery<DropdownOption[]>({
-      queryKey: ["attendance-filter-constraints"],
+      queryKey: ["attendance-filter-constraints", CONSTRAINTS_PER_PAGE],
       queryFn: fetchConstraintOptions,
       staleTime: 5 * 60 * 1000,
     });
