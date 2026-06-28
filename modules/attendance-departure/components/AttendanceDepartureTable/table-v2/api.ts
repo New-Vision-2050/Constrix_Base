@@ -1,6 +1,6 @@
 import { apiClient } from "@/config/axios-config";
 import getHierarchies from "@/modules/attendance-departure/api/getHierarchies";
-import { getAllConstraintsForSelect } from "@/modules/attendance-departure/api/getConstraints";
+import { getConstraintsPage } from "@/modules/attendance-departure/api/getConstraints";
 import {
   AttendanceApiResponse,
   AttendanceFilterParams,
@@ -86,11 +86,21 @@ export async function fetchManagementOptions(): Promise<DropdownOption[]> {
   return payload.map((item) => ({ id: String(item.id), name: item.name }));
 }
 
-export async function fetchConstraintOptions(): Promise<DropdownOption[]> {
-  const payload = await getAllConstraintsForSelect();
+export async function fetchConstraintsPage(page: number): Promise<{
+  items: DropdownOption[];
+  currentPage: number;
+  lastPage: number;
+  hasMore: boolean;
+}> {
+  const result = await getConstraintsPage(page);
 
-  return payload.map((item) => ({
-    id: String(item.id),
-    name: item.constraint_name,
-  }));
+  return {
+    currentPage: result.currentPage,
+    lastPage: result.lastPage,
+    hasMore: result.hasMore,
+    items: result.items.map((item) => ({
+      id: String(item.id),
+      name: item.constraint_name,
+    })),
+  };
 }

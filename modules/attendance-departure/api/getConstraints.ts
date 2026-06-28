@@ -21,7 +21,7 @@ type GetConstraintsParams = {
 };
 
 /** Matches `/attendance/constraints?per_page=10&page=1` */
-export const CONSTRAINTS_PER_PAGE = 1000;
+export const CONSTRAINTS_PER_PAGE = 10;
 
 /**
  * Single page: GET `/attendance/constraints?per_page={n}&page={n}`
@@ -43,27 +43,75 @@ export default async function getConstraints(
   return Array.isArray(payload) ? payload : [];
 }
 
+export type ConstraintsPageResult = {
+  items: Constraint[];
+  currentPage: number;
+  lastPage: number;
+  hasMore: boolean;
+};
+
+function parseConstraintsPagination(
+  pagination: ResponseT["pagination"] | undefined,
+  requestedPage: number,
+  itemCount: number,
+): Pick<ConstraintsPageResult, "currentPage" | "lastPage" | "hasMore"> {
+  const currentPage = Number(pagination?.page ?? requestedPage) || requestedPage;
+  const lastPageValue = pagination?.last_page;
+
+  if (lastPageValue != null && !Number.isNaN(Number(lastPageValue))) {
+    const lastPage = Number(lastPageValue);
+    return {
+      currentPage,
+      lastPage,
+      hasMore: currentPage < lastPage,
+    };
+  }
+
+  const hasMore = itemCount >= CONSTRAINTS_PER_PAGE;
+  return {
+    currentPage,
+    lastPage: hasMore ? currentPage + 1 : currentPage,
+    hasMore,
+  };
+}
+
+export async function getConstraintsPage(
+  page: number,
+): Promise<ConstraintsPageResult> {
+  const res = await apiClient.get<ResponseT>("/attendance/constraints", {
+    params: {
+      per_page: CONSTRAINTS_PER_PAGE,
+      page,
+    },
+  });
+
+  const items = Array.isArray(res.data.payload) ? res.data.payload : [];
+  const pagination = parseConstraintsPagination(
+    res.data.pagination,
+    page,
+    items.length,
+  );
+
+  return {
+    items,
+    ...pagination,
+  };
+}
+
 /**
  * Loads every constraint for selects by paging with `per_page=10`.
  */
 export async function getAllConstraintsForSelect(): Promise<Constraint[]> {
   const merged: Constraint[] = [];
   let page = 1;
-  let lastPage = 1;
+  let hasMore = true;
 
-  do {
-    const res = await apiClient.get<ResponseT>("/attendance/constraints", {
-      params: {
-        per_page: CONSTRAINTS_PER_PAGE,
-        page,
-      },
-    });
-
-    const payload = Array.isArray(res.data.payload) ? res.data.payload : [];
-    merged.push(...payload);
-    lastPage = res.data.pagination?.last_page ?? 1;
+  while (hasMore) {
+    const result = await getConstraintsPage(page);
+    merged.push(...result.items);
+    hasMore = result.hasMore;
     page += 1;
-  } while (page <= lastPage);
+  }
 
   return merged;
 }

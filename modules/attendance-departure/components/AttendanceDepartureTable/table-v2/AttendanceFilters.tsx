@@ -17,10 +17,9 @@ import { useQuery } from "@tanstack/react-query";
 import { AttendanceFiltersProps, DropdownOption } from "./types";
 import {
   fetchBranchOptions,
-  fetchConstraintOptions,
   fetchManagementOptions,
 } from "./api";
-import { CONSTRAINTS_PER_PAGE } from "@/modules/attendance-departure/api/getConstraints";
+import { usePaginatedConstraintOptions } from "./usePaginatedConstraintOptions";
 import { useAttendance } from "@/modules/attendance-departure/context/AttendanceContext";
 import { syncTableFiltersToContext } from "./syncTableFiltersToContext";
 
@@ -61,12 +60,12 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: constraintsOptions = [], isLoading: constraintsLoading } =
-    useQuery<DropdownOption[]>({
-      queryKey: ["attendance-filter-constraints", CONSTRAINTS_PER_PAGE],
-      queryFn: fetchConstraintOptions,
-      staleTime: 5 * 60 * 1000,
-    });
+  const {
+    options: constraintsOptions,
+    isLoading: constraintsLoading,
+    isFetchingNextPage: constraintsFetchingNextPage,
+    listboxSlotProps: constraintsListboxSlotProps,
+  } = usePaginatedConstraintOptions();
 
   const branchValue = useMemo(
     () =>
@@ -208,12 +207,20 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
           <Autocomplete
             fullWidth
             size="small"
-            loading={constraintsLoading}
+            loading={constraintsLoading || constraintsFetchingNextPage}
             options={constraintsOptions}
+            filterOptions={(options) => options}
             getOptionLabel={(option) => option.name}
             getOptionKey={(option) => option.id}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={constraintValue}
+            slotProps={{
+              listbox: constraintsListboxSlotProps,
+            }}
+            ListboxProps={{
+              onScroll: constraintsListboxSlotProps.onScroll,
+              style: { maxHeight: 280, overflow: "auto" },
+            }}
             onChange={(_, value) =>
               onFilterChange({
                 ...filters,
@@ -228,7 +235,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
                   ...params.InputProps,
                   endAdornment: (
                     <>
-                      {constraintsLoading ? (
+                      {constraintsLoading || constraintsFetchingNextPage ? (
                         <CircularProgress color="inherit" size={16} />
                       ) : null}
                       {params.InputProps.endAdornment}
