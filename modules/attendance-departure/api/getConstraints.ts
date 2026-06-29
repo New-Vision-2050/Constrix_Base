@@ -18,6 +18,7 @@ type ResponseT = {
 type GetConstraintsParams = {
   page?: number;
   per_page?: number;
+  name?: string;
 };
 
 /** Matches `/attendance/constraints?per_page=10&page=1` */
@@ -36,6 +37,7 @@ export default async function getConstraints(
     params: {
       per_page: params.per_page ?? CONSTRAINTS_PER_PAGE,
       page: params.page ?? 1,
+      ...(params.name ? { name: params.name } : {}),
     },
   });
 
@@ -77,11 +79,13 @@ function parseConstraintsPagination(
 
 export async function getConstraintsPage(
   page: number,
+  name?: string,
 ): Promise<ConstraintsPageResult> {
   const res = await apiClient.get<ResponseT>("/attendance/constraints", {
     params: {
       per_page: CONSTRAINTS_PER_PAGE,
       page,
+      ...(name ? { name } : {}),
     },
   });
 

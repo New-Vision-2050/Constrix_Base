@@ -6,7 +6,7 @@ import { CONSTRAINTS_PER_PAGE } from "@/modules/attendance-departure/api/getCons
 import { fetchConstraintsPage } from "./api";
 import type { DropdownOption } from "./types";
 
-export function usePaginatedConstraintOptions() {
+export function usePaginatedConstraintOptions(search?: string) {
   const {
     data,
     isLoading,
@@ -14,8 +14,8 @@ export function usePaginatedConstraintOptions() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ["attendance-filter-constraints", CONSTRAINTS_PER_PAGE],
-    queryFn: ({ pageParam }) => fetchConstraintsPage(pageParam),
+    queryKey: ["attendance-filter-constraints", search, CONSTRAINTS_PER_PAGE],
+    queryFn: ({ pageParam }) => fetchConstraintsPage(pageParam, search),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _allPages, lastPageParam) =>
       lastPage.hasMore ? lastPageParam + 1 : undefined,

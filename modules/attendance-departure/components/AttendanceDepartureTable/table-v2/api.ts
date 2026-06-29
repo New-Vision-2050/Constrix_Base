@@ -86,13 +86,16 @@ export async function fetchManagementOptions(): Promise<DropdownOption[]> {
   return payload.map((item) => ({ id: String(item.id), name: item.name }));
 }
 
-export async function fetchConstraintsPage(page: number): Promise<{
+export async function fetchConstraintsPage(
+  page: number,
+  name?: string,
+): Promise<{
   items: DropdownOption[];
   currentPage: number;
   lastPage: number;
   hasMore: boolean;
 }> {
-  const result = await getConstraintsPage(page);
+  const result = await getConstraintsPage(page, name);
 
   return {
     currentPage: result.currentPage,
