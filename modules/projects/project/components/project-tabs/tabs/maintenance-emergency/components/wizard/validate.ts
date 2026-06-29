@@ -16,12 +16,6 @@ export function validateStep(
     if (!data.contractor_name?.trim()) {
       errors.contractor_name = "required";
     }
-    if (data.contractor_mobile?.trim()) {
-      const saMobile = /^05\d{8}$/;
-      if (!saMobile.test(data.contractor_mobile.trim())) {
-        errors.contractor_mobile = "invalidMobile";
-      }
-    }
   }
 
   if (step === 3) {
@@ -37,9 +31,6 @@ export function validateStep(
     }
     if (!data.location_radius || data.location_radius <= 0) {
       errors.location_radius = "required";
-    }
-    if (!data.repair_point?.trim()) {
-      errors.repair_point = "required";
     }
   }
 
@@ -58,8 +49,8 @@ export function validateStep(
 export function firstStepWithError(errors: WizardFormErrors): 1 | 2 | 3 | 4 | 5 | null {
   const stepFields: Record<1 | 2 | 3 | 4 | 5, string[]> = {
     1: ["notification_type"],
-    2: ["contractor_name", "contractor_mobile"],
-    3: ["task_latitude", "task_longitude", "location_radius", "repair_point"],
+    2: ["contractor_name"],
+    3: ["task_latitude", "task_longitude", "location_radius"],
     4: ["assigned_user_id"],
     5: [],
   };

@@ -79,6 +79,7 @@ export default function ProjectNotificationMap({
   const notificationMarkerRef = useRef<google.maps.Marker | null>(null);
   const circleRef = useRef<google.maps.Circle | null>(null);
   const employeeMarkersRef = useRef<google.maps.Marker[]>([]);
+  const employeeInfoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const polygonRefs = useRef<google.maps.Polygon[]>([]);
   const polylineRef = useRef<google.maps.Polyline | null>(null);
   const clickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
@@ -341,22 +342,27 @@ export default function ProjectNotificationMap({
 
     employeeMarkersRef.current.forEach((marker) => marker.setMap(null));
     employeeMarkersRef.current = [];
+    employeeInfoWindowRef.current?.close();
 
     if (!showEmployees) return;
 
+    if (!employeeInfoWindowRef.current) {
+      employeeInfoWindowRef.current = new window.google.maps.InfoWindow({
+        maxWidth: 280,
+      });
+    }
+
     employees.forEach((employee) => {
-      if (!employee.location?.latitude || !employee.location?.longitude) return;
-      const position = {
-        lat: employee.location.latitude,
-        lng: employee.location.longitude,
-      };
+      const lat = Number(employee.location?.latitude);
+      const lng = Number(employee.location?.longitude);
+      if (!lat || !lng) return;
+      const position = { lat, lng };
       const color = statusColors[employee.status] ?? "#6b7280";
       const isSelected = employee.user_id === selectedUserId;
 
       const marker = new window.google.maps.Marker({
         map: mapInstance,
         position,
-        title: `${employee.name} — ${employee.status_label}`,
         icon: {
           path: window.google.maps.SymbolPath.CIRCLE,
           fillColor: color,
@@ -367,16 +373,30 @@ export default function ProjectNotificationMap({
         },
       });
 
-      const infoWindow = new window.google.maps.InfoWindow({
-        content: `<div style="direction:rtl;text-align:right;font-family:Arial,sans-serif">
-          <strong>${employee.name}</strong><br/>
-          ${employee.status_label}<br/>
-          ${employee.distance_label}
-        </div>`,
+      const infoLines = [
+        employee.name || "غير معروف",
+        employee.status_label || employee.status || "لا توجد حالة",
+        employee.distance_label || "لا يوجد مسافة",
+        employee.branch || null,
+        employee.last_update ? `آخر تحديث: ${employee.last_update}` : null,
+      ].filter((line): line is string => Boolean(line));
+
+      const content = `<div style="direction:rtl;text-align:right;font-family:Arial,sans-serif;padding:8px;color:#000;background:#fff;min-width:120px;border-radius:4px">
+        ${infoLines.length > 0 ? infoLines.join("<br/>") : "لا توجد بيانات"}
+      </div>`;
+
+      marker.addListener("mouseover", () => {
+        employeeInfoWindowRef.current?.setContent(content);
+        employeeInfoWindowRef.current?.open(mapInstance, marker);
+      });
+
+      marker.addListener("mouseout", () => {
+        employeeInfoWindowRef.current?.close();
       });
 
       marker.addListener("click", () => {
-        infoWindow.open(mapInstance, marker);
+        employeeInfoWindowRef.current?.setContent(content);
+        employeeInfoWindowRef.current?.open(mapInstance, marker);
         onSelectEmployee?.(employee.user_id);
       });
 
@@ -393,12 +413,14 @@ export default function ProjectNotificationMap({
     if (!showPolyline || !selectedUserId) return;
 
     const selectedEmployee = employees.find((e) => e.user_id === selectedUserId);
-    if (!selectedEmployee?.location?.latitude || !selectedEmployee?.location?.longitude) return;
+    const selLat = Number(selectedEmployee?.location?.latitude);
+    const selLng = Number(selectedEmployee?.location?.longitude);
+    if (!selLat || !selLng) return;
 
     polylineRef.current = new window.google.maps.Polyline({
       map: mapInstance,
       path: [
-        { lat: selectedEmployee.location.latitude, lng: selectedEmployee.location.longitude },
+        { lat: selLat, lng: selLng },
         activeCenter,
       ],
       geodesic: true,
@@ -512,6 +534,8 @@ export default function ProjectNotificationMap({
           polygonRefs.current = [];
           employeeMarkersRef.current.forEach((marker) => marker.setMap(null));
           employeeMarkersRef.current = [];
+          employeeInfoWindowRef.current?.close();
+          employeeInfoWindowRef.current = null;
           polylineRef.current?.setMap(null);
           polylineRef.current = null;
           mapRef.current = null;

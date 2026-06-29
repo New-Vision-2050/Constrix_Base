@@ -2,7 +2,6 @@ import type {
   CreateProjectNotificationArgs,
   UpdateProjectNotificationArgs,
 } from "@/services/api/projects/notifications/types/args";
-import type { NotificationSeverity } from "@/services/api/projects/notifications/types/response";
 import type { WizardFormData } from "./types";
 
 export function buildCreatePayload(
@@ -11,10 +10,9 @@ export function buildCreatePayload(
 ): CreateProjectNotificationArgs {
   return {
     project_id: projectId,
+    notification_number: data.notification_number || null,
     notification_type: data.notification_type,
-    severity: data.severity ? (data.severity as NotificationSeverity) : null,
     feeder_number: data.feeder_number || null,
-    work_type: data.work_type || null,
     work_description: data.work_description || null,
     task_date: data.task_date || null,
     duration_hours: data.duration_hours || null,
@@ -25,9 +23,7 @@ export function buildCreatePayload(
     contractor_number: data.contractor_number || null,
     contractor_technical_name: data.contractor_technical_name || null,
     contractor_technical_number: data.contractor_technical_number || null,
-    contractor_category: data.contractor_category || null,
     contractor_notes: data.contractor_notes || null,
-    contractor_mobile: data.contractor_mobile || null,
 
     task_latitude: data.task_latitude ?? 0,
     task_longitude: data.task_longitude ?? 0,
@@ -48,10 +44,9 @@ export function buildUpdatePayload(
   return {
     id,
     project_id: projectId,
+    notification_number: data.notification_number || null,
     notification_type: data.notification_type,
-    severity: data.severity ? (data.severity as NotificationSeverity) : null,
     feeder_number: data.feeder_number || null,
-    work_type: data.work_type || null,
     work_description: data.work_description || null,
     task_date: data.task_date || null,
     duration_hours: data.duration_hours || null,
@@ -62,9 +57,7 @@ export function buildUpdatePayload(
     contractor_number: data.contractor_number || null,
     contractor_technical_name: data.contractor_technical_name || null,
     contractor_technical_number: data.contractor_technical_number || null,
-    contractor_category: data.contractor_category || null,
     contractor_notes: data.contractor_notes || null,
-    contractor_mobile: data.contractor_mobile || null,
 
     task_latitude: data.task_latitude ?? 0,
     task_longitude: data.task_longitude ?? 0,
