@@ -139,7 +139,7 @@ export const projectMessages = new MessagesGroup({
     attachFile: _m("Attach File", "ارفاق ملف"),
     notes: _m("Notes", "ملاحظات"),
     save: _m("Save", "حفظ"),
-    saveWithNotes: _m("Approve with notes", "اعتماد بملاحظات"),
+    saveWithNotes: _m("Save with notes", "حفظ بملاحظات"),
     saveViewerChangesSuccess: _m(
       "Document changes saved",
       "تم حفظ تغييرات المستند",
