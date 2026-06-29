@@ -553,9 +553,16 @@ export default function AttachmentRequestDetailDialog({
 
   const [fileViewerOpen, setFileViewerOpen] = useState(false);
   const [activeFile, setActiveFile] = useState<DocumentAttachment | null>(null);
+  const [localDocument, setLocalDocument] = useState<DocumentRow | null>(null);
   const [itemsWithSavedNotes, setItemsWithSavedNotes] = useState<Set<string>>(
     () => new Set(),
   );
+
+  useEffect(() => {
+    if (document) {
+      setLocalDocument(document);
+    }
+  }, [document]);
 
   useEffect(() => {
     if (!open) {
@@ -594,6 +601,19 @@ export default function AttachmentRequestDetailDialog({
 
   const handleAnnotationsSaved = (itemId: string) => {
     setItemsWithSavedNotes((prev) => new Set(prev).add(itemId));
+  };
+
+  const handleFileUpdated = (file: DocumentAttachment) => {
+    setActiveFile(file);
+    setLocalDocument((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        attachments: prev.attachments?.map((attachment) =>
+          attachment.id === file.id ? file : attachment,
+        ),
+      };
+    });
   };
 
   const handleApproveWithNotes = () => {
@@ -665,7 +685,7 @@ export default function AttachmentRequestDetailDialog({
     declineMutation.isPending ||
     approveWithNotesMutation.isPending;
 
-  if (!document) return null;
+  if (!document || !localDocument) return null;
 
   const handleFileClick = (file: DocumentAttachment) => {
     setActiveFile(file);
@@ -727,7 +747,7 @@ export default function AttachmentRequestDetailDialog({
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 8.5 }}>
               <DetailMain
-                document={document}
+                document={localDocument}
                 t={t}
                 isRTL={isRTL}
                 onFileView={handleFileClick}
@@ -741,7 +761,7 @@ export default function AttachmentRequestDetailDialog({
               />
             </Grid>
             <Grid size={{ xs: 12, md: 3.5 }}>
-              <DetailSidebar document={document} t={t} />
+              <DetailSidebar document={localDocument} t={t} />
             </Grid>
           </Grid>
         </DialogContent>
@@ -753,10 +773,11 @@ export default function AttachmentRequestDetailDialog({
           setFileViewerOpen(false);
           setActiveFile(null);
         }}
-        document={document}
+        document={localDocument}
         activeFile={activeFile}
         isIncoming={variant === "incoming"}
         onAnnotationsSaved={handleAnnotationsSaved}
+        onFileUpdated={handleFileUpdated}
       />
     </>
   );

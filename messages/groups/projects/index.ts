@@ -139,7 +139,7 @@ export const projectMessages = new MessagesGroup({
     attachFile: _m("Attach File", "ارفاق ملف"),
     notes: _m("Notes", "ملاحظات"),
     save: _m("Save", "حفظ"),
-    saveWithNotes: _m("Approve with notes", "اعتماد بملاحظات"),
+    saveWithNotes: _m("Save with notes", "حفظ بملاحظات"),
     saveViewerChangesSuccess: _m(
       "Document changes saved",
       "تم حفظ تغييرات المستند",
@@ -424,6 +424,8 @@ export const projectMessages = new MessagesGroup({
       clearFilters: _m("Clear filters", "مسح التصفية"),
       number: _m("Number", "الرقم"),
       notificationNumber: _m("Notification Number", "رقم الإشعار"),
+      notification_number: _m("Notification Number", "رقم الإشعار"),
+      notificationType: _m("Notification Type", "نوع الاشعار"),
       magdy_number: _m("Magdy Number", "رقم مجدي"),
       feeder_number: _m("Feeder Number", "رقم المغذي"),
       date: _m("Date", "التاريخ"),
@@ -524,7 +526,7 @@ export const projectMessages = new MessagesGroup({
       readyToSend: _m("Ready to send", "جاهز للإرسال"),
       locationConfirmed: _m("Location confirmed successfully", "تم تحديد الموقع بنجاح"),
       dropPin: _m("Drop pin", "نقطة على الخريطة"),
-      parseLink: _m("Parse link", "رابط من جوال"),
+      parseLink: _m("Parse link", "التحديد من الرابط"),
       parseLinkPlaceholder: _m("Paste Google Maps link", "الصق رابط Google Maps"),
       invalidLocationLink: _m("Invalid location link", "رابط موقع غير صالح"),
       locationOutsideAllowedZone: _m(

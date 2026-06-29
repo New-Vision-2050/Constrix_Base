@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Checkbox,
@@ -46,8 +47,6 @@ import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 import {
   EMPTY_FORM,
   NOTIFICATION_TYPE_OPTIONS,
-  SEVERITY_OPTIONS,
-  WORK_TYPE_OPTIONS,
   type WizardFormData,
   type WizardFormErrors,
   type WizardStep,
@@ -158,6 +157,10 @@ export default function CreateNotificationWizard({
     const validation = validateStep(step, data);
     if (!validation.valid) {
       setErrors(validation.errors);
+      return;
+    }
+    if (step === 3 && !isInsideAllowedZone) {
+      toast.error(t("locationOutsideAllowedZone"));
       return;
     }
     if (step < STEP_COUNT) {
@@ -370,10 +373,22 @@ function Step1Form({
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
+          fullWidth
+          size="small"
+          label={t("notification_number", { defaultValue: "رقم الإشعار" })}
+          value={data.notification_number}
+          onChange={(e) => onChange("notification_number", e.target.value)}
+          error={Boolean(errors.notification_number)}
+          helperText={errors.notification_number}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
           select
           fullWidth
           size="small"
-          label={t("type")}
+          label={t("notificationType", { defaultValue: "نوع الاشعار" })}
           value={data.notification_type}
           onChange={(e) => onChange("notification_type", e.target.value)}
           error={Boolean(errors.notification_type)}
@@ -389,52 +404,14 @@ function Step1Form({
 
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
-          select
           fullWidth
           size="small"
-          label={t("severity")}
-          value={data.severity}
-          onChange={(e) => onChange("severity", e.target.value)}
-          error={Boolean(errors.severity)}
-          helperText={errors.severity}
-        >
-          {SEVERITY_OPTIONS.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {t(`severities.${option.label}`)}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("feeder_number", { defaultValue: "Feeder number" })}
+          label={t("feeder_number", { defaultValue: "رقم المغذي" })}
           value={data.feeder_number}
           onChange={(e) => onChange("feeder_number", e.target.value)}
           error={Boolean(errors.feeder_number)}
           helperText={errors.feeder_number}
         />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          select
-          fullWidth
-          size="small"
-          label={t("workType")}
-          value={data.work_type}
-          onChange={(e) => onChange("work_type", e.target.value)}
-          error={Boolean(errors.work_type)}
-          helperText={errors.work_type}
-        >
-          {WORK_TYPE_OPTIONS.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {t(`workTypes.${option.label}`)}
-            </MenuItem>
-          ))}
-        </TextField>
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -518,26 +495,25 @@ function Step2Form({
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          select
+        <Autocomplete
           fullWidth
           size="small"
-          label={t("contractor")}
-          value={data.contractor_id}
-          onChange={(e) => handleContractorChange(e.target.value)}
-          error={Boolean(errors.contractor_name)}
-          helperText={errors.contractor_name}
-          disabled={contractorsQuery.isLoading}
-        >
-          <MenuItem value="">
-            {t("chooseContractor", { defaultValue: "Choose contractor" })}
-          </MenuItem>
-          {contractors.map((contractor) => (
-            <MenuItem key={contractor.id} value={contractor.id}>
-              {contractor.name}
-            </MenuItem>
-          ))}
-        </TextField>
+          options={contractors}
+          loading={contractorsQuery.isLoading}
+          getOptionLabel={(option) => option.name ?? ""}
+          isOptionEqualToValue={(option, value) => option.id === value?.id}
+          value={contractors.find((c) => c.id === data.contractor_id) ?? null}
+          onChange={(_e, value) => handleContractorChange(value?.id ?? "")}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("contractor")}
+              error={Boolean(errors.contractor_name)}
+              helperText={errors.contractor_name}
+              placeholder={t("chooseContractor", { defaultValue: "Choose contractor" })}
+            />
+          )}
+        />
       </Grid>
 
       <Grid size={{ xs: 12, md: 6 }}>
@@ -546,7 +522,7 @@ function Step2Form({
           size="small"
           label={t("contractorNumber")}
           value={data.contractor_number}
-          InputProps={{ readOnly: true }}
+          onChange={(e) => onChange("contractor_number", e.target.value)}
         />
       </Grid>
 
@@ -567,28 +543,6 @@ function Step2Form({
           label={t("contractorTechnicalNumber")}
           value={data.contractor_technical_number}
           onChange={(e) => onChange("contractor_technical_number", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("contractorCategory")}
-          value={data.contractor_category}
-          onChange={(e) => onChange("contractor_category", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("contractorMobile")}
-          value={data.contractor_mobile}
-          onChange={(e) => onChange("contractor_mobile", e.target.value)}
-          error={Boolean(errors.contractor_mobile)}
-          helperText={errors.contractor_mobile}
         />
       </Grid>
 
@@ -655,11 +609,6 @@ function Step3Form({
     }
   }
 
-  function dropPinAtCenter() {
-    setLocation(center.lat, center.lng);
-    toast.success(t("locationConfirmed"));
-  }
-
   return (
     <Stack spacing={2}>
       <ProjectNotificationMap
@@ -721,26 +670,6 @@ function Step3Form({
             helperText={errors.location_radius}
             inputProps={{ min: 1 }}
           />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 8 }}>
-          <TextField
-            fullWidth
-            size="small"
-            label={t("repairPoint")}
-            value={data.repair_point}
-            onChange={(e) => onChange("repair_point", e.target.value)}
-            error={Boolean(errors.repair_point)}
-            helperText={errors.repair_point}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Stack direction="row" spacing={1} sx={{ height: "100%" }}>
-            <Button variant="outlined" onClick={dropPinAtCenter}>
-              {t("dropPin")}
-            </Button>
-          </Stack>
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>
@@ -996,8 +925,8 @@ function Step4Form({
                         <TableCell>
                           {hasLocation ? (
                             <Typography variant="caption" color="text.secondary">
-                              {employee.location?.latitude?.toFixed(4)},{" "}
-                              {employee.location?.longitude?.toFixed(4)}
+                              {Number(employee.location?.latitude)?.toFixed(4)},{" "}
+                              {Number(employee.location?.longitude)?.toFixed(4)}
                             </Typography>
                           ) : (
                             <Typography variant="caption" color="text.secondary">
@@ -1048,9 +977,9 @@ function Step5Form({
       <SummaryCard
         title={t("summaryNotification")}
         rows={[
-          { label: t("type"), value: data.notification_type },
-          { label: t("severity"), value: data.severity },
-          { label: t("feeder_number", { defaultValue: "Feeder number" }), value: data.feeder_number },
+          { label: t("notification_number", { defaultValue: "رقم الإشعار" }), value: data.notification_number },
+          { label: t("notificationType", { defaultValue: "نوع الاشعار" }), value: data.notification_type },
+          { label: t("feeder_number", { defaultValue: "رقم المغذي" }), value: data.feeder_number },
           { label: t("description"), value: data.work_description },
         ]}
       />
@@ -1061,7 +990,7 @@ function Step5Form({
           { label: t("contractor"), value: data.contractor_name },
           { label: t("contractorNumber"), value: data.contractor_number },
           { label: t("contractorTechnicalName", { defaultValue: "Contractor technical name" }), value: data.contractor_technical_name },
-          { label: t("contractorMobile"), value: data.contractor_mobile },
+          { label: t("contractorTechnicalNumber"), value: data.contractor_technical_number },
         ]}
       />
 
@@ -1072,7 +1001,6 @@ function Step5Form({
             label: t("coordinates"),
             value: `${data.task_latitude ?? ""}, ${data.task_longitude ?? ""}`,
           },
-          { label: t("repairPoint"), value: data.repair_point },
           { label: t("locationRadius"), value: `${data.location_radius} ${t("meters")}` },
         ]}
       >
@@ -1082,7 +1010,10 @@ function Step5Form({
               center={{ lat: data.task_latitude, lng: data.task_longitude }}
               radius={data.location_radius}
               height="160px"
-              showEmployees={false}
+              employees={selectedEmployee ? [selectedEmployee] : []}
+              selectedUserId={data.assigned_user_id}
+              showEmployees={Boolean(selectedEmployee)}
+              showPolyline={Boolean(selectedEmployee)}
               interactivePin={false}
               showPin={data.task_latitude != null && data.task_longitude != null}
             />

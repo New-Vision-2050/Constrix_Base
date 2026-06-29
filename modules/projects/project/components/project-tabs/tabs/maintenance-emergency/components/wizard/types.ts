@@ -4,10 +4,9 @@ export type WizardStep = 1 | 2 | 3 | 4 | 5;
 
 export interface WizardFormData {
   // Step 1
+  notification_number: string;
   notification_type: string;
-  severity: string;
   feeder_number: string;
-  work_type: string;
   work_description: string;
   task_date: string;
   duration_hours: number;
@@ -19,9 +18,7 @@ export interface WizardFormData {
   contractor_number: string;
   contractor_technical_name: string;
   contractor_technical_number: string;
-  contractor_category: string;
   contractor_notes: string;
-  contractor_mobile: string;
 
   // Step 3
   task_latitude: number | null;
@@ -41,10 +38,9 @@ export interface WizardFormErrors {
 }
 
 export const EMPTY_FORM: WizardFormData = {
+  notification_number: "",
   notification_type: "",
-  severity: "",
   feeder_number: "",
-  work_type: "",
   work_description: "",
   task_date: new Date().toISOString().split("T")[0],
   duration_hours: 4,
@@ -55,9 +51,7 @@ export const EMPTY_FORM: WizardFormData = {
   contractor_number: "",
   contractor_technical_name: "",
   contractor_technical_number: "",
-  contractor_category: "",
   contractor_notes: "",
-  contractor_mobile: "",
 
   task_latitude: null,
   task_longitude: null,
@@ -77,18 +71,4 @@ export const NOTIFICATION_TYPE_OPTIONS = [
   { value: "inspection", label: "inspection" },
   { value: "installation", label: "installation" },
   { value: "removal", label: "removal" },
-];
-
-export const SEVERITY_OPTIONS = [
-  { value: "low", label: "low" },
-  { value: "medium", label: "medium" },
-  { value: "high", label: "high" },
-];
-
-export const WORK_TYPE_OPTIONS = [
-  { value: "electrical", label: "electrical" },
-  { value: "mechanical", label: "mechanical" },
-  { value: "civil", label: "civil" },
-  { value: "finishing", label: "finishing" },
-  { value: "landscaping", label: "landscaping" },
 ];

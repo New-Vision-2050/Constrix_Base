@@ -1,5 +1,3 @@
-import type { NotificationSeverity } from "./response";
-
 export interface ProjectNotificationsListArgs {
   project_id: string;
   page?: number;
@@ -40,10 +38,9 @@ export interface ProjectNotificationsEmployeesLocationsArgs {
 
 export interface CreateProjectNotificationArgs {
   project_id: string;
+  notification_number?: string | null;
   notification_type: string;
-  severity?: NotificationSeverity | null;
   feeder_number?: string | null;
-  work_type?: string | null;
   work_description?: string | null;
   contractor_id?: string | null;
   contractor_name?: string | null;

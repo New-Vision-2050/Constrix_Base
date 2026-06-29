@@ -13,6 +13,7 @@ import {
   GetIncomingAttachmentRequestsResponse,
   GetOutgoingAttachmentRequestsResponse,
 } from "./types/response";
+import type { AttachmentRequest } from "./types/response";
 import { ApiBaseResponse } from "@/types/common/response/base";
 
 export const AttachmentRequestsApi = {
@@ -94,12 +95,12 @@ export const AttachmentRequestsApi = {
       body,
     ),
 
-  /** POST multipart: `item_id`, `new_file` */
+  /** POST multipart: `item_id`, `new_file` — returns updated attachment request in `payload`. */
   replaceItemMedia: (body: ReplaceAttachmentItemMediaPayload) => {
     const formData = new FormData();
     formData.append("item_id", body.item_id);
     formData.append("new_file", body.new_file);
-    return baseApi.post<{ code?: string; message?: string | null }>(
+    return baseApi.post<ApiBaseResponse<AttachmentRequest>>(
       "projects/attachment-requests/items/replace-media",
       formData,
     );
