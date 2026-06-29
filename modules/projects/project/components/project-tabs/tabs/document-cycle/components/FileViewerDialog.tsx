@@ -15,7 +15,7 @@ import {
   TextField,
   CircularProgress,
 } from "@mui/material";
-import { X, Download, Printer, Bold, Italic, List } from "lucide-react";
+import { X, Download, Printer, Bold, Italic, List, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -25,7 +25,15 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
 import type { RespondAttachmentItemPayload } from "@/services/api/projects/attachment-requests/types/params";
-import { ATTACHMENT_REQUESTS_QUERY_KEY } from "@/modules/projects/project/query/useAttachmentRequests";
+import type { AttachmentRequest } from "@/services/api/projects/attachment-requests/types/response";
+import {
+  mapAttachmentRequestFileToDocumentAttachment,
+  mapAttachmentRequestFilesToDocumentAttachments,
+} from "../mapAttachmentFiles";
+import {
+  ATTACHMENT_REQUESTS_QUERY_KEY,
+  type AttachmentRequestsResult,
+} from "@/modules/projects/project/query/useAttachmentRequests";
 import { DocumentRow, DocumentAttachment } from "../types";
 import {
   downloadAttachmentFile,
@@ -78,6 +86,38 @@ function isApprovedStatus(approvalStatus: string | undefined): boolean {
 function axiosErrorMessage(error: unknown): string | undefined {
   if (!isAxiosError(error)) return undefined;
   return (error.response?.data as { message?: string } | undefined)?.message;
+}
+
+function resolveUpdatedAttachmentFromRequest(
+  request: AttachmentRequest | undefined,
+  itemId: string,
+): DocumentAttachment | null {
+  const preview = request?.attachments_preview ?? request?.items ?? [];
+  const entry = preview.find((item) => item.id === itemId) ?? preview[0];
+  if (!entry?.file_url) return null;
+  return mapAttachmentRequestFileToDocumentAttachment(entry);
+}
+
+function patchAttachmentRequestInQueryCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  request: AttachmentRequest,
+) {
+  const attachments = mapAttachmentRequestFilesToDocumentAttachments(
+    request.attachments_preview ?? request.items ?? [],
+  );
+
+  queryClient.setQueriesData<AttachmentRequestsResult>(
+    { queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY] },
+    (old) => {
+      if (!old) return old;
+      return {
+        ...old,
+        data: old.data.map((row) =>
+          row.id === request.id ? { ...row, attachments } : row,
+        ),
+      };
+    },
+  );
 }
 
 const STACKED_Z = "z-[1600]";
@@ -185,6 +225,8 @@ type FileViewerDialogProps = {
   ) => void | Promise<void>;
   /** Called after annotated media is saved — used to enable “Approve with notes”. */
   onAnnotationsSaved?: (itemId: string) => void;
+  /** Called when replace-media returns an updated file URL for the open attachment. */
+  onFileUpdated?: (file: DocumentAttachment) => void;
 };
 
 type ViewerBufferState = {
@@ -246,7 +288,7 @@ function useViewerBufferState(
       apryseReady,
   );
 
-  const viewerInstanceKey = `${activeFile?.id ?? "none"}-${extension}`;
+  const viewerInstanceKey = `${activeFile?.id ?? "none"}-${activeFile?.url ?? ""}-${extension}`;
 
   const onViewerReady = useCallback(() => {
     setApryseReady(true);
@@ -272,15 +314,26 @@ export default function FileViewerDialog({
   isIncoming,
   onSaveAnnotatedDocument,
   onAnnotationsSaved,
+  onFileUpdated,
 }: FileViewerDialogProps) {
   const t = useTranslations("project.documentCycle");
   const queryClient = useQueryClient();
   const [note, setNote] = useState("");
+  const [previewFile, setPreviewFile] = useState<DocumentAttachment | null>(
+    null,
+  );
 
   const apryseRef = useRef<ApryseWebViewerHandle>(null);
   const [savePending, setSavePending] = useState(false);
 
-  const viewer = useViewerBufferState(open, activeFile);
+  const viewerFile = previewFile ?? activeFile;
+  const viewer = useViewerBufferState(open, viewerFile);
+
+  useEffect(() => {
+    if (open) {
+      setPreviewFile(activeFile);
+    }
+  }, [open, activeFile?.id, activeFile?.url, activeFile]);
 
   useEffect(() => {
     if (open) setNote("");
@@ -312,9 +365,30 @@ export default function FileViewerDialog({
     savePending || replaceBusy;
 
   const handleDownload = useCallback(() => {
-    if (!activeFile) return;
-    downloadAttachmentFile({ url: activeFile.url, name: activeFile.name });
-  }, [activeFile]);
+    if (!viewerFile) return;
+    downloadAttachmentFile({ url: viewerFile.url, name: viewerFile.name });
+  }, [viewerFile]);
+
+  const applyUpdatedAttachment = useCallback(
+    (request: AttachmentRequest | undefined, itemId: string) => {
+      const updated = resolveUpdatedAttachmentFromRequest(request, itemId);
+      if (!updated) return null;
+
+      setPreviewFile(updated);
+      onFileUpdated?.(updated);
+
+      if (request) {
+        patchAttachmentRequestInQueryCache(queryClient, request);
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: ["file-viewer-buffer", updated.id, updated.url],
+      });
+
+      return updated;
+    },
+    [onFileUpdated, queryClient],
+  );
 
   const handlePrint = useCallback(() => {
     window.print();
@@ -340,32 +414,57 @@ export default function FileViewerDialog({
     });
   }, [activeFile, notesPayload, respondMutation]);
 
+  const persistAnnotatedDocument = useCallback(async () => {
+    if (!activeFile || !viewer.canExport || !apryseRef.current) return;
+    const blob = await apryseRef.current.exportDocumentWithAnnotations();
+    const uploadName = fileNameForReplaceUpload(activeFile.name, blob);
+    const payload: SaveAnnotatedDocumentPayload = {
+      blob,
+      itemId: activeFile.id,
+      fileName: uploadName,
+    };
+    if (onSaveAnnotatedDocument) {
+      await onSaveAnnotatedDocument(payload);
+    } else {
+      const file = new File([blob], uploadName, { type: blob.type });
+      const response = await replaceMediaMutation.mutateAsync({
+        item_id: activeFile.id,
+        new_file: file,
+      });
+      applyUpdatedAttachment(response.data.payload, activeFile.id);
+    }
+    onAnnotationsSaved?.(activeFile.id);
+  }, [
+    activeFile,
+    viewer.canExport,
+    onSaveAnnotatedDocument,
+    replaceMediaMutation,
+    applyUpdatedAttachment,
+    onAnnotationsSaved,
+  ]);
+
+  const handleSaveWithNotes = useCallback(async () => {
+    if (!activeFile || !viewer.canExport || !apryseRef.current) return;
+    setSavePending(true);
+    try {
+      await persistAnnotatedDocument();
+      toast.success(t("saveViewerChangesSuccess"));
+    } catch (e: unknown) {
+      toast.error(
+        axiosErrorMessage(e)?.trim() ||
+          (e instanceof Error ? e.message : String(e)) ||
+          t("saveViewerChangesError"),
+      );
+    } finally {
+      setSavePending(false);
+    }
+  }, [activeFile, viewer.canExport, persistAnnotatedDocument, t]);
+
   const handleSaveWithNotesAndApprove = useCallback(async () => {
     if (!activeFile || !viewer.canExport || !apryseRef.current) return;
     setSavePending(true);
     try {
-      const blob = await apryseRef.current.exportDocumentWithAnnotations();
-      const uploadName = fileNameForReplaceUpload(activeFile.name, blob);
-      const payload: SaveAnnotatedDocumentPayload = {
-        blob,
-        itemId: activeFile.id,
-        fileName: uploadName,
-      };
-      if (onSaveAnnotatedDocument) {
-        await onSaveAnnotatedDocument(payload);
-      } else {
-        const file = new File([blob], uploadName, { type: blob.type });
-        await replaceMediaMutation.mutateAsync({
-          item_id: activeFile.id,
-          new_file: file,
-        });
-        queryClient.invalidateQueries({
-          queryKey: [ATTACHMENT_REQUESTS_QUERY_KEY],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["file-viewer-buffer", activeFile.id],
-        });
-      }
+      await persistAnnotatedDocument();
       await respondMutation.mutateAsync({
         item_id: activeFile.id,
         action: "approve",
@@ -384,10 +483,8 @@ export default function FileViewerDialog({
     activeFile,
     viewer.canExport,
     notesPayload,
-    onSaveAnnotatedDocument,
-    replaceMediaMutation,
+    persistAnnotatedDocument,
     respondMutation,
-    queryClient,
     t,
   ]);
 
@@ -416,7 +513,7 @@ export default function FileViewerDialog({
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography variant="body2" color="text.secondary" noWrap>
-                {activeFile.name}
+                {viewerFile?.name ?? activeFile.name}
               </Typography>
               <IconButton size="small" onClick={onClose}>
                 <X className="w-4 h-4" />
@@ -595,6 +692,19 @@ export default function FileViewerDialog({
             <Box sx={layout.previewColumn}>
               <Box sx={layout.previewToolbar}>
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                  {showWorkflow && (
+                    <Button
+                      size="sm"
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white disabled:opacity-50"
+                      onClick={handleSaveWithNotes}
+                      disabled={
+                        !viewer.canExport || saveExportBusy || respondBusy
+                      }
+                    >
+                      <Save className="w-4 h-4 me-1" />
+                      {t("saveWithNotes")}
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -704,7 +814,7 @@ export default function FileViewerDialog({
                         key={viewer.viewerInstanceKey}
                         documentBuffer={viewer.buffer}
                         extension={viewer.extension}
-                        fileName={activeFile.name}
+                        fileName={viewerFile?.name ?? activeFile.name}
                         onViewerReady={viewer.onViewerReady}
                       />
                     </Box>
