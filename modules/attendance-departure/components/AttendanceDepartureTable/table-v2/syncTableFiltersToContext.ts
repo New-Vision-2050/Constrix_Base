@@ -16,6 +16,14 @@ export function parseFilterDate(value: string): Date {
   return new Date(year, month - 1, day);
 }
 
+/** Format a Date to YYYY-MM-DD in local time (inverse of parseFilterDate). */
+export function formatFilterDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function toTrimmedString(value: unknown): string | undefined {
   if (value == null || value === "") return undefined;
   const trimmed = String(value).trim();
@@ -73,9 +81,13 @@ export function syncTableFiltersToContext(
   ctx.setSelectedAttendanceStatus(normalized.attendance_status ?? "all");
 }
 
-/** Initial load: no date filters — dates are sent only after the user searches. */
+/** Initial load: auto-filter by today's date. */
 export function defaultAttendanceFilters(): AttendanceFilterParams {
-  return {};
+  const today = formatFilterDate(new Date());
+  return {
+    start_date: today,
+    end_date: today,
+  };
 }
 
 export function attendanceFiltersQueryKey(

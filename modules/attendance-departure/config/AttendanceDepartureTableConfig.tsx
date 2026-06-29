@@ -127,7 +127,7 @@ export const getAttendanceDepartureTableConfig = (
             url: `${baseURL}/attendance/constraints`,
             valueField: "id",
             labelField: "constraint_name",
-            searchParam: "constraint_name",
+            searchParam: "name",
             paginationEnabled: true,
             pageParam: "page",
             limitParam: "per_page",

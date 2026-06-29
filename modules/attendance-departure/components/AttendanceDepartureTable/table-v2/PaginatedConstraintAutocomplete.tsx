@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import type { DropdownOption } from "./types";
 import { usePaginatedConstraintOptions } from "./usePaginatedConstraintOptions";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
 
 type PaginatedConstraintAutocompleteProps = {
   selectedId?: string;
@@ -16,18 +17,23 @@ type PaginatedConstraintAutocompleteProps = {
   onChange: (value: DropdownOption | null) => void;
 };
 
+const SEARCH_DEBOUNCE_MS = 300;
+
 export function PaginatedConstraintAutocomplete({
   selectedId,
   placeholder,
   onChange,
 }: PaginatedConstraintAutocompleteProps) {
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
+
   const {
     options,
     isLoading,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = usePaginatedConstraintOptions();
+  } = usePaginatedConstraintOptions(debouncedSearch);
 
   const value = useMemo(() => {
     const id = String(selectedId ?? "").trim();
@@ -122,6 +128,11 @@ export function PaginatedConstraintAutocomplete({
         >
       }
       onChange={(_, next) => onChange(next)}
+      onInputChange={(_, value, reason) => {
+        if (reason === "input" || reason === "clear") {
+          setSearch(value);
+        }
+      }}
       renderOption={(props, option, state) => {
         const { key, ...optionProps } = props;
         const isLast = state.index === options.length - 1;
