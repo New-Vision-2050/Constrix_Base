@@ -21,6 +21,8 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const currentHost = await getCurrentHost();
   const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
+  const isPublicPage =
+    /^\/([a-z]{2}\/)?(login|privacy-policy|delete-email)$/.test(pathname);
 
   // Debug logging for shared-file routes
   if (pathname.includes("shared-file")) {
@@ -47,7 +49,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // If user is not logged in and trying to access protected route, redirect to login
-  if (!nvToken && !isLoginPage) {
+  if (!nvToken && !isPublicPage) {
     return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
   }
 
@@ -65,7 +67,7 @@ export async function middleware(req: NextRequest) {
     sameSite: "lax",
   });
 
-  if ((!existingCompanyCookie && currentHost) || isLoginPage) {
+  if ((!existingCompanyCookie && currentHost) || isPublicPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
         headers: {
@@ -102,7 +104,7 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  if (!!existingCompanyCookie && !isLoginPage) {
+  if (!!existingCompanyCookie && !isPublicPage) {
     const company = existingCompanyCookie
       ? JSON.parse(existingCompanyCookie)
       : null;
