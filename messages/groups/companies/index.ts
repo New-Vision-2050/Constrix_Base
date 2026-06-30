@@ -38,7 +38,7 @@ export const companiesMessages = new MessagesGroup({
   SubEntitiesTable: new MessagesGroup({
     Name: _m("Name", "الاسم"),
     JobTitle: _m("Job Title", "المسمى الوظيفي"),
-    ResidenceNumber: _m("Residence Number", "رقم الهوية"),
+    ResidenceNumber: _m("Identity / Iqama", "الهوية / الاقامة"),
     Phone: _m("Phone", "رقم الجوال"),
     Branch: _m("Branch", "الفرع"),
     Broker: _m("Broker", "الوسيط"),
