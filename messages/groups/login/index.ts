@@ -12,6 +12,7 @@ export const loginMessages = new MessagesGroup({
   Identifier: _m("Mobile number / Email / ID number", "رقم الجوال / البريد الالكتروني / رقم المعرف"),
   Password: _m("Password", "كلمة المرور"),
   Copyright: _m("All programming rights reserved for New Vision Technology.", "جميع الحقوق البرمجية محفوظة لشركة نيو فيجن التقنية."),
+  BackToLogin: _m("Back to Login", "العودة لتسجيل الدخول"),
   Verification: new MessagesGroup({
     Mobile: _m("Mobile Number", "رقم الجوال"),
     Password: _m("Password", "كلمة المرور"),
