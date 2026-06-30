@@ -7,7 +7,7 @@ export const privacyPolicyMessages = new MessagesGroup({
     "تعرف على كيفية جمع معلوماتك واستخدامها وتخزينها وحمايتها."
   ),
   lastUpdated: _m("Last Updated", "آخر تحديث"),
-  updatedDate: _m("June 30, 2026", "30 يونيو 2026"),
+  updatedDate: _m("May 3, 2026", "3 مايو 2026"),
   intro: _m(
     "This Privacy Policy explains how our application collects, uses, stores, and protects your information when you use our services.",
     "توضح سياسة الخصوصية هذه كيفية جمع تطبيقنا واستخدامه وتخزينه وحماية معلوماتك عند استخدام خدماتنا."
