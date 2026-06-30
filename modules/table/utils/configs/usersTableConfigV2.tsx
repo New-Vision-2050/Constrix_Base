@@ -45,6 +45,7 @@ export interface UserTableRow {
   is_active: "active" | "inActive";
   companies: CompanyData[];
   user_id: string;
+  identity_entry?: string | null;
   [key: string]: any; // For any other properties
 }
 
@@ -130,6 +131,11 @@ export const UsersConfigV2 = (options?: {
         key: "residence",
         label: tSubTable("ResidenceNumber"),
         render: (_: unknown, row: UserTableRow) => {
+          const identityEntry = row.identity_entry;
+          if (identityEntry != null && identityEntry !== "") {
+            return String(identityEntry);
+          }
+
           const identity = row.identity;
           if (identity == null || identity === "") return "—";
           if (typeof identity === "object") {
