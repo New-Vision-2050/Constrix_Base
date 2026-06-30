@@ -1,30 +1,23 @@
 "use client";
 
-import ConstrixIcon from "@/public/icons/constrix";
 import NewVisionWhite from "@/public/icons/new-vision-white";
 import { SparklesCore } from "@/modules/auth/components/sparkles-core";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
-import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Link } from "@i18n/navigation";
 import { ROUTER } from "@/router";
 import { ArrowLeft } from "lucide-react";
 
-type PublicLegalLayoutProps = {
+type PrivacyPolicyLayoutProps = {
   children: React.ReactNode;
-  mainLogo?: string;
-  companyName?: string;
   pageTitle: string;
 };
 
-export default function PublicLegalLayout({
+export default function PrivacyPolicyLayout({
   children,
-  mainLogo,
-  companyName,
   pageTitle,
-}: PublicLegalLayoutProps) {
+}: PrivacyPolicyLayoutProps) {
   const { resolvedTheme } = useTheme();
   const t = useTranslations();
 
@@ -39,7 +32,7 @@ export default function PublicLegalLayout({
   return (
     <main className="min-h-screen flex flex-col relative overflow-hidden bg-background">
       <SparklesCore
-        id="tsparticles-legal-page"
+        id="tsparticles-privacy-policy"
         background="transparent"
         minSize={0.6}
         maxSize={1.4}
@@ -48,50 +41,11 @@ export default function PublicLegalLayout({
         particleColor={particleColor}
       />
 
-      <header className="w-full bg-sidebar pt-6 pb-12 sm:pt-8 sm:pb-16 rounded-b-[40%] sm:rounded-b-[50%] z-10">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="order-3 md:order-1 mt-2 md:mt-0 scale-75 md:scale-100">
-            <ConstrixIcon className="animate-[sidebar-logo-breathe_4s_ease-in-out_infinite] will-change-transform" />
-            <style jsx>{`
-              @keyframes sidebar-logo-breathe {
-                0%,
-                100% {
-                  transform: scale(0.54);
-                }
-                50% {
-                  transform: scale(1);
-                }
-              }
-            `}</style>
-          </div>
-          <div className="order-2 md:order-2 text-center">
-            <h1 className="text-xl md:text-3xl font-bold">{pageTitle}</h1>
-            {companyName ? (
-              <p className="text-sm md:text-base text-muted-foreground mt-1">
-                {companyName}
-              </p>
-            ) : null}
-          </div>
-          <div className="order-1 md:order-3 mb-2 md:mb-0 rounded-full overflow-hidden w-[70px] h-[70px] shrink-0">
-            {mainLogo ? (
-              <Image
-                src={mainLogo}
-                alt="logo"
-                width={70}
-                height={70}
-                priority
-                className="w-[70px] h-[70px] rounded-full object-cover"
-              />
-            ) : (
-              <Image
-                src={LogoPlaceholder}
-                alt="logo placeholder"
-                width={70}
-                height={70}
-                priority
-                className="w-[70px] h-[70px] rounded-full object-cover"
-              />
-            )}
+      <header className="w-full bg-sidebar pt-8 pb-14 sm:pt-10 sm:pb-16 rounded-b-[40%] sm:rounded-b-[50%] z-10">
+        <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-4 text-center">
+          <h1 className="text-2xl md:text-4xl font-bold">{pageTitle}</h1>
+          <div className="scale-[1.75] sm:scale-[2] mt-4">
+            <NewVisionWhite />
           </div>
         </div>
       </header>
