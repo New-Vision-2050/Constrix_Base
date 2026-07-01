@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
-import type { ProjectNotification } from "@/services/api/projects/notifications/types/response";
+import type { ProjectNotification, ProjectNotificationAvailableAction } from "@/services/api/projects/notifications/types/response";
 import type {
   CreateProjectNotificationArgs,
   UpdateProjectNotificationArgs,
@@ -10,6 +10,7 @@ import type {
 import { projectNotificationsQueryKey } from "./useProjectNotifications";
 
 export const PROJECT_NOTIFICATION_DETAIL_QUERY_KEY = "project-notification-detail" as const;
+export const PROJECT_NOTIFICATION_AVAILABLE_ACTIONS_QUERY_KEY = "project-notification-available-actions" as const;
 
 export function useCreateProjectNotificationMutation() {
   const queryClient = useQueryClient();
@@ -64,8 +65,31 @@ export function useProjectNotificationDetail(
     queryFn: async () => {
       if (!projectId || !notificationId) return null;
       const res = await ProjectNotificationsApi.getById(notificationId);
-      return res.data.payload?.[0] ?? null;
+      const payload = res.data.payload;
+      if (!payload) return null;
+      if (Array.isArray(payload)) return payload[0] ?? null;
+      return payload as unknown as ProjectNotification;
     },
     enabled: !!projectId && !!notificationId,
+  });
+}
+
+export function useProjectNotificationAvailableActions(
+  notificationId: string | undefined,
+) {
+  return useQuery<ProjectNotificationAvailableAction[]>({
+    queryKey: [
+      PROJECT_NOTIFICATION_AVAILABLE_ACTIONS_QUERY_KEY,
+      notificationId,
+    ],
+    queryFn: async () => {
+      if (!notificationId) return [];
+      const res = await ProjectNotificationsApi.getAvailableActions(notificationId);
+      const payload = res.data.payload;
+      if (!payload) return [];
+      if (Array.isArray(payload)) return payload;
+      return [];
+    },
+    enabled: Boolean(notificationId),
   });
 }

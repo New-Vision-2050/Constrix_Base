@@ -22,6 +22,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
+import I18nLink from "@i18n/link";
+import { ROUTER } from "@/router";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import {
@@ -229,9 +231,20 @@ export default function ProjectNotificationsView() {
         key: "notification_number",
         name: t("notificationNumber"),
         sortable: false,
-        render: (row: ProjectNotification) => (
-          <span>{row.notification_number ?? "—"}</span>
-        ),
+        render: (row: ProjectNotification) =>
+          row.notification_number ? (
+            <I18nLink
+              href={ROUTER.PROJECT_NOTIFICATION_DETAILS(
+                projectId,
+                row.id,
+              )}
+              className="p-2 text-sm text-primary hover:underline"
+            >
+              {row.notification_number}
+            </I18nLink>
+          ) : (
+            <span className="p-2 text-sm">—</span>
+          ),
       },
       {
         key: "status",
@@ -373,6 +386,7 @@ export default function ProjectNotificationsView() {
     ],
     [
       t,
+      projectId,
       canUpdate,
       canDelete,
       canApprove,

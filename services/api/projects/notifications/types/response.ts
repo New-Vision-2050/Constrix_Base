@@ -46,6 +46,31 @@ export interface ProjectNotificationEmployee {
   branch_id?: string | number | null;
 }
 
+export interface ProjectNotificationAttachment {
+  id?: string | null;
+  url: string;
+  name?: string | null;
+  mime_type?: string | null;
+}
+
+export interface ProjectNotificationProcedureAttachmentGroup {
+  title: string;
+  attachments: ProjectNotificationAttachment[];
+}
+
+export interface ProjectNotificationEmployeeTask {
+  id: string;
+  serial_number: string;
+  status: string;
+  status_label?: string | null;
+  title: string;
+  task_date: string;
+  duration_hours: string | number;
+  user: ProjectNotificationUser;
+  attachments: ProjectNotificationAttachment[];
+  procedure_attachments: ProjectNotificationProcedureAttachmentGroup[];
+}
+
 export interface ProjectNotification {
   id: string;
   project_id: string;
@@ -75,7 +100,12 @@ export interface ProjectNotification {
   duration_hours: number;
   notes?: string | null;
   status: NotificationStatus;
+  status_label?: string | null;
   violations_count: number;
+  magdy_number?: string | null;
+  internal_procedure_setting_id?: string | null;
+  pending_processes?: unknown[];
+  employee_task?: ProjectNotificationEmployeeTask | null;
   created_by?: ProjectNotificationUser | null;
   created_at: string;
   updated_at: string;
@@ -143,10 +173,26 @@ export interface ProjectNotificationFilters {
 export interface ProjectNotificationFiltersResponse
   extends ApiBaseResponse<ProjectNotificationFilters> {}
 
+export interface ProjectNotificationAvailableActionForm {
+  key: string;
+  label_ar: string;
+}
+
+export interface ProjectNotificationAvailableActionCondition {
+  key: string;
+  settings: unknown;
+  is_active: boolean;
+  sort_order: number;
+}
+
 export interface ProjectNotificationAvailableAction {
-  form: string;
-  label?: string;
-  internal_procedure_setting_id?: string;
+  id: string;
+  name: string;
+  form: ProjectNotificationAvailableActionForm;
+  conditions: ProjectNotificationAvailableActionCondition[];
+  appears_before_ids: string[];
+  appears_after_ids: string[];
+  sort_order: number;
 }
 
 export interface ProjectNotificationAvailableActionsResponse

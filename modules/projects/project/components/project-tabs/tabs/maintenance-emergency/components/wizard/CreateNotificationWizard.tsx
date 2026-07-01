@@ -1003,6 +1003,15 @@ function Step5Form({
   t: ReturnType<typeof useTranslations>;
 }) {
   const selectedEmployee = employees.find((e) => e.user_id === data.assigned_user_id);
+  const center = useMemo(() => {
+    if (data.task_latitude == null || data.task_longitude == null) return null;
+    return { lat: data.task_latitude, lng: data.task_longitude };
+  }, [data.task_latitude, data.task_longitude]);
+  const routeEmployees = useMemo(
+    () => (selectedEmployee ? [selectedEmployee] : []),
+    [selectedEmployee],
+  );
+  const routeDistances = useGoogleRouteDistances(routeEmployees, center);
 
   return (
     <Stack spacing={3}>
@@ -1046,6 +1055,7 @@ function Step5Form({
               selectedUserId={data.assigned_user_id}
               showEmployees={Boolean(selectedEmployee)}
               showPolyline={Boolean(selectedEmployee)}
+              routeDistances={routeDistances}
               interactivePin={false}
               showPin={data.task_latitude != null && data.task_longitude != null}
             />

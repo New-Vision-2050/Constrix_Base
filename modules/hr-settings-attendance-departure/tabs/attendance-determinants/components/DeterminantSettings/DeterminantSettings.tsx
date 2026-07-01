@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import { SETTINGS_TABS } from "./config/settings-tabs";
@@ -18,9 +19,14 @@ export default function DeterminantSettings({
   const tTabs = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.tabs",
   );
+  const isRtl = useIsRtl();
 
   return (
-    <Tabs defaultValue="determinant-details" dir="rtl" className="w-full gap-4">
+    <Tabs
+      defaultValue="determinant-details"
+      dir={isRtl ? "rtl" : "ltr"}
+      className="w-full gap-4"
+    >
       <TabsList className="w-full h-auto gap-0 rounded-none border-0 border-b border-border bg-transparent p-0 justify-between overflow-x-auto">
         {SETTINGS_TABS.map((tab) => (
           <TabsTrigger

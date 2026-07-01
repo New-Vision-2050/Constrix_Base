@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
+import { cn } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -112,6 +114,8 @@ export default function EditEmployeeDialog({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.selectedEmployees",
   );
+  const isRtl = useIsRtl();
+  const textAlignClass = isRtl ? "text-right" : "text-left";
 
   const CONSTRAINT_SECTIONS = useMemo(
     () => [
@@ -307,22 +311,22 @@ export default function EditEmployeeDialog({
   const statusMessages = (pool: ConstraintCatalogRow[]) => (
     <>
       {isError && employeeUserId && !isLoading && (
-        <p className="text-sm text-destructive text-right px-1">
+        <p className={cn("text-sm text-destructive px-1", textAlignClass)}>
           {t("loadingError")}
         </p>
       )}
       {isLoading && employeeUserId && (
-        <p className="text-sm text-muted-foreground text-right px-1">
+        <p className={cn("text-sm text-muted-foreground px-1", textAlignClass)}>
           {t("loading")}
         </p>
       )}
       {!employeeUserId && (
-        <p className="text-xs text-muted-foreground text-right px-1">
+        <p className={cn("text-xs text-muted-foreground px-1", textAlignClass)}>
           {t("noEmployeeLinked")}
         </p>
       )}
       {!isLoading && !isError && employeeUserId && pool.length === 0 && (
-        <p className="text-sm text-muted-foreground text-right px-1">
+        <p className={cn("text-sm text-muted-foreground px-1", textAlignClass)}>
           {t("noDeterminants")}
         </p>
       )}
@@ -332,8 +336,18 @@ export default function EditEmployeeDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-6">
-        <DialogHeader className="gap-3 space-y-0 text-right sm:text-right">
-          <DialogTitle className="text-center text-lg font-semibold leading-snug">
+        <DialogHeader
+          className={cn(
+            "gap-3 space-y-0",
+            isRtl ? "text-right sm:text-right" : "text-left sm:text-left",
+          )}
+        >
+          <DialogTitle
+            className={cn(
+              "text-lg font-semibold leading-snug",
+              isRtl ? "text-center" : "text-left",
+            )}
+          >
             {t("dialogTitle")}
           </DialogTitle>
           <button
@@ -368,13 +382,15 @@ export default function EditEmployeeDialog({
               type="multiple"
               defaultValue={["main", "sub"]}
               className="w-full space-y-2"
-              dir="rtl"
+              dir={isRtl ? "rtl" : "ltr"}
             >
               {CONSTRAINT_SECTIONS.map(({ id, title }) => {
                 const pool = sectionPool(id);
                 return (
                   <AccordionItem key={id} value={id} className="border-none">
-                    <AccordionTrigger className="text-right rounded-lg p-4">
+                    <AccordionTrigger
+                      className={cn("rounded-lg p-4", textAlignClass)}
+                    >
                       {title}
                     </AccordionTrigger>
                     <AccordionContent className="px-0 pb-2">
@@ -411,7 +427,7 @@ export default function EditEmployeeDialog({
               type="multiple"
               defaultValue={["main", "sub"]}
               className="w-full space-y-2"
-              dir="rtl"
+              dir={isRtl ? "rtl" : "ltr"}
             >
               {CONSTRAINT_SECTIONS.map(({ id, title }) => {
                 const pool = sectionPool(id);
@@ -423,18 +439,30 @@ export default function EditEmployeeDialog({
 
                 return (
                   <AccordionItem key={id} value={id}>
-                    <AccordionTrigger className="py-4 text-right rounded-lg p-4">
+                    <AccordionTrigger
+                      className={cn("py-4 rounded-lg p-4", textAlignClass)}
+                    >
                       {title}
                     </AccordionTrigger>
                     <AccordionContent className="px-0 pb-2">
                       <div className="space-y-3 max-h-[min(40vh,280px)] overflow-y-auto pe-1">
                         {catalogLoading && (
-                          <p className="text-sm text-muted-foreground text-right px-1">
+                          <p
+                            className={cn(
+                              "text-sm text-muted-foreground px-1",
+                              textAlignClass,
+                            )}
+                          >
                             {t("loadingCatalog")}
                           </p>
                         )}
                         {catalogError && !catalogLoading && (
-                          <p className="text-sm text-destructive text-right px-1">
+                          <p
+                            className={cn(
+                              "text-sm text-destructive px-1",
+                              textAlignClass,
+                            )}
+                          >
                             {t("catalogError")}
                           </p>
                         )}
@@ -443,7 +471,12 @@ export default function EditEmployeeDialog({
                           !Array.from(selectedKeysSet).some((k) =>
                             k.startsWith(`${id}:`),
                           ) && (
-                            <p className="text-sm text-muted-foreground text-right px-1">
+                            <p
+                              className={cn(
+                                "text-sm text-muted-foreground px-1",
+                                textAlignClass,
+                              )}
+                            >
                               {t("noSectionSelections")}
                             </p>
                           )}
@@ -501,16 +534,21 @@ export default function EditEmployeeDialog({
               })}
             </Accordion>
           ) : (
-            <div className="space-y-4" dir="rtl">
+            <div className="space-y-4" dir={isRtl ? "rtl" : "ltr"}>
               {selectedKeysList.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-right px-1">
+                <p
+                  className={cn(
+                    "text-sm text-muted-foreground px-1",
+                    textAlignClass,
+                  )}
+                >
                   {t("noSelectionsForDisplay")}
                 </p>
               ) : (
                 <>
                   <div className="grid grid-cols-2 gap-4 text-sm font-medium border-b border-border pb-2">
-                    <p className="text-right">{t("before")}</p>
-                    <p className="text-right">{t("after")}</p>
+                    <p className={textAlignClass}>{t("before")}</p>
+                    <p className={textAlignClass}>{t("after")}</p>
                   </div>
 
                   <div className="space-y-2 max-h-[min(50vh,360px)] overflow-y-auto pe-1">
@@ -539,8 +577,12 @@ export default function EditEmployeeDialog({
                               key={rk}
                               className="grid grid-cols-2 gap-4 items-center py-2 border-b border-border last:border-b-0"
                             >
-                              <p className="text-sm text-right">{beforeLabel}</p>
-                              <p className="text-sm text-right">{afterLabel}</p>
+                              <p className={cn("text-sm", textAlignClass)}>
+                                {beforeLabel}
+                              </p>
+                              <p className={cn("text-sm", textAlignClass)}>
+                                {afterLabel}
+                              </p>
                             </div>
                           );
                         });
@@ -553,24 +595,34 @@ export default function EditEmployeeDialog({
 
           <div className="flex justify-between">
             <div className="flex justify-end">
-              {currentStep > 1 && <Button
-                variant="contained"
-                className="px-8"
-                onClick={goToPreviousStep}
-              >
-                <ChevronRight className="h-4 w-4" />
-                {t("previous")}
-              </Button>}
+              {currentStep > 1 && (
+                <Button
+                  variant="contained"
+                  className="px-8 gap-1"
+                  onClick={goToPreviousStep}
+                >
+                  {isRtl ? (
+                    <ChevronRight className="h-4 w-4" />
+                  ) : (
+                    <ChevronLeft className="h-4 w-4" />
+                  )}
+                  {t("previous")}
+                </Button>
+              )}
             </div>
             {currentStep < 3 ? (
               <div className="flex justify-end">
                 <Button
                   variant="contained"
-                  className="px-8"
+                  className="px-8 gap-1"
                   onClick={goToNextStep}
                 >
                   {t("next")}
-                  <ChevronLeft className="h-4 w-4" />
+                  {isRtl ? (
+                    <ChevronLeft className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             ) : (

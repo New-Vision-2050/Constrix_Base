@@ -84,18 +84,20 @@ export function createTopActionsComponent<TRow>(
               </div>
             )}
             {customActions}
-          </Stack>
-          {columnVisibility && (
-            <div>
+            {columnVisibility && (
               <Button
                 variant="outlined"
                 startIcon={<ViewColumn />}
                 onClick={() => setColumnDialogOpen(true)}
+                sx={{
+                  gap: 1,
+                  "& .MuiButton-startIcon": { margin: 0 },
+                }}
               >
                 {t("Columns")}
               </Button>
-            </div>
-          )}
+            )}
+          </Stack>
         </Box>
 
         {columnVisibility && (

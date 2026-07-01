@@ -56,6 +56,8 @@ export const ROUTER = {
   ALL_PROJECTS: "/projects",
   PROJECTS_INBOX: "/projects/inbox",
   PROJECT_DETAILS: (id: string) => `/projects/${id}`,
+  PROJECT_NOTIFICATION_DETAILS: (projectId: string, notificationId: string) =>
+    `/projects/${projectId}/notifications/${notificationId}`,
   CMS: {
     CATEGORIES: "/content-management-system/categories",
     ICONS: "/content-management-system/icons",

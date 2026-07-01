@@ -47,4 +47,6 @@ export const commonMessages = new MessagesGroup({
     addMoreFiles: _m("Add more files", "إضافة المزيد من الملفات"),
     maxSizeLabel: _m("Max size", "الحجم الأقصى"),
   }),
+  back: _m("Back", "رجوع"),
+  counts: _m("Counts", "الإحصائيات"),
 });

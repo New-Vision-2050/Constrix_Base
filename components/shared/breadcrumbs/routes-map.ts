@@ -96,6 +96,9 @@ export const getRoutesMap = (
       label: getText("projects", "المشاريع"),
       href: "/projects",
     },
+    notifications: {
+      label: getText("notifications", "الإشعارات"),
+    },
     permissions: getText("permissions", "صلاحيات"),
     programs: getText("programs", "البرامج"),
     roles: getText("roles", "الصلاحيات"),

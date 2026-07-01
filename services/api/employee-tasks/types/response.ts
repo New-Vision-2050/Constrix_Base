@@ -74,3 +74,30 @@ export interface EmployeeTaskInboxListResponse {
   last_page?: number;
   result_count?: number;
 }
+
+export interface EmployeeTaskProcedure {
+  id: string;
+  step_number: number;
+  name: string;
+  icon: string | null;
+  percentage: number;
+  form: string;
+  taken_by: { id: string; name: string } | null;
+  taken_at: string | null;
+}
+
+export interface EmployeeTaskProceduresSummary {
+  total: number;
+  last_action: string | null;
+  start_date: string | null;
+  progress: number;
+}
+
+export interface EmployeeTaskProceduresPayload {
+  items: EmployeeTaskProcedure[];
+  summary: EmployeeTaskProceduresSummary;
+}
+
+export interface EmployeeTaskProceduresResponse {
+  payload: EmployeeTaskProceduresPayload | null;
+}
