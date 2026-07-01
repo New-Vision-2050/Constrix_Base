@@ -28,6 +28,41 @@ export interface DynamicDropdownConfig {
     queryParameters?: Record<string, string>; // Additional query parameters
     transformResponse?: (data: any) => DropdownOption[]; // Transform API response to dropdown options
     enableServerSearch?: boolean; // Whether to enable server-side search
+    /** Exclude option values taken from another form field (string or string[]). */
+    excludeValuesFromField?: string;
+}
+
+export function getExcludedOptionValues(
+    excludeValuesFromField: string | undefined,
+    dependencies: Record<string, string | string[]> | undefined,
+): string[] {
+    if (!excludeValuesFromField || !dependencies) return [];
+
+    const raw = dependencies[excludeValuesFromField];
+    if (!raw) return [];
+
+    return Array.isArray(raw) ? raw.map(String) : [String(raw)];
+}
+
+export function filterExcludedOptions(
+    options: DropdownOption[],
+    excludedValues: string[],
+    currentValue?: string | string[],
+): DropdownOption[] {
+    if (excludedValues.length === 0) return options;
+
+    const keepValues = new Set<string>();
+    if (Array.isArray(currentValue)) {
+        currentValue.forEach((value) => keepValues.add(String(value)));
+    } else if (currentValue) {
+        keepValues.add(String(currentValue));
+    }
+
+    return options.filter(
+        (option) =>
+            !excludedValues.includes(option.value) ||
+            keepValues.has(option.value),
+    );
 }
 
 export interface DropdownBaseProps {

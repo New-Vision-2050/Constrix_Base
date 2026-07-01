@@ -1,4 +1,4 @@
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
@@ -19,8 +19,14 @@ export const JobFormConfig = () => {
     handleRefetchAdditionalConstraints,
   } = useFunctionalContractualCxt();
 
+  const formId = "job-data-form";
+  const mainConstraintId = professionalData?.attendance_constraint?.id;
+  const additionalConstraintIds = additionalConstraints
+    .map((c) => c.id)
+    .filter((id) => id !== mainConstraintId);
+
   const jobFormConfig: FormConfig = {
-    formId: "job-data-form",
+    formId,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -183,6 +189,20 @@ export const JobFormConfig = () => {
               searchParam: "constraint_name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
+              excludeValuesFromField: "additional_constraint_ids",
+            },
+            onChange: (newValue, values) => {
+              if (!newValue) return;
+
+              const additionalIds =
+                (values.additional_constraint_ids as string[]) ?? [];
+              if (!additionalIds.includes(String(newValue))) return;
+
+              useFormStore.getState().setValue(
+                formId,
+                "additional_constraint_ids",
+                additionalIds.filter((id) => id !== String(newValue)),
+              );
             },
             validation: [
               {
@@ -205,6 +225,19 @@ export const JobFormConfig = () => {
               searchParam: "constraint_name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
+              excludeValuesFromField: "attendance_constraint_id",
+            },
+            onChange: (newValue, values) => {
+              const mainId = values.attendance_constraint_id as string | undefined;
+              if (!mainId || !Array.isArray(newValue) || !newValue.includes(mainId)) {
+                return;
+              }
+
+              useFormStore.getState().setValue(
+                formId,
+                "additional_constraint_ids",
+                newValue.filter((id) => id !== mainId),
+              );
             },
           },
            {
@@ -240,8 +273,8 @@ export const JobFormConfig = () => {
       job_type_id: professionalData?.job_type?.id,
       job_title_id: professionalData?.job_title?.id,
       job_code: professionalData?.job_code,
-      attendance_constraint_id: professionalData?.attendance_constraint?.id,
-      additional_constraint_ids: additionalConstraints.map((c) => c.id),
+      attendance_constraint_id: mainConstraintId,
+      additional_constraint_ids: additionalConstraintIds,
       roles: professionalData?.roles,
     },
     submitButtonText: t("save"),
