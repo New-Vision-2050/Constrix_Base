@@ -212,10 +212,32 @@ export default function ShareTab() {
   const sharesQuery = useQuery({
     queryKey: ["project-shares", projectId],
     queryFn: async () => {
-      const res = await ProjectSharingApi.listForProject(projectId);
-      return res.data?.payload ?? [];
+      if (!projectId) {
+        console.warn("projectId is undefined, skipping fetch");
+        return [];
+      }
+      console.log("Fetching project shares for projectId:", projectId);
+      try {
+        const res = await ProjectSharingApi.listForProject(projectId);
+        console.log("Project shares response:", res);
+        const payload = res.data?.payload;
+        if (!Array.isArray(payload)) {
+          console.error("Invalid payload format, expected array:", payload);
+          return [];
+        }
+        return payload;
+      } catch (error: any) {
+        console.error("Error fetching project shares:", error);
+        // Return empty array instead of throwing to prevent page crash
+        if (error?.response?.status === 500) {
+          console.error("Server returned 500 error - endpoint may not exist or backend error");
+        }
+        return [];
+      }
     },
     enabled: !!projectId,
+    retry: false,
+    staleTime: 0,
   });
 
   const allRows = useMemo(
@@ -419,6 +441,11 @@ export default function ShareTab() {
       {sharesQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
           {t("loadError")}
+        </Alert>
+      ) : null}
+
+      {!sharesQuery.isLoading && !sharesQuery.isError && allRows.length === 0 ? (
+        <Alert severity="info" sx={{ mb: 2 }}>
         </Alert>
       ) : null}
 
