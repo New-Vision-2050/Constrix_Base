@@ -386,6 +386,7 @@ export default function ProjectNotificationsView() {
     ],
     [
       t,
+      projectId,
       canUpdate,
       canDelete,
       canApprove,
