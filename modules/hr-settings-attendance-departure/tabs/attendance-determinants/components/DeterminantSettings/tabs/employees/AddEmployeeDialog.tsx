@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
+import { cn } from "@/lib/utils";
 import {
   Autocomplete,
   Dialog,
@@ -35,6 +37,7 @@ export default function AddEmployeeDialog({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.selectedEmployees",
   );
+  const isRtl = useIsRtl();
 
   const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
 
@@ -59,8 +62,8 @@ export default function AddEmployeeDialog({
         sx: {
           width: { xs: "92%", sm: "50%" },
           maxWidth: 640,
-          minHeight: isExpanded ? "min(60vh, 520px)" : 220,
-          height: isExpanded ? "min(60vh, 520px)" : "auto",
+          minHeight: isExpanded ? "min(75vh, 680px)" : 220,
+          height: isExpanded ? "min(75vh, 680px)" : "auto",
           transition:
             "min-height 0.35s ease, height 0.35s ease, transform 0.35s ease",
           overflow: "hidden",
@@ -75,18 +78,24 @@ export default function AddEmployeeDialog({
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          py: 2,
+          pt: 2,
+          pb: 4,
           minHeight: 0,
         }}
         className="w-full"
       >
-        <DialogTitle className="shrink-0 text-right text-base px-0 pt-0 pb-2">
+        <DialogTitle
+          className={cn(
+            "shrink-0 text-base px-0 pt-0 pb-2",
+            isRtl ? "text-right" : "text-left",
+          )}
+        >
           {t("addDialogTitle")}
         </DialogTitle>
 
         <div
           className="flex min-h-0 flex-1 flex-col justify-start gap-4"
-          dir="rtl"
+          dir={isRtl ? "rtl" : "ltr"}
         >
           <div className="relative z-10 shrink-0">
             <Autocomplete
@@ -132,7 +141,7 @@ export default function AddEmployeeDialog({
 
           <Button
             type="button"
-            className={`w-full shrink-0 gap-2 ${isExpanded ? "mt-auto" : ""}`}
+            className={`w-full shrink-0 gap-2 ${isExpanded ? "mt-auto mb-2" : ""}`}
             disabled={
               !selectedEmployeeId.trim() ||
               isAssigning ||
