@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Map } from "lucide-react";
@@ -120,6 +121,7 @@ export default function SelectedEmployees({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.selectedEmployees",
   );
+  const isRtl = useIsRtl();
 
   const queryClient = useQueryClient();
   const [view, setView] = useState<"table" | "map">("table");
@@ -300,13 +302,15 @@ export default function SelectedEmployees({
                 <SelectedEmployeesTable.TopActions
                   state={state}
                   searchComponent={
-                    <SelectedEmployeesTable.Search
-                      search={state.search}
-                      placeholder={t("searchPlaceholder")}
-                    />
+                    <div dir={isRtl ? "rtl" : "ltr"}>
+                      <SelectedEmployeesTable.Search
+                        search={state.search}
+                        placeholder={t("searchPlaceholder")}
+                      />
+                    </div>
                   }
                   customActions={
-                    <>
+                    <div className="flex items-center gap-2">
                       <Button
                         className="h-9 gap-2"
                         onClick={() => setView("map")}
@@ -323,7 +327,7 @@ export default function SelectedEmployees({
                       >
                         {t("addButton")}
                       </Button>
-                    </>
+                    </div>
                   }
                 />
               }
