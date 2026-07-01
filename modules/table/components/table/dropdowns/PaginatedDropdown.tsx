@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { Check, ChevronsUpDown, Loader2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/modules/table/components/ui/button";
@@ -17,6 +17,10 @@ import {
 } from "@/modules/table/components/ui/popover";
 import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
+import {
+  filterExcludedOptions,
+  getExcludedOptionValues,
+} from "./DropdownUtils";
 import { useTranslations } from "next-intl";
 import { Label } from "@/modules/table/components/ui/label";
 
@@ -58,6 +62,15 @@ const t = useTranslations();
       selectedValue: value,
       isMulti,
     });
+
+  const visibleOptions = useMemo(() => {
+    const excludedValues = getExcludedOptionValues(
+      dynamicConfig?.excludeValuesFromField,
+      dependencies,
+    );
+
+    return filterExcludedOptions(options, excludedValues, value);
+  }, [options, dynamicConfig?.excludeValuesFromField, dependencies, value]);
 
   // Set first option as default when options change and no value is selected
   useEffect(() => {
@@ -284,7 +297,7 @@ const t = useTranslations();
                 )}
               </CommandEmpty>
               <CommandGroup id={"inner-list"}>
-                {options.map((option, index) => (
+                {visibleOptions.map((option, index) => (
                   <CommandItem
                     key={`${option.value}-${index}`}
                     value={option.value}
