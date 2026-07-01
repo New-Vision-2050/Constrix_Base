@@ -88,6 +88,8 @@ export interface DynamicDropdownConfig {
   transformResponse?: (data: any) => DropdownOption[]; // Transform API response to dropdown options
   enableServerSearch?: boolean; // Whether to enable server-side search
   disableReactQuery?: boolean; // Whether to disable React Query caching and use direct API calls
+  /** Exclude option values taken from another form field (string or string[]). */
+  excludeValuesFromField?: string;
 }
 
 export interface SearchTypeConfig {
