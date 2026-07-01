@@ -7,7 +7,7 @@ import {
   Libraries,
 } from "@react-google-maps/api";
 
-const libraries: Libraries = ["places"];
+const libraries: Libraries = ["places", "geometry"];
 const mapContainerStyle = {
   width: "100%",
   height: "400px",
