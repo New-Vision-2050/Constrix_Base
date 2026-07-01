@@ -100,12 +100,17 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     );
   };
 
+  // Track whether the dynamic page title has already been used for an ID segment
+  let pageTitleUsed = false;
+
   // Get label for ID segments from translation file or context
   const getIdSegmentLabel = (): string => {
-    // First check if we have a dynamic page title from context
-    if (breadcrumbContext?.pageTitle) {
+    // Use the dynamic page title only for the first ID-like segment
+    if (!pageTitleUsed && breadcrumbContext?.pageTitle) {
+      pageTitleUsed = true;
       return breadcrumbContext.pageTitle;
     }
+    pageTitleUsed = true;
 
     // Get the translation key for "details" from the breadcrumbs namespace
     // We need to get this from the default routes map since it should be translated there

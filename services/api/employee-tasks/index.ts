@@ -1,11 +1,18 @@
 import { baseApi } from "@/config/axios/instances/base";
-import type { EmployeeTaskInboxListResponse } from "./types/response";
+import type {
+  EmployeeTaskInboxListResponse,
+  EmployeeTaskProceduresResponse,
+} from "./types/response";
 
 export type {
   EmployeeTaskInboxRow,
   EmployeeTaskInboxListResponse,
   EmployeeTaskCurrentStep,
   EmployeeTaskUser,
+  EmployeeTaskProcedure,
+  EmployeeTaskProceduresSummary,
+  EmployeeTaskProceduresPayload,
+  EmployeeTaskProceduresResponse,
 } from "./types/response";
 
 export interface EmployeeTaskInboxParams {
@@ -29,5 +36,10 @@ export const EmployeeTasksApi = {
     baseApi.patch(
       `admin/employee-tasks/${encodeURIComponent(taskId)}/reject`,
       body,
+    ),
+
+  procedures: (taskId: string) =>
+    baseApi.get<EmployeeTaskProceduresResponse>(
+      `employee-tasks/${encodeURIComponent(taskId)}/procedures`,
     ),
 };
