@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker, Polygon } from "@react-google-maps/api";
@@ -29,7 +29,7 @@ interface Props {
 
 const CENTER = { lat: 24.7136, lng: 46.6753 };
 const ZOOM = 12;
-const LIBS: Libraries = ["places"];
+const LIBS: Libraries = ["places", "geometry"];
 
 export default function MapPolygonDrawer({ polygons, onChange, disabled, height = 200, label }: Props) {
   const theme = useTheme();

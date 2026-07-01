@@ -594,6 +594,8 @@ export const projectMessages = new MessagesGroup({
       radius: _m("Radius", "نطاق"),
       meters: _m("m", "م"),
       kilometers: _m("km", "كم"),
+      routeDistance: _m("Route distance", "مسافة الطريق"),
+      estimatedDuration: _m("Estimated duration", "الوقت المتوقع"),
       awayFromProject: _m("away from project", "بعيد عن المشروع"),
       withinProject: _m("within project", "داخل المشروع"),
       columnActions: _m("Actions", "إجراء"),

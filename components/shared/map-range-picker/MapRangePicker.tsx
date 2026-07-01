@@ -76,7 +76,7 @@ const DEFAULT_RADIUS = 1000;
 const DEFAULT_ZOOM = 16;
 
 // Libraries to load with Google Maps
-const libraries: Libraries = ["places"];
+const libraries: Libraries = ["places", "geometry"];
 
 // Container style for the Google Map
 const createContainerStyle = (

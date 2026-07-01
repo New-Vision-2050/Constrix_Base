@@ -94,7 +94,7 @@ const defaultCenter = {
 };
 
 // Libraries to load with Google Maps
-const libraries: Libraries = ["places"];
+const libraries: Libraries = ["places", "geometry"];
 
 const LocationSelector: React.FC<LocationSelectorProps> = ({
   onSave,

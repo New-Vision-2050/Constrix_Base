@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Autocomplete,
@@ -43,6 +43,7 @@ import { useProjectNotificationEmployees } from "@/modules/projects/project/quer
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications/types/response";
 import ProjectNotificationMap from "./ProjectNotificationMap";
+import { useGoogleRouteDistances } from "./useGoogleRouteDistances";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 import {
   EMPTY_FORM,
@@ -131,27 +132,18 @@ export default function CreateNotificationWizard({
     }
   }, [open, mode, existingNotification]);
 
-  useEffect(() => {
-    if (employees.length > 0 && data.assigned_user_id) {
-      const selected = employees.find((e) => e.user_id === data.assigned_user_id);
-      if (selected) {
-        setData((prev) => ({
-          ...prev,
-          selected_distance_meters: selected.distance_meters,
-        }));
-      }
-    }
-  }, [employees, data.assigned_user_id]);
-
-  function updateField<K extends keyof WizardFormData>(
-    field: K,
-    value: WizardFormData[K],
-  ) {
-    setData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  }
+  const updateField = useCallback(
+    function updateField<K extends keyof WizardFormData>(
+      field: K,
+      value: WizardFormData[K],
+    ) {
+      setData((prev) => ({ ...prev, [field]: value }));
+      setErrors((prev) =>
+        prev[field] ? { ...prev, [field]: undefined } : prev,
+      );
+    },
+    [],
+  );
 
   function handleNext() {
     const validation = validateStep(step, data);
@@ -761,6 +753,35 @@ function Step4Form({
     });
   }, [employees, statusFilter, nameFilter, branchFilter]);
 
+  const routeDistances = useGoogleRouteDistances(filteredEmployees, center);
+
+  const enrichedEmployees = useMemo(() => {
+    return filteredEmployees.map((employee) => {
+      const route = routeDistances[employee.user_id];
+      return {
+        ...employee,
+        route_distance_meters: route?.distance.value ?? employee.distance_meters,
+        route_distance_label: route?.distance.text ?? employee.distance_label,
+        route_duration_text: route?.duration.text ?? "",
+      };
+    });
+  }, [filteredEmployees, routeDistances]);
+
+  const sortedEmployees = useMemo(() => {
+    return [...enrichedEmployees].sort(
+      (a, b) => a.route_distance_meters - b.route_distance_meters,
+    );
+  }, [enrichedEmployees]);
+
+  useEffect(() => {
+    const selected = sortedEmployees.find(
+      (employee) => employee.user_id === data.assigned_user_id,
+    );
+    if (selected) {
+      onChange("selected_distance_meters", selected.route_distance_meters);
+    }
+  }, [sortedEmployees, data.assigned_user_id, onChange]);
+
   const statusColor = (status: string) => {
     switch (status) {
       case "available":
@@ -783,12 +804,13 @@ function Step4Form({
         <ProjectNotificationMap
           center={center}
           radius={data.location_radius}
-          employees={filteredEmployees}
+          employees={sortedEmployees}
           selectedUserId={data.assigned_user_id}
           onSelectEmployee={(userId) => onChange("assigned_user_id", userId)}
           height="100%"
           polygons={polygons}
           showPolyline
+          routeDistances={routeDistances}
           showPin={data.task_latitude != null && data.task_longitude != null}
           showEmployees
         />
@@ -865,7 +887,10 @@ function Step4Form({
                       {t("employeeStatus", { defaultValue: "Status" })}
                     </TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>
-                      {t("distance", { defaultValue: "Distance" })}
+                      {t("routeDistance", { defaultValue: "Distance" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("estimatedDuration", { defaultValue: "Duration" })}
                     </TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>
                       {t("currentLocation", { defaultValue: "Current location" })}
@@ -873,7 +898,7 @@ function Step4Form({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredEmployees.map((employee) => {
+                  {sortedEmployees.map((employee) => {
                     const isSelected = data.assigned_user_id === employee.user_id;
                     const hasLocation =
                       employee.location?.latitude != null &&
@@ -920,7 +945,14 @@ function Step4Form({
                           </Stack>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2">{employee.distance_label}</Typography>
+                          <Typography variant="body2">
+                            {employee.route_distance_label}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {employee.route_duration_text || "-"}
+                          </Typography>
                         </TableCell>
                         <TableCell>
                           {hasLocation ? (

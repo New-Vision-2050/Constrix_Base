@@ -16,6 +16,8 @@ import {
 import { useTranslations } from "next-intl";
 import { MyLocation, Search } from "@mui/icons-material";
 import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications/types/response";
+import type { RouteInfo } from "./useGoogleRouteDistances";
+import { computeRoute } from "./googleRoutesApi";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 
 interface ProjectNotificationMapProps {
@@ -34,13 +36,14 @@ interface ProjectNotificationMapProps {
   showEmployees?: boolean;
   /** Draw a polyline from the selected employee to the notification pin. */
   showPolyline?: boolean;
+  routeDistances?: Record<string, RouteInfo>;
   /** Show the notification pin marker. */
   showPin?: boolean;
   /** Show map search and current-location controls. */
   showControls?: boolean;
 }
 
-const libraries: Libraries = ["places"];
+const libraries: Libraries = ["places", "geometry"];
 
 const DEFAULT_CENTER = { lat: 24.7136, lng: 46.6753 };
 const DEFAULT_ZOOM = 14;
@@ -65,6 +68,7 @@ export default function ProjectNotificationMap({
   interactivePin = false,
   showEmployees = true,
   showPolyline = false,
+  routeDistances,
   showPin = true,
   showControls = false,
 }: ProjectNotificationMapProps) {
@@ -95,7 +99,10 @@ export default function ProjectNotificationMap({
   const [searchLoading, setSearchLoading] = useState(false);
   const [locating, setLocating] = useState(false);
 
-  const activeCenter = center || DEFAULT_CENTER;
+  const activeCenter = {
+    lat: Number(center?.lat ?? DEFAULT_CENTER.lat),
+    lng: Number(center?.lng ?? DEFAULT_CENTER.lng),
+  };
 
   const movePin = useCallback(
     (lat: number, lng: number) => {
@@ -373,10 +380,14 @@ export default function ProjectNotificationMap({
         },
       });
 
+      const routeInfo = routeDistances?.[employee.user_id];
       const infoLines = [
         employee.name || "غير معروف",
         employee.status_label || employee.status || "لا توجد حالة",
-        employee.distance_label || "لا يوجد مسافة",
+        routeInfo?.distance?.text ?? employee.distance_label ?? "لا يوجد مسافة",
+        routeInfo?.duration?.text
+          ? `${t("estimatedDuration", { defaultValue: "Duration" })}: ${routeInfo.duration.text}`
+          : null,
         employee.branch || null,
         employee.last_update ? `آخر تحديث: ${employee.last_update}` : null,
       ].filter((line): line is string => Boolean(line));
@@ -402,7 +413,7 @@ export default function ProjectNotificationMap({
 
       employeeMarkersRef.current.push(marker);
     });
-  }, [isLoaded, mapInstance, employees, selectedUserId, onSelectEmployee, showEmployees]);
+  }, [isLoaded, mapInstance, employees, selectedUserId, onSelectEmployee, showEmployees, routeDistances, t]);
 
   useEffect(() => {
     if (!isLoaded || !mapInstance) return;
@@ -417,18 +428,59 @@ export default function ProjectNotificationMap({
     const selLng = Number(selectedEmployee?.location?.longitude);
     if (!selLat || !selLng) return;
 
-    polylineRef.current = new window.google.maps.Polyline({
-      map: mapInstance,
-      path: [
+    const routeInfo = routeDistances?.[selectedUserId];
+
+    if (routeInfo) {
+      let cancelled = false;
+      computeRoute(
         { lat: selLat, lng: selLng },
-        activeCenter,
-      ],
-      geodesic: true,
-      strokeColor: "#4F46E5",
-      strokeOpacity: 0.8,
-      strokeWeight: 3,
-    });
-  }, [isLoaded, mapInstance, showPolyline, selectedUserId, employees, activeCenter]);
+        { lat: activeCenter.lat, lng: activeCenter.lng },
+      ).then((route) => {
+        if (cancelled || !mapInstance) return;
+        if (route && route.encodedPolyline) {
+          const path =
+            window.google.maps.geometry.encoding.decodePath(
+              route.encodedPolyline,
+            );
+          polylineRef.current = new window.google.maps.Polyline({
+            map: mapInstance,
+            path,
+            geodesic: true,
+            strokeColor: "#4F46E5",
+            strokeOpacity: 0.8,
+            strokeWeight: 4,
+          });
+        } else {
+          polylineRef.current = new window.google.maps.Polyline({
+            map: mapInstance,
+            path: [
+              { lat: selLat, lng: selLng },
+              activeCenter,
+            ],
+            geodesic: true,
+            strokeColor: "#4F46E5",
+            strokeOpacity: 0.8,
+            strokeWeight: 3,
+          });
+        }
+      });
+      return () => {
+        cancelled = true;
+      };
+    } else if (routeDistances === undefined) {
+      polylineRef.current = new window.google.maps.Polyline({
+        map: mapInstance,
+        path: [
+          { lat: selLat, lng: selLng },
+          activeCenter,
+        ],
+        geodesic: true,
+        strokeColor: "#4F46E5",
+        strokeOpacity: 0.8,
+        strokeWeight: 3,
+      });
+    }
+  }, [isLoaded, mapInstance, showPolyline, selectedUserId, employees, activeCenter, routeDistances]);
 
   if (!isLoaded) {
     return (
