@@ -20,6 +20,7 @@ import type {
   ProjectNotificationMyTasksResponse,
   ProjectNotificationSingleResponse,
   ProjectNotificationsListResponse,
+  SiteStatusUpdatesResponse,
 } from "./types/response";
 
 export type {
@@ -166,5 +167,10 @@ export const ProjectNotificationsApi = {
   getFilters: () =>
     baseApi.get<ProjectNotificationFiltersResponse>(
       "projects/notifications/filters",
+    ),
+
+  getSiteStatusUpdates: (notificationId: string) =>
+    baseApi.get<SiteStatusUpdatesResponse>(
+      `projects/notifications/${encodeURIComponent(notificationId)}/site-status-updates`,
     ),
 };

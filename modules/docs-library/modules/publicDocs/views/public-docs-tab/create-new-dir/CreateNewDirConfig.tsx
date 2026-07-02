@@ -6,8 +6,10 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { serialize } from "object-to-formdata";
 import { DocumentT } from "../../../types/Directory";
 
+type TranslateFn = ReturnType<typeof useTranslations>;
+
 export function getCreateNewDirConfig(
-  t: ReturnType<typeof useTranslations>,
+  t: TranslateFn,
   onSuccessFn: () => void,
   editedDoc?: DocumentT,
   parentId?: string,
@@ -49,6 +51,23 @@ export function getCreateNewDirConfig(
             label: t("name"),
             type: "text",
             placeholder: t("namePlaceholder"),
+            required: true,
+            validation: [
+              {
+                type: "required" as const,
+                message: t("validation.nameRequired"),
+              },
+              {
+                type: "minLength" as const,
+                value: 2,
+                message: t("validation.nameMinLength"),
+              },
+              {
+                type: "maxLength" as const,
+                value: 255,
+                message: t("validation.nameMaxLength"),
+              },
+            ],
           },
           // parent_id
           {
@@ -100,6 +119,14 @@ export function getCreateNewDirConfig(
               totalCountHeader: "X-Total-Count",
             },
             condition: (values) => values.access_type === "private",
+            validation: [
+              {
+                type: "custom" as const,
+                message: t("validation.usersRequired"),
+                validator: (value) =>
+                  Array.isArray(value) && value.length > 0,
+              },
+            ],
           },
           // attached file
           {

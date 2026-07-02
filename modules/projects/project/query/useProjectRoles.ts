@@ -7,11 +7,18 @@ export function projectRolesQueryKey(projectId: string | undefined) {
   return [PROJECT_ROLES_QUERY_KEY, projectId] as const;
 }
 
-export function useProjectRoles(projectId: string | undefined) {
+export function useProjectRoles(
+  projectId: string | undefined,
+  options?: { search?: string },
+) {
+  const search = options?.search?.trim() || undefined;
+
   return useQuery({
-    queryKey: projectRolesQueryKey(projectId),
+    queryKey: [...projectRolesQueryKey(projectId), search ?? ""],
     queryFn: async () => {
-      const res = await ProjectRolesApi.list(projectId!);
+      const res = await ProjectRolesApi.list(projectId!, {
+        ...(search ? { search } : {}),
+      });
       return res.data.payload;
     },
     enabled: !!projectId,
