@@ -219,6 +219,21 @@ export const docsLibraryMessages = new MessagesGroup({
       submitButtonText: _m("Save", "حفظ"),
       cancelButtonText: _m("Cancel", "الغاء"),
       resetButtonText: _m("Reset", "مسح"),
+      validation: new MessagesGroup({
+        nameRequired: _m("Folder name is required", "اسم المجلد مطلوب"),
+        nameMinLength: _m(
+          "Name must be at least 2 characters",
+          "يجب أن يكون الاسم حرفين على الأقل",
+        ),
+        nameMaxLength: _m(
+          "Name must not exceed 255 characters",
+          "يجب ألا يتجاوز الاسم 255 حرفاً",
+        ),
+        usersRequired: _m(
+          "Select at least one user for private folders",
+          "يرجى اختيار مستخدم واحد على الأقل للمجلدات الخاصة",
+        ),
+      }),
     }),
     createNewFileDialog: new MessagesGroup({
       title: _m("Create New File", "إنشاء ملف جديد"),
