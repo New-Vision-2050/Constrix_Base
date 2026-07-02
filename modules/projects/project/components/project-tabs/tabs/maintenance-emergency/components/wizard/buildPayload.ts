@@ -23,7 +23,9 @@ export function buildCreatePayload(
     contractor_number: data.contractor_number || null,
     contractor_technical_name: data.contractor_technical_name || null,
     contractor_technical_number: data.contractor_technical_number || null,
+    contractor_category: data.contractor_category || null,
     contractor_notes: data.contractor_notes || null,
+    contractor_mobile: data.contractor_mobile || null,
 
     task_latitude: data.task_latitude ?? 0,
     task_longitude: data.task_longitude ?? 0,
@@ -57,7 +59,9 @@ export function buildUpdatePayload(
     contractor_number: data.contractor_number || null,
     contractor_technical_name: data.contractor_technical_name || null,
     contractor_technical_number: data.contractor_technical_number || null,
+    contractor_category: data.contractor_category || null,
     contractor_notes: data.contractor_notes || null,
+    contractor_mobile: data.contractor_mobile || null,
 
     task_latitude: data.task_latitude ?? 0,
     task_longitude: data.task_longitude ?? 0,

@@ -46,11 +46,41 @@ export const ProjectNotificationsApi = {
       `projects/notifications/${encodeURIComponent(id)}`,
     ),
 
-  update: (id: string, args: UpdateProjectNotificationArgs) =>
-    baseApi.put<ProjectNotificationSingleResponse>(
+  update: (id: string, args: UpdateProjectNotificationArgs) => {
+    const { files, deleted_media_ids, ...rest } = args;
+    const hasFiles = files && files.length > 0;
+    const hasDeletedMedia = deleted_media_ids && deleted_media_ids.length > 0;
+
+    if (hasFiles || hasDeletedMedia) {
+      const formData = new FormData();
+      Object.entries(rest).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (typeof value === "number" || typeof value === "boolean") {
+          formData.append(key, String(value));
+        } else {
+          formData.append(key, value as string);
+        }
+      });
+      if (hasFiles) {
+        files!.forEach((file) => formData.append("files[]", file));
+      }
+      if (hasDeletedMedia) {
+        deleted_media_ids!.forEach((mediaId) =>
+          formData.append("deleted_media_ids[]", String(mediaId)),
+        );
+      }
+      return baseApi.put<ProjectNotificationSingleResponse>(
+        `projects/notifications/${encodeURIComponent(id)}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+    }
+
+    return baseApi.put<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}`,
-      args,
-    ),
+      rest,
+    );
+  },
 
   delete: (id: string) =>
     baseApi.delete<ProjectNotificationDeleteResponse>(

@@ -65,6 +65,8 @@ export interface CreateProjectNotificationArgs {
 export interface UpdateProjectNotificationArgs
   extends Partial<CreateProjectNotificationArgs> {
   id: string;
+  files?: File[];
+  deleted_media_ids?: (string | number)[];
 }
 
 export interface ProjectNotificationRejectArgs {

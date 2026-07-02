@@ -75,6 +75,23 @@ export interface EmployeeTaskInboxListResponse {
   result_count?: number;
 }
 
+export interface EmployeeTaskProcedureStep {
+  step_order: number;
+  name: string | null;
+  status: "approved" | "rejected" | "pending";
+  action_by: { id: string; name: string } | null;
+  acted_at: string | null;
+}
+
+export interface EmployeeTaskProcedureAttachment {
+  id: number;
+  url: string;
+  name: string;
+  mime_type: string;
+  type: string;
+  size: number;
+}
+
 export interface EmployeeTaskProcedure {
   id: string;
   step_number: number;
@@ -84,6 +101,11 @@ export interface EmployeeTaskProcedure {
   form: string;
   taken_by: { id: string; name: string } | null;
   taken_at: string | null;
+  status: string | null;
+  steps: EmployeeTaskProcedureStep[];
+  approved_by: { id: string; name: string } | null;
+  attachments: EmployeeTaskProcedureAttachment[];
+  form_data: Record<string, unknown> | null;
 }
 
 export interface EmployeeTaskProceduresSummary {

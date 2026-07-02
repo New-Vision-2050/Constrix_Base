@@ -10,6 +10,8 @@ export type {
   EmployeeTaskCurrentStep,
   EmployeeTaskUser,
   EmployeeTaskProcedure,
+  EmployeeTaskProcedureStep,
+  EmployeeTaskProcedureAttachment,
   EmployeeTaskProceduresSummary,
   EmployeeTaskProceduresPayload,
   EmployeeTaskProceduresResponse,

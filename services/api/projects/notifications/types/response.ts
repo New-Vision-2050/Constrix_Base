@@ -47,10 +47,12 @@ export interface ProjectNotificationEmployee {
 }
 
 export interface ProjectNotificationAttachment {
-  id?: string | null;
+  id?: string | number | null;
   url: string;
   name?: string | null;
   mime_type?: string | null;
+  type?: string | null;
+  size?: number | null;
 }
 
 export interface ProjectNotificationProcedureAttachmentGroup {
@@ -106,6 +108,8 @@ export interface ProjectNotification {
   internal_procedure_setting_id?: string | null;
   pending_processes?: unknown[];
   employee_task?: ProjectNotificationEmployeeTask | null;
+  attachments?: ProjectNotificationAttachment[];
+  procedure_attachments?: ProjectNotificationProcedureAttachmentGroup[];
   created_by?: ProjectNotificationUser | null;
   created_at: string;
   updated_at: string;
