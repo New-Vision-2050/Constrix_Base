@@ -47,6 +47,12 @@ function truncateFileName(str: string, n: number): string {
   return str.length > n ? str.slice(0, n) + "..." : str;
 }
 
+function normalizeFileUrl(url: string): string {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  return `https://${url}`;
+}
+
 function formatDateTime(value: string | null | undefined): string {
   if (!value) return "—";
   const d = new Date(value.replace(" ", "T"));
@@ -175,7 +181,7 @@ function AttachmentList({
                 fontWeight={600}
                 noWrap
                 component={Link}
-                href={attachment.url}
+                href={normalizeFileUrl(attachment.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{ color: "primary.main", textDecoration: "none" }}
@@ -256,8 +262,8 @@ export default function NotificationDetailView({
     ];
   }, [notification, t]);
 
-  const taskAttachments = notification?.employee_task?.attachments ?? [];
-  const procedureAttachments = notification?.employee_task?.procedure_attachments ?? [];
+  const taskAttachments = notification?.attachments ?? notification?.employee_task?.attachments ?? [];
+  const procedureAttachments = notification?.procedure_attachments ?? notification?.employee_task?.procedure_attachments ?? [];
   const allAttachments = useMemo(() => {
     const list: ProjectNotificationAttachment[] = [...taskAttachments];
     procedureAttachments.forEach((group) => {
