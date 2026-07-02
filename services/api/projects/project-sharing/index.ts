@@ -34,11 +34,14 @@ export const ProjectSharingApi = {
     ),
 
   /** List assignments for a project (backend: GET with `project_id`). */
-  listForProject: (projectId: string) =>
+  listForProject: (projectId: string, params?: { search?: string }) =>
     baseApi.get<ListProjectSharesResponse>(
       `projects/sharing/projects/${projectId}/shares`,
       {
-        params: { project_id: projectId },
+        params: {
+          project_id: projectId,
+          ...(params?.search?.trim() ? { search: params.search.trim() } : {}),
+        },
       },
     ),
 

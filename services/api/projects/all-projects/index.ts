@@ -67,7 +67,10 @@ export const AllProjectsApi = {
   getProjectDetails: (projectId: string) =>
     baseApi.get<ShowProjectResponse>(`projects/${projectId}`),
 
-  getProjectEmployees: (projectId: string, params?: { company_id?: string }) =>
+  getProjectEmployees: (
+    projectId: string,
+    params?: { company_id?: string; search?: string },
+  ) =>
     baseApi.get<GetProjectEmployeesResponse>(
       `projects/employees/project/${projectId}`,
       { params },

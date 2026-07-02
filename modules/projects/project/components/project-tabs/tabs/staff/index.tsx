@@ -47,6 +47,9 @@ import StaffRoleSelect from "./StaffRoleSelect";
 import { getProjectEmployeeAttendanceColumns } from "./shared/projectEmployeeAttendanceColumns";
 import { ProjectStaffMap } from "./shared/ProjectStaffMap";
 import { ProjectStaffAttendanceShell } from "./shared/ProjectStaffAttendanceShell";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
+
+const SEARCH_DEBOUNCE_MS = 400;
 
 const StaffTableLayout = HeadlessTableLayout<Employee>("staff");
 
@@ -163,9 +166,10 @@ export default function StaffTab() {
     initialPage: 1,
     initialLimit: 10,
   });
+  const debouncedSearch = useDebouncedValue(params.search.trim(), SEARCH_DEBOUNCE_MS);
 
   const { data: employeesData, isLoading: isLoadingEmployees } =
-    useProjectEmployees(projectId);
+    useProjectEmployees(projectId, { search: debouncedSearch || undefined });
   const data = employeesData ?? [];
   const totalPages = 1;
   const totalItems = data.length;
@@ -226,6 +230,7 @@ export default function StaffTab() {
     getRowId: (row: Employee) => row.id,
     loading: isLoadingEmployees,
     searchable: true,
+    filtered: debouncedSearch.length > 0,
     onExport: async () => {
       // TODO: implement export
     },

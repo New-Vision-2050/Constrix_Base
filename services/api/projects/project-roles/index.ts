@@ -14,8 +14,10 @@ export const ProjectRolesApi = {
   permissionsTree: () =>
     baseApi.get<ProjectPermissionsTreeResponse>("projects/permissions/tree"),
 
-  list: (projectId: string) =>
-    baseApi.get<ProjectRolesListResponse>(`projects/${projectId}/roles`),
+  list: (projectId: string, params?: { search?: string }) =>
+    baseApi.get<ProjectRolesListResponse>(`projects/${projectId}/roles`, {
+      params,
+    }),
 
   show: (projectId: string, roleId: string) =>
     baseApi.get<ProjectRoleDetailsResponse>(

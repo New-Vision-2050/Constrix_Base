@@ -14,6 +14,9 @@ import type { ProjectShareEntityRef, ProjectShareRow } from "./types";
 import ShareProjectDialog from "./components/ShareProjectDialog";
 import ShareStatsWidgets from "./components/ShareStatsWidgets";
 import { countShareAssignmentSegments } from "./share-status-segments";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
+
+const SEARCH_DEBOUNCE_MS = 400;
 
 function toEntityRef(
   c:
@@ -208,9 +211,10 @@ export default function ShareTab() {
     initialLimit: 10,
     initialSortBy: "shared_with_company",
   });
+  const debouncedSearch = useDebouncedValue(params.search.trim(), SEARCH_DEBOUNCE_MS);
 
   const sharesQuery = useQuery({
-    queryKey: ["project-shares", projectId],
+    queryKey: ["project-shares", projectId, debouncedSearch],
     queryFn: async () => {
       if (!projectId) {
         console.warn("projectId is undefined, skipping fetch");
@@ -218,7 +222,9 @@ export default function ShareTab() {
       }
       console.log("Fetching project shares for projectId:", projectId);
       try {
-        const res = await ProjectSharingApi.listForProject(projectId);
+        const res = await ProjectSharingApi.listForProject(projectId, {
+          search: debouncedSearch || undefined,
+        });
         console.log("Project shares response:", res);
         const payload = res.data?.payload;
         if (!Array.isArray(payload)) {
@@ -252,36 +258,14 @@ export default function ShareTab() {
 
   const emptyDash = t("emptyDash");
 
-  const searchFiltered = useMemo(() => {
-    const q = params.search.trim().toLowerCase();
-    if (!q) return allRows;
-    return allRows.filter((row) =>
-      [
-        row.shared_with_company?.name,
-        row.shared_with_company?.email,
-        row.shared_with_company?.phone,
-        row.shared_by?.name,
-        row.type,
-        row.relation,
-        row.role,
-        row.status,
-        resolveShareStatusLabel(row.status, tStatus, emptyDash),
-        formatSentDate(row.created_at),
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(q),
-    );
-  }, [allRows, params.search, tStatus, emptyDash]);
-
   const sortedRows = useMemo(() => {
     const key = params.sortBy ?? "shared_with_company";
-    if (key === "actions") return searchFiltered;
+    if (key === "actions") return allRows;
     const direction = (params.sortDirection ?? "asc") as "asc" | "desc";
-    return [...searchFiltered].sort((a, b) =>
+    return [...allRows].sort((a, b) =>
       compareShareRows(a, b, key, direction),
     );
-  }, [searchFiltered, params.sortBy, params.sortDirection]);
+  }, [allRows, params.sortBy, params.sortDirection]);
 
   const pageData = useMemo(() => {
     const start = (params.page - 1) * params.limit;
@@ -420,7 +404,7 @@ export default function ShareTab() {
     getRowId: (row: ProjectShareRow) => row.id,
     loading: sharesQuery.isLoading,
     searchable: true,
-    filtered: params.search.trim().length > 0,
+    filtered: debouncedSearch.length > 0,
     onExport: async () => {
       // TODO: export selected rows
     },
