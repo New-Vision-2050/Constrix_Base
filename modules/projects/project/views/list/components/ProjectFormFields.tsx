@@ -364,10 +364,10 @@ export function ProjectFormFields({
               ListboxProps={{
                 style: { maxHeight: '300px' }
               }}
-              renderOption={(props, option) => {
+              renderOption={(props, option, index) => {
                 const { key, ...restProps } = props;
                 return (
-                  <Box component="li" key={`manager-${option.id}`} {...restProps}>
+                  <Box component="li" key={`manager-${option.id}-${index}`} {...restProps}>
                     {option.name}
                   </Box>
                 );
