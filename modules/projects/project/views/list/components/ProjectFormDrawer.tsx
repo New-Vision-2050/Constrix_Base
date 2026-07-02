@@ -85,27 +85,27 @@ export function ProjectFormDrawer({
     }
   }, [watchBranchId, setValue, editingProjectId]);
 
-  useEffect(() => {
-    if (editingProjectId) return;
-
-    const managements = formData?.managementsData;
-    if (!managements || managements.length === 0) return;
-    if (!watchManagementId) {
-      setValue("manager_id", "");
-      return;
-    }
-
-    const selected = managements.find(
-      (m) => String(m.id) === watchManagementId,
-    );
-    const managerId = selected?.manager?.id ? String(selected.manager.id) : "";
-    setValue("manager_id", managerId);
-  }, [
-    editingProjectId,
-    watchManagementId,
-    formData?.managementsData,
-    setValue,
-  ]);
+  // useEffect(() => {
+  //   if (editingProjectId) return;
+  //
+  //   const managements = formData?.managementsData;
+  //   if (!managements || managements.length === 0) return;
+  //   if (!watchManagementId) {
+  //     setValue("manager_id", "");
+  //     return;
+  //   }
+  //
+  //   const selected = managements.find(
+  //     (m) => String(m.id) === watchManagementId,
+  //   );
+  //   const managerId = selected?.manager?.id ? String(selected.manager.id) : "";
+  //   setValue("manager_id", managerId);
+  // }, [
+  //   editingProjectId,
+  //   watchManagementId,
+  //   formData?.managementsData,
+  //   setValue,
+  // ]);
 
   useEffect(() => {
     if (open && !editingProjectId) {

@@ -11,15 +11,19 @@ export const projectEmployeesByCompanyQueryKey = (
 export function useProjectEmployeesByCompany(
   projectId: string | undefined,
   companyId: string | undefined,
+  options?: { search?: string },
 ) {
+  const search = options?.search?.trim() || undefined;
+
   return useQuery({
     queryKey:
       projectId && companyId
-        ? projectEmployeesByCompanyQueryKey(projectId, companyId)
+        ? [...projectEmployeesByCompanyQueryKey(projectId, companyId), search ?? ""]
         : ["project-employees-by-company", "", ""],
     queryFn: async () => {
       const res = await AllProjectsApi.getProjectEmployees(projectId!, {
         company_id: companyId!,
+        ...(search ? { search } : {}),
       });
       const body = res.data as typeof res.data & { status?: string };
       if (body.status === "error") {

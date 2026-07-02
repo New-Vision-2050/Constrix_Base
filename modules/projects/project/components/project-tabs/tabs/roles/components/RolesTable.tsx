@@ -19,6 +19,9 @@ import { useProjectRoles } from "@/modules/projects/project/query/useProjectRole
 import type { ProjectRoleRow } from "../types";
 import type { ProjectRoleListItem } from "@/services/api/projects/project-roles/types/response";
 import { extractAllIds } from "./ProjectCreateRoleForm";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
+
+const SEARCH_DEBOUNCE_MS = 400;
 
 const TableLayout = HeadlessTableLayout<ProjectRoleRow>("project-roles-table");
 
@@ -124,8 +127,11 @@ export default function RolesTable({
     initialPage: 1,
     initialLimit: 10,
   });
+  const debouncedSearch = useDebouncedValue(params.search.trim(), SEARCH_DEBOUNCE_MS);
 
-  const { data: roles, isLoading } = useProjectRoles(projectId);
+  const { data: roles, isLoading } = useProjectRoles(projectId, {
+    search: debouncedSearch || undefined,
+  });
 
   const allRows = useMemo(() => (roles ?? []).map(mapRoleToRow), [roles]);
 
@@ -252,6 +258,7 @@ export default function RolesTable({
     getRowId: (row: ProjectRoleRow) => row.id,
     loading: isLoading,
     searchable: true,
+    filtered: debouncedSearch.length > 0 || filterRoleName !== "" || filterStatus !== "",
     onExport: async () => {},
   });
 
