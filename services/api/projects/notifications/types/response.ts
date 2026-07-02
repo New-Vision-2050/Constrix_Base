@@ -201,3 +201,61 @@ export interface ProjectNotificationAvailableAction {
 
 export interface ProjectNotificationAvailableActionsResponse
   extends ApiBaseResponse<ProjectNotificationAvailableAction[]> {}
+
+/* ── Site Status Updates ── */
+
+export interface SiteStatusUpdateAttachment {
+  id: string;
+  url: string;
+  mime_type?: string | null;
+  size?: number | null;
+  name?: string | null;
+}
+
+export interface SiteStatusUpdateUser {
+  id: string;
+  name: string;
+}
+
+export interface SiteStatusUpdateStep {
+  step_order: number;
+  name?: string | null;
+  status: string;
+  action_by?: SiteStatusUpdateUser | null;
+  acted_at?: string | null;
+}
+
+export interface SiteStatusUpdateProcess {
+  id: string;
+  status: string;
+  steps: SiteStatusUpdateStep[];
+}
+
+export interface SiteStatusUpdate {
+  id: string;
+  status: string;
+  description: string;
+  attachments: SiteStatusUpdateAttachment[];
+  requested_by: SiteStatusUpdateUser;
+  reviewed_by?: SiteStatusUpdateUser | null;
+  reviewed_at?: string | null;
+  review_notes?: string | null;
+  created_at: string;
+  process?: SiteStatusUpdateProcess | null;
+}
+
+export interface SiteStatusUpdateSummary {
+  total: number;
+  approved: number;
+  pending: number;
+}
+
+export interface SiteStatusUpdatesData {
+  items: SiteStatusUpdate[];
+  summary: SiteStatusUpdateSummary;
+}
+
+export interface SiteStatusUpdatesResponse {
+  data: SiteStatusUpdatesData;
+  message?: string;
+}

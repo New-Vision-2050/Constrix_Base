@@ -28,6 +28,7 @@ import NotificationStatusBadge from "./NotificationStatusBadge";
 import NotificationSeverityBadge from "./NotificationSeverityBadge";
 import NotificationDetailEditable from "./NotificationDetailEditable";
 import ProceduresCarousel from "./ProceduresCarousel";
+import SiteStatusUpdatesTab from "./SiteStatusUpdatesTab";
 import type { ProjectNotificationAttachment } from "@/services/api/projects/notifications/types/response";
 
 interface NotificationDetailViewProps {
@@ -425,6 +426,7 @@ export default function NotificationDetailView({
           <Tab label={t("details")} />
           <Tab label={t("attachments")} />
           <Tab label={t("procedures")} />
+          <Tab label={t("siteStatusUpdates")} />
         </Tabs>
       </Paper>
 
@@ -514,6 +516,14 @@ export default function NotificationDetailView({
             </Paper>
           )}
         </Stack>
+      )}
+
+      {/* Site status updates tab */}
+      {activeTab === 3 && (
+        <SiteStatusUpdatesTab
+          notification={notification}
+          notificationId={notificationId}
+        />
       )}
     </Box>
   );
