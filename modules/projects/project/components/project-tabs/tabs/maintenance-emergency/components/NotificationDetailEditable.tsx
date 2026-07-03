@@ -27,6 +27,7 @@ import type { ProjectNotification } from "@/services/api/projects/notifications/
 import { useUpdateProjectNotificationMutation } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
+import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceFormat";
 import EditableSection from "./EditableSection";
@@ -36,7 +37,6 @@ import { useProjectNotificationLocationPolygons } from "./wizard/useProjectNotif
 import { isPointInAnyPolygon } from "./wizard/utils";
 import {
   EMPTY_FORM,
-  NOTIFICATION_TYPE_OPTIONS,
   type WizardFormData,
 } from "./wizard/types";
 import { notificationToWizardForm } from "./wizard/normalize";
@@ -98,6 +98,8 @@ export default function NotificationDetailEditable({
   const updateMutation = useUpdateProjectNotificationMutation();
   const contractorsQuery = useProjectNotificationContractors();
   const contractors = contractorsQuery.data ?? [];
+  const notificationTypesQuery = useProjectNotificationTypes();
+  const notificationTypes = notificationTypesQuery.data ?? [];
   const locationPolygons = useProjectNotificationLocationPolygons(projectId);
 
   const [formData, setFormData] = useState<WizardFormData>(EMPTY_FORM);
@@ -162,6 +164,7 @@ export default function NotificationDetailEditable({
     { caption: t("workType"), value: notification.work_type ?? tDash },
     { caption: t("severity"), value: t(SEVERITY_CONFIG[notification.severity]?.labelKey ?? "severities.medium") },
     { caption: t("feeder_number"), value: notification.feeder_number ?? tDash },
+    { caption: t("machineNumber", { defaultValue: "رقم المعدة" }), value: notification.machine_number ?? tDash },
     { caption: t("taskDate"), value: formatDateOnly(notification.task_date) },
     {
       caption: t("durationHours"),
@@ -190,9 +193,9 @@ export default function NotificationDetailEditable({
           value={formData.notification_type}
           onChange={(e) => updateField("notification_type", e.target.value)}
         >
-          {NOTIFICATION_TYPE_OPTIONS.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {t(`types.${option.label}`)}
+          {notificationTypes.map((option) => (
+            <MenuItem key={option.id} value={option.value}>
+              {option.value}
             </MenuItem>
           ))}
         </TextField>
@@ -204,6 +207,15 @@ export default function NotificationDetailEditable({
           label={t("feeder_number")}
           value={formData.feeder_number}
           onChange={(e) => updateField("feeder_number", e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("machineNumber", { defaultValue: "رقم المعدة" })}
+          value={formData.machine_number}
+          onChange={(e) => updateField("machine_number", e.target.value)}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
@@ -258,11 +270,11 @@ export default function NotificationDetailEditable({
   // ===========================================================================
   const contractorReadFields = [
     { caption: t("contractor"), value: notification.contractor_name ?? tDash },
-    { caption: t("contractorNumber"), value: notification.contractor_number ?? tDash },
     { caption: t("contractorTechnicalName"), value: notification.contractor_technical_name ?? tDash },
     { caption: t("contractorTechnicalNumber"), value: notification.contractor_technical_number ?? tDash },
     { caption: t("contractorCategory"), value: notification.contractor_category ?? tDash },
-    { caption: t("contractorMobile"), value: notification.contractor_mobile ?? tDash },
+    { caption: t("permitSource", { defaultValue: "Permit Source" }), value: notification.permit_source ?? tDash },
+    { caption: t("permitRecipient", { defaultValue: "Permit Recipient" }), value: notification.permit_recipient ?? tDash },
     { caption: t("contractorNotes"), value: notification.contractor_notes ?? tDash },
   ];
 
@@ -270,7 +282,6 @@ export default function NotificationDetailEditable({
     const selected = contractors.find((c) => c.id === contractorId);
     updateField("contractor_id", contractorId);
     updateField("contractor_name", selected?.name ?? "");
-    updateField("contractor_number", selected?.number ?? "");
   }
 
   const contractorEditFields = (
@@ -292,15 +303,6 @@ export default function NotificationDetailEditable({
               placeholder={t("chooseContractor")}
             />
           )}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("contractorNumber")}
-          value={formData.contractor_number}
-          onChange={(e) => updateField("contractor_number", e.target.value)}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
@@ -334,9 +336,18 @@ export default function NotificationDetailEditable({
         <TextField
           fullWidth
           size="small"
-          label={t("contractorMobile")}
-          value={formData.contractor_mobile}
-          onChange={(e) => updateField("contractor_mobile", e.target.value)}
+          label={t("permitSource", { defaultValue: "Permit Source" })}
+          value={formData.permit_source}
+          onChange={(e) => updateField("permit_source", e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("permitRecipient", { defaultValue: "Permit Recipient" })}
+          value={formData.permit_recipient}
+          onChange={(e) => updateField("permit_recipient", e.target.value)}
         />
       </Grid>
       <Grid size={{ xs: 12 }}>

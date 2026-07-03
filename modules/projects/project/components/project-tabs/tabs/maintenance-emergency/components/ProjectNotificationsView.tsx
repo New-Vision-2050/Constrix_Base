@@ -30,6 +30,7 @@ import {
   useProjectNotifications,
   projectNotificationsQueryKey,
 } from "@/modules/projects/project/query/useProjectNotifications";
+import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
 import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
 import type { ProjectNotification } from "@/services/api/projects/notifications/types/response";
 import {
@@ -70,7 +71,6 @@ const STATUS_OPTIONS: { value: string; labelKey: string }[] = [
   { value: "cancelled", labelKey: "statuses.cancelled" },
 ];
 const SEVERITY_OPTIONS = ["low", "medium", "high", "critical"];
-const TYPE_OPTIONS = ["maintenance", "emergency", "violation", "inspection"];
 const WORK_TYPE_OPTIONS = ["electrical", "mechanical", "civil", "finishing", "landscaping"];
 
 export default function ProjectNotificationsView() {
@@ -94,6 +94,8 @@ export default function ProjectNotificationsView() {
 
   const { data: flatPerms, isLoading: isLoadingPerms } =
     useProjectMyPermissionsFlat(projectId);
+  const notificationTypesQuery = useProjectNotificationTypes();
+  const notificationTypes = notificationTypesQuery.data ?? [];
 
   const canView = useMemo(
     () =>
@@ -498,9 +500,9 @@ export default function ProjectNotificationsView() {
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
-                  {TYPE_OPTIONS.map((value) => (
-                    <MenuItem key={value} value={value}>
-                      {t(`types.${value}`)}
+                  {notificationTypes.map((option) => (
+                    <MenuItem key={option.id} value={option.value}>
+                      {option.value}
                     </MenuItem>
                   ))}
                 </TextField>

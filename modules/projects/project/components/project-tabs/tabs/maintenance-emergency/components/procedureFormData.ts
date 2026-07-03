@@ -3,10 +3,12 @@ import type { EmployeeTaskProcedureAttachment } from "@/services/api/employee-ta
 export const FORM_DATA_LABELS: Record<string, { en: string; ar: string }> = {
   notification_type: { en: "Notification Type", ar: "نوع الإشعار" },
   feeder_number: { en: "Feeder Number", ar: "رقم المغذي" },
+  machine_number: { en: "Machine Number", ar: "رقم المعدة" },
   work_description: { en: "Work Description", ar: "وصف العمل" },
   contractor_name: { en: "Contractor Name", ar: "اسم المقاول" },
   contractor_technical_name: { en: "Contractor Technical Name", ar: "الاسم الفني للمقاول" },
-  contractor_mobile: { en: "Contractor Mobile", ar: "جوال المقاول" },
+  permit_source: { en: "Permit Source", ar: "مصدر التصريح" },
+  permit_recipient: { en: "Permit Recipient", ar: "مستلم التصريح" },
   task_latitude: { en: "Latitude", ar: "خط العرض" },
   task_longitude: { en: "Longitude", ar: "خط الطول" },
   notes: { en: "Notes", ar: "ملاحظات" },

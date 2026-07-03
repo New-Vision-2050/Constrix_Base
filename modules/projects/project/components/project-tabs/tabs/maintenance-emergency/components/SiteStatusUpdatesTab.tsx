@@ -81,10 +81,10 @@ function buildCopyText(
     `📅 التاريخ:  ${date}`,
     `🔢 رقم البلاغ: ${notification.notification_number ?? ""}`,
     `🔌 المغذي: ${notification.feeder_number ?? ""}`,
-    `⚙️ رقم المعدة: ${notification.magdy_number ?? ""}`,
+    `⚙️ رقم المعدة: ${notification.machine_number ?? ""}`,
     `🏗️ طبيعة العمل: ${notification.work_type ?? ""}`,
-    `✍️ مصدر التصريح: ${update.requested_by?.name ?? notification.created_by?.name ?? ""}`,
-    `👤 مستلم التصريح: ${notification.assigned_user?.name ?? ""}`,
+    `✍️ مصدر التصريح: ${notification.permit_source ?? ""}`,
+    `👤 مستلم التصريح: ${notification.permit_recipient ?? ""}`,
     `⏱️ الوقت المتوقع لإنهاء العمل: ${notification.duration_hours ?? ""}`,
     `🟢 حالة التشغيل: ${update.status ?? ""}`,
     `📍 الموقع الجغرافي: ${notification.repair_point ?? ""}`,
@@ -291,17 +291,17 @@ function SiteStatusCard({
           <ReportField icon="📅" label={t("reportDate")} value={dateLabel} />
           <ReportField icon="🔢" label={t("reportNotificationNumber")} value={notification.notification_number} />
           <ReportField icon="🔌" label={t("reportFeeder")} value={notification.feeder_number} />
-          <ReportField icon="⚙️" label={t("reportEquipmentNumber")} value={notification.magdy_number} />
+          <ReportField icon="⚙️" label={t("reportEquipmentNumber")} value={notification.machine_number} />
           <ReportField icon="🏗️" label={t("reportWorkType")} value={notification.work_type} />
           <ReportField
             icon="✍️"
             label={t("reportAuthorizationSource")}
-            value={update.requested_by?.name ?? notification.created_by?.name}
+            value={notification.permit_source}
           />
           <ReportField
             icon="👤"
             label={t("reportAuthorizationReceiver")}
-            value={notification.assigned_user?.name}
+            value={notification.permit_recipient}
           />
           <ReportField
             icon="⏱️"

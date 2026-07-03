@@ -84,12 +84,12 @@ export interface ProjectNotification {
   work_description: string;
   contractor_id?: string | null;
   contractor_name: string;
-  contractor_number?: string | null;
   contractor_technical_name?: string | null;
   contractor_technical_number?: string | null;
   contractor_category?: string | null;
   contractor_notes?: string | null;
-  contractor_mobile?: string | null;
+  permit_source?: string | null;
+  permit_recipient?: string | null;
   task_latitude: number;
   task_longitude: number;
   location_radius: number;
@@ -105,6 +105,7 @@ export interface ProjectNotification {
   status_label?: string | null;
   violations_count: number;
   magdy_number?: string | null;
+  machine_number?: string | null;
   internal_procedure_setting_id?: string | null;
   pending_processes?: unknown[];
   employee_task?: ProjectNotificationEmployeeTask | null;
@@ -135,6 +136,18 @@ export interface ProjectNotificationContractorsResponse
 
 export interface ProjectNotificationEmployeesLocationsResponse
   extends ApiBaseResponse<ProjectNotificationEmployee[]> {}
+
+export interface ProjectNotificationType {
+  id: string;
+  value: string;
+  name_ar: string;
+  name_en: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface ProjectNotificationTypesResponse
+  extends ApiBaseResponse<ProjectNotificationType[]> {}
 
 export interface ProjectNotificationDeleteResponse {
   code?: string;
