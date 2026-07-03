@@ -196,6 +196,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
         whatsapp: _m("WhatsApp", "واتساب"),
         sms: _m("SMS", "رسالة نصية"),
         push: _m("Push Notification", "إشعار التطبيق"),
+        voice: _m("Voice", "مكالمة صوتية"),
       }),
       actionTakerType: new MessagesGroup({
         specificUser: _m("Specific user", "لمستخدم محدد"),
