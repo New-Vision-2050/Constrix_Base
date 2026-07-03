@@ -104,6 +104,7 @@ export interface ProcedureStep {
   notify_by_whatsapp?: boolean;
   notify_by_sms?: boolean;
   notify_by_push?: boolean;
+  notify_by_voice?: boolean;
   /** Legacy fields */
   employee_id?: string;
   employee?: Employee;

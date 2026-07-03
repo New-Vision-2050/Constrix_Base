@@ -58,6 +58,7 @@ export interface CreateStepArgs {
   notify_by_whatsapp: boolean;
   notify_by_sms: boolean;
   notify_by_push?: boolean;
+  notify_by_voice?: boolean;
   duration?: number;
   report_type_ids?: string[];
 }

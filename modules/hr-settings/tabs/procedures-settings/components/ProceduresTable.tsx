@@ -175,6 +175,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
           notify_by_whatsapp: false,
           notify_by_sms: false,
           notify_by_push: false,
+          notify_by_voice: false,
         };
 
         try {
@@ -234,6 +235,7 @@ const ProceduresTable = forwardRef<ProceduresTableRef, ProceduresTableProps>(
         notify_by_whatsapp: false,
         notify_by_sms: false,
         notify_by_push: false,
+        notify_by_voice: false,
       };
 
       try {
