@@ -44,12 +44,12 @@ export interface CreateProjectNotificationArgs {
   work_description?: string | null;
   contractor_id?: string | null;
   contractor_name?: string | null;
-  contractor_number?: string | null;
   contractor_technical_name?: string | null;
   contractor_technical_number?: string | null;
   contractor_category?: string | null;
   contractor_notes?: string | null;
-  contractor_mobile?: string | null;
+  permit_source?: string | null;
+  permit_recipient?: string | null;
   task_latitude: number;
   task_longitude: number;
   location_radius: number;
@@ -60,6 +60,7 @@ export interface CreateProjectNotificationArgs {
   task_date?: string | null;
   duration_hours?: number | null;
   notes?: string | null;
+  machine_number?: string | null;
 }
 
 export interface UpdateProjectNotificationArgs

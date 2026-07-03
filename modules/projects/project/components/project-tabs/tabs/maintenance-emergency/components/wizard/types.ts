@@ -7,6 +7,7 @@ export interface WizardFormData {
   notification_number: string;
   notification_type: string;
   feeder_number: string;
+  machine_number: string;
   work_description: string;
   task_date: string;
   duration_hours: number;
@@ -15,12 +16,12 @@ export interface WizardFormData {
   // Step 2
   contractor_id: string;
   contractor_name: string;
-  contractor_number: string;
   contractor_technical_name: string;
   contractor_technical_number: string;
   contractor_category: string;
   contractor_notes: string;
-  contractor_mobile: string;
+  permit_source: string;
+  permit_recipient: string;
 
   // Step 3
   task_latitude: number | null;
@@ -43,6 +44,7 @@ export const EMPTY_FORM: WizardFormData = {
   notification_number: "",
   notification_type: "",
   feeder_number: "",
+  machine_number: "",
   work_description: "",
   task_date: new Date().toISOString().split("T")[0],
   duration_hours: 4,
@@ -50,12 +52,12 @@ export const EMPTY_FORM: WizardFormData = {
 
   contractor_id: "",
   contractor_name: "",
-  contractor_number: "",
   contractor_technical_name: "",
   contractor_technical_number: "",
   contractor_category: "",
   contractor_notes: "",
-  contractor_mobile: "",
+  permit_source: "",
+  permit_recipient: "",
 
   task_latitude: null,
   task_longitude: null,
@@ -67,12 +69,3 @@ export const EMPTY_FORM: WizardFormData = {
   selected_distance_meters: 0,
   employees: [],
 };
-
-export const NOTIFICATION_TYPE_OPTIONS = [
-  { value: "maintenance", label: "maintenance" },
-  { value: "emergency", label: "emergency" },
-  { value: "repair", label: "repair" },
-  { value: "inspection", label: "inspection" },
-  { value: "installation", label: "installation" },
-  { value: "removal", label: "removal" },
-];

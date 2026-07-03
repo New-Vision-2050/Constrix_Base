@@ -19,6 +19,7 @@ import type {
   ProjectNotificationMyInboxResponse,
   ProjectNotificationMyTasksResponse,
   ProjectNotificationSingleResponse,
+  ProjectNotificationTypesResponse,
   ProjectNotificationsListResponse,
   SiteStatusUpdatesResponse,
 } from "./types/response";
@@ -27,6 +28,7 @@ export type {
   ProjectNotification,
   ProjectNotificationContractor,
   ProjectNotificationEmployee,
+  ProjectNotificationType,
   ProjectNotificationUser,
   ProjectNotificationLocation,
   NotificationSeverity,
@@ -167,6 +169,11 @@ export const ProjectNotificationsApi = {
   getFilters: () =>
     baseApi.get<ProjectNotificationFiltersResponse>(
       "projects/notifications/filters",
+    ),
+
+  getNotificationTypes: () =>
+    baseApi.get<ProjectNotificationTypesResponse>(
+      "projects/notifications/notification-types",
     ),
 
   getSiteStatusUpdates: (notificationId: string) =>

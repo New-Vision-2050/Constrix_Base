@@ -41,13 +41,13 @@ import {
 } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
-import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications/types/response";
+import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
+import type { ProjectNotificationEmployee, ProjectNotificationType } from "@/services/api/projects/notifications/types/response";
 import ProjectNotificationMap from "./ProjectNotificationMap";
 import { useGoogleRouteDistances } from "./useGoogleRouteDistances";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 import {
   EMPTY_FORM,
-  NOTIFICATION_TYPE_OPTIONS,
   type WizardFormData,
   type WizardFormErrors,
   type WizardStep,
@@ -93,6 +93,8 @@ export default function CreateNotificationWizard({
   const createMutation = useCreateProjectNotificationMutation();
   const updateMutation = useUpdateProjectNotificationMutation();
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
+  const notificationTypesQuery = useProjectNotificationTypes();
+  const notificationTypes = notificationTypesQuery.data ?? [];
 
   const employeeQuery = useProjectNotificationEmployees({
     projectId,
@@ -272,7 +274,7 @@ export default function CreateNotificationWizard({
             </Stepper>
 
             {step === 1 && (
-              <Step1Form data={data} errors={errors} onChange={updateField} t={t} />
+              <Step1Form data={data} errors={errors} onChange={updateField} t={t} notificationTypes={notificationTypes} />
             )}
             {step === 2 && (
               <Step2Form data={data} errors={errors} onChange={updateField} t={t} />
@@ -355,11 +357,13 @@ function Step1Form({
   errors,
   onChange,
   t,
+  notificationTypes,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: ReturnType<typeof useTranslations>;
+  notificationTypes: ProjectNotificationType[];
 }) {
   return (
     <Grid container spacing={2}>
@@ -386,9 +390,9 @@ function Step1Form({
           error={Boolean(errors.notification_type)}
           helperText={errors.notification_type}
         >
-          {NOTIFICATION_TYPE_OPTIONS.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {t(`types.${option.label}`)}
+          {notificationTypes.map((option) => (
+            <MenuItem key={option.id} value={option.value}>
+              {option.value}
             </MenuItem>
           ))}
         </TextField>
@@ -403,6 +407,16 @@ function Step1Form({
           onChange={(e) => onChange("feeder_number", e.target.value)}
           error={Boolean(errors.feeder_number)}
           helperText={errors.feeder_number}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("machineNumber", { defaultValue: "رقم المعدة" })}
+          value={data.machine_number}
+          onChange={(e) => onChange("machine_number", e.target.value)}
         />
       </Grid>
 
@@ -481,7 +495,6 @@ function Step2Form({
     const selected = contractors.find((c) => c.id === contractorId);
     onChange("contractor_id", contractorId);
     onChange("contractor_name", selected?.name ?? "");
-    onChange("contractor_number", selected?.number ?? "");
   }
 
   return (
@@ -512,16 +525,6 @@ function Step2Form({
         <TextField
           fullWidth
           size="small"
-          label={t("contractorNumber")}
-          value={data.contractor_number}
-          onChange={(e) => onChange("contractor_number", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
           label={t("contractorTechnicalName", { defaultValue: "Contractor technical name" })}
           value={data.contractor_technical_name}
           onChange={(e) => onChange("contractor_technical_name", e.target.value)}
@@ -535,6 +538,26 @@ function Step2Form({
           label={t("contractorTechnicalNumber")}
           value={data.contractor_technical_number}
           onChange={(e) => onChange("contractor_technical_number", e.target.value)}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("permitSource", { defaultValue: "Permit Source" })}
+          value={data.permit_source}
+          onChange={(e) => onChange("permit_source", e.target.value)}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("permitRecipient", { defaultValue: "Permit Recipient" })}
+          value={data.permit_recipient}
+          onChange={(e) => onChange("permit_recipient", e.target.value)}
         />
       </Grid>
 
@@ -1021,6 +1044,7 @@ function Step5Form({
           { label: t("notification_number", { defaultValue: "رقم الإشعار" }), value: data.notification_number },
           { label: t("notificationType", { defaultValue: "نوع الاشعار" }), value: data.notification_type },
           { label: t("feeder_number", { defaultValue: "رقم المغذي" }), value: data.feeder_number },
+          { label: t("machineNumber", { defaultValue: "رقم المعدة" }), value: data.machine_number },
           { label: t("description"), value: data.work_description },
         ]}
       />
@@ -1029,9 +1053,10 @@ function Step5Form({
         title={t("summaryContractor")}
         rows={[
           { label: t("contractor"), value: data.contractor_name },
-          { label: t("contractorNumber"), value: data.contractor_number },
           { label: t("contractorTechnicalName", { defaultValue: "Contractor technical name" }), value: data.contractor_technical_name },
           { label: t("contractorTechnicalNumber"), value: data.contractor_technical_number },
+          { label: t("permitSource", { defaultValue: "Permit Source" }), value: data.permit_source },
+          { label: t("permitRecipient", { defaultValue: "Permit Recipient" }), value: data.permit_recipient },
         ]}
       />
 
