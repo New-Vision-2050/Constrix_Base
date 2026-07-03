@@ -216,7 +216,7 @@ export default function NotificationDetailView({
   );
 
   const handleBack = () => {
-    router.back();
+    router.push(`/projects/${projectId}?tab=project-tab-maintenance`);
   };
 
   const taskAttachments = notification?.attachments ?? notification?.employee_task?.attachments ?? [];

@@ -204,11 +204,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         index
       );
 
-      // Build default link if no custom link is provided
-      const defaultHref = `/${locale}${pathSegments
-        .slice(0, index + 1)
-        .map((seg) => `/${seg}`)
-        .join("")}`;
+      // Build default link if no custom link is provided (locale is added by i18n Link)
+      const defaultHref = `/${pathSegments.slice(0, index + 1).join("/")}`;
 
       // Use custom link if provided
       const href = customHref || defaultHref;
@@ -226,7 +223,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     <nav aria-label="breadcrumbs" className={`breadcrumbs ${className}`}>
       <ol className="flex items-center space-x-2 rtl:space-x-reverse">
         {breadcrumbs.map((crumb, index) => (
-          <React.Fragment key={crumb.href}>
+          <React.Fragment key={`${index}-${crumb.href}`}>
             <li>
               {crumb.isActive ? (
                 <span className="text-pink-500 font-medium">{crumb.label}</span>

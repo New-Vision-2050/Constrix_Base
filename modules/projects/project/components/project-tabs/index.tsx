@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Paper, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material";
+import { useSearchParams } from "@i18n/navigation";
 import { useProjectTabsList } from "./constants/ProjectTabsList";
 
 const tabsRowSx = {
@@ -21,13 +22,33 @@ export default function ProjectTabs() {
   const tabsList = useProjectTabsList();
   const [activeTab, setActiveTab] = useState<string>("");
   const [activeNestedTab, setActiveNestedTab] = useState<string>("");
+  const searchParams = useSearchParams();
+  const userSelected = useRef(false);
 
   useEffect(() => {
     if (tabsList.length === 0) return;
+
+    // If user manually picked a tab, only reset it when it becomes unavailable
+    if (userSelected.current) {
+      if (!activeTab || !tabsList.some((t) => t.id === activeTab)) {
+        setActiveTab(tabsList[0].id);
+        userSelected.current = false;
+      }
+      return;
+    }
+
+    // Otherwise, respect the URL tab param once it appears in the list
+    const tabFromUrl = searchParams.get("tab");
+    if (tabFromUrl && tabsList.some((t) => t.id === tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+      return;
+    }
+
+    // Fallback to the first available tab
     if (!activeTab || !tabsList.some((t) => t.id === activeTab)) {
       setActiveTab(tabsList[0].id);
     }
-  }, [tabsList, activeTab]);
+  }, [tabsList, activeTab, searchParams]);
 
   const value =
     tabsList.find((t) => t.id === activeTab)?.id ?? tabsList[0]?.id ?? false;
@@ -81,7 +102,10 @@ export default function ProjectTabs() {
         >
           <Tabs
             value={value}
-            onChange={(_, v: string) => setActiveTab(v)}
+            onChange={(_, v: string) => {
+              userSelected.current = true;
+              setActiveTab(v);
+            }}
             variant={isMdUp ? "fullWidth" : "scrollable"}
             scrollButtons={isMdUp ? false : "auto"}
             allowScrollButtonsMobile
