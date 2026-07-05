@@ -17,6 +17,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Plus, Eye, FileDown, Pencil, Trash2 } from "lucide-react";
+import { Map } from "@mui/icons-material";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -24,8 +26,12 @@ import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import I18nLink from "@i18n/link";
 import { ROUTER } from "@/router";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
+import {
+  buildNotificationsExportArgs,
+  notificationScopeExportFilename,
+} from "@/modules/projects/project/utils/notificationScope";
 import {
   useProjectNotifications,
   projectNotificationsQueryKey,
@@ -53,6 +59,18 @@ import NotificationStatusBadge from "./NotificationStatusBadge";
 import NotificationSeverityBadge from "./NotificationSeverityBadge";
 import CreateNotificationWizard from "./wizard/CreateNotificationWizard";
 
+const ProjectNotificationMapTasksView = dynamic(
+  () => import("./ProjectNotificationMapTasksView"),
+  {
+    ssr: false,
+    loading: () => (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress size={28} />
+      </Box>
+    ),
+  },
+);
+
 const TableLayout = HeadlessTableLayout<ProjectNotification>(
   "project-notifications-table",
 );
@@ -76,7 +94,12 @@ const WORK_TYPE_OPTIONS = ["electrical", "mechanical", "civil", "finishing", "la
 export default function ProjectNotificationsView() {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const tCommon = useTranslations("common");
-  const { projectId } = useProject();
+  const {
+    projectId,
+    contractualEngagementKey,
+    isEngagement,
+    hasScope,
+  } = useNotificationScope();
   const queryClient = useQueryClient();
 
   const [filterStatus, setFilterStatus] = useState("");
@@ -91,6 +114,7 @@ export default function ProjectNotificationsView() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardMode, setWizardMode] = useState<"create" | "edit">("create");
   const [editTargetId, setEditTargetId] = useState<string | null>(null);
+  const [view, setView] = useState<"table" | "map">("table");
 
   const { data: flatPerms, isLoading: isLoadingPerms } =
     useProjectMyPermissionsFlat(projectId);
@@ -99,35 +123,49 @@ export default function ProjectNotificationsView() {
 
   const canView = useMemo(
     () =>
-      hasAnyProjectPermissionKey(flatPerms, [
-        PROJECT_NOTIFICATION_VIEW,
-        PROJECT_NOTIFICATION_LIST,
-      ]),
-    [flatPerms],
+      isEngagement
+        ? true
+        : hasAnyProjectPermissionKey(flatPerms, [
+            PROJECT_NOTIFICATION_VIEW,
+            PROJECT_NOTIFICATION_LIST,
+          ]),
+    [isEngagement, flatPerms],
   );
   const canCreate = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_CREATE),
-    [flatPerms],
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_CREATE),
+    [isEngagement, flatPerms],
   );
   const canUpdate = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_UPDATE),
-    [flatPerms],
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_UPDATE),
+    [isEngagement, flatPerms],
   );
   const canDelete = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_DELETE),
-    [flatPerms],
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_DELETE),
+    [isEngagement, flatPerms],
   );
   const canExport = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_EXPORT),
-    [flatPerms],
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_EXPORT),
+    [isEngagement, flatPerms],
   );
   const canApprove = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_APPROVE),
-    [flatPerms],
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_APPROVE),
+    [isEngagement, flatPerms],
   );
   const canReject = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_REJECT),
-    [flatPerms],
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_REJECT),
+    [isEngagement, flatPerms],
   );
 
   const params = TableLayout.useTableParams({
@@ -137,6 +175,7 @@ export default function ProjectNotificationsView() {
 
   const { data: queryResult, isLoading } = useProjectNotifications({
     projectId,
+    contractualEngagementKey,
     page: params.page,
     perPage: params.limit,
     status: filterStatus || undefined,
@@ -153,16 +192,20 @@ export default function ProjectNotificationsView() {
   const totalPages = queryResult?.pagination?.last_page ?? 1;
   const totalItems = queryResult?.pagination?.result_count ?? data.length;
 
+  const notificationScope = { projectId, contractualEngagementKey };
+
+  const invalidateNotifications = () => {
+    queryClient.invalidateQueries({
+      queryKey: projectNotificationsQueryKey(notificationScope),
+    });
+  };
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => ProjectNotificationsApi.delete(id),
     onSuccess: () => {
       setDeleteTarget(null);
       toast.success(t("deleteSuccess"));
-      if (projectId) {
-        queryClient.invalidateQueries({
-          queryKey: projectNotificationsQueryKey({ projectId }),
-        });
-      }
+      invalidateNotifications();
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
       toast.error(error?.response?.data?.message ?? t("deleteError"));
@@ -173,11 +216,7 @@ export default function ProjectNotificationsView() {
     mutationFn: (id: string) => ProjectNotificationsApi.approve(id),
     onSuccess: () => {
       toast.success(t("approveSuccess"));
-      if (projectId) {
-        queryClient.invalidateQueries({
-          queryKey: projectNotificationsQueryKey({ projectId }),
-        });
-      }
+      invalidateNotifications();
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
       toast.error(error?.response?.data?.message ?? t("approveError"));
@@ -189,11 +228,7 @@ export default function ProjectNotificationsView() {
       ProjectNotificationsApi.reject(id, { rejection_reason: "" }),
     onSuccess: () => {
       toast.success(t("rejectSuccess"));
-      if (projectId) {
-        queryClient.invalidateQueries({
-          queryKey: projectNotificationsQueryKey({ projectId }),
-        });
-      }
+      invalidateNotifications();
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
       toast.error(error?.response?.data?.message ?? t("rejectError"));
@@ -202,21 +237,22 @@ export default function ProjectNotificationsView() {
 
   const exportMutation = useMutation({
     mutationFn: async () => {
-      const res = await ProjectNotificationsApi.export({
-        project_id: projectId!,
-        status: filterStatus || undefined,
-        severity: filterSeverity || undefined,
-        notification_type: filterType || undefined,
-        work_type: filterWorkType || undefined,
-        from_date: filterFromDate || undefined,
-        to_date: filterToDate || undefined,
-        assigned_user_id: filterAssignedUser || undefined,
-        search: params.search || undefined,
-      });
+      const res = await ProjectNotificationsApi.export(
+        buildNotificationsExportArgs(notificationScope, {
+          status: filterStatus || undefined,
+          severity: filterSeverity || undefined,
+          notification_type: filterType || undefined,
+          work_type: filterWorkType || undefined,
+          from_date: filterFromDate || undefined,
+          to_date: filterToDate || undefined,
+          assigned_user_id: filterAssignedUser || undefined,
+          search: params.search || undefined,
+        }),
+      );
       const url = window.URL.createObjectURL(res.data);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `notifications-${projectId}.xlsx`;
+      a.download = notificationScopeExportFilename(notificationScope);
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -236,10 +272,14 @@ export default function ProjectNotificationsView() {
         render: (row: ProjectNotification) =>
           row.notification_number ? (
             <I18nLink
-              href={ROUTER.PROJECT_NOTIFICATION_DETAILS(
-                projectId,
-                row.id,
-              )}
+              href={
+                contractualEngagementKey
+                  ? ROUTER.UNIFIED_CONTRACT_NOTIFICATION_DETAILS(
+                      contractualEngagementKey,
+                      row.id,
+                    )
+                  : ROUTER.PROJECT_NOTIFICATION_DETAILS(projectId!, row.id)
+              }
               className="p-2 text-sm text-primary hover:underline"
             >
               {row.notification_number}
@@ -389,6 +429,7 @@ export default function ProjectNotificationsView() {
     [
       t,
       projectId,
+      contractualEngagementKey,
       canUpdate,
       canDelete,
       canApprove,
@@ -411,11 +452,11 @@ export default function ProjectNotificationsView() {
     searchable: true,
   });
 
-  if (!projectId) {
+  if (!hasScope) {
     return null;
   }
 
-  if (isLoadingPerms) {
+  if (!isEngagement && isLoadingPerms) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
         <CircularProgress size={28} />
@@ -445,6 +486,13 @@ export default function ProjectNotificationsView() {
 
   return (
     <>
+      {view === "map" ? (
+        <ProjectNotificationMapTasksView
+          projectId={projectId}
+          contractualEngagementKey={contractualEngagementKey}
+          onBackToTable={() => setView("table")}
+        />
+      ) : (
       <Box>
         <TableLayout
           filters={
@@ -568,6 +616,13 @@ export default function ProjectNotificationsView() {
                 state={state}
                 customActions={
                   <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      startIcon={<Map />}
+                      onClick={() => setView("map")}
+                    >
+                      {t("showMap")}
+                    </Button>
                     {canCreate ? (
                       <Button
                         variant="contained"
@@ -605,6 +660,7 @@ export default function ProjectNotificationsView() {
           pagination={<TableLayout.Pagination state={state} />}
         />
       </Box>
+      )}
 
       <CreateNotificationWizard
         open={wizardOpen}

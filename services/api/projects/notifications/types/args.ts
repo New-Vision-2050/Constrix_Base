@@ -1,5 +1,8 @@
-export interface ProjectNotificationsListArgs {
-  project_id: string;
+export type ProjectNotificationScopeArgs =
+  | { project_id: string; contractual_engagement_key?: never }
+  | { contractual_engagement_key: string; project_id?: never };
+
+export interface ProjectNotificationsListArgs extends ProjectNotificationScopeArgs {
   page?: number;
   per_page?: number;
   status?: string;
@@ -18,8 +21,8 @@ export interface ProjectNotificationsMobileListArgs
   project_id?: string;
 }
 
-export interface ProjectNotificationsExportArgs {
-  project_id: string;
+export interface ProjectNotificationsExportArgs
+  extends ProjectNotificationScopeArgs {
   status?: string;
   severity?: string;
   notification_type?: string;
@@ -30,14 +33,19 @@ export interface ProjectNotificationsExportArgs {
   search?: string;
 }
 
-export interface ProjectNotificationsEmployeesLocationsArgs {
-  project_id: string;
+export interface ProjectNotificationsMapTasksArgs
+  extends ProjectNotificationScopeArgs {
+  status?: string;
+}
+
+export interface ProjectNotificationsEmployeesLocationsArgs
+  extends ProjectNotificationScopeArgs {
   latitude: number;
   longitude: number;
 }
 
-export interface CreateProjectNotificationArgs {
-  project_id: string;
+export interface CreateProjectNotificationArgs
+  extends ProjectNotificationScopeArgs {
   notification_number?: string | null;
   notification_type: string;
   feeder_number?: string | null;

@@ -46,12 +46,12 @@ function extractPolygonValues(
   return polygons;
 }
 
-export function useProjectNotificationLocationPolygons(projectId: string) {
+export function useProjectNotificationLocationPolygons(enabled: boolean) {
   const { data: procedures } = useQuery({
-    queryKey: ["project-notification-location-polygons", projectId],
+    queryKey: ["project-notification-location-polygons"],
     queryFn: () =>
       InternalProcedureSettingsApi.getInternalProcedures(PROCEDURE_TYPE),
-    enabled: !!projectId,
+    enabled,
   });
 
   const polygons = useMemo(() => {

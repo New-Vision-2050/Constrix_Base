@@ -416,6 +416,12 @@ export const projectMessages = new MessagesGroup({
     notifications: new MessagesGroup({
       title: _m("Notifications", "الإشعارات"),
       addNotification: _m("Add Notification", "إضافة إشعار"),
+      showMap: _m("Show Map", "عرض الخريطة"),
+      backToTable: _m("Back to table", "العودة للجدول"),
+      mapTasksTitle: _m("Pending notification tasks map", "خريطة مهام الإشعارات المعلقة"),
+      refreshMap: _m("Refresh", "تحديث"),
+      mapLoadError: _m("Failed to load map tasks", "تعذر تحميل مهام الخريطة"),
+      mapNoTasks: _m("No pending map tasks", "لا توجد مهام معلقة على الخريطة"),
       editNotification: _m("Edit Notification", "تعديل إشعار"),
       viewNotification: _m("View Notification", "عرض الإشعار"),
       deleteNotification: _m("Delete Notification", "حذف الإشعار"),
