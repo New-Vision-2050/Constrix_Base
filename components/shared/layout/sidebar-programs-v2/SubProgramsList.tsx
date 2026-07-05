@@ -132,7 +132,8 @@ export const SubProgramsList = memo(function SubProgramsList({
                       backgroundColor: "action.hover",
                       transform: "translateX(4px)",
                     },
-                    pl: isActive ? 3 : 2,
+                    pl: isActive ? 3 : sub.indent ? 4 : 2,
+                    pr: 2,
                   }}
                 >
                   {/* Icon */}

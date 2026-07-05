@@ -8,6 +8,8 @@ export type Entity = {
   slug?: string;
   origin_super_entity?: string;
   show: boolean;
+  /** Indent nested item under a parent sidebar entry */
+  indent?: boolean;
 };
 
 export type Attribute = {

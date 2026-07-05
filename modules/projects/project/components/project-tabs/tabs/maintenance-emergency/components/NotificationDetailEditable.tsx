@@ -28,7 +28,7 @@ import { useUpdateProjectNotificationMutation } from "@/modules/projects/project
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
 import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceFormat";
 import EditableSection from "./EditableSection";
 import ProjectNotificationMap from "./wizard/ProjectNotificationMap";
@@ -93,14 +93,16 @@ export default function NotificationDetailEditable({
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const theme = useTheme();
   const isRTL = theme.direction === "rtl";
-  const { projectId } = useProject();
+  const { projectId, contractualEngagementKey, hasScope } =
+    useNotificationScope();
+  const notificationScope = { projectId, contractualEngagementKey };
 
   const updateMutation = useUpdateProjectNotificationMutation();
   const contractorsQuery = useProjectNotificationContractors();
   const contractors = contractorsQuery.data ?? [];
   const notificationTypesQuery = useProjectNotificationTypes();
   const notificationTypes = notificationTypesQuery.data ?? [];
-  const locationPolygons = useProjectNotificationLocationPolygons(projectId);
+  const locationPolygons = useProjectNotificationLocationPolygons(hasScope);
 
   const [formData, setFormData] = useState<WizardFormData>(EMPTY_FORM);
   const [savingSection, setSavingSection] = useState<string | null>(null);
@@ -129,12 +131,12 @@ export default function NotificationDetailEditable({
   }, [formData.task_latitude, formData.task_longitude, locationPolygons]);
 
   async function saveSection(section: string, partialData: Partial<WizardFormData>) {
-    if (!projectId || !notification) return;
+    if (!hasScope || !notification) return;
     setSavingSection(section);
     try {
       const mergedData = { ...formData, ...partialData };
       await updateMutation.mutateAsync(
-        buildUpdatePayload(notification.id, projectId, mergedData),
+        buildUpdatePayload(notification.id, notificationScope, mergedData),
       );
       setFormData(mergedData);
       toast.success(t("updatedSuccess"));
@@ -504,6 +506,7 @@ export default function NotificationDetailEditable({
   // ===========================================================================
   const employeeQuery = useProjectNotificationEmployees({
     projectId,
+    contractualEngagementKey,
     latitude: formData.task_latitude ?? undefined,
     longitude: formData.task_longitude ?? undefined,
     enabled: true,

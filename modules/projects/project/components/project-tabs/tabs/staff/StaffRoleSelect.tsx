@@ -111,6 +111,27 @@ export default function StaffRoleSelect({
   };
 
   if (!projectId) {
+    const roleName = projectRole?.name?.trim();
+    if (roleName) {
+      return (
+        <Box
+          component="span"
+          sx={{
+            fontSize: "body2.fontSize",
+            minWidth: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            display: "inline-block",
+            maxWidth: 260,
+          }}
+          title={roleName}
+        >
+          {roleName}
+        </Box>
+      );
+    }
+
     return (
       <TextField
         select

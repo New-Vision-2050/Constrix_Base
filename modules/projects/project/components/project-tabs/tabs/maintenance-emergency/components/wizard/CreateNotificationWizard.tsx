@@ -33,7 +33,7 @@ import {
 import { Close } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
 import {
   useCreateProjectNotificationMutation,
   useProjectNotificationDetail,
@@ -74,11 +74,13 @@ export default function CreateNotificationWizard({
   notificationId,
 }: CreateNotificationWizardProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
-  const { projectId } = useProject();
+  const { projectId, contractualEngagementKey, hasScope } =
+    useNotificationScope();
+  const notificationScope = { projectId, contractualEngagementKey };
 
   const { data: existingNotification, isLoading: isLoadingDetail } =
     useProjectNotificationDetail(
-      projectId,
+      notificationScope,
       mode === "edit" ? notificationId ?? undefined : undefined,
     );
 
@@ -98,6 +100,7 @@ export default function CreateNotificationWizard({
 
   const employeeQuery = useProjectNotificationEmployees({
     projectId,
+    contractualEngagementKey,
     latitude: data.task_latitude ?? undefined,
     longitude: data.task_longitude ?? undefined,
     enabled: step === 4,
@@ -108,7 +111,7 @@ export default function CreateNotificationWizard({
     return [...list].sort((a, b) => a.distance_meters - b.distance_meters);
   }, [employeeQuery.data]);
 
-  const locationPolygons = useProjectNotificationLocationPolygons(projectId);
+  const locationPolygons = useProjectNotificationLocationPolygons(hasScope);
 
   const isInsideAllowedZone = useMemo(() => {
     if (data.task_latitude == null || data.task_longitude == null) return true;
@@ -202,7 +205,7 @@ export default function CreateNotificationWizard({
   }
 
   async function handleSubmit() {
-    if (!projectId) return;
+    if (!hasScope) return;
 
     const validation = validateStep(4, data);
     if (!validation.valid) {
@@ -214,11 +217,13 @@ export default function CreateNotificationWizard({
     try {
       if (mode === "edit" && notificationId) {
         await updateMutation.mutateAsync(
-          buildUpdatePayload(notificationId, projectId, data),
+          buildUpdatePayload(notificationId, notificationScope, data),
         );
         toast.success(t("updatedSuccess"));
       } else {
-        await createMutation.mutateAsync(buildCreatePayload(projectId, data));
+        await createMutation.mutateAsync(
+          buildCreatePayload(notificationScope, data),
+        );
         toast.success(t("createdSuccess"));
       }
       onClose();

@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, ReactNode, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AllProjectsApi, ProjectDetails } from "@/services/api/projects/all-projects";
+import { AllProjectsApi } from "@/services/api/projects/all-projects";
+import type { ProjectDetails } from "@/services/api/all-projects/types/response";
 import { useBreadcrumb } from "@/components/shared/breadcrumbs";
 
 interface ProjectContextType {
@@ -61,4 +62,8 @@ export function useProject() {
     throw new Error("useProject must be used within a ProjectProvider");
   }
   return context;
+}
+
+export function useOptionalProject() {
+  return useContext(ProjectContext);
 }

@@ -5,11 +5,14 @@ import type {
   ProjectNotificationsListPagination,
 } from "@/services/api/projects/notifications/types/response";
 import type { ProjectNotificationsListArgs } from "@/services/api/projects/notifications/types/args";
+import {
+  buildNotificationsListArgs,
+  type NotificationScope,
+} from "@/modules/projects/project/utils/notificationScope";
 
 export const PROJECT_NOTIFICATIONS_QUERY_KEY = "project-notifications" as const;
 
-export interface UseProjectNotificationsParams {
-  projectId: string | undefined;
+export interface UseProjectNotificationsParams extends NotificationScope {
   page?: number;
   perPage?: number;
   status?: string;
@@ -36,6 +39,7 @@ export interface ProjectNotificationsResult {
 export function useProjectNotifications(params: UseProjectNotificationsParams) {
   const {
     projectId,
+    contractualEngagementKey,
     page = 1,
     perPage = 10,
     status,
@@ -51,19 +55,21 @@ export function useProjectNotifications(params: UseProjectNotificationsParams) {
   return useQuery({
     queryKey: projectNotificationsQueryKey(params),
     queryFn: async (): Promise<ProjectNotificationsResult> => {
-      const args: ProjectNotificationsListArgs = {
-        project_id: projectId!,
-        page,
-        per_page: perPage,
-        ...(status ? { status } : {}),
-        ...(severity ? { severity } : {}),
-        ...(notificationType ? { notification_type: notificationType } : {}),
-        ...(workType ? { work_type: workType } : {}),
-        ...(fromDate ? { from_date: fromDate } : {}),
-        ...(toDate ? { to_date: toDate } : {}),
-        ...(assignedUserId ? { assigned_user_id: assignedUserId } : {}),
-        ...(search ? { search } : {}),
-      };
+      const args: ProjectNotificationsListArgs = buildNotificationsListArgs(
+        { projectId, contractualEngagementKey },
+        {
+          page,
+          per_page: perPage,
+          ...(status ? { status } : {}),
+          ...(severity ? { severity } : {}),
+          ...(notificationType ? { notification_type: notificationType } : {}),
+          ...(workType ? { work_type: workType } : {}),
+          ...(fromDate ? { from_date: fromDate } : {}),
+          ...(toDate ? { to_date: toDate } : {}),
+          ...(assignedUserId ? { assigned_user_id: assignedUserId } : {}),
+          ...(search ? { search } : {}),
+        },
+      );
 
       const res = await ProjectNotificationsApi.getList(args);
       const body = res.data;
@@ -77,7 +83,7 @@ export function useProjectNotifications(params: UseProjectNotificationsParams) {
 
       return { data: rows, pagination };
     },
-    enabled: !!projectId,
+    enabled: !!projectId || !!contractualEngagementKey,
     placeholderData: (prev) => prev,
   });
 }

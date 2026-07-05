@@ -7,6 +7,14 @@ export interface ProjectType {
   name: string;
 }
 
+export interface ContractualEngagement {
+  id: string;
+  name_ar: string;
+  name_en: string;
+  sort_order: number;
+  code: string;
+}
+
 export interface Manager {
   id: string;
   name: string;
@@ -133,6 +141,8 @@ export interface ProjectDetails {
   project_owner_type: string | null;
   project_owner_id: string | null;
   contract_id: string | null;
+  contract_type_id?: string | null;
+  contractual_engagement?: ContractualEngagement | null;
   client_id: string | null;
   project_classification_id: number | null;
   cost_center_branch_id: number | null;
@@ -194,6 +204,7 @@ export type CreateProjectResponse = ApiResponse<ProjectDetails>;
 export type UpdateProjectResponse = ApiResponse<ProjectDetails>;
 export type DeleteProjectResponse = ApiResponse<null>;
 export type GetProjectTypesResponse = ApiResponse<ProjectType[]>;
+export type GetContractualEngagementsResponse = ApiResponse<ContractualEngagement[]>;
 export type GetBranchesResponse = ApiResponse<Branch[]>;
 export type GetManagementsResponse = ApiResponse<Management[]>;
 export type GetCompanyUsersResponse = ApiResponse<Manager[]>;

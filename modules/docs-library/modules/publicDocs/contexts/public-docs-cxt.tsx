@@ -65,6 +65,8 @@ interface CxtType {
   setDocToView: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
   /** Set when viewing project attachments — folder APIs are project-scoped. */
   projectId?: string;
+  /** Contractual engagement scope (MAKKAH_UNIFIED / JEDDAH_UNIFIED). */
+  contractualEngagementKey?: string;
   /**
    * When viewing project-scoped library (`projectId` set), gates destructive / create
    * actions together with library permissions (`GET .../my-permissions/flat`).
@@ -204,6 +206,152 @@ function LibraryPublicDocsProviderInner({ children, fixedType, isProject }: Libr
         usersList,
         handleRefetchUsersList: () => refetchUsersList(),
         projectId: undefined,
+        projectArchiveGates: undefined,
+      }}
+    >
+      {children}
+    </Cxt.Provider>
+  );
+}
+
+type EngagementProps = {
+  children: ReactNode;
+  fixedType?: string;
+  contractualEngagementKey: string;
+};
+
+function EngagementPublicDocsProviderInner({
+  children,
+  fixedType,
+  contractualEngagementKey,
+}: EngagementProps) {
+  const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
+  const [showItemDetials, setShowItemDetials] = useState(false);
+  const [branchId, setBranchId] = useState("all");
+  const [openDirDialog, setOpenDirDialog] = useState(false);
+  const [openFileDialog, setOpenFileDialog] = useState(false);
+  const [openDirWithPassword, setOpenDirWithPassword] = useState(false);
+  const [deletedDocId, setDeletedDocId] = useState<string>();
+  const [editedDoc, setEditedDoc] = useState<DocumentT | undefined>(undefined);
+  const [parentId, setParentId] = useState<string | undefined>();
+  const [dirPassword, setDirPassword] = useState<string>();
+  const [tempParentId, setTempParentId] = useState("");
+  const [selectedDocs, setSelectedDocs] = useState<DocumentT[]>([]);
+  const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
+  const [docToView, setDocToView] = useState<DocumentT | undefined>(undefined);
+  const [sort, setSort] = useState("desc");
+  const [searchData, setSearchData] = useState<SearchFormData>({
+    endDate: "",
+    type: "",
+    documentType: "",
+    search: "",
+  });
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset list when scope changes only
+  }, [branchId, parentId]);
+
+  const { data: usersList, refetch: refetchUsersList } = useUsersData();
+
+  const {
+    data: docsResponse,
+    isLoading: isLoadingDocs,
+    refetch: refetchDocs,
+  } = useDocsData(
+    branchId,
+    parentId,
+    dirPassword,
+    limit,
+    page,
+    searchData,
+    sort,
+    fixedType,
+    undefined,
+    undefined,
+    contractualEngagementKey,
+  );
+
+  const {
+    data: foldersList,
+    isLoading: isLoadingFoldersList,
+    isError: isErrorFoldersList,
+    refetch: refetchFoldersList,
+  } = useFoldersList();
+
+  const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
+  const storeSelectedDocument = (document: DocumentT | undefined) => {
+    setSelectedDocument(document);
+  };
+  const handleSetBranchId = (id: string) => setBranchId(id);
+
+  const toggleDocInSelectedDocs = (doc: DocumentT) => {
+    const existing = selectedDocs.find((d) => d.id === doc.id);
+    if (existing) {
+      setSelectedDocs(selectedDocs.filter((d) => d.id !== existing.id));
+    } else {
+      setSelectedDocs([...selectedDocs, doc]);
+    }
+  };
+
+  const clearSelectedDocs = () => {
+    setSelectedDocs([]);
+  };
+
+  return (
+    <Cxt.Provider
+      value={{
+        showItemDetials,
+        toggleShowItemDetials,
+        docs: docsResponse?.payload,
+        docsPagination: docsResponse?.pagination,
+        isLoadingDocs,
+        refetchDocs,
+        selectedDocument,
+        storeSelectedDocument,
+        branchId,
+        handleSetBranchId,
+        openDirDialog,
+        setOpenDirDialog,
+        openFileDialog,
+        setOpenFileDialog,
+        openDirWithPassword,
+        setOpenDirWithPassword,
+        editedDoc,
+        setEditedDoc,
+        parentId,
+        setParentId,
+        deletedDocId,
+        setDeletedDocId,
+        dirPassword,
+        setDirPassword,
+        tempParentId,
+        setTempParentId,
+        selectedDocs,
+        toggleDocInSelectedDocs,
+        clearSelectedDocs,
+        limit,
+        setLimit,
+        page,
+        setPage,
+        foldersList,
+        isLoadingFoldersList,
+        isErrorFoldersList,
+        handleRefetchFoldersList: () => refetchFoldersList(),
+        searchData,
+        setSearchData,
+        visitedDirs,
+        setVisitedDirs,
+        sort,
+        setSort,
+        docToView,
+        setDocToView,
+        usersList,
+        handleRefetchUsersList: () => refetchUsersList(),
+        projectId: undefined,
+        contractualEngagementKey,
         projectArchiveGates: undefined,
       }}
     >
@@ -363,6 +511,7 @@ interface PropsT {
   children: ReactNode;
   fixedType?: string;
   projectId?: string;
+  contractualEngagementKey?: string;
   /** Initial folder scope when `projectId` is set (defaults to project root in API). */
   initialParentId?: string;
   /** Project archive-library permission gates for `projectId` attachments tab. */
@@ -375,10 +524,21 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
   children,
   fixedType,
   projectId,
+  contractualEngagementKey,
   initialParentId,
   projectArchiveGates,
   isProject,
 }) => {
+  if (contractualEngagementKey) {
+    return (
+      <EngagementPublicDocsProviderInner
+        fixedType={fixedType}
+        contractualEngagementKey={contractualEngagementKey}
+      >
+        {children}
+      </EngagementPublicDocsProviderInner>
+    );
+  }
   if (projectId) {
     return (
       <ProjectPublicDocsProviderInner

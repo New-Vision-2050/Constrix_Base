@@ -134,6 +134,52 @@ export interface ProjectNotificationSingleResponse
 export interface ProjectNotificationContractorsResponse
   extends ApiBaseResponse<ProjectNotificationContractor[]> {}
 
+export interface ProjectNotificationMapTaskItem {
+  id: string;
+  notification_number: string | null;
+  task_name: string | null;
+  latitude: number;
+  longitude: number;
+  radius: number;
+  status: string;
+  status_label?: string | null;
+  status_label_ar?: string | null;
+  status_label_en?: string | null;
+  assigned_user?: ProjectNotificationUser | null;
+  assigned_user_name?: string | null;
+  contractor_technical_name?: string | null;
+  contractor_name?: string | null;
+  receive_date?: string | null;
+}
+
+export interface ProjectNotificationMapTaskStatusOption {
+  key: string;
+  label_ar: string;
+  label_en: string;
+}
+
+export interface ProjectNotificationMapTasksPayload {
+  items: ProjectNotificationMapTaskItem[];
+  statuses: ProjectNotificationMapTaskStatusOption[];
+}
+
+/** Normalized row for map rendering. */
+export interface ProjectNotificationMapTask {
+  id: string;
+  name: string;
+  notificationNumber: string | null;
+  latitude: number;
+  longitude: number;
+  radius: number;
+  status: string;
+  statusLabel: string | null;
+  assignedUserName: string | null;
+  receiveDate?: string | null;
+}
+
+export interface ProjectNotificationMapTasksResponse
+  extends ApiBaseResponse<ProjectNotificationMapTasksPayload> {}
+
 export interface ProjectNotificationEmployeesLocationsResponse
   extends ApiBaseResponse<ProjectNotificationEmployee[]> {}
 
