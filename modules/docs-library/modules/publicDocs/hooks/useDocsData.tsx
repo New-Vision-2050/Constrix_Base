@@ -7,7 +7,7 @@ import {
 } from "@/services/api/projects/project-attachments";
 
 /**
- * Folder contents for the public docs library, or project attachments when `projectId` is set.
+ * Folder contents for the public docs library, project attachments, or contractual engagement scope.
  */
 export default function useDocsData(
   branchId?: string,
@@ -20,13 +20,17 @@ export default function useDocsData(
   fixedType?: string,
   projectId?: string,
   isProject?: boolean,
+  contractualEngagementKey?: string,
 ) {
+  const isEngagementScope = Boolean(contractualEngagementKey);
+  const isProjectScope = Boolean(projectId) && !isEngagementScope;
+
   return useQuery({
-    queryKey: projectId
+    queryKey: isEngagementScope
       ? [
           "docs",
-          "project",
-          projectId,
+          "contractual-engagement",
+          contractualEngagementKey,
           branchId,
           parentId,
           password,
@@ -36,32 +40,22 @@ export default function useDocsData(
           sort,
           fixedType,
         ]
-      : [
-          "docs",
-          branchId,
-          parentId,
-          password,
-          limit,
-          page,
-          searchData,
-          sort,
-          fixedType,
-          isProject,
-        ],
-    queryFn: () =>
-      projectId
-        ? ProjectAttachmentsApi.getFolderContents(
+      : isProjectScope
+        ? [
+            "docs",
+            "project",
             projectId,
             branchId,
             parentId,
             password,
             limit,
             page,
-            searchData as ProjectAttachmentsSearchFormData | undefined,
+            searchData,
             sort,
             fixedType,
-          )
-        : getDocs(
+          ]
+        : [
+            "docs",
             branchId,
             parentId,
             password,
@@ -71,8 +65,48 @@ export default function useDocsData(
             sort,
             fixedType,
             isProject,
-          ),
-    enabled: projectId ? Boolean(projectId) : true,
+          ],
+    queryFn: () => {
+      if (isEngagementScope) {
+        return ProjectAttachmentsApi.getFolderContents(
+          undefined,
+          branchId,
+          parentId,
+          password,
+          limit,
+          page,
+          searchData as ProjectAttachmentsSearchFormData | undefined,
+          sort,
+          fixedType,
+          contractualEngagementKey,
+        );
+      }
+      if (isProjectScope) {
+        return ProjectAttachmentsApi.getFolderContents(
+          projectId,
+          branchId,
+          parentId,
+          password,
+          limit,
+          page,
+          searchData as ProjectAttachmentsSearchFormData | undefined,
+          sort,
+          fixedType,
+        );
+      }
+      return getDocs(
+        branchId,
+        parentId,
+        password,
+        limit,
+        page,
+        searchData,
+        sort,
+        fixedType,
+        isProject,
+      );
+    },
+    enabled: isEngagementScope || isProjectScope || !projectId,
     refetchOnWindowFocus: false,
   });
 }

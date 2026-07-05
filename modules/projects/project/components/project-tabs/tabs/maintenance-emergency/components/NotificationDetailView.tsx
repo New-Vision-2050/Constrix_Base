@@ -22,6 +22,7 @@ import { useTranslations } from "next-intl";
 import { useTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "@/i18n/navigation";
+import { ROUTER } from "@/router";
 import { useProjectNotificationDetail, useProjectNotificationAvailableActions } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useEmployeeTaskProcedures } from "@/modules/projects/project/query/useEmployeeTaskProcedures";
 import NotificationStatusBadge from "./NotificationStatusBadge";
@@ -32,7 +33,8 @@ import SiteStatusUpdatesTab from "./SiteStatusUpdatesTab";
 import type { ProjectNotificationAttachment } from "@/services/api/projects/notifications/types/response";
 
 interface NotificationDetailViewProps {
-  projectId: string;
+  projectId?: string;
+  contractualEngagementKey?: string;
   notificationId: string;
 }
 
@@ -193,6 +195,7 @@ function AttachmentList({
 
 export default function NotificationDetailView({
   projectId,
+  contractualEngagementKey,
   notificationId,
 }: NotificationDetailViewProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
@@ -201,9 +204,10 @@ export default function NotificationDetailView({
   const theme = useTheme();
   const isRTL = theme.direction === "rtl";
   const [activeTab, setActiveTab] = useState(0);
+  const notificationScope = { projectId, contractualEngagementKey };
 
   const { data: notification, isLoading, isError } = useProjectNotificationDetail(
-    projectId,
+    notificationScope,
     notificationId,
   );
 
@@ -216,6 +220,12 @@ export default function NotificationDetailView({
   );
 
   const handleBack = () => {
+    if (contractualEngagementKey) {
+      router.push(
+        `${ROUTER.UNIFIED_CONTRACT(contractualEngagementKey)}?tab=engagement-tab-maintenance`,
+      );
+      return;
+    }
     router.push(`/projects/${projectId}?tab=project-tab-maintenance`);
   };
 

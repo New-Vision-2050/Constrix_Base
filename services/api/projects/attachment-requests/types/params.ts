@@ -18,7 +18,8 @@ export interface OutgoingAttachmentRequestsParams {
 
 /** GET `projects/attachment-requests` — unified incoming + outgoing list */
 export interface AttachmentRequestsListParams {
-  project_id: string;
+  project_id?: string;
+  contractual_engagement_key?: string;
   page?: number;
   per_page?: number;
   document_type?: string;
@@ -27,6 +28,8 @@ export interface AttachmentRequestsListParams {
   end_date?: string;
   /** Optional: restrict to incoming or outgoing rows when API supports it */
   direction?: "incoming" | "outgoing";
+  receiver_id?: string;
+  name?: string;
 }
 
 export interface CreateAttachmentRequestData {

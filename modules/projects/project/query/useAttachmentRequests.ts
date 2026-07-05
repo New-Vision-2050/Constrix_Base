@@ -101,7 +101,8 @@ function attachmentRequestsListFromBody(body: {
 }
 
 export interface UseAttachmentRequestsParams {
-  projectId: string | undefined;
+  projectId?: string;
+  contractualEngagementKey?: string;
   page: number;
   perPage: number;
   documentType?: string;
@@ -125,6 +126,7 @@ export interface AttachmentRequestsResult {
 export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
   const {
     projectId,
+    contractualEngagementKey,
     page,
     perPage,
     documentType,
@@ -139,7 +141,6 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
     queryKey: attachmentRequestsQueryKey(params),
     queryFn: async (): Promise<AttachmentRequestsResult> => {
       const res = await AttachmentRequestsApi.getList({
-        project_id: projectId!,
         page,
         per_page: perPage,
         ...(documentType ? { document_type: documentType } : {}),
@@ -150,6 +151,9 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
           : {}),
         ...(receiverId ? { receiver_id: receiverId } : {}),
         ...(name ? { name } : {}),
+        ...(contractualEngagementKey
+          ? { contractual_engagement_key: contractualEngagementKey }
+          : { project_id: projectId! }),
       });
 
       const body = res.data;
@@ -166,7 +170,7 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
         totalItems,
       };
     },
-    enabled: !!projectId,
+    enabled: !!projectId || !!contractualEngagementKey,
     placeholderData: (prev) => prev,
   });
 }

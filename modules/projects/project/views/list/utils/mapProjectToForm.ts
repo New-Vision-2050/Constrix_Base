@@ -9,6 +9,7 @@ export type ProjectEditSelections = {
   management?: { id: number | string; name: string } | null;
   manager?: { id: string; name: string } | null;
   projectOwner?: { id: string; name: string; type?: string } | null;
+  contractType?: { id: string; name: string } | null;
 };
 
 function toIdString(value: unknown): string | undefined {
@@ -40,7 +41,9 @@ export function mapProjectToFormValues(
         ? project.project_owner_type
         : undefined,
     project_classification_id: toIdString(project.project_classification_id),
-    contract_type_id: undefined,
+    contractual_engagement_id: toIdString(
+      project.contractual_engagement?.id ?? project.contract_type_id,
+    ),
     status: project.status ?? 1,
   };
 }
@@ -56,6 +59,14 @@ export function mapProjectToEditSelections(
     management: project.management,
     manager: project.manager,
     projectOwner: project.project_owner,
+    contractType: project.contractual_engagement
+      ? {
+          id: project.contractual_engagement.id,
+          name: project.contractual_engagement.name_ar,
+        }
+      : project.contract_type_id
+        ? { id: project.contract_type_id, name: project.contract_type_id }
+        : null,
   };
 }
 

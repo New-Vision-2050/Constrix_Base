@@ -4,6 +4,7 @@ import type {
   ProjectNotificationsEmployeesLocationsArgs,
   ProjectNotificationsExportArgs,
   ProjectNotificationsListArgs,
+  ProjectNotificationsMapTasksArgs,
   ProjectNotificationsMobileListArgs,
   ProjectNotificationMobileActionArgs,
   ProjectNotificationRejectArgs,
@@ -15,6 +16,7 @@ import type {
   ProjectNotificationDeleteResponse,
   ProjectNotificationEmployeesLocationsResponse,
   ProjectNotificationFiltersResponse,
+  ProjectNotificationMapTasksResponse,
   ProjectNotificationMyInboxCountsResponse,
   ProjectNotificationMyInboxResponse,
   ProjectNotificationMyTasksResponse,
@@ -116,6 +118,12 @@ export const ProjectNotificationsApi = {
   ) =>
     baseApi.get<ProjectNotificationEmployeesLocationsResponse>(
       "projects/notifications/employees-with-locations",
+      { params: args },
+    ),
+
+  getMapTasks: (args: ProjectNotificationsMapTasksArgs) =>
+    baseApi.get<ProjectNotificationMapTasksResponse>(
+      "projects/notifications/map-tasks",
       { params: args },
     ),
 

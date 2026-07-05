@@ -20,6 +20,7 @@ export interface CreateProjectData {
   management_id: number;
   status: number;
   project_owner_type?: "company" | "individual";
+  contractual_engagement_id?: string;
 }
 
 export interface UpdateProjectData extends Partial<CreateProjectData> {}

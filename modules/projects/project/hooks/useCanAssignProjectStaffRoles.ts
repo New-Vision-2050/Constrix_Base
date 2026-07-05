@@ -1,12 +1,16 @@
 import { useMemo } from "react";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
+import {
+  useOptionalProject,
+} from "@/modules/all-project/context/ProjectContext";
 import useUserProfileData from "@/modules/user-profile/hooks/useUserProfileData";
 
 /**
  * Only the project's `manager_id` may change staff/cadre project roles (`user_id` from company-users profile).
  */
 export function useCanAssignProjectStaffRoles(canUpdate: boolean) {
-  const { projectData, isLoading: isLoadingProject } = useProject();
+  const project = useOptionalProject();
+  const projectData = project?.projectData;
+  const isLoadingProject = project?.isLoading ?? false;
   const { data: profileData, isLoading: isLoadingProfile } =
     useUserProfileData();
 

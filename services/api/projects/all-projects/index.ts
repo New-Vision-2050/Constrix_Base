@@ -13,6 +13,7 @@ import {
   GetManagementsResponse,
   GetEmployeesNotInProjectResponse,
   GetProjectEmployeesResponse,
+  GetContractualEngagementsResponse,
   GetProjectTypesResponse,
   ListProjectsResponse,
   ShowProjectResponse,
@@ -34,6 +35,11 @@ export const AllProjectsApi = {
 
   delete: (id: string | number) =>
     baseApi.delete<DeleteProjectResponse>(`projects/${id}`),
+
+  getContractualEngagements: () =>
+    baseApi.get<GetContractualEngagementsResponse>(
+      "projects/contractual-engagements",
+    ),
 
   getProjectTypes: () =>
     baseApi.get<GetProjectTypesResponse>("project-types/roots"),
@@ -110,5 +116,14 @@ export const AllProjectsApi = {
     baseApi.put<{ code: string; message?: string | null }>(
       `projects/employees/${assignmentId}/assign-role`,
       data,
+    ),
+
+  getEmployeesByContractualEngagement: (
+    contractualEngagementKey: string,
+    params?: { company_id?: string; search?: string },
+  ) =>
+    baseApi.get<GetProjectEmployeesResponse>(
+      `projects/employees/contractual-engagement/${contractualEngagementKey}`,
+      { params },
     ),
 };

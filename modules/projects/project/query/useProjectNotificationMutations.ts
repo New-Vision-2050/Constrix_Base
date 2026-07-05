@@ -8,10 +8,23 @@ import type {
   UpdateProjectNotificationArgs,
 } from "@/services/api/projects/notifications/types/args";
 import { projectNotificationsQueryKey } from "./useProjectNotifications";
+import type { NotificationScope } from "@/modules/projects/project/utils/notificationScope";
 
 export const PROJECT_NOTIFICATION_DETAIL_QUERY_KEY = "project-notification-detail" as const;
 export const PROJECT_NOTIFICATION_AVAILABLE_ACTIONS_QUERY_KEY = "project-notification-available-actions" as const;
 export const SITE_STATUS_UPDATES_QUERY_KEY = "site-status-updates" as const;
+
+function notificationScopeFromArgs(
+  args: Pick<
+    CreateProjectNotificationArgs | UpdateProjectNotificationArgs,
+    "project_id" | "contractual_engagement_key"
+  >,
+): NotificationScope {
+  return {
+    projectId: args.project_id,
+    contractualEngagementKey: args.contractual_engagement_key,
+  };
+}
 
 export function useCreateProjectNotificationMutation() {
   const queryClient = useQueryClient();
@@ -23,7 +36,9 @@ export function useCreateProjectNotificationMutation() {
     },
     onSuccess: (_, args) => {
       queryClient.invalidateQueries({
-        queryKey: projectNotificationsQueryKey({ projectId: args.project_id }),
+        queryKey: projectNotificationsQueryKey(
+          notificationScopeFromArgs(args),
+        ),
       });
     },
   });
@@ -34,18 +49,20 @@ export function useUpdateProjectNotificationMutation() {
 
   return useMutation({
     mutationFn: async (args: UpdateProjectNotificationArgs) => {
-      const { id, project_id, ...rest } = args;
+      const { id, project_id: _projectId, contractual_engagement_key: _key, ...rest } = args;
       const res = await ProjectNotificationsApi.update(id, rest);
       return res.data.payload?.[0] ?? null;
     },
     onSuccess: (_, args) => {
+      const scope = notificationScopeFromArgs(args);
       queryClient.invalidateQueries({
-        queryKey: projectNotificationsQueryKey({ projectId: args.project_id }),
+        queryKey: projectNotificationsQueryKey(scope),
       });
       queryClient.invalidateQueries({
         queryKey: [
           PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
-          args.project_id,
+          scope.projectId,
+          scope.contractualEngagementKey,
           args.id,
         ],
       });
@@ -54,24 +71,25 @@ export function useUpdateProjectNotificationMutation() {
 }
 
 export function useProjectNotificationDetail(
-  projectId: string | undefined,
+  scope: NotificationScope,
   notificationId: string | undefined,
 ) {
   return useQuery<ProjectNotification | null>({
     queryKey: [
       PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
-      projectId,
+      scope.projectId,
+      scope.contractualEngagementKey,
       notificationId,
     ],
     queryFn: async () => {
-      if (!projectId || !notificationId) return null;
+      if (!notificationId) return null;
       const res = await ProjectNotificationsApi.getById(notificationId);
       const payload = res.data.payload;
       if (!payload) return null;
       if (Array.isArray(payload)) return payload[0] ?? null;
       return payload as unknown as ProjectNotification;
     },
-    enabled: !!projectId && !!notificationId,
+    enabled: !!notificationId,
   });
 }
 

@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import SaveButton from "@/components/shared/buttons/save";
 import CancelButton from "@/components/shared/buttons/cancel";
 import FormDatePicker from "@/components/shared/FormDatePicker";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
 import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 
@@ -41,7 +41,7 @@ interface AddFileDialogProps {
 
 export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
   const t = useTranslations("project.documentCycle");
-  const { projectId } = useProject();
+  const projectId = useOptionalProject()?.projectId;
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
