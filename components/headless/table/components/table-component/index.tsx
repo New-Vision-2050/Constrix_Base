@@ -274,7 +274,7 @@ export function createTableComponent<TRow>() {
                 </TableCell>
               )}
               {columns.map((column) => (
-                <TableCell key={column.key}>
+                <TableCell key={column.key} align={column.align || "left"}>
                   {column.sortable ? (
                     <TableSortLabel
                       active={sortBy === column.key}
@@ -345,7 +345,7 @@ export function createTableComponent<TRow>() {
                           </TableCell>
                         )}
                         {columns.map((column) => (
-                          <TableCell key={column.key}>
+                          <TableCell key={column.key} align={column.align || "left"}>
                             {column.render(row, index, column)}
                           </TableCell>
                         ))}
