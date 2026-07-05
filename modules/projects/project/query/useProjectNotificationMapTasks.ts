@@ -4,6 +4,7 @@ import type {
   ProjectNotificationMapTask,
   ProjectNotificationMapTaskItem,
   ProjectNotificationMapTasksPayload,
+  ProjectNotificationMapTaskStatusOption,
 } from "@/services/api/projects/notifications/types/response";
 import {
   buildNotificationsMapTasksArgs,
@@ -40,6 +41,14 @@ function normalizeMapTask(
   const notificationNumber = item.notification_number?.trim() || null;
   const name = taskName || notificationNumber || item.id;
 
+  const assignedUserName =
+    item.assigned_user?.name?.trim() ||
+    (typeof item.assigned_user === "string" ? item.assigned_user.trim() : null) ||
+    item.assigned_user_name?.trim() ||
+    item.contractor_technical_name?.trim() ||
+    item.contractor_name?.trim() ||
+    null;
+
   return {
     id: item.id,
     name,
@@ -49,7 +58,8 @@ function normalizeMapTask(
     radius: radius ?? 100,
     status: item.status,
     statusLabel: item.status_label?.trim() || null,
-    assignedUserName: item.assigned_user?.name?.trim() || null,
+    assignedUserName,
+    receiveDate: item.receive_date,
   };
 }
 
@@ -65,24 +75,34 @@ export function projectNotificationMapTasksQueryKey(
   ] as const;
 }
 
+export interface ProjectNotificationMapTasksData {
+  items: ProjectNotificationMapTask[];
+  statuses: ProjectNotificationMapTaskStatusOption[];
+}
+
 export function useProjectNotificationMapTasks(
   scope: NotificationScope,
-  status = "pending",
+  status?: string,
 ) {
   const { projectId, contractualEngagementKey } = scope;
 
   return useQuery({
     queryKey: projectNotificationMapTasksQueryKey(scope, status),
-    queryFn: async (): Promise<ProjectNotificationMapTask[]> => {
+    queryFn: async (): Promise<ProjectNotificationMapTasksData> => {
       const res = await ProjectNotificationsApi.getMapTasks(
         buildNotificationsMapTasksArgs(scope, status),
       );
 
-      const items = resolveMapTasksPayload(res.data.payload);
+      const payload = res.data.payload;
+      const items = resolveMapTasksPayload(payload);
+      const statuses = Array.isArray(payload?.statuses) ? payload.statuses : [];
 
-      return items
-        .map((item) => normalizeMapTask(item))
-        .filter((item): item is ProjectNotificationMapTask => item != null);
+      return {
+        items: items
+          .map((item) => normalizeMapTask(item))
+          .filter((item): item is ProjectNotificationMapTask => item != null),
+        statuses,
+      };
     },
     enabled: !!projectId || !!contractualEngagementKey,
   });

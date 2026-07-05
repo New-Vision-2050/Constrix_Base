@@ -143,7 +143,12 @@ export interface ProjectNotificationMapTaskItem {
   radius: number;
   status: string;
   status_label?: string | null;
+  status_label_ar?: string | null;
+  status_label_en?: string | null;
   assigned_user?: ProjectNotificationUser | null;
+  assigned_user_name?: string | null;
+  contractor_technical_name?: string | null;
+  contractor_name?: string | null;
   receive_date?: string | null;
 }
 
@@ -169,6 +174,7 @@ export interface ProjectNotificationMapTask {
   status: string;
   statusLabel: string | null;
   assignedUserName: string | null;
+  receiveDate?: string | null;
 }
 
 export interface ProjectNotificationMapTasksResponse
