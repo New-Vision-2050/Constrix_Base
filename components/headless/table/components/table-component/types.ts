@@ -5,6 +5,7 @@ export type ColumnDef<TRow> = {
   key: string; // Unique identifier for the column (used for sorting)
   name: string; // Display name for the column header
   sortable?: boolean; // Whether this column can be sorted
+  align?: "left" | "center" | "right" | "justify"; // Alignment for header and body cells
   render: (
     row: TRow,
     index: number,

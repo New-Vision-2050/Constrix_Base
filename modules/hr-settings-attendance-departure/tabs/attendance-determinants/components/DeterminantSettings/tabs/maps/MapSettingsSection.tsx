@@ -416,6 +416,7 @@ export default function MapSettingsSection({
         key: "actions",
         name: t("columnActions"),
         sortable: false,
+        align: "center",
         render: (row: MapLocationRow) => (
           <div className="flex justify-center p-2">
             <DropdownMenu dir="rtl">
