@@ -13,7 +13,7 @@ import {
   GetManagementsResponse,
   GetEmployeesNotInProjectResponse,
   GetProjectEmployeesResponse,
-  ContractualEngagementsResponse,
+  GetContractualEngagementsResponse,
   GetProjectTypesResponse,
   ListProjectsResponse,
   ShowProjectResponse,
@@ -37,7 +37,7 @@ export const AllProjectsApi = {
     baseApi.delete<DeleteProjectResponse>(`projects/${id}`),
 
   getContractualEngagements: () =>
-    baseApi.get<ContractualEngagementsResponse>(
+    baseApi.get<GetContractualEngagementsResponse>(
       "projects/contractual-engagements",
     ),
 

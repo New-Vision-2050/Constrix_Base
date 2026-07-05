@@ -15,11 +15,6 @@ export interface ContractualEngagement {
   code: string;
 }
 
-export interface ContractualEngagementsResponse {
-  success: boolean;
-  data: ContractualEngagement[];
-}
-
 export interface Manager {
   id: string;
   name: string;
@@ -209,6 +204,7 @@ export type CreateProjectResponse = ApiResponse<ProjectDetails>;
 export type UpdateProjectResponse = ApiResponse<ProjectDetails>;
 export type DeleteProjectResponse = ApiResponse<null>;
 export type GetProjectTypesResponse = ApiResponse<ProjectType[]>;
+export type GetContractualEngagementsResponse = ApiResponse<ContractualEngagement[]>;
 export type GetBranchesResponse = ApiResponse<Branch[]>;
 export type GetManagementsResponse = ApiResponse<Management[]>;
 export type GetCompanyUsersResponse = ApiResponse<Manager[]>;
