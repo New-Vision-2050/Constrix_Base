@@ -7,6 +7,19 @@ export interface ProjectType {
   name: string;
 }
 
+export interface ContractualEngagement {
+  id: string;
+  name_ar: string;
+  name_en: string;
+  sort_order: number;
+  code: string;
+}
+
+export interface ContractualEngagementsResponse {
+  success: boolean;
+  data: ContractualEngagement[];
+}
+
 export interface Manager {
   id: string;
   name: string;
@@ -133,6 +146,8 @@ export interface ProjectDetails {
   project_owner_type: string | null;
   project_owner_id: string | null;
   contract_id: string | null;
+  contract_type_id?: string | null;
+  contractual_engagement?: ContractualEngagement | null;
   client_id: string | null;
   project_classification_id: number | null;
   cost_center_branch_id: number | null;

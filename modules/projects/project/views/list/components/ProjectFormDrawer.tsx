@@ -174,6 +174,7 @@ export function ProjectFormDrawer({
         manager_id: data.manager_id ? data.manager_id : null,
         status: data.status,
         project_owner_type: data.project_owner_type || undefined,
+        contract_type_id: data.contract_type_id?.trim() || undefined,
       };
 
       if (editingProjectId) {

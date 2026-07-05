@@ -51,6 +51,7 @@ interface ProjectFormFieldsProps {
   companyUsersData?: OptionItem[];
   entityClientsData?: OptionItem[];
   individualClientsData?: OptionItem[];
+  contractTypesData?: OptionItem[];
   editSelections?: ProjectEditSelections | null;
   onSearchChange?: (fieldName: string, searchValue: string) => void;
 }
@@ -71,6 +72,7 @@ export function ProjectFormFields({
   companyUsersData,
   entityClientsData,
   individualClientsData,
+  contractTypesData,
   editSelections,
   onSearchChange,
 }: ProjectFormFieldsProps) {
@@ -138,6 +140,12 @@ export function ProjectFormFields({
     }
     return individualClientsData ?? [];
   }, [individualClientsData, editSelections?.projectOwner]);
+
+  const contractTypesOptions = useMemo(
+    () =>
+      withSelectedOption(contractTypesData, editSelections?.contractType ?? null),
+    [contractTypesData, editSelections?.contractType],
+  );
 
   const filterOptions = createFilterOptions({
     matchFrom: 'any',
@@ -544,23 +552,20 @@ export function ProjectFormFields({
 
       <Controller
         name="contract_type_id"
-        disabled
         control={control}
         render={({ field }) => (
-          <FormControl fullWidth error={!!errors.contract_type_id}>
-            <InputLabel>الارتباط التعاقدي</InputLabel>
-            <Select {...field} label="الارتباط التعاقدي">
-              {/* {contractTypesData?.map((type: OptionItem) => (
+          <FormControl fullWidth error={!!errors.contract_type_id} size="small">
+            <InputLabel>{t("project.contractType")}</InputLabel>
+            <Select
+              {...field}
+              value={field.value ?? ""}
+              label={t("project.contractType")}
+            >
+              {contractTypesOptions.map((type) => (
                 <MenuItem key={type.id} value={String(type.id)}>
                   {type.name}
                 </MenuItem>
-              ))} */}
-              <MenuItem key="1" value="1">
-                عقد مقاولة
-              </MenuItem>
-              <MenuItem key="2" value="2">
-                عقد استثمار
-              </MenuItem>
+              ))}
             </Select>
             {errors.contract_type_id && (
               <Typography variant="caption" color="error">

@@ -13,6 +13,7 @@ import {
   GetManagementsResponse,
   GetEmployeesNotInProjectResponse,
   GetProjectEmployeesResponse,
+  ContractualEngagementsResponse,
   GetProjectTypesResponse,
   ListProjectsResponse,
   ShowProjectResponse,
@@ -34,6 +35,11 @@ export const AllProjectsApi = {
 
   delete: (id: string | number) =>
     baseApi.delete<DeleteProjectResponse>(`projects/${id}`),
+
+  getContractualEngagements: () =>
+    baseApi.get<ContractualEngagementsResponse>(
+      "projects/contractual-engagements",
+    ),
 
   getProjectTypes: () =>
     baseApi.get<GetProjectTypesResponse>("project-types/roots"),

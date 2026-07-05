@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
+import { useLocale } from "next-intl";
 
 export function useProjectFormData(
   watchProjectTypeId?: string,
@@ -9,6 +10,7 @@ export function useProjectFormData(
   watchOwnerType?: "company" | "individual",
   watchBranchId?: string,
 ) {
+  const locale = useLocale();
   const [searchParams, setSearchParams] = useState<Record<string, string>>({});
   const { data: projectTypesData } = useQuery({
     queryKey: ["project-types-roots"],
@@ -104,13 +106,24 @@ export function useProjectFormData(
     enabled: watchOwnerType === "individual",
   });
 
-  // const { data: contractTypesData } = useQuery({
-  //   queryKey: ["contract-types"],
-  //   queryFn: async () => {
-  //     const response = await AllProjectsApi.getContractTypes();
-  //     return response.data.payload ?? [];
-  //   },
-  // });
+  const { data: contractualEngagementsRaw } = useQuery({
+    queryKey: ["contractual-engagements"],
+    queryFn: async () => {
+      const response = await AllProjectsApi.getContractualEngagements();
+      return response.data.data ?? [];
+    },
+  });
+
+  const contractTypesData = useMemo(
+    () =>
+      [...(contractualEngagementsRaw ?? [])]
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((item) => ({
+          id: item.id,
+          name: locale === "ar" ? item.name_ar : item.name_en,
+        })),
+    [contractualEngagementsRaw, locale],
+  );
 
   // const { data: projectClassificationsData } = useQuery({
   //   queryKey: ["project-classifications"],
@@ -146,7 +159,7 @@ export function useProjectFormData(
     companyUsersData,
     entityClientsData,
     individualClientsData,
-    // contractTypesData,
+    contractTypesData,
     // projectClassificationsData,
     onSearchChange: handleSearchChange,
   };

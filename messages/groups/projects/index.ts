@@ -42,6 +42,7 @@ export const projectMessages = new MessagesGroup({
   individual: _m("Individual", "فرد"),
   selectClient: _m("Select Client", "اختر العميل"),
   clientRequired: _m("Client is required", "العميل مطلوب"),
+  contractType: _m("Contractual engagement", "الارتباط التعاقدي"),
   tableActions: _m("Actions", "الإجراءات"),
   filterSearch: _m("Filter & Search", "التصفية والبحث"),
   projectClassification: _m("Project Classification", "تصنيف المشروع"),
