@@ -41,7 +41,7 @@ export function mapProjectToFormValues(
         ? project.project_owner_type
         : undefined,
     project_classification_id: toIdString(project.project_classification_id),
-    contract_type_id: toIdString(
+    contractual_engagement_id: toIdString(
       project.contractual_engagement?.id ?? project.contract_type_id,
     ),
     status: project.status ?? 1,

@@ -5,6 +5,7 @@ import { ROUTER } from "@/router";
 import { Project } from "@/types/sidebar-menu";
 import { SidebarProjectProps } from "./types";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { CONTRACTUAL_ENGAGEMENT_KEYS } from "@/modules/projects/project/constants/contractualEngagementKeys";
 
 export function getWorkPanelProject({
   t,
@@ -12,10 +13,19 @@ export function getWorkPanelProject({
   isCentralCompany,
   can,
 }: SidebarProjectProps): Project {
+  const makkahUrl = ROUTER.UNIFIED_CONTRACT(
+    CONTRACTUAL_ENGAGEMENT_KEYS.MAKKAH_UNIFIED,
+  );
+  const jeddahUrl = ROUTER.UNIFIED_CONTRACT(
+    CONTRACTUAL_ENGAGEMENT_KEYS.JEDDAH_UNIFIED,
+  );
+
   return {
     name: t("Sidebar.WorkPanel"),
     urls: [
       ROUTER.ALL_PROJECTS,
+      makkahUrl,
+      jeddahUrl,
       ROUTER.PROJECTS_INBOX,
       ROUTER.WORK_PANEL_SETTINGS,
       ROUTER.PROJECTS_SETTINGS,
@@ -25,6 +35,7 @@ export function getWorkPanelProject({
     isActive:
       fullPath.startsWith(ROUTER.WORK_PANEL_SETTINGS) ||
       fullPath.startsWith(ROUTER.ALL_PROJECTS) ||
+      fullPath.startsWith("/unified-contract") ||
       fullPath.startsWith(ROUTER.AttendancePresence),
     slug: "work-panel",
     show: !isCentralCompany,
@@ -41,9 +52,24 @@ export function getWorkPanelProject({
         url: ROUTER.ALL_PROJECTS,
         icon: FolderClosed,
         isActive:
-          fullPath.startsWith("/projects") &&
-          !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS) &&
-          !fullPath.startsWith(ROUTER.PROJECTS_INBOX),
+          fullPath === ROUTER.ALL_PROJECTS ||
+          (fullPath.startsWith("/projects") &&
+            !fullPath.startsWith(ROUTER.PROJECTS_SETTINGS) &&
+            !fullPath.startsWith(ROUTER.PROJECTS_INBOX)),
+        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
+      },
+      {
+        name: t("Sidebar.UnifiedContractMakkah"),
+        url: makkahUrl,
+        icon: FolderClosed,
+        isActive: fullPath.startsWith(makkahUrl),
+        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
+      },
+      {
+        name: t("Sidebar.UnifiedContractJeddah"),
+        url: jeddahUrl,
+        icon: FolderClosed,
+        isActive: fullPath.startsWith(jeddahUrl),
         show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
       },
       {

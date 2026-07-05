@@ -26,7 +26,7 @@ type GenericPayloadResponse<T> = {
 export const ProjectAttachmentsApi = {
   
   getFolderContents: async (
-    projectId: string,
+    projectId: string | undefined,
     branchId?: string,
     parentId?: string,
     password?: string,
@@ -35,13 +35,23 @@ export const ProjectAttachmentsApi = {
     searchData?: ProjectAttachmentsSearchFormData,
     sort?: string,
     fixedType?: string,
+    contractualEngagementKey?: string,
   ): Promise<{
     payload: ProjectFolderContentsPayload;
     pagination: ProjectFolderContentsPagination;
   }> => {
     const params: Record<string, string | number> = {};
 
-    params.parent_id = parentId ?? projectId;
+    if (contractualEngagementKey) {
+      params.contractual_engagement_key = contractualEngagementKey;
+      if (parentId) params.parent_id = parentId;
+    } else if (projectId) {
+      params.parent_id = parentId ?? projectId;
+      params.project_id = projectId;
+    } else if (parentId) {
+      params.parent_id = parentId;
+    }
+
     if (branchId && branchId !== "all") params.branch_id = branchId;
     if (password?.length) params.password = password;
     if (limit) params.per_page = limit;
@@ -65,7 +75,6 @@ export const ProjectAttachmentsApi = {
     if (sort) params.sort = sort;
 
     params.withoutTenancy = 1;
-    params.project_id = projectId;
 
     const res = await apiClient.get<FolderContentsResponse>(`/folders/contents`, {
       params,

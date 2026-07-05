@@ -9,7 +9,8 @@ import {
   Tabs,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
+import { useOptionalContractualEngagement } from "@/modules/projects/project/context/ContractualEngagementContext";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import {
   PROJECT_NOTIFICATION_LIST,
@@ -30,7 +31,9 @@ const TABS = [
 export default function MaintenanceEmergencyTab() {
   const t = useTranslations("project.maintenanceEmergency");
   const tCommon = useTranslations("common");
-  const { projectId } = useProject();
+  const engagement = useOptionalContractualEngagement();
+  const project = useOptionalProject();
+  const projectId = project?.projectId;
   const [activeTab, setActiveTab] = useState<string>("notifications");
 
   const { data: flatPerms, isLoading: isLoadingPerms } =
@@ -45,8 +48,16 @@ export default function MaintenanceEmergencyTab() {
     [flatPerms],
   );
 
-  if (!projectId) {
+  if (!engagement && !projectId) {
     return null;
+  }
+
+  if (engagement && !projectId) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="info">{t("comingSoon")}</Alert>
+      </Box>
+    );
   }
 
   if (isLoadingPerms) {

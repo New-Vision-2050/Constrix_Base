@@ -551,10 +551,10 @@ export function ProjectFormFields({
       )}
 
       <Controller
-        name="contract_type_id"
+        name="contractual_engagement_id"
         control={control}
         render={({ field }) => (
-          <FormControl fullWidth error={!!errors.contract_type_id} size="small">
+          <FormControl fullWidth error={!!errors.contractual_engagement_id} size="small">
             <InputLabel>{t("project.contractType")}</InputLabel>
             <Select
               {...field}
@@ -567,9 +567,9 @@ export function ProjectFormFields({
                 </MenuItem>
               ))}
             </Select>
-            {errors.contract_type_id && (
+            {errors.contractual_engagement_id && (
               <Typography variant="caption" color="error">
-                {errors.contract_type_id.message}
+                {errors.contractual_engagement_id.message}
               </Typography>
             )}
           </FormControl>

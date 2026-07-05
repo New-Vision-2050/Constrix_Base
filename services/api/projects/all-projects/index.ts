@@ -117,4 +117,13 @@ export const AllProjectsApi = {
       `projects/employees/${assignmentId}/assign-role`,
       data,
     ),
+
+  getEmployeesByContractualEngagement: (
+    contractualEngagementKey: string,
+    params?: { company_id?: string; search?: string },
+  ) =>
+    baseApi.get<GetProjectEmployeesResponse>(
+      `projects/employees/contractual-engagement/${contractualEngagementKey}`,
+      { params },
+    ),
 };

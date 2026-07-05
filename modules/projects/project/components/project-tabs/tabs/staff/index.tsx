@@ -21,11 +21,14 @@ import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import {
   projectEmployeesQueryKey,
   useProjectEmployees,
 } from "@/modules/projects/project/query/useProjectEmployees";
+import { useContractualEngagementEmployees } from "@/modules/projects/project/query/useContractualEngagementEmployees";
+import { useOptionalContractualEngagement } from "@/modules/projects/project/context/ContractualEngagementContext";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import {
   PROJECT_EMPLOYEE_CREATE,
@@ -44,10 +47,24 @@ import AddStaffDialog, {
   employeesNotInProjectQueryKey,
 } from "./add-staff/AddStaffDialog";
 import StaffRoleSelect from "./StaffRoleSelect";
+import dynamic from "next/dynamic";
 import { getProjectEmployeeAttendanceColumns } from "./shared/projectEmployeeAttendanceColumns";
-import { ProjectStaffMap } from "./shared/ProjectStaffMap";
 import { ProjectStaffAttendanceShell } from "./shared/ProjectStaffAttendanceShell";
-import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
+
+const ProjectStaffMap = dynamic(
+  () =>
+    import("./shared/ProjectStaffMap").then((mod) => ({
+      default: mod.ProjectStaffMap,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <Box className="flex min-h-[320px] items-center justify-center">
+        <CircularProgress />
+      </Box>
+    ),
+  },
+);
 
 const SEARCH_DEBOUNCE_MS = 400;
 
@@ -56,7 +73,9 @@ const StaffTableLayout = HeadlessTableLayout<Employee>("staff");
 export default function StaffTab() {
   const t = useTranslations("project");
   const tCommon = useTranslations("common");
-  const { projectId } = useProject();
+  const engagement = useOptionalContractualEngagement();
+  const project = useOptionalProject();
+  const projectId = project?.projectId;
   const queryClient = useQueryClient();
   const [openStaff, setAddStaffOpen] = useState(false);
   const [view, setView] = useState<"table" | "map">("table");
@@ -69,23 +88,25 @@ export default function StaffTab() {
 
   const canViewStaff = useMemo(
     () =>
-      hasAnyProjectPermissionKey(flatPerms, [
-        PROJECT_EMPLOYEE_VIEW,
-        PROJECT_EMPLOYEE_LIST,
-      ]),
-    [flatPerms],
+      engagement
+        ? true
+        : hasAnyProjectPermissionKey(flatPerms, [
+            PROJECT_EMPLOYEE_VIEW,
+            PROJECT_EMPLOYEE_LIST,
+          ]),
+    [engagement, flatPerms],
   );
   const canCreate = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_CREATE),
-    [flatPerms],
+    () => !engagement && hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_CREATE),
+    [engagement, flatPerms],
   );
   const canUpdate = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_UPDATE),
-    [flatPerms],
+    () => !engagement && hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_UPDATE),
+    [engagement, flatPerms],
   );
   const canDelete = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_DELETE),
-    [flatPerms],
+    () => !engagement && hasProjectPermissionKey(flatPerms, PROJECT_EMPLOYEE_DELETE),
+    [engagement, flatPerms],
   );
 
   const canChangeStaffRole = useCanAssignProjectStaffRoles(canUpdate);
@@ -168,9 +189,20 @@ export default function StaffTab() {
   });
   const debouncedSearch = useDebouncedValue(params.search.trim(), SEARCH_DEBOUNCE_MS);
 
+  const { data: engagementEmployees, isLoading: isLoadingEngagementEmployees } =
+    useContractualEngagementEmployees(engagement?.contractualEngagementKey, {
+      search: debouncedSearch || undefined,
+    });
+
   const { data: employeesData, isLoading: isLoadingEmployees } =
-    useProjectEmployees(projectId, { search: debouncedSearch || undefined });
-  const data = employeesData ?? [];
+    useProjectEmployees(engagement ? undefined : projectId, {
+      search: debouncedSearch || undefined,
+    });
+
+  const data = engagement ? (engagementEmployees ?? []) : (employeesData ?? []);
+  const isLoadingEmployeesResolved = engagement
+    ? isLoadingEngagementEmployees
+    : isLoadingEmployees;
   const totalPages = 1;
   const totalItems = data.length;
 
@@ -228,7 +260,7 @@ export default function StaffTab() {
     params,
     selectable: true,
     getRowId: (row: Employee) => row.id,
-    loading: isLoadingEmployees,
+    loading: isLoadingEmployeesResolved,
     searchable: true,
     filtered: debouncedSearch.length > 0,
     onExport: async () => {
@@ -236,11 +268,11 @@ export default function StaffTab() {
     },
   });
 
-  if (!projectId) {
+  if (!engagement && !projectId) {
     return null;
   }
 
-  if (isLoadingPerms) {
+  if (!engagement && isLoadingPerms) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
         <CircularProgress size={28} />
@@ -260,7 +292,7 @@ export default function StaffTab() {
     <ProjectStaffAttendanceShell>
       <>
         <Box sx={{ p: 3 }}>
-        {view === "map" ? (
+        {view === "map" && !engagement ? (
           <ProjectStaffMap
             projectId={projectId}
             onBackToTable={() => setView("table")}
@@ -272,13 +304,15 @@ export default function StaffTab() {
                 state={state}
                 customActions={
                   <>
-                    <Button
-                      variant="contained"
-                      startIcon={<Map />}
-                      onClick={() => setView("map")}
-                    >
-                      {t("staff.mapView")}
-                    </Button>
+                    {!engagement ? (
+                      <Button
+                        variant="contained"
+                        startIcon={<Map />}
+                        onClick={() => setView("map")}
+                      >
+                        {t("staff.mapView")}
+                      </Button>
+                    ) : null}
                     {canCreate ? (
                       <Button
                         variant="contained"
@@ -301,7 +335,9 @@ export default function StaffTab() {
           />
         )}
       </Box>
-      <AddStaffDialog open={openStaff} setOpen={setAddStaffOpen} />
+      {!engagement && (
+        <AddStaffDialog open={openStaff} setOpen={setAddStaffOpen} />
+      )}
 
       <Dialog
         open={employeeToRemove !== null}

@@ -14,7 +14,8 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
+import { useOptionalContractualEngagement } from "@/modules/projects/project/context/ContractualEngagementContext";
 import { useAttachmentRequests } from "@/modules/projects/project/query/useAttachmentRequests";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
@@ -95,30 +96,38 @@ function RequestFlowCell({
 export default function AttachmentRequestsTable() {
   const t = useTranslations("project.documentCycle");
   const tCommon = useTranslations("common");
-  const { projectId } = useProject();
+  const engagement = useOptionalContractualEngagement();
+  const project = useOptionalProject();
+  const projectId = project?.projectId;
 
   const { data: flatPerms, isLoading: isLoadingPerms } =
     useProjectMyPermissionsFlat(projectId);
 
   const canViewCycle = useMemo(
     () =>
-      hasAnyProjectPermissionKey(flatPerms, [
-        PROJECT_ARCHIVE_CYCLE_VIEW,
-        PROJECT_ARCHIVE_CYCLE_LIST,
-      ]),
-    [flatPerms],
+      engagement
+        ? true
+        : hasAnyProjectPermissionKey(flatPerms, [
+            PROJECT_ARCHIVE_CYCLE_VIEW,
+            PROJECT_ARCHIVE_CYCLE_LIST,
+          ]),
+    [engagement, flatPerms],
   );
   const canCreateCycle = useMemo(
-    () => hasProjectPermissionKey(flatPerms, PROJECT_ARCHIVE_CYCLE_CREATE),
-    [flatPerms],
+    () =>
+      !engagement &&
+      hasProjectPermissionKey(flatPerms, PROJECT_ARCHIVE_CYCLE_CREATE),
+    [engagement, flatPerms],
   );
   const canOpenDetail = useMemo(
     () =>
-      hasAnyProjectPermissionKey(flatPerms, [
-        PROJECT_ARCHIVE_CYCLE_VIEW,
-        PROJECT_ARCHIVE_CYCLE_LIST,
-      ]),
-    [flatPerms],
+      engagement
+        ? true
+        : hasAnyProjectPermissionKey(flatPerms, [
+            PROJECT_ARCHIVE_CYCLE_VIEW,
+            PROJECT_ARCHIVE_CYCLE_LIST,
+          ]),
+    [engagement, flatPerms],
   );
 
   // Fetch shared companies for receiver filter dropdown
@@ -155,6 +164,7 @@ export default function AttachmentRequestsTable() {
 
   const { data: queryResult, isLoading } = useAttachmentRequests({
     projectId,
+    contractualEngagementKey: engagement?.contractualEngagementKey,
     page: params.page,
     perPage: params.limit,
     type: filterType || undefined,
@@ -296,11 +306,11 @@ export default function AttachmentRequestsTable() {
   const detailVariant =
     selectedDocument?.flow === "incoming" ? "incoming" : "outgoing";
 
-  if (!projectId) {
+  if (!engagement && !projectId) {
     return null;
   }
 
-  if (isLoadingPerms) {
+  if (!engagement && isLoadingPerms) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
         <CircularProgress size={28} />
@@ -420,7 +430,9 @@ export default function AttachmentRequestsTable() {
         />
       </Box>
 
-      <AddFileDialog open={addFileOpen} onClose={() => setAddFileOpen(false)} />
+      {!engagement && (
+        <AddFileDialog open={addFileOpen} onClose={() => setAddFileOpen(false)} />
+      )}
 
       <AttachmentRequestDetailDialog
         open={detailDialogOpen}

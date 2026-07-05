@@ -54,6 +54,7 @@ export const ROUTER = {
   TERMS_CONDITIONS: "/stores/terms",
   PROJECTS_SETTINGS: "/projects/settings",
   ALL_PROJECTS: "/projects",
+  UNIFIED_CONTRACT: (key: string) => `/unified-contract/${key}`,
   PROJECTS_INBOX: "/projects/inbox",
   PROJECT_DETAILS: (id: string) => `/projects/${id}`,
   PROJECT_NOTIFICATION_DETAILS: (projectId: string, notificationId: string) =>
