@@ -57,7 +57,11 @@ import { isNotificationActionable } from "@/modules/projects/project/utils/notif
 import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceFormat";
 import NotificationStatusBadge from "./NotificationStatusBadge";
 import NotificationSeverityBadge from "./NotificationSeverityBadge";
-import CreateNotificationWizard from "./wizard/CreateNotificationWizard";
+
+const CreateNotificationWizard = dynamic(
+  () => import("./wizard/CreateNotificationWizard"),
+  { ssr: false },
+);
 
 const ProjectNotificationMapTasksView = dynamic(
   () => import("./ProjectNotificationMapTasksView"),
