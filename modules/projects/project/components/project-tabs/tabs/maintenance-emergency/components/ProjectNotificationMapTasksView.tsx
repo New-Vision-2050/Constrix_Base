@@ -65,7 +65,7 @@ function buildTaskMarkerIcon(color: string): google.maps.Icon {
 
 const MAX_VISIBLE_ZOOM = 17;
 
-const libraries: Libraries = ["geometry"];
+const libraries: Libraries = ["places", "geometry"];
 
 function formatDateTime(value: string | null | undefined): string {
   if (!value) return "—";

@@ -8,7 +8,11 @@ import type {
   UpdateProjectNotificationArgs,
 } from "@/services/api/projects/notifications/types/args";
 import { projectNotificationsQueryKey } from "./useProjectNotifications";
-import type { NotificationScope } from "@/modules/projects/project/utils/notificationScope";
+import {
+  buildNotificationScopeParams,
+  hasNotificationScope,
+  type NotificationScope,
+} from "@/modules/projects/project/utils/notificationScope";
 
 export const PROJECT_NOTIFICATION_DETAIL_QUERY_KEY = "project-notification-detail" as const;
 export const PROJECT_NOTIFICATION_AVAILABLE_ACTIONS_QUERY_KEY = "project-notification-available-actions" as const;
@@ -83,7 +87,13 @@ export function useProjectNotificationDetail(
     ],
     queryFn: async () => {
       if (!notificationId) return null;
-      const res = await ProjectNotificationsApi.getById(notificationId);
+      const scopeParams = hasNotificationScope(scope)
+        ? buildNotificationScopeParams(scope)
+        : undefined;
+      const res = await ProjectNotificationsApi.getById(
+        notificationId,
+        scopeParams,
+      );
       const payload = res.data.payload;
       if (!payload) return null;
       if (Array.isArray(payload)) return payload[0] ?? null;

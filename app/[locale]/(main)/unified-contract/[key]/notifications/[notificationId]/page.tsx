@@ -1,7 +1,6 @@
-"use client";
-
-import { useParams } from "@i18n/navigation";
 import { notFound } from "next/navigation";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import { ContractualEngagementProvider } from "@/modules/projects/project/context/ContractualEngagementContext";
 import {
   isContractualEngagementKey,
@@ -9,10 +8,16 @@ import {
 } from "@/modules/projects/project/constants/contractualEngagementKeys";
 import NotificationDetailView from "@/modules/projects/project/components/project-tabs/tabs/maintenance-emergency/components/NotificationDetailView";
 
-export default function UnifiedContractNotificationDetailPage() {
-  const params = useParams();
-  const key = params?.key as string | undefined;
-  const notificationId = params?.notificationId as string | undefined;
+export const dynamic = "force-dynamic";
+
+type PageProps = {
+  params: Promise<{ key: string; notificationId: string }>;
+};
+
+async function UnifiedContractNotificationDetailPage({
+  params,
+}: PageProps) {
+  const { key, notificationId } = await params;
 
   if (!key || !notificationId || !isContractualEngagementKey(key)) {
     notFound();
@@ -29,3 +34,7 @@ export default function UnifiedContractNotificationDetailPage() {
     </ContractualEngagementProvider>
   );
 }
+
+export default withServerPermissionsPage(UnifiedContractNotificationDetailPage, [
+  PERMISSIONS.projectManagement.list,
+]);
