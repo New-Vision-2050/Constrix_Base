@@ -22,12 +22,14 @@ export function getLocalizedStatusLabel(
 }
 
 export function formatFullDate(date: Date, locale: string) {
-  return new Intl.DateTimeFormat(locale, {
+  const formatted = new Intl.DateTimeFormat(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
   }).format(date);
+
+  return localizeWesternDigits(formatted, locale);
 }
 
 const EASTERN_ARABIC_DIGITS = [
@@ -54,7 +56,9 @@ export function formatLocalizedNumber(
   locale: string,
   options?: Intl.NumberFormatOptions,
 ) {
-  return new Intl.NumberFormat(locale, options).format(value);
+  const formatted = new Intl.NumberFormat(locale, options).format(value);
+
+  return localizeWesternDigits(formatted, locale);
 }
 
 export function formatLocalizedValue(
