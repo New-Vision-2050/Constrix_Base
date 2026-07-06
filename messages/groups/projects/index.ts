@@ -443,6 +443,7 @@ export const projectMessages = new MessagesGroup({
       type: _m("Type", "النوع"),
       workType: _m("Work Type", "نوع العمل"),
       contractor: _m("Contractor", "المقاول"),
+      companyName: _m("Company Name", "اسم الشركة"),
       engineer: _m("Engineer", "المهندس"),
       distance: _m("Distance", "المسافة"),
       location: _m("Location", "الموقع"),

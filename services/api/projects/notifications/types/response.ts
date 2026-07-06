@@ -101,6 +101,7 @@ export interface ProjectNotification {
   task_date: string;
   duration_hours: number;
   notes?: string | null;
+  company_name?: string | null;
   status: NotificationStatus;
   status_label?: string | null;
   violations_count: number;

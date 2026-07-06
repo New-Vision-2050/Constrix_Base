@@ -158,6 +158,12 @@ export default function CadreTab() {
         ),
       },
       {
+        key: "company",
+        name: t("staff.company"),
+        sortable: false,
+        render: (row: Employee) => <span>{row.company.name}</span>,
+      },
+      {
         key: "role",
         name: t("staff.role"),
         sortable: false,
