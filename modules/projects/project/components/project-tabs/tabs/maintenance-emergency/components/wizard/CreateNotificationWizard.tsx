@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Alert,
   Autocomplete,
@@ -43,7 +44,6 @@ import { useProjectNotificationEmployees } from "@/modules/projects/project/quer
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
 import type { ProjectNotificationEmployee, ProjectNotificationType } from "@/services/api/projects/notifications/types/response";
-import ProjectNotificationMap from "./ProjectNotificationMap";
 import { useGoogleRouteDistances } from "./useGoogleRouteDistances";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 import {
@@ -57,6 +57,11 @@ import { buildCreatePayload, buildUpdatePayload } from "./buildPayload";
 import { validateStep, firstStepWithError } from "./validate";
 import { useProjectNotificationLocationPolygons } from "./useProjectNotificationLocationPolygons";
 import { isPointInAnyPolygon } from "./utils";
+
+const ProjectNotificationMap = dynamic(
+  () => import("./ProjectNotificationMap"),
+  { ssr: false },
+);
 
 interface CreateNotificationWizardProps {
   open: boolean;
