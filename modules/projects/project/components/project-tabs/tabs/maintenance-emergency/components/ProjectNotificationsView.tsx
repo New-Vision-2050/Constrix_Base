@@ -323,6 +323,14 @@ export default function ProjectNotificationsView() {
         render: (row: ProjectNotification) => <span>{row.contractor_name}</span>,
       },
       {
+        key: "company_name",
+        name: t("companyName"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{row.company_name?.trim() || "—"}</span>
+        ),
+      },
+      {
         key: "engineer",
         name: t("engineer"),
         sortable: false,
@@ -754,6 +762,14 @@ export default function ProjectNotificationsView() {
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
                   {viewTarget.contractor_name}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("companyName")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.company_name || "-"}
                 </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>

@@ -116,6 +116,16 @@ export const PublicDocsTable = () => {
         ),
       },
       {
+        key: "company_name",
+        name: t("companyName"),
+        sortable: false,
+        render: (row: DocRow) => (
+          <span className="text-muted-foreground">
+            {row.document.company_name?.trim() || "-"}
+          </span>
+        ),
+      },
+      {
         key: "sortedBy",
         name: t("sortedBy"),
         sortable: false,

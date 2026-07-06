@@ -30,4 +30,6 @@ export type DocumentT = {
   is_file?: number;
   can_update: boolean;
   can_delete: boolean; // 1 can delete 0 can't delete
+  company_name?: string | null;
+  company?: { id: string; name: string } | null;
 };
