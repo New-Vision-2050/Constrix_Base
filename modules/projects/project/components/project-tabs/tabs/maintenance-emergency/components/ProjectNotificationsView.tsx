@@ -57,23 +57,7 @@ import { isNotificationActionable } from "@/modules/projects/project/utils/notif
 import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceFormat";
 import NotificationStatusBadge from "./NotificationStatusBadge";
 import NotificationSeverityBadge from "./NotificationSeverityBadge";
-
-const CreateNotificationWizard = dynamic(
-  () => import("./wizard/CreateNotificationWizard"),
-  { ssr: false },
-);
-
-const ProjectNotificationMapTasksView = dynamic(
-  () => import("./ProjectNotificationMapTasksView"),
-  {
-    ssr: false,
-    loading: () => (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-        <CircularProgress size={28} />
-      </Box>
-    ),
-  },
-);
+import CreateNotificationWizard from "./wizard/CreateNotificationWizard";
 
 const TableLayout = HeadlessTableLayout<ProjectNotification>(
   "project-notifications-table",
