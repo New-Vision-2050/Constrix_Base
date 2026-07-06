@@ -21,7 +21,11 @@ function toNumber(value: unknown): number | null {
 }
 
 function resolveMapTasksPayload(
-  payload: ProjectNotificationMapTasksPayload | ProjectNotificationMapTaskItem[] | null | undefined,
+  payload:
+    | ProjectNotificationMapTasksPayload
+    | ProjectNotificationMapTaskItem[]
+    | null
+    | undefined,
 ): ProjectNotificationMapTaskItem[] {
   if (!payload) return [];
   if (Array.isArray(payload)) return payload;
@@ -43,7 +47,9 @@ function normalizeMapTask(
 
   const assignedUserName =
     item.assigned_user?.name?.trim() ||
-    (typeof item.assigned_user === "string" ? item.assigned_user.trim() : null) ||
+    (typeof item.assigned_user === "string"
+      ? item.assigned_user.trim()
+      : null) ||
     item.assigned_user_name?.trim() ||
     item.contractor_technical_name?.trim() ||
     item.contractor_name?.trim() ||
