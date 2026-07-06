@@ -75,18 +75,6 @@ const ProjectNotificationMapTasksView = dynamic(
   },
 );
 
-const ProjectNotificationMapTasksView = dynamic(
-  () => import("./ProjectNotificationMapTasksView"),
-  {
-    ssr: false,
-    loading: () => (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-        <CircularProgress size={28} />
-      </Box>
-    ),
-  },
-);
-
 const TableLayout = HeadlessTableLayout<ProjectNotification>(
   "project-notifications-table",
 );
