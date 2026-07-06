@@ -297,14 +297,6 @@ export default function ProjectNotificationsView() {
         ),
       },
       {
-        key: "severity",
-        name: t("severity"),
-        sortable: false,
-        render: (row: ProjectNotification) => (
-          <NotificationSeverityBadge severity={row.severity} />
-        ),
-      },
-      {
         key: "notification_type",
         name: t("type"),
         sortable: false,
@@ -315,6 +307,14 @@ export default function ProjectNotificationsView() {
         name: t("workType"),
         sortable: false,
         render: (row: ProjectNotification) => <span>{row.work_type}</span>,
+      },
+      {
+        key: "last_site_update_status",
+        name: t("lastSiteUpdateStatus"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{row.last_site_update_status?.trim() || "—"}</span>
+        ),
       },
       {
         key: "contractor",
