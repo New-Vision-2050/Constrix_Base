@@ -1,6 +1,13 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Circle,
   GoogleMap,
@@ -72,10 +79,18 @@ function buildTaskInfoContent(
   t: (key: string) => string,
   statusLabelMap: Map<string, string>,
 ) {
-  const displayStatusLabel = task.statusLabel || statusLabelMap.get(task.status) || null;
+  const displayStatusLabel =
+    task.statusLabel || statusLabelMap.get(task.status) || null;
 
   return (
-    <div style={{ minWidth: 220, lineHeight: 1.6, padding: "4px 0", color: "#1a1a1a" }}>
+    <div
+      style={{
+        minWidth: 220,
+        lineHeight: 1.6,
+        padding: "4px 0",
+        color: "#1a1a1a",
+      }}
+    >
       <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
         {task.name}
       </div>
@@ -201,17 +216,15 @@ export default function ProjectNotificationMapTasksView({
     [locale],
   );
 
-  const handleMapLoad = useCallback(
-    (map: google.maps.Map) => {
-      mapRef.current = map;
-      fittedTasksRef.current = null;
-      setMapInstance(map);
-    },
-    [],
-  );
+  const handleMapLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+    fittedTasksRef.current = null;
+    setMapInstance(map);
+  }, []);
 
   useEffect(() => {
-    if (!mapInstance || !visibleTasks.length || typeof google === "undefined") return;
+    if (!mapInstance || !visibleTasks.length || typeof google === "undefined")
+      return;
 
     const visibleKey = visibleTasks.map((task) => task.id).join(",");
     if (fittedTasksRef.current === visibleKey) return;
@@ -324,7 +337,11 @@ export default function ProjectNotificationMapTasksView({
         </Alert>
       ) : (
         <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "520px", borderRadius: 12 }}
+          mapContainerStyle={{
+            width: "100%",
+            height: "520px",
+            borderRadius: 12,
+          }}
           center={DEFAULT_CENTER}
           zoom={DEFAULT_ZOOM}
           onLoad={handleMapLoad}
