@@ -4,6 +4,7 @@ import {
 } from "@/services/api/user-attendance";
 import { STATUS_HEX_COLORS } from "./status-colors";
 import { CalendarCell } from "../types";
+import { localizeWesternDigits } from "./i18n";
 
 export function buildCalendarGrid(
   days: UserAttendanceCalendarDay[],
@@ -37,10 +38,12 @@ export function buildCalendarGrid(
 }
 
 export function formatMonthYear(date: Date, locale: string) {
-  return new Intl.DateTimeFormat(locale, {
+  const formatted = new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
   }).format(date);
+
+  return localizeWesternDigits(formatted, locale);
 }
 
 export function formatMonthYearFromParts(
