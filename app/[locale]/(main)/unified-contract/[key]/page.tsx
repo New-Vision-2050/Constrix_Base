@@ -1,11 +1,10 @@
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import UnifiedContractView from "@/modules/projects/project/views/unified-contract";
-import {
-  CONTRACTUAL_ENGAGEMENT_KEYS,
-  isContractualEngagementKey,
-} from "@/modules/projects/project/constants/contractualEngagementKeys";
+import { isContractualEngagementKey } from "@/modules/projects/project/constants/contractualEngagementKeys";
 import { notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ key: string }>;
@@ -23,10 +22,3 @@ async function UnifiedContractPage({ params }: PageProps) {
 export default withServerPermissionsPage(UnifiedContractPage, [
   PERMISSIONS.projectManagement.list,
 ]);
-
-export function generateStaticParams() {
-  return [
-    { key: CONTRACTUAL_ENGAGEMENT_KEYS.MAKKAH_UNIFIED },
-    { key: CONTRACTUAL_ENGAGEMENT_KEYS.JEDDAH_UNIFIED },
-  ];
-}
