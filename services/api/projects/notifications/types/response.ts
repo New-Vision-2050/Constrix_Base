@@ -325,3 +325,42 @@ export interface SiteStatusUpdatesResponse {
   data: SiteStatusUpdatesData;
   message?: string;
 }
+
+/* ── Notification Charts ── */
+
+export interface NotificationChartDimensionItem {
+  code: string;
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface NotificationChartDimensionData {
+  chart_type: string;
+  total: number;
+  data: NotificationChartDimensionItem[];
+}
+
+export interface NotificationChartTrendItem {
+  month: string;
+  count: number;
+}
+
+export interface NotificationChartTrendData {
+  chart_type: "trend";
+  total: number;
+  data: NotificationChartTrendItem[];
+}
+
+export interface NotificationChartsPayload {
+  status: NotificationChartDimensionData;
+  notification_type: NotificationChartDimensionData;
+  work_type: NotificationChartDimensionData;
+  project: NotificationChartDimensionData;
+  assigned_employee: NotificationChartDimensionData;
+  contractor: NotificationChartDimensionData;
+  trend: NotificationChartTrendData;
+}
+
+export interface NotificationChartsResponse
+  extends ApiBaseResponse<NotificationChartsPayload> {}

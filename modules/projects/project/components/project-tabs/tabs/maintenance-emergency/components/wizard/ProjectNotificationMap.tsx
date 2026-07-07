@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import type { Libraries } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/config/google-maps";
 import {
   Autocomplete,
   Box,
@@ -43,8 +43,6 @@ interface ProjectNotificationMapProps {
   showControls?: boolean;
 }
 
-const libraries: Libraries = ["places", "geometry"];
-
 const DEFAULT_CENTER = { lat: 24.7136, lng: 46.6753 };
 const DEFAULT_ZOOM = 14;
 
@@ -73,10 +71,7 @@ export default function ProjectNotificationMap({
   showControls = false,
 }: ProjectNotificationMapProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-    libraries,
-  });
+  const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
   const mapRef = useRef<google.maps.Map | null>(null);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);

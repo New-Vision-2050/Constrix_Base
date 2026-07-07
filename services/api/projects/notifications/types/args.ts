@@ -88,3 +88,19 @@ export interface ProjectNotificationMobileActionArgs {
   internal_procedure_setting_id?: string;
   notes?: string;
 }
+
+export interface ProjectNotificationsChartsArgs {
+  project_id?: string;
+  contractual_engagement_key?: string;
+  status?: string;
+  notification_type?: string;
+  work_type?: string;
+  contractor_name?: string;
+  contractor_id?: string;
+  contractor_category?: string;
+  assigned_user_id?: string;
+  task_date?: string;
+  date_from?: string;
+  date_to?: string;
+  search?: string;
+}

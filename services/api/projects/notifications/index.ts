@@ -1,6 +1,7 @@
 import { baseApi } from "@/config/axios/instances/base";
 import type {
   CreateProjectNotificationArgs,
+  ProjectNotificationsChartsArgs,
   ProjectNotificationsEmployeesLocationsArgs,
   ProjectNotificationsExportArgs,
   ProjectNotificationsListArgs,
@@ -12,6 +13,7 @@ import type {
   UpdateProjectNotificationArgs,
 } from "./types/args";
 import type {
+  NotificationChartsResponse,
   ProjectNotificationAvailableActionsResponse,
   ProjectNotificationContractorsResponse,
   ProjectNotificationDeleteResponse,
@@ -189,5 +191,11 @@ export const ProjectNotificationsApi = {
   getSiteStatusUpdates: (notificationId: string) =>
     baseApi.get<SiteStatusUpdatesResponse>(
       `projects/notifications/${encodeURIComponent(notificationId)}/site-status-updates`,
+    ),
+
+  getCharts: (args: ProjectNotificationsChartsArgs) =>
+    baseApi.get<NotificationChartsResponse>(
+      "projects/notifications/charts",
+      { params: args },
     ),
 };

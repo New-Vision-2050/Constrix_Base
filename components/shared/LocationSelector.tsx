@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import type { Libraries } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/config/google-maps";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { Button } from "@/components/ui/button";
@@ -93,9 +93,6 @@ const defaultCenter = {
   lng: 46.64794921875,
 };
 
-// Libraries to load with Google Maps
-const libraries: Libraries = ["places", "geometry"];
-
 const LocationSelector: React.FC<LocationSelectorProps> = ({
   onSave,
   initialLocation,
@@ -128,11 +125,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   });
 
   // Load Google Maps API
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-    libraries,
-  });
+  const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
