@@ -54,6 +54,15 @@ function formatArabicDate(value: string | null | undefined): string {
   return `${day}/${month}/${year}`;
 }
 
+function formatArabicTime(value: string | null | undefined): string {
+  if (!value) return "—";
+  const d = new Date(value.replace(" ", "T"));
+  if (Number.isNaN(d.getTime())) return value;
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
 function normalizeUrl(url: string): string {
   if (!url) return url;
   if (/^https?:\/\//i.test(url)) return url;
@@ -86,7 +95,6 @@ function buildCopyText(
     `✍️ مصدر التصريح: ${notification.permit_source ?? ""}`,
     `👤 مستلم التصريح: ${notification.permit_recipient ?? ""}`,
     `⏱️ الوقت المتوقع لإنهاء العمل: ${notification.duration_hours ?? ""}`,
-    `🟢 حالة التشغيل: ${update.status ?? ""}`,
     `📍 الموقع الجغرافي: ${notification.repair_point ?? ""}`,
     `🗺️ رابط الموقع (Google Maps):   ${notification.location_link ?? ""}`,
     "",
@@ -219,6 +227,7 @@ function SiteStatusCard({
 
   const statusColor = STATUS_COLOR_MAP[update.status] ?? "default";
   const dateLabel = formatArabicDate(update.created_at);
+  const timeLabel = formatArabicTime(update.created_at);
   const imageAttachments = update.attachments.filter(isImageAttachment);
   const otherAttachments = update.attachments.filter((a) => !isImageAttachment(a));
 
@@ -250,6 +259,9 @@ function SiteStatusCard({
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Typography variant="caption" color="text.secondary" fontWeight={600}>
             📅 {dateLabel}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" fontWeight={600}>
+            🕒 {timeLabel}
           </Typography>
           <Chip
             label={STATUS_LABEL_KEY[update.status] ? t(STATUS_LABEL_KEY[update.status]) : update.status}
@@ -307,11 +319,6 @@ function SiteStatusCard({
             icon="⏱️"
             label={t("reportEstimatedTime")}
             value={notification.duration_hours ? String(notification.duration_hours) : null}
-          />
-          <ReportField
-            icon="🟢"
-            label={t("reportOperationStatus")}
-            value={STATUS_LABEL_KEY[update.status] ? t(STATUS_LABEL_KEY[update.status]) : update.status}
           />
           <ReportField icon="📍" label={t("reportLocation")} value={notification.repair_point} />
           {notification.location_link && (
