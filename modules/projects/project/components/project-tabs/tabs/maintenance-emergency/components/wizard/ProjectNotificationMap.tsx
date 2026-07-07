@@ -24,7 +24,7 @@ interface ProjectNotificationMapProps {
   center: { lat: number; lng: number };
   radius: number;
   employees?: ProjectNotificationEmployee[];
-  selectedUserId?: string | null;
+  selectedUserIds?: string[];
   onSelectEmployee?: (userId: string) => void;
   onPinMoved?: (lat: number, lng: number) => void;
   height?: string;
@@ -58,7 +58,7 @@ export default function ProjectNotificationMap({
   center,
   radius,
   employees = [],
-  selectedUserId,
+  selectedUserIds = [],
   onSelectEmployee,
   onPinMoved,
   height = "400px",
@@ -80,7 +80,7 @@ export default function ProjectNotificationMap({
   const employeeMarkersRef = useRef<google.maps.Marker[]>([]);
   const employeeInfoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const polygonRefs = useRef<google.maps.Polygon[]>([]);
-  const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const polylineRef = useRef<google.maps.Polyline[]>([]);
   const clickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const dragEndListenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
@@ -360,7 +360,7 @@ export default function ProjectNotificationMap({
       if (!lat || !lng) return;
       const position = { lat, lng };
       const color = statusColors[employee.status] ?? "#6b7280";
-      const isSelected = employee.user_id === selectedUserId;
+      const isSelected = selectedUserIds.includes(employee.user_id);
 
       const marker = new window.google.maps.Marker({
         map: mapInstance,
@@ -408,74 +408,81 @@ export default function ProjectNotificationMap({
 
       employeeMarkersRef.current.push(marker);
     });
-  }, [isLoaded, mapInstance, employees, selectedUserId, onSelectEmployee, showEmployees, routeDistances, t]);
+  }, [isLoaded, mapInstance, employees, selectedUserIds, onSelectEmployee, showEmployees, routeDistances, t]);
 
   useEffect(() => {
     if (!isLoaded || !mapInstance) return;
 
-    polylineRef.current?.setMap(null);
-    polylineRef.current = null;
+    polylineRef.current.forEach((p) => p.setMap(null));
+    polylineRef.current = [];
 
-    if (!showPolyline || !selectedUserId) return;
+    if (!showPolyline || selectedUserIds.length === 0) return;
 
-    const selectedEmployee = employees.find((e) => e.user_id === selectedUserId);
-    const selLat = Number(selectedEmployee?.location?.latitude);
-    const selLng = Number(selectedEmployee?.location?.longitude);
-    if (!selLat || !selLng) return;
+    const polylines: google.maps.Polyline[] = [];
+    let cancelled = false;
 
-    const routeInfo = routeDistances?.[selectedUserId];
+    selectedUserIds.forEach((userId) => {
+      const selectedEmployee = employees.find((e) => e.user_id === userId);
+      const selLat = Number(selectedEmployee?.location?.latitude);
+      const selLng = Number(selectedEmployee?.location?.longitude);
+      if (!selLat || !selLng) return;
 
-    if (routeInfo) {
-      let cancelled = false;
-      computeRoute(
-        { lat: selLat, lng: selLng },
-        { lat: activeCenter.lat, lng: activeCenter.lng },
-      ).then((route) => {
-        if (cancelled || !mapInstance) return;
-        if (route && route.encodedPolyline) {
-          const path =
-            window.google.maps.geometry.encoding.decodePath(
-              route.encodedPolyline,
-            );
-          polylineRef.current = new window.google.maps.Polyline({
-            map: mapInstance,
-            path,
-            geodesic: true,
-            strokeColor: "#4F46E5",
-            strokeOpacity: 0.8,
-            strokeWeight: 4,
-          });
-        } else {
-          polylineRef.current = new window.google.maps.Polyline({
-            map: mapInstance,
-            path: [
-              { lat: selLat, lng: selLng },
-              activeCenter,
-            ],
-            geodesic: true,
-            strokeColor: "#4F46E5",
-            strokeOpacity: 0.8,
-            strokeWeight: 3,
-          });
-        }
-      });
-      return () => {
-        cancelled = true;
-      };
-    } else if (routeDistances === undefined) {
-      polylineRef.current = new window.google.maps.Polyline({
-        map: mapInstance,
-        path: [
+      const routeInfo = routeDistances?.[userId];
+
+      if (routeInfo) {
+        computeRoute(
           { lat: selLat, lng: selLng },
-          activeCenter,
-        ],
-        geodesic: true,
-        strokeColor: "#4F46E5",
-        strokeOpacity: 0.8,
-        strokeWeight: 3,
-      });
-    }
-  }, [isLoaded, mapInstance, showPolyline, selectedUserId, employees, activeCenter, routeDistances]);
+          { lat: activeCenter.lat, lng: activeCenter.lng },
+        ).then((route) => {
+          if (cancelled || !mapInstance) return;
+          if (route && route.encodedPolyline) {
+            const path =
+              window.google.maps.geometry.encoding.decodePath(
+                route.encodedPolyline,
+              );
+            polylines.push(new window.google.maps.Polyline({
+              map: mapInstance,
+              path,
+              geodesic: true,
+              strokeColor: "#4F46E5",
+              strokeOpacity: 0.8,
+              strokeWeight: 4,
+            }));
+          } else {
+            polylines.push(new window.google.maps.Polyline({
+              map: mapInstance,
+              path: [
+                { lat: selLat, lng: selLng },
+                activeCenter,
+              ],
+              geodesic: true,
+              strokeColor: "#4F46E5",
+              strokeOpacity: 0.8,
+              strokeWeight: 3,
+            }));
+          }
+        });
+      } else if (routeDistances === undefined) {
+        polylines.push(new window.google.maps.Polyline({
+          map: mapInstance,
+          path: [
+            { lat: selLat, lng: selLng },
+            activeCenter,
+          ],
+          geodesic: true,
+          strokeColor: "#4F46E5",
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+        }));
+      }
+    });
+
+    polylineRef.current = polylines;
+    return () => {
+      cancelled = true;
+      polylines.forEach((p) => p.setMap(null));
+    };
+  }, [isLoaded, mapInstance, showPolyline, selectedUserIds, employees, activeCenter, routeDistances]);
 
   if (!isLoaded) {
     return (
@@ -583,8 +590,8 @@ export default function ProjectNotificationMap({
           employeeMarkersRef.current = [];
           employeeInfoWindowRef.current?.close();
           employeeInfoWindowRef.current = null;
-          polylineRef.current?.setMap(null);
-          polylineRef.current = null;
+          polylineRef.current.forEach((p) => p.setMap(null));
+          polylineRef.current = [];
           mapRef.current = null;
           setMapInstance(null);
         }}

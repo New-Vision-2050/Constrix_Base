@@ -35,8 +35,8 @@ export function validateStep(
   }
 
   if (step === 4) {
-    if (!data.assigned_user_id?.trim()) {
-      errors.assigned_user_id = "required";
+    if (!data.assigned_user_ids || data.assigned_user_ids.length === 0) {
+      errors.assigned_user_ids = "required";
     }
   }
 
@@ -51,7 +51,7 @@ export function firstStepWithError(errors: WizardFormErrors): 1 | 2 | 3 | 4 | 5 
     1: ["notification_type"],
     2: ["contractor_name"],
     3: ["task_latitude", "task_longitude", "location_radius"],
-    4: ["assigned_user_id"],
+    4: ["assigned_user_ids"],
     5: [],
   };
 

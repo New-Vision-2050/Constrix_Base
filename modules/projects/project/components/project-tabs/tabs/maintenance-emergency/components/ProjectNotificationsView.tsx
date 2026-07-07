@@ -335,7 +335,11 @@ export default function ProjectNotificationsView() {
         name: t("engineer"),
         sortable: false,
         render: (row: ProjectNotification) => (
-          <span>{row.assigned_user?.name ?? "—"}</span>
+          <span>
+            {row.assigned_users && row.assigned_users.length > 0
+              ? row.assigned_users.map((u) => u.name).join(", ")
+              : (row.assigned_user?.name ?? "—")}
+          </span>
         ),
       },
       {
@@ -777,7 +781,9 @@ export default function ProjectNotificationsView() {
                   {t("engineer")}
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {viewTarget.assigned_user?.name ?? "-"}
+                  {viewTarget.assigned_users && viewTarget.assigned_users.length > 0
+                    ? viewTarget.assigned_users.map((u) => u.name).join(", ")
+                    : (viewTarget.assigned_user?.name ?? "-")}
                 </Typography>
               </Grid>
               <Grid size={{ xs: 12 }}>

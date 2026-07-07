@@ -32,8 +32,9 @@ function wizardDataToNotificationFields(data: WizardFormData) {
     location_link: data.location_link || null,
     repair_point: data.repair_point,
 
-    assigned_user_id: data.assigned_user_id,
+    assigned_user_ids: data.assigned_user_ids,
     selected_distance_meters: data.selected_distance_meters,
+    independent_progress: data.independent_progress,
   };
 }
 

@@ -46,14 +46,13 @@ function normalizeMapTask(
   const name = taskName || notificationNumber || item.id;
 
   const assignedUserName =
-    item.assigned_user?.name?.trim() ||
-    (typeof item.assigned_user === "string"
-      ? item.assigned_user.trim()
-      : null) ||
-    item.assigned_user_name?.trim() ||
-    item.contractor_technical_name?.trim() ||
-    item.contractor_name?.trim() ||
-    null;
+    item.assigned_users && item.assigned_users.length > 0
+      ? item.assigned_users.map((u) => u.name).join(", ")
+      : item.assigned_user?.name?.trim() ||
+        item.assigned_user_name?.trim() ||
+        item.contractor_technical_name?.trim() ||
+        item.contractor_name?.trim() ||
+        null;
 
   return {
     id: item.id,

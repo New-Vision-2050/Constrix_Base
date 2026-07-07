@@ -63,8 +63,9 @@ export interface CreateProjectNotificationArgs
   location_radius: number;
   location_link?: string | null;
   repair_point: string;
-  assigned_user_id: string;
+  assigned_user_ids: string[];
   selected_distance_meters: number;
+  independent_progress?: boolean;
   task_date?: string | null;
   duration_hours?: number | null;
   notes?: string | null;

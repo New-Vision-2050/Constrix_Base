@@ -95,9 +95,11 @@ export interface ProjectNotification {
   location_radius: number;
   location_link?: string | null;
   repair_point: string;
-  assigned_user_id: string;
+  assigned_user_ids: string[];
   selected_distance_meters: number;
-  assigned_user: ProjectNotificationUser;
+  assigned_user: ProjectNotificationUser | null;
+  assigned_users: ProjectNotificationUser[];
+  independent_progress: boolean;
   task_date: string;
   duration_hours: number;
   notes?: string | null;
@@ -151,6 +153,7 @@ export interface ProjectNotificationMapTaskItem {
   status_label_ar?: string | null;
   status_label_en?: string | null;
   assigned_user?: ProjectNotificationUser | null;
+  assigned_users?: ProjectNotificationUser[];
   assigned_user_name?: string | null;
   contractor_technical_name?: string | null;
   contractor_name?: string | null;

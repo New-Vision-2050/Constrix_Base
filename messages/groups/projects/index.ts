@@ -660,6 +660,9 @@ export const projectMessages = new MessagesGroup({
       copyReport: _m("Copy report", "نسخ التقرير"),
       copiedToClipboard: _m("Report copied to clipboard", "تم نسخ التقرير"),
       copyFailed: _m("Could not copy report", "تعذر نسخ التقرير"),
+      independentProgress: _m("Independent progress", "تقدم مستقل"),
+      yes: _m("Yes", "نعم"),
+      no: _m("No", "لا"),
       // Report card fields
       reportTitle: _m(
         "Work Accomplishment Report & Operation Permit",
