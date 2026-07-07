@@ -633,18 +633,19 @@ export default function DeterminantDetailsTab({
   }, [editingCountry, resolvedCountryId, resolvedTimeZoneId]);
 
   useEffect(() => {
-    if (!editingCountry || !countryIdDraft || !timeZonesQuery.data?.length) {
+    if (!editingCountry || !countryIdDraft) {
+      return;
+    }
+    if (!timeZonesQuery.data?.length) {
       return;
     }
     setTimeZoneIdDraft((prev) => {
       if (prev && timeZonesQuery.data.some((t) => t.id === prev)) return prev;
-      if (resolvedTimeZoneId) return resolvedTimeZoneId;
       return timeZonesQuery.data[0]?.id ?? "";
     });
   }, [
     countryIdDraft,
     editingCountry,
-    resolvedTimeZoneId,
     timeZonesQuery.data,
   ]);
 

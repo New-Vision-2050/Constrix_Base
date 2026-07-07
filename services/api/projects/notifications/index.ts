@@ -9,6 +9,7 @@ import type {
   ProjectNotificationsMobileListArgs,
   ProjectNotificationMobileActionArgs,
   ProjectNotificationRejectArgs,
+  ProjectNotificationScopeArgs,
   UpdateProjectNotificationArgs,
 } from "./types/args";
 import type {
@@ -48,9 +49,10 @@ export const ProjectNotificationsApi = {
   create: (args: CreateProjectNotificationArgs) =>
     baseApi.post<ProjectNotificationSingleResponse>("projects/notifications", args),
 
-  getById: (id: string) =>
+  getById: (id: string, scope?: ProjectNotificationScopeArgs) =>
     baseApi.get<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}`,
+      { params: scope },
     ),
 
   update: (id: string, args: UpdateProjectNotificationArgs) => {

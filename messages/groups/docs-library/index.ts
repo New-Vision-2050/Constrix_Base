@@ -107,6 +107,7 @@ export const docsLibraryMessages = new MessagesGroup({
     table: new MessagesGroup({
       noDocuments: _m("No documents found", "لا توجد مستندات"),
       doc_name: _m("Folder/File Name", "اسم المستند/المجلد"),
+      companyName: _m("Consultant Name", "اسم الاستشاري"),
       sortedBy: _m("Sorted By", "تم التعديل بواسطة"),
       fileSize: _m("File Size", "حجم الملف"),
       docsCount: _m("Docs Count", "عدد المستندات"),

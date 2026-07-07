@@ -101,8 +101,10 @@ export interface ProjectNotification {
   task_date: string;
   duration_hours: number;
   notes?: string | null;
+  company_name?: string | null;
   status: NotificationStatus;
   status_label?: string | null;
+  last_site_update_status?: string | null;
   violations_count: number;
   magdy_number?: string | null;
   machine_number?: string | null;
@@ -123,16 +125,19 @@ export interface ProjectNotificationsListPagination {
   result_count: number;
 }
 
-export interface ProjectNotificationsListResponse
-  extends ApiBaseResponse<ProjectNotification[]> {
+export interface ProjectNotificationsListResponse extends ApiBaseResponse<
+  ProjectNotification[]
+> {
   pagination?: ProjectNotificationsListPagination;
 }
 
-export interface ProjectNotificationSingleResponse
-  extends ApiBaseResponse<ProjectNotification[]> {}
+export interface ProjectNotificationSingleResponse extends ApiBaseResponse<
+  ProjectNotification[]
+> {}
 
-export interface ProjectNotificationContractorsResponse
-  extends ApiBaseResponse<ProjectNotificationContractor[]> {}
+export interface ProjectNotificationContractorsResponse extends ApiBaseResponse<
+  ProjectNotificationContractor[]
+> {}
 
 export interface ProjectNotificationMapTaskItem {
   id: string;
@@ -177,11 +182,11 @@ export interface ProjectNotificationMapTask {
   receiveDate?: string | null;
 }
 
-export interface ProjectNotificationMapTasksResponse
-  extends ApiBaseResponse<ProjectNotificationMapTasksPayload> {}
+export interface ProjectNotificationMapTasksResponse extends ApiBaseResponse<ProjectNotificationMapTasksPayload> {}
 
-export interface ProjectNotificationEmployeesLocationsResponse
-  extends ApiBaseResponse<ProjectNotificationEmployee[]> {}
+export interface ProjectNotificationEmployeesLocationsResponse extends ApiBaseResponse<
+  ProjectNotificationEmployee[]
+> {}
 
 export interface ProjectNotificationType {
   id: string;
@@ -192,8 +197,9 @@ export interface ProjectNotificationType {
   is_active: boolean;
 }
 
-export interface ProjectNotificationTypesResponse
-  extends ApiBaseResponse<ProjectNotificationType[]> {}
+export interface ProjectNotificationTypesResponse extends ApiBaseResponse<
+  ProjectNotificationType[]
+> {}
 
 export interface ProjectNotificationDeleteResponse {
   code?: string;
@@ -201,10 +207,12 @@ export interface ProjectNotificationDeleteResponse {
 }
 
 /** Alias for mobile task list responses (same shape as dashboard list). */
-export type ProjectNotificationMyTasksResponse = ProjectNotificationsListResponse;
+export type ProjectNotificationMyTasksResponse =
+  ProjectNotificationsListResponse;
 
 /** Alias for mobile inbox list responses. */
-export type ProjectNotificationMyInboxResponse = ProjectNotificationsListResponse;
+export type ProjectNotificationMyInboxResponse =
+  ProjectNotificationsListResponse;
 
 export interface ProjectNotificationInboxCounts {
   pending?: number;
@@ -216,8 +224,7 @@ export interface ProjectNotificationInboxCounts {
   total?: number;
 }
 
-export interface ProjectNotificationMyInboxCountsResponse
-  extends ApiBaseResponse<ProjectNotificationInboxCounts> {}
+export interface ProjectNotificationMyInboxCountsResponse extends ApiBaseResponse<ProjectNotificationInboxCounts> {}
 
 export interface ProjectNotificationFilterOption {
   value: string;
@@ -233,8 +240,7 @@ export interface ProjectNotificationFilters {
   };
 }
 
-export interface ProjectNotificationFiltersResponse
-  extends ApiBaseResponse<ProjectNotificationFilters> {}
+export interface ProjectNotificationFiltersResponse extends ApiBaseResponse<ProjectNotificationFilters> {}
 
 export interface ProjectNotificationAvailableActionForm {
   key: string;
@@ -258,8 +264,9 @@ export interface ProjectNotificationAvailableAction {
   sort_order: number;
 }
 
-export interface ProjectNotificationAvailableActionsResponse
-  extends ApiBaseResponse<ProjectNotificationAvailableAction[]> {}
+export interface ProjectNotificationAvailableActionsResponse extends ApiBaseResponse<
+  ProjectNotificationAvailableAction[]
+> {}
 
 /* ── Site Status Updates ── */
 

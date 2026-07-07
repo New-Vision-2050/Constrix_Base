@@ -297,14 +297,6 @@ export default function ProjectNotificationsView() {
         ),
       },
       {
-        key: "severity",
-        name: t("severity"),
-        sortable: false,
-        render: (row: ProjectNotification) => (
-          <NotificationSeverityBadge severity={row.severity} />
-        ),
-      },
-      {
         key: "notification_type",
         name: t("type"),
         sortable: false,
@@ -317,10 +309,26 @@ export default function ProjectNotificationsView() {
         render: (row: ProjectNotification) => <span>{row.work_type}</span>,
       },
       {
+        key: "last_site_update_status",
+        name: t("lastSiteUpdateStatus"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{row.last_site_update_status?.trim() || "—"}</span>
+        ),
+      },
+      {
         key: "contractor",
         name: t("contractor"),
         sortable: false,
         render: (row: ProjectNotification) => <span>{row.contractor_name}</span>,
+      },
+      {
+        key: "company_name",
+        name: t("companyName"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{row.company_name?.trim() || "—"}</span>
+        ),
       },
       {
         key: "engineer",
@@ -754,6 +762,14 @@ export default function ProjectNotificationsView() {
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
                   {viewTarget.contractor_name}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("companyName")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.company_name || "-"}
                 </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>

@@ -1,11 +1,14 @@
 import { WorkPeriod } from "../types";
+import { localizeWesternDigits } from "./i18n";
 
 export function formatCurrentTime(date: Date, locale: string) {
-  return new Intl.DateTimeFormat(locale, {
+  const formatted = new Intl.DateTimeFormat(locale, {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
   }).format(date);
+
+  return localizeWesternDigits(formatted, locale);
 }
 
 export function formatCurrentTimeParts(date: Date, locale: string) {
@@ -20,7 +23,7 @@ export function formatCurrentTimeParts(date: Date, locale: string) {
   const dayPeriod = parts.find((part) => part.type === "dayPeriod")?.value ?? "";
 
   return {
-    time: `${hour}:${minute}`,
+    time: localizeWesternDigits(`${hour}:${minute}`, locale),
     period: dayPeriod,
   };
 }
