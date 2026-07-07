@@ -355,7 +355,9 @@ export interface NotificationChartTrendData {
 export interface NotificationChartsPayload {
   status: NotificationChartDimensionData;
   notification_type: NotificationChartDimensionData;
+  severity: NotificationChartDimensionData;
   work_type: NotificationChartDimensionData;
+  contractor_category: NotificationChartDimensionData;
   project: NotificationChartDimensionData;
   assigned_employee: NotificationChartDimensionData;
   contractor: NotificationChartDimensionData;
