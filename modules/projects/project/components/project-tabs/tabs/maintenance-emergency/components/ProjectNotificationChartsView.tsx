@@ -802,7 +802,7 @@ function ChartsContent({
             <DimensionBarChart
               data={data.contractor}
               filters={filters}
-              filterKey="contractor_name"
+              filterKey="contractor_id"
               onToggle={onToggleFilter}
               total={data.contractor.total}
             />

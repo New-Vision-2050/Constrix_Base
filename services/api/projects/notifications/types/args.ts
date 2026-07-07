@@ -94,6 +94,7 @@ export interface ProjectNotificationsChartsArgs {
   contractual_engagement_key?: string;
   status?: string;
   notification_type?: string;
+  severity?: string;
   work_type?: string;
   contractor_name?: string;
   contractor_id?: string;
