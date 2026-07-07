@@ -8,7 +8,7 @@ import {
   Marker,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import type { Libraries } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/config/google-maps";
 import {
   Alert,
   Box,
@@ -57,8 +57,6 @@ function buildTaskMarkerIcon(color: string): google.maps.Icon {
 }
 
 const MAX_VISIBLE_ZOOM = 17;
-
-const libraries: Libraries = ["geometry"];
 
 function formatDateTime(value: string | null | undefined): string {
   if (!value) return "—";
@@ -162,10 +160,7 @@ export default function ProjectNotificationMapTasksView({
   const { data, isLoading, isError, refetch, isFetching } =
     useProjectNotificationMapTasks({ projectId, contractualEngagementKey });
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-    libraries,
-  });
+  const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
   const tasks = data?.items ?? [];
   const statuses = data?.statuses ?? [];

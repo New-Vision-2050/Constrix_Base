@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, forwardRef, useState } from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import type { Libraries } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/config/google-maps";
 import { MapEvents } from "./MapEvents";
 
 /**
@@ -75,9 +75,6 @@ const DEFAULT_RADIUS = 1000;
 // Default zoom level
 const DEFAULT_ZOOM = 16;
 
-// Libraries to load with Google Maps
-const libraries: Libraries = ["places", "geometry"];
-
 // Container style for the Google Map
 const createContainerStyle = (
   width: string = "100%",
@@ -124,10 +121,7 @@ const MapRangePicker = forwardRef<HTMLDivElement, MapRangePickerProps>(
     const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
     const [mapType, setMapType] = useState<"roadmap" | "satellite">("roadmap");
 
-    const { isLoaded } = useJsApiLoader({
-      googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-      libraries,
-    });
+    const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
     // Initialize marker when the map is ready or pin changes
     useEffect(() => {
