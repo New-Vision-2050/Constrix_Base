@@ -302,7 +302,7 @@ function DimensionBarChart({
   data: NotificationChartDimensionData;
   filters: ChartFilters;
   filterKey?: keyof ChartFilters;
-  onToggle: (key: keyof ChartFilters, code: string) => void;
+  onToggle: (key: keyof ChartFilters, code: string, label?: string) => void;
   total: number;
 }) {
   const theme = useTheme();
@@ -374,7 +374,11 @@ function DimensionBarChart({
         <Bar
           dataKey="value"
           radius={[4, 4, 4, 4]}
-          onClick={filterKey ? (payload: any) => onToggle(filterKey, payload.code) : undefined}
+          onClick={filterKey ? (payload: any, _index: number, e: any) => {
+            const chartDatum = payload?.payload ?? payload;
+            onToggle(filterKey, chartDatum?.code, chartDatum?.name);
+            e?.stopPropagation?.();
+          } : undefined}
           cursor={filterKey ? "pointer" : "default"}
         >
           {chartData.map((entry, i) => (
@@ -401,7 +405,7 @@ function StatusDonutChart({
 }: {
   data: NotificationChartDimensionData;
   filters: ChartFilters;
-  onToggle: (key: keyof ChartFilters, code: string) => void;
+  onToggle: (key: keyof ChartFilters, code: string, label?: string) => void;
 }) {
   const theme = useTheme();
   const selectedStatus = filters.status;
@@ -440,7 +444,10 @@ function StatusDonutChart({
             outerRadius={95}
             paddingAngle={2}
             dataKey="value"
-            onClick={(payload: any) => onToggle("status", payload.code)}
+            onClick={(payload: any) => {
+              const chartDatum = payload?.payload ?? payload;
+              onToggle("status", chartDatum?.code, chartDatum?.name);
+            }}
             cursor="pointer"
             stroke={theme.palette.background.paper}
             strokeWidth={2}
@@ -539,6 +546,33 @@ function TrendChart({ data }: { data: NotificationChartsPayload["trend"] }) {
   );
 }
 
+function getFilterKeyLabel(
+  key: keyof ChartFilters,
+  t: (key: string) => string,
+  tCharts: (key: string) => string,
+): string {
+  switch (key) {
+    case "status":
+      return tCharts("filterStatus");
+    case "notification_type":
+      return tCharts("filterNotificationType");
+    case "work_type":
+      return tCharts("filterWorkType");
+    case "contractor_id":
+      return tCharts("filterContractor");
+    case "assigned_user_id":
+      return tCharts("filterAssignedUser");
+    case "date_from":
+      return t("fromDate");
+    case "date_to":
+      return t("toDate");
+    case "search":
+      return t("search");
+    default:
+      return key;
+  }
+}
+
 /* ── Charts Content (shared between inline and fullscreen) ── */
 
 function ChartsContent({
@@ -546,6 +580,7 @@ function ChartsContent({
   isLoading,
   isFetching,
   filters,
+  filterLabels,
   statusKpis,
   t,
   tCharts,
@@ -566,11 +601,12 @@ function ChartsContent({
   isLoading: boolean;
   isFetching: boolean;
   filters: ChartFilters;
+  filterLabels?: Partial<Record<keyof ChartFilters, string>>;
   statusKpis: any[];
   t: (key: string) => string;
   tCharts: (key: string) => string;
   theme: any;
-  onToggleFilter: (key: keyof ChartFilters, code: string) => void;
+  onToggleFilter: (key: keyof ChartFilters, code: string, label?: string) => void;
   onClearFilters: () => void;
   onRefetch: () => void;
   searchInput: string;
@@ -659,10 +695,12 @@ function ChartsContent({
         <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ mb: 2, gap: 0.5 }}>
           {Object.entries(filters).map(([key, value]) => {
             if (!value) return null;
+            const displayKey = getFilterKeyLabel(key as keyof ChartFilters, t, tCharts);
+            const displayValue = filterLabels?.[key as keyof ChartFilters] ?? value;
             return (
               <Chip
                 key={key}
-                label={`${key}: ${value}`}
+                label={`${displayKey}: ${displayValue}`}
                 size="small"
                 onDelete={() => onToggleFilter(key as keyof ChartFilters, value as string)}
                 deleteIcon={<X />}
@@ -699,7 +737,7 @@ function ChartsContent({
                 item.code === "received" || item.code === "in_progress" ? <NotificationsActive /> :
                 <NotificationsActive />
               }
-              onClick={() => onToggleFilter("status", item.code)}
+              onClick={() => onToggleFilter("status", item.code, item.label)}
               active={filters.status === item.code}
             />
           ))}
@@ -846,6 +884,7 @@ export default function ProjectNotificationChartsView() {
   const { projectId, contractualEngagementKey } = useNotificationScope();
 
   const [filters, setFilters] = useState<ChartFilters>({});
+  const [filterLabels, setFilterLabels] = useState<Partial<Record<keyof ChartFilters, string>>>({});
   const [searchInput, setSearchInput] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -859,7 +898,7 @@ export default function ProjectNotificationChartsView() {
   const { data, isLoading, isFetching, refetch } = useProjectNotificationCharts(scope, filters);
 
   const handleToggleFilter = useCallback(
-    (key: keyof ChartFilters, code: string) => {
+    (key: keyof ChartFilters, code: string, label?: string) => {
       setFilters((prev) => {
         const current = prev[key] as string | undefined;
         const next = { ...prev };
@@ -870,12 +909,24 @@ export default function ProjectNotificationChartsView() {
         }
         return next;
       });
+      if (label) {
+        setFilterLabels((prev) => {
+          const next = { ...prev };
+          if (prev[key] === label) {
+            delete next[key];
+          } else {
+            next[key] = label;
+          }
+          return next;
+        });
+      }
     },
     [],
   );
 
   const handleClearFilters = useCallback(() => {
     setFilters({});
+    setFilterLabels({});
     setSearchInput("");
     setDateFrom("");
     setDateTo("");
@@ -909,6 +960,7 @@ export default function ProjectNotificationChartsView() {
     isLoading,
     isFetching,
     filters,
+    filterLabels,
     statusKpis,
     t,
     tCharts,
