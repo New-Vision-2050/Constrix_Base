@@ -6,11 +6,14 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   Chip,
+  FormControlLabel,
   Grid,
   MenuItem,
   Paper,
   Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -555,7 +558,14 @@ export default function NotificationDetailEditable({
     <Stack spacing={2}>
       <Grid container rowSpacing={3} columnSpacing={2}>
         <Grid size={{ xs: 6, sm: 4, md: 3 }}>
-          <FieldBlock caption={t("engineer")} value={notification.assigned_user?.name ?? tDash} />
+          <FieldBlock
+            caption={t("engineer")}
+            value={
+              notification.assigned_users && notification.assigned_users.length > 0
+                ? notification.assigned_users.map((u) => u.name).join(", ")
+                : (notification.assigned_user?.name ?? tDash)
+            }
+          />
         </Grid>
         <Grid size={{ xs: 6, sm: 4, md: 3 }}>
           <FieldBlock
@@ -567,6 +577,14 @@ export default function NotificationDetailEditable({
             )}
           />
         </Grid>
+        <Grid size={{ xs: 6, sm: 4, md: 3 }}>
+          <FieldBlock
+            caption={t("independentProgress", { defaultValue: "Independent progress" })}
+            value={notification.independent_progress
+              ? t("yes", { defaultValue: "Yes" })
+              : t("no", { defaultValue: "No" })}
+          />
+        </Grid>
       </Grid>
       <Box sx={{ height: 250, borderRadius: 2, overflow: "hidden" }}>
         <ProjectNotificationMap
@@ -574,7 +592,7 @@ export default function NotificationDetailEditable({
           radius={notification.location_radius}
           height="250px"
           employees={sortedEmployees}
-          selectedUserId={notification.assigned_user_id}
+          selectedUserIds={notification.assigned_user_ids ?? []}
           interactivePin={false}
           showEmployees
           showPolyline
@@ -593,8 +611,15 @@ export default function NotificationDetailEditable({
           center={locationCenter}
           radius={formData.location_radius}
           employees={sortedEmployees}
-          selectedUserId={formData.assigned_user_id}
-          onSelectEmployee={(userId) => updateField("assigned_user_id", userId)}
+          selectedUserIds={formData.assigned_user_ids}
+          onSelectEmployee={(userId) => {
+            const current = formData.assigned_user_ids;
+            if (current.includes(userId)) {
+              updateField("assigned_user_ids", current.filter((id) => id !== userId));
+            } else {
+              updateField("assigned_user_ids", [...current, userId]);
+            }
+          }}
           height="100%"
           polygons={locationPolygons}
           showPolyline
@@ -608,6 +633,16 @@ export default function NotificationDetailEditable({
           <Typography variant="subtitle2" gutterBottom>
             {t("employees")}
           </Typography>
+          <FormControlLabel
+            sx={{ mb: 1 }}
+            control={
+              <Switch
+                checked={formData.independent_progress}
+                onChange={(e) => updateField("independent_progress", e.target.checked)}
+              />
+            }
+            label={t("independentProgress", { defaultValue: "Independent progress" })}
+          />
           {employeeQuery.isLoading ? (
             <Typography color="text.secondary">{t("loading")}</Typography>
           ) : sortedEmployees.length === 0 ? (
@@ -633,13 +668,18 @@ export default function NotificationDetailEditable({
                 </TableHead>
                 <TableBody>
                   {sortedEmployees.map((employee) => {
-                    const isSelected = formData.assigned_user_id === employee.user_id;
+                    const isSelected = formData.assigned_user_ids.includes(employee.user_id);
                     return (
                       <TableRow
                         key={employee.user_id}
                         onClick={() => {
-                          updateField("assigned_user_id", employee.user_id);
-                          updateField("selected_distance_meters", employee.route_distance_meters);
+                          const current = formData.assigned_user_ids;
+                          if (current.includes(employee.user_id)) {
+                            updateField("assigned_user_ids", current.filter((id) => id !== employee.user_id));
+                          } else {
+                            updateField("assigned_user_ids", [...current, employee.user_id]);
+                            updateField("selected_distance_meters", employee.route_distance_meters);
+                          }
                         }}
                         sx={{
                           cursor: "pointer",
@@ -648,10 +688,17 @@ export default function NotificationDetailEditable({
                         }}
                       >
                         <TableCell align="center">
-                          <input
-                            type="radio"
+                          <Checkbox
                             checked={isSelected}
-                            onChange={() => updateField("assigned_user_id", employee.user_id)}
+                            onChange={(e) => {
+                              const current = formData.assigned_user_ids;
+                              if (e.target.checked) {
+                                updateField("assigned_user_ids", [...current, employee.user_id]);
+                                updateField("selected_distance_meters", employee.route_distance_meters);
+                              } else {
+                                updateField("assigned_user_ids", current.filter((id) => id !== employee.user_id));
+                              }
+                            }}
                             onClick={(e) => e.stopPropagation()}
                           />
                         </TableCell>

@@ -277,7 +277,10 @@ export default function NotificationDetailView({
     );
   }
 
-  const assignedUserName = notification.assigned_user?.name ?? "—";
+  const assignedUserName =
+    notification.assigned_users && notification.assigned_users.length > 0
+      ? notification.assigned_users.map((u) => u.name).join(", ")
+      : (notification.assigned_user?.name ?? "—");
   const durationLabel = notification.duration_hours
     ? String(notification.duration_hours)
     : "—";
