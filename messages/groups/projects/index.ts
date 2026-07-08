@@ -471,6 +471,7 @@ export const projectMessages = new MessagesGroup({
       confirm: _m("Confirm", "تأكيد"),
       all: _m("All", "الكل"),
       selectStatus: _m("Select status", "اختر الحالة"),
+      legend: _m("Legend", "دليل الألوان"),
       selectSeverity: _m("Select severity", "اختر الخطورة"),
       selectType: _m("Select type", "اختر النوع"),
       selectWorkType: _m("Select work type", "اختر نوع العمل"),

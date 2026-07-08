@@ -45,11 +45,9 @@ const DEFAULT_ZOOM = 14;
 
 const STATUS_COLOR_MAP: Record<string, string> = {
   pending: "#F59E0B",
-  approved: "#10B981",
-  rejected: "#EF4444",
-  in_progress: "#0EA5E9",
+  received: "#0EA5E9",
+  confirmed_location: "#10B981",
   completed: "#4F46E5",
-  cancelled: "#9CA3AF",
 };
 
 const TASK_CIRCLE_COLORS = [
@@ -298,6 +296,39 @@ export default function ProjectNotificationMapTasksView({
               ))}
             </TextField>
           )}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1.5,
+              alignItems: "center",
+              px: 2,
+              py: 1,
+              bgcolor: "background.paper",
+              borderRadius: 1,
+              border: 1,
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="caption" color="text.secondary">
+              {t("legend")}:
+            </Typography>
+            {statuses.map((status) => (
+              <Stack key={status.key} direction="row" spacing={0.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    backgroundColor: STATUS_COLOR_MAP[status.key] || "#9CA3AF",
+                    border: "1px solid rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Typography variant="caption" sx={{ fontSize: 11 }}>
+                  {getStatusLabel(status)}
+                </Typography>
+              </Stack>
+            ))}
+          </Box>
           <Button
             variant="outlined"
             startIcon={<Refresh />}
