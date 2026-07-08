@@ -384,7 +384,7 @@ export default function ProjectNotificationsView() {
         name: t("date"),
         sortable: false,
         render: (row: ProjectNotification) => (
-          <span>{formatDateTime(row.task_date)}</span>
+          <span>{formatDateTime(row.created_at)}</span>
         ),
       },
       {
