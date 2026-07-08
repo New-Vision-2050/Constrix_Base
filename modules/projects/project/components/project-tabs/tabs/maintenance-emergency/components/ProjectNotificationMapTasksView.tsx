@@ -43,6 +43,15 @@ type ProjectNotificationMapTasksViewProps = {
 const DEFAULT_CENTER = { lat: 24.7136, lng: 46.6753 };
 const DEFAULT_ZOOM = 14;
 
+const STATUS_COLOR_MAP: Record<string, string> = {
+  pending: "#F59E0B",
+  approved: "#10B981",
+  rejected: "#EF4444",
+  in_progress: "#0EA5E9",
+  completed: "#4F46E5",
+  cancelled: "#9CA3AF",
+};
+
 const TASK_CIRCLE_COLORS = [
   "#4F46E5",
   "#0EA5E9",
@@ -353,7 +362,7 @@ export default function ProjectNotificationMapTasksView({
           }}
         >
           {visibleTasks.map((task, index) => {
-            const color = TASK_CIRCLE_COLORS[index % TASK_CIRCLE_COLORS.length];
+            const color = STATUS_COLOR_MAP[task.status] || TASK_CIRCLE_COLORS[index % TASK_CIRCLE_COLORS.length];
             const isHovered = hoveredTaskId === task.id;
             const center = { lat: task.latitude, lng: task.longitude };
 
