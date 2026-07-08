@@ -760,7 +760,10 @@ export default function ProjectNotificationsView() {
                   {t("status")}
                 </Typography>
                 <Box sx={{ mt: 0.5 }}>
-                  <NotificationStatusBadge status={viewTarget.status} />
+                  <NotificationStatusBadge
+                    status={viewTarget.status}
+                    statusLabel={viewTarget.status_label}
+                  />
                 </Box>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
