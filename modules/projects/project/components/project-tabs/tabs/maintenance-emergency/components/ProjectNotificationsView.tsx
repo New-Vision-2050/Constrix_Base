@@ -293,7 +293,10 @@ export default function ProjectNotificationsView() {
         name: t("status"),
         sortable: false,
         render: (row: ProjectNotification) => (
-          <NotificationStatusBadge status={row.status} />
+          <NotificationStatusBadge
+            status={row.status}
+            statusLabel={row.status_label}
+          />
         ),
       },
       {
@@ -741,7 +744,10 @@ export default function ProjectNotificationsView() {
                   {t("status")}
                 </Typography>
                 <Box sx={{ mt: 0.5 }}>
-                  <NotificationStatusBadge status={viewTarget.status} />
+                  <NotificationStatusBadge
+                    status={viewTarget.status}
+                    statusLabel={viewTarget.status_label}
+                  />
                 </Box>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>

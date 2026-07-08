@@ -341,7 +341,10 @@ export default function NotificationDetailView({
       <Grid container spacing={2} sx={{ mb: 2.5 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard title={t("status")}>
-            <NotificationStatusBadge status={notification.status} />
+            <NotificationStatusBadge
+              status={notification.status}
+              statusLabel={notification.status_label}
+            />
           </StatCard>
         </Grid>
 
