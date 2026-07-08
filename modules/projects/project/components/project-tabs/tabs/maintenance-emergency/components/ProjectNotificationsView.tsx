@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Box,
@@ -16,7 +16,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Plus, Eye, FileDown, Pencil, Trash2 } from "lucide-react";
+import { Plus, Eye, FileDown, Pencil, Trash2, Phone, Clock } from "lucide-react";
 import { Map } from "@mui/icons-material";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
@@ -74,6 +74,61 @@ const ProjectNotificationMapTasksView = dynamic(
 const TableLayout = HeadlessTableLayout<ProjectNotification>(
   "project-notifications-table",
 );
+
+const THIRTY_MINUTES_MS = 30 * 60 * 1000;
+
+interface TimerCellProps {
+  lastSiteUpdateDate?: string | null;
+  status?: string;
+}
+
+function TimerCell({ lastSiteUpdateDate, status }: TimerCellProps) {
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    if (!lastSiteUpdateDate || status === "completed") {
+      setTimeRemaining(0);
+      setIsExpired(false);
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const updateDate = new Date(lastSiteUpdateDate).getTime();
+      const elapsed = now - updateDate;
+      const remaining = THIRTY_MINUTES_MS - elapsed;
+      
+      setTimeRemaining(remaining);
+      setIsExpired(remaining < 0);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [lastSiteUpdateDate]);
+
+  if (!lastSiteUpdateDate || status === "completed") {
+    return <span className="text-sm">—</span>;
+  }
+
+  const formatTime = (ms: number) => {
+    const totalSeconds = Math.floor(Math.abs(ms) / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const sign = ms < 0 ? "-" : "";
+    return `${sign}${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <span
+      className={`text-sm ${isExpired ? "text-red-600 font-semibold" : "text-green-600"}`}
+    >
+      {formatTime(timeRemaining)}
+    </span>
+  );
+}
 
 const filterSx = {
   flex: 1,
@@ -242,6 +297,18 @@ export default function ProjectNotificationsView() {
     },
   });
 
+  const notifyByVoiceMutation = useMutation({
+    mutationFn: (id: string) =>
+      ProjectNotificationsApi.notifySiteStatusUpdateByVoice(id),
+    onSuccess: () => {
+      toast.success(t("notifyByVoiceSuccess"));
+      invalidateNotifications();
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? t("notifyByVoiceError"));
+    },
+  });
+
   const exportMutation = useMutation({
     mutationFn: async () => {
       const res = await ProjectNotificationsApi.export(
@@ -324,6 +391,25 @@ export default function ProjectNotificationsView() {
         sortable: false,
         render: (row: ProjectNotification) => (
           <span>{row.last_site_update_status?.trim() || "—"}</span>
+        ),
+      },
+      {
+        key: "timer",
+        name: t("timer"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <TimerCell
+            lastSiteUpdateDate={row.last_site_update_date}
+            status={row.status}
+          />
+        ),
+      },
+      {
+        key: "last_site_update_date",
+        name: t("lastSiteUpdateDate"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{formatDateTime(row.last_site_update_date)}</span>
         ),
       },
       {
@@ -439,6 +525,13 @@ export default function ProjectNotificationsView() {
                   {t("reject")}
                 </MenuItem>
               ) : null}
+              <MenuItem
+                onClick={() => notifyByVoiceMutation.mutate(row.id)}
+                disabled={notifyByVoiceMutation.isPending}
+              >
+                <Phone className="w-4 h-4 me-2" />
+                {t("notifyByCall")}
+              </MenuItem>
               {actionable && canDelete ? (
                 <MenuItem
                   onClick={(e) => {
