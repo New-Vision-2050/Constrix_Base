@@ -80,6 +80,13 @@ const filterSx = {
   "& .MuiOutlinedInput-root": { borderRadius: "8px" },
 } as const;
 
+function formatDateTime(value: string | null | undefined): string {
+  if (!value) return "—";
+  const d = new Date(value.replace(" ", "T"));
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleString();
+}
+
 const STATUS_OPTIONS: { value: string; labelKey: string }[] = [
   { value: "pending", labelKey: "statuses.pending" },
   { value: "approved", labelKey: "statuses.approved" },
@@ -338,11 +345,18 @@ export default function ProjectNotificationsView() {
         name: t("engineer"),
         sortable: false,
         render: (row: ProjectNotification) => (
-          <span>
+          <Stack spacing={0.25}>
+            <span>
             {row.assigned_users && row.assigned_users.length > 0
               ? row.assigned_users.map((u) => u.name).join(", ")
               : (row.assigned_user?.name ?? "—")}
           </span>
+            {row.assigned_user?.phone ? (
+              <Typography variant="caption" color="text.secondary">
+                {t("phone")}: {row.assigned_user.phone}
+              </Typography>
+            ) : null}
+          </Stack>
         ),
       },
       {
@@ -369,7 +383,9 @@ export default function ProjectNotificationsView() {
         key: "date",
         name: t("date"),
         sortable: false,
-        render: (row: ProjectNotification) => <span>{row.task_date}</span>,
+        render: (row: ProjectNotification) => (
+          <span>{formatDateTime(row.task_date)}</span>
+        ),
       },
       {
         key: "actions",
@@ -791,6 +807,11 @@ export default function ProjectNotificationsView() {
                     ? viewTarget.assigned_users.map((u) => u.name).join(", ")
                     : (viewTarget.assigned_user?.name ?? "-")}
                 </Typography>
+                {viewTarget.assigned_user?.phone ? (
+                  <Typography variant="body2" color="text.secondary">
+                    {t("phone")}: {viewTarget.assigned_user.phone}
+                  </Typography>
+                ) : null}
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <Typography variant="caption" color="text.secondary">
