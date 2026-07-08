@@ -9,17 +9,19 @@ import {
 
 interface NotificationStatusBadgeProps {
   status: NotificationStatus;
+  statusLabel?: string | null;
 }
 
 export default function NotificationStatusBadge({
   status,
+  statusLabel,
 }: NotificationStatusBadgeProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.pending;
 
   return (
     <Chip
-      label={t(config.labelKey)}
+      label={statusLabel?.trim() || t(config.labelKey)}
       size="small"
       variant="outlined"
       color={config.muiColor}

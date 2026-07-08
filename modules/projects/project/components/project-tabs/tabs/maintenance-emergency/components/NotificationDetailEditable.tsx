@@ -751,7 +751,10 @@ export default function NotificationDetailEditable({
     <Stack spacing={2.5}>
       {/* Status & severity badges row */}
       <Stack direction="row" spacing={1.5} flexWrap="wrap" sx={{ gap: 1 }}>
-        <NotificationStatusBadge status={notification.status} />
+        <NotificationStatusBadge
+          status={notification.status}
+          statusLabel={notification.status_label}
+        />
         <NotificationSeverityBadge severity={notification.severity} />
         {notification.violations_count > 0 && (
           <Chip
