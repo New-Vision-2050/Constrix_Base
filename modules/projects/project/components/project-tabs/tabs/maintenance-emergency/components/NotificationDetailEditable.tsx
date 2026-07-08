@@ -522,6 +522,11 @@ export default function NotificationDetailEditable({
 
   const routeDistances = useGoogleRouteDistances(employees, locationCenter);
 
+  const initialAssignedUserIds = useMemo(
+    () => new Set(notification.assigned_user_ids ?? []),
+    [notification],
+  );
+
   const enrichedEmployees = useMemo(() => {
     return employees.map((employee) => {
       const route = routeDistances[employee.user_id];
@@ -615,6 +620,7 @@ export default function NotificationDetailEditable({
           onSelectEmployee={(userId) => {
             const current = formData.assigned_user_ids;
             if (current.includes(userId)) {
+              if (initialAssignedUserIds.has(userId)) return;
               updateField("assigned_user_ids", current.filter((id) => id !== userId));
             } else {
               updateField("assigned_user_ids", [...current, userId]);
@@ -675,6 +681,7 @@ export default function NotificationDetailEditable({
                         onClick={() => {
                           const current = formData.assigned_user_ids;
                           if (current.includes(employee.user_id)) {
+                            if (initialAssignedUserIds.has(employee.user_id)) return;
                             updateField("assigned_user_ids", current.filter((id) => id !== employee.user_id));
                           } else {
                             updateField("assigned_user_ids", [...current, employee.user_id]);
@@ -690,12 +697,14 @@ export default function NotificationDetailEditable({
                         <TableCell align="center">
                           <Checkbox
                             checked={isSelected}
+                            disabled={isSelected && initialAssignedUserIds.has(employee.user_id)}
                             onChange={(e) => {
                               const current = formData.assigned_user_ids;
                               if (e.target.checked) {
                                 updateField("assigned_user_ids", [...current, employee.user_id]);
                                 updateField("selected_distance_meters", employee.route_distance_meters);
                               } else {
+                                if (initialAssignedUserIds.has(employee.user_id)) return;
                                 updateField("assigned_user_ids", current.filter((id) => id !== employee.user_id));
                               }
                             }}

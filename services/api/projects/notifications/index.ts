@@ -198,4 +198,9 @@ export const ProjectNotificationsApi = {
       "projects/notifications/charts",
       { params: args },
     ),
+
+  notifySiteStatusUpdateByVoice: (id: string) =>
+    baseApi.post<ProjectNotificationSingleResponse>(
+      `projects/notifications/${encodeURIComponent(id)}/notify-site-status-update-by-voice`,
+    ),
 };
