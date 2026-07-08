@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker, Polygon } from "@react-google-maps/api";
-import type { Libraries } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/config/google-maps";
 import {
   Box, Button, Typography, IconButton, useTheme,
   Dialog, DialogTitle, DialogContent, DialogActions,
@@ -29,14 +29,9 @@ interface Props {
 
 const CENTER = { lat: 24.7136, lng: 46.6753 };
 const ZOOM = 12;
-const LIBS: Libraries = ["places", "geometry"];
-
 export default function MapPolygonDrawer({ polygons, onChange, disabled, height = 200, label }: Props) {
   const theme = useTheme();
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-    libraries: LIBS,
-  });
+  const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [drawing, setDrawing] = useState(false);

@@ -1,5 +1,6 @@
 import type {
   CreateProjectNotificationArgs,
+  ProjectNotificationsChartsArgs,
   ProjectNotificationsEmployeesLocationsArgs,
   ProjectNotificationsExportArgs,
   ProjectNotificationsListArgs,
@@ -103,4 +104,17 @@ export function buildUpdateNotificationArgs(
 
 export function notificationScopeExportFilename(scope: NotificationScope): string {
   return `notifications-${scope.contractualEngagementKey ?? scope.projectId}.xlsx`;
+}
+
+export function buildNotificationsChartsArgs(
+  scope: NotificationScope,
+  filters: Omit<
+    ProjectNotificationsChartsArgs,
+    "project_id" | "contractual_engagement_key"
+  >,
+): ProjectNotificationsChartsArgs {
+  return {
+    ...buildNotificationScopeParams(scope),
+    ...filters,
+  } as ProjectNotificationsChartsArgs;
 }

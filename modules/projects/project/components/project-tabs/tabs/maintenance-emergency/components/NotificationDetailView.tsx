@@ -277,7 +277,10 @@ export default function NotificationDetailView({
     );
   }
 
-  const assignedUserName = notification.assigned_user?.name ?? "—";
+  const assignedUserName =
+    notification.assigned_users && notification.assigned_users.length > 0
+      ? notification.assigned_users.map((u) => u.name).join(", ")
+      : (notification.assigned_user?.name ?? "—");
   const durationLabel = notification.duration_hours
     ? String(notification.duration_hours)
     : "—";
@@ -338,7 +341,10 @@ export default function NotificationDetailView({
       <Grid container spacing={2} sx={{ mb: 2.5 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard title={t("status")}>
-            <NotificationStatusBadge status={notification.status} />
+            <NotificationStatusBadge
+              status={notification.status}
+              statusLabel={notification.status_label}
+            />
           </StatCard>
         </Grid>
 

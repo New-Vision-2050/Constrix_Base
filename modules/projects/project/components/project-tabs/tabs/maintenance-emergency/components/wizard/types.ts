@@ -31,8 +31,9 @@ export interface WizardFormData {
   repair_point: string;
 
   // Step 4
-  assigned_user_id: string;
+  assigned_user_ids: string[];
   selected_distance_meters: number;
+  independent_progress: boolean;
   employees: ProjectNotificationEmployee[];
 }
 
@@ -65,7 +66,8 @@ export const EMPTY_FORM: WizardFormData = {
   location_link: "",
   repair_point: "",
 
-  assigned_user_id: "",
+  assigned_user_ids: [],
   selected_distance_meters: 0,
+  independent_progress: true,
   employees: [],
 };

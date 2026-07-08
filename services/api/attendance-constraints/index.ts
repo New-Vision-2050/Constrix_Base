@@ -216,7 +216,8 @@ function splitFlat(rows: ConstraintCatalogRow[]): {
 
 /**
  * GET .../employees/{userId}/constraint-locations sometimes returns one object:
- * `main_constraint`, `branch_locations`, `additional_locations`, plus root fields.
+ * `main_constraint`, `additional_constraints`, `branch_locations`,
+ * `additional_locations`, plus root fields.
  */
 function normalizeEmployeeConstraintAssignmentObject(
   obj: Record<string, unknown>,
@@ -224,7 +225,8 @@ function normalizeEmployeeConstraintAssignmentObject(
   const hasShape =
     obj.main_constraint != null ||
     Array.isArray(obj.branch_locations) ||
-    Array.isArray(obj.additional_locations);
+    Array.isArray(obj.additional_locations) ||
+    Array.isArray(obj.additional_constraints);
 
   if (!hasShape) {
     return null;
@@ -300,7 +302,14 @@ function normalizeEmployeeConstraintAssignmentObject(
     ? rowsFromArray(obj.additional_locations as unknown[])
     : [];
 
-  let additionalMerged = [...additionalFromLocations];
+  const additionalFromRoot = Array.isArray(obj.additional_constraints)
+    ? rowsFromArray(obj.additional_constraints as unknown[])
+    : [];
+
+  let additionalMerged = [
+    ...additionalFromLocations,
+    ...additionalFromRoot,
+  ];
 
   if (mcRaw && typeof mcRaw === "object") {
     const nested = (mcRaw as Record<string, unknown>).additional_constraints;
@@ -347,6 +356,12 @@ function normalizeEmployeeConstraintPayload(
     assignmentShape &&
     (assignmentShape.main.length > 0 || assignmentShape.additional.length > 0)
   ) {
+    if (assignmentShape.additional.length === 0) {
+      const keyedAdditional = tryKeyedArrays(obj).additional;
+      if (keyedAdditional.length > 0) {
+        return { ...assignmentShape, additional: keyedAdditional };
+      }
+    }
     return assignmentShape;
   }
 

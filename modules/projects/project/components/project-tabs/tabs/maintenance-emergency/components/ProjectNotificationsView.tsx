@@ -300,7 +300,10 @@ export default function ProjectNotificationsView() {
         name: t("status"),
         sortable: false,
         render: (row: ProjectNotification) => (
-          <NotificationStatusBadge status={row.status} />
+          <NotificationStatusBadge
+            status={row.status}
+            statusLabel={row.status_label}
+          />
         ),
       },
       {
@@ -343,7 +346,11 @@ export default function ProjectNotificationsView() {
         sortable: false,
         render: (row: ProjectNotification) => (
           <Stack spacing={0.25}>
-            <span>{row.assigned_user?.name ?? "—"}</span>
+            <span>
+            {row.assigned_users && row.assigned_users.length > 0
+              ? row.assigned_users.map((u) => u.name).join(", ")
+              : (row.assigned_user?.name ?? "—")}
+          </span>
             {row.assigned_user?.phone ? (
               <Typography variant="caption" color="text.secondary">
                 {t("phone")}: {row.assigned_user.phone}
@@ -374,7 +381,7 @@ export default function ProjectNotificationsView() {
       },
       {
         key: "date",
-        name: t("dateTime"),
+        name: t("date"),
         sortable: false,
         render: (row: ProjectNotification) => (
           <span>{formatDateTime(row.task_date)}</span>
@@ -793,7 +800,9 @@ export default function ProjectNotificationsView() {
                   {t("engineer")}
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {viewTarget.assigned_user?.name ?? "-"}
+                  {viewTarget.assigned_users && viewTarget.assigned_users.length > 0
+                    ? viewTarget.assigned_users.map((u) => u.name).join(", ")
+                    : (viewTarget.assigned_user?.name ?? "-")}
                 </Typography>
                 {viewTarget.assigned_user?.phone ? (
                   <Typography variant="body2" color="text.secondary">

@@ -63,8 +63,9 @@ export interface CreateProjectNotificationArgs
   location_radius: number;
   location_link?: string | null;
   repair_point: string;
-  assigned_user_id: string;
+  assigned_user_ids: string[];
   selected_distance_meters: number;
+  independent_progress?: boolean;
   task_date?: string | null;
   duration_hours?: number | null;
   notes?: string | null;
@@ -87,4 +88,21 @@ export interface ProjectNotificationMobileActionArgs {
   longitude?: number;
   internal_procedure_setting_id?: string;
   notes?: string;
+}
+
+export interface ProjectNotificationsChartsArgs {
+  project_id?: string;
+  contractual_engagement_key?: string;
+  status?: string;
+  notification_type?: string;
+  severity?: string;
+  work_type?: string;
+  contractor_name?: string;
+  contractor_id?: string;
+  contractor_category?: string;
+  assigned_user_id?: string;
+  task_date?: string;
+  date_from?: string;
+  date_to?: string;
+  search?: string;
 }

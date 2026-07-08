@@ -22,6 +22,7 @@ import {
   Step,
   StepLabel,
   Stepper,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -808,12 +809,12 @@ function Step4Form({
 
   useEffect(() => {
     const selected = sortedEmployees.find(
-      (employee) => employee.user_id === data.assigned_user_id,
+      (employee) => employee.user_id === data.assigned_user_ids[0],
     );
     if (selected) {
       onChange("selected_distance_meters", selected.route_distance_meters);
     }
-  }, [sortedEmployees, data.assigned_user_id, onChange]);
+  }, [sortedEmployees, data.assigned_user_ids, onChange]);
 
   const statusColor = (status: string) => {
     switch (status) {
@@ -838,8 +839,15 @@ function Step4Form({
           center={center}
           radius={data.location_radius}
           employees={sortedEmployees}
-          selectedUserId={data.assigned_user_id}
-          onSelectEmployee={(userId) => onChange("assigned_user_id", userId)}
+          selectedUserIds={data.assigned_user_ids}
+          onSelectEmployee={(userId) => {
+            const current = data.assigned_user_ids;
+            if (current.includes(userId)) {
+              onChange("assigned_user_ids", current.filter((id) => id !== userId));
+            } else {
+              onChange("assigned_user_ids", [...current, userId]);
+            }
+          }}
           height="100%"
           polygons={polygons}
           showPolyline
@@ -854,6 +862,17 @@ function Step4Form({
           <Typography variant="subtitle2" gutterBottom>
             {t("employees")}
           </Typography>
+
+          <FormControlLabel
+            sx={{ mb: 1 }}
+            control={
+              <Switch
+                checked={data.independent_progress}
+                onChange={(e) => onChange("independent_progress", e.target.checked)}
+              />
+            }
+            label={t("independentProgress", { defaultValue: "Independent progress" })}
+          />
 
           <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
             <TextField
@@ -932,14 +951,21 @@ function Step4Form({
                 </TableHead>
                 <TableBody>
                   {sortedEmployees.map((employee) => {
-                    const isSelected = data.assigned_user_id === employee.user_id;
+                    const isSelected = data.assigned_user_ids.includes(employee.user_id);
                     const hasLocation =
                       employee.location?.latitude != null &&
                       employee.location?.longitude != null;
                     return (
                       <TableRow
                         key={employee.user_id}
-                        onClick={() => onChange("assigned_user_id", employee.user_id)}
+                        onClick={() => {
+                          const current = data.assigned_user_ids;
+                          if (current.includes(employee.user_id)) {
+                            onChange("assigned_user_ids", current.filter((id) => id !== employee.user_id));
+                          } else {
+                            onChange("assigned_user_ids", [...current, employee.user_id]);
+                          }
+                        }}
                         sx={{
                           cursor: "pointer",
                           bgcolor: isSelected ? "action.selected" : "background.paper",
@@ -947,10 +973,16 @@ function Step4Form({
                         }}
                       >
                         <TableCell align="center">
-                          <input
-                            type="radio"
+                          <Checkbox
                             checked={isSelected}
-                            onChange={() => onChange("assigned_user_id", employee.user_id)}
+                            onChange={(e) => {
+                              const current = data.assigned_user_ids;
+                              if (e.target.checked) {
+                                onChange("assigned_user_ids", [...current, employee.user_id]);
+                              } else {
+                                onChange("assigned_user_ids", current.filter((id) => id !== employee.user_id));
+                              }
+                            }}
                             onClick={(e) => e.stopPropagation()}
                           />
                         </TableCell>
@@ -1007,9 +1039,9 @@ function Step4Form({
             </TableContainer>
           )}
 
-          {errors.assigned_user_id && (
+          {errors.assigned_user_ids && (
             <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
-              {errors.assigned_user_id}
+              {errors.assigned_user_ids}
             </Typography>
           )}
         </Paper>
@@ -1035,16 +1067,15 @@ function Step5Form({
   onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
   t: ReturnType<typeof useTranslations>;
 }) {
-  const selectedEmployee = employees.find((e) => e.user_id === data.assigned_user_id);
+  const selectedEmployees = useMemo(
+    () => employees.filter((e) => data.assigned_user_ids.includes(e.user_id)),
+    [employees, data.assigned_user_ids],
+  );
   const center = useMemo(() => {
     if (data.task_latitude == null || data.task_longitude == null) return null;
     return { lat: data.task_latitude, lng: data.task_longitude };
   }, [data.task_latitude, data.task_longitude]);
-  const routeEmployees = useMemo(
-    () => (selectedEmployee ? [selectedEmployee] : []),
-    [selectedEmployee],
-  );
-  const routeDistances = useGoogleRouteDistances(routeEmployees, center);
+  const routeDistances = useGoogleRouteDistances(selectedEmployees, center);
 
   return (
     <Stack spacing={3}>
@@ -1086,10 +1117,10 @@ function Step5Form({
               center={{ lat: data.task_latitude, lng: data.task_longitude }}
               radius={data.location_radius}
               height="160px"
-              employees={selectedEmployee ? [selectedEmployee] : []}
-              selectedUserId={data.assigned_user_id}
-              showEmployees={Boolean(selectedEmployee)}
-              showPolyline={Boolean(selectedEmployee)}
+              employees={selectedEmployees}
+              selectedUserIds={data.assigned_user_ids}
+              showEmployees={selectedEmployees.length > 0}
+              showPolyline={selectedEmployees.length > 0}
               routeDistances={routeDistances}
               interactivePin={false}
               showPin={data.task_latitude != null && data.task_longitude != null}
@@ -1101,14 +1132,25 @@ function Step5Form({
       <SummaryCard
         title={t("summaryAssignment")}
         rows={[
-          { label: t("employeeName"), value: selectedEmployee?.name ?? "-" },
+          {
+            label: t("employeeName"),
+            value: selectedEmployees.length > 0
+              ? selectedEmployees.map((e) => e.name).join(", ")
+              : "-",
+          },
           {
             label: t("distance"),
-            value: selectedEmployee?.distance_label ?? "-",
+            value: selectedEmployees[0]?.distance_label ?? "-",
           },
           {
             label: t("employeeStatus"),
-            value: selectedEmployee?.status_label ?? "-",
+            value: selectedEmployees[0]?.status_label ?? "-",
+          },
+          {
+            label: t("independentProgress", { defaultValue: "Independent progress" }),
+            value: data.independent_progress
+              ? t("yes", { defaultValue: "Yes" })
+              : t("no", { defaultValue: "No" }),
           },
         ]}
       />

@@ -27,8 +27,9 @@ export function notificationToWizardForm(
       location_radius: 250,
       location_link: "",
       repair_point: "",
-      assigned_user_id: "",
+      assigned_user_ids: [],
       selected_distance_meters: 0,
+      independent_progress: true,
       employees: [],
     };
   }
@@ -58,8 +59,9 @@ export function notificationToWizardForm(
     location_link: notification.location_link ?? "",
     repair_point: notification.repair_point ?? "",
 
-    assigned_user_id: notification.assigned_user_id ?? "",
+    assigned_user_ids: notification.assigned_user_ids ?? [],
     selected_distance_meters: notification.selected_distance_meters ?? 0,
+    independent_progress: notification.independent_progress ?? true,
     employees: [],
   };
 }
