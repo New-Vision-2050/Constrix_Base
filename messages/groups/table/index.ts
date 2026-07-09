@@ -24,7 +24,12 @@ export const tableMessages = new MessagesGroup({
   Error: _m("Error", "خطأ"),
 
   // HeadlessTableLayout translations
-  Selected: _m("selected", "محدد"),
+  Selected: _m("row selected", "صف محدد"),
+  SelectedRows: _m("rows selected", "صفوف محددة"),
+  SelectedRowsMessage: _m(
+    "You have selected multiple rows. You can perform bulk actions on them.",
+    "لقد قمت بتحديد عدة صفوف. يمكنك تنفيذ إجراءات مجموعة عليها.",
+  ),
   ClearSelection: _m("Clear Selection", "مسح التحديد"),
   Delete: _m("Delete", "حذف"),
   NoData: _m("No data", "لا توجد بيانات"),

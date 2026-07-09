@@ -11,6 +11,8 @@ import {
   TableSortLabel,
   Skeleton,
   Checkbox,
+  Alert,
+  Chip,
 } from "@mui/material";
 import { InboxOutlined, SearchOff } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
@@ -71,6 +73,10 @@ export function createTableComponent<TRow>() {
     const getRowKeyFromState = isUsingState
       ? props.state.selection.getRowKey
       : undefined;
+    const selectedCount =
+      isUsingState && props.state.table.selectable
+        ? props.state.selection.selectedCount
+        : 0;
     const handleColumnSort = (columnKey: string, sortable?: boolean) => {
       if (sortable && handleSort) {
         handleSort(columnKey);
@@ -218,7 +224,32 @@ export function createTableComponent<TRow>() {
     };
 
     return (
-      <TableContainer>
+      <>
+        {selectedCount > 0 && (
+          <Alert
+            severity="info"
+            sx={{
+              mb: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderRadius: 1,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Chip
+                label={`${selectedCount} ${selectedCount === 1 ? t("Selected") : t("SelectedRows")}`}
+                color="primary"
+                variant="filled"
+                sx={{ fontWeight: "600" }}
+              />
+              <Typography variant="body2" color="textSecondary">
+                {t("SelectedRowsMessage")}
+              </Typography>
+            </Box>
+          </Alert>
+        )}
+        <TableContainer>
         <Table
           sx={{
             tableLayout: "auto",
@@ -354,7 +385,8 @@ export function createTableComponent<TRow>() {
                   })}
           </TableBody>
         </Table>
-      </TableContainer>
+        </TableContainer>
+      </>
     );
   };
 
