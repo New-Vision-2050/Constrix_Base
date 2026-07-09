@@ -351,7 +351,7 @@ export default function ProjectNotificationsView() {
                     )
                   : ROUTER.PROJECT_NOTIFICATION_DETAILS(projectId!, row.id)
               }
-              className="p-2 text-sm text-primary hover:underline"
+              className="p-2 text-sm  hover:underline"
             >
               {row.notification_number}
             </I18nLink>
@@ -618,43 +618,8 @@ export default function ProjectNotificationsView() {
                   ))}
                 </TextField>
 
-                <TextField
-                  select
-                  size="small"
-                  label={t("severity")}
-                  value={filterSeverity}
-                  onChange={(e) => {
-                    setFilterSeverity(e.target.value);
-                    params.setPage(1);
-                  }}
-                  sx={filterSx}
-                >
-                  <MenuItem value="">{t("all")}</MenuItem>
-                  {SEVERITY_OPTIONS.map((value) => (
-                    <MenuItem key={value} value={value}>
-                      {t(`severities.${value}`)}
-                    </MenuItem>
-                  ))}
-                </TextField>
 
-                <TextField
-                  select
-                  size="small"
-                  label={t("type")}
-                  value={filterType}
-                  onChange={(e) => {
-                    setFilterType(e.target.value);
-                    params.setPage(1);
-                  }}
-                  sx={filterSx}
-                >
-                  <MenuItem value="">{t("all")}</MenuItem>
-                  {notificationTypes.map((option) => (
-                    <MenuItem key={option.id} value={option.value}>
-                      {option.value}
-                    </MenuItem>
-                  ))}
-                </TextField>
+
 
 
                 <TextField
