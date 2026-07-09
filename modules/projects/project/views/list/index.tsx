@@ -11,8 +11,6 @@ import {
   FormControl,
   InputLabel,
   Select,
-  Chip,
-  Alert,
 } from "@mui/material";
 import { LayoutGrid, List, EditIcon, Trash2, Eye } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -288,32 +286,6 @@ function ProjectsList() {
           </FormControl>
         </Box>
       </Paper>
-
-      {/* ── Selected Rows Count Alert ─────────────────────────────────── */}
-      {state.selection.selectedCount > 0 && (
-        <Alert
-          severity="info"
-          sx={{
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderRadius: 1,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Chip
-              label={`${state.selection.selectedCount} ${state.selection.selectedCount === 1 ? tProject("selected") : tProject("selectedRows")}`}
-              color="primary"
-              variant="filled"
-              sx={{ fontWeight: "600" }}
-            />
-            <Typography variant="body2" color="textSecondary">
-              {tProject("selectedRowsMessage")}
-            </Typography>
-          </Box>
-        </Alert>
-      )}
 
       {viewMode === "table" ? (
         <ProjectsTableLayout
