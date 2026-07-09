@@ -167,7 +167,6 @@ export default function ProjectNotificationsView() {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterSeverity, setFilterSeverity] = useState("");
   const [filterType, setFilterType] = useState("");
-  const [filterWorkType, setFilterWorkType] = useState("");
   const [filterFromDate, setFilterFromDate] = useState("");
   const [filterToDate, setFilterToDate] = useState("");
   const [filterAssignedUser, setFilterAssignedUser] = useState("");
@@ -243,7 +242,6 @@ export default function ProjectNotificationsView() {
     status: filterStatus || undefined,
     severity: filterSeverity || undefined,
     notificationType: filterType || undefined,
-    workType: filterWorkType || undefined,
     fromDate: filterFromDate || undefined,
     toDate: filterToDate || undefined,
     assignedUserId: filterAssignedUser || undefined,
@@ -316,7 +314,6 @@ export default function ProjectNotificationsView() {
           status: filterStatus || undefined,
           severity: filterSeverity || undefined,
           notification_type: filterType || undefined,
-          work_type: filterWorkType || undefined,
           from_date: filterFromDate || undefined,
           to_date: filterToDate || undefined,
           assigned_user_id: filterAssignedUser || undefined,
@@ -380,12 +377,6 @@ export default function ProjectNotificationsView() {
         render: (row: ProjectNotification) => <span>{row.notification_type}</span>,
       },
       {
-        key: "work_type",
-        name: t("workType"),
-        sortable: false,
-        render: (row: ProjectNotification) => <span>{row.work_type}</span>,
-      },
-      {
         key: "last_site_update_status",
         name: t("lastSiteUpdateStatus"),
         sortable: false,
@@ -412,6 +403,14 @@ export default function ProjectNotificationsView() {
           <span>{formatDateTime(row.last_site_update_date)}</span>
         ),
       },
+        {
+            key: "date",
+            name: t("date"),
+            sortable: false,
+            render: (row: ProjectNotification) => (
+                <span>{formatDateTime(row.created_at)}</span>
+            ),
+        },
       {
         key: "contractor",
         name: t("contractor"),
@@ -446,33 +445,12 @@ export default function ProjectNotificationsView() {
         ),
       },
       {
-        key: "distance",
-        name: t("distance"),
-        sortable: false,
-        render: (row: ProjectNotification) => (
-          <span>
-            {formatDistanceMeters(
-              row.selected_distance_meters,
-              t("meters"),
-              t("kilometers"),
-            )}
-          </span>
-        ),
-      },
-      {
         key: "location",
         name: t("location"),
         sortable: false,
         render: (row: ProjectNotification) => <span>{row.repair_point}</span>,
       },
-      {
-        key: "date",
-        name: t("date"),
-        sortable: false,
-        render: (row: ProjectNotification) => (
-          <span>{formatDateTime(row.created_at)}</span>
-        ),
-      },
+
       {
         key: "actions",
         name: t("columnActions"),
@@ -600,7 +578,6 @@ export default function ProjectNotificationsView() {
     setFilterStatus("");
     setFilterSeverity("");
     setFilterType("");
-    setFilterWorkType("");
     setFilterFromDate("");
     setFilterToDate("");
     setFilterAssignedUser("");
@@ -679,24 +656,6 @@ export default function ProjectNotificationsView() {
                   ))}
                 </TextField>
 
-                <TextField
-                  select
-                  size="small"
-                  label={t("workType")}
-                  value={filterWorkType}
-                  onChange={(e) => {
-                    setFilterWorkType(e.target.value);
-                    params.setPage(1);
-                  }}
-                  sx={filterSx}
-                >
-                  <MenuItem value="">{t("all")}</MenuItem>
-                  {WORK_TYPE_OPTIONS.map((value) => (
-                    <MenuItem key={value} value={value}>
-                      {t(`workTypes.${value}`)}
-                    </MenuItem>
-                  ))}
-                </TextField>
 
                 <TextField
                   size="small"
