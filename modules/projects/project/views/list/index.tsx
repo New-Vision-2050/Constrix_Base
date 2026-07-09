@@ -286,6 +286,7 @@ function ProjectsList() {
           </FormControl>
         </Box>
       </Paper>
+
       {viewMode === "table" ? (
         <ProjectsTableLayout
           filters={
