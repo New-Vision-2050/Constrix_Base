@@ -653,6 +653,8 @@ export const projectMessages = new MessagesGroup({
       createdError: _m("Could not create notification", "تعذر إنشاء الإشعار"),
       updatedSuccess: _m("Notification updated", "تم تحديث الإشعار"),
       updatedError: _m("Could not update notification", "تعذر تحديث الإشعار"),
+      draftSaved: _m("Draft saved", "تم حفظ المسودة"),
+      draftSavedError: _m("Could not save draft", "تعذر حفظ المسودة"),
       radius: _m("Radius", "نطاق"),
       meters: _m("m", "م"),
       kilometers: _m("km", "كم"),
