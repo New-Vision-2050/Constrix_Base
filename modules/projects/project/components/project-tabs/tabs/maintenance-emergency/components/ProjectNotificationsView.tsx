@@ -79,54 +79,59 @@ const TableLayout = HeadlessTableLayout<ProjectNotification>(
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 
 interface TimerCellProps {
+  createdAt: string;
   lastSiteUpdateDate?: string | null;
   status?: string;
+  updatedAt?: string;
 }
 
-function TimerCell({ lastSiteUpdateDate, status }: TimerCellProps) {
-  const [timeRemaining, setTimeRemaining] = useState<number>(0);
-  const [isExpired, setIsExpired] = useState(false);
+function TimerCell({
+  createdAt,
+  lastSiteUpdateDate,
+  status,
+  updatedAt,
+}: TimerCellProps) {
+  const [elapsed, setElapsed] = useState<number>(0);
+  const [isStale, setIsStale] = useState(false);
 
   useEffect(() => {
-    if (!lastSiteUpdateDate || status === "completed") {
-      setTimeRemaining(0);
-      setIsExpired(false);
-      return;
-    }
-
-    const updateTimer = () => {
+    const compute = () => {
       const now = new Date().getTime();
-      const updateDate = new Date(lastSiteUpdateDate).getTime();
-      const elapsed = now - updateDate;
-      const remaining = THIRTY_MINUTES_MS - elapsed;
-      
-      setTimeRemaining(remaining);
-      setIsExpired(remaining < 0);
+      const created = new Date(createdAt).getTime();
+      const endTime =
+        status === "completed" && updatedAt
+          ? new Date(updatedAt).getTime()
+          : now;
+
+      setElapsed(Math.max(0, endTime - created));
+
+      if (lastSiteUpdateDate) {
+        const updateTime = new Date(lastSiteUpdateDate).getTime();
+        setIsStale(now - updateTime > THIRTY_MINUTES_MS);
+      } else {
+        setIsStale(true);
+      }
     };
 
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-
+    compute();
+    if (status === "completed") return;
+    const interval = setInterval(compute, 1000);
     return () => clearInterval(interval);
-  }, [lastSiteUpdateDate]);
-
-  if (!lastSiteUpdateDate || status === "completed") {
-    return <span className="text-sm">—</span>;
-  }
+  }, [createdAt, lastSiteUpdateDate, status, updatedAt]);
 
   const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(Math.abs(ms) / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    const sign = ms < 0 ? "-" : "";
-    return `${sign}${minutes}:${seconds.toString().padStart(2, "0")}`;
+    const totalSeconds = Math.floor(ms / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}:${minutes.toString().padStart(2, "0")}`;
   };
 
   return (
     <span
-      className={`text-sm ${isExpired ? "text-red-600 font-semibold" : "text-green-600"}`}
+      className={`text-sm font-semibold ${isStale ? "text-red-600" : "text-green-600"}`}
     >
-      {formatTime(timeRemaining)}
+      {formatTime(elapsed)}
     </span>
   );
 }
@@ -353,7 +358,7 @@ export default function ProjectNotificationsView() {
                     )
                   : ROUTER.PROJECT_NOTIFICATION_DETAILS(projectId!, row.id)
               }
-              className="p-2 text-sm  hover:underline"
+              className="p-2 text-sm font-bold underline hover:underline"
             >
               {row.notification_number}
             </I18nLink>
@@ -392,8 +397,10 @@ export default function ProjectNotificationsView() {
         sortable: false,
         render: (row: ProjectNotification) => (
           <TimerCell
+            createdAt={row.created_at}
             lastSiteUpdateDate={row.last_site_update_date}
             status={row.status}
+            updatedAt={row.updated_at}
           />
         ),
       },
