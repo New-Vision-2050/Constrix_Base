@@ -209,10 +209,6 @@ export default function CreateNotificationWizard({
       return;
     }
     if (step < STEP_COUNT) {
-      if (isDraftMode()) {
-        const saved = await saveDraft({ silent: true });
-        if (!saved) return;
-      }
       setStep((prev) => ((prev + 1) as WizardStep));
     }
   }
@@ -316,41 +312,6 @@ export default function CreateNotificationWizard({
       return true;
     } catch (error) {
       if (!silent) handleApiError(error, "draftSavedError");
-      return false;
-    }
-  }
-
-  async function saveDraft(): Promise<boolean> {
-    if (!hasScope) return false;
-
-    try {
-      if (mode === "edit" && notificationId) {
-        await draftMutation.mutateAsync(
-          buildUpdatePayload(notificationId, notificationScope, data, {
-            isDraft: true,
-          }),
-        );
-        return true;
-      }
-
-      if (draftId) {
-        await draftMutation.mutateAsync(
-          buildUpdatePayload(draftId, notificationScope, data, {
-            isDraft: true,
-          }),
-        );
-        return true;
-      }
-
-      const saved = await draftMutation.mutateAsync(
-        buildCreatePayload(notificationScope, data, { isDraft: true }),
-      );
-      if (saved?.id) {
-        setDraftId(saved.id);
-      }
-      return true;
-    } catch (error) {
-      handleApiError(error);
       return false;
     }
   }
