@@ -91,7 +91,7 @@ export interface ProjectNotificationMobileActionArgs {
 }
 
 export interface ProjectNotificationReassignArgs {
-  user_id: string;
+  assigned_user_ids: string[];
 }
 
 export interface ProjectNotificationsChartsArgs {

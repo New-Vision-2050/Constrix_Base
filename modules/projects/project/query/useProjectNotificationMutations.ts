@@ -145,12 +145,12 @@ export function useReassignProjectNotificationMutation(scope: NotificationScope)
   return useMutation({
     mutationFn: async ({
       id,
-      userId,
+      assignedUserIds,
     }: {
       id: string;
-      userId: string;
+      assignedUserIds: string[];
     }): Promise<ProjectNotification | null> => {
-      const res = await ProjectNotificationsApi.reassign(id, { user_id: userId });
+      const res = await ProjectNotificationsApi.reassign(id, { assigned_user_ids: assignedUserIds });
       const payload = res.data.payload;
       if (!payload) return null;
       if (Array.isArray(payload)) return payload[0] ?? null;

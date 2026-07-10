@@ -242,30 +242,26 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   // Custom search function using Google Places API
   const searchPlaces = useCallback(
     async (query: string) => {
-      if (!query.trim() || !isLoaded || !window.google) return;
+      if (!query.trim() || !isLoaded || !window.google?.maps?.places) return;
 
       try {
-        const service = new window.google.maps.places.AutocompleteService();
-
-        service.getPlacePredictions(
-          {
-            input: query,
-            sessionToken: new window.google.maps.places.AutocompleteSessionToken(),
-          },
-          (predictions, status) => {
-            if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-              const results: SearchResult[] = predictions.map((prediction) => ({
-                place_id: prediction.place_id,
-                description: prediction.description,
-              }));
-              setSearchResults(results);
-              setShowResults(true);
-            } else {
-              setSearchResults([]);
-              setShowResults(false);
-            }
-          }
-        );
+        const request: google.maps.places.AutocompleteRequest = {
+          input: query,
+          sessionToken: new window.google.maps.places.AutocompleteSessionToken(),
+        };
+        const { suggestions } = await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+        const results: SearchResult[] = suggestions
+          .map((suggestion) => {
+            const placePrediction = suggestion.placePrediction;
+            if (!placePrediction) return null;
+            return {
+              place_id: placePrediction.placeId,
+              description: placePrediction.text.text,
+            };
+          })
+          .filter(Boolean) as SearchResult[];
+        setSearchResults(results);
+        setShowResults(true);
       } catch (error) {
         console.error("Error searching places:", error);
         setSearchResults([]);
@@ -291,38 +287,32 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   // Handle selecting a search result
   const handleSelectPlace = useCallback(
-    (placeId: string) => {
-      if (!isLoaded || !window.google) return;
+    async (placeId: string) => {
+      if (!isLoaded || !window.google?.maps?.places) return;
 
-      const service = new window.google.maps.places.PlacesService(
-        document.createElement('div')
-      );
+      try {
+        const place = new window.google.maps.places.Place({ id: placeId });
+        await place.fetchFields({ fields: ["location"] });
+        if (place.location) {
+          const newPosition = {
+            lat: place.location.lat(),
+            lng: place.location.lng(),
+          };
 
-      service.getDetails(
-        {
-          placeId: placeId,
-          fields: ['geometry'],
-        },
-        (place, status) => {
-          if (status === window.google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
-            const newPosition = {
-              lat: place.geometry.location.lat(),
-              lng: place.geometry.location.lng(),
-            };
+          setMarkerPosition(newPosition);
 
-            setMarkerPosition(newPosition);
-
-            if (map) {
-              map.panTo(newPosition);
-              map.setZoom(15);
-            }
-
-            // Hide search results
-            setShowResults(false);
-            setSearchQuery("");
+          if (map) {
+            map.panTo(newPosition);
+            map.setZoom(15);
           }
+
+          // Hide search results
+          setShowResults(false);
+          setSearchQuery("");
         }
-      );
+      } catch (error) {
+        console.error("Error fetching place details:", error);
+      }
     },
     [isLoaded, map]
   );

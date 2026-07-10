@@ -4,17 +4,24 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
+  Divider,
   Grid,
+  MenuItem,
   Paper,
-  Radio,
-  RadioGroup,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
@@ -26,7 +33,6 @@ import { useProjectNotificationEmployees } from "@/modules/projects/project/quer
 import { useProjectNotificationLocationPolygons } from "./wizard/useProjectNotificationLocationPolygons";
 import { useGoogleRouteDistances } from "./wizard/useGoogleRouteDistances";
 import ProjectNotificationMap from "./wizard/ProjectNotificationMap";
-import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceFormat";
 
 interface ReassignTaskModalProps {
   notification: ProjectNotification;
@@ -35,25 +41,12 @@ interface ReassignTaskModalProps {
   onClose: () => void;
 }
 
-const statusColors: Record<string, string> = {
-  available: "#22c55e",
-  busy: "#f97316",
-  offline: "#6b7280",
-  no_location: "#ef4444",
-  available_far: "#eab308",
-};
-
-function getInitialSelectedUserId(notification: ProjectNotification): string {
-  if (notification.employee_task?.user?.id) {
-    return notification.employee_task.user.id;
-  }
-  if (notification.assigned_user?.id) {
-    return notification.assigned_user.id;
-  }
-  if (notification.assigned_users.length > 0) {
-    return notification.assigned_users[0].id;
-  }
-  return "";
+function getInitialSelectedUserIds(notification: ProjectNotification): string[] {
+  const ids = new Set<string>();
+  notification.assigned_users.forEach((u) => ids.add(u.id));
+  if (notification.assigned_user?.id) ids.add(notification.assigned_user.id);
+  if (notification.employee_task?.user?.id) ids.add(notification.employee_task.user.id);
+  return Array.from(ids);
 }
 
 export default function ReassignTaskModal({
@@ -65,13 +58,19 @@ export default function ReassignTaskModal({
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const tCommon = useTranslations("common");
 
-  const [selectedUserId, setSelectedUserId] = useState<string>(() =>
-    getInitialSelectedUserId(notification),
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>(() =>
+    getInitialSelectedUserIds(notification),
   );
+  const [statusFilter, setStatusFilter] = useState("");
+  const [nameFilter, setNameFilter] = useState("");
+  const [branchFilter, setBranchFilter] = useState("");
 
   useEffect(() => {
     if (open) {
-      setSelectedUserId(getInitialSelectedUserId(notification));
+      setSelectedUserIds(getInitialSelectedUserIds(notification));
+      setStatusFilter("");
+      setNameFilter("");
+      setBranchFilter("");
     }
   }, [open, notification]);
 
@@ -100,10 +99,39 @@ export default function ReassignTaskModal({
     return [...list].sort((a, b) => a.distance_meters - b.distance_meters);
   }, [employeeQuery.data]);
 
-  const routeDistances = useGoogleRouteDistances(employees, locationCenter);
+  const statusOptions = [
+    { value: "", label: t("allStatuses", { defaultValue: "All statuses" }) },
+    { value: "available", label: t("available", { defaultValue: "Available" }) },
+    { value: "busy", label: t("busy", { defaultValue: "Busy" }) },
+    { value: "no_location", label: t("noLocation", { defaultValue: "No Location" }) },
+    { value: "offline", label: t("offline", { defaultValue: "Offline" }) },
+  ];
+
+  const branchOptions = useMemo(() => {
+    const branches = new Set<string>();
+    employees.forEach((e) => {
+      if (e.branch) branches.add(e.branch);
+    });
+    return [
+      { value: "", label: t("allBranches", { defaultValue: "All branches" }) },
+      ...Array.from(branches).map((b) => ({ value: b, label: b })),
+    ];
+  }, [employees, t]);
+
+  const filteredEmployees = useMemo(() => {
+    return employees.filter((employee) => {
+      const matchesStatus = !statusFilter || employee.status === statusFilter;
+      const matchesName =
+        !nameFilter || employee.name.toLowerCase().includes(nameFilter.toLowerCase());
+      const matchesBranch = !branchFilter || employee.branch === branchFilter;
+      return matchesStatus && matchesName && matchesBranch;
+    });
+  }, [employees, statusFilter, nameFilter, branchFilter]);
+
+  const routeDistances = useGoogleRouteDistances(filteredEmployees, locationCenter);
 
   const enrichedEmployees = useMemo(() => {
-    return employees.map((employee) => {
+    return filteredEmployees.map((employee) => {
       const route = routeDistances[employee.user_id];
       return {
         ...employee,
@@ -112,7 +140,7 @@ export default function ReassignTaskModal({
         route_duration_text: route?.duration.text ?? "",
       };
     });
-  }, [employees, routeDistances]);
+  }, [filteredEmployees, routeDistances]);
 
   const sortedEmployees = useMemo(() => {
     return [...enrichedEmployees].sort(
@@ -120,22 +148,34 @@ export default function ReassignTaskModal({
     );
   }, [enrichedEmployees]);
 
+  const currentAssignedUserIds = useMemo(() => {
+    return new Set(notification.assigned_users.map((u) => u.id));
+  }, [notification.assigned_users]);
+
+  const toggleUser = (userId: string) => {
+    setSelectedUserIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
+    );
+  };
+
   const reassignMutation = useReassignProjectNotificationMutation(scope);
 
   const handleConfirm = () => {
-    if (!selectedUserId) {
-      toast.error(t("reassignSelectUserError", { defaultValue: "Please select an employee" }));
+    if (selectedUserIds.length === 0) {
+      toast.error(
+        t("reassignSelectUserError", { defaultValue: "Please select at least one employee" }),
+      );
       return;
     }
 
     reassignMutation.mutate(
-      { id: notification.id, userId: selectedUserId },
+      { id: notification.id, assignedUserIds: selectedUserIds },
       {
         onSuccess: () => {
           toast.success(
             t("reassignSuccess", {
               defaultValue:
-                "Task reassigned successfully. The employee can now confirm receipt to start a new lifecycle.",
+                "Task reassigned successfully. Selected employees can now confirm receipt to start their lifecycle.",
             }),
           );
           onClose();
@@ -150,7 +190,7 @@ export default function ReassignTaskModal({
             toast.error(
               message ??
                 t("reassignValidationError", {
-                  defaultValue: "Invalid or missing employee selection.",
+                  defaultValue: "Please select at least one valid employee.",
                 }),
             );
           } else if (status === 404) {
@@ -174,6 +214,20 @@ export default function ReassignTaskModal({
 
   const isBusy = reassignMutation.isPending || employeeQuery.isLoading;
 
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "available":
+      case "available_far":
+        return "#22c55e";
+      case "busy":
+        return "#f97316";
+      case "no_location":
+        return "#ef4444";
+      default:
+        return "#6b7280";
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>{t("reassignTask", { defaultValue: "Reassign Task" })}</DialogTitle>
@@ -184,8 +238,8 @@ export default function ReassignTaskModal({
               center={locationCenter}
               radius={notification.location_radius}
               employees={sortedEmployees}
-              selectedUserIds={[selectedUserId]}
-              onSelectEmployee={(userId) => setSelectedUserId(userId)}
+              selectedUserIds={selectedUserIds}
+              onSelectEmployee={toggleUser}
               height="100%"
               polygons={locationPolygons}
               showPolyline
@@ -198,8 +252,53 @@ export default function ReassignTaskModal({
           <Grid size={{ xs: 12, md: 5 }} sx={{ height: { xs: "auto", md: 460 } }}>
             <Paper variant="outlined" sx={{ p: 2, height: "100%", overflow: "auto" }}>
               <Typography variant="subtitle2" gutterBottom>
-                {t("selectEmployee", { defaultValue: "Select employee" })}
+                {t("selectEmployees", { defaultValue: "Select employees" })}
               </Typography>
+
+              <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                <TextField
+                  select
+                  size="small"
+                  label={t("filterByStatus")}
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  sx={{ minWidth: 130 }}
+                >
+                  {statusOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <TextField
+                  size="small"
+                  label={t("searchByName", { defaultValue: "Search by name" })}
+                  value={nameFilter}
+                  onChange={(e) => setNameFilter(e.target.value)}
+                  sx={{ flex: 1 }}
+                />
+
+                {branchOptions.length > 1 && (
+                  <TextField
+                    select
+                    size="small"
+                    label={t("branch", { defaultValue: "Branch" })}
+                    value={branchFilter}
+                    onChange={(e) => setBranchFilter(e.target.value)}
+                    sx={{ minWidth: 130 }}
+                  >
+                    {branchOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              </Stack>
+
+              <Divider sx={{ mb: 2 }} />
+
               {employeeQuery.isLoading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 2 }}>
                   <CircularProgress size={20} />
@@ -207,89 +306,127 @@ export default function ReassignTaskModal({
                 </Box>
               ) : sortedEmployees.length === 0 ? (
                 <Typography color="text.secondary">
-                  {t("noEmployeesMatch", { defaultValue: "No employees found" })}
+                  {t("noEmployeesMatch", { defaultValue: "No employees match the filters" })}
                 </Typography>
               ) : (
-                <RadioGroup
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                >
-                  <Stack spacing={1}>
-                    {sortedEmployees.map((employee) => {
-                      const isSelected = selectedUserId === employee.user_id;
-                      const isCurrentTaskUser =
-                        notification.employee_task?.user?.id === employee.user_id;
-                      return (
-                        <Paper
-                          key={employee.user_id}
-                          variant="outlined"
-                          sx={{
-                            p: 1.5,
-                            borderColor: isSelected ? "primary.main" : "divider",
-                            bgcolor: isSelected ? "action.selected" : "background.paper",
-                            cursor: "pointer",
-                            "&:hover": { bgcolor: "action.hover" },
-                          }}
-                          onClick={() => setSelectedUserId(employee.user_id)}
-                        >
-                          <FormControlLabel
-                            value={employee.user_id}
-                            control={<Radio />}
-                            label={
-                              <Stack spacing={0.5} sx={{ ml: 0.5 }}>
-                                <Stack
-                                  direction="row"
-                                  spacing={1}
-                                  alignItems="center"
-                                  flexWrap="wrap"
-                                >
-                                  <Box
-                                    sx={{
-                                      width: 10,
-                                      height: 10,
-                                      borderRadius: "50%",
-                                      bgcolor: statusColors[employee.status] ?? "#6b7280",
-                                    }}
-                                  />
-                                  <Typography variant="body2" fontWeight={600}>
-                                    {employee.name}
-                                  </Typography>
-                                  {isCurrentTaskUser && (
-                                    <Typography
-                                      variant="caption"
-                                      color="primary.main"
-                                      fontWeight={600}
-                                    >
-                                      {t("currentlyAssigned", {
-                                        defaultValue: "Currently assigned",
-                                      })}
-                                    </Typography>
-                                  )}
-                                </Stack>
-                                {employee.branch && (
-                                  <Typography variant="caption" color="text.secondary">
-                                    {employee.branch}
-                                  </Typography>
-                                )}
-                                <Typography variant="caption" color="text.secondary">
-                                  {formatDistanceMeters(
-                                    employee.route_distance_meters,
-                                    t("meters"),
-                                    t("kilometers"),
-                                  )}
-                                  {employee.route_duration_text
-                                    ? ` · ${employee.route_duration_text}`
-                                    : null}
+                <TableContainer component={Box} sx={{ border: "1px solid", borderColor: "divider" }}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow sx={{ bgcolor: "action.hover" }}>
+                        <TableCell align="center" sx={{ fontWeight: 700 }}>
+                          {t("assignment", { defaultValue: "Assign" })}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t("employeeName", { defaultValue: "Employee name" })}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t("employeeStatus", { defaultValue: "Status" })}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t("routeDistance", { defaultValue: "Distance" })}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t("estimatedDuration", { defaultValue: "Duration" })}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {t("currentLocation", { defaultValue: "Current location" })}
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {sortedEmployees.map((employee) => {
+                        const isSelected = selectedUserIds.includes(employee.user_id);
+                        const isCurrentlyAssigned = currentAssignedUserIds.has(employee.user_id);
+                        const hasLocation =
+                          employee.location?.latitude != null &&
+                          employee.location?.longitude != null;
+                        return (
+                          <TableRow
+                            key={employee.user_id}
+                            onClick={() => toggleUser(employee.user_id)}
+                            sx={{
+                              cursor: "pointer",
+                              bgcolor: isSelected ? "action.selected" : "background.paper",
+                              "&:hover": { bgcolor: "action.hover" },
+                            }}
+                          >
+                            <TableCell align="center">
+                              <Checkbox
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  if (e.target.checked) {
+                                    setSelectedUserIds((prev) => [...prev, employee.user_id]);
+                                  } else {
+                                    setSelectedUserIds((prev) =>
+                                      prev.filter((id) => id !== employee.user_id),
+                                    );
+                                  }
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" fontWeight={600}>
+                                {employee.name}
+                              </Typography>
+                              {employee.branch && (
+                                <Typography variant="caption" color="text.secondary" display="block">
+                                  {employee.branch}
                                 </Typography>
+                              )}
+                              {isCurrentlyAssigned && (
+                                <Typography
+                                  variant="caption"
+                                  color="primary.main"
+                                  fontWeight={600}
+                                  display="block"
+                                >
+                                  {t("currentlyAssigned", { defaultValue: "Currently assigned" })}
+                                </Typography>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Box
+                                  sx={{
+                                    width: 10,
+                                    height: 10,
+                                    borderRadius: "50%",
+                                    bgcolor: statusColor(employee.status),
+                                  }}
+                                />
+                                <Typography variant="body2">{employee.status_label}</Typography>
                               </Stack>
-                            }
-                            sx={{ alignItems: "flex-start", m: 0 }}
-                          />
-                        </Paper>
-                      );
-                    })}
-                  </Stack>
-                </RadioGroup>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                {employee.route_distance_label}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                {employee.route_duration_text || "-"}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              {hasLocation ? (
+                                <Typography variant="caption" color="text.secondary">
+                                  {Number(employee.location?.latitude)?.toFixed(4)},{" "}
+                                  {Number(employee.location?.longitude)?.toFixed(4)}
+                                </Typography>
+                              ) : (
+                                <Typography variant="caption" color="text.secondary">
+                                  {t("noLocation", { defaultValue: "No location" })}
+                                </Typography>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               )}
             </Paper>
           </Grid>
@@ -302,7 +439,7 @@ export default function ReassignTaskModal({
         <Button
           variant="contained"
           onClick={handleConfirm}
-          disabled={!selectedUserId || isBusy}
+          disabled={selectedUserIds.length === 0 || isBusy}
           startIcon={reassignMutation.isPending ? <CircularProgress size={16} /> : null}
         >
           {t("confirmReassign", { defaultValue: "Confirm Reassign" })}
