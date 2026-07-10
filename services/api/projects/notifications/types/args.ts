@@ -2,7 +2,7 @@ export type ProjectNotificationScopeArgs =
   | { project_id: string; contractual_engagement_key?: never }
   | { contractual_engagement_key: string; project_id?: never };
 
-export interface ProjectNotificationsListArgs extends ProjectNotificationScopeArgs {
+export type ProjectNotificationsListArgs = ProjectNotificationScopeArgs & {
   page?: number;
   per_page?: number;
   status?: string;
@@ -13,16 +13,17 @@ export interface ProjectNotificationsListArgs extends ProjectNotificationScopeAr
   to_date?: string;
   assigned_user_id?: string;
   search?: string;
-}
+};
 
 /** Mobile list endpoints do not require project_id; backend filters by current employee. */
-export interface ProjectNotificationsMobileListArgs
-  extends Omit<ProjectNotificationsListArgs, "project_id"> {
+export type ProjectNotificationsMobileListArgs = Omit<
+  ProjectNotificationsListArgs,
+  "project_id"
+> & {
   project_id?: string;
-}
+};
 
-export interface ProjectNotificationsExportArgs
-  extends ProjectNotificationScopeArgs {
+export type ProjectNotificationsExportArgs = ProjectNotificationScopeArgs & {
   status?: string;
   severity?: string;
   notification_type?: string;
@@ -31,21 +32,18 @@ export interface ProjectNotificationsExportArgs
   to_date?: string;
   assigned_user_id?: string;
   search?: string;
-}
+};
 
-export interface ProjectNotificationsMapTasksArgs
-  extends ProjectNotificationScopeArgs {
+export type ProjectNotificationsMapTasksArgs = ProjectNotificationScopeArgs & {
   status?: string;
-}
+};
 
-export interface ProjectNotificationsEmployeesLocationsArgs
-  extends ProjectNotificationScopeArgs {
+export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScopeArgs & {
   latitude: number;
   longitude: number;
-}
+};
 
-export interface CreateProjectNotificationArgs
-  extends ProjectNotificationScopeArgs {
+export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {
   notification_number?: string | null;
   notification_type: string;
   feeder_number?: string | null;
@@ -71,7 +69,7 @@ export interface CreateProjectNotificationArgs
   notes?: string | null;
   machine_number?: string | null;
   is_draft?: boolean;
-}
+};
 
 export type UpdateProjectNotificationArgs = {
   [K in keyof CreateProjectNotificationArgs]?: CreateProjectNotificationArgs[K];

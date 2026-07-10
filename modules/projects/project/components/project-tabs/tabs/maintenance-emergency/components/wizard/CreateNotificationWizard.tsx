@@ -174,7 +174,7 @@ export default function CreateNotificationWizard({
     if (!hasData) return;
 
     const timeout = setTimeout(() => {
-      saveDraftRef.current().catch(() => {});
+      saveDraftRef.current({ silent: true }).catch(() => {});
     }, 1500);
 
     return () => clearTimeout(timeout);
@@ -210,7 +210,7 @@ export default function CreateNotificationWizard({
     }
     if (step < STEP_COUNT) {
       if (isDraftMode()) {
-        const saved = await saveDraft();
+        const saved = await saveDraft({ silent: true });
         if (!saved) return;
       }
       setStep((prev) => ((prev + 1) as WizardStep));
@@ -247,7 +247,7 @@ export default function CreateNotificationWizard({
     onClose();
   }
 
-  function handleApiError(error: unknown) {
+  function handleApiError(error: unknown, messageKey: string = "createdError") {
     const axiosError = error as {
       response?: {
         status?: number;
@@ -272,15 +272,17 @@ export default function CreateNotificationWizard({
       setErrors(fieldErrors);
       const errorStep = firstStepWithError(fieldErrors);
       if (errorStep) setStep(errorStep);
-      toast.error(t("createdError"));
+      toast.error(t(messageKey));
     } else {
       toast.error(
-        axiosError.response?.data?.message?.description ?? t("createdError"),
+        axiosError.response?.data?.message?.description ?? t(messageKey),
       );
     }
   }
 
-  async function saveDraft(): Promise<boolean> {
+  async function saveDraft(
+    { silent = false }: { silent?: boolean } = {},
+  ): Promise<boolean> {
     if (!hasScope) return false;
 
     try {
@@ -290,6 +292,7 @@ export default function CreateNotificationWizard({
             isDraft: true,
           }),
         );
+        if (!silent) toast.success(t("draftSaved"));
         return true;
       }
 
@@ -299,6 +302,7 @@ export default function CreateNotificationWizard({
             isDraft: true,
           }),
         );
+        if (!silent) toast.success(t("draftSaved"));
         return true;
       }
 
@@ -308,9 +312,10 @@ export default function CreateNotificationWizard({
       if (saved?.id) {
         setDraftId(saved.id);
       }
+      if (!silent) toast.success(t("draftSaved"));
       return true;
     } catch (error) {
-      handleApiError(error);
+      if (!silent) handleApiError(error, "draftSavedError");
       return false;
     }
   }
