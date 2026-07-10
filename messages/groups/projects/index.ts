@@ -502,6 +502,7 @@ export const projectMessages = new MessagesGroup({
         inProgress: _m("In Progress", "قيد التنفيذ"),
         completed: _m("Completed", "مكتمل"),
         cancelled: _m("Cancelled", "ملغى"),
+        draft: _m("Draft", "مسودة"),
       }),
       severities: new MessagesGroup({
         low: _m("Low", "منخفضة"),

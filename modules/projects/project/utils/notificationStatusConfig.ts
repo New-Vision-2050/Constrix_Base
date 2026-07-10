@@ -12,6 +12,7 @@ export const STATUS_CONFIG: Record<NotificationStatus, StatusStyle> = {
   in_progress: { labelKey: "statuses.inProgress", muiColor: "info" },
   completed: { labelKey: "statuses.completed", muiColor: "success" },
   cancelled: { labelKey: "statuses.cancelled", muiColor: "default" },
+  draft: { labelKey: "statuses.draft", muiColor: "default" },
 };
 
 export type SeverityStyle = {
@@ -27,5 +28,5 @@ export const SEVERITY_CONFIG: Record<NotificationSeverity, SeverityStyle> = {
 };
 
 export function isNotificationActionable(status: NotificationStatus): boolean {
-  return status === "pending";
+  return status === "pending" || status === "draft";
 }

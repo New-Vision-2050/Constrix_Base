@@ -74,6 +74,54 @@ export function useUpdateProjectNotificationMutation() {
   });
 }
 
+export function useSaveProjectNotificationDraftMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (
+      args: CreateProjectNotificationArgs | UpdateProjectNotificationArgs,
+    ) => {
+      if ("id" in args) {
+        const {
+          id,
+          project_id: _projectId,
+          contractual_engagement_key: _key,
+          ...rest
+        } = args as UpdateProjectNotificationArgs & {
+          project_id?: string;
+          contractual_engagement_key?: string;
+        };
+        const res = await ProjectNotificationsApi.update(id, {
+          ...rest,
+          is_draft: true,
+        });
+        return res.data.payload?.[0] ?? null;
+      }
+      const res = await ProjectNotificationsApi.create({
+        ...args,
+        is_draft: true,
+      });
+      return res.data.payload?.[0] ?? null;
+    },
+    onSuccess: (_, args) => {
+      const scope = notificationScopeFromArgs(args);
+      queryClient.invalidateQueries({
+        queryKey: projectNotificationsQueryKey(scope),
+      });
+      if ("id" in args) {
+        queryClient.invalidateQueries({
+          queryKey: [
+            PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+            scope.projectId,
+            scope.contractualEngagementKey,
+            args.id,
+          ],
+        });
+      }
+    },
+  });
+}
+
 export function useProjectNotificationDetail(
   scope: NotificationScope,
   notificationId: string | undefined,
