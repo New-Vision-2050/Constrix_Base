@@ -8,6 +8,7 @@ import type {
   ProjectNotificationsMapTasksArgs,
   ProjectNotificationsMobileListArgs,
   ProjectNotificationMobileActionArgs,
+  ProjectNotificationReassignArgs,
   ProjectNotificationRejectArgs,
   ProjectNotificationScopeArgs,
   UpdateProjectNotificationArgs,
@@ -202,5 +203,11 @@ export const ProjectNotificationsApi = {
   notifySiteStatusUpdateByVoice: (id: string) =>
     baseApi.post<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}/notify-site-status-update-by-voice`,
+    ),
+
+  reassign: (id: string, args: ProjectNotificationReassignArgs) =>
+    baseApi.post<ProjectNotificationSingleResponse>(
+      `projects/notifications/${encodeURIComponent(id)}/reassign`,
+      args,
     ),
 };

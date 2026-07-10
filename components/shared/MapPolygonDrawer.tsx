@@ -44,14 +44,11 @@ export default function MapPolygonDrawer({ polygons, onChange, disabled, height 
   const [err, setErr] = useState<string | null>(null);
 
   const mapRef = useRef<google.maps.Map | null>(null);
-  const acRef = useRef<google.maps.places.AutocompleteService | null>(null);
-  const psRef = useRef<google.maps.places.PlacesService | null>(null);
   const tokRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const tRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (isLoaded && window.google?.maps?.places) {
-      acRef.current = new window.google.maps.places.AutocompleteService();
       tokRef.current = new window.google.maps.places.AutocompleteSessionToken();
     }
   }, [isLoaded]);
@@ -71,31 +68,35 @@ export default function MapPolygonDrawer({ polygons, onChange, disabled, height 
     setPoints(p => [...p, { lat: e.latLng.lat(), lng: e.latLng.lng() }]);
   }, [drawing]);
 
-  const onSearch = useCallback((_e: React.SyntheticEvent, v: string) => {
+  const onSearch = useCallback(async (_e: React.SyntheticEvent, v: string) => {
     setQuery(v);
     if (tRef.current) clearTimeout(tRef.current);
-    if (!v || v.length < 2 || !acRef.current) { setOpts([]); setLoading(false); return; }
+    if (!v || v.length < 2 || !window.google?.maps?.places) { setOpts([]); setLoading(false); return; }
     setLoading(true);
-    tRef.current = setTimeout(() => {
-      acRef.current!.getPlacePredictions(
-        { input: v, sessionToken: tokRef.current || undefined },
-        (preds, status) => {
-          if (status !== window.google.maps.places.PlacesServiceStatus.OK || !preds) {
-            setOpts([]); setLoading(false); return;
-          }
-          if (!psRef.current) psRef.current = new window.google.maps.places.PlacesService(document.createElement("div"));
-          Promise.all(preds.slice(0,5).map(p => new Promise<{ label: string; lat: number; lng: number } | null>(resolve => {
-            psRef.current!.getDetails(
-              { placeId: p.place_id, fields: ["geometry"], sessionToken: tokRef.current || undefined },
-              (place, s) => {
-                if (s === window.google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
-                  resolve({ label: p.description, lat: place.geometry.location.lat(), lng: place.geometry.location.lng() });
-                } else resolve(null);
-              }
-            );
-          }))).then(r => { setOpts(r.filter(Boolean) as any); setLoading(false); });
-        }
-      );
+    tRef.current = setTimeout(async () => {
+      try {
+        const request: google.maps.places.AutocompleteRequest = {
+          input: v,
+          sessionToken: tokRef.current || undefined,
+        };
+        const { suggestions } = await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+        const results = await Promise.all(
+          suggestions.slice(0, 5).map(async (suggestion) => {
+            const placePrediction = suggestion.placePrediction;
+            if (!placePrediction) return null;
+            const place = placePrediction.toPlace();
+            await place.fetchFields({ fields: ["location"] });
+            if (!place.location) return null;
+            return { label: placePrediction.text.text, lat: place.location.lat(), lng: place.location.lng() };
+          }),
+        );
+        setOpts(results.filter(Boolean) as { label: string; lat: number; lng: number }[]);
+      } catch (error) {
+        console.error("Error fetching place suggestions:", error);
+        setOpts([]);
+      } finally {
+        setLoading(false);
+      }
     }, 350);
   }, []);
 
