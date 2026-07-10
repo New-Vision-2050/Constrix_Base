@@ -320,6 +320,41 @@ export default function CreateNotificationWizard({
     }
   }
 
+  async function saveDraft(): Promise<boolean> {
+    if (!hasScope) return false;
+
+    try {
+      if (mode === "edit" && notificationId) {
+        await draftMutation.mutateAsync(
+          buildUpdatePayload(notificationId, notificationScope, data, {
+            isDraft: true,
+          }),
+        );
+        return true;
+      }
+
+      if (draftId) {
+        await draftMutation.mutateAsync(
+          buildUpdatePayload(draftId, notificationScope, data, {
+            isDraft: true,
+          }),
+        );
+        return true;
+      }
+
+      const saved = await draftMutation.mutateAsync(
+        buildCreatePayload(notificationScope, data, { isDraft: true }),
+      );
+      if (saved?.id) {
+        setDraftId(saved.id);
+      }
+      return true;
+    } catch (error) {
+      handleApiError(error);
+      return false;
+    }
+  }
+
   async function handleSubmit() {
     if (!hasScope) return;
 
