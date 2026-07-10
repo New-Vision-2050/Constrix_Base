@@ -155,6 +155,7 @@ const STATUS_OPTIONS: { value: string; labelKey: string }[] = [
   { value: "in_progress", labelKey: "statuses.inProgress" },
   { value: "completed", labelKey: "statuses.completed" },
   { value: "cancelled", labelKey: "statuses.cancelled" },
+  { value: "draft", labelKey: "statuses.draft" },
 ];
 const SEVERITY_OPTIONS = ["low", "medium", "high", "critical"];
 const WORK_TYPE_OPTIONS = ["electrical", "mechanical", "civil", "finishing", "landscaping"];

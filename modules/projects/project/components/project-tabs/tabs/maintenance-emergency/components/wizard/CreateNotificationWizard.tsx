@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   Alert,
@@ -39,6 +39,7 @@ import { useNotificationScope } from "@/modules/projects/project/hooks/useNotifi
 import {
   useCreateProjectNotificationMutation,
   useProjectNotificationDetail,
+  useSaveProjectNotificationDraftMutation,
   useUpdateProjectNotificationMutation,
 } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
@@ -97,10 +98,15 @@ export default function CreateNotificationWizard({
     dataReviewed: false,
     readyToSend: false,
   });
+  const [draftId, setDraftId] = useState<string | null>(null);
 
   const createMutation = useCreateProjectNotificationMutation();
   const updateMutation = useUpdateProjectNotificationMutation();
-  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+  const draftMutation = useSaveProjectNotificationDraftMutation();
+  const isSubmitting =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    draftMutation.isPending;
   const notificationTypesQuery = useProjectNotificationTypes();
   const notificationTypes = notificationTypesQuery.data ?? [];
 
@@ -133,6 +139,7 @@ export default function CreateNotificationWizard({
       setData(EMPTY_FORM);
       setErrors({});
       setConfirmed({ dataReviewed: false, readyToSend: false });
+      setDraftId(null);
       return;
     }
 
@@ -142,6 +149,36 @@ export default function CreateNotificationWizard({
       setData(EMPTY_FORM);
     }
   }, [open, mode, existingNotification]);
+
+  const saveDraftRef = useRef(saveDraft);
+  saveDraftRef.current = saveDraft;
+
+  useEffect(() => {
+    if (!open || !hasScope) return;
+
+    const isDraftModeActive =
+      mode === "create" || existingNotification?.status === "draft";
+    if (!isDraftModeActive) return;
+
+    const hasData = Boolean(
+      data.notification_type?.trim() ||
+        data.contractor_name?.trim() ||
+        data.repair_point?.trim() ||
+        data.notification_number?.trim() ||
+        data.work_description?.trim() ||
+        data.notes?.trim() ||
+        data.contractor_notes?.trim() ||
+        data.assigned_user_ids.length > 0 ||
+        draftId,
+    );
+    if (!hasData) return;
+
+    const timeout = setTimeout(() => {
+      saveDraftRef.current().catch(() => {});
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [data, open, hasScope, mode, existingNotification?.status, draftId]);
 
   const updateField = useCallback(
     function updateField<K extends keyof WizardFormData>(
@@ -156,7 +193,12 @@ export default function CreateNotificationWizard({
     [],
   );
 
-  function handleNext() {
+  function isDraftMode() {
+    if (mode === "create") return true;
+    return existingNotification?.status === "draft";
+  }
+
+  async function handleNext() {
     const validation = validateStep(step, data);
     if (!validation.valid) {
       setErrors(validation.errors);
@@ -167,6 +209,10 @@ export default function CreateNotificationWizard({
       return;
     }
     if (step < STEP_COUNT) {
+      if (isDraftMode()) {
+        const saved = await saveDraft();
+        if (!saved) return;
+      }
       setStep((prev) => ((prev + 1) as WizardStep));
     }
   }
@@ -175,6 +221,30 @@ export default function CreateNotificationWizard({
     if (step > 1) {
       setStep((prev) => ((prev - 1) as WizardStep));
     }
+  }
+
+  function shouldPersistDraftOnClose() {
+    if (mode === "edit") {
+      return existingNotification?.status === "draft" && Boolean(notificationId);
+    }
+    return Boolean(
+      data.notification_type?.trim() ||
+        data.contractor_name?.trim() ||
+        data.repair_point?.trim() ||
+        data.notification_number?.trim() ||
+        data.work_description?.trim() ||
+        data.notes?.trim() ||
+        data.contractor_notes?.trim() ||
+        data.assigned_user_ids.length > 0 ||
+        draftId,
+    );
+  }
+
+  async function handleClose() {
+    if (hasScope && isDraftMode() && shouldPersistDraftOnClose()) {
+      await saveDraft().catch(() => {});
+    }
+    onClose();
   }
 
   function handleApiError(error: unknown) {
@@ -210,6 +280,41 @@ export default function CreateNotificationWizard({
     }
   }
 
+  async function saveDraft(): Promise<boolean> {
+    if (!hasScope) return false;
+
+    try {
+      if (mode === "edit" && notificationId) {
+        await draftMutation.mutateAsync(
+          buildUpdatePayload(notificationId, notificationScope, data, {
+            isDraft: true,
+          }),
+        );
+        return true;
+      }
+
+      if (draftId) {
+        await draftMutation.mutateAsync(
+          buildUpdatePayload(draftId, notificationScope, data, {
+            isDraft: true,
+          }),
+        );
+        return true;
+      }
+
+      const saved = await draftMutation.mutateAsync(
+        buildCreatePayload(notificationScope, data, { isDraft: true }),
+      );
+      if (saved?.id) {
+        setDraftId(saved.id);
+      }
+      return true;
+    } catch (error) {
+      handleApiError(error);
+      return false;
+    }
+  }
+
   async function handleSubmit() {
     if (!hasScope) return;
 
@@ -226,6 +331,11 @@ export default function CreateNotificationWizard({
           buildUpdatePayload(notificationId, notificationScope, data),
         );
         toast.success(t("updatedSuccess"));
+      } else if (draftId) {
+        await updateMutation.mutateAsync(
+          buildUpdatePayload(draftId, notificationScope, data),
+        );
+        toast.success(t("createdSuccess"));
       } else {
         await createMutation.mutateAsync(
           buildCreatePayload(notificationScope, data),
@@ -247,7 +357,7 @@ export default function CreateNotificationWizard({
   ];
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
       <DialogTitle
         sx={{
           display: "flex",
@@ -325,7 +435,7 @@ export default function CreateNotificationWizard({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={onClose} disabled={isSubmitting}>
+        <Button onClick={handleClose} disabled={isSubmitting}>
           {t("cancel")}
         </Button>
         <Box sx={{ flex: 1 }} />
@@ -335,7 +445,7 @@ export default function CreateNotificationWizard({
           </Button>
         )}
         {step < STEP_COUNT && (
-          <Button variant="contained" onClick={handleNext}>
+          <Button variant="contained" onClick={handleNext} disabled={isSubmitting}>
             {t("next")}
           </Button>
         )}

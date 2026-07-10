@@ -70,14 +70,18 @@ export interface CreateProjectNotificationArgs
   duration_hours?: number | null;
   notes?: string | null;
   machine_number?: string | null;
+  is_draft?: boolean;
 }
 
-export interface UpdateProjectNotificationArgs
-  extends Partial<CreateProjectNotificationArgs> {
+export type UpdateProjectNotificationArgs = {
+  [K in keyof CreateProjectNotificationArgs]?: CreateProjectNotificationArgs[K];
+} & {
   id: string;
+  project_id?: string;
+  contractual_engagement_key?: string;
   files?: File[];
   deleted_media_ids?: (string | number)[];
-}
+};
 
 export interface ProjectNotificationRejectArgs {
   rejection_reason: string;

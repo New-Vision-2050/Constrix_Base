@@ -6,7 +6,8 @@ export type NotificationStatus =
   | "rejected"
   | "in_progress"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  | "draft";
 
 export type NotificationSeverity = "low" | "medium" | "high" | "critical";
 
