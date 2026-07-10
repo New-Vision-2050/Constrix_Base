@@ -518,6 +518,23 @@ export const projectMessages = new MessagesGroup({
       rejectError: _m("Could not reject notification", "تعذر رفض الإشعار"),
       notifyByVoiceSuccess: _m("Voice notification sent", "تم إرسال الإشعار الصوتي"),
       notifyByVoiceError: _m("Could not send voice notification", "تعذر إرسال الإشعار الصوتي"),
+      reassignTask: _m("Reassign Task", "إعادة إسناد المهمة"),
+      confirmReassign: _m("Confirm Reassign", "تأكيد إعادة الإسناد"),
+      currentlyAssigned: _m("Currently assigned", "المُسند حالياً"),
+      reassignSuccess: _m(
+        "Task reassigned successfully. The employee can now confirm receipt to start a new lifecycle.",
+        "تمت إعادة إسناد المهمة بنجاح. يمكن للموظف الآن تأكيد الاستلام لبدء دورة حياة جديدة.",
+      ),
+      reassignError: _m(
+        "Could not reassign task. The linked task or selected employee may not exist.",
+        "تعذر إعادة إسناد المهمة. قد لا تكون المهمة المرتبطة أو الموظف المحدد موجودين.",
+      ),
+      reassignValidationError: _m(
+        "Invalid or missing employee selection.",
+        "اختيار موظف غير صالح أو مفقود.",
+      ),
+      reassignNotFoundError: _m("Notification not found.", "الإشعار غير موجود."),
+      reassignSelectUserError: _m("Please select an employee", "يرجى اختيار موظف"),
       createdAt: _m("Created at", "تاريخ الإنشاء"),
       updatedAt: _m("Updated at", "تاريخ التحديث"),
       createdBy: _m("Created by", "تم الإنشاء بواسطة"),

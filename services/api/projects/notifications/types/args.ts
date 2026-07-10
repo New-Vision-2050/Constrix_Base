@@ -90,6 +90,10 @@ export interface ProjectNotificationMobileActionArgs {
   notes?: string;
 }
 
+export interface ProjectNotificationReassignArgs {
+  user_id: string;
+}
+
 export interface ProjectNotificationsChartsArgs {
   project_id?: string;
   contractual_engagement_key?: string;

@@ -58,6 +58,7 @@ import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceF
 import NotificationStatusBadge from "./NotificationStatusBadge";
 import NotificationSeverityBadge from "./NotificationSeverityBadge";
 import CreateNotificationWizard from "./wizard/CreateNotificationWizard";
+import ReassignTaskModal from "./ReassignTaskModal";
 
 const ProjectNotificationMapTasksView = dynamic(
   () => import("./ProjectNotificationMapTasksView"),
@@ -173,6 +174,7 @@ export default function ProjectNotificationsView() {
   const [filterAssignedUser, setFilterAssignedUser] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<ProjectNotification | null>(null);
   const [viewTarget, setViewTarget] = useState<ProjectNotification | null>(null);
+  const [reassignTarget, setReassignTarget] = useState<ProjectNotification | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardMode, setWizardMode] = useState<"create" | "edit">("create");
   const [editTargetId, setEditTargetId] = useState<string | null>(null);
@@ -496,6 +498,11 @@ export default function ProjectNotificationsView() {
                 <Eye className="w-4 h-4 me-2" />
                 {t("view")}
               </MenuItem>
+              {row.employee_task && canUpdate ? (
+                <MenuItem onClick={() => setReassignTarget(row)}>
+                  {t("reassignTask", { defaultValue: "Reassign Task" })}
+                </MenuItem>
+              ) : null}
               {actionable && canUpdate ? (
                 <MenuItem
                   onClick={() => {
@@ -792,6 +799,15 @@ export default function ProjectNotificationsView() {
         mode={wizardMode}
         notificationId={editTargetId}
       />
+
+      {reassignTarget && (
+        <ReassignTaskModal
+          notification={reassignTarget}
+          scope={notificationScope}
+          open
+          onClose={() => setReassignTarget(null)}
+        />
+      )}
 
       <Dialog
         open={deleteTarget !== null}

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import {
   Avatar,
   Box,
+  Button,
   Chip,
   CircularProgress,
   Grid,
@@ -25,11 +26,17 @@ import { useRouter } from "@/i18n/navigation";
 import { ROUTER } from "@/router";
 import { useProjectNotificationDetail, useProjectNotificationAvailableActions } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useEmployeeTaskProcedures } from "@/modules/projects/project/query/useEmployeeTaskProcedures";
+import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import {
+  PROJECT_NOTIFICATION_UPDATE,
+} from "@/modules/projects/project/constants/projectPermissionKeys";
+import { hasProjectPermissionKey } from "@/modules/projects/project/utils/projectMyPermissions";
 import NotificationStatusBadge from "./NotificationStatusBadge";
 import NotificationSeverityBadge from "./NotificationSeverityBadge";
 import NotificationDetailEditable from "./NotificationDetailEditable";
 import ProceduresCarousel from "./ProceduresCarousel";
 import SiteStatusUpdatesTab from "./SiteStatusUpdatesTab";
+import ReassignTaskModal from "./ReassignTaskModal";
 import type { ProjectNotificationAttachment } from "@/services/api/projects/notifications/types/response";
 
 interface NotificationDetailViewProps {
@@ -204,7 +211,18 @@ export default function NotificationDetailView({
   const theme = useTheme();
   const isRTL = theme.direction === "rtl";
   const [activeTab, setActiveTab] = useState(0);
+  const [reassignOpen, setReassignOpen] = useState(false);
   const notificationScope = { projectId, contractualEngagementKey };
+  const isEngagement = !!contractualEngagementKey;
+
+  const { data: flatPerms } = useProjectMyPermissionsFlat(projectId);
+
+  const canReassign = useMemo(
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_UPDATE),
+    [isEngagement, flatPerms],
+  );
 
   const { data: notification, isLoading, isError } = useProjectNotificationDetail(
     notificationScope,
@@ -335,6 +353,15 @@ export default function NotificationDetailView({
         <Typography variant="caption" color="text.secondary">
           {t("updatedAt")}: {formatDateTime(notification.updated_at)}
         </Typography>
+        {notification.employee_task && canReassign && (
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setReassignOpen(true)}
+          >
+            {t("reassignTask", { defaultValue: "Reassign Task" })}
+          </Button>
+        )}
       </Stack>
 
       {/* Stat cards */}
@@ -541,6 +568,13 @@ export default function NotificationDetailView({
           notificationId={notificationId}
         />
       )}
+
+      <ReassignTaskModal
+        notification={notification}
+        scope={notificationScope}
+        open={reassignOpen}
+        onClose={() => setReassignOpen(false)}
+      />
     </Box>
   );
 }

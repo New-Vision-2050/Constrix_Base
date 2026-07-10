@@ -138,3 +138,47 @@ export function useSiteStatusUpdates(notificationId: string | undefined) {
     enabled: Boolean(notificationId),
   });
 }
+
+export function useReassignProjectNotificationMutation(scope: NotificationScope) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      userId,
+    }: {
+      id: string;
+      userId: string;
+    }): Promise<ProjectNotification | null> => {
+      const res = await ProjectNotificationsApi.reassign(id, { user_id: userId });
+      const payload = res.data.payload;
+      if (!payload) return null;
+      if (Array.isArray(payload)) return payload[0] ?? null;
+      return payload as unknown as ProjectNotification;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: projectNotificationsQueryKey(scope),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+          scope.projectId,
+          scope.contractualEngagementKey,
+          variables.id,
+        ],
+      });
+      if (data) {
+        queryClient.setQueryData<ProjectNotification | null>(
+          [
+            PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+            scope.projectId,
+            scope.contractualEngagementKey,
+            variables.id,
+          ],
+          data,
+        );
+      }
+    },
+  });
+}
