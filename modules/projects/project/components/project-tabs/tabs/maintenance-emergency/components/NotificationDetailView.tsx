@@ -40,6 +40,7 @@ import NotificationSeverityBadge from "./NotificationSeverityBadge";
 import NotificationDetailEditable from "./NotificationDetailEditable";
 import ProceduresCarousel from "./ProceduresCarousel";
 import SiteStatusUpdatesTab from "./SiteStatusUpdatesTab";
+import NotificationNotesTab from "./NotificationNotesTab";
 import ReassignTaskModal from "./ReassignTaskModal";
 import type { ProjectNotificationAttachment } from "@/services/api/projects/notifications/types/response";
 
@@ -482,6 +483,7 @@ export default function NotificationDetailView({
           <Tab label={t("attachments")} />
           <Tab label={t("procedures")} />
           <Tab label={t("siteStatusUpdates")} />
+          <Tab label={t("notes")} />
         </Tabs>
       </Paper>
 
@@ -578,6 +580,14 @@ export default function NotificationDetailView({
         <SiteStatusUpdatesTab
           notification={notification}
           notificationId={notificationId}
+        />
+      )}
+
+      {/* Notes tab */}
+      {activeTab === 4 && (
+        <NotificationNotesTab
+          notificationId={notificationId}
+          scope={notificationScope}
         />
       )}
 

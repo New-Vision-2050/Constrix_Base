@@ -1,6 +1,7 @@
 import { baseApi } from "@/config/axios/instances/base";
 import type {
   CreateProjectNotificationArgs,
+  CreateProjectNotificationNoteArgs,
   ProjectNotificationsChartsArgs,
   ProjectNotificationsEmployeesLocationsArgs,
   ProjectNotificationsExportArgs,
@@ -25,6 +26,8 @@ import type {
   ProjectNotificationMyInboxCountsResponse,
   ProjectNotificationMyInboxResponse,
   ProjectNotificationMyTasksResponse,
+  ProjectNotificationNoteSingleResponse,
+  ProjectNotificationNotesResponse,
   ProjectNotificationSingleResponse,
   ProjectNotificationTypesResponse,
   ProjectNotificationsListResponse,
@@ -199,6 +202,17 @@ export const ProjectNotificationsApi = {
   getSiteStatusUpdates: (notificationId: string) =>
     baseApi.get<SiteStatusUpdatesResponse>(
       `projects/notifications/${encodeURIComponent(notificationId)}/site-status-updates`,
+    ),
+
+  getNotes: (notificationId: string) =>
+    baseApi.get<ProjectNotificationNotesResponse>(
+      `projects/notifications/${encodeURIComponent(notificationId)}/notes`,
+    ),
+
+  addNote: (notificationId: string, args: CreateProjectNotificationNoteArgs) =>
+    baseApi.post<ProjectNotificationNoteSingleResponse>(
+      `projects/notifications/${encodeURIComponent(notificationId)}/notes`,
+      args,
     ),
 
   getCharts: (args: ProjectNotificationsChartsArgs) =>

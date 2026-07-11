@@ -2,9 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
-import type { ProjectNotification, ProjectNotificationAvailableAction, SiteStatusUpdatesData } from "@/services/api/projects/notifications/types/response";
+import type { ProjectNotification, ProjectNotificationAvailableAction, ProjectNotificationNote, ProjectNotificationNotesData, SiteStatusUpdatesData } from "@/services/api/projects/notifications/types/response";
 import type {
   CreateProjectNotificationArgs,
+  CreateProjectNotificationNoteArgs,
   ProjectNotificationReadStatusArgs,
   UpdateProjectNotificationArgs,
 } from "@/services/api/projects/notifications/types/args";
@@ -22,6 +23,7 @@ import {
 export const PROJECT_NOTIFICATION_DETAIL_QUERY_KEY = "project-notification-detail" as const;
 export const PROJECT_NOTIFICATION_AVAILABLE_ACTIONS_QUERY_KEY = "project-notification-available-actions" as const;
 export const SITE_STATUS_UPDATES_QUERY_KEY = "site-status-updates" as const;
+export const PROJECT_NOTIFICATION_NOTES_QUERY_KEY = "project-notification-notes" as const;
 
 function notificationScopeFromArgs(
   args: Pick<
@@ -189,6 +191,60 @@ export function useSiteStatusUpdates(notificationId: string | undefined) {
       return { items, summary };
     },
     enabled: Boolean(notificationId),
+  });
+}
+
+export function useProjectNotificationNotes(notificationId: string | undefined) {
+  return useQuery<ProjectNotificationNotesData>({
+    queryKey: [PROJECT_NOTIFICATION_NOTES_QUERY_KEY, notificationId],
+    queryFn: async (): Promise<ProjectNotificationNotesData> => {
+      if (!notificationId) return { items: [], timezone: null };
+      const res = await ProjectNotificationsApi.getNotes(notificationId);
+      const body = res.data as any;
+      const data = body?.data ?? body?.payload ?? body;
+      const items = data?.items ?? [];
+      const timezone = data?.timezone ?? null;
+      return { items, timezone };
+    },
+    enabled: Boolean(notificationId),
+  });
+}
+
+export function useAddProjectNotificationNoteMutation(
+  notificationId: string | undefined,
+  scope: NotificationScope,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (args: CreateProjectNotificationNoteArgs): Promise<ProjectNotificationNote | null> => {
+      if (!notificationId) return null;
+      const res = await ProjectNotificationsApi.addNote(notificationId, args);
+      const body = res.data as any;
+      return body?.payload ?? body?.data ?? body ?? null;
+    },
+    onSuccess: (note) => {
+      if (!notificationId) return;
+      queryClient.setQueryData<ProjectNotificationNotesData>(
+        [PROJECT_NOTIFICATION_NOTES_QUERY_KEY, notificationId],
+        (old) => {
+          if (!old) return { items: note ? [note] : [], timezone: null };
+          if (!note) return old;
+          return { ...old, items: [note, ...old.items] };
+        },
+      );
+      queryClient.invalidateQueries({
+        queryKey: projectNotificationsQueryKey(scope),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+          scope.projectId,
+          scope.contractualEngagementKey,
+          notificationId,
+        ],
+      });
+    },
   });
 }
 

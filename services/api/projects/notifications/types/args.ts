@@ -100,6 +100,10 @@ export interface ProjectNotificationReassignArgs {
   assigned_user_ids: string[];
 }
 
+export interface CreateProjectNotificationNoteArgs {
+  note: string;
+}
+
 export interface ProjectNotificationsChartsArgs {
   project_id?: string;
   contractual_engagement_key?: string;

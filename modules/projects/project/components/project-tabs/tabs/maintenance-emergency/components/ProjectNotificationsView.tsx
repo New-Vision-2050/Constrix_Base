@@ -16,7 +16,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Plus, Eye, EyeOff, FileDown, Pencil, Trash2, Phone, Clock } from "lucide-react";
+import {
+  Plus,
+  Eye,
+  EyeOff,
+  FileDown,
+  Pencil,
+  Trash2,
+  Phone,
+  Clock,
+  MessageSquare,
+} from "lucide-react";
 import { Map } from "@mui/icons-material";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
@@ -39,6 +49,7 @@ import {
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
 import {
   useProjectNotificationReadStatusMutation,
+  useAddProjectNotificationNoteMutation,
 } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
 import type { ProjectNotification } from "@/services/api/projects/notifications/types/response";
@@ -183,6 +194,8 @@ export default function ProjectNotificationsView() {
   const [deleteTarget, setDeleteTarget] = useState<ProjectNotification | null>(null);
   const [viewTarget, setViewTarget] = useState<ProjectNotification | null>(null);
   const [reassignTarget, setReassignTarget] = useState<ProjectNotification | null>(null);
+  const [addNoteTarget, setAddNoteTarget] = useState<ProjectNotification | null>(null);
+  const [addNoteText, setAddNoteText] = useState("");
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardMode, setWizardMode] = useState<"create" | "edit">("create");
   const [editTargetId, setEditTargetId] = useState<string | null>(null);
@@ -264,6 +277,11 @@ export default function ProjectNotificationsView() {
   const totalItems = queryResult?.pagination?.result_count ?? data.length;
 
   const notificationScope = { projectId, contractualEngagementKey };
+
+  const addNoteMutation = useAddProjectNotificationNoteMutation(
+    addNoteTarget?.id,
+    notificationScope,
+  );
 
   const invalidateNotifications = () => {
     queryClient.invalidateQueries({
@@ -433,6 +451,28 @@ export default function ProjectNotificationsView() {
             ),
         },
       {
+        key: "last_note",
+        name: t("lastNote"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <Stack spacing={0.25}>
+            <Typography
+              variant="body2"
+              noWrap
+              title={row.last_note?.note?.trim() || undefined}
+              sx={{ maxWidth: 240 }}
+            >
+              {row.last_note?.note?.trim() || "—"}
+            </Typography>
+            {row.last_note?.user?.name ? (
+              <Typography variant="caption" color="text.secondary">
+                {row.last_note.user.name} &bull; {formatDateTime(row.last_note.created_at)}
+              </Typography>
+            ) : null}
+          </Stack>
+        ),
+      },
+      {
         key: "contractor",
         name: t("contractor"),
         sortable: false,
@@ -494,6 +534,15 @@ export default function ProjectNotificationsView() {
               <MenuItem onClick={() => setViewTarget(row)}>
                 <Eye className="w-4 h-4 me-2" />
                 {t("view")}
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setAddNoteTarget(row);
+                  setAddNoteText("");
+                }}
+              >
+                <MessageSquare className="w-4 h-4 me-2" />
+                {t("addNote")}
               </MenuItem>
               <MenuItem
                 onClick={(e) => {
@@ -916,6 +965,65 @@ export default function ProjectNotificationsView() {
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setViewTarget(null)}>{tCommon("close")}</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={addNoteTarget !== null}
+        onClose={() => {
+          if (addNoteMutation.isPending) return;
+          setAddNoteTarget(null);
+          setAddNoteText("");
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{t("addNote")}</DialogTitle>
+        <DialogContent dividers>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            value={addNoteText}
+            onChange={(e) => setAddNoteText(e.target.value)}
+            placeholder={t("writeNote")}
+            disabled={addNoteMutation.isPending}
+            inputProps={{ maxLength: 1000 }}
+          />
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
+            {addNoteText.length}/1000
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => {
+              setAddNoteTarget(null);
+              setAddNoteText("");
+            }}
+            disabled={addNoteMutation.isPending}
+          >
+            {tCommon("cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            disabled={!addNoteText.trim() || addNoteMutation.isPending}
+            onClick={async () => {
+              if (!addNoteTarget) return;
+              const trimmed = addNoteText.trim();
+              if (!trimmed) return;
+              try {
+                await addNoteMutation.mutateAsync({ note: trimmed });
+                toast.success(t("addNoteSuccess"));
+                setAddNoteTarget(null);
+                setAddNoteText("");
+              } catch (error: unknown) {
+                const err = error as { response?: { data?: { message?: string } } };
+                toast.error(err?.response?.data?.message ?? t("addNoteError"));
+              }
+            }}
+          >
+            {addNoteMutation.isPending ? t("addingNote") : t("addNote")}
+          </Button>
         </DialogActions>
       </Dialog>
     </>
