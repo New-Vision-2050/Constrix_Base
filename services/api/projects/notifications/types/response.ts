@@ -107,6 +107,7 @@ export interface ProjectNotification {
   company_name?: string | null;
   status: NotificationStatus;
   status_label?: string | null;
+  is_read?: boolean;
   last_site_update_status?: string | null;
   last_site_update_date?: string | null;
   violations_count: number;

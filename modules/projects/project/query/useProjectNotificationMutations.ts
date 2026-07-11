@@ -5,9 +5,14 @@ import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
 import type { ProjectNotification, ProjectNotificationAvailableAction, SiteStatusUpdatesData } from "@/services/api/projects/notifications/types/response";
 import type {
   CreateProjectNotificationArgs,
+  ProjectNotificationReadStatusArgs,
   UpdateProjectNotificationArgs,
 } from "@/services/api/projects/notifications/types/args";
-import { projectNotificationsQueryKey } from "./useProjectNotifications";
+import {
+  projectNotificationsQueryKey,
+  PROJECT_NOTIFICATIONS_QUERY_KEY,
+  type ProjectNotificationsResult,
+} from "./useProjectNotifications";
 import {
   buildNotificationScopeParams,
   hasNotificationScope,
@@ -205,6 +210,63 @@ export function useReassignProjectNotificationMutation(scope: NotificationScope)
       return payload as unknown as ProjectNotification;
     },
     onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: projectNotificationsQueryKey(scope),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+          scope.projectId,
+          scope.contractualEngagementKey,
+          variables.id,
+        ],
+      });
+      if (data) {
+        queryClient.setQueryData<ProjectNotification | null>(
+          [
+            PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+            scope.projectId,
+            scope.contractualEngagementKey,
+            variables.id,
+          ],
+          data,
+        );
+      }
+    },
+  });
+}
+
+export function useProjectNotificationReadStatusMutation(scope: NotificationScope) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      is_read,
+    }: {
+      id: string;
+      is_read: boolean;
+    }): Promise<ProjectNotification | null> => {
+      const args: ProjectNotificationReadStatusArgs = { is_read };
+      const res = await ProjectNotificationsApi.readStatus(id, args);
+      const payload = res.data.payload;
+      if (!payload) return null;
+      if (Array.isArray(payload)) return payload[0] ?? null;
+      return payload as unknown as ProjectNotification;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.setQueriesData<ProjectNotificationsResult | null>(
+        { queryKey: [PROJECT_NOTIFICATIONS_QUERY_KEY] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: old.data.map((row) =>
+              row.id === variables.id ? { ...row, is_read: variables.is_read } : row,
+            ),
+          };
+        },
+      );
       queryClient.invalidateQueries({
         queryKey: projectNotificationsQueryKey(scope),
       });

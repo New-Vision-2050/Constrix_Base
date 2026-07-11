@@ -8,6 +8,7 @@ import type {
   ProjectNotificationsMapTasksArgs,
   ProjectNotificationsMobileListArgs,
   ProjectNotificationMobileActionArgs,
+  ProjectNotificationReadStatusArgs,
   ProjectNotificationReassignArgs,
   ProjectNotificationRejectArgs,
   ProjectNotificationScopeArgs,
@@ -105,6 +106,12 @@ export const ProjectNotificationsApi = {
   reject: (id: string, args: ProjectNotificationRejectArgs) =>
     baseApi.post<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}/reject`,
+      args,
+    ),
+
+  readStatus: (id: string, args: ProjectNotificationReadStatusArgs) =>
+    baseApi.post<ProjectNotificationSingleResponse>(
+      `projects/notifications/${encodeURIComponent(id)}/read-status`,
       args,
     ),
 

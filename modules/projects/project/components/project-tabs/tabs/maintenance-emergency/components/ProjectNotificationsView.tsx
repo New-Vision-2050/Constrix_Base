@@ -16,7 +16,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Plus, Eye, FileDown, Pencil, Trash2, Phone, Clock } from "lucide-react";
+import { Plus, Eye, EyeOff, FileDown, Pencil, Trash2, Phone, Clock } from "lucide-react";
 import { Map } from "@mui/icons-material";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
@@ -37,6 +37,9 @@ import {
   projectNotificationsQueryKey,
 } from "@/modules/projects/project/query/useProjectNotifications";
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
+import {
+  useProjectNotificationReadStatusMutation,
+} from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
 import type { ProjectNotification } from "@/services/api/projects/notifications/types/response";
 import {
@@ -303,6 +306,14 @@ export default function ProjectNotificationsView() {
     },
   });
 
+  const readStatusMutation = useProjectNotificationReadStatusMutation(notificationScope);
+
+  useEffect(() => {
+    if (viewTarget && viewTarget.is_read === false && !readStatusMutation.isPending) {
+      readStatusMutation.mutate({ id: viewTarget.id, is_read: true });
+    }
+  }, [viewTarget, readStatusMutation]);
+
   const notifyByVoiceMutation = useMutation({
     mutationFn: (id: string) =>
       ProjectNotificationsApi.notifySiteStatusUpdateByVoice(id),
@@ -359,12 +370,12 @@ export default function ProjectNotificationsView() {
                     )
                   : ROUTER.PROJECT_NOTIFICATION_DETAILS(projectId!, row.id)
               }
-              className="p-2 text-sm font-bold underline hover:underline"
+              className={`p-2 text-sm underline hover:underline ${row.is_read === false ? "font-extrabold" : "font-bold"}`}
             >
               {row.notification_number}
             </I18nLink>
           ) : (
-            <span className="p-2 text-sm">—</span>
+            <span className={`p-2 text-sm ${row.is_read === false ? "font-extrabold" : ""}`}>—</span>
           ),
       },
       {
@@ -484,6 +495,28 @@ export default function ProjectNotificationsView() {
                 <Eye className="w-4 h-4 me-2" />
                 {t("view")}
               </MenuItem>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  readStatusMutation.mutate({
+                    id: row.id,
+                    is_read: !row.is_read,
+                  });
+                }}
+                disabled={readStatusMutation.isPending}
+              >
+                {row.is_read ? (
+                  <>
+                    <EyeOff className="w-4 h-4 me-2" />
+                    {t("markAsUnread")}
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4 me-2" />
+                    {t("markAsRead")}
+                  </>
+                )}
+              </MenuItem>
               {row.employee_task && canUpdate ? (
                 <MenuItem onClick={() => setReassignTarget(row)}>
                   {t("reassignTask", { defaultValue: "Reassign Task" })}
@@ -565,6 +598,14 @@ export default function ProjectNotificationsView() {
     params,
     selectable: true,
     getRowId: (row: ProjectNotification) => row.id,
+    getRowSx: (row: ProjectNotification) =>
+      row.is_read === false
+        ? {
+            borderLeft: "4px solid #0284c7",
+            backgroundColor: "transparent",
+            "&:hover": { backgroundColor: "#f0f9ff" },
+          }
+        : undefined,
     loading: isLoading,
     searchable: true,
   });

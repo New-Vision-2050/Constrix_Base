@@ -24,6 +24,7 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
       selectable = false,
       searchable = false,
       getRowId,
+      getRowSx,
       loading = false,
       filtered = false,
       onExport,
@@ -161,6 +162,7 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
         handleSort: params.handleSort,
         selectable,
         searchable,
+        getRowSx,
       },
       columnVisibility,
       pagination: {

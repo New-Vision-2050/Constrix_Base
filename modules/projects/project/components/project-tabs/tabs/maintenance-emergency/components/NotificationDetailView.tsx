@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Avatar,
   Box,
@@ -24,7 +24,11 @@ import { useTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "@/i18n/navigation";
 import { ROUTER } from "@/router";
-import { useProjectNotificationDetail, useProjectNotificationAvailableActions } from "@/modules/projects/project/query/useProjectNotificationMutations";
+import {
+  useProjectNotificationDetail,
+  useProjectNotificationAvailableActions,
+  useProjectNotificationReadStatusMutation,
+} from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useEmployeeTaskProcedures } from "@/modules/projects/project/query/useEmployeeTaskProcedures";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import {
@@ -224,10 +228,18 @@ export default function NotificationDetailView({
     [isEngagement, flatPerms],
   );
 
+  const readStatusMutation = useProjectNotificationReadStatusMutation(notificationScope);
+
   const { data: notification, isLoading, isError } = useProjectNotificationDetail(
     notificationScope,
     notificationId,
   );
+
+  useEffect(() => {
+    if (notification && notification.is_read === false && !readStatusMutation.isPending) {
+      readStatusMutation.mutate({ id: notificationId, is_read: true });
+    }
+  }, [notification, notificationId, readStatusMutation]);
 
   const taskId = notification?.employee_task?.id;
   const { data: proceduresData } = useEmployeeTaskProcedures(taskId);
