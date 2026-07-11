@@ -74,6 +74,26 @@ export interface ProjectNotificationEmployeeTask {
   procedure_attachments: ProjectNotificationProcedureAttachmentGroup[];
 }
 
+export interface ProjectNotificationNoteUser {
+  id: string;
+  name: string;
+  phone?: string | null;
+}
+
+export interface ProjectNotificationNoteBranch {
+  id: string;
+  name: string;
+}
+
+export interface ProjectNotificationNote {
+  id: string;
+  note: string;
+  created_at: string;
+  timezone?: string | null;
+  user: ProjectNotificationNoteUser | null;
+  branch: ProjectNotificationNoteBranch | null;
+}
+
 export interface ProjectNotification {
   id: string;
   project_id: string;
@@ -107,8 +127,10 @@ export interface ProjectNotification {
   company_name?: string | null;
   status: NotificationStatus;
   status_label?: string | null;
+  is_read?: boolean;
   last_site_update_status?: string | null;
   last_site_update_date?: string | null;
+  last_note?: ProjectNotificationNote | null;
   violations_count: number;
   magdy_number?: string | null;
   machine_number?: string | null;
@@ -121,6 +143,15 @@ export interface ProjectNotification {
   created_at: string;
   updated_at: string;
 }
+
+export interface ProjectNotificationNotesData {
+  items: ProjectNotificationNote[];
+  timezone?: string | null;
+}
+
+export interface ProjectNotificationNotesResponse extends ApiBaseResponse<ProjectNotificationNotesData> {}
+
+export interface ProjectNotificationNoteSingleResponse extends ApiBaseResponse<ProjectNotificationNote> {}
 
 export interface ProjectNotificationsListPagination {
   page: number;

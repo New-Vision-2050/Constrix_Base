@@ -85,6 +85,10 @@ export interface ProjectNotificationRejectArgs {
   rejection_reason: string;
 }
 
+export interface ProjectNotificationReadStatusArgs {
+  is_read: boolean;
+}
+
 export interface ProjectNotificationMobileActionArgs {
   latitude?: number;
   longitude?: number;
@@ -94,6 +98,10 @@ export interface ProjectNotificationMobileActionArgs {
 
 export interface ProjectNotificationReassignArgs {
   assigned_user_ids: string[];
+}
+
+export interface CreateProjectNotificationNoteArgs {
+  note: string;
 }
 
 export interface ProjectNotificationsChartsArgs {

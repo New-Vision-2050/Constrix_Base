@@ -2,12 +2,18 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
-import type { ProjectNotification, ProjectNotificationAvailableAction, SiteStatusUpdatesData } from "@/services/api/projects/notifications/types/response";
+import type { ProjectNotification, ProjectNotificationAvailableAction, ProjectNotificationNote, ProjectNotificationNotesData, SiteStatusUpdatesData } from "@/services/api/projects/notifications/types/response";
 import type {
   CreateProjectNotificationArgs,
+  CreateProjectNotificationNoteArgs,
+  ProjectNotificationReadStatusArgs,
   UpdateProjectNotificationArgs,
 } from "@/services/api/projects/notifications/types/args";
-import { projectNotificationsQueryKey } from "./useProjectNotifications";
+import {
+  projectNotificationsQueryKey,
+  PROJECT_NOTIFICATIONS_QUERY_KEY,
+  type ProjectNotificationsResult,
+} from "./useProjectNotifications";
 import {
   buildNotificationScopeParams,
   hasNotificationScope,
@@ -17,6 +23,7 @@ import {
 export const PROJECT_NOTIFICATION_DETAIL_QUERY_KEY = "project-notification-detail" as const;
 export const PROJECT_NOTIFICATION_AVAILABLE_ACTIONS_QUERY_KEY = "project-notification-available-actions" as const;
 export const SITE_STATUS_UPDATES_QUERY_KEY = "site-status-updates" as const;
+export const PROJECT_NOTIFICATION_NOTES_QUERY_KEY = "project-notification-notes" as const;
 
 function notificationScopeFromArgs(
   args: Pick<
@@ -187,6 +194,60 @@ export function useSiteStatusUpdates(notificationId: string | undefined) {
   });
 }
 
+export function useProjectNotificationNotes(notificationId: string | undefined) {
+  return useQuery<ProjectNotificationNotesData>({
+    queryKey: [PROJECT_NOTIFICATION_NOTES_QUERY_KEY, notificationId],
+    queryFn: async (): Promise<ProjectNotificationNotesData> => {
+      if (!notificationId) return { items: [], timezone: null };
+      const res = await ProjectNotificationsApi.getNotes(notificationId);
+      const body = res.data as any;
+      const data = body?.data ?? body?.payload ?? body;
+      const items = data?.items ?? [];
+      const timezone = data?.timezone ?? null;
+      return { items, timezone };
+    },
+    enabled: Boolean(notificationId),
+  });
+}
+
+export function useAddProjectNotificationNoteMutation(
+  notificationId: string | undefined,
+  scope: NotificationScope,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (args: CreateProjectNotificationNoteArgs): Promise<ProjectNotificationNote | null> => {
+      if (!notificationId) return null;
+      const res = await ProjectNotificationsApi.addNote(notificationId, args);
+      const body = res.data as any;
+      return body?.payload ?? body?.data ?? body ?? null;
+    },
+    onSuccess: (note) => {
+      if (!notificationId) return;
+      queryClient.setQueryData<ProjectNotificationNotesData>(
+        [PROJECT_NOTIFICATION_NOTES_QUERY_KEY, notificationId],
+        (old) => {
+          if (!old) return { items: note ? [note] : [], timezone: null };
+          if (!note) return old;
+          return { ...old, items: [note, ...old.items] };
+        },
+      );
+      queryClient.invalidateQueries({
+        queryKey: projectNotificationsQueryKey(scope),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+          scope.projectId,
+          scope.contractualEngagementKey,
+          notificationId,
+        ],
+      });
+    },
+  });
+}
+
 export function useReassignProjectNotificationMutation(scope: NotificationScope) {
   const queryClient = useQueryClient();
 
@@ -205,6 +266,63 @@ export function useReassignProjectNotificationMutation(scope: NotificationScope)
       return payload as unknown as ProjectNotification;
     },
     onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: projectNotificationsQueryKey(scope),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+          scope.projectId,
+          scope.contractualEngagementKey,
+          variables.id,
+        ],
+      });
+      if (data) {
+        queryClient.setQueryData<ProjectNotification | null>(
+          [
+            PROJECT_NOTIFICATION_DETAIL_QUERY_KEY,
+            scope.projectId,
+            scope.contractualEngagementKey,
+            variables.id,
+          ],
+          data,
+        );
+      }
+    },
+  });
+}
+
+export function useProjectNotificationReadStatusMutation(scope: NotificationScope) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      is_read,
+    }: {
+      id: string;
+      is_read: boolean;
+    }): Promise<ProjectNotification | null> => {
+      const args: ProjectNotificationReadStatusArgs = { is_read };
+      const res = await ProjectNotificationsApi.readStatus(id, args);
+      const payload = res.data.payload;
+      if (!payload) return null;
+      if (Array.isArray(payload)) return payload[0] ?? null;
+      return payload as unknown as ProjectNotification;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.setQueriesData<ProjectNotificationsResult | null>(
+        { queryKey: [PROJECT_NOTIFICATIONS_QUERY_KEY] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: old.data.map((row) =>
+              row.id === variables.id ? { ...row, is_read: variables.is_read } : row,
+            ),
+          };
+        },
+      );
       queryClient.invalidateQueries({
         queryKey: projectNotificationsQueryKey(scope),
       });

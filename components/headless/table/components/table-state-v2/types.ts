@@ -1,3 +1,4 @@
+import type { SxProps } from "@mui/material/styles";
 import { ColumnDef } from "../table-component/types";
 import { TableParams } from "../table-params/types";
 import { ColumnVisibilityState } from "../column-visibility";
@@ -21,6 +22,9 @@ export type TableStateV2Options<TRow> = {
   // Selection
   selectable?: boolean;
   getRowId?: (row: TRow) => string;
+
+  // Row styling
+  getRowSx?: (row: TRow, index: number) => SxProps | undefined;
 
   // Search
   searchable?: boolean;
@@ -60,6 +64,7 @@ export type TableStateV2<TRow> = {
     handleSort: (key: string) => void;
     selectable: boolean;
     searchable: boolean;
+    getRowSx?: (row: TRow, index: number) => SxProps | undefined;
   };
 
   // Column Visibility state (optional, only if prefix provided)

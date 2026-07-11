@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Avatar,
   Box,
@@ -24,7 +24,11 @@ import { useTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "@/i18n/navigation";
 import { ROUTER } from "@/router";
-import { useProjectNotificationDetail, useProjectNotificationAvailableActions } from "@/modules/projects/project/query/useProjectNotificationMutations";
+import {
+  useProjectNotificationDetail,
+  useProjectNotificationAvailableActions,
+  useProjectNotificationReadStatusMutation,
+} from "@/modules/projects/project/query/useProjectNotificationMutations";
 import { useEmployeeTaskProcedures } from "@/modules/projects/project/query/useEmployeeTaskProcedures";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import {
@@ -36,6 +40,7 @@ import NotificationSeverityBadge from "./NotificationSeverityBadge";
 import NotificationDetailEditable from "./NotificationDetailEditable";
 import ProceduresCarousel from "./ProceduresCarousel";
 import SiteStatusUpdatesTab from "./SiteStatusUpdatesTab";
+import NotificationNotesTab from "./NotificationNotesTab";
 import ReassignTaskModal from "./ReassignTaskModal";
 import type { ProjectNotificationAttachment } from "@/services/api/projects/notifications/types/response";
 
@@ -224,10 +229,18 @@ export default function NotificationDetailView({
     [isEngagement, flatPerms],
   );
 
+  const readStatusMutation = useProjectNotificationReadStatusMutation(notificationScope);
+
   const { data: notification, isLoading, isError } = useProjectNotificationDetail(
     notificationScope,
     notificationId,
   );
+
+  useEffect(() => {
+    if (notification && notification.is_read === false && !readStatusMutation.isPending) {
+      readStatusMutation.mutate({ id: notificationId, is_read: true });
+    }
+  }, [notification, notificationId, readStatusMutation]);
 
   const taskId = notification?.employee_task?.id;
   const { data: proceduresData } = useEmployeeTaskProcedures(taskId);
@@ -470,6 +483,7 @@ export default function NotificationDetailView({
           <Tab label={t("attachments")} />
           <Tab label={t("procedures")} />
           <Tab label={t("siteStatusUpdates")} />
+          <Tab label={t("notes")} />
         </Tabs>
       </Paper>
 
@@ -566,6 +580,14 @@ export default function NotificationDetailView({
         <SiteStatusUpdatesTab
           notification={notification}
           notificationId={notificationId}
+        />
+      )}
+
+      {/* Notes tab */}
+      {activeTab === 4 && (
+        <NotificationNotesTab
+          notificationId={notificationId}
+          scope={notificationScope}
         />
       )}
 

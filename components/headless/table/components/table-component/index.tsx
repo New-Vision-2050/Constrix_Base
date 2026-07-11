@@ -52,6 +52,9 @@ export function createTableComponent<TRow>() {
     const loading = isUsingState
       ? props.state.table.loading
       : props.loading || false;
+    const getRowSx = isUsingState
+      ? props.state.table.getRowSx
+      : undefined;
     const loadingOptions = props.loadingOptions || { rows: 5 };
 
     // Selection config
@@ -345,6 +348,7 @@ export function createTableComponent<TRow>() {
                     const selected = isRowSelected(row, index);
                     const isSticky =
                       stateSelection?.isRowFromOtherPage(row) || false;
+                    const rowSx = getRowSx ? getRowSx(row, index) : undefined;
                     return (
                       <TableRow
                         key={getRowKey(row, index)}
@@ -365,6 +369,7 @@ export function createTableComponent<TRow>() {
                             borderLeft: "3px solid",
                             borderLeftColor: "primary.main",
                           }),
+                          ...rowSx,
                         }}
                       >
                         {selectable && (
