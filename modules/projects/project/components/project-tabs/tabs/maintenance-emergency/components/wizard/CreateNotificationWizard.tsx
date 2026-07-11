@@ -103,10 +103,8 @@ export default function CreateNotificationWizard({
   const createMutation = useCreateProjectNotificationMutation();
   const updateMutation = useUpdateProjectNotificationMutation();
   const draftMutation = useSaveProjectNotificationDraftMutation();
-  const isSubmitting =
-    createMutation.isPending ||
-    updateMutation.isPending ||
-    draftMutation.isPending;
+  const isFinalizing =
+    createMutation.isPending || updateMutation.isPending;
   const notificationTypesQuery = useProjectNotificationTypes();
   const notificationTypes = notificationTypesQuery.data ?? [];
 
@@ -209,10 +207,6 @@ export default function CreateNotificationWizard({
       return;
     }
     if (step < STEP_COUNT) {
-      if (isDraftMode()) {
-        const saved = await saveDraft({ silent: true });
-        if (!saved) return;
-      }
       setStep((prev) => ((prev + 1) as WizardStep));
     }
   }
@@ -320,41 +314,6 @@ export default function CreateNotificationWizard({
     }
   }
 
-  async function saveDraft(): Promise<boolean> {
-    if (!hasScope) return false;
-
-    try {
-      if (mode === "edit" && notificationId) {
-        await draftMutation.mutateAsync(
-          buildUpdatePayload(notificationId, notificationScope, data, {
-            isDraft: true,
-          }),
-        );
-        return true;
-      }
-
-      if (draftId) {
-        await draftMutation.mutateAsync(
-          buildUpdatePayload(draftId, notificationScope, data, {
-            isDraft: true,
-          }),
-        );
-        return true;
-      }
-
-      const saved = await draftMutation.mutateAsync(
-        buildCreatePayload(notificationScope, data, { isDraft: true }),
-      );
-      if (saved?.id) {
-        setDraftId(saved.id);
-      }
-      return true;
-    } catch (error) {
-      handleApiError(error);
-      return false;
-    }
-  }
-
   async function handleSubmit() {
     if (!hasScope) return;
 
@@ -411,7 +370,7 @@ export default function CreateNotificationWizard({
         </span>
         <IconButton
           onClick={onClose}
-          disabled={isSubmitting}
+          disabled={isFinalizing}
           aria-label={t("cancel")}
           sx={{ position: "absolute", right: 8, top: 8 }}
         >
@@ -475,17 +434,17 @@ export default function CreateNotificationWizard({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={handleClose} disabled={isSubmitting}>
+        <Button onClick={handleClose} disabled={isFinalizing}>
           {t("cancel")}
         </Button>
         <Box sx={{ flex: 1 }} />
         {step > 1 && (
-          <Button onClick={handleBack} disabled={isSubmitting}>
+          <Button onClick={handleBack} disabled={isFinalizing}>
             {t("previous")}
           </Button>
         )}
         {step < STEP_COUNT && (
-          <Button variant="contained" onClick={handleNext} disabled={isSubmitting}>
+          <Button variant="contained" onClick={handleNext} disabled={isFinalizing}>
             {t("next")}
           </Button>
         )}
@@ -494,10 +453,10 @@ export default function CreateNotificationWizard({
             variant="contained"
             onClick={handleSubmit}
             disabled={
-              isSubmitting || !confirmed.dataReviewed || !confirmed.readyToSend
+              isFinalizing || !confirmed.dataReviewed || !confirmed.readyToSend
             }
           >
-            {isSubmitting
+            {isFinalizing
               ? t("loading")
               : mode === "edit"
                 ? t("update")
