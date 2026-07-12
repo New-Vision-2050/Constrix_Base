@@ -11,6 +11,7 @@ import {
   Users,
   UsersRound,
   Wrench,
+  HardHat,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -31,6 +32,7 @@ import {
   hasAnyMaintenanceTabPermission,
 } from "@/modules/projects/project/utils/projectMyPermissions";
 import ShareTab from "../tabs/share";
+import ContractorsTab from "../tabs/contractors";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
@@ -51,6 +53,12 @@ function createStakeholderSubTabs(
       title: tProject("tabs.staff"),
       icon: <UsersRound className="w-4 h-4" />,
       content: <CadreTab />,
+    },
+    {
+      id: "project-tab-contractors",
+      title: tProject("tabs.contractors"),
+      icon: <HardHat className="w-4 h-4" />,
+      content: <ContractorsTab />,
     },
     {
       id: "project-tab-roles",
@@ -76,6 +84,8 @@ function passesProjectTypeVisibility(
     case "project-tab-staff":
     case "project-tab-cadre":
       return permissions.employee_contract_setting?.is_all_data_visible === 1;
+    case "project-tab-contractors":
+      return permissions.contractor_contract_setting?.is_all_data_visible === 1;
     case "project-tab-roles":
       return (
         permissions.roles_and_permissions_setting?.is_all_data_visible === 1

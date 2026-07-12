@@ -1,18 +1,21 @@
 import { MessagesGroup, _m } from "../../types";
 import { projectInboxMessages } from "./inbox";
 import { projectShareTabMessages } from "./share-tab";
+import { projectContractorsTabMessages } from "./contractors-tab";
 import { projectSettingsMessages } from "./settings";
 
 export const projectMessages = new MessagesGroup({
   Settings: projectSettingsMessages,
   inbox: projectInboxMessages,
   shareTab: projectShareTabMessages,
+  contractorsTab: projectContractorsTabMessages,
   tabs: new MessagesGroup({
     attachments: _m("Attachments", "المرفقات"),
     documentCycle: _m("Document cycle", "دورة الوثائق"),
     stakeholders: _m("Stakeholders", "أصحاب المصلحة"),
     concernedParties: _m("Concerned parties", "المعنيين"),
     staff: _m("Staff", "الكادر"),
+    contractors: _m("Contractors", "المقاولين"),
     rolesAndPermissions: _m("Roles and permissions", "الأدوار والصلاحيات"),
     sharedEntities: _m("Shared entities", "الجهات المشاركة"),
     maintenanceAndEmergencies: _m(

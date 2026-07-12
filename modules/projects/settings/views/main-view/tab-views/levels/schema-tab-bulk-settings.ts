@@ -32,7 +32,12 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
 ]);
 
 /** Tabs grouped under «أصحاب المصلحة» in schema settings (not attachments / document-cycle). */
-export const STAKEHOLDER_GROUP_TAB_VALUES = ["team", "roles-and-permissions", "project-sharing"] as const;
+export const STAKEHOLDER_GROUP_TAB_VALUES = [
+  "contractors",
+  "team",
+  "roles-and-permissions",
+  "project-sharing",
+] as const;
 
 const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
   "is_reference_number",

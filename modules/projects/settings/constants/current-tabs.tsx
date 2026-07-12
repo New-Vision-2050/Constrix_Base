@@ -4,7 +4,7 @@ export const SCHEMA_IDS = {
   detailsView: 1,
   projectTerms: 2,
   attachments: 3,
-  contractors: 4,
+  contractors: 13,
   team: 5,
   workOrders: 6,
   financial: 7,
