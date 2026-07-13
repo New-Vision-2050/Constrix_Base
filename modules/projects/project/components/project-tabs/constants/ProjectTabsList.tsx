@@ -42,6 +42,7 @@ import WorkOrdersTab from "../tabs/work-orders";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const CONSTRUCTIONS_GROUP_ID = "project-tab-constructions";
+const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
 
 /** Sub-sections under «أصحاب المصلحة» (RTL: المعنيين on the right). */
 function createStakeholderSubTabs(
@@ -83,6 +84,8 @@ function createStakeholderSubTabs(
 
 /** Sub-sections under «الانشاءات». */
 function createConstructionSubTabs(
+/** Sub-sections under «إدارة الوثائق». */
+function createDocumentManagementSubTabs(
   tProject: ReturnType<typeof useTranslations<"project">>,
 ): SystemTab[] {
   return [
@@ -96,6 +99,24 @@ function createConstructionSubTabs(
 
 function isSettingShown(value: boolean | number | undefined): boolean {
   return value === true || value === 1;
+}
+
+      id: "project-tab-document-cycle",
+      title: tProject("tabs.documentCycle"),
+      icon: <FolderSyncIconWithCount />,
+      content: <DocumentCycleTab />,
+    },
+    {
+      id: "project-tab-sequence-of-procedures",
+      title: tProject("tabs.sequenceOfProcedures"),
+      content: <SequenceOfProceduresTab />,
+    },
+    {
+      id: "project-tab-document-requirements",
+      title: tProject("tabs.documentRequirements"),
+      content: <DocumentRequirementsTab />,
+    },
+  ];
 }
 
 function passesProjectTypeVisibility(
@@ -196,6 +217,8 @@ export function useProjectTabsList(): SystemTab[] {
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
     const constructionSubTabs = createConstructionSubTabs(tProject);
+    const documentManagementSubTabs =
+      createDocumentManagementSubTabs(tProject);
 
     const ownerCompanyId = projectData?.company_id;
     const currentCompanyId = authCompanyData?.payload?.id;
@@ -244,6 +267,25 @@ export function useProjectTabsList(): SystemTab[] {
             icon: <Building2 className="w-4 h-4" />,
             content: <></>,
             nestedTabs: visibleConstructionSubs,
+    const visibleDocumentManagementSubs = documentManagementSubTabs.filter(
+      (tab) =>
+        shouldShowTopLevelTab(
+          tab.id,
+          permissions,
+          projectId,
+          flatPermissionsFetched,
+          flatPerms,
+        ),
+    );
+
+    const documentManagementTab: SystemTab | null =
+      visibleDocumentManagementSubs.length > 0
+        ? {
+            id: DOCUMENT_MANAGEMENT_GROUP_ID,
+            title: tProject("tabs.documentManagement"),
+            icon: <FileText className="w-4 h-4" />,
+            content: <></>,
+            nestedTabs: visibleDocumentManagementSubs,
           }
         : null;
 
@@ -275,6 +317,7 @@ export function useProjectTabsList(): SystemTab[] {
     ) {
       topLevel.push(documentCycleTab);
     }
+    if (documentManagementTab) topLevel.push(documentManagementTab);
 
     if (
       shouldShowTopLevelTab(

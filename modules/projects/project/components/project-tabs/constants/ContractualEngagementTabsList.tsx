@@ -87,6 +87,29 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       title: tProject("tabs.documentCycle"),
       icon: <FolderSyncIconWithCount />,
       content: <DocumentCycleTab />,
+    const documentManagementTab: SystemTab = {
+      id: DOCUMENT_MANAGEMENT_GROUP_ID,
+      title: tProject("tabs.documentManagement"),
+      icon: <FileText className="w-4 h-4" />,
+      content: <></>,
+      nestedTabs: [
+        {
+          id: "engagement-tab-document-cycle",
+          title: tProject("tabs.documentCycle"),
+          icon: <FolderSyncIconWithCount />,
+          content: <DocumentCycleTab />,
+        },
+        {
+          id: "engagement-tab-sequence-of-procedures",
+          title: tProject("tabs.sequenceOfProcedures"),
+          content: <SequenceOfProceduresTab />,
+        },
+        {
+          id: "engagement-tab-document-requirements",
+          title: tProject("tabs.documentRequirements"),
+          content: <DocumentRequirementsTab />,
+        },
+      ],
     };
 
     const maintenanceTab: SystemTab = {
@@ -101,6 +124,7 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       stakeholdersTab,
       constructionsTab,
       documentCycleTab,
+      documentManagementTab,
       maintenanceTab,
     ];
   }, [tProject]);
