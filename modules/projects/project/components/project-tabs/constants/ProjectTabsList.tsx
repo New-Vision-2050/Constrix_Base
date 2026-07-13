@@ -49,6 +49,10 @@ function isSettingShown(value: boolean | number | undefined | null): boolean {
   return value === true || value === 1;
 }
 
+function isSettingShown(value: boolean | number | undefined | null): boolean {
+  return value === true || value === 1;
+}
+
 /** Sub-sections under «أصحاب المصلحة» (RTL: المعنيين on the right). */
 function createStakeholderSubTabs(
   tProject: ReturnType<typeof useTranslations<"project">>,
