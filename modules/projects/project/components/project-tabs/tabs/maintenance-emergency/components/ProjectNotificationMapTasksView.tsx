@@ -151,8 +151,16 @@ export default function ProjectNotificationMapTasksView({
 }: ProjectNotificationMapTasksViewProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const locale = useLocale();
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+
   const { data, isLoading, isError, refetch, isFetching } =
-    useProjectNotificationMapTasks({ projectId, contractualEngagementKey });
+    useProjectNotificationMapTasks({ projectId, contractualEngagementKey }, {
+      status: selectedStatus,
+      dateFrom,
+      dateTo,
+    });
 
   const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
@@ -166,8 +174,6 @@ export default function ProjectNotificationMapTasksView({
     });
     return map;
   }, [statuses, locale]);
-
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const fittedTasksRef = useRef<string | null>(null);
@@ -299,10 +305,12 @@ export default function ProjectNotificationMapTasksView({
       const color = STATUS_COLOR_MAP[task.status] || TASK_CIRCLE_COLORS[index % TASK_CIRCLE_COLORS.length];
       const center = { lat: task.latitude, lng: task.longitude };
 
+      const markerEl = buildTaskMarkerElement(color);
+      markerEl.style.pointerEvents = "none";
       const marker = new window.google.maps.marker.AdvancedMarkerElement({
         map: mapInstance,
         position: center,
-        content: buildTaskMarkerElement(color),
+        content: markerEl,
       });
 
       const circle = new window.google.maps.Circle({
@@ -341,25 +349,30 @@ export default function ProjectNotificationMapTasksView({
         taskInfoWindowRef.current?.open(mapInstance, marker);
       };
 
-      marker.addListener("mouseover", () => {
+      const closeInfo = () => {
+        taskInfoWindowRef.current?.close();
+      };
+
+      const highlight = () => {
         setHoveredTaskId(task.id);
         circle.setOptions({ fillOpacity: 0.4, strokeWeight: 4, zIndex: visibleTasks.length * 2 + 1 });
-      });
-      marker.addListener("mouseout", () => {
+      };
+      const unhighlight = () => {
         setHoveredTaskId(null);
         circle.setOptions({ fillOpacity: 0.28, strokeWeight: 3, zIndex: index + visibleTasks.length + 1 });
-      });
-      marker.addListener("gmp-click", openInfo);
+      };
 
       circle.addListener("mouseover", () => {
-        setHoveredTaskId(task.id);
-        circle.setOptions({ fillOpacity: 0.4, strokeWeight: 4, zIndex: visibleTasks.length * 2 + 1 });
+        highlight();
+        openInfo();
       });
       circle.addListener("mouseout", () => {
-        setHoveredTaskId(null);
-        circle.setOptions({ fillOpacity: 0.28, strokeWeight: 3, zIndex: index + visibleTasks.length + 1 });
+        unhighlight();
+        closeInfo();
       });
       circle.addListener("click", openInfo);
+
+      marker.addListener("gmp-click", openInfo);
 
       taskMarkersRef.current.push(marker);
       taskCirclesRef.current.push(circle);
@@ -389,12 +402,34 @@ export default function ProjectNotificationMapTasksView({
 
   const buildEmployeeInfoContent = useCallback(
     (employee: ProjectNotificationEmployee) => {
+      const attendance = employee.attendance;
       const lines = [
-        employee.name,
-        employee.status_label || employee.status,
-        employee.distance_label,
-        employee.branch || null,
-        employee.last_update ? `${t("lastUpdate", { defaultValue: "Last update" })}: ${employee.last_update}` : null,
+        employee.name
+          ? `${t("employeeName", { defaultValue: "Name" })}: ${employee.name}`
+          : null,
+        employee.status_label || employee.status
+          ? `${t("employeeStatus", { defaultValue: "Status" })}: ${employee.status_label || employee.status}`
+          : null,
+        employee.distance_label
+          ? `${t("distance", { defaultValue: "Distance" })}: ${employee.distance_label}`
+          : null,
+        employee.branch
+          ? `${t("branch", { defaultValue: "Branch" })}: ${employee.branch}`
+          : null,
+        employee.last_update
+          ? `${t("lastUpdate", { defaultValue: "Last update" })}: ${employee.last_update}`
+          : null,
+        attendance?.["status"]
+          ? `${t("attendance", { defaultValue: "Attendance" })}: ${String(attendance["status"])}${
+              attendance["clock_in_time"] ? ` (${String(attendance["clock_in_time"])})` : ""
+            }`
+          : null,
+        employee.location?.source
+          ? `${t("locationSource", { defaultValue: "Location source" })}: ${employee.location.source}`
+          : null,
+        employee.location?.accuracy != null
+          ? `${t("accuracy", { defaultValue: "Accuracy" })}: ${employee.location.accuracy}m`
+          : null,
       ].filter(Boolean);
       return `<div style="direction:rtl;text-align:right;font-family:Arial,sans-serif;padding:8px;color:#000;background:#fff;min-width:140px;border-radius:4px;line-height:1.5">
         ${lines.length > 0 ? lines.join("<br/>") : t("noData", { defaultValue: "No data" })}
@@ -436,18 +471,20 @@ export default function ProjectNotificationMapTasksView({
       if (!lat || !lng) return;
 
       const color = EMPLOYEE_STATUS_COLOR_MAP[employee.status] ?? "#6b7280";
+      const markerEl = buildEmployeeMarkerElement(color);
+      markerEl.style.pointerEvents = "auto";
       const marker = new window.google.maps.marker.AdvancedMarkerElement({
         map: mapInstance,
         position: { lat, lng },
-        content: buildEmployeeMarkerElement(color),
+        content: markerEl,
       });
 
       const content = buildEmployeeInfoContent(employee);
-      marker.addListener("mouseover", () => {
+      markerEl.addEventListener("mouseenter", () => {
         employeeInfoWindowRef.current?.setContent(content);
         employeeInfoWindowRef.current?.open(mapInstance, marker);
       });
-      marker.addListener("mouseout", () => {
+      markerEl.addEventListener("mouseleave", () => {
         employeeInfoWindowRef.current?.close();
       });
 
@@ -637,6 +674,29 @@ export default function ProjectNotificationMapTasksView({
                     </MenuItem>
                   ))}
                 </TextField>
+              )}
+
+              {showTasks && (
+                <Stack direction="row" spacing={1}>
+                  <TextField
+                    type="date"
+                    size="small"
+                    label={t("fromDate")}
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                  />
+                  <TextField
+                    type="date"
+                    size="small"
+                    label={t("toDate")}
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                  />
+                </Stack>
               )}
 
               {showEmployees && (

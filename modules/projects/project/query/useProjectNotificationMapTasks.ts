@@ -68,15 +68,23 @@ function normalizeMapTask(
   };
 }
 
+export interface ProjectNotificationMapTasksFilters {
+  status?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
 export function projectNotificationMapTasksQueryKey(
   scope: NotificationScope,
-  status?: string,
+  filters: ProjectNotificationMapTasksFilters = {},
 ) {
   return [
     PROJECT_NOTIFICATION_MAP_TASKS_QUERY_KEY,
     scope.projectId,
     scope.contractualEngagementKey,
-    status,
+    filters.status,
+    filters.dateFrom,
+    filters.dateTo,
   ] as const;
 }
 
@@ -87,15 +95,20 @@ export interface ProjectNotificationMapTasksData {
 
 export function useProjectNotificationMapTasks(
   scope: NotificationScope,
-  status?: string,
+  filters: ProjectNotificationMapTasksFilters = {},
 ) {
   const { projectId, contractualEngagementKey } = scope;
+  const { status, dateFrom, dateTo } = filters;
 
   return useQuery({
-    queryKey: projectNotificationMapTasksQueryKey(scope, status),
+    queryKey: projectNotificationMapTasksQueryKey(scope, filters),
     queryFn: async (): Promise<ProjectNotificationMapTasksData> => {
       const res = await ProjectNotificationsApi.getMapTasks(
-        buildNotificationsMapTasksArgs(scope, status),
+        buildNotificationsMapTasksArgs(scope, {
+          status: status || undefined,
+          date_from: dateFrom || undefined,
+          date_to: dateTo || undefined,
+        }),
       );
 
       const payload = res.data.payload;

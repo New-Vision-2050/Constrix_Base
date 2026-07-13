@@ -350,6 +350,7 @@ export default function ProjectNotificationMap({
       markerEl.style.border = `${isSelected ? 3 : 2}px solid ${isSelected ? "#000" : "#fff"}`;
       markerEl.style.boxShadow = "0 1px 4px rgba(0,0,0,0.35)";
       markerEl.style.cursor = "pointer";
+      markerEl.style.pointerEvents = "auto";
 
       const marker = new window.google.maps.marker.AdvancedMarkerElement({
         map: mapInstance,
@@ -358,27 +359,51 @@ export default function ProjectNotificationMap({
       });
 
       const routeInfo = routeDistances?.[employee.user_id];
+      const attendance = employee.attendance;
       const infoLines = [
-        employee.name || "غير معروف",
-        employee.status_label || employee.status || "لا توجد حالة",
-        routeInfo?.distance?.text ?? employee.distance_label ?? "لا يوجد مسافة",
+        employee.name
+          ? `${t("employeeName", { defaultValue: "Name" })}: ${employee.name}`
+          : null,
+        employee.status_label || employee.status
+          ? `${t("employeeStatus", { defaultValue: "Status" })}: ${employee.status_label || employee.status}`
+          : null,
+        routeInfo?.distance?.text
+          ? `${t("distance", { defaultValue: "Distance" })}: ${routeInfo.distance.text}`
+          : employee.distance_label
+            ? `${t("distance", { defaultValue: "Distance" })}: ${employee.distance_label}`
+            : null,
         routeInfo?.duration?.text
           ? `${t("estimatedDuration", { defaultValue: "Duration" })}: ${routeInfo.duration.text}`
           : null,
-        employee.branch || null,
-        employee.last_update ? `آخر تحديث: ${employee.last_update}` : null,
+        employee.branch
+          ? `${t("branch", { defaultValue: "Branch" })}: ${employee.branch}`
+          : null,
+        employee.last_update
+          ? `${t("lastUpdate", { defaultValue: "Last update" })}: ${employee.last_update}`
+          : null,
+        attendance?.["status"]
+          ? `${t("attendance", { defaultValue: "Attendance" })}: ${String(attendance["status"])}${
+              attendance["clock_in_time"] ? ` (${String(attendance["clock_in_time"])})` : ""
+            }`
+          : null,
+        employee.location?.source
+          ? `${t("locationSource", { defaultValue: "Location source" })}: ${employee.location.source}`
+          : null,
+        employee.location?.accuracy != null
+          ? `${t("accuracy", { defaultValue: "Accuracy" })}: ${employee.location.accuracy}m`
+          : null,
       ].filter((line): line is string => Boolean(line));
 
-      const content = `<div style="direction:rtl;text-align:right;font-family:Arial,sans-serif;padding:8px;color:#000;background:#fff;min-width:120px;border-radius:4px">
-        ${infoLines.length > 0 ? infoLines.join("<br/>") : "لا توجد بيانات"}
+      const content = `<div style="direction:rtl;text-align:right;font-family:Arial,sans-serif;padding:8px;color:#000;background:#fff;min-width:120px;border-radius:4px;line-height:1.5">
+        ${infoLines.length > 0 ? infoLines.join("<br/>") : t("noData", { defaultValue: "No data" })}
       </div>`;
 
-      marker.addListener("mouseover", () => {
+      markerEl.addEventListener("mouseenter", () => {
         employeeInfoWindowRef.current?.setContent(content);
         employeeInfoWindowRef.current?.open(mapInstance, marker);
       });
 
-      marker.addListener("mouseout", () => {
+      markerEl.addEventListener("mouseleave", () => {
         employeeInfoWindowRef.current?.close();
       });
 

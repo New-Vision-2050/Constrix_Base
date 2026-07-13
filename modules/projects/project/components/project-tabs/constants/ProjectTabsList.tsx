@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import {
+  FileText,
   Paperclip,
   UserCog,
   Share2,
@@ -20,6 +21,8 @@ import AttachmentsTab from "../tabs/attachments";
 import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
 import DocumentCycleTab from "../tabs/document-cycle";
+import DocumentRequirementsTab from "../tabs/document-requirements";
+import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import RolesTab from "../tabs/roles";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
@@ -113,6 +116,8 @@ function passesProjectTypeVisibility(
     case "project-tab-share":
       return permissions.project_sharing_setting?.is_all_data_visible === 1;
     case "project-tab-document-cycle":
+    case "project-tab-sequence-of-procedures":
+    case "project-tab-document-requirements":
       return permissions.attachment_cycle_setting?.is_all_data_visible === 1;
     case "project-tab-attachments":
       return permissions.archive_library_setting?.is_all_data_visible === 1;
@@ -137,6 +142,8 @@ function passesFlatPermission(
     case "project-tab-cadre":
       return hasAnyStaffTabPermission(flatPerms);
     case "project-tab-document-cycle":
+    case "project-tab-sequence-of-procedures":
+    case "project-tab-document-requirements":
       return hasAnyDocumentCycleTabPermission(flatPerms);
     case "project-tab-roles":
       return hasAnyRolesTabPermission(flatPerms);
@@ -180,12 +187,6 @@ export function useProjectTabsList(): SystemTab[] {
       title: tProject("tabs.attachments"),
       icon: <Paperclip className="w-4 h-4" />,
       content: <AttachmentsTab />,
-    };
-    const documentCycleTab: SystemTab = {
-      id: "project-tab-document-cycle",
-      title: tProject("tabs.documentCycle"),
-      icon: <FolderSyncIconWithCount />,
-      content: <DocumentCycleTab />,
     };
     const maintenanceTab: SystemTab = {
       id: "project-tab-maintenance",

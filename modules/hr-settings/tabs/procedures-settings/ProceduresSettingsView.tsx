@@ -12,13 +12,17 @@ import type { ProceduresSettingsViewProps } from "./types";
 export default function ProceduresSettingsView({
   outerTabs = DEFAULT_HR_PROCEDURES_OUTER_TABS,
   translationNamespace = DEFAULT_HR_PROCEDURES_CONFIG.translationNamespace,
+  hideWorkPlanTabs = DEFAULT_HR_PROCEDURES_CONFIG.hideWorkPlanTabs,
+  addProcedureVariant = DEFAULT_HR_PROCEDURES_CONFIG.addProcedureVariant,
 }: ProceduresSettingsViewProps = {}) {
   const config = useMemo(
     () => ({
       translationNamespace,
       outerTabs,
+      hideWorkPlanTabs,
+      addProcedureVariant,
     }),
-    [translationNamespace, outerTabs],
+    [translationNamespace, outerTabs, hideWorkPlanTabs, addProcedureVariant],
   );
 
   return (

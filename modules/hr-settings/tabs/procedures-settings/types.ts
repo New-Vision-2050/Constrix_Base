@@ -4,14 +4,22 @@ export interface ProceduresSettingsOuterTab {
   type: string;
 }
 
+export type ProceduresAddProcedureVariant = "default" | "document-classification";
+
 export interface ProceduresSettingsConfig {
   translationNamespace: string;
   outerTabs: ProceduresSettingsOuterTab[];
+  /** When true, hides خطة العمل / branch tabs and always shows stages. */
+  hideWorkPlanTabs?: boolean;
+  /** Controls which "Add procedure" dialog is shown. */
+  addProcedureVariant?: ProceduresAddProcedureVariant;
 }
 
 export interface ProceduresSettingsViewProps {
   outerTabs?: ProceduresSettingsOuterTab[];
   translationNamespace?: string;
+  hideWorkPlanTabs?: boolean;
+  addProcedureVariant?: ProceduresAddProcedureVariant;
 }
 
 export interface MapPolygonPoint {
