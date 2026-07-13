@@ -20,6 +20,7 @@ import AttachmentsTab from "../tabs/attachments";
 import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
 import DocumentCycleTab from "../tabs/document-cycle";
+import DocumentRequirementsTab from "../tabs/document-requirements";
 import RolesTab from "../tabs/roles";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
@@ -98,7 +99,7 @@ function createDocumentManagementSubTabs(
     {
       id: "project-tab-document-requirements",
       title: tProject("tabs.documentRequirements"),
-      content: <ComingSoonTab message={comingSoon} />,
+      content: <DocumentRequirementsTab />,
     },
   ];
 }

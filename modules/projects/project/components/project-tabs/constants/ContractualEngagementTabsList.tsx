@@ -17,6 +17,7 @@ import AttachmentsTab from "../tabs/attachments";
 import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
 import DocumentCycleTab from "../tabs/document-cycle";
+import DocumentRequirementsTab from "../tabs/document-requirements";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
@@ -86,7 +87,7 @@ export function useContractualEngagementTabsList(): SystemTab[] {
         {
           id: "engagement-tab-document-requirements",
           title: tProject("tabs.documentRequirements"),
-          content: <ComingSoonTab message={comingSoon} />,
+          content: <DocumentRequirementsTab />,
         },
       ],
     };
