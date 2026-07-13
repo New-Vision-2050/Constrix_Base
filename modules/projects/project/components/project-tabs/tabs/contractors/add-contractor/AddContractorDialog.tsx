@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useMemo, useState } from "react";
 import {
-  Autocomplete,
   Box,
   Button,
   Checkbox,
@@ -38,11 +37,17 @@ import {
   PersonOutline,
   GroupsOutlined,
 } from "@mui/icons-material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { getCountries } from "@/services/api/shared/countries";
 import type { API_Country } from "@/types/api/shared/country";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { ProjectContractorsApi } from "@/services/api/projects/project-contractors";
+import { projectContractorsQueryKey } from "@/modules/projects/project/query/useProjectContractors";
+import { useCountries } from "@/modules/projects/project/query/useCountries";
+import { buildCreateProjectContractorPayload } from "./buildCreatePayload";
+import { mapProjectContractorToForm } from "./mapContractorToForm";
+import CountrySelectField from "./CountrySelectField";
 
 const STEP_KEYS = [
   "contractorInfo",
@@ -130,46 +135,136 @@ function displayValue(value: string | null | undefined, emptyDash: string) {
 export interface AddContractorDialogProps {
   open: boolean;
   onClose: () => void;
+  contractorId?: string | null;
 }
 
 export default function AddContractorDialog({
   open,
   onClose,
+  contractorId = null,
 }: AddContractorDialogProps) {
+  const isEditMode = Boolean(contractorId);
+  const { projectId } = useProject();
+  const queryClient = useQueryClient();
   const t = useTranslations("project.contractorsTab.dialog");
   const tFields = useTranslations("project.contractorsTab.dialog.fields");
   const tReview = useTranslations("project.contractorsTab.dialog.review");
   const tValidation = useTranslations("project.contractorsTab.dialog.validation");
+  const tCommon = useTranslations("common");
   const uploadInputId = useId();
 
   const [activeStep, setActiveStep] = useState(0);
   const [form, setForm] = useState<AddContractorFormData>(INITIAL_FORM);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
 
-  const { data: countries = [], isLoading: loadingCountries } = useQuery({
-    queryKey: ["countries"],
-    queryFn: async () => {
-      const response = await getCountries();
-      return response.data.payload ?? [];
+  const createMutation = useMutation({
+    mutationFn: async (payload: ReturnType<typeof buildCreateProjectContractorPayload>) => {
+      if (!projectId) throw new Error("Missing project ID");
+      return ProjectContractorsApi.createForProject(projectId, payload);
     },
-    enabled: open,
-    staleTime: 5 * 60 * 1000,
+    onSuccess: (res) => {
+      toast.success(res.data?.message ?? t("submitSuccess"));
+      if (projectId) {
+        queryClient.invalidateQueries({
+          queryKey: projectContractorsQueryKey(projectId),
+        });
+      }
+      onClose();
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? t("submitError"));
+    },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: async (payload: ReturnType<typeof buildCreateProjectContractorPayload>) => {
+      if (!projectId || !contractorId) throw new Error("Missing project or contractor ID");
+      return ProjectContractorsApi.updateForProject(projectId, contractorId, payload);
+    },
+    onSuccess: (res) => {
+      toast.success(res.data?.message ?? t("updateSuccess"));
+      if (projectId) {
+        queryClient.invalidateQueries({
+          queryKey: projectContractorsQueryKey(projectId),
+        });
+      }
+      onClose();
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? t("updateError"));
+    },
+  });
+
+  const submitting = createMutation.isPending || updateMutation.isPending;
+
+  const { data: countries = [], isLoading: loadingCountries } = useCountries({
+    enabled: open,
+  });
+
+  const contractorDetailQuery = useQuery({
+    queryKey: ["project-contractor-detail", projectId, contractorId],
+    queryFn: async () => {
+      const res = await ProjectContractorsApi.getForProject(projectId!, contractorId!);
+      return res.data.payload;
+    },
+    enabled: open && isEditMode && !!projectId && !!contractorId,
+    retry: false,
+  });
+
+  const loadingContractor =
+    isEditMode &&
+    !contractorDetailQuery.isError &&
+    (contractorDetailQuery.isLoading ||
+      loadingCountries ||
+      !contractorDetailQuery.data);
 
   useEffect(() => {
     if (!open) {
       setActiveStep(0);
       setForm(INITIAL_FORM);
       setLogoPreview(null);
-      setSubmitting(false);
+      createMutation.reset();
+      updateMutation.reset();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || isEditMode) return;
+    setActiveStep(0);
+    setForm({
+      ...INITIAL_FORM,
+      constrixId: generateConstrixId(),
+    });
+    setLogoPreview(null);
+  }, [open, isEditMode]);
+
+  useEffect(() => {
+    if (
+      !open ||
+      !isEditMode ||
+      contractorDetailQuery.isLoading ||
+      loadingCountries ||
+      !contractorDetailQuery.data
+    ) {
       return;
     }
-    setForm((prev) => ({
-      ...prev,
-      constrixId: generateConstrixId(),
-    }));
-  }, [open]);
+    setActiveStep(0);
+    setForm(mapProjectContractorToForm(contractorDetailQuery.data, countries));
+    setLogoPreview(null);
+  }, [
+    open,
+    isEditMode,
+    contractorDetailQuery.data,
+    contractorDetailQuery.isLoading,
+    loadingCountries,
+    countries,
+  ]);
+
+  useEffect(() => {
+    if (!open || !isEditMode || !contractorDetailQuery.isError) return;
+    toast.error(t("loadContractorError"));
+    onClose();
+  }, [open, isEditMode, contractorDetailQuery.isError]);
 
   useEffect(() => {
     return () => {
@@ -253,6 +348,10 @@ export default function AddContractorDialog({
         toast.error(tValidation("emailInvalid"));
         return false;
       }
+      if (!form.country?.id) {
+        toast.error(tValidation("countryRequired"));
+        return false;
+      }
       return true;
     }
     if (step === 1) {
@@ -266,6 +365,10 @@ export default function AddContractorDialog({
       }
       if (!isValidEmail(form.managerEmail)) {
         toast.error(tValidation("emailInvalid"));
+        return false;
+      }
+      if (!form.managerNationality?.name?.trim()) {
+        toast.error(tValidation("managerNationalityRequired"));
         return false;
       }
       return true;
@@ -313,14 +416,15 @@ export default function AddContractorDialog({
   const handleNext = async () => {
     if (!validateStep(activeStep)) return;
     if (activeStep === STEP_KEYS.length - 1) {
-      setSubmitting(true);
-      try {
-        // TODO: wire to API when available
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        toast.success(t("submitSuccess"));
-        onClose();
-      } finally {
-        setSubmitting(false);
+      if (!projectId) {
+        toast.error(isEditMode ? t("updateError") : t("submitError"));
+        return;
+      }
+      const payload = buildCreateProjectContractorPayload(form);
+      if (isEditMode) {
+        updateMutation.mutate(payload);
+      } else {
+        createMutation.mutate(payload);
       }
       return;
     }
@@ -484,20 +588,14 @@ export default function AddContractorDialog({
                   </Grid>
                 </Grid>
 
-                <Autocomplete
-                  loading={loadingCountries}
-                  options={countries}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(a, b) => a.id === b.id}
+                <CountrySelectField
+                  label={tFields("country")}
+                  placeholder={tFields("selectCountry")}
                   value={form.country}
-                  onChange={(_, value) => updateField("country", value)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={tFields("country")}
-                      placeholder={tFields("selectCountry")}
-                    />
-                  )}
+                  onChange={(value) => updateField("country", value)}
+                  countries={countries}
+                  loading={loadingCountries}
+                  required
                 />
               </StackColumn>
             </Grid>
@@ -536,20 +634,13 @@ export default function AddContractorDialog({
               </Grid>
             </Grid>
 
-            <Autocomplete
-              loading={loadingCountries}
-              options={countries}
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(a, b) => a.id === b.id}
+            <CountrySelectField
+              label={tFields("nationality")}
+              placeholder={tFields("selectNationality")}
               value={form.managerNationality}
-              onChange={(_, value) => updateField("managerNationality", value)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={tFields("nationality")}
-                  placeholder={tFields("selectNationality")}
-                />
-              )}
+              onChange={(value) => updateField("managerNationality", value)}
+              countries={countries}
+              loading={loadingCountries}
             />
           </StackColumn>
         );
@@ -604,23 +695,16 @@ export default function AddContractorDialog({
                           />
                         </TableCell>
                         <TableCell>
-                          <Autocomplete
-                            size="small"
-                            loading={loadingCountries}
-                            options={countries}
-                            getOptionLabel={(option) => option.name}
-                            isOptionEqualToValue={(a, b) => a.id === b.id}
+                          <CountrySelectField
                             value={rep.nationality}
-                            onChange={(_, value) =>
+                            onChange={(value) =>
                               updateRepresentative(rep.id, { nationality: value })
                             }
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder={tFields("selectNationality")}
-                                required
-                              />
-                            )}
+                            countries={countries}
+                            loading={loadingCountries}
+                            placeholder={tFields("selectNationality")}
+                            required
+                            size="small"
                           />
                         </TableCell>
                         <TableCell>
@@ -794,7 +878,7 @@ export default function AddContractorDialog({
           <Close />
         </IconButton>
         <DialogTitle sx={{ flex: 1, textAlign: "center", pr: 6, m: 0 }}>
-          {t("title")}
+          {isEditMode ? t("editTitle") : t("title")}
         </DialogTitle>
       </Box>
 
@@ -807,7 +891,15 @@ export default function AddContractorDialog({
           ))}
         </Stepper>
 
-        <Box sx={{ minHeight: 280 }}>{renderStepContent()}</Box>
+        <Box sx={{ minHeight: 280 }}>
+          {loadingContractor ? (
+            <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 8 }}>
+              {tCommon("states.loading")}
+            </Typography>
+          ) : (
+            renderStepContent()
+          )}
+        </Box>
 
         <Divider sx={{ my: 3 }} />
 
@@ -824,12 +916,7 @@ export default function AddContractorDialog({
               <Button variant="outlined" onClick={handleClose} disabled={submitting}>
                 {t("cancel")}
               </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleNext}
-                disabled={submitting}
-              >
+              <Button variant="contained" color="secondary" onClick={handleNext} disabled={submitting || loadingContractor}>
                 {t("next")}
               </Button>
             </>
@@ -842,12 +929,12 @@ export default function AddContractorDialog({
                 <Button variant="outlined" onClick={handleClose} disabled={submitting}>
                   {t("cancel")}
                 </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleNext}
-                  disabled={submitting || (isLastStep && !form.confirmedReview)}
-                >
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleNext}
+                disabled={submitting || loadingContractor || (isLastStep && !form.confirmedReview)}
+              >
                   {isLastStep ? t("next") : t("next")}
                 </Button>
               </Box>

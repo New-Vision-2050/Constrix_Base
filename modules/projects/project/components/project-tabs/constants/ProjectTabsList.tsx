@@ -12,6 +12,7 @@ import {
   UsersRound,
   Wrench,
   HardHat,
+  Building2,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -34,8 +35,10 @@ import {
 import ShareTab from "../tabs/share";
 import ContractorsTab from "../tabs/contractors";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
+import WorkOrdersTab from "../tabs/work-orders";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
+const CONSTRUCTIONS_GROUP_ID = "project-tab-constructions";
 
 /** Sub-sections under «أصحاب المصلحة» (RTL: المعنيين on the right). */
 function createStakeholderSubTabs(
@@ -75,6 +78,23 @@ function createStakeholderSubTabs(
   ];
 }
 
+/** Sub-sections under «الانشاءات». */
+function createConstructionSubTabs(
+  tProject: ReturnType<typeof useTranslations<"project">>,
+): SystemTab[] {
+  return [
+    {
+      id: "project-tab-work-orders",
+      title: tProject("tabs.workOrders"),
+      content: <WorkOrdersTab />,
+    },
+  ];
+}
+
+function isSettingShown(value: boolean | number | undefined): boolean {
+  return value === true || value === 1;
+}
+
 function passesProjectTypeVisibility(
   tabId: string,
   permissions: ProjectPermissions | null | undefined,
@@ -85,7 +105,7 @@ function passesProjectTypeVisibility(
     case "project-tab-cadre":
       return permissions.employee_contract_setting?.is_all_data_visible === 1;
     case "project-tab-contractors":
-      return permissions.contractor_contract_setting?.is_all_data_visible === 1;
+      return isSettingShown(permissions.contractor_setting?.is_shown);
     case "project-tab-roles":
       return (
         permissions.roles_and_permissions_setting?.is_all_data_visible === 1
@@ -97,7 +117,7 @@ function passesProjectTypeVisibility(
     case "project-tab-attachments":
       return permissions.archive_library_setting?.is_all_data_visible === 1;
     case "project-tab-maintenance":
-      return permissions.maintenance_emergency_setting?.is_shown === 1;
+      return isSettingShown(permissions.maintenance_emergency_setting?.is_shown);
     default:
       return true;
   }
@@ -174,6 +194,7 @@ export function useProjectTabsList(): SystemTab[] {
       content: <MaintenanceEmergencyTab />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
+    const constructionSubTabs = createConstructionSubTabs(tProject);
 
     const ownerCompanyId = projectData?.company_id;
     const currentCompanyId = authCompanyData?.payload?.id;
@@ -204,6 +225,27 @@ export function useProjectTabsList(): SystemTab[] {
           }
         : null;
 
+    const visibleConstructionSubs = constructionSubTabs.filter((tab) =>
+      shouldShowTopLevelTab(
+        tab.id,
+        permissions,
+        projectId,
+        flatPermissionsFetched,
+        flatPerms,
+      ),
+    );
+
+    const constructionsTab: SystemTab | null =
+      visibleConstructionSubs.length > 0
+        ? {
+            id: CONSTRUCTIONS_GROUP_ID,
+            title: tProject("tabs.constructions"),
+            icon: <Building2 className="w-4 h-4" />,
+            content: <></>,
+            nestedTabs: visibleConstructionSubs,
+          }
+        : null;
+
     const topLevel: SystemTab[] = [];
     if (
       shouldShowTopLevelTab(
@@ -218,6 +260,8 @@ export function useProjectTabsList(): SystemTab[] {
     }
 
     if (stakeholdersTab) topLevel.push(stakeholdersTab);
+
+    if (constructionsTab) topLevel.push(constructionsTab);
 
     if (
       shouldShowTopLevelTab(

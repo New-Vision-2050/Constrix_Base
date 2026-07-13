@@ -81,7 +81,7 @@ export default function ProjectTabsLayout({
     return activeMainTab?.content ?? null;
   }, [activeMainTab, nestedTabs, activeNestedTab]);
 
-  const showNestedTabsRow = Boolean(nestedTabs && nestedTabs.length > 1);
+  const showNestedTabsRow = Boolean(nestedTabs?.length);
 
   if (!tabsList.length) {
     return null;

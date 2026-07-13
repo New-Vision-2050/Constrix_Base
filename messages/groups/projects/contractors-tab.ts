@@ -3,6 +3,14 @@ import { MessagesGroup, _m } from "../../types";
 export const projectContractorsTabMessages = new MessagesGroup({
   searchPlaceholder: _m("Search contractors", "بحث"),
   addContractor: _m("Add contractor", "إضافة مقاول"),
+  loadError: _m("Could not load contractors", "تعذر تحميل المقاولين"),
+  deleteSuccess: _m("Contractor removed", "تم حذف المقاول"),
+  deleteError: _m("Could not remove contractor", "تعذر حذف المقاول"),
+  deleteConfirmTitle: _m("Delete contractor", "حذف المقاول"),
+  deleteConfirmMessage: _m(
+    "Are you sure you want to delete this contractor? This action cannot be undone.",
+    "هل أنت متأكد من حذف هذا المقاول؟ لا يمكن التراجع عن هذا الإجراء.",
+  ),
   emptyDash: _m("—", "—"),
   table: new MessagesGroup({
     name: _m("Contractor name", "اسم المقاول"),
@@ -17,6 +25,7 @@ export const projectContractorsTabMessages = new MessagesGroup({
     actions: _m("Actions", "الإجراءات"),
     action: _m("Action", "إجراء"),
     edit: _m("Edit", "تعديل"),
+    delete: _m("Delete", "حذف"),
   }),
   status: new MessagesGroup({
     active: _m("Active", "نشط"),
@@ -24,6 +33,7 @@ export const projectContractorsTabMessages = new MessagesGroup({
   }),
   dialog: new MessagesGroup({
     title: _m("Add contractor", "اضافة مقاول"),
+    editTitle: _m("Edit contractor", "تعديل مقاول"),
     cancel: _m("Cancel", "الغاء"),
     next: _m("Next", "التالي"),
     back: _m("Back", "تراجع"),
@@ -32,6 +42,13 @@ export const projectContractorsTabMessages = new MessagesGroup({
     copyFailed: _m("Could not copy", "تعذر النسخ"),
     submit: _m("Submit", "حفظ"),
     submitSuccess: _m("Contractor added successfully", "تمت إضافة المقاول بنجاح"),
+    submitError: _m("Could not add contractor", "تعذر إضافة المقاول"),
+    updateSuccess: _m("Contractor updated successfully", "تم تحديث المقاول بنجاح"),
+    updateError: _m("Could not update contractor", "تعذر تحديث المقاول"),
+    loadContractorError: _m(
+      "Could not load contractor details",
+      "تعذر تحميل بيانات المقاول",
+    ),
     emptyDash: _m("—", "—"),
     steps: new MessagesGroup({
       contractorInfo: _m("Contractor information", "معلومات المقاول"),
@@ -97,6 +114,11 @@ export const projectContractorsTabMessages = new MessagesGroup({
       representativesRequired: _m(
         "Add at least one representative",
         "أضف مندوباً واحداً على الأقل",
+      ),
+      countryRequired: _m("Country is required", "الدولة مطلوبة"),
+      managerNationalityRequired: _m(
+        "Project manager nationality is required",
+        "جنسية مدير المشروع مطلوبة",
       ),
       confirmRequired: _m(
         "Please confirm the data review",

@@ -2,6 +2,7 @@ import { MessagesGroup, _m } from "../../types";
 import { projectInboxMessages } from "./inbox";
 import { projectShareTabMessages } from "./share-tab";
 import { projectContractorsTabMessages } from "./contractors-tab";
+import { projectWorkOrdersTabMessages } from "./work-orders-tab";
 import { projectSettingsMessages } from "./settings";
 
 export const projectMessages = new MessagesGroup({
@@ -9,6 +10,7 @@ export const projectMessages = new MessagesGroup({
   inbox: projectInboxMessages,
   shareTab: projectShareTabMessages,
   contractorsTab: projectContractorsTabMessages,
+  workOrdersTab: projectWorkOrdersTabMessages,
   tabs: new MessagesGroup({
     attachments: _m("Attachments", "المرفقات"),
     documentCycle: _m("Document cycle", "دورة الوثائق"),
@@ -22,6 +24,8 @@ export const projectMessages = new MessagesGroup({
       "Maintenance & Emergencies",
       "الصيانة والطوارئ",
     ),
+    constructions: _m("Constructions", "الانشاءات"),
+    workOrders: _m("Work orders", "اوامر العمل"),
   }),
   addProject: _m("Add Project", "إضافة مشروع"),
   editProject: _m("Edit Project", "تعديل مشروع"),
