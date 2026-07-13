@@ -29,6 +29,8 @@ import { useToast } from "@/modules/table/hooks/use-toast";
 import CustomMenu from "@/components/headless/custom-menu";
 import AddStageDialog from "./dialogs/AddStageDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
+import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
+import DocumentStageCard from "./DocumentStageCard";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { getProcedureSettingsTabTitle } from "../utils/getProcedureTabTitle";
@@ -39,6 +41,7 @@ import {
   ProcedureStep,
   GetStepsResponse,
 } from "@/services/api/crm-settings/procedure-settings/types/response";
+import { useProceduresSettings } from "../context/ProceduresSettingsContext";
 
 interface StagesViewProps {
   parentId?: string;
@@ -49,13 +52,16 @@ interface StagesViewProps {
 
 export interface StagesViewRef {
   openAddProcedureDialog: () => void;
+  addStage: () => void;
 }
 
 const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesView(
   { parentId, currentTabType, branchId, workFlowId: workFlowIdProp },
   ref,
 ) {
-  const { t } = useProceduresSettingsTranslations();
+  const { t, ts } = useProceduresSettingsTranslations();
+  const { addProcedureVariant } = useProceduresSettings();
+  const useDocumentAddDialog = addProcedureVariant === "document-classification";
   const tConfirm = useTranslations("common.deleteConfirmation");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -112,8 +118,21 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
   );
   const [pendingDraftKeys, setPendingDraftKeys] = useState<string[]>([]);
 
+  const handleAddStep = () => {
+    const key = crypto.randomUUID();
+    if (selectedProcedureId) {
+      setDraftStepKeys((prev) => ({
+        ...prev,
+        [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
+      }));
+    } else {
+      setPendingDraftKeys((prev) => [...prev, key]);
+    }
+  };
+
   useImperativeHandle(ref, () => ({
     openAddProcedureDialog: () => setAddDialogOpen(true),
+    addStage: handleAddStep,
   }));
 
   useEffect(() => {
@@ -179,18 +198,6 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
         description: t("messages.error"),
         variant: "destructive",
       });
-    }
-  };
-
-  const handleAddStep = () => {
-    const key = crypto.randomUUID();
-    if (selectedProcedureId) {
-      setDraftStepKeys((prev) => ({
-        ...prev,
-        [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
-      }));
-    } else {
-      setPendingDraftKeys((prev) => [...prev, key]);
     }
   };
 
@@ -299,6 +306,312 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(function StagesVie
   const currentDraftKeys = selectedProcedureId
     ? (draftStepKeys[selectedProcedureId] ?? [])
     : [];
+
+  const hasAnySteps =
+    pendingDraftKeys.length > 0 ||
+    serverSteps.length > 0 ||
+    currentDraftKeys.length > 0;
+
+  const modelTabName = useMemo(() => {
+    if (!currentTabType) return "";
+    try {
+      if (currentTabType === "correspondence") return ts("correspondence");
+      if (currentTabType === "technical_submittal") return ts("technicalSubmittal");
+      if (currentTabType === "ncr") return ts("ncr");
+      if (currentTabType === "vo") return ts("vo");
+    } catch {
+      /* fallback below */
+    }
+    return currentTabType;
+  }, [currentTabType, ts]);
+
+  const documentStagesContent = (
+    <>
+      {pendingDraftKeys.map((draftKey, index) => (
+        <DocumentStageCard
+          key={`pending-${draftKey}`}
+          procedureSettingId={selectedProcedureId ?? ""}
+          serverStep={null}
+          stepIndex={index + 1}
+          onSaved={() => {
+            setPendingDraftKeys((prev) =>
+              prev.filter((k) => k !== draftKey),
+            );
+            if (selectedProcedureId)
+              queryClient.invalidateQueries({
+                queryKey: ["procedure-steps", selectedProcedureId],
+              });
+          }}
+          onDelete={() =>
+            setPendingDraftKeys((prev) =>
+              prev.filter((k) => k !== draftKey),
+            )
+          }
+          onCopy={handleAddStep}
+        />
+      ))}
+      {serverSteps.map((step, index) => (
+        <DocumentStageCard
+          key={`server-${step.id}`}
+          procedureSettingId={selectedProcedureId!}
+          serverStep={step}
+          stepIndex={pendingDraftKeys.length + index + 1}
+          onSaved={() => handleStepSaved(selectedProcedureId!)}
+          onDelete={() =>
+            handleDeleteServerStep(selectedProcedureId!, step.id)
+          }
+          onCopy={handleAddStep}
+        />
+      ))}
+      {currentDraftKeys.map((draftKey, index) => (
+        <DocumentStageCard
+          key={`draft-${draftKey}`}
+          procedureSettingId={selectedProcedureId!}
+          serverStep={null}
+          stepIndex={
+            pendingDraftKeys.length + serverSteps.length + index + 1
+          }
+          onSaved={() => handleStepSaved(selectedProcedureId!, draftKey)}
+          onDelete={() => removeDraftStep(selectedProcedureId!, draftKey)}
+          onCopy={handleAddStep}
+        />
+      ))}
+    </>
+  );
+
+  if (useDocumentAddDialog) {
+    return (
+      <Box>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <Box
+              sx={{
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+                minHeight: 320,
+              }}
+            >
+              {procedures.map((procedure: Stage) => (
+                <Box
+                  key={procedure.id}
+                  onClick={() => setSelectedProcedureId(procedure.id)}
+                  sx={{
+                    px: 1.5,
+                    py: 1.25,
+                    mb: 1,
+                    cursor: "pointer",
+                    borderRadius: 1.5,
+                    bgcolor:
+                      selectedProcedureId === procedure.id
+                        ? "action.selected"
+                        : "action.hover",
+                    border: "1px solid",
+                    borderColor:
+                      selectedProcedureId === procedure.id
+                        ? "primary.main"
+                        : "transparent",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={600}
+                      sx={{ flex: 1 }}
+                    >
+                      {procedure.name}
+                    </Typography>
+                    <CustomMenu
+                      renderAnchor={({ onClick }) => (
+                        <IconButton
+                          size="small"
+                          aria-label={t("stages.editStage")}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onClick(e);
+                          }}
+                        >
+                          <Settings sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      )}
+                    >
+                      <MenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setProcedureToEdit(procedure);
+                          setEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit fontSize="small" sx={{ mr: 1 }} />
+                        {t("actions.edit")}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setProcedureToDelete(procedure);
+                          setDeleteConfirmOpen(true);
+                        }}
+                        sx={{ color: "error.main" }}
+                      >
+                        <Delete fontSize="small" sx={{ mr: 1 }} />
+                        {t("actions.delete")}
+                      </MenuItem>
+                    </CustomMenu>
+                  </Box>
+                </Box>
+              ))}
+
+              <Button
+                variant="text"
+                color="primary"
+                startIcon={<AddIcon />}
+                fullWidth
+                onClick={() => setAddDialogOpen(true)}
+                sx={{
+                  justifyContent: "flex-start",
+                  mt: 1,
+                  fontWeight: 600,
+                  px: 1,
+                }}
+              >
+                {t("procedures.addProcedure")}
+              </Button>
+            </Box>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 9 }}>
+            <Box
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                bgcolor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+                minHeight: 320,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" fontWeight={700} sx={{ mb: 0.75 }}>
+                  {t("steps.modelStagesTitle", { name: modelTabName })}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t("steps.modelStagesDescription")}
+                </Typography>
+              </Box>
+
+              <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                {hasAnySteps ? (
+                  <Box className="space-y-4">{documentStagesContent}</Box>
+                ) : (
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      py: 6,
+                    }}
+                  >
+                    <Typography color="text.secondary" fontWeight={500}>
+                      {t("steps.noStagesAdded")}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+
+        <DocumentClassificationAddProcedureDialog
+          open={addDialogOpen}
+          onClose={() => setAddDialogOpen(false)}
+          procedureType={currentTabType ?? ""}
+          onSave={async (values) => {
+            await handleCreateProcedure({
+              name: values.name,
+              type: currentTabType ?? "",
+              execute_type: "sequence",
+              icon: "settings",
+              percentage: 0,
+              deadline_days: 1,
+              deadline_hours: 0,
+              escalation_management_hierarchy_id: "",
+            });
+          }}
+        />
+        <EditStageDialog
+          open={editDialogOpen}
+          onClose={() => {
+            setEditDialogOpen(false);
+            setProcedureToEdit(null);
+          }}
+          procedure={procedureToEdit}
+          onDeleted={(procedureId) => {
+            setDraftStepKeys((prev) => {
+              const next = { ...prev };
+              delete next[procedureId];
+              return next;
+            });
+            queryClient.removeQueries({
+              queryKey: ["procedure-steps", procedureId],
+            });
+          }}
+          onSuccess={async () => {
+            await refetch();
+            if (procedureToEdit) {
+              await queryClient.invalidateQueries({
+                queryKey: ["procedure-steps", procedureToEdit.id],
+              });
+            }
+          }}
+        />
+        <Dialog
+          open={deleteConfirmOpen}
+          onClose={closeDeleteConfirm}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle sx={{ textAlign: "start" }}>
+            {t("actions.delete")}
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" color="text.secondary">
+              {tConfirm("defaultMessage")}
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2.5, gap: 1.5 }}>
+            <Button
+              onClick={closeDeleteConfirm}
+              variant="outlined"
+              disabled={isDeletingProcedure}
+              sx={{ flex: 1 }}
+            >
+              {t("actions.cancel")}
+            </Button>
+            <Button
+              onClick={confirmDeleteProcedure}
+              variant="contained"
+              color="error"
+              disabled={isDeletingProcedure}
+              sx={{ flex: 1 }}
+            >
+              {t("actions.delete")}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    );
+  }
 
   return (
     <Box>

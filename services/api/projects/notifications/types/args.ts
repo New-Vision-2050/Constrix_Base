@@ -36,6 +36,8 @@ export type ProjectNotificationsExportArgs = ProjectNotificationScopeArgs & {
 
 export type ProjectNotificationsMapTasksArgs = ProjectNotificationScopeArgs & {
   status?: string;
+  date_from?: string;
+  date_to?: string;
 };
 
 export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScopeArgs & {

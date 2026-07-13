@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import {
+  FileText,
   Paperclip,
   UserCog,
   Users,
@@ -15,9 +16,12 @@ import AttachmentsTab from "../tabs/attachments";
 import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
 import DocumentCycleTab from "../tabs/document-cycle";
+import DocumentRequirementsTab from "../tabs/document-requirements";
+import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
+const DOCUMENT_MANAGEMENT_GROUP_ID = "engagement-tab-document-management";
 
 export function useContractualEngagementTabsList(): SystemTab[] {
   const tProject = useTranslations("project");
@@ -53,11 +57,29 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       nestedTabs: stakeholderSubTabs,
     };
 
-    const documentCycleTab: SystemTab = {
-      id: "engagement-tab-document-cycle",
-      title: tProject("tabs.documentCycle"),
-      icon: <FolderSyncIconWithCount />,
-      content: <DocumentCycleTab />,
+    const documentManagementTab: SystemTab = {
+      id: DOCUMENT_MANAGEMENT_GROUP_ID,
+      title: tProject("tabs.documentManagement"),
+      icon: <FileText className="w-4 h-4" />,
+      content: <></>,
+      nestedTabs: [
+        {
+          id: "engagement-tab-document-cycle",
+          title: tProject("tabs.documentCycle"),
+          icon: <FolderSyncIconWithCount />,
+          content: <DocumentCycleTab />,
+        },
+        {
+          id: "engagement-tab-sequence-of-procedures",
+          title: tProject("tabs.sequenceOfProcedures"),
+          content: <SequenceOfProceduresTab />,
+        },
+        {
+          id: "engagement-tab-document-requirements",
+          title: tProject("tabs.documentRequirements"),
+          content: <DocumentRequirementsTab />,
+        },
+      ],
     };
 
     const maintenanceTab: SystemTab = {
@@ -70,7 +92,7 @@ export function useContractualEngagementTabsList(): SystemTab[] {
     return [
       attachmentsTab,
       stakeholdersTab,
-      documentCycleTab,
+      documentManagementTab,
       maintenanceTab,
     ];
   }, [tProject]);

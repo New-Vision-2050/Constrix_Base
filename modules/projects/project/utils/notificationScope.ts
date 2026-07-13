@@ -56,11 +56,14 @@ export function buildNotificationsExportArgs(
 
 export function buildNotificationsMapTasksArgs(
   scope: NotificationScope,
-  status?: string,
+  params: Omit<
+    ProjectNotificationsMapTasksArgs,
+    "project_id" | "contractual_engagement_key"
+  > = {},
 ): ProjectNotificationsMapTasksArgs {
   return {
     ...buildNotificationScopeParams(scope),
-    ...(status ? { status } : {}),
+    ...params,
   } as ProjectNotificationsMapTasksArgs;
 }
 
