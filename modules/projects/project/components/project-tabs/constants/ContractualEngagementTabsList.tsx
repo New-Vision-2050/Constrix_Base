@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import {
+  FileText,
   Paperclip,
   UserCog,
   Users,
@@ -18,11 +19,14 @@ import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
 import ContractorsTab from "../tabs/contractors";
 import DocumentCycleTab from "../tabs/document-cycle";
+import DocumentRequirementsTab from "../tabs/document-requirements";
+import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 import WorkOrdersTab from "../tabs/work-orders";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
 const CONSTRUCTIONS_GROUP_ID = "engagement-tab-constructions";
+const DOCUMENT_MANAGEMENT_GROUP_ID = "engagement-tab-document-management";
 
 export function useContractualEngagementTabsList(): SystemTab[] {
   const tProject = useTranslations("project");
