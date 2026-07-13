@@ -13,6 +13,7 @@ import {
   UsersRound,
   Wrench,
   HardHat,
+  Building2,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -37,9 +38,11 @@ import {
 import ShareTab from "../tabs/share";
 import ContractorsTab from "../tabs/contractors";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
+import WorkOrdersTab from "../tabs/work-orders";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
+const CONSTRUCTIONS_GROUP_ID = "project-tab-constructions";
 
 function isSettingShown(value: boolean | number | undefined | null): boolean {
   return value === true || value === 1;
@@ -103,6 +106,19 @@ function createDocumentManagementSubTabs(
       id: "project-tab-document-requirements",
       title: tProject("tabs.documentRequirements"),
       content: <DocumentRequirementsTab />,
+    },
+  ];
+}
+
+/** Sub-sections under «الانشاءات». */
+function createConstructionsSubTabs(
+  tProject: ReturnType<typeof useTranslations<"project">>,
+): SystemTab[] {
+  return [
+    {
+      id: "project-tab-work-orders",
+      title: tProject("tabs.workOrders"),
+      content: <WorkOrdersTab />,
     },
   ];
 }
@@ -207,6 +223,7 @@ export function useProjectTabsList(): SystemTab[] {
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
     const documentManagementSubTabs = createDocumentManagementSubTabs(tProject);
+    const constructionsSubTabs = createConstructionsSubTabs(tProject);
 
     const ownerCompanyId = projectData?.company_id;
     const currentCompanyId = authCompanyData?.payload?.id;
@@ -259,6 +276,27 @@ export function useProjectTabsList(): SystemTab[] {
           }
         : null;
 
+    const visibleConstructionsSubs = constructionsSubTabs.filter((tab) =>
+      shouldShowTopLevelTab(
+        tab.id,
+        permissions,
+        projectId,
+        flatPermissionsFetched,
+        flatPerms,
+      ),
+    );
+
+    const constructionsTab: SystemTab | null =
+      visibleConstructionsSubs.length > 0
+        ? {
+            id: CONSTRUCTIONS_GROUP_ID,
+            title: tProject("tabs.constructions"),
+            icon: <Building2 className="w-4 h-4" />,
+            content: <></>,
+            nestedTabs: visibleConstructionsSubs,
+          }
+        : null;
+
     const topLevel: SystemTab[] = [];
     if (
       shouldShowTopLevelTab(
@@ -273,6 +311,8 @@ export function useProjectTabsList(): SystemTab[] {
     }
 
     if (stakeholdersTab) topLevel.push(stakeholdersTab);
+
+    if (constructionsTab) topLevel.push(constructionsTab);
 
     if (documentManagementTab) topLevel.push(documentManagementTab);
 

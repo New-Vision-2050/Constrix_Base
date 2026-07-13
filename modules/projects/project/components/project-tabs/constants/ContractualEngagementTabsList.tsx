@@ -11,6 +11,7 @@ import {
   UsersRound,
   Wrench,
   HardHat,
+  Building2,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import AttachmentsTab from "../tabs/attachments";
@@ -21,9 +22,11 @@ import DocumentCycleTab from "../tabs/document-cycle";
 import DocumentRequirementsTab from "../tabs/document-requirements";
 import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
+import WorkOrdersTab from "../tabs/work-orders";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "engagement-tab-document-management";
+const CONSTRUCTIONS_GROUP_ID = "engagement-tab-constructions";
 
 export function useContractualEngagementTabsList(): SystemTab[] {
   const tProject = useTranslations("project");
@@ -90,6 +93,20 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       ],
     };
 
+    const constructionsTab: SystemTab = {
+      id: CONSTRUCTIONS_GROUP_ID,
+      title: tProject("tabs.constructions"),
+      icon: <Building2 className="w-4 h-4" />,
+      content: <></>,
+      nestedTabs: [
+        {
+          id: "engagement-tab-work-orders",
+          title: tProject("tabs.workOrders"),
+          content: <WorkOrdersTab />,
+        },
+      ],
+    };
+
     const maintenanceTab: SystemTab = {
       id: "engagement-tab-maintenance",
       title: tProject("tabs.maintenanceAndEmergencies"),
@@ -100,6 +117,7 @@ export function useContractualEngagementTabsList(): SystemTab[] {
     return [
       attachmentsTab,
       stakeholdersTab,
+      constructionsTab,
       documentManagementTab,
       maintenanceTab,
     ];
