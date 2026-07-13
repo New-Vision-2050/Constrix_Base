@@ -84,8 +84,6 @@ function createStakeholderSubTabs(
 
 /** Sub-sections under «الانشاءات». */
 function createConstructionSubTabs(
-/** Sub-sections under «إدارة الوثائق». */
-function createDocumentManagementSubTabs(
   tProject: ReturnType<typeof useTranslations<"project">>,
 ): SystemTab[] {
   return [
@@ -97,10 +95,12 @@ function createDocumentManagementSubTabs(
   ];
 }
 
-function isSettingShown(value: boolean | number | undefined): boolean {
-  return value === true || value === 1;
-}
-
+/** Sub-sections under «إدارة الوثائق». */
+function createDocumentManagementSubTabs(
+  tProject: ReturnType<typeof useTranslations<"project">>,
+): SystemTab[] {
+  return [
+    {
       id: "project-tab-document-cycle",
       title: tProject("tabs.documentCycle"),
       icon: <FolderSyncIconWithCount />,
@@ -117,6 +117,10 @@ function isSettingShown(value: boolean | number | undefined): boolean {
       content: <DocumentRequirementsTab />,
     },
   ];
+}
+
+function isSettingShown(value: boolean | number | undefined): boolean {
+  return value === true || value === 1;
 }
 
 function passesProjectTypeVisibility(
@@ -267,6 +271,9 @@ export function useProjectTabsList(): SystemTab[] {
             icon: <Building2 className="w-4 h-4" />,
             content: <></>,
             nestedTabs: visibleConstructionSubs,
+          }
+        : null;
+
     const visibleDocumentManagementSubs = documentManagementSubTabs.filter(
       (tab) =>
         shouldShowTopLevelTab(
@@ -306,17 +313,6 @@ export function useProjectTabsList(): SystemTab[] {
 
     if (constructionsTab) topLevel.push(constructionsTab);
 
-    if (
-      shouldShowTopLevelTab(
-        "project-tab-document-cycle",
-        permissions,
-        projectId,
-        flatPermissionsFetched,
-        flatPerms,
-      )
-    ) {
-      topLevel.push(documentCycleTab);
-    }
     if (documentManagementTab) topLevel.push(documentManagementTab);
 
     if (
