@@ -1,7 +1,7 @@
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import type {
   UpdateArchiveLibrarySettingsArgs,
-  UpdateContractorContractSettingsArgs,
+  UpdateContractorSettingsArgs,
   UpdateDataSettingsArgs,
   UpdateEmployeeContractSettingsArgs,
   UpdateAttachmentCycleSettingsArgs,
@@ -12,7 +12,7 @@ import type {
 import type {
   ArchiveLibrarySettings,
   AttachmentCycleSettings,
-  ContractorContractSettings,
+  ContractorSettings,
   DataSettings,
   EmployeeContractSettings,
   RolesAndPermissionsSettings,
@@ -32,7 +32,12 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
 ]);
 
 /** Tabs grouped under «أصحاب المصلحة» in schema settings (not attachments / document-cycle). */
-export const STAKEHOLDER_GROUP_TAB_VALUES = ["team", "roles-and-permissions", "project-sharing"] as const;
+export const STAKEHOLDER_GROUP_TAB_VALUES = [
+  "contractors",
+  "team",
+  "roles-and-permissions",
+  "project-sharing",
+] as const;
 
 const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
   "is_reference_number",
@@ -55,7 +60,7 @@ export function getTabBulkCheckboxState(
   data: {
     dataSettings: DataSettings | null | undefined;
     archiveLibrary: ArchiveLibrarySettings | null | undefined;
-    contractor: ContractorContractSettings | null | undefined;
+    contractor: ContractorSettings | null | undefined;
     employee: EmployeeContractSettings | null | undefined;
     attachmentCycle: AttachmentCycleSettings | null | undefined;
     rolesAndPermissions: RolesAndPermissionsSettings | null | undefined;
@@ -84,7 +89,7 @@ export function getTabBulkCheckboxState(
   }
 
   if (tabValue === "contractors") {
-    const v = data.contractor?.is_all_data_visible;
+    const v = data.contractor?.is_shown;
     if (v === undefined) return null;
     return {
       checked: isTruthySetting(v),
@@ -199,10 +204,10 @@ export async function bulkToggleTabSettings(
       return;
     }
     case "contractors": {
-      const payload: UpdateContractorContractSettingsArgs = {
-        is_all_data_visible: v,
+      const payload: UpdateContractorSettingsArgs = {
+        is_shown: v,
       };
-      await ProjectTypesApi.updateContractorContractSettings(
+      await ProjectTypesApi.updateContractorSettings(
         projectTypeId,
         payload,
       );

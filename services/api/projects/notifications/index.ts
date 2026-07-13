@@ -204,6 +204,11 @@ export const ProjectNotificationsApi = {
       `projects/notifications/${encodeURIComponent(notificationId)}/site-status-updates`,
     ),
 
+  getCopiedSiteStatusUpdates: (notificationId: string) =>
+    baseApi.get<SiteStatusUpdatesResponse>(
+      `projects/notifications/${encodeURIComponent(notificationId)}/site-status-updates/copied`,
+    ),
+
   getNotes: (notificationId: string) =>
     baseApi.get<ProjectNotificationNotesResponse>(
       `projects/notifications/${encodeURIComponent(notificationId)}/notes`,

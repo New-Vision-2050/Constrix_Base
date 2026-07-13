@@ -1,12 +1,16 @@
 import { MessagesGroup, _m } from "../../types";
 import { projectInboxMessages } from "./inbox";
 import { projectShareTabMessages } from "./share-tab";
+import { projectContractorsTabMessages } from "./contractors-tab";
+import { projectWorkOrdersTabMessages } from "./work-orders-tab";
 import { projectSettingsMessages } from "./settings";
 
 export const projectMessages = new MessagesGroup({
   Settings: projectSettingsMessages,
   inbox: projectInboxMessages,
   shareTab: projectShareTabMessages,
+  contractorsTab: projectContractorsTabMessages,
+  workOrdersTab: projectWorkOrdersTabMessages,
   tabs: new MessagesGroup({
     attachments: _m("Attachments", "المرفقات"),
     documentManagement: _m("Document Management", "إدارة الوثائق"),
@@ -19,12 +23,15 @@ export const projectMessages = new MessagesGroup({
     stakeholders: _m("Stakeholders", "أصحاب المصلحة"),
     concernedParties: _m("Concerned parties", "المعنيين"),
     staff: _m("Staff", "الكادر"),
+    contractors: _m("Contractors", "المقاولين"),
     rolesAndPermissions: _m("Roles and permissions", "الأدوار والصلاحيات"),
     sharedEntities: _m("Shared entities", "الجهات المشاركة"),
     maintenanceAndEmergencies: _m(
       "Maintenance & Emergencies",
       "الصيانة والطوارئ",
     ),
+    constructions: _m("Constructions", "الانشاءات"),
+    workOrders: _m("Work orders", "اوامر العمل"),
   }),
   addProject: _m("Add Project", "إضافة مشروع"),
   editProject: _m("Edit Project", "تعديل مشروع"),
@@ -623,6 +630,9 @@ export const projectMessages = new MessagesGroup({
       selectEmployees: _m("Select employees", "اختر الموظفين"),
       assignment: _m("Assign", "إسناد"),
       employeeStatus: _m("Employee Status", "حالة الموظف"),
+      attendance: _m("Attendance", "الحضور"),
+      locationSource: _m("Location source", "مصدر الموقع"),
+      accuracy: _m("Accuracy", "الدقة"),
       currentLocation: _m("Current Location", "الموقع الحالي"),
       available: _m("Available", "متاح"),
       busy: _m("Busy", "مشغول"),
@@ -703,6 +713,7 @@ export const projectMessages = new MessagesGroup({
       more: _m("More", "المزيد"),
       // Site status updates
       siteStatusUpdates: _m("Site Status Updates", "التحديث الدوري للموقع"),
+      copiedSiteStatusUpdates: _m("Copied Updates", "التحديثات المنسوخة"),
       siteStatusTotal: _m("Total", "الإجمالي"),
       siteStatusApproved: _m("Approved", "معتمد"),
       siteStatusPending: _m("Pending", "قيد الانتظار"),
@@ -714,10 +725,16 @@ export const projectMessages = new MessagesGroup({
         "No site status updates",
         "لا توجد تحديثات للموقع",
       ),
+      noCopiedSiteStatusUpdates: _m(
+        "No copied site status updates",
+        "لا توجد تحديثات منسوخة للموقع",
+      ),
       siteStatusLoadError: _m(
         "Could not load site status updates",
         "تعذر تحميل تحديثات الموقع",
       ),
+      siteStatusOriginal: _m("Original", "أصلي"),
+      siteStatusCopied: _m("Copied", "منسوخ"),
       // Notes
       noNotes: _m("No notes yet", "لا توجد ملاحظات بعد"),
       writeNote: _m("Write a note…", "اكتب ملاحظة…"),

@@ -10,11 +10,13 @@ import {
   Users,
   UsersRound,
   Wrench,
+  HardHat,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import AttachmentsTab from "../tabs/attachments";
 import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
+import ContractorsTab from "../tabs/contractors";
 import DocumentCycleTab from "../tabs/document-cycle";
 import DocumentRequirementsTab from "../tabs/document-requirements";
 import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
@@ -46,6 +48,12 @@ export function useContractualEngagementTabsList(): SystemTab[] {
         title: tProject("tabs.staff"),
         icon: <UsersRound className="w-4 h-4" />,
         content: <CadreTab />,
+      },
+      {
+        id: "engagement-tab-contractors",
+        title: tProject("tabs.contractors"),
+        icon: <HardHat className="w-4 h-4" />,
+        content: <ContractorsTab />,
       },
     ];
 

@@ -5,40 +5,44 @@ import { Box, Typography } from "@mui/material";
 import HorizontalSwitch from "@/modules/projects/settings/components/horizontal-switch";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
-import { UpdateContractorContractSettingsArgs } from "@/services/api/projects/project-types/types/args";
+import { UpdateContractorSettingsArgs } from "@/services/api/projects/project-types/types/args";
 
 interface ContractorsProps {
     projectTypeId: number | null;
+}
+
+function isContractorShown(value: boolean | number | undefined): boolean {
+    return value === true || value === 1;
 }
 
 function Contractors({ projectTypeId }: ContractorsProps) {
     const queryClient = useQueryClient();
 
     const { data, isLoading } = useQuery({
-        queryKey: ["contractor-contract-settings", projectTypeId],
+        queryKey: ["contractor-settings", projectTypeId],
         queryFn: async () => {
             if (!projectTypeId) return null;
-            const response = await ProjectTypesApi.getContractorContractSettings(projectTypeId);
+            const response = await ProjectTypesApi.getContractorSettings(projectTypeId);
             return response.data.payload;
         },
         enabled: projectTypeId !== null,
     });
 
     const updateMutation = useMutation({
-        mutationFn: async (args: UpdateContractorContractSettingsArgs) => {
+        mutationFn: async (args: UpdateContractorSettingsArgs) => {
             if (!projectTypeId) throw new Error("No project type ID");
-            return ProjectTypesApi.updateContractorContractSettings(projectTypeId, args);
+            return ProjectTypesApi.updateContractorSettings(projectTypeId, args);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["contractor-contract-settings", projectTypeId],
+                queryKey: ["contractor-settings", projectTypeId],
             });
         },
     });
 
     const handleSwitchChange = (checked: boolean) => {
         updateMutation.mutate({
-            is_all_data_visible: checked ? 1 : 0,
+            is_shown: checked ? 1 : 0,
         });
     };
 
@@ -52,17 +56,15 @@ function Contractors({ projectTypeId }: ContractorsProps) {
 
     return (
         <div className="w-full">
-            {/* Header with Add Button */}
             <Box className="flex justify-between items-center mb-6">
                 <Typography variant="h5" fontWeight="bold">
                    المقاولين
                 </Typography>
             </Box>
 
-            {/* Attachment Items List */}
             <div className="space-y-2">
                 <HorizontalSwitch
-                    checked={data?.is_all_data_visible === 1}
+                    checked={isContractorShown(data?.is_shown)}
                     onChange={handleSwitchChange}
                     label="إظهار جميع بيانات الخاصة بالمقاولين"
                     disabled={updateMutation.isPending}

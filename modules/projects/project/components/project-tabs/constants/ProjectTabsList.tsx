@@ -12,6 +12,7 @@ import {
   Users,
   UsersRound,
   Wrench,
+  HardHat,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -34,10 +35,15 @@ import {
   hasAnyMaintenanceTabPermission,
 } from "@/modules/projects/project/utils/projectMyPermissions";
 import ShareTab from "../tabs/share";
+import ContractorsTab from "../tabs/contractors";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
+
+function isSettingShown(value: boolean | number | undefined | null): boolean {
+  return value === true || value === 1;
+}
 
 /** Sub-sections under «أصحاب المصلحة» (RTL: المعنيين on the right). */
 function createStakeholderSubTabs(
@@ -55,6 +61,12 @@ function createStakeholderSubTabs(
       title: tProject("tabs.staff"),
       icon: <UsersRound className="w-4 h-4" />,
       content: <CadreTab />,
+    },
+    {
+      id: "project-tab-contractors",
+      title: tProject("tabs.contractors"),
+      icon: <HardHat className="w-4 h-4" />,
+      content: <ContractorsTab />,
     },
     {
       id: "project-tab-roles",
@@ -104,6 +116,8 @@ function passesProjectTypeVisibility(
     case "project-tab-staff":
     case "project-tab-cadre":
       return permissions.employee_contract_setting?.is_all_data_visible === 1;
+    case "project-tab-contractors":
+      return isSettingShown(permissions.contractor_setting?.is_shown);
     case "project-tab-roles":
       return (
         permissions.roles_and_permissions_setting?.is_all_data_visible === 1
@@ -117,7 +131,9 @@ function passesProjectTypeVisibility(
     case "project-tab-attachments":
       return permissions.archive_library_setting?.is_all_data_visible === 1;
     case "project-tab-maintenance":
-      return permissions.maintenance_emergency_setting?.is_shown === 1;
+      return isSettingShown(
+        permissions.maintenance_emergency_setting?.is_shown,
+      );
     default:
       return true;
   }
@@ -190,8 +206,7 @@ export function useProjectTabsList(): SystemTab[] {
       content: <MaintenanceEmergencyTab />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
-    const documentManagementSubTabs =
-      createDocumentManagementSubTabs(tProject);
+    const documentManagementSubTabs = createDocumentManagementSubTabs(tProject);
 
     const ownerCompanyId = projectData?.company_id;
     const currentCompanyId = authCompanyData?.payload?.id;

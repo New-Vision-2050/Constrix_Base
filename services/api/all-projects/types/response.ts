@@ -103,6 +103,14 @@ export interface ContractSetting {
   updated_at: string;
 }
 
+export interface ContractorSetting {
+  id: number;
+  project_type_id: number;
+  is_shown: boolean | number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface MaintenanceEmergencySetting {
   id: number;
   project_type_id: number;
@@ -115,7 +123,7 @@ export interface ProjectPermissions {
   project_data_setting: ProjectDataSetting | null;
   attachment_contract_setting: AttachmentSetting | null;
   attachment_terms_contract_setting: AttachmentSetting | null;
-  contractor_contract_setting: ContractSetting | null;
+  contractor_setting: ContractorSetting | null;
   employee_contract_setting: ContractSetting | null;
   department_contract_setting: ContractSetting | null;
   attachment_cycle_setting: ContractSetting | null;

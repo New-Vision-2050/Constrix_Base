@@ -247,9 +247,9 @@ export default function SchemaLevelTabs({
   });
 
   const contractorSettingsQuery = useQuery({
-    queryKey: ["contractor-contract-settings", thirdLevelId],
+    queryKey: ["contractor-settings", thirdLevelId],
     queryFn: async () => {
-      const response = await ProjectTypesApi.getContractorContractSettings(
+      const response = await ProjectTypesApi.getContractorSettings(
         thirdLevelId!,
       );
       return response.data.payload;
@@ -413,7 +413,7 @@ export default function SchemaLevelTabs({
         queryKey: ["archive-library-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
-        queryKey: ["contractor-contract-settings", thirdLevelId],
+        queryKey: ["contractor-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
         queryKey: ["employee-contract-settings", thirdLevelId],
@@ -550,7 +550,7 @@ export default function SchemaLevelTabs({
         queryKey: ["archive-library-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
-        queryKey: ["contractor-contract-settings", thirdLevelId],
+        queryKey: ["contractor-settings", thirdLevelId],
       });
       await queryClient.invalidateQueries({
         queryKey: ["employee-contract-settings", thirdLevelId],
