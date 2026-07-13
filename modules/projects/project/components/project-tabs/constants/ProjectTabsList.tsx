@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Alert, Box } from "@mui/material";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import {
   FileText,
@@ -21,6 +20,7 @@ import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
 import DocumentCycleTab from "../tabs/document-cycle";
 import DocumentRequirementsTab from "../tabs/document-requirements";
+import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import RolesTab from "../tabs/roles";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
@@ -38,14 +38,6 @@ import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
-
-function ComingSoonTab({ message }: { message: string }) {
-  return (
-    <Box sx={{ p: 4, textAlign: "center" }}>
-      <Alert severity="info">{message}</Alert>
-    </Box>
-  );
-}
 
 /** Sub-sections under «أصحاب المصلحة» (RTL: المعنيين on the right). */
 function createStakeholderSubTabs(
@@ -83,7 +75,6 @@ function createStakeholderSubTabs(
 function createDocumentManagementSubTabs(
   tProject: ReturnType<typeof useTranslations<"project">>,
 ): SystemTab[] {
-  const comingSoon = tProject("maintenanceEmergency.comingSoon");
   return [
     {
       id: "project-tab-document-cycle",
@@ -94,7 +85,7 @@ function createDocumentManagementSubTabs(
     {
       id: "project-tab-sequence-of-procedures",
       title: tProject("tabs.sequenceOfProcedures"),
-      content: <ComingSoonTab message={comingSoon} />,
+      content: <SequenceOfProceduresTab />,
     },
     {
       id: "project-tab-document-requirements",

@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Alert, Box } from "@mui/material";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import {
   FileText,
@@ -18,25 +17,16 @@ import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
 import DocumentCycleTab from "../tabs/document-cycle";
 import DocumentRequirementsTab from "../tabs/document-requirements";
+import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "engagement-tab-document-management";
 
-function ComingSoonTab({ message }: { message: string }) {
-  return (
-    <Box sx={{ p: 4, textAlign: "center" }}>
-      <Alert severity="info">{message}</Alert>
-    </Box>
-  );
-}
-
 export function useContractualEngagementTabsList(): SystemTab[] {
   const tProject = useTranslations("project");
 
   return useMemo(() => {
-    const comingSoon = tProject("maintenanceEmergency.comingSoon");
-
     const attachmentsTab: SystemTab = {
       id: "engagement-tab-attachments",
       title: tProject("tabs.attachments"),
@@ -82,7 +72,7 @@ export function useContractualEngagementTabsList(): SystemTab[] {
         {
           id: "engagement-tab-sequence-of-procedures",
           title: tProject("tabs.sequenceOfProcedures"),
-          content: <ComingSoonTab message={comingSoon} />,
+          content: <SequenceOfProceduresTab />,
         },
         {
           id: "engagement-tab-document-requirements",

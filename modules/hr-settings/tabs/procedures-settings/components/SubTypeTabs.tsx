@@ -49,12 +49,16 @@ import type { TaskActionFormValues } from "../types";
 import StagesView, { type StagesViewRef } from "./StagesView";
 import AddTaskActionDialog from "./dialogs/AddTaskActionDialog";
 import EditTaskActionDialog from "./dialogs/EditTaskActionDialog";
+import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
 
 const WORK_PLAN_TAB = "work_plan";
 
 export default function SubTypeTabs() {
-  const { outerTabs } = useProceduresSettings();
   const { t, ts } = useProceduresSettingsTranslations();
+  const { outerTabs, hideWorkPlanTabs, addProcedureVariant } =
+    useProceduresSettings();
+  const useDocumentSequenceLayout =
+    hideWorkPlanTabs && addProcedureVariant === "document-classification";
   const tConfirm = useTranslations("common.deleteConfirmation");
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -367,6 +371,7 @@ export default function SubTypeTabs() {
   );
 
   const showStagesView =
+    hideWorkPlanTabs ||
     selectedInner === WORK_PLAN_TAB ||
     branchUsesWorkPlan[selectedInner] === false;
 
@@ -446,110 +451,194 @@ export default function SubTypeTabs() {
 
   return (
     <div className="space-y-4">
-      <Paper>
-        <Tabs
-          value={selectedOuter}
-          onChange={(_, val: number) => {
-            setSelectedOuter(val);
-            setSelectedProcedureId(null);
-            setSelectedInner(WORK_PLAN_TAB);
+      {useDocumentSequenceLayout ? (
+        <Paper
+          elevation={0}
+          sx={{
+            px: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            bgcolor: "background.paper",
+            borderRadius: 2,
           }}
-          variant="scrollable"
-          scrollButtons="auto"
         >
-          {outerTabs.map((tab) => (
-            <Tab key={tab.id} value={tab.id} label={ts(tab.name)} />
-          ))}
-        </Tabs>
-      </Paper>
-
-      {activeOuterTab && (
-        <>
-          <Paper
+          <Tabs
+            value={selectedOuter}
+            onChange={(_, val: number) => {
+              setSelectedOuter(val);
+              setSelectedProcedureId(null);
+              setSelectedInner(WORK_PLAN_TAB);
+            }}
+            variant="scrollable"
+            scrollButtons="auto"
             sx={{
-              p: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 2,
-              flexDirection: "row-reverse",
+              flex: 1,
+              minWidth: 0,
+              "& .MuiTabs-indicator": { height: 3, borderRadius: "3px 3px 0 0" },
             }}
           >
-            <PlusIcon
-              className="h-5 w-5 shrink-0 cursor-pointer text-primary rounded-full"
-              onClick={openAddTaskDialog}
-            />
+            {outerTabs.map((tab) => (
+              <Tab
+                key={tab.id}
+                value={tab.id}
+                label={
+                  <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}>
+                    <span>{ts(tab.name)}</span>
+                    <Settings sx={{ fontSize: 16, opacity: 0.85 }} />
+                  </Box>
+                }
+              />
+            ))}
+          </Tabs>
 
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.5,
-                flexWrap: "wrap",
-                justifyContent: "flex-start",
-                flex: 1,
-                minWidth: 0,
-              }}
-            >
-              {isLoadingInternalProcedures ? (
-                <CircularProgress size={20} />
-              ) : (
-                <>
-                  {childProcedures.map((procedure) => (
-                    <React.Fragment key={procedure.id}>
-                      {renderProcedureChip(procedure, () =>
-                        setSelectedProcedureId(procedure.id),
-                      )}
-                    </React.Fragment>
-                  ))}
-                </>
-              )}
-            </Box>
-          </Paper>
-
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<PlusIcon className="h-4 w-4" />}
+            onClick={() => stagesViewRef.current?.addStage()}
+            sx={{
+              fontWeight: 700,
+              flexShrink: 0,
+              whiteSpace: "nowrap",
+              borderRadius: 2,
+              px: 2.5,
+            }}
+          >
+            {t("steps.addStage")}
+          </Button>
+        </Paper>
+      ) : (
+        !(hideWorkPlanTabs && outerTabs.length <= 1) && (
           <Paper>
             <Tabs
-              value={selectedInner}
-              onChange={(_, val: string) => setSelectedInner(val)}
+              value={selectedOuter}
+              onChange={(_, val: number) => {
+                setSelectedOuter(val);
+                setSelectedProcedureId(null);
+                setSelectedInner(WORK_PLAN_TAB);
+              }}
               variant="scrollable"
               scrollButtons="auto"
             >
-              <Tab value={WORK_PLAN_TAB} label={ts("workPlan")} />
-              {branches.map((branch) => (
-                <Tab
-                  key={branch.id}
-                  value={branch.id}
-                  label={
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                      component="span"
-                    >
-                      <Checkbox
-                        checked={branchUsesWorkPlan[branch.id] ?? false}
-                        onChange={(e) => handleBranchCheckbox(e, branch.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        size="small"
-                        disabled={isUpdating}
-                        sx={{ p: 0 }}
-                      />
-                      <span>{branch.name}</span>
-                    </Box>
-                  }
-                />
+              {outerTabs.map((tab) => (
+                <Tab key={tab.id} value={tab.id} label={ts(tab.name)} />
               ))}
             </Tabs>
           </Paper>
+        )
+      )}
+
+      {activeOuterTab && (
+        <>
+          {!useDocumentSequenceLayout && (
+            <Paper
+              sx={{
+                p: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 2,
+                flexDirection: "row-reverse",
+              }}
+            >
+              {hideWorkPlanTabs ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<PlusIcon className="h-4 w-4" />}
+                  onClick={openAddTaskDialog}
+                  size="small"
+                >
+                  {t("actions.add")}
+                </Button>
+              ) : (
+                <PlusIcon
+                  className="h-5 w-5 shrink-0 cursor-pointer text-primary rounded-full"
+                  onClick={openAddTaskDialog}
+                />
+              )}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  flexWrap: "wrap",
+                  justifyContent: "flex-start",
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+                {isLoadingInternalProcedures ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <>
+                    {childProcedures.map((procedure) => (
+                      <React.Fragment key={procedure.id}>
+                        {renderProcedureChip(procedure, () =>
+                          setSelectedProcedureId(procedure.id),
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </>
+                )}
+              </Box>
+            </Paper>
+          )}
+
+          {!hideWorkPlanTabs && (
+            <Paper>
+              <Tabs
+                value={selectedInner}
+                onChange={(_, val: string) => setSelectedInner(val)}
+                variant="scrollable"
+                scrollButtons="auto"
+              >
+                <Tab value={WORK_PLAN_TAB} label={ts("workPlan")} />
+                {branches.map((branch) => (
+                  <Tab
+                    key={branch.id}
+                    value={branch.id}
+                    label={
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                        component="span"
+                      >
+                        <Checkbox
+                          checked={branchUsesWorkPlan[branch.id] ?? false}
+                          onChange={(e) => handleBranchCheckbox(e, branch.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          size="small"
+                          disabled={isUpdating}
+                          sx={{ p: 0 }}
+                        />
+                        <span>{branch.name}</span>
+                      </Box>
+                    }
+                  />
+                ))}
+              </Tabs>
+            </Paper>
+          )}
 
           {showStagesView ? (
             <StagesView
               ref={stagesViewRef}
-              parentId={stagesParentId}
+              parentId={
+                useDocumentSequenceLayout
+                  ? (rootProcedure?.id ?? stagesParentId)
+                  : stagesParentId
+              }
               workFlowId={
-                selectedInner === WORK_PLAN_TAB ? workFlowId : undefined
+                hideWorkPlanTabs || selectedInner === WORK_PLAN_TAB
+                  ? workFlowId
+                  : undefined
               }
               currentTabType={currentTabType}
               branchId={
-                selectedInner !== WORK_PLAN_TAB
+                !hideWorkPlanTabs && selectedInner !== WORK_PLAN_TAB
                   ? Number(selectedInner)
                   : undefined
               }
@@ -611,15 +700,26 @@ export default function SubTypeTabs() {
         </DialogActions>
       </Dialog>
 
-      <AddTaskActionDialog
-        open={taskActionDialogOpen}
-        onClose={() => setTaskActionDialogOpen(false)}
-        procedureType={currentTabType}
-        existingActions={existingActions}
-        excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
-        excludeFromAppearBefore={primaryProcedureId ? [primaryProcedureId] : []}
-        onSave={handleAddTaskAction}
-      />
+      {addProcedureVariant === "document-classification" ? (
+        <DocumentClassificationAddProcedureDialog
+          open={taskActionDialogOpen}
+          onClose={() => setTaskActionDialogOpen(false)}
+          procedureType={currentTabType}
+          onSave={handleAddTaskAction}
+        />
+      ) : (
+        <AddTaskActionDialog
+          open={taskActionDialogOpen}
+          onClose={() => setTaskActionDialogOpen(false)}
+          procedureType={currentTabType}
+          existingActions={existingActions}
+          excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
+          excludeFromAppearBefore={
+            primaryProcedureId ? [primaryProcedureId] : []
+          }
+          onSave={handleAddTaskAction}
+        />
+      )}
 
       <EditTaskActionDialog
         open={editTaskActionDialogOpen}

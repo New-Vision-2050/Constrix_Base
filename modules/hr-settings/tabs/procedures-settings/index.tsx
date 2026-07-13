@@ -15,6 +15,7 @@ export type {
   ProceduresSettingsConfig,
   ProceduresSettingsOuterTab,
   ProceduresSettingsViewProps,
+  ProceduresAddProcedureVariant,
   TaskActionFormValues,
   TaskActionConditionFormValue,
 } from "./types";

@@ -13,6 +13,10 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "Procedures will be taken from the work plan",
       "سيتم اخذ الاجراءات من خطة العمل",
     ),
+    correspondence: _m("Correspondences", "مراسلات"),
+    technicalSubmittal: _m("Technical Submittal", "Technical Submittal"),
+    ncr: _m("NCR", "NCR"),
+    vo: _m("VO", "VO"),
   }),
   tabTitles: new MessagesGroup({
     contract: _m("Contract procedures settings", "اعداد إجراءات العقود"),
@@ -108,6 +112,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
     departmentManager: _m("Department Manager", "مدير القسم الوظيفي"),
     selectDepartmentName: _m("Select department name", "اختار اسم القسم"),
     addProcedureName: _m("Add procedure name", "اضافة اسم الاجراء"),
+    addProcedure: _m("Add procedure", "اضافة الاجراء"),
     accreditationType: new MessagesGroup({
       approval: _m("Approval", "موافقة"),
       financial: _m("Financial", "مالي"),
@@ -124,6 +129,18 @@ export const proceduresSettingsMessages = new MessagesGroup({
     noProcedures: _m(
       "No procedures yet. Add a procedure to get started.",
       "لا توجد إجراءات. أضف إجراءاً للبدء.",
+    ),
+    noStagesAdded: _m(
+      "No stages added currently..",
+      "لا توجد مراحل مضافة حاليا..",
+    ),
+    modelStagesTitle: _m(
+      "{name} model stages",
+      "مراحل نموذج {name}",
+    ),
+    modelStagesDescription: _m(
+      "Define and sequence the procedure stages for this model and identify decision-makers, rules, and alerts.",
+      "قم بتعريف وتسلسل مراحل الاجراء الخاصة بهذا النموذج وتحديد متخذي الاجراء والقواعد والتنبيهات.",
     ),
   }),
   stepCard: new MessagesGroup({
@@ -167,6 +184,23 @@ export const proceduresSettingsMessages = new MessagesGroup({
     selectTemplate: _m("Select template", "نموذج"),
     notifications: _m("Notifications", "الاعلامات"),
     escalation: _m("Escalation", "التصعيد"),
+    stageDetails: _m("Stage details", "تفاصيل المرحلة"),
+    procedureName: _m("Procedure name", "اسم الاجراء"),
+    procedureOrder: _m("Procedure order", "ترتيب الاجراء"),
+    model: _m("Model", "النموذج"),
+    description: _m("Description", "الوصف"),
+    copyProcedure: _m("Copy procedure", "نسخ الاجراء"),
+    saveStage: _m("Save stage", "حفظ المرحلة"),
+    autoEscalateAfter: _m(
+      "Automatic escalation after",
+      "تصعيد تلقائي بعد",
+    ),
+    to: _m("to", "الى"),
+    day: _m("Day", "يوم"),
+    responsibleEngineer: _m("Responsible engineer", "المهندس المسئول"),
+    mobileApp: _m("Mobile app", "تطبيق الجوال"),
+    workAlert: _m("Work alert", "تنبيه عمل"),
+    systemEntryEmail: _m("System entry email", "بريد ادخال النظام"),
     timeLimit: _m("Time limit", "المهلة الزمنية"),
     escalationEntity: _m("Escalation entity", "الجهة المصعد إليها"),
     selectEscalationEntity: _m(
@@ -304,5 +338,37 @@ export const proceduresSettingsMessages = new MessagesGroup({
       conditionType: _m("Condition type", "نوع الشرط"),
       settings: _m("Condition settings", "إعدادات الشرط"),
     }),
+  }),
+  documentAddProcedureDialog: new MessagesGroup({
+    title: _m("Add procedure", "اضافة اجراء"),
+    procedureName: _m("Procedure name", "اسم الاجراء"),
+    classificationSection: _m(
+      "Classification and linking data",
+      "بيانات التصنيف والربط",
+    ),
+    classificationName: _m("Classification name", "اسم التصنيف"),
+    linkedFolderName: _m("Linked folder name", "اسم المجلد المرتبط"),
+    classificationCode: _m("Classification code", "كود التصنيف"),
+    documentNature: _m("Document nature", "طبيعة المستند"),
+    usedInDocumentCycle: _m(
+      "Used in document cycle",
+      "يستخدم في دورة الوثائق",
+    ),
+    showInAttachmentsLibrary: _m(
+      "Appears in attachments library",
+      "يظهر في مكتبة المرفقات",
+    ),
+    showInArchiveAfterApproval: _m(
+      "Appears in archive after approval",
+      "يظهر في الارشيف بعد الاعتماد",
+    ),
+    requiresAssetId: _m("Requires original (Asset ID)", "يتطلب اصل (Asset ID)"),
+    notice: _m(
+      "Internal review applications are not affected by modification unless they are within digital notes or a modification request.",
+      "تطبيقات المراجعة الداخلية لا تتأثر بالتعديل إلا اذا كانت ضمن ملاحظات الرقمي او طلب تعديل",
+    ),
+    save: _m("Save", "حفظ"),
+    cancel: _m("Cancel", "تراجع"),
+    select: _m("Select", "اختر"),
   }),
 });
