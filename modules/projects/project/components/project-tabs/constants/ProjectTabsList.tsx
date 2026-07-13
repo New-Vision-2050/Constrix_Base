@@ -43,6 +43,7 @@ import WorkOrdersTab from "../tabs/work-orders";
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
 const CONSTRUCTIONS_GROUP_ID = "project-tab-constructions";
+const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
 
 function isSettingShown(value: boolean | number | undefined | null): boolean {
   return value === true || value === 1;
@@ -121,6 +122,34 @@ function createConstructionsSubTabs(
       content: <WorkOrdersTab />,
     },
   ];
+}
+
+/** Sub-sections under «إدارة الوثائق». */
+function createDocumentManagementSubTabs(
+  tProject: ReturnType<typeof useTranslations<"project">>,
+): SystemTab[] {
+  return [
+    {
+      id: "project-tab-document-cycle",
+      title: tProject("tabs.documentCycle"),
+      icon: <FolderSyncIconWithCount />,
+      content: <DocumentCycleTab />,
+    },
+    {
+      id: "project-tab-sequence-of-procedures",
+      title: tProject("tabs.sequenceOfProcedures"),
+      content: <SequenceOfProceduresTab />,
+    },
+    {
+      id: "project-tab-document-requirements",
+      title: tProject("tabs.documentRequirements"),
+      content: <DocumentRequirementsTab />,
+    },
+  ];
+}
+
+function isSettingShown(value: boolean | number | undefined): boolean {
+  return value === true || value === 1;
 }
 
 function passesProjectTypeVisibility(
@@ -222,8 +251,9 @@ export function useProjectTabsList(): SystemTab[] {
       content: <MaintenanceEmergencyTab />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
-    const documentManagementSubTabs = createDocumentManagementSubTabs(tProject);
-    const constructionsSubTabs = createConstructionsSubTabs(tProject);
+    const constructionSubTabs = createConstructionSubTabs(tProject);
+    const documentManagementSubTabs =
+      createDocumentManagementSubTabs(tProject);
 
     const ownerCompanyId = projectData?.company_id;
     const currentCompanyId = authCompanyData?.payload?.id;
@@ -294,6 +324,28 @@ export function useProjectTabsList(): SystemTab[] {
             icon: <Building2 className="w-4 h-4" />,
             content: <></>,
             nestedTabs: visibleConstructionsSubs,
+          }
+        : null;
+
+    const visibleDocumentManagementSubs = documentManagementSubTabs.filter(
+      (tab) =>
+        shouldShowTopLevelTab(
+          tab.id,
+          permissions,
+          projectId,
+          flatPermissionsFetched,
+          flatPerms,
+        ),
+    );
+
+    const documentManagementTab: SystemTab | null =
+      visibleDocumentManagementSubs.length > 0
+        ? {
+            id: DOCUMENT_MANAGEMENT_GROUP_ID,
+            title: tProject("tabs.documentManagement"),
+            icon: <FileText className="w-4 h-4" />,
+            content: <></>,
+            nestedTabs: visibleDocumentManagementSubs,
           }
         : null;
 

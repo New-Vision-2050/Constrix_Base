@@ -23,3 +23,6 @@ export const getCountryStatesCities = (params?: GetCountryStatesCitiesParams) =>
     "/countries/get-country-states-cities",
     { params },
   );
+
+export const getStatesList = () =>
+  baseApi.get<ApiBaseResponse<CountryStateCityItem[]>>("/countries/states/list");

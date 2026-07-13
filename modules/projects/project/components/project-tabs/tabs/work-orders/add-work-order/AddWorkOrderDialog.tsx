@@ -36,6 +36,9 @@ import {
   useOrderPermitDepartments,
   useOrderPermits,
 } from "@/modules/projects/project/query/useOrderPermitOptions";
+import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
+import { useStatesList } from "@/modules/projects/project/query/useStatesList";
+import { buildCreateWorkOrdersPayload } from "./buildCreatePayload";
 
 const STEP_KEYS = ["workOrderData", "review"] as const;
 
@@ -47,8 +50,8 @@ export interface WorkOrderEntry {
   contractor: string;
   management: string;
   location: string;
-  length: string;
-  width: string;
+  lat: string;
+  long: string;
   price: string;
 }
 
@@ -69,10 +72,22 @@ function createWorkOrderEntry(): WorkOrderEntry {
     contractor: "",
     management: "",
     location: "",
-    length: "",
-    width: "",
+    lat: "",
+    long: "",
     price: "",
   };
+}
+
+function parsePrice(value: string): number {
+  const num = Number(value.replace(/,/g, ""));
+  return Number.isNaN(num) ? 0 : num;
+}
+
+function formatDisplayDate(isoDate: string): string {
+  if (!isoDate) return "";
+  const [year, month, day] = isoDate.split("-").map(Number);
+  if (!year || !month || !day) return isoDate;
+  return `${day}/${month}/${year}`;
 }
 
 function formatPrice(value: string): string {
@@ -89,14 +104,25 @@ function displayValue(value: string, emptyDash: string) {
   return trimmed ? trimmed : emptyDash;
 }
 
+function isValidWorkOrderEntry(entry: WorkOrderEntry): boolean {
+  return Boolean(
+    entry.workOrderId.trim() &&
+      entry.assignmentDate &&
+      entry.contractor &&
+      entry.price.trim(),
+  );
+}
+
 export interface AddWorkOrderDialogProps {
   open: boolean;
   onClose: () => void;
+  onCreated?: () => void;
 }
 
 export default function AddWorkOrderDialog({
   open,
   onClose,
+  onCreated,
 }: AddWorkOrderDialogProps) {
   const { projectId, projectData } = useProject();
   const projectTypeId = projectData?.project_type_id;
@@ -117,14 +143,23 @@ export default function AddWorkOrderDialog({
   const orderPermitDepartmentsQuery = useOrderPermitDepartments(
     open ? projectTypeId : undefined,
   );
+  const statesQuery = useStatesList({ enabled: open });
 
   const contractorOptions = useMemo(
     () =>
-      (contractorsQuery.data ?? [])
-        .map((c) => c.name.trim())
-        .filter(Boolean),
+      (contractorsQuery.data ?? []).filter(
+        (contractor) => contractor.id && contractor.name.trim(),
+      ),
     [contractorsQuery.data],
   );
+
+  const contractorNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const contractor of contractorOptions) {
+      map.set(contractor.id, contractor.name.trim());
+    }
+    return map;
+  }, [contractorOptions]);
 
   const orderPermitLabelMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -141,6 +176,14 @@ export default function AddWorkOrderDialog({
     }
     return map;
   }, [orderPermitDepartmentsQuery.data]);
+
+  const stateLabelMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const state of statesQuery.data ?? []) {
+      map.set(state.id, state.name);
+    }
+    return map;
+  }, [statesQuery.data]);
 
   useEffect(() => {
     if (!open) {
@@ -200,10 +243,6 @@ export default function AddWorkOrderDialog({
           toast.error(tValidation("workOrderIdRequired"));
           return false;
         }
-        if (!entry.workOrderType) {
-          toast.error(tValidation("workOrderTypeRequired"));
-          return false;
-        }
         if (!entry.assignmentDate) {
           toast.error(tValidation("assignmentDateRequired"));
           return false;
@@ -212,27 +251,15 @@ export default function AddWorkOrderDialog({
           toast.error(tValidation("contractorRequired"));
           return false;
         }
-        if (!entry.management) {
-          toast.error(tValidation("managementRequired"));
-          return false;
-        }
         if (!entry.price.trim()) {
           toast.error(tValidation("priceRequired"));
           return false;
         }
       }
 
-      const validEntries = entries.filter(
-        (entry) =>
-          entry.workOrderId.trim() &&
-          entry.workOrderType &&
-          entry.assignmentDate &&
-          entry.contractor &&
-          entry.management &&
-          entry.price.trim(),
-      );
+      const validEntriesCount = entries.filter(isValidWorkOrderEntry).length;
 
-      if (validEntries.length === 0) {
+      if (validEntriesCount === 0) {
         toast.error(tValidation("rowsRequired"));
         return false;
       }
@@ -252,31 +279,57 @@ export default function AddWorkOrderDialog({
   };
 
   const validEntries = useMemo(
-    () =>
-      entries.filter(
-        (entry) =>
-          entry.workOrderId.trim() &&
-          entry.workOrderType &&
-          entry.assignmentDate &&
-          entry.contractor &&
-          entry.management &&
-          entry.price.trim(),
-      ),
+    () => entries.filter(isValidWorkOrderEntry),
     [entries],
   );
+
+  const reviewSummary = useMemo(() => {
+    const totalPrice = validEntries.reduce(
+      (sum, entry) => sum + parsePrice(entry.price),
+      0,
+    );
+    const dates = validEntries
+      .map((entry) => entry.assignmentDate)
+      .filter(Boolean)
+      .sort();
+    const minDate = dates[0] ?? "";
+    const maxDate = dates[dates.length - 1] ?? "";
+
+    return {
+      count: validEntries.length,
+      totalPrice: totalPrice.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+      dateRange:
+        minDate && maxDate
+          ? `${formatDisplayDate(minDate)} - ${formatDisplayDate(maxDate)}`
+          : emptyDash,
+    };
+  }, [validEntries, emptyDash]);
 
   const handleNext = async () => {
     if (!validateStep(activeStep)) return;
 
     if (activeStep === STEP_KEYS.length - 1) {
+      if (!projectId) {
+        toast.error(t("submitError"));
+        return;
+      }
+
       setSubmitting(true);
       try {
-        // TODO: wire to API when available
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        toast.success(t("submitSuccess"));
+        const payload = buildCreateWorkOrdersPayload(
+          projectId,
+          validEntries,
+          orderPermitsQuery.data ?? [],
+        );
+        const res = await ProjectOrderPermitsApi.create(projectId, payload);
+        toast.success(res.data?.message ?? t("submitSuccess"));
+        onCreated?.();
         onClose();
-      } catch {
-        toast.error(t("submitError"));
+      } catch (error: { response?: { data?: { message?: string } } }) {
+        toast.error(error?.response?.data?.message ?? t("submitError"));
       } finally {
         setSubmitting(false);
       }
@@ -305,7 +358,7 @@ export default function AddWorkOrderDialog({
                 {tFields("workOrderId")} *
               </TableCell>
               <TableCell sx={{ minWidth: 150, whiteSpace: "nowrap" }}>
-                {tFields("workOrderType")} *
+                {tFields("workOrderType")}
               </TableCell>
               <TableCell sx={{ minWidth: 140, whiteSpace: "nowrap" }}>
                 {tFields("assignmentDate")} *
@@ -314,16 +367,16 @@ export default function AddWorkOrderDialog({
                 {tFields("contractor")} *
               </TableCell>
               <TableCell sx={{ minWidth: 140, whiteSpace: "nowrap" }}>
-                {tFields("management")} *
+                {tFields("management")}
               </TableCell>
               <TableCell sx={{ minWidth: 160, whiteSpace: "nowrap" }}>
                 {tFields("location")}
               </TableCell>
-              <TableCell sx={{ minWidth: 90, whiteSpace: "nowrap" }}>
-                {tFields("length")}
+              <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
+                {tFields("latitude")}
               </TableCell>
-              <TableCell sx={{ minWidth: 90, whiteSpace: "nowrap" }}>
-                {tFields("width")}
+              <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
+                {tFields("longitude")}
               </TableCell>
               <TableCell sx={{ minWidth: 130, whiteSpace: "nowrap" }}>
                 {tFields("price")} *
@@ -351,8 +404,11 @@ export default function AddWorkOrderDialog({
                 </TableCell>
                 <TableCell>
                   {readOnly ? (
-                    orderPermitLabelMap.get(entry.workOrderType) ??
-                    entry.workOrderType
+                    displayValue(
+                      orderPermitLabelMap.get(entry.workOrderType) ??
+                        entry.workOrderType,
+                      emptyDash,
+                    )
                   ) : (
                     <TextField
                       select
@@ -364,7 +420,6 @@ export default function AddWorkOrderDialog({
                       }
                       size="small"
                       fullWidth
-                      required
                       disabled={orderPermitsQuery.isLoading}
                     >
                       <MenuItem value="">
@@ -380,7 +435,7 @@ export default function AddWorkOrderDialog({
                 </TableCell>
                 <TableCell>
                   {readOnly ? (
-                    entry.assignmentDate
+                    formatDisplayDate(entry.assignmentDate)
                   ) : (
                     <TextField
                       type="date"
@@ -399,7 +454,10 @@ export default function AddWorkOrderDialog({
                 </TableCell>
                 <TableCell>
                   {readOnly ? (
-                    entry.contractor
+                    displayValue(
+                      contractorNameMap.get(entry.contractor) ?? entry.contractor,
+                      emptyDash,
+                    )
                   ) : (
                     <TextField
                       select
@@ -410,13 +468,14 @@ export default function AddWorkOrderDialog({
                       size="small"
                       fullWidth
                       required
+                      disabled={contractorsQuery.isLoading}
                     >
                       <MenuItem value="">
                         <em>{tFields("selectContractor")}</em>
                       </MenuItem>
                       {contractorOptions.map((contractor) => (
-                        <MenuItem key={contractor} value={contractor}>
-                          {contractor}
+                        <MenuItem key={contractor.id} value={contractor.id}>
+                          {contractor.name}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -424,8 +483,11 @@ export default function AddWorkOrderDialog({
                 </TableCell>
                 <TableCell>
                   {readOnly ? (
-                    orderPermitDepartmentLabelMap.get(entry.management) ??
-                    entry.management
+                    displayValue(
+                      orderPermitDepartmentLabelMap.get(entry.management) ??
+                        entry.management,
+                      emptyDash,
+                    )
                   ) : (
                     <TextField
                       select
@@ -435,7 +497,6 @@ export default function AddWorkOrderDialog({
                       }
                       size="small"
                       fullWidth
-                      required
                       disabled={orderPermitDepartmentsQuery.isLoading}
                     >
                       <MenuItem value="">
@@ -451,47 +512,61 @@ export default function AddWorkOrderDialog({
                 </TableCell>
                 <TableCell>
                   {readOnly ? (
-                    displayValue(entry.location, emptyDash)
+                    displayValue(
+                      stateLabelMap.get(entry.location) ?? entry.location,
+                      emptyDash,
+                    )
                   ) : (
                     <TextField
+                      select
                       value={entry.location}
                       onChange={(e) =>
                         updateEntry(entry.id, { location: e.target.value })
                       }
                       size="small"
                       fullWidth
+                      disabled={statesQuery.isLoading}
+                    >
+                      <MenuItem value="">
+                        <em>{tFields("selectLocation")}</em>
+                      </MenuItem>
+                      {(statesQuery.data ?? []).map((state) => (
+                        <MenuItem key={state.id} value={state.id}>
+                          {state.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {readOnly ? (
+                    displayValue(entry.lat, emptyDash)
+                  ) : (
+                    <TextField
+                      value={entry.lat}
+                      onChange={(e) =>
+                        updateEntry(entry.id, { lat: e.target.value })
+                      }
+                      size="small"
+                      fullWidth
+                      type="number"
+                      inputProps={{ step: "0.000001" }}
                     />
                   )}
                 </TableCell>
                 <TableCell>
                   {readOnly ? (
-                    displayValue(entry.length, emptyDash)
+                    displayValue(entry.long, emptyDash)
                   ) : (
                     <TextField
-                      value={entry.length}
+                      value={entry.long}
                       onChange={(e) =>
-                        updateEntry(entry.id, { length: e.target.value })
+                        updateEntry(entry.id, { long: e.target.value })
                       }
                       size="small"
                       fullWidth
                       type="number"
-                      inputProps={{ step: "0.001" }}
-                    />
-                  )}
-                </TableCell>
-                <TableCell>
-                  {readOnly ? (
-                    displayValue(entry.width, emptyDash)
-                  ) : (
-                    <TextField
-                      value={entry.width}
-                      onChange={(e) =>
-                        updateEntry(entry.id, { width: e.target.value })
-                      }
-                      size="small"
-                      fullWidth
-                      type="number"
-                      inputProps={{ step: "0.001" }}
+                      inputProps={{ step: "0.000001" }}
                     />
                   )}
                 </TableCell>
@@ -587,6 +662,43 @@ export default function AddWorkOrderDialog({
           </Stack>
         ) : (
           <Stack spacing={2.5}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr 1fr" },
+                gap: 2,
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="body2">
+                <Box component="span" color="text.secondary">
+                  {tReview("workOrdersCountLabel")}{" "}
+                </Box>
+                <Box component="span" fontWeight={700}>
+                  {tReview("newWorkOrdersCount", { count: reviewSummary.count })}
+                </Box>
+              </Typography>
+              <Typography variant="body2">
+                <Box component="span" color="text.secondary">
+                  {tReview("totalPriceLabel")}{" "}
+                </Box>
+                <Box component="span" fontWeight={700}>
+                  {reviewSummary.totalPrice} {tReview("sarCurrency")}
+                </Box>
+              </Typography>
+              <Typography variant="body2">
+                <Box component="span" color="text.secondary">
+                  {tReview("dateRangeLabel")}{" "}
+                </Box>
+                <Box component="span" fontWeight={700}>
+                  {reviewSummary.dateRange}
+                </Box>
+              </Typography>
+            </Box>
+
+            <Typography variant="subtitle1" fontWeight={700}>
+              {t("listTitle")}
+            </Typography>
             {renderEntriesTable(true)}
             <FormControlLabel
               control={
@@ -605,42 +717,40 @@ export default function AddWorkOrderDialog({
 
         <Box
           sx={{
+            direction: "rtl",
             display: "flex",
-            justifyContent: activeStep === 0 ? "flex-start" : "space-between",
+            justifyContent: "space-between",
             alignItems: "center",
             gap: 2,
           }}
         >
-          {activeStep > 0 ? (
-            <Button variant="outlined" onClick={handleBack} disabled={submitting}>
-              {t("back")}
-            </Button>
-          ) : null}
-
           {activeStep === 0 ? (
             <Button
+              
               variant="contained"
               color="primary"
               onClick={handleNext}
               disabled={submitting}
-              sx={{ minWidth: 120 }}
-            >
+              sx={{ minWidth: 120}}
+              className="flex-end"
+              >
               {t("next")}
             </Button>
           ) : (
-            <Stack direction="row" spacing={1} sx={{ ms: "auto" }}>
-              <Button variant="outlined" onClick={handleClose} disabled={submitting}>
-                {t("cancel")}
-              </Button>
+            <>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleNext}
                 disabled={submitting || !confirmedReview}
+                sx={{ minWidth: 120 }}
               >
-                {t("submit")}
+                {t("next")}
               </Button>
-            </Stack>
+              <Button variant="outlined" onClick={handleBack} disabled={submitting}>
+                {t("back")}
+              </Button>
+            </>
           )}
         </Box>
       </DialogContent>
