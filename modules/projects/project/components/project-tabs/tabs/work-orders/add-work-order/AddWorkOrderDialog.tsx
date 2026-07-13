@@ -39,13 +39,6 @@ import {
 
 const STEP_KEYS = ["workOrderData", "review"] as const;
 
-const LOCATION_OPTIONS = [
-  "جدة - محطة النخيل",
-  "الرياض - محطة اليرموك",
-  "الدمام - محطة الخليج",
-  "مكة - محطة العزيزية",
-] as const;
-
 export interface WorkOrderEntry {
   id: string;
   workOrderId: string;
@@ -125,13 +118,13 @@ export default function AddWorkOrderDialog({
     open ? projectTypeId : undefined,
   );
 
-  const contractorOptions = useMemo(() => {
-    const fromApi = (contractorsQuery.data ?? [])
-      .map((c) => c.name.trim())
-      .filter(Boolean);
-    if (fromApi.length > 0) return fromApi;
-    return ["شركة كهرباء المملكة", "شركة الانشاءات المتحدة", "شركة البناء الحديث"];
-  }, [contractorsQuery.data]);
+  const contractorOptions = useMemo(
+    () =>
+      (contractorsQuery.data ?? [])
+        .map((c) => c.name.trim())
+        .filter(Boolean),
+    [contractorsQuery.data],
+  );
 
   const orderPermitLabelMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -461,23 +454,13 @@ export default function AddWorkOrderDialog({
                     displayValue(entry.location, emptyDash)
                   ) : (
                     <TextField
-                      select
                       value={entry.location}
                       onChange={(e) =>
                         updateEntry(entry.id, { location: e.target.value })
                       }
                       size="small"
                       fullWidth
-                    >
-                      <MenuItem value="">
-                        <em>{tFields("selectLocation")}</em>
-                      </MenuItem>
-                      {LOCATION_OPTIONS.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                    />
                   )}
                 </TableCell>
                 <TableCell>

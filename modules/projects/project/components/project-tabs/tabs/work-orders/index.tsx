@@ -18,7 +18,6 @@ import { Plus } from "lucide-react";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
-import { MOCK_WORK_ORDERS } from "./mockData";
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
 import type { WorkOrderFilters, WorkOrderRow } from "./types";
 import {
@@ -145,23 +144,8 @@ export default function WorkOrdersTab() {
     initialLimit: 10,
   });
 
-  const contractingPartyOptions = useMemo(
-    () => [...new Set(MOCK_WORK_ORDERS.map((row) => row.contractingParty))],
-    [],
-  );
-
-  const typeOptions = useMemo(
-    () => [...new Set(MOCK_WORK_ORDERS.map((row) => row.type))],
-    [],
-  );
-
-  const paymentStatusOptions = useMemo(
-    () => [...new Set(MOCK_WORK_ORDERS.map((row) => row.paymentStatus))],
-    [],
-  );
-
   const filteredRows = useMemo(
-    () => filterWorkOrders(MOCK_WORK_ORDERS, appliedFilters),
+    () => filterWorkOrders([], appliedFilters),
     [appliedFilters],
   );
 
@@ -279,11 +263,6 @@ export default function WorkOrdersTab() {
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
-              {typeOptions.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
             </TextField>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -333,11 +312,6 @@ export default function WorkOrdersTab() {
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
-              {contractingPartyOptions.map((party) => (
-                <MenuItem key={party} value={party}>
-                  {party}
-                </MenuItem>
-              ))}
             </TextField>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -352,11 +326,6 @@ export default function WorkOrdersTab() {
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
-              {paymentStatusOptions.map((status) => (
-                <MenuItem key={status} value={status}>
-                  {status}
-                </MenuItem>
-              ))}
             </TextField>
           </Grid>
         </Grid>
