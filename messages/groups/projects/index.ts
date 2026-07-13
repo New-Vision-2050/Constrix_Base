@@ -713,6 +713,7 @@ export const projectMessages = new MessagesGroup({
       more: _m("More", "المزيد"),
       // Site status updates
       siteStatusUpdates: _m("Site Status Updates", "التحديث الدوري للموقع"),
+      copiedSiteStatusUpdates: _m("Copied Updates", "التحديثات المنسوخة"),
       siteStatusTotal: _m("Total", "الإجمالي"),
       siteStatusApproved: _m("Approved", "معتمد"),
       siteStatusPending: _m("Pending", "قيد الانتظار"),
@@ -724,10 +725,16 @@ export const projectMessages = new MessagesGroup({
         "No site status updates",
         "لا توجد تحديثات للموقع",
       ),
+      noCopiedSiteStatusUpdates: _m(
+        "No copied site status updates",
+        "لا توجد تحديثات منسوخة للموقع",
+      ),
       siteStatusLoadError: _m(
         "Could not load site status updates",
         "تعذر تحميل تحديثات الموقع",
       ),
+      siteStatusOriginal: _m("Original", "أصلي"),
+      siteStatusCopied: _m("Copied", "منسوخ"),
       // Notes
       noNotes: _m("No notes yet", "لا توجد ملاحظات بعد"),
       writeNote: _m("Write a note…", "اكتب ملاحظة…"),

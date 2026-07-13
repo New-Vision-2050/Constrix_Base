@@ -336,6 +336,7 @@ export interface SiteStatusUpdateProcess {
 export interface SiteStatusUpdate {
   id: string;
   status: string;
+  is_copied: boolean;
   description: string;
   attachments: SiteStatusUpdateAttachment[];
   requested_by: SiteStatusUpdateUser;

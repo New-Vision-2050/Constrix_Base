@@ -9,6 +9,8 @@ import {
   IconButton,
   Paper,
   Stack,
+  Tab,
+  Tabs,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -17,7 +19,10 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import Link from "next/link";
-import { useSiteStatusUpdates } from "@/modules/projects/project/query/useProjectNotificationMutations";
+import {
+  useCopiedSiteStatusUpdates,
+  useSiteStatusUpdates,
+} from "@/modules/projects/project/query/useProjectNotificationMutations";
 import type {
   ProjectNotification,
   SiteStatusUpdate,
@@ -113,91 +118,146 @@ export default function SiteStatusUpdatesTab({
   notificationId,
 }: SiteStatusUpdatesTabProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
-  const { data, isLoading, isError } = useSiteStatusUpdates(notificationId);
+  const [activeTab, setActiveTab] = useState(0);
+  const isCopiedTab = activeTab === 1;
 
-  const items = useMemo(() => data?.items ?? [], [data]);
-  const summary = data?.summary;
+  const {
+    data,
+    isLoading,
+    isError,
+  } = useSiteStatusUpdates(notificationId);
+  const {
+    data: copiedData,
+    isLoading: isCopiedLoading,
+    isError: isCopiedError,
+  } = useCopiedSiteStatusUpdates(notificationId);
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-        <CircularProgress size={28} />
-      </Box>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography color="error">{t("siteStatusLoadError")}</Typography>
-      </Box>
-    );
-  }
-
-  if (!items.length) {
-    return (
-      <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="body2" color="text.secondary">
-          {t("noSiteStatusUpdates")}
-        </Typography>
-      </Box>
-    );
-  }
+  const activeData = isCopiedTab ? copiedData : data;
+  const items = useMemo(() => activeData?.items ?? [], [activeData]);
+  const summary = activeData?.summary;
+  const tabLoading = isCopiedTab ? isCopiedLoading : isLoading;
+  const tabError = isCopiedTab ? isCopiedError : isError;
 
   return (
     <Stack spacing={2.5}>
-      {/* Summary */}
-      {summary && (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-          <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h6" fontWeight={700}>
-                {summary.total}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t("siteStatusTotal")}
-              </Typography>
-            </Box>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h6" fontWeight={700} color="success.main">
-                {summary.approved}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t("siteStatusApproved")}
-              </Typography>
-            </Box>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h6" fontWeight={700} color="warning.main">
-                {summary.pending}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t("siteStatusPending")}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      )}
-
-      {/* Cards */}
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "repeat(2, minmax(0, 1fr))",
-          },
-          gap: 2.5,
+          px: 1.5,
+          py: 1,
+          borderRadius: 2,
+          bgcolor: "action.hover",
         }}
       >
-        {items.map((update) => (
-          <SiteStatusCard
-            key={update.id}
-            update={update}
-            notification={notification}
-            t={t}
-          />
-        ))}
-      </Box>
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => setActiveTab(v)}
+          aria-label={t("siteStatusUpdates")}
+          variant="scrollable"
+          scrollButtons={false}
+          TabIndicatorProps={{ sx: { display: "none" } }}
+          sx={{
+            minHeight: 40,
+            "& .MuiTab-root": {
+              textTransform: "none",
+              minHeight: 36,
+              borderRadius: 999,
+              px: 2,
+              mx: 0.25,
+              fontWeight: 600,
+              color: "text.primary",
+              transition:
+                "background-color 120ms ease, color 120ms ease, box-shadow 120ms ease",
+            },
+            "& .Mui-selected": {
+              bgcolor: "primary.main",
+              color: "white !important",
+              boxShadow: 1,
+            },
+          }}
+        >
+          <Tab label={t("siteStatusUpdates")} />
+          <Tab label={t("copiedSiteStatusUpdates")} />
+        </Tabs>
+      </Paper>
+
+      {tabLoading && (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+          <CircularProgress size={28} />
+        </Box>
+      )}
+
+      {!tabLoading && tabError && (
+        <Box sx={{ p: 3 }}>
+          <Typography color="error">{t("siteStatusLoadError")}</Typography>
+        </Box>
+      )}
+
+      {!tabLoading && !tabError && !items.length && (
+        <Box sx={{ p: 4, textAlign: "center" }}>
+          <Typography variant="body2" color="text.secondary">
+            {isCopiedTab ? t("noCopiedSiteStatusUpdates") : t("noSiteStatusUpdates")}
+          </Typography>
+        </Box>
+      )}
+
+      {!tabLoading && !tabError && items.length > 0 && (
+        <>
+          {/* Summary */}
+          {summary && (
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+              <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="h6" fontWeight={700}>
+                    {summary.total}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {t("siteStatusTotal")}
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="h6" fontWeight={700} color="success.main">
+                    {summary.approved}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {t("siteStatusApproved")}
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="h6" fontWeight={700} color="warning.main">
+                    {summary.pending}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {t("siteStatusPending")}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Paper>
+          )}
+
+          {/* Cards */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, minmax(0, 1fr))",
+              },
+              gap: 2.5,
+            }}
+          >
+            {items.map((update) => (
+              <SiteStatusCard
+                key={update.id}
+                update={update}
+                notification={notification}
+                t={t}
+                showCopiedBadge={!isCopiedTab}
+              />
+            ))}
+          </Box>
+        </>
+      )}
     </Stack>
   );
 }
@@ -206,10 +266,12 @@ function SiteStatusCard({
   update,
   notification,
   t,
+  showCopiedBadge = false,
 }: {
   update: SiteStatusUpdate;
   notification: ProjectNotification;
   t: ReturnType<typeof useTranslations>;
+  showCopiedBadge?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -241,6 +303,8 @@ function SiteStatusCard({
         flexDirection: "column",
         transition: "box-shadow 200ms ease",
         "&:hover": { boxShadow: 2 },
+        border: (theme) =>
+          update.is_copied ? undefined : `2px solid ${theme.palette.warning.main}`,
       }}
     >
       {/* Card header */}
@@ -270,6 +334,15 @@ function SiteStatusCard({
             variant="outlined"
             sx={{ borderRadius: "16px", fontWeight: 500 }}
           />
+          {showCopiedBadge && (
+            <Chip
+              label={update.is_copied ? t("siteStatusCopied") : t("siteStatusOriginal")}
+              size="small"
+              color={update.is_copied ? "default" : "warning"}
+              variant="filled"
+              sx={{ borderRadius: "16px", fontWeight: 500 }}
+            />
+          )}
         </Stack>
         <Tooltip title={t("copyReport")}>
           <IconButton

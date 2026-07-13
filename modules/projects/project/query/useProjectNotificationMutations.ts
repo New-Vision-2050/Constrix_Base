@@ -23,6 +23,7 @@ import {
 export const PROJECT_NOTIFICATION_DETAIL_QUERY_KEY = "project-notification-detail" as const;
 export const PROJECT_NOTIFICATION_AVAILABLE_ACTIONS_QUERY_KEY = "project-notification-available-actions" as const;
 export const SITE_STATUS_UPDATES_QUERY_KEY = "site-status-updates" as const;
+export const COPIED_SITE_STATUS_UPDATES_QUERY_KEY = "copied-site-status-updates" as const;
 export const PROJECT_NOTIFICATION_NOTES_QUERY_KEY = "project-notification-notes" as const;
 
 function notificationScopeFromArgs(
@@ -184,6 +185,22 @@ export function useSiteStatusUpdates(notificationId: string | undefined) {
     queryFn: async (): Promise<SiteStatusUpdatesData> => {
       if (!notificationId) return { items: [], summary: { total: 0, approved: 0, pending: 0 } };
       const res = await ProjectNotificationsApi.getSiteStatusUpdates(notificationId);
+      const body = res.data as any;
+      const data = body?.data ?? body?.payload ?? body;
+      const items = data?.items ?? [];
+      const summary = data?.summary ?? { total: items.length, approved: 0, pending: 0 };
+      return { items, summary };
+    },
+    enabled: Boolean(notificationId),
+  });
+}
+
+export function useCopiedSiteStatusUpdates(notificationId: string | undefined) {
+  return useQuery<SiteStatusUpdatesData>({
+    queryKey: [COPIED_SITE_STATUS_UPDATES_QUERY_KEY, notificationId],
+    queryFn: async (): Promise<SiteStatusUpdatesData> => {
+      if (!notificationId) return { items: [], summary: { total: 0, approved: 0, pending: 0 } };
+      const res = await ProjectNotificationsApi.getCopiedSiteStatusUpdates(notificationId);
       const body = res.data as any;
       const data = body?.data ?? body?.payload ?? body;
       const items = data?.items ?? [];

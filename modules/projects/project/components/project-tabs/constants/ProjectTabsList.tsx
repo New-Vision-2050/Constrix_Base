@@ -247,6 +247,13 @@ export function useProjectTabsList(): SystemTab[] {
           }
         : null;
 
+    const documentCycleTab: SystemTab = {
+      id: "project-tab-document-cycle",
+      title: tProject("tabs.documentCycle"),
+      icon: <FolderSyncIconWithCount />,
+      content: <DocumentCycleTab />,
+    };
+
     const topLevel: SystemTab[] = [];
     if (
       shouldShowTopLevelTab(
