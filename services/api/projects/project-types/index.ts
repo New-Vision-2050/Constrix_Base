@@ -8,7 +8,7 @@ import {
     UpdateDataSettingsArgs,
     UpdateAttachmentContractSettingsArgs,
     UpdateAttachmentTermsContractSettingsArgs,
-    UpdateContractorContractSettingsArgs,
+    UpdateContractorSettingsArgs,
     UpdateEmployeeContractSettingsArgs,
     UpdateAttachmentCycleSettingsArgs,
     UpdateArchiveLibrarySettingsArgs,
@@ -30,8 +30,8 @@ import {
     UpdateAttachmentContractSettingsResponse,
     GetAttachmentTermsContractSettingsResponse,
     UpdateAttachmentTermsContractSettingsResponse,
-    GetContractorContractSettingsResponse,
-    UpdateContractorContractSettingsResponse,
+    GetContractorSettingsResponse,
+    UpdateContractorSettingsResponse,
     GetEmployeeContractSettingsResponse,
     UpdateEmployeeContractSettingsResponse,
     GetAttachmentCycleSettingsResponse,
@@ -136,16 +136,16 @@ export const ProjectTypesApi = {
             `project-types/${projectTypeId}/archive-library-settings`,
             args,
         ),
-    getContractorContractSettings: (projectTypeId: number | string) =>
-        baseApi.get<GetContractorContractSettingsResponse>(
-            `project-types/${projectTypeId}/contractor-contract-settings`,
+    getContractorSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetContractorSettingsResponse>(
+            `project-types/${projectTypeId}/contractor-settings`,
         ),
-    updateContractorContractSettings: (
+    updateContractorSettings: (
         projectTypeId: number | string,
-        args: UpdateContractorContractSettingsArgs,
+        args: UpdateContractorSettingsArgs,
     ) =>
-        baseApi.put<UpdateContractorContractSettingsResponse>(
-            `project-types/${projectTypeId}/contractor-contract-settings`,
+        baseApi.put<UpdateContractorSettingsResponse>(
+            `project-types/${projectTypeId}/contractor-settings`,
             args,
         ),
     getEmployeeContractSettings: (projectTypeId: number | string) =>

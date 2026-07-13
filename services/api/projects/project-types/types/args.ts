@@ -75,8 +75,8 @@ export interface UpdateArchiveLibrarySettingsArgs {
     is_all_data_visible?: 0 | 1;
 }
 
-export interface UpdateContractorContractSettingsArgs {
-    is_all_data_visible?: 0 | 1;
+export interface UpdateContractorSettingsArgs {
+    is_shown?: 0 | 1;
 }
 
 export interface UpdateEmployeeContractSettingsArgs {

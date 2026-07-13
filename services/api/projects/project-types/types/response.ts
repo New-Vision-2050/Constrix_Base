@@ -103,18 +103,18 @@ export interface GetArchiveLibrarySettingsResponse extends ApiBaseResponse<Archi
 export interface UpdateArchiveLibrarySettingsResponse extends ApiBaseResponse<ArchiveLibrarySettings> {
 }
 
-export interface ContractorContractSettings {
+export interface ContractorSettings {
     id: number;
     project_type_id: number;
-    is_all_data_visible: number;
+    is_shown: boolean | number;
     created_at: string;
     updated_at: string;
 }
 
-export interface GetContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {
+export interface GetContractorSettingsResponse extends ApiBaseResponse<ContractorSettings> {
 }
 
-export interface UpdateContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {
+export interface UpdateContractorSettingsResponse extends ApiBaseResponse<ContractorSettings> {
 }
 
 export interface EmployeeContractSettings {
