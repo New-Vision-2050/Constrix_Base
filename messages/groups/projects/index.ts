@@ -9,7 +9,13 @@ export const projectMessages = new MessagesGroup({
   shareTab: projectShareTabMessages,
   tabs: new MessagesGroup({
     attachments: _m("Attachments", "المرفقات"),
+    documentManagement: _m("Document Management", "إدارة الوثائق"),
     documentCycle: _m("Document cycle", "دورة الوثائق"),
+    sequenceOfProcedures: _m(
+      "Sequence of Procedures",
+      "تسلسل الإجراءات",
+    ),
+    documentRequirements: _m("Document Requirements", "متطلبات الوثائق"),
     stakeholders: _m("Stakeholders", "أصحاب المصلحة"),
     concernedParties: _m("Concerned parties", "المعنيين"),
     staff: _m("Staff", "الكادر"),

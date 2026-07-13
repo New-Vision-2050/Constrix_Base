@@ -2,8 +2,10 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { Alert, Box } from "@mui/material";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import {
+  FileText,
   Paperclip,
   UserCog,
   Share2,
@@ -34,6 +36,15 @@ import ShareTab from "../tabs/share";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
+const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
+
+function ComingSoonTab({ message }: { message: string }) {
+  return (
+    <Box sx={{ p: 4, textAlign: "center" }}>
+      <Alert severity="info">{message}</Alert>
+    </Box>
+  );
+}
 
 /** Sub-sections under «أصحاب المصلحة» (RTL: المعنيين on the right). */
 function createStakeholderSubTabs(
@@ -67,6 +78,31 @@ function createStakeholderSubTabs(
   ];
 }
 
+/** Sub-sections under «إدارة الوثائق». */
+function createDocumentManagementSubTabs(
+  tProject: ReturnType<typeof useTranslations<"project">>,
+): SystemTab[] {
+  const comingSoon = tProject("maintenanceEmergency.comingSoon");
+  return [
+    {
+      id: "project-tab-document-cycle",
+      title: tProject("tabs.documentCycle"),
+      icon: <FolderSyncIconWithCount />,
+      content: <DocumentCycleTab />,
+    },
+    {
+      id: "project-tab-sequence-of-procedures",
+      title: tProject("tabs.sequenceOfProcedures"),
+      content: <ComingSoonTab message={comingSoon} />,
+    },
+    {
+      id: "project-tab-document-requirements",
+      title: tProject("tabs.documentRequirements"),
+      content: <ComingSoonTab message={comingSoon} />,
+    },
+  ];
+}
+
 function passesProjectTypeVisibility(
   tabId: string,
   permissions: ProjectPermissions | null | undefined,
@@ -83,6 +119,8 @@ function passesProjectTypeVisibility(
     case "project-tab-share":
       return permissions.project_sharing_setting?.is_all_data_visible === 1;
     case "project-tab-document-cycle":
+    case "project-tab-sequence-of-procedures":
+    case "project-tab-document-requirements":
       return permissions.attachment_cycle_setting?.is_all_data_visible === 1;
     case "project-tab-attachments":
       return permissions.archive_library_setting?.is_all_data_visible === 1;
@@ -107,6 +145,8 @@ function passesFlatPermission(
     case "project-tab-cadre":
       return hasAnyStaffTabPermission(flatPerms);
     case "project-tab-document-cycle":
+    case "project-tab-sequence-of-procedures":
+    case "project-tab-document-requirements":
       return hasAnyDocumentCycleTabPermission(flatPerms);
     case "project-tab-roles":
       return hasAnyRolesTabPermission(flatPerms);
@@ -151,12 +191,6 @@ export function useProjectTabsList(): SystemTab[] {
       icon: <Paperclip className="w-4 h-4" />,
       content: <AttachmentsTab />,
     };
-    const documentCycleTab: SystemTab = {
-      id: "project-tab-document-cycle",
-      title: tProject("tabs.documentCycle"),
-      icon: <FolderSyncIconWithCount />,
-      content: <DocumentCycleTab />,
-    };
     const maintenanceTab: SystemTab = {
       id: "project-tab-maintenance",
       title: tProject("tabs.maintenanceAndEmergencies"),
@@ -164,6 +198,8 @@ export function useProjectTabsList(): SystemTab[] {
       content: <MaintenanceEmergencyTab />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
+    const documentManagementSubTabs =
+      createDocumentManagementSubTabs(tProject);
 
     const ownerCompanyId = projectData?.company_id;
     const currentCompanyId = authCompanyData?.payload?.id;
@@ -194,6 +230,28 @@ export function useProjectTabsList(): SystemTab[] {
           }
         : null;
 
+    const visibleDocumentManagementSubs = documentManagementSubTabs.filter(
+      (tab) =>
+        shouldShowTopLevelTab(
+          tab.id,
+          permissions,
+          projectId,
+          flatPermissionsFetched,
+          flatPerms,
+        ),
+    );
+
+    const documentManagementTab: SystemTab | null =
+      visibleDocumentManagementSubs.length > 0
+        ? {
+            id: DOCUMENT_MANAGEMENT_GROUP_ID,
+            title: tProject("tabs.documentManagement"),
+            icon: <FileText className="w-4 h-4" />,
+            content: <></>,
+            nestedTabs: visibleDocumentManagementSubs,
+          }
+        : null;
+
     const topLevel: SystemTab[] = [];
     if (
       shouldShowTopLevelTab(
@@ -209,17 +267,7 @@ export function useProjectTabsList(): SystemTab[] {
 
     if (stakeholdersTab) topLevel.push(stakeholdersTab);
 
-    if (
-      shouldShowTopLevelTab(
-        "project-tab-document-cycle",
-        permissions,
-        projectId,
-        flatPermissionsFetched,
-        flatPerms,
-      )
-    ) {
-      topLevel.push(documentCycleTab);
-    }
+    if (documentManagementTab) topLevel.push(documentManagementTab);
 
     if (
       shouldShowTopLevelTab(
