@@ -4,7 +4,8 @@ export type UserAttendanceStatusKey =
   | "late"
   | "leave"
   | "off"
-  | "required";
+  | "required"
+  | "on_task";
 
 export interface UserAttendanceCalendarDay {
   date: string;
@@ -26,6 +27,7 @@ export interface UserAttendanceCalendarSummary {
   leave_count: number;
   off_count: number;
   required_count: number;
+  on_task_count?: number;
   total_work_hours: number;
 }
 

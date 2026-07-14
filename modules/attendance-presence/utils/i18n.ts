@@ -7,6 +7,7 @@ const STATUS_TRANSLATION_KEYS: Record<UserAttendanceStatusKey, string> = {
   leave: "leave",
   off: "holiday",
   required: "required",
+  on_task: "onTask",
 };
 
 export function getLocalizedStatusLabel(
@@ -18,7 +19,9 @@ export function getLocalizedStatusLabel(
   if (locale === "ar") return apiStatus;
 
   const key = STATUS_TRANSLATION_KEYS[statusKey];
-  return translate(key);
+  // Fall back to the API-provided label for any status the frontend
+  // doesn't have a local translation for (keeps rendering dynamic).
+  return key ? translate(key) : apiStatus;
 }
 
 export function formatFullDate(date: Date, locale: string) {
