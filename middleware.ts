@@ -17,6 +17,19 @@ export async function middleware(req: NextRequest) {
 
   const existingCompanyCookie = req.cookies.get("company-data")?.value;
 
+  let isCentralCompany = true;
+  if (existingCompanyCookie) {
+    try {
+      const company = JSON.parse(existingCompanyCookie);
+      isCentralCompany = !!company?.is_central_company;
+    } catch (error) {
+      console.log("Company cookie parse error:", error);
+    }
+  }
+  const postLoginRedirectPage = isCentralCompany
+    ? "user-profile"
+    : "attendance-presence";
+
   const nvToken = req.cookies.get("new-vision-token")?.value;
   const pathname = req.nextUrl.pathname;
   const currentHost = await getCurrentHost();
@@ -34,14 +47,17 @@ export async function middleware(req: NextRequest) {
   const locale = localeMatch ? localeMatch[1] : "ar";
 
   // Strip locale from pathname for comparisons
-  const pathnameWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, "") || "/";
+  const pathnameWithoutLocale =
+    pathname.replace(/^\/[a-z]{2}(\/|$)/, "") || "/";
   const isRootRoute = pathnameWithoutLocale === "/";
 
   // Handle root route redirects based on authentication
   if (isRootRoute) {
     if (nvToken) {
-      // User is logged in, redirect to user-profile
-      return NextResponse.redirect(new URL(`/${locale}/user-profile`, req.url));
+      // User is logged in, redirect to user-profile (or attendance-presence for non-central companies)
+      return NextResponse.redirect(
+        new URL(`/${locale}/${postLoginRedirectPage}`, req.url),
+      );
     } else {
       // User is not logged in, redirect to login
       return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
@@ -53,9 +69,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
   }
 
-  // If user is logged in and trying to access login page, redirect to user-profile
+  // If user is logged in and trying to access login page, redirect to user-profile (or attendance-presence for non-central companies)
   if (nvToken && isLoginPage) {
-    return NextResponse.redirect(new URL(`/${locale}/user-profile`, req.url));
+    return NextResponse.redirect(
+      new URL(`/${locale}/${postLoginRedirectPage}`, req.url),
+    );
   }
 
   const res = intlMiddleware(req);
@@ -95,7 +113,7 @@ export async function middleware(req: NextRequest) {
         protectedCentralPages.includes(pathnameWithoutLocale)
       ) {
         return NextResponse.redirect(
-          new URL(`/${locale}/user-profile`, req.url)
+          new URL(`/${locale}/user-profile`, req.url),
         );
       }
     } catch (error) {
@@ -112,7 +130,9 @@ export async function middleware(req: NextRequest) {
     const isCentral = !!company?.is_central_company;
 
     if (!isCentral && protectedCentralPages.includes(pathnameWithoutLocale)) {
-      return NextResponse.redirect(new URL(`/${locale}/user-profile`, req.url));
+      return NextResponse.redirect(
+        new URL(`/${locale}/attendance-presence`, req.url),
+      );
     }
   }
 
