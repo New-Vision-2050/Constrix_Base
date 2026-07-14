@@ -392,6 +392,7 @@ export default function MapSettingsSection({
         key: "longitude",
         name: t("columnLongitude"),
         sortable: false,
+        align: "center",
         render: (row: MapLocationRow) => (
           <span className="p-2 text-sm tabular-nums">{row.longitude}</span>
         ),
@@ -400,6 +401,7 @@ export default function MapSettingsSection({
         key: "latitude",
         name: t("columnLatitude"),
         sortable: false,
+        align: "center",
         render: (row: MapLocationRow) => (
           <span className="p-2 text-sm tabular-nums">{row.latitude}</span>
         ),
@@ -408,6 +410,7 @@ export default function MapSettingsSection({
         key: "location",
         name: t("columnLocation"),
         sortable: false,
+        align: "center",
         render: (row: MapLocationRow) => (
           <span className="p-2 text-sm">{row.location}</span>
         ),
@@ -418,7 +421,7 @@ export default function MapSettingsSection({
         sortable: false,
         align: "center",
         render: (row: MapLocationRow) => (
-          <div className="flex justify-center p-2">
+          <div className="flex  justify-center  p-2">
             <DropdownMenu dir="rtl">
               <DropdownMenuTrigger asChild>
                 <Button
