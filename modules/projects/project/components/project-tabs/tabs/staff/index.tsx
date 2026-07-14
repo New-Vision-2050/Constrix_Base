@@ -30,6 +30,7 @@ import { useContractualEngagementEmployees } from "@/modules/projects/project/qu
 import { useOptionalContractualEngagement } from "@/modules/projects/project/context/ContractualEngagementContext";
 import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import { useProjectRoles } from "@/modules/projects/project/query/useProjectRoles";
 import {
   PROJECT_EMPLOYEE_CREATE,
   PROJECT_EMPLOYEE_DELETE,
@@ -111,6 +112,10 @@ export default function StaffTab() {
 
   const canChangeStaffRole = useCanAssignProjectStaffRoles(canUpdate);
 
+  const { data: projectRoles, isLoading: isLoadingRoles } = useProjectRoles(
+    canChangeStaffRole ? projectId : undefined,
+  );
+
   const deleteEmployeeMutation = useMutation({
     mutationFn: (assignmentId: string) =>
       AllProjectsApi.removeProjectEmployee(assignmentId),
@@ -175,12 +180,14 @@ export default function StaffTab() {
             assignmentId={row.id}
             projectRole={row.projectRole}
             canChangeRole={canChangeStaffRole}
+            roles={projectRoles}
+            rolesLoading={isLoadingRoles}
           />
         ),
       },
       ...getProjectEmployeeAttendanceColumns(t),
     ],
-    [t, projectId, canChangeStaffRole],
+    [t, projectId, canChangeStaffRole, projectRoles, isLoadingRoles],
   );
 
   const params = StaffTableLayout.useTableParams({
@@ -199,12 +206,19 @@ export default function StaffTab() {
       search: debouncedSearch || undefined,
     });
 
-  const data = engagement ? (engagementEmployees ?? []) : (employeesData ?? []);
+  const allRows = engagement
+    ? (engagementEmployees ?? [])
+    : (employeesData ?? []);
   const isLoadingEmployeesResolved = engagement
     ? isLoadingEngagementEmployees
     : isLoadingEmployees;
-  const totalPages = 1;
-  const totalItems = data.length;
+  const totalItems = allRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
+
+  const data = useMemo(() => {
+    const start = (params.page - 1) * params.limit;
+    return allRows.slice(start, start + params.limit);
+  }, [allRows, params.page, params.limit]);
 
   const columns = useMemo(() => {
     const base = [...staffColumns];
