@@ -14,6 +14,8 @@ export type TopActionsProps<TRow> = {
   customActions?: React.ReactNode;
   searchComponent?: React.ReactNode;
   children?: React.ReactNode;
+  exportLabel?: string;
+  exportDisabled?: boolean;
 };
 
 export function createTopActionsComponent<TRow>(
@@ -30,10 +32,14 @@ export function createTopActionsComponent<TRow>(
     customActions,
     searchComponent,
     children,
+    exportLabel,
+    exportDisabled,
   }: TopActionsProps<TRow>) => {
     const { actions, columnVisibility } = state;
     const t = useTranslations("Table");
     const [columnDialogOpen, setColumnDialogOpen] = useState(false);
+    const showExportButton = actions.onExport || exportLabel;
+    const isExportDisabled = exportDisabled ?? !actions.canExport;
 
     // Use provided searchComponent, or default Search if searchable
     const finalSearchComponent =
@@ -56,16 +62,16 @@ export function createTopActionsComponent<TRow>(
         >
           <Box flexGrow={1}>{finalSearchComponent}</Box>
           <Stack direction="row" spacing={1}>
-            {actions.onExport && (
+            {showExportButton && (
               <div>
                 <Button
                   variant="outlined"
                   startIcon={<FileDownload />}
                   onClick={actions.onExport}
-                  disabled={!actions.canExport}
+                  disabled={isExportDisabled}
                   color="info"
                 >
-                  {t("Export")}
+                  {exportLabel ?? t("Export")}
                 </Button>
               </div>
             )}
