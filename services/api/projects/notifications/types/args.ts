@@ -106,6 +106,11 @@ export interface CreateProjectNotificationNoteArgs {
   note: string;
 }
 
+export interface CopySiteStatusUpdateArgs {
+  notification_id: string;
+  site_status_update_id: string;
+}
+
 export interface ProjectNotificationsChartsArgs {
   project_id?: string;
   contractual_engagement_key?: string;

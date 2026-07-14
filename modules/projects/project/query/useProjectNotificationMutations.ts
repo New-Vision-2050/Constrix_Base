@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
 import type { ProjectNotification, ProjectNotificationAvailableAction, ProjectNotificationNote, ProjectNotificationNotesData, SiteStatusUpdatesData } from "@/services/api/projects/notifications/types/response";
 import type {
+  CopySiteStatusUpdateArgs,
   CreateProjectNotificationArgs,
   CreateProjectNotificationNoteArgs,
   ProjectNotificationReadStatusArgs,
@@ -208,6 +209,34 @@ export function useCopiedSiteStatusUpdates(notificationId: string | undefined) {
       return { items, summary };
     },
     enabled: Boolean(notificationId),
+  });
+}
+
+export function useCopySiteStatusUpdateMutation(notificationId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (siteStatusUpdateId: string): Promise<SiteStatusUpdatesData | null> => {
+      if (!notificationId) return null;
+      const res = await ProjectNotificationsApi.copySiteStatusUpdate({
+        notification_id: notificationId,
+        site_status_update_id: siteStatusUpdateId,
+      });
+      const body = res.data as any;
+      const data = body?.data ?? body?.payload ?? body;
+      const items = data?.items ?? [];
+      const summary = data?.summary ?? { total: items.length, approved: 0, pending: 0 };
+      return { items, summary };
+    },
+    onSuccess: () => {
+      if (!notificationId) return;
+      queryClient.invalidateQueries({
+        queryKey: [SITE_STATUS_UPDATES_QUERY_KEY, notificationId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [COPIED_SITE_STATUS_UPDATES_QUERY_KEY, notificationId],
+      });
+    },
   });
 }
 

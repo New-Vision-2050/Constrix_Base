@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import {
   useCopiedSiteStatusUpdates,
+  useCopySiteStatusUpdateMutation,
   useSiteStatusUpdates,
 } from "@/modules/projects/project/query/useProjectNotificationMutations";
 import type {
@@ -251,6 +252,7 @@ export default function SiteStatusUpdatesTab({
                 key={update.id}
                 update={update}
                 notification={notification}
+                notificationId={notificationId}
                 t={t}
                 showCopiedBadge={!isCopiedTab}
               />
@@ -265,19 +267,23 @@ export default function SiteStatusUpdatesTab({
 function SiteStatusCard({
   update,
   notification,
+  notificationId,
   t,
   showCopiedBadge = false,
 }: {
   update: SiteStatusUpdate;
   notification: ProjectNotification;
+  notificationId: string;
   t: ReturnType<typeof useTranslations>;
   showCopiedBadge?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const copyMutation = useCopySiteStatusUpdateMutation(notificationId);
 
   const handleCopy = async () => {
-    const text = buildCopyText(notification, update);
     try {
+      await copyMutation.mutateAsync(update.id);
+      const text = buildCopyText(notification, update);
       await navigator.clipboard.writeText(text);
       setCopied(true);
       toast.success(t("copiedToClipboard"));
@@ -348,12 +354,15 @@ function SiteStatusCard({
           <IconButton
             size="small"
             onClick={handleCopy}
+            disabled={copyMutation.isPending}
             sx={{
               color: copied ? "success.main" : "text.secondary",
               "&:hover": { color: "primary.main" },
             }}
           >
-            {copied ? (
+            {copyMutation.isPending ? (
+              <CircularProgress size={16} thickness={4} />
+            ) : copied ? (
               <Check className="w-4 h-4" />
             ) : (
               <Copy className="w-4 h-4" />

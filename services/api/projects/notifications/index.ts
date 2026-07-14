@@ -1,5 +1,6 @@
 import { baseApi } from "@/config/axios/instances/base";
 import type {
+  CopySiteStatusUpdateArgs,
   CreateProjectNotificationArgs,
   CreateProjectNotificationNoteArgs,
   ProjectNotificationsChartsArgs,
@@ -207,6 +208,11 @@ export const ProjectNotificationsApi = {
   getCopiedSiteStatusUpdates: (notificationId: string) =>
     baseApi.get<SiteStatusUpdatesResponse>(
       `projects/notifications/${encodeURIComponent(notificationId)}/site-status-updates/copied`,
+    ),
+
+  copySiteStatusUpdate: (args: CopySiteStatusUpdateArgs) =>
+    baseApi.post<SiteStatusUpdatesResponse>(
+      `projects/notifications/${encodeURIComponent(args.notification_id)}/site-status-updates/${encodeURIComponent(args.site_status_update_id)}/copy`,
     ),
 
   getNotes: (notificationId: string) =>
