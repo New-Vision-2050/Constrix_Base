@@ -1,3 +1,34 @@
+export interface ProjectOrderPermitTypeDto {
+  id: number;
+  project_type_id: number;
+  code: string;
+  description: string;
+  type: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ListProjectOrderPermitTypesResponse {
+  code: string;
+  message: string | null;
+  payload: ProjectOrderPermitTypeDto[];
+}
+
+export interface ProjectOrderPermitDepartmentDto {
+  id: number;
+  project_type_id: number;
+  code: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ListProjectOrderPermitDepartmentsResponse {
+  code: string;
+  message: string | null;
+  payload: ProjectOrderPermitDepartmentDto[];
+}
+
 export interface ProjectOrderPermitContractorDto {
   id?: string | number | null;
   name?: string | null;

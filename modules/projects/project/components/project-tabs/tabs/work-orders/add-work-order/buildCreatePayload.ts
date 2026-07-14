@@ -3,7 +3,7 @@ import type {
   CreateProjectOrderPermitWorkOrderArgs,
   CreateProjectOrderPermitsArgs,
 } from "@/services/api/projects/project-order-permits/types/params";
-import type { ProjectSharingWorkOrderPayload } from "@/services/api/projects/project-sharing-work-orders/types/response";
+import type { ProjectOrderPermitTypeDto } from "@/services/api/projects/project-order-permits/types/response";
 
 function parsePrice(value: string): number {
   const num = Number(value.replace(/,/g, ""));
@@ -20,7 +20,7 @@ function parseCoordinate(value: string): number | undefined {
 export function buildCreateWorkOrdersPayload(
   projectId: string,
   entries: WorkOrderEntry[],
-  orderPermits: ProjectSharingWorkOrderPayload[],
+  orderPermits: ProjectOrderPermitTypeDto[],
 ): CreateProjectOrderPermitsArgs {
   const orderPermitById = new Map(
     orderPermits.map((item) => [String(item.id), item]),

@@ -3,16 +3,16 @@ import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-pe
 import type { WorkOrderRow } from "@/modules/projects/project/components/project-tabs/tabs/work-orders/types";
 import { mapProjectOrderPermitDto } from "./mapProjectOrderPermit";
 
-export const projectOrderPermitsQueryKey = (projectId: string) =>
-  ["project-order-permits", projectId] as const;
+export const projectOrderPermitsQueryKey = () =>
+  ["project-order-permits"] as const;
 
 export function useProjectOrderPermits(projectId: string | undefined) {
   return useQuery({
     queryKey: projectId
-      ? projectOrderPermitsQueryKey(projectId)
-      : ["project-order-permits", ""],
+      ? projectOrderPermitsQueryKey()
+      : ["project-order-permits"],
     queryFn: async () => {
-      const res = await ProjectOrderPermitsApi.list(projectId!);
+      const res = await ProjectOrderPermitsApi.list();
       const payload = res.data?.payload;
       if (!Array.isArray(payload)) {
         return [] as WorkOrderRow[];

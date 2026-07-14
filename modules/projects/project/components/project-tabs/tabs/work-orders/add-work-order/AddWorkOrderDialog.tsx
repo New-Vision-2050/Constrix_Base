@@ -55,18 +55,10 @@ export interface WorkOrderEntry {
   price: string;
 }
 
-function generateWorkOrderId(): string {
-  const year = new Date().getFullYear();
-  const suffix = Math.floor(Math.random() * 100_000)
-    .toString()
-    .padStart(5, "0");
-  return `VD-${year}-${suffix}`;
-}
-
 function createWorkOrderEntry(): WorkOrderEntry {
   return {
     id: crypto.randomUUID(),
-    workOrderId: generateWorkOrderId(),
+    workOrderId: "",
     workOrderType: "",
     assignmentDate: "",
     contractor: "",
@@ -113,6 +105,58 @@ function isValidWorkOrderEntry(entry: WorkOrderEntry): boolean {
   );
 }
 
+function OrderPermitDepartmentSelect({
+  orderPermitId,
+  value,
+  onChange,
+  readOnly,
+  emptyDash,
+}: {
+  orderPermitId: string;
+  value: string;
+  onChange?: (value: string) => void;
+  readOnly?: boolean;
+  emptyDash: string;
+}) {
+  const tFields = useTranslations("project.workOrdersTab.dialog.fields");
+  const parsedOrderPermitId = orderPermitId ? Number(orderPermitId) : undefined;
+  const orderPermitDepartmentsQuery = useOrderPermitDepartments(
+    Number.isFinite(parsedOrderPermitId) ? parsedOrderPermitId : undefined,
+  );
+
+  if (readOnly) {
+    const selectedDepartment = (orderPermitDepartmentsQuery.data ?? []).find(
+      (item) => String(item.id) === value,
+    );
+    return displayValue(
+      selectedDepartment
+        ? getOrderPermitDepartmentLabel(selectedDepartment)
+        : value,
+      emptyDash,
+    );
+  }
+
+  return (
+    <TextField
+      select
+      value={value}
+      onChange={(e) => onChange?.(e.target.value)}
+      size="small"
+      fullWidth
+      disabled={!orderPermitId || orderPermitDepartmentsQuery.isLoading}
+    >
+      <MenuItem value="">
+        <em>{tFields("selectManagement")}</em>
+      </MenuItem>
+      {(orderPermitDepartmentsQuery.data ?? []).map((item) => (
+        <MenuItem key={item.id} value={String(item.id)}>
+          {getOrderPermitDepartmentLabel(item)}
+        </MenuItem>
+      ))}
+    </TextField>
+  );
+}
+
 export interface AddWorkOrderDialogProps {
   open: boolean;
   onClose: () => void;
@@ -124,8 +168,7 @@ export default function AddWorkOrderDialog({
   onClose,
   onCreated,
 }: AddWorkOrderDialogProps) {
-  const { projectId, projectData } = useProject();
-  const projectTypeId = projectData?.project_type_id;
+  const { projectId } = useProject();
   const t = useTranslations("project.workOrdersTab.dialog");
   const tFields = useTranslations("project.workOrdersTab.dialog.fields");
   const tReview = useTranslations("project.workOrdersTab.dialog.review");
@@ -139,10 +182,7 @@ export default function AddWorkOrderDialog({
   const [submitting, setSubmitting] = useState(false);
 
   const contractorsQuery = useProjectContractors(open ? projectId : undefined);
-  const orderPermitsQuery = useOrderPermits(open ? projectTypeId : undefined);
-  const orderPermitDepartmentsQuery = useOrderPermitDepartments(
-    open ? projectTypeId : undefined,
-  );
+  const orderPermitsQuery = useOrderPermits(open);
   const statesQuery = useStatesList({ enabled: open });
 
   const contractorOptions = useMemo(
@@ -168,14 +208,6 @@ export default function AddWorkOrderDialog({
     }
     return map;
   }, [orderPermitsQuery.data]);
-
-  const orderPermitDepartmentLabelMap = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const item of orderPermitDepartmentsQuery.data ?? []) {
-      map.set(String(item.id), getOrderPermitDepartmentLabel(item));
-    }
-    return map;
-  }, [orderPermitDepartmentsQuery.data]);
 
   const stateLabelMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -416,6 +448,7 @@ export default function AddWorkOrderDialog({
                       onChange={(e) =>
                         updateEntry(entry.id, {
                           workOrderType: e.target.value,
+                          management: "",
                         })
                       }
                       size="small"
@@ -482,33 +515,15 @@ export default function AddWorkOrderDialog({
                   )}
                 </TableCell>
                 <TableCell>
-                  {readOnly ? (
-                    displayValue(
-                      orderPermitDepartmentLabelMap.get(entry.management) ??
-                        entry.management,
-                      emptyDash,
-                    )
-                  ) : (
-                    <TextField
-                      select
-                      value={entry.management}
-                      onChange={(e) =>
-                        updateEntry(entry.id, { management: e.target.value })
-                      }
-                      size="small"
-                      fullWidth
-                      disabled={orderPermitDepartmentsQuery.isLoading}
-                    >
-                      <MenuItem value="">
-                        <em>{tFields("selectManagement")}</em>
-                      </MenuItem>
-                      {(orderPermitDepartmentsQuery.data ?? []).map((item) => (
-                        <MenuItem key={item.id} value={String(item.id)}>
-                          {getOrderPermitDepartmentLabel(item)}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
+                  <OrderPermitDepartmentSelect
+                    orderPermitId={entry.workOrderType}
+                    value={entry.management}
+                    onChange={(management) =>
+                      updateEntry(entry.id, { management })
+                    }
+                    readOnly={readOnly}
+                    emptyDash={emptyDash}
+                  />
                 </TableCell>
                 <TableCell>
                   {readOnly ? (
