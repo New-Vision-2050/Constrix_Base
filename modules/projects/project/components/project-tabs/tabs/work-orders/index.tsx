@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
+  Alert,
   Box,
   Button,
   Chip,
@@ -15,9 +16,14 @@ import {
 } from "@mui/material";
 import { FileDownloadOutlined, PrintOutlined } from "@mui/icons-material";
 import { Plus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
+import {
+  projectOrderPermitsQueryKey,
+  useProjectOrderPermits,
+} from "@/modules/projects/project/query/useProjectOrderPermits";
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
 import type { WorkOrderFilters, WorkOrderRow } from "./types";
 import {
@@ -128,6 +134,7 @@ function renderWorkOrderCell(
 
 export default function WorkOrdersTab() {
   const { projectId } = useProject();
+  const queryClient = useQueryClient();
   const t = useTranslations("project.workOrdersTab");
   const tFilters = useTranslations("project.workOrdersTab.filters");
   const tTable = useTranslations("project.workOrdersTab.table");
@@ -144,9 +151,31 @@ export default function WorkOrdersTab() {
     initialLimit: 10,
   });
 
+  const workOrdersQuery = useProjectOrderPermits(projectId);
+
+  const allRows = useMemo(
+    () => workOrdersQuery.data ?? [],
+    [workOrdersQuery.data],
+  );
+
+  const typeOptions = useMemo(
+    () => [...new Set(allRows.map((row) => row.type).filter(Boolean))],
+    [allRows],
+  );
+
+  const contractingPartyOptions = useMemo(
+    () => [...new Set(allRows.map((row) => row.contractingParty).filter(Boolean))],
+    [allRows],
+  );
+
+  const paymentStatusOptions = useMemo(
+    () => [...new Set(allRows.map((row) => row.paymentStatus).filter(Boolean))],
+    [allRows],
+  );
+
   const filteredRows = useMemo(
-    () => filterWorkOrders([], appliedFilters),
-    [appliedFilters],
+    () => filterWorkOrders(allRows, appliedFilters),
+    [allRows, appliedFilters],
   );
 
   const totalItems = filteredRows.length;
@@ -222,11 +251,18 @@ export default function WorkOrdersTab() {
     params,
     selectable: true,
     getRowId: (row: WorkOrderRow) => row.id,
-    loading: false,
+    loading: workOrdersQuery.isLoading,
     onExport: async () => {
       // TODO: export when API is available
     },
   });
+
+  const handleWorkOrdersCreated = () => {
+    if (!projectId) return;
+    queryClient.invalidateQueries({
+      queryKey: projectOrderPermitsQueryKey(projectId),
+    });
+  };
 
   if (!projectId) {
     return null;
@@ -237,6 +273,12 @@ export default function WorkOrdersTab() {
       <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
         {t("title")}
       </Typography>
+
+      {workOrdersQuery.isError ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {t("loadError")}
+        </Alert>
+      ) : null}
 
       <Paper variant="outlined" sx={{ p: 2.5, mb: 2, borderRadius: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
@@ -263,6 +305,11 @@ export default function WorkOrdersTab() {
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
+              {typeOptions.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
             </TextField>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -312,6 +359,11 @@ export default function WorkOrdersTab() {
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
+              {contractingPartyOptions.map((party) => (
+                <MenuItem key={party} value={party}>
+                  {party}
+                </MenuItem>
+              ))}
             </TextField>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -326,6 +378,11 @@ export default function WorkOrdersTab() {
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
+              {paymentStatusOptions.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
             </TextField>
           </Grid>
         </Grid>
@@ -398,6 +455,7 @@ export default function WorkOrdersTab() {
       <AddWorkOrderDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
+        onCreated={handleWorkOrdersCreated}
       />
     </Box>
   );

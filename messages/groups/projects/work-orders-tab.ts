@@ -12,6 +12,7 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   export: _m("Export", "تصدير"),
   print: _m("Print", "طباعة"),
   totalCount: _m("Total count", "المجموع الكلي"),
+  loadError: _m("Could not load work orders", "تعذر تحميل أوامر العمل"),
   emptyDash: _m("—", "—"),
   all: _m("All", "الكل"),
   yes: _m("Yes", "نعم"),
@@ -90,8 +91,8 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       contractor: _m("Contractor", "المقاول"),
       management: _m("Management", "الادارة"),
       location: _m("Location", "الموقع"),
-      length: _m("Length", "الطول"),
-      width: _m("Width", "العرض"),
+      latitude: _m("Latitude", "خط العرض"),
+      longitude: _m("Longitude", "خط الطول"),
       price: _m("Price (SAR)", "السعر (ريال)"),
       delete: _m("Remove", "الغاء"),
       selectType: _m("Select type", "اختر النوع"),
@@ -100,9 +101,23 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       selectLocation: _m("Select location", "اختر الموقع"),
     }),
     review: new MessagesGroup({
+      workOrdersCountLabel: _m("Work orders count", "عدد اوامر العمل"),
+      newWorkOrdersCount: _m(
+        "{count} new work orders",
+        "{count} امر عمل جديد",
+      ),
+      totalPriceLabel: _m(
+        "Total work orders price",
+        "مجموع اسعار اوامر العمل",
+      ),
+      sarCurrency: _m("Saudi Riyal", "ريال سعودي"),
+      dateRangeLabel: _m(
+        "Added orders date range",
+        "نطاق تاريخ الاوامر المضافة",
+      ),
       confirmLabel: _m(
         "All work order data has been reviewed and confirmed.",
-        "تمت مراجعة جميع بيانات أوامر العمل والتأكد من صحتها.",
+        "تمت مراجعة جميع بيانات اوامر العمل والتأكد من صحتها.",
       ),
     }),
     validation: new MessagesGroup({
