@@ -10,6 +10,7 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   reset: _m("Reset", "إعادة ضبط"),
   addWorkOrder: _m("Add work order", "إضافة أمر عمل"),
   export: _m("Export", "تصدير"),
+  refreshFromUds: _m("Refresh data from UDS", "تحديث البيانات من UDS"),
   print: _m("Print", "طباعة"),
   totalCount: _m("Total count", "المجموع الكلي"),
   loadError: _m("Could not load work orders", "تعذر تحميل أوامر العمل"),
@@ -18,7 +19,7 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   yes: _m("Yes", "نعم"),
   no: _m("No", "لا"),
   filters: new MessagesGroup({
-    contractCode: _m("Contract code", "كود العقد"),
+    contractCode: _m("work order number", "رقم أمر العمل"),
     type: _m("Type", "النوع"),
     stationName: _m("Station name", "اسم المحطة"),
     projectStartDate: _m("Project start date", "تاريخ بدء المشروع"),

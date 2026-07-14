@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { FileDownloadOutlined, PrintOutlined } from "@mui/icons-material";
+import { FileDownloadOutlined } from "@mui/icons-material";
 import { Plus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -140,9 +140,7 @@ export default function WorkOrdersTab() {
   const tTable = useTranslations("project.workOrdersTab.table");
   const emptyDash = t("emptyDash");
 
-  const [draftFilters, setDraftFilters] =
-    useState<WorkOrderFilters>(EMPTY_WORK_ORDER_FILTERS);
-  const [appliedFilters, setAppliedFilters] =
+  const [filters, setFilters] =
     useState<WorkOrderFilters>(EMPTY_WORK_ORDER_FILTERS);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
@@ -174,8 +172,8 @@ export default function WorkOrdersTab() {
   );
 
   const filteredRows = useMemo(
-    () => filterWorkOrders(allRows, appliedFilters),
-    [allRows, appliedFilters],
+    () => filterWorkOrders(allRows, filters),
+    [allRows, filters],
   );
 
   const totalItems = filteredRows.length;
@@ -186,21 +184,11 @@ export default function WorkOrdersTab() {
     return filteredRows.slice(start, start + params.limit);
   }, [filteredRows, params.page, params.limit]);
 
-  const updateDraftFilter = <K extends keyof WorkOrderFilters>(
+  const updateFilter = <K extends keyof WorkOrderFilters>(
     key: K,
     value: WorkOrderFilters[K],
   ) => {
-    setDraftFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleSearch = () => {
-    setAppliedFilters({ ...draftFilters });
-    params.setPage(1);
-  };
-
-  const handleReset = () => {
-    setDraftFilters(EMPTY_WORK_ORDER_FILTERS);
-    setAppliedFilters(EMPTY_WORK_ORDER_FILTERS);
+    setFilters((prev) => ({ ...prev, [key]: value }));
     params.setPage(1);
   };
 
@@ -243,6 +231,10 @@ export default function WorkOrdersTab() {
     [tTable, emptyDash, t],
   );
 
+  const handleExport = () => {
+    // TODO: export when API is available
+  };
+
   const state = WorkOrdersTableLayout.useTableState({
     data: pageData,
     columns,
@@ -252,22 +244,19 @@ export default function WorkOrdersTab() {
     selectable: true,
     getRowId: (row: WorkOrderRow) => row.id,
     loading: workOrdersQuery.isLoading,
-    onExport: async () => {
-      // TODO: export when API is available
-    },
   });
 
   const handleWorkOrdersCreated = () => {
     if (!projectId) return;
     queryClient.invalidateQueries({
-      queryKey: projectOrderPermitsQueryKey(projectId),
+      queryKey: projectOrderPermitsQueryKey(),
     });
   };
 
   if (!projectId) {
     return null;
   }
-
+  
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
@@ -289,8 +278,8 @@ export default function WorkOrdersTab() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
               label={tFilters("contractCode")}
-              value={draftFilters.contractCode}
-              onChange={(e) => updateDraftFilter("contractCode", e.target.value)}
+              value={filters.contractCode}
+              onChange={(e) => updateFilter("contractCode", e.target.value)}
               fullWidth
               size="small"
             />
@@ -299,8 +288,8 @@ export default function WorkOrdersTab() {
             <TextField
               select
               label={tFilters("type")}
-              value={draftFilters.type}
-              onChange={(e) => updateDraftFilter("type", e.target.value)}
+              value={filters.type}
+              onChange={(e) => updateFilter("type", e.target.value)}
               fullWidth
               size="small"
             >
@@ -315,8 +304,8 @@ export default function WorkOrdersTab() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
               label={tFilters("stationName")}
-              value={draftFilters.stationName}
-              onChange={(e) => updateDraftFilter("stationName", e.target.value)}
+              value={filters.stationName}
+              onChange={(e) => updateFilter("stationName", e.target.value)}
               fullWidth
               size="small"
             />
@@ -325,9 +314,9 @@ export default function WorkOrdersTab() {
             <TextField
               label={tFilters("projectStartDate")}
               type="date"
-              value={draftFilters.projectStartDate}
+              value={filters.projectStartDate}
               onChange={(e) =>
-                updateDraftFilter("projectStartDate", e.target.value)
+                updateFilter("projectStartDate", e.target.value)
               }
               fullWidth
               size="small"
@@ -338,9 +327,9 @@ export default function WorkOrdersTab() {
             <TextField
               label={tFilters("projectEndDate")}
               type="date"
-              value={draftFilters.projectEndDate}
+              value={filters.projectEndDate}
               onChange={(e) =>
-                updateDraftFilter("projectEndDate", e.target.value)
+                updateFilter("projectEndDate", e.target.value)
               }
               fullWidth
               size="small"
@@ -351,9 +340,9 @@ export default function WorkOrdersTab() {
             <TextField
               select
               label={tFilters("contractingParty")}
-              value={draftFilters.contractingParty}
+              value={filters.contractingParty}
               onChange={(e) =>
-                updateDraftFilter("contractingParty", e.target.value)
+                updateFilter("contractingParty", e.target.value)
               }
               fullWidth
               size="small"
@@ -370,9 +359,9 @@ export default function WorkOrdersTab() {
             <TextField
               select
               label={tFilters("paymentStatus")}
-              value={draftFilters.paymentStatus}
+              value={filters.paymentStatus}
               onChange={(e) =>
-                updateDraftFilter("paymentStatus", e.target.value)
+                updateFilter("paymentStatus", e.target.value)
               }
               fullWidth
               size="small"
@@ -386,26 +375,14 @@ export default function WorkOrdersTab() {
             </TextField>
           </Grid>
         </Grid>
-
-        <Stack
-          direction="row"
-          spacing={1.5}
-          justifyContent="flex-end"
-          sx={{ mt: 2.5 }}
-        >
-          <Button variant="outlined" onClick={handleReset}>
-            {t("reset")}
-          </Button>
-          <Button variant="contained" color="secondary" onClick={handleSearch}>
-            {t("search")}
-          </Button>
-        </Stack>
       </Paper>
 
       <WorkOrdersTableLayout
         filters={
           <WorkOrdersTableLayout.TopActions
             state={state}
+            exportLabel={t("refreshFromUds")}
+            exportDisabled
             customActions={
               <Stack direction="row" spacing={1} alignItems="center">
                 <Button
@@ -419,24 +396,10 @@ export default function WorkOrdersTab() {
                 <Button
                   variant="outlined"
                   startIcon={<FileDownloadOutlined />}
-                  onClick={() => state.actions.onExport?.()}
+                  onClick={handleExport}
                 >
                   {t("export")}
                 </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<PrintOutlined />}
-                  onClick={() => window.print()}
-                >
-                  {t("print")}
-                </Button>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ ml: 1 }}
-                >
-                  {t("totalCount")} : {totalItems}
-                </Typography>
               </Stack>
             }
           />

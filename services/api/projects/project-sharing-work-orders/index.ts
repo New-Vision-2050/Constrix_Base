@@ -10,8 +10,10 @@ import type {
 } from "./types/response";
 
 export const ProjectSharingWorkOrdersApi = {
-  list: () =>
-    baseApi.get<ListProjectSharingWorkOrdersResponse>("/order-permits"),
+  list: (projectTypeId: number | string) =>
+    baseApi.get<ListProjectSharingWorkOrdersResponse>("/order-permits", {
+      params: { project_type_id: projectTypeId },
+    }),
 
   show: (workOrderId: number | string) =>
     baseApi.get<GetProjectSharingWorkOrderResponse>(

@@ -1,49 +1,47 @@
 import { useQuery } from "@tanstack/react-query";
-import { ProjectSharingDepartmentApi } from "@/services/api/projects/project-sharing-department";
-import type { ProjectSharingDepartmentPayload } from "@/services/api/projects/project-sharing-department/types/response";
-import { ProjectSharingWorkOrdersApi } from "@/services/api/projects/project-sharing-work-orders";
-import type { ProjectSharingWorkOrderPayload } from "@/services/api/projects/project-sharing-work-orders/types/response";
+import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
+import type {
+  ProjectOrderPermitDepartmentDto,
+  ProjectOrderPermitTypeDto,
+} from "@/services/api/projects/project-order-permits/types/response";
 
-export const orderPermitsQueryKey = (projectTypeId: number | string) =>
-  ["order-permits", projectTypeId] as const;
+export const orderPermitsQueryKey = () => ["order-permits", "options"] as const;
 
-export const orderPermitDepartmentsQueryKey = (projectTypeId: number | string) =>
-  ["order-permit-departments", projectTypeId] as const;
+export const orderPermitDepartmentsQueryKey = (orderPermitId: number | string) =>
+  ["order-permit-departments", orderPermitId] as const;
 
-export function getOrderPermitLabel(item: ProjectSharingWorkOrderPayload): string {
+export function getOrderPermitLabel(item: ProjectOrderPermitTypeDto): string {
   return item.type?.trim() || item.description?.trim() || item.code;
 }
 
 export function getOrderPermitDepartmentLabel(
-  item: ProjectSharingDepartmentPayload,
+  item: ProjectOrderPermitDepartmentDto,
 ): string {
   return item.description?.trim() || item.code;
 }
 
-export function useOrderPermits(projectTypeId: number | undefined) {
+export function useOrderPermits(enabled = false) {
   return useQuery({
-    queryKey: projectTypeId
-      ? orderPermitsQueryKey(projectTypeId)
-      : ["order-permits", ""],
+    queryKey: orderPermitsQueryKey(),
     queryFn: async () => {
-      const res = await ProjectSharingWorkOrdersApi.list(projectTypeId!);
-      return res.data.payload ?? [];
+      const res = await ProjectOrderPermitsApi.list();
+      return (res.data.payload ?? []) as ProjectOrderPermitTypeDto[];
     },
-    enabled: !!projectTypeId,
+    enabled,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-export function useOrderPermitDepartments(projectTypeId: number | undefined) {
+export function useOrderPermitDepartments(orderPermitId: number | undefined) {
   return useQuery({
-    queryKey: projectTypeId
-      ? orderPermitDepartmentsQueryKey(projectTypeId)
+    queryKey: orderPermitId
+      ? orderPermitDepartmentsQueryKey(orderPermitId)
       : ["order-permit-departments", ""],
     queryFn: async () => {
-      const res = await ProjectSharingDepartmentApi.list(projectTypeId!);
+      const res = await ProjectOrderPermitsApi.listDepartments(orderPermitId!);
       return res.data.payload ?? [];
     },
-    enabled: !!projectTypeId,
+    enabled: !!orderPermitId,
     staleTime: 5 * 60 * 1000,
   });
 }
