@@ -6,10 +6,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
-import { useProjectRoles } from "@/modules/projects/project/query/useProjectRoles";
 import { projectEmployeesQueryKey } from "@/modules/projects/project/query/useProjectEmployees";
 import { projectMyPermissionsFlatQueryKey } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
 import type { ProjectEmployeeRoleSummary } from "./types";
+
+export type StaffRoleOption = {
+  id: string;
+  name: string;
+  is_active?: boolean;
+};
 
 type Props = {
   projectId: string | undefined;
@@ -19,6 +24,9 @@ type Props = {
   projectRole?: ProjectEmployeeRoleSummary | null;
   /** When false, role is shown read-only (`PROJECT_EMPLOYEE_UPDATE`). */
   canChangeRole?: boolean;
+  /** Roles list fetched once by the parent table (avoids N requests per row). */
+  roles?: StaffRoleOption[] | null;
+  rolesLoading?: boolean;
 };
 
 export default function StaffRoleSelect({
@@ -26,10 +34,11 @@ export default function StaffRoleSelect({
   assignmentId,
   projectRole,
   canChangeRole = true,
+  roles = null,
+  rolesLoading = false,
 }: Props) {
   const t = useTranslations("project");
   const queryClient = useQueryClient();
-  const { data: roles, isLoading, isFetching } = useProjectRoles(projectId);
 
   const serverRoleId = projectRole?.id ?? "";
 
@@ -83,7 +92,7 @@ export default function StaffRoleSelect({
     return list;
   }, [activeRoles, projectRole]);
 
-  const loading = Boolean(projectId) && (isLoading || isFetching);
+  const loading = Boolean(projectId) && canChangeRole && rolesLoading;
   const pending = assignMutation.isPending;
 
   const displayNameForValue = (id: string) => {
@@ -96,7 +105,7 @@ export default function StaffRoleSelect({
     }
     const fromMenu = menuRoles.find((r) => r.id === id);
     if (fromMenu) return fromMenu.name;
-    return id;
+    return projectRole?.name?.trim() || id;
   };
 
   const handleChange = (next: string) => {
@@ -110,9 +119,10 @@ export default function StaffRoleSelect({
     assignMutation.mutate(next);
   };
 
-  if (!projectId) {
-    const roleName = projectRole?.name?.trim();
-    if (roleName) {
+  const readOnlyName = projectRole?.name?.trim();
+
+  if (!projectId || !canChangeRole) {
+    if (readOnlyName) {
       return (
         <Box
           component="span"
@@ -125,9 +135,9 @@ export default function StaffRoleSelect({
             display: "inline-block",
             maxWidth: 260,
           }}
-          title={roleName}
+          title={readOnlyName}
         >
-          {roleName}
+          {readOnlyName}
         </Box>
       );
     }

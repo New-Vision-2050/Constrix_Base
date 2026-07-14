@@ -6,12 +6,13 @@ import getHierarchies from '../api/getHierarchies';
  * Custom hook for fetching management hierarchies data (branches, departments) using React Query
  * @returns Object containing management hierarchies data, loading state, and error state
  */
-export const useManagements = () => {
+export const useManagements = (options?: { enabled?: boolean }) => {
   const queryKey = ['management-hierarchies-managements'];
 
   return useQuery({
     queryKey,
     queryFn: () => getHierarchies('management'),
+    enabled: options?.enabled ?? true,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
