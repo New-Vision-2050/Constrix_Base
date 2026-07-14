@@ -55,7 +55,7 @@ export default function WorkLogCalendar() {
         {WEEKDAY_KEYS.map((key) => (
           <div
             key={key}
-            className="text-center text-xs text-muted-foreground py-1"
+            className="py-1 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground/80"
           >
             {weekdaysT(key)}
           </div>
@@ -87,15 +87,21 @@ export default function WorkLogCalendar() {
           return (
             <div
               key={day.isoDate ?? day.date}
-              className="aspect-square rounded-xl border p-2 flex flex-col items-center justify-between text-center transition-colors"
+              className={cn(
+                "group/day relative flex aspect-square flex-col items-center justify-between overflow-hidden rounded-xl border p-2 text-center transition-all duration-200 hover:-translate-y-0.5 hover:brightness-125",
+                day.isToday && "ring-2 ring-primary/60 ring-offset-0",
+              )}
               style={{
                 backgroundColor: cellStyles.backgroundColor,
                 borderColor: cellStyles.borderColor,
+                boxShadow: day.isToday
+                  ? `0 0 0 1px ${cellStyles.dotColor}, 0 8px 20px -10px ${cellStyles.dotColor}`
+                  : undefined,
               }}
             >
               <span
                 className={cn(
-                  "text-sm font-medium w-full",
+                  "w-full text-sm font-semibold",
                   isRtl ? "text-end" : "text-start",
                 )}
                 style={{ color: cellStyles.dayNumberColor }}
@@ -105,7 +111,7 @@ export default function WorkLogCalendar() {
 
               {showHours && day.hours ? (
                 <span
-                  className="text-[10px] font-semibold"
+                  className="text-[10px] font-bold tracking-tight"
                   style={{ color: cellStyles.labelColor }}
                   dir="ltr"
                 >
@@ -123,15 +129,18 @@ export default function WorkLogCalendar() {
               ) : null}
 
               <span
-                className="w-1.5 h-1.5 shrink-0 rounded-full"
-                style={{ backgroundColor: cellStyles.dotColor }}
+                className="h-1.5 w-1.5 shrink-0 rounded-full transition-transform duration-200 group-hover/day:scale-150"
+                style={{
+                  backgroundColor: cellStyles.dotColor,
+                  boxShadow: `0 0 6px ${cellStyles.dotColor}`,
+                }}
               />
             </div>
           );
         })}
       </div>
 
-      <div className="flex flex-wrap gap-4 pt-2 border-t border-border">
+      <div className="flex flex-wrap gap-2 border-t border-white/10 pt-3">
         {legendItems.map((item) => {
           const label = getLocalizedStatusLabel(
             item.statusKey as UserAttendanceStatusKey,
@@ -141,10 +150,16 @@ export default function WorkLogCalendar() {
           );
 
           return (
-            <div key={item.statusKey} className="flex items-center gap-1.5">
+            <div
+              key={item.statusKey}
+              className="flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1"
+            >
               <span
-                className="w-2 h-2 shrink-0 rounded-full"
-                style={{ backgroundColor: item.dotColor }}
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{
+                  backgroundColor: item.dotColor,
+                  boxShadow: `0 0 6px ${item.dotColor}`,
+                }}
               />
               <span className="text-xs text-muted-foreground">{label}</span>
             </div>
