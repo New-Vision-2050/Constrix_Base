@@ -13,6 +13,7 @@ interface UseMapTrackingDataProps {
   department?: string;
   branch?: string;
   attendance_status?: string;
+  enabled?: boolean;
 }
 
 /**
@@ -29,6 +30,7 @@ export const useMapTrackingData = (props?: UseMapTrackingDataProps) => {
     department,
     branch,
     attendance_status,
+    enabled = true,
   } = props || {};
 
   // Include all search params in queryKey to refetch when any of them changes
@@ -59,6 +61,7 @@ export const useMapTrackingData = (props?: UseMapTrackingDataProps) => {
       attendance_status:
         attendance_status === 'all' ? undefined : attendance_status,
     }),
+    enabled,
     refetchOnWindowFocus: false, // don't refetch on tab switch
     // refetchOnReconnect: false,   // don't refetch on network reconnect
     // refetchOnMount: false,       // don't refetch when component remounts

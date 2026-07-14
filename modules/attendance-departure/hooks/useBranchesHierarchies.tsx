@@ -13,12 +13,13 @@ export interface ManagementHierarchyItem {
  * Custom hook for fetching management hierarchies data (branches, departments) using React Query
  * @returns Object containing management hierarchies data, loading state, and error state
  */
-export const useBranchesHierarchies = () => {
+export const useBranchesHierarchies = (options?: { enabled?: boolean }) => {
   const queryKey = ['branches-management-hierarchies'];
 
   return useQuery({
     queryKey,
     queryFn: () => getHierarchies('branch'),
+    enabled: options?.enabled ?? true,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
