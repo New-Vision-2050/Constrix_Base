@@ -141,10 +141,16 @@ export const AttendanceContext = createContext<
 // Provider component
 interface AttendanceProviderProps {
   children: ReactNode;
+  /**
+   * When false, skips team/map/summary/filter list fetches on mount.
+   * Useful for staff tables that only need attendance dialogs.
+   */
+  eagerFetch?: boolean;
 }
 
 export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   children,
+  eagerFetch = true,
 }) => {
   // Display state: table or map
   const [view, setView] = useState<"table" | "map">("table");
@@ -208,7 +214,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isLoading: teamAttendanceLoading,
     error: teamAttendanceError,
     refetch: refetchTeamAttendance
-  } = useTeamAttendance(searchParams);
+  } = useTeamAttendance({ ...searchParams, enabled: eagerFetch });
 
 
   // Get team attendance data for map display with date and search filtering
@@ -217,7 +223,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isLoading: mapTrackingDataLoading,
     error: mapTrackingDataError,
     refetch: refetchMapTrackingData
-  } = useMapTrackingData(searchParams);
+  } = useMapTrackingData({ ...searchParams, enabled: eagerFetch });
 
 
   
@@ -231,7 +237,8 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   } = useAttendanceSummary({
     // Format dates to YYYY-MM-DD string format for API
     start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
-    end_date: endDate ? endDate.toISOString().split('T')[0] : undefined
+    end_date: endDate ? endDate.toISOString().split('T')[0] : undefined,
+    enabled: eagerFetch,
   });
   
   // Get branches data from API
@@ -240,14 +247,14 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isLoading: branchesLoading,
     error: branchesError,
     refetch: refetchBranches
-  } = useBranchesHierarchies();
+  } = useBranchesHierarchies({ enabled: eagerFetch });
 
   const {
     data:managements,
     isLoading: managementsLoading,
     error: managementsError,
     refetch: refetchManagements
-  } = useManagements();
+  } = useManagements({ enabled: eagerFetch });
 
   // Get constraints (approvers) data from API
   const {
@@ -255,7 +262,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isLoading: constraintsLoading,
     error: constraintsError,
     refetch: refetchConstraints
-  } = useConstraints();
+  } = useConstraints({ enabled: eagerFetch });
 
   // Attendance history hook
   const {

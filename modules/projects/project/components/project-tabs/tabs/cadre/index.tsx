@@ -31,6 +31,7 @@ import { useContractualEngagementEmployees } from "@/modules/projects/project/qu
 import { useOptionalContractualEngagement } from "@/modules/projects/project/context/ContractualEngagementContext";
 import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import { useProjectRoles } from "@/modules/projects/project/query/useProjectRoles";
 import {
   PROJECT_EMPLOYEE_CREATE,
   PROJECT_EMPLOYEE_DELETE,
@@ -113,6 +114,10 @@ export default function CadreTab() {
 
   const canChangeStaffRole = useCanAssignProjectStaffRoles(canUpdate);
 
+  const { data: projectRoles, isLoading: isLoadingRoles } = useProjectRoles(
+    canChangeStaffRole ? projectId : undefined,
+  );
+
   const deleteEmployeeMutation = useMutation({
     mutationFn: (assignmentId: string) =>
       AllProjectsApi.removeProjectEmployee(assignmentId),
@@ -174,12 +179,14 @@ export default function CadreTab() {
             assignmentId={row.id}
             projectRole={row.projectRole}
             canChangeRole={canChangeStaffRole}
+            roles={projectRoles}
+            rolesLoading={isLoadingRoles}
           />
         ),
       },
       ...getProjectEmployeeAttendanceColumns(t),
     ],
-    [t, projectId, canChangeStaffRole],
+    [t, projectId, canChangeStaffRole, projectRoles, isLoadingRoles],
   );
 
   const params = CadreTableLayout.useTableParams({

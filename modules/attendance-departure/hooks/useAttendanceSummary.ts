@@ -4,6 +4,7 @@ import { getAttendanceSummary, AttendanceSummaryData } from '../api/attendanceSu
 interface UseAttendanceSummaryProps {
   start_date?: string;
   end_date?: string;
+  enabled?: boolean;
 }
 
 /**
@@ -12,13 +13,14 @@ interface UseAttendanceSummaryProps {
  * @returns Object containing attendance summary data, loading state, and error state
  */
 export const useAttendanceSummary = (props?: UseAttendanceSummaryProps) => {
-  const { start_date, end_date } = props || {};
+  const { start_date, end_date, enabled = true } = props || {};
   
   const queryKey = ['attendance-summary', start_date, end_date];
   
   const { data, isLoading, error, refetch } = useQuery<AttendanceSummaryData>({
     queryKey,
     queryFn: () => getAttendanceSummary({ start_date, end_date }),
+    enabled,
     refetchOnWindowFocus: false, // don't refetch on tab switch
   });
 

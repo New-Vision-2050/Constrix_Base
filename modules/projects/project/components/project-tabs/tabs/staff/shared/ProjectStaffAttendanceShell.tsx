@@ -12,7 +12,7 @@ export function ProjectStaffAttendanceShell({
   children,
 }: ProjectStaffAttendanceShellProps) {
   return (
-    <AttendanceProvider>
+    <AttendanceProvider eagerFetch={false}>
       {children}
       <AttendanceStatusDialog />
       <ApproverDialog />
