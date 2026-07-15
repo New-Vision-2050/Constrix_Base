@@ -600,6 +600,11 @@ export default function DocumentRequirementsTable() {
         onClose={() => setAddDialogOpen(false)}
         onAdd={addRequirement}
       />
+      <AddDocumentRequirementDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onAdd={addRequirement}
+      />
     </Box>
   );
 }
