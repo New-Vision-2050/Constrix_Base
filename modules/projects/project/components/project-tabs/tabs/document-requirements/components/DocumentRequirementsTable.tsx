@@ -10,12 +10,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { ExternalLink, EyeIcon } from "lucide-react";
+import { ExternalLink, EyeIcon, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import RequirementStatsCards from "./RequirementStatsCards";
 import SubmissionStatusBadge from "./SubmissionStatusBadge";
+import AddDocumentRequirementDialog, {
+  type NewDocumentRequirement,
+} from "./AddDocumentRequirementDialog";
 import {
   DOCUMENT_REQUIREMENT_MOCK_ROWS,
   DOCUMENT_REQUIREMENT_STATS,
@@ -71,6 +74,10 @@ export default function DocumentRequirementsTable() {
   const [filterType, setFilterType] = useState("");
   const [filterPhase, setFilterPhase] = useState("");
   const [filterEntity, setFilterEntity] = useState("");
+  const [rows, setRows] = useState<DocumentRequirementRow[]>(
+    DOCUMENT_REQUIREMENT_MOCK_ROWS,
+  );
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
@@ -80,38 +87,38 @@ export default function DocumentRequirementsTable() {
   const specializations = useMemo(
     () =>
       Array.from(
-        new Set(DOCUMENT_REQUIREMENT_MOCK_ROWS.map((r) => r.specialization)),
+        new Set(rows.map((r) => r.specialization)),
       ),
-    [],
+    [rows],
   );
   const documentTypes = useMemo(
     () =>
       Array.from(
-        new Set(DOCUMENT_REQUIREMENT_MOCK_ROWS.map((r) => r.documentType)),
+        new Set(rows.map((r) => r.documentType)),
       ),
-    [],
+    [rows],
   );
   const phases = useMemo(
     () =>
-      Array.from(new Set(DOCUMENT_REQUIREMENT_MOCK_ROWS.map((r) => r.phase))),
-    [],
+      Array.from(new Set(rows.map((r) => r.phase))),
+    [rows],
   );
   const entities = useMemo(
     () =>
       Array.from(
         new Set(
-          DOCUMENT_REQUIREMENT_MOCK_ROWS.flatMap((r) => [
+          rows.flatMap((r) => [
             r.sendingEntity,
             r.reviewingEntity,
           ]),
         ),
       ),
-    [],
+    [rows],
   );
 
   const filteredRows = useMemo(() => {
     const search = params.search.trim().toLowerCase();
-    return DOCUMENT_REQUIREMENT_MOCK_ROWS.filter((row) => {
+    return rows.filter((row) => {
       if (filterSpecialization && row.specialization !== filterSpecialization) {
         return false;
       }
@@ -139,6 +146,7 @@ export default function DocumentRequirementsTable() {
     filterPhase,
     filterEntity,
     params.search,
+    rows,
   ]);
 
   const totalItems = filteredRows.length;
@@ -148,7 +156,7 @@ export default function DocumentRequirementsTable() {
     if (params.page > totalPages) {
       params.setPage(totalPages);
     }
-  }, [params.page, params.setPage, totalPages]);
+  }, [params, totalPages]);
 
   const data = useMemo(() => {
     const safePage = Math.min(params.page, totalPages);
@@ -162,6 +170,23 @@ export default function DocumentRequirementsTable() {
     setFilterPhase("");
     setFilterEntity("");
     params.setSearch("");
+    params.setPage(1);
+  };
+
+  const addRequirement = (requirement: NewDocumentRequirement) => {
+    setRows((currentRows) => [
+      {
+        id: `requirement-${Date.now()}`,
+        ...requirement,
+        phase: "—",
+        sendingEntity: "—",
+        reviewingEntity: "—",
+        submissionStatus: "awaiting_acceptance",
+        linkedDocument: "—",
+        completionPercent: 0,
+      },
+      ...currentRows,
+    ]);
     params.setPage(1);
   };
 
@@ -409,15 +434,33 @@ export default function DocumentRequirementsTable() {
             <TableLayout.TopActions
               state={state}
               customActions={
-                <Button variant="outlined" color="primary" onClick={clearFilters}>
-                  {t("clearFilters")}
-                </Button>
+                <>
+                  <Button
+                    variant="contained"
+                    startIcon={<Plus size={18} />}
+                    onClick={() => setAddDialogOpen(true)}
+                  >
+                    {t("addRequirement")}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={clearFilters}
+                  >
+                    {t("clearFilters")}
+                  </Button>
+                </>
               }
             />
           </Stack>
         }
         table={<TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />}
         pagination={<TableLayout.Pagination state={state} />}
+      />
+      <AddDocumentRequirementDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onAdd={addRequirement}
       />
     </Box>
   );
