@@ -28,8 +28,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import CustomMenu from "@/components/headless/custom-menu";
 import AddStageDialog from "./dialogs/AddStageDialog";
-import EditStageDialog from "./dialogs/EditStageDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
+import DocumentSequenceAddProcedureDialog from "./dialogs/DocumentSequenceAddProcedureDialog";
+import EditStageDialog from "./dialogs/EditStageDialog";
 import DocumentStageCard from "./DocumentStageCard";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
@@ -109,6 +110,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
       string | null
     >(null);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
+    const [classificationDialogOpen, setClassificationDialogOpen] =
+      useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [procedureToEdit, setProcedureToEdit] = useState<Stage | null>(null);
     const [procedureToDelete, setProcedureToDelete] = useState<Stage | null>(
@@ -134,7 +137,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     };
 
     useImperativeHandle(ref, () => ({
-      openAddProcedureDialog: () => setAddDialogOpen(true),
+      openAddProcedureDialog: () => setClassificationDialogOpen(true),
       addStage: handleAddStep,
     }));
 
@@ -549,9 +552,18 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             </Grid>
           </Grid>
 
-          <DocumentClassificationAddProcedureDialog
+          <DocumentSequenceAddProcedureDialog
             open={addDialogOpen}
             onClose={() => setAddDialogOpen(false)}
+            currentTabType={currentTabType}
+            onSuccess={(newStage) => {
+              handleCreateProcedure(newStage);
+              setAddDialogOpen(false);
+            }}
+          />
+          <DocumentClassificationAddProcedureDialog
+            open={classificationDialogOpen}
+            onClose={() => setClassificationDialogOpen(false)}
             procedureType={currentTabType ?? ""}
             onSave={async (values) => {
               await handleCreateProcedure({

@@ -320,7 +320,14 @@ export default function SubTypeTabs() {
         throw error;
       }
     },
-    [editingProcedure, currentTabType, refetchInternalProcedures, queryClient, t, toast],
+    [
+      editingProcedure,
+      currentTabType,
+      refetchInternalProcedures,
+      queryClient,
+      t,
+      toast,
+    ],
   );
 
   const handleAddTaskAction = useCallback(
@@ -390,62 +397,62 @@ export default function SubTypeTabs() {
     const canDelete = !isProtected && !isLast;
 
     return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 0.5,
-        cursor: "pointer",
-        px: 1,
-        py: 0.5,
-        borderRadius: 1,
-        bgcolor: isProcedureSelected(procedure.id)
-          ? "action.selected"
-          : "transparent",
-      }}
-      onClick={onSelect}
-    >
-      <Typography variant="subtitle1" fontWeight={600}>
-        {procedure.name}
-      </Typography>
-      <CustomMenu
-        renderAnchor={({ onClick }) => (
-          <IconButton
-            size="small"
-            aria-label={t("stages.editStage")}
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick(e);
-            }}
-          >
-            <Settings sx={{ fontSize: 22 }} />
-          </IconButton>
-        )}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 0.5,
+          cursor: "pointer",
+          px: 1,
+          py: 0.5,
+          borderRadius: 1,
+          bgcolor: isProcedureSelected(procedure.id)
+            ? "action.selected"
+            : "transparent",
+        }}
+        onClick={onSelect}
       >
-        <MenuItem
-          onClick={(e) => {
-            e.stopPropagation();
-            openEditProcedureDialog(procedure);
-          }}
+        <Typography variant="subtitle1" fontWeight={600}>
+          {procedure.name}
+        </Typography>
+        <CustomMenu
+          renderAnchor={({ onClick }) => (
+            <IconButton
+              size="small"
+              aria-label={t("stages.editStage")}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick(e);
+              }}
+            >
+              <Settings sx={{ fontSize: 22 }} />
+            </IconButton>
+          )}
         >
-          <Edit fontSize="small" sx={{ mr: 1 }} />
-          {t("actions.edit")}
-        </MenuItem>
-        {canDelete ? (
           <MenuItem
             onClick={(e) => {
               e.stopPropagation();
-              setProcedureToDelete(procedure);
-              setDeleteConfirmOpen(true);
+              openEditProcedureDialog(procedure);
             }}
-            sx={{ color: "error.main" }}
           >
-            <Delete fontSize="small" sx={{ mr: 1 }} />
-            {t("actions.delete")}
+            <Edit fontSize="small" sx={{ mr: 1 }} />
+            {t("actions.edit")}
           </MenuItem>
-        ) : null}
-      </CustomMenu>
-    </Box>
+          {canDelete ? (
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                setProcedureToDelete(procedure);
+                setDeleteConfirmOpen(true);
+              }}
+              sx={{ color: "error.main" }}
+            >
+              <Delete fontSize="small" sx={{ mr: 1 }} />
+              {t("actions.delete")}
+            </MenuItem>
+          ) : null}
+        </CustomMenu>
+      </Box>
     );
   };
 
@@ -476,7 +483,10 @@ export default function SubTypeTabs() {
             sx={{
               flex: 1,
               minWidth: 0,
-              "& .MuiTabs-indicator": { height: 3, borderRadius: "3px 3px 0 0" },
+              "& .MuiTabs-indicator": {
+                height: 3,
+                borderRadius: "3px 3px 0 0",
+              },
             }}
           >
             {outerTabs.map((tab) => (
@@ -484,7 +494,13 @@ export default function SubTypeTabs() {
                 key={tab.id}
                 value={tab.id}
                 label={
-                  <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}>
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 0.75,
+                    }}
+                  >
                     <span>{ts(tab.name)}</span>
                     <Settings sx={{ fontSize: 16, opacity: 0.85 }} />
                   </Box>
@@ -497,14 +513,6 @@ export default function SubTypeTabs() {
             color="primary"
             onClick={() => stagesViewRef.current?.openAddProcedureDialog()}
             aria-label={t("procedures.addProcedure")}
-            sx={{
-              flexShrink: 0,
-              width: 40,
-              height: 40,
-              bgcolor: "primary.main",
-              color: "primary.contrastText",
-              "&:hover": { bgcolor: "primary.dark" },
-            }}
           >
             <PlusIcon className="h-5 w-5" />
           </IconButton>
@@ -731,8 +739,10 @@ export default function SubTypeTabs() {
         procedure={editingProcedure}
         lockFormModel={
           editingProcedure
-            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures) ||
-              isLastInternalProcedure(editingProcedure, internalProcedures)
+            ? isPrimaryInternalProcedure(
+                editingProcedure,
+                internalProcedures,
+              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
             : false
         }
         hideAppearAfter={
@@ -758,12 +768,13 @@ export default function SubTypeTabs() {
         }
         disableIsActiveSwitch={
           editingProcedure
-            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures) ||
-              isLastInternalProcedure(editingProcedure, internalProcedures)
+            ? isPrimaryInternalProcedure(
+                editingProcedure,
+                internalProcedures,
+              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
             : false
         }
         onSave={handleEditTaskAction}
-
       />
     </div>
   );
