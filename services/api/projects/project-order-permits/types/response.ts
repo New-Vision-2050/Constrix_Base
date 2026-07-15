@@ -55,7 +55,9 @@ export interface ProjectOrderPermitWorkOrderDto {
   order_permit_id?: number | null;
   order_permit_department_id?: number | null;
   contractor_id?: string | null;
+  contractor_name?: string | null;
   state_id?: string | number | null;
+  state_name?: string | null;
   lat?: number | string | null;
   long?: number | string | null;
   price?: number | string | null;
