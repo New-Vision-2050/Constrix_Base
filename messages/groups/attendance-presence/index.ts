@@ -39,6 +39,7 @@ export const attendancePresenceMessages = new MessagesGroup({
     leave: _m("Leave", "اجازة"),
     holiday: _m("Holiday", "عطلة"),
     required: _m("Required Attendance", "الحضور المطلوب"),
+    onTask: _m("On Task", "متواجد"),
   }),
 
   // Today log

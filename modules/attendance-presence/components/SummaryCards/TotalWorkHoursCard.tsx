@@ -21,15 +21,16 @@ export default function TotalWorkHoursCard() {
 
   return (
     <SummaryCardShell
-      icon={<Clock size={18} className="text-primary" />}
+      icon={<Clock size={18} />}
       title={t("totalWorkHours")}
+      accent="#EC1E8C"
       footer={
-        <div className="border-t border-border pt-3">
+        <div className="border-t border-white/10 pt-3">
           <p className="text-xs text-muted-foreground text-start">{t("thisMonth")}</p>
         </div>
       }
     >
-      <p className="text-xl font-semibold text-foreground leading-tight">
+      <p className="bg-gradient-to-br from-white to-white/60 bg-clip-text text-2xl font-bold leading-tight text-transparent">
         {isLoading && !data
           ? "—"
           : t("hoursAndMinutes", {

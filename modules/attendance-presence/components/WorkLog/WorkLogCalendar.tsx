@@ -8,85 +8,15 @@ import { useAttendancePresence } from "../../context/AttendancePresenceContext";
 import { useUserAttendanceCalendar } from "../../hooks/useUserAttendanceCalendar";
 import {
   buildCalendarGrid,
-  CALENDAR_LEGEND_ITEMS,
+  buildCalendarLegend,
   shouldShowHours,
   shouldShowStatusLabel,
 } from "../../utils/calendar";
+import { getCalendarDayCellStyles } from "../../utils/status-colors";
 import { useAttendanceDirection } from "../../utils/direction";
 import { getLocalizedStatusLabel } from "../../utils/i18n";
 
 const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
-
-type CalendarStatusKey = UserAttendanceStatusKey;
-
-const CALENDAR_STATUS_CLASSES: Record<
-  CalendarStatusKey,
-  { cell: string; dayNumber: string; label: string; dot: string }
-> = {
-  off: {
-    cell: "bg-secondary/45 border-secondary-foreground/20",
-    dayNumber: "text-foreground/80",
-    label: "text-secondary-foreground",
-    dot: "bg-secondary-foreground/75",
-  },
-  absent: {
-    cell: "bg-destructive/15 border-destructive/25",
-    dayNumber: "text-foreground",
-    label: "text-destructive",
-    dot: "bg-destructive",
-  },
-  present: {
-    cell: "bg-chart-2/15 border-chart-2/25",
-    dayNumber: "text-foreground",
-    label: "text-chart-2",
-    dot: "bg-chart-2",
-  },
-  late: {
-    cell: "bg-chart-3/15 border-chart-3/25",
-    dayNumber: "text-foreground",
-    label: "text-chart-3",
-    dot: "bg-chart-3",
-  },
-  leave: {
-    cell: "bg-chart-4/15 border-chart-4/25",
-    dayNumber: "text-foreground",
-    label: "text-chart-4",
-    dot: "bg-chart-4",
-  },
-  required: {
-    cell: "bg-chart-1/15 border-chart-1/25",
-    dayNumber: "text-foreground",
-    label: "text-chart-1",
-    dot: "bg-chart-1",
-  },
-};
-
-const LEGEND_DOT_CLASS: Record<string, string> = {
-  late: "bg-chart-3",
-  absent: "bg-destructive",
-  holiday: "bg-secondary-foreground/75",
-  required: "bg-chart-1",
-};
-
-function getCalendarStatusClasses(
-  statusKey?: string,
-  isToday = false,
-) {
-  const key =
-    statusKey && statusKey in CALENDAR_STATUS_CLASSES
-      ? (statusKey as CalendarStatusKey)
-      : "off";
-
-  const styles = CALENDAR_STATUS_CLASSES[key];
-
-  return {
-    ...styles,
-    cell: cn(
-      styles.cell,
-      isToday && "border-primary ring-1 ring-primary/30 border-2",
-    ),
-  };
-}
 
 export default function WorkLogCalendar() {
   const t = useTranslations("AttendancePresence");
@@ -101,6 +31,7 @@ export default function WorkLogCalendar() {
   const { data, isLoading, isError } = useUserAttendanceCalendar(month, year);
 
   const calendarDays = buildCalendarGrid(data?.days ?? []);
+  const legendItems = buildCalendarLegend(data?.days ?? []);
 
   if (isLoading) {
     return (
@@ -124,7 +55,7 @@ export default function WorkLogCalendar() {
         {WEEKDAY_KEYS.map((key) => (
           <div
             key={key}
-            className="text-center text-xs text-muted-foreground py-1"
+            className="py-1 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground/80"
           >
             {weekdaysT(key)}
           </div>
@@ -135,8 +66,9 @@ export default function WorkLogCalendar() {
             return <div key={`empty-${index}`} />;
           }
 
-          const cellClasses = getCalendarStatusClasses(
+          const cellStyles = getCalendarDayCellStyles(
             day.statusKey,
+            day.dotColor,
             day.isToday,
           );
 
@@ -156,23 +88,31 @@ export default function WorkLogCalendar() {
             <div
               key={day.isoDate ?? day.date}
               className={cn(
-                "aspect-square rounded-xl border p-2 flex flex-col items-center justify-between text-center transition-colors",
-                cellClasses.cell,
+                "group/day relative flex aspect-square flex-col items-center justify-between overflow-hidden rounded-xl border p-2 text-center transition-all duration-200 hover:-translate-y-0.5 hover:brightness-125",
+                day.isToday && "ring-2 ring-primary/60 ring-offset-0",
               )}
+              style={{
+                backgroundColor: cellStyles.backgroundColor,
+                borderColor: cellStyles.borderColor,
+                boxShadow: day.isToday
+                  ? `0 0 0 1px ${cellStyles.dotColor}, 0 8px 20px -10px ${cellStyles.dotColor}`
+                  : undefined,
+              }}
             >
               <span
                 className={cn(
-                  "text-sm font-medium w-full",
+                  "w-full text-sm font-semibold",
                   isRtl ? "text-end" : "text-start",
-                  cellClasses.dayNumber,
                 )}
+                style={{ color: cellStyles.dayNumberColor }}
               >
                 {day.date}
               </span>
 
               {showHours && day.hours ? (
                 <span
-                  className={cn("text-[10px] font-semibold", cellClasses.label)}
+                  className="text-[10px] font-bold tracking-tight"
+                  style={{ color: cellStyles.labelColor }}
                   dir="ltr"
                 >
                   {day.hours}
@@ -181,37 +121,50 @@ export default function WorkLogCalendar() {
 
               {showLabel && statusLabel ? (
                 <span
-                  className={cn("text-[10px] font-medium", cellClasses.label)}
+                  className="text-[10px] font-medium"
+                  style={{ color: cellStyles.labelColor }}
                 >
                   {statusLabel}
                 </span>
               ) : null}
 
               <span
-                className={cn(
-                  "w-1.5 h-1.5 shrink-0 rounded-full",
-                  cellClasses.dot,
-                )}
+                className="h-1.5 w-1.5 shrink-0 rounded-full transition-transform duration-200 group-hover/day:scale-150"
+                style={{
+                  backgroundColor: cellStyles.dotColor,
+                  boxShadow: `0 0 6px ${cellStyles.dotColor}`,
+                }}
               />
             </div>
           );
         })}
       </div>
 
-      <div className="flex flex-wrap gap-4 pt-2 border-t border-border">
-        {CALENDAR_LEGEND_ITEMS.map((item) => (
-          <div key={item.key} className="flex items-center gap-1.5">
-            <span
-              className={cn(
-                "w-2 h-2 shrink-0 rounded-full",
-                LEGEND_DOT_CLASS[item.labelKey] ?? "bg-muted-foreground",
-              )}
-            />
-            <span className="text-xs text-muted-foreground">
-              {statusT(item.labelKey)}
-            </span>
-          </div>
-        ))}
+      <div className="flex flex-wrap gap-2 border-t border-white/10 pt-3">
+        {legendItems.map((item) => {
+          const label = getLocalizedStatusLabel(
+            item.statusKey as UserAttendanceStatusKey,
+            item.statusLabel,
+            locale,
+            statusT,
+          );
+
+          return (
+            <div
+              key={item.statusKey}
+              className="flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1"
+            >
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{
+                  backgroundColor: item.dotColor,
+                  boxShadow: `0 0 6px ${item.dotColor}`,
+                }}
+              />
+              <span className="text-xs text-muted-foreground">{label}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

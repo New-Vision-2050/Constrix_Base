@@ -249,7 +249,7 @@ export default function WorkOrdersTab() {
   const handleWorkOrdersCreated = () => {
     if (!projectId) return;
     queryClient.invalidateQueries({
-      queryKey: projectOrderPermitsQueryKey(projectId),
+      queryKey: projectOrderPermitsQueryKey(),
     });
   };
 

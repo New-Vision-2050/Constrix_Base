@@ -6,6 +6,7 @@ export const STATUS_HEX_COLORS = {
   leave: "#9C27B0",
   off: "#9E9E9E",
   required: "#2196F3",
+  on_task: "#26A69A",
 } as const;
 
 export type StatusHexColorKey = keyof typeof STATUS_HEX_COLORS;
@@ -57,6 +58,11 @@ const CALENDAR_STATUS_PALETTE: Record<
     dayNumberColor: "rgba(255, 255, 255, 0.88)",
     labelColor: "#64B5F6",
   },
+  on_task: {
+    backgroundColor: "rgba(38, 166, 154, 0.16)",
+    dayNumberColor: "rgba(255, 255, 255, 0.88)",
+    labelColor: "#4DB6AC",
+  },
 };
 
 function hexToRgba(hex: string, alpha: number): string {
@@ -106,12 +112,23 @@ export function getCalendarDayCellStyles(
     ? dotColor
     : STATUS_HEX_COLORS[key];
 
+  // When the status is one we don't have a tuned palette for, derive the
+  // colors straight from the API-provided dot color so new statuses render
+  // dynamically (matching the mobile behavior) without frontend changes.
+  const hasKnownPalette =
+    statusKey != null && statusKey in CALENDAR_STATUS_PALETTE;
+  const isDynamicHex = !hasKnownPalette && dotColor?.startsWith("#");
+
+  const labelColor = isDynamicHex ? resolvedDot : palette.labelColor;
+  const baseBackground = isDynamicHex
+    ? hexToRgba(resolvedDot, 0.16)
+    : palette.backgroundColor;
+
   return {
     ...palette,
+    labelColor,
     dotColor: resolvedDot,
     borderColor: isToday ? "#2196F3" : "rgba(255, 255, 255, 0.08)",
-    backgroundColor: isToday
-      ? hexToRgba(resolvedDot, 0.22)
-      : palette.backgroundColor,
+    backgroundColor: isToday ? hexToRgba(resolvedDot, 0.22) : baseBackground,
   };
 }
