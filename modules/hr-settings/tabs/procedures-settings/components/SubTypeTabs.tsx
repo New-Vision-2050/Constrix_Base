@@ -17,8 +17,16 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { Delete, Edit, Settings } from "@mui/icons-material";
-import { PlusIcon } from "lucide-react";
+import {
+  PlusIcon,
+  Mail,
+  FileCheck,
+  AlertOctagon,
+  FileEdit,
+  Layers,
+} from "lucide-react";
 import { useState, useMemo, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -52,6 +60,18 @@ import EditTaskActionDialog from "./dialogs/EditTaskActionDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
 
 const WORK_PLAN_TAB = "work_plan";
+
+const OUTER_TAB_ICONS: Record<string, typeof Mail> = {
+  correspondence: Mail,
+  technical_submittal: FileCheck,
+  ncr: AlertOctagon,
+  vo: FileEdit,
+};
+
+function getOuterTabIcon(type: string) {
+  const Icon = OUTER_TAB_ICONS[type] ?? Layers;
+  return <Icon size={16} strokeWidth={2} />;
+}
 
 export default function SubTypeTabs() {
   const { t, ts } = useProceduresSettingsTranslations();
@@ -462,13 +482,24 @@ export default function SubTypeTabs() {
         <Paper
           elevation={0}
           sx={{
-            px: 2,
+            px: 1.5,
+            py: 1.5,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: 2,
-            bgcolor: "background.paper",
-            borderRadius: 2,
+            borderRadius: "16px",
+            border: "1px solid",
+            borderColor: "divider",
+            bgcolor: (theme) => alpha(theme.palette.background.paper, 0.7),
+            backdropFilter: "blur(12px)",
+            backgroundImage: (theme) =>
+              `linear-gradient(180deg, ${alpha(
+                theme.palette.primary.main,
+                0.05,
+              )} 0%, transparent 100%)`,
+            boxShadow: (theme) =>
+              `0 4px 24px ${alpha(theme.palette.common.black, 0.25)}`,
           }}
         >
           <Tabs
@@ -480,12 +511,45 @@ export default function SubTypeTabs() {
             }}
             variant="scrollable"
             scrollButtons="auto"
+            TabIndicatorProps={{
+              sx: {
+                height: "100%",
+                borderRadius: "12px",
+                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.14),
+                border: "1px solid",
+                borderColor: "primary.main",
+                boxShadow: (theme) =>
+                  `0 0 20px ${alpha(theme.palette.primary.main, 0.35)}`,
+                top: 0,
+                bottom: 0,
+                zIndex: 0,
+              },
+            }}
             sx={{
               flex: 1,
               minWidth: 0,
-              "& .MuiTabs-indicator": {
-                height: 3,
-                borderRadius: "3px 3px 0 0",
+              "& .MuiTabs-flexContainer": {
+                gap: 0.5,
+              },
+              "& .MuiTab-root": {
+                textTransform: "none",
+                minHeight: 44,
+                px: 2,
+                py: 1,
+                borderRadius: "12px",
+                color: "text.secondary",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                transition: "all 0.2s ease",
+                zIndex: 1,
+                "&:hover": {
+                  color: "text.primary",
+                  bgcolor: "rgba(255, 255, 255, 0.03)",
+                },
+                "&.Mui-selected": {
+                  color: "primary.main",
+                  fontWeight: 700,
+                },
               },
             }}
           >
@@ -499,23 +563,40 @@ export default function SubTypeTabs() {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 0.75,
+                      position: "relative",
+                      zIndex: 1,
+                      "& svg": {
+                        width: 16,
+                        height: 16,
+                      },
                     }}
                   >
+                    {getOuterTabIcon(tab.type)}
                     <span>{ts(tab.name)}</span>
-                    <Settings sx={{ fontSize: 16, opacity: 0.85 }} />
                   </Box>
                 }
               />
             ))}
           </Tabs>
 
-          <IconButton
-            color="primary"
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<PlusIcon className="h-4 w-4" />}
             onClick={() => stagesViewRef.current?.openAddProcedureDialog()}
             aria-label={t("procedures.addProcedure")}
+            sx={{
+              borderRadius: "12px",
+              textTransform: "none",
+              fontWeight: 700,
+              px: 2,
+              boxShadow: (theme) =>
+                `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+              flexShrink: 0,
+            }}
           >
-            <PlusIcon className="h-5 w-5" />
-          </IconButton>
+            {t("procedures.addProcedure")}
+          </Button>
         </Paper>
       ) : (
         !(hideWorkPlanTabs && outerTabs.length <= 1) && (

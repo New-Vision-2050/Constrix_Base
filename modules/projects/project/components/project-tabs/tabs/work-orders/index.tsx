@@ -381,10 +381,19 @@ export default function WorkOrdersTab() {
         filters={
           <WorkOrdersTableLayout.TopActions
             state={state}
-            exportLabel={t("refreshFromUds")}
-            exportDisabled
             customActions={
               <Stack direction="row" spacing={1} alignItems="center">
+                <Button
+                  variant="outlined"
+                  color="info"
+                  startIcon={<FileDownloadOutlined />}
+                  disabled
+                  onClick={() => {
+                    // TODO: refresh from UDS when API is available
+                  }}
+                >
+                  {t("refreshFromUds")}
+                </Button>
                 <Button
                   variant="contained"
                   color="primary"

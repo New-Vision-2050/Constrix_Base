@@ -68,11 +68,12 @@ export default function SubmissionStatusBadge({
           <Box
             component="span"
             sx={{
-              width: 6,
-              height: 6,
+              width: 7,
+              height: 7,
               borderRadius: "50%",
               bgcolor: config.color,
               flexShrink: 0,
+              boxShadow: `0 0 8px ${config.color}`,
             }}
           />
           {t(config.labelKey)}
@@ -81,10 +82,26 @@ export default function SubmissionStatusBadge({
       sx={{
         bgcolor: config.bg,
         color: config.color,
-        fontWeight: 500,
-        borderRadius: "16px",
+        fontWeight: 600,
+        borderRadius: "20px",
         border: "none",
-        "& .MuiChip-label": { px: 1.5, py: 0.25 },
+        position: "relative",
+        overflow: "visible",
+        pl: 0.25,
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          insetInlineStart: 0,
+          top: "15%",
+          bottom: "15%",
+          width: "3px",
+          borderStartStartRadius: "4px",
+          borderEndStartRadius: "4px",
+          borderStartEndRadius: 0,
+          borderEndEndRadius: 0,
+          bgcolor: config.color,
+        },
+        "& .MuiChip-label": { px: 1.5, py: 0.35 },
       }}
     />
   );

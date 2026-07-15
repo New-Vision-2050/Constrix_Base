@@ -5,12 +5,21 @@ import {
   Box,
   Button,
   CircularProgress,
+  InputAdornment,
   MenuItem,
+  Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { ExternalLink, EyeIcon, Plus } from "lucide-react";
+import {
+  ExternalLink,
+  EyeIcon,
+  Filter,
+  Plus,
+  Search,
+} from "lucide-react";
+import { alpha } from "@mui/material/styles";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
@@ -31,8 +40,18 @@ const TableLayout = HeadlessTableLayout<DocumentRequirementRow>(
 
 const filterSx = {
   flex: 1,
-  minWidth: 160,
-  "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+  minWidth: 170,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    bgcolor: "background.paper",
+    transition: "all 0.2s ease",
+    "&:hover fieldset": {
+      borderColor: "primary.main",
+    },
+    "&.Mui-focused fieldset": {
+      borderWidth: "1px",
+    },
+  },
 } as const;
 
 function CompletionCell({ percent }: { percent: number }) {
@@ -40,10 +59,22 @@ function CompletionCell({ percent }: { percent: number }) {
     percent >= 70 ? "#22C55E" : percent >= 40 ? "#F59E0B" : "#EF4444";
 
   return (
-    <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1 }}>
+    <Box
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 1.25,
+        px: 1.25,
+        py: 0.5,
+        borderRadius: "999px",
+        bgcolor: `${color}14`,
+        border: "1px solid",
+        borderColor: `${color}33`,
+      }}
+    >
       <Typography
         component="span"
-        sx={{ fontWeight: 600, color, fontSize: "0.875rem" }}
+        sx={{ fontWeight: 700, color, fontSize: "0.8125rem" }}
       >
         {percent}%
       </Typography>
@@ -51,14 +82,14 @@ function CompletionCell({ percent }: { percent: number }) {
         <CircularProgress
           variant="determinate"
           value={100}
-          size={22}
+          size={20}
           thickness={5}
-          sx={{ color: "action.hover", position: "absolute" }}
+          sx={{ color: `${color}22`, position: "absolute" }}
         />
         <CircularProgress
           variant="determinate"
           value={percent}
-          size={22}
+          size={20}
           thickness={5}
           sx={{ color }}
         />
@@ -173,18 +204,18 @@ export default function DocumentRequirementsTable() {
     params.setPage(1);
   };
 
-  const addRequirement = (requirement: NewDocumentRequirement) => {
+  const addRequirement = (requirements: NewDocumentRequirement[]) => {
     setRows((currentRows) => [
-      {
-        id: `requirement-${Date.now()}`,
+      ...requirements.map((requirement, index) => ({
+        id: `requirement-${Date.now()}-${index}`,
         ...requirement,
         phase: "—",
         sendingEntity: "—",
         reviewingEntity: "—",
-        submissionStatus: "awaiting_acceptance",
+        submissionStatus: "awaiting_acceptance" as const,
         linkedDocument: "—",
         completionPercent: 0,
-      },
+      })),
       ...currentRows,
     ]);
     params.setPage(1);
@@ -342,18 +373,104 @@ export default function DocumentRequirementsTable() {
     selectable: true,
     getRowId: (row: DocumentRequirementRow) => row.id,
     loading: false,
-    searchable: true,
+    searchable: false,
     onExport: async () => {},
+    getRowSx: (_row: DocumentRequirementRow, index: number) => ({
+      transition: "background-color 0.15s ease",
+      ...(index % 2 === 1 && {
+        backgroundColor: "rgba(255, 255, 255, 0.02)",
+      }),
+      "&:hover": {
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+      },
+    }),
   });
 
   return (
     <Box>
       <RequirementStatsCards stats={DOCUMENT_REQUIREMENT_STATS} />
 
-      <TableLayout
-        filters={
-          <Stack spacing={2}>
-            <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          overflow: "hidden",
+          mb: 3,
+        }}
+      >
+        <Box
+          sx={{
+            px: 2.5,
+            py: 2,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "10px",
+                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                color: "primary.main",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Filter size={18} />
+            </Box>
+            <Typography variant="subtitle1" fontWeight={700}>
+              {t("filterSearch")}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Button
+              variant="contained"
+              startIcon={<Plus size={18} />}
+              onClick={() => setAddDialogOpen(true)}
+              sx={{
+                borderRadius: "10px",
+                textTransform: "none",
+                fontWeight: 600,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.18)",
+              }}
+            >
+              {t("addRequirement")}
+            </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={clearFilters}
+              sx={{
+                borderRadius: "10px",
+                textTransform: "none",
+                fontWeight: 600,
+              }}
+            >
+              {t("clearFilters")}
+            </Button>
+          </Box>
+        </Box>
+
+        <Box sx={{ p: 2.5 }}>
+          <Stack spacing={2.5}>
+            <Stack
+              direction="row"
+              spacing={2}
+              flexWrap="wrap"
+              useFlexGap
+              sx={{ alignItems: "center" }}
+            >
               <TextField
                 select
                 size="small"
@@ -429,33 +546,59 @@ export default function DocumentRequirementsTable() {
                   </MenuItem>
                 ))}
               </TextField>
-            </Stack>
 
-            <TableLayout.TopActions
-              state={state}
-              customActions={
-                <>
-                  <Button
-                    variant="contained"
-                    startIcon={<Plus size={18} />}
-                    onClick={() => setAddDialogOpen(true)}
-                  >
-                    {t("addRequirement")}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={clearFilters}
-                  >
-                    {t("clearFilters")}
-                  </Button>
-                </>
-              }
-            />
+              <TextField
+                size="small"
+                placeholder={t("search")}
+                value={params.search}
+                onChange={(e) => {
+                  params.setSearch(e.target.value);
+                  params.setPage(1);
+                }}
+                sx={{
+                  flex: 1.5,
+                  minWidth: 240,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    bgcolor: "background.paper",
+                    pl: 1.5,
+                  },
+                }}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search size={18} />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </Stack>
           </Stack>
-        }
-        table={<TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />}
-        pagination={<TableLayout.Pagination state={state} />}
+        </Box>
+      </Paper>
+
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          overflow: "hidden",
+        }}
+      >
+        <TableLayout
+          filters={undefined}
+          table={<TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />}
+          pagination={<TableLayout.Pagination state={state} />}
+        />
+      </Paper>
+      <AddDocumentRequirementDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onAdd={addRequirement}
       />
       <AddDocumentRequirementDialog
         open={addDialogOpen}
