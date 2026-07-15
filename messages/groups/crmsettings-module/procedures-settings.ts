@@ -350,6 +350,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
     linkedFolderName: _m("Linked folder name", "اسم المجلد المرتبط"),
     classificationCode: _m("Classification code", "كود التصنيف"),
     documentNature: _m("Document nature", "طبيعة المستند"),
+    jobAttribute: _m("Job attribute", "سمة الوظيفة"),
     usedInDocumentCycle: _m(
       "Used in document cycle",
       "يستخدم في دورة الوثائق",
