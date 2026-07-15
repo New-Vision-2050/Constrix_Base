@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
+  Box,
   Button,
   Checkbox,
   Dialog,
@@ -10,11 +11,21 @@ import {
   DialogTitle,
   FormControlLabel,
   FormGroup,
+  IconButton,
   MenuItem,
+  Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
+  Typography,
 } from "@mui/material";
+import { Add as AddIcon, DeleteOutline } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 export type NewDocumentRequirement = {
   requirementCode: string;
@@ -27,10 +38,22 @@ export type NewDocumentRequirement = {
 
 type FrequencyType = "day" | "week" | "month";
 
+interface RequirementEntry {
+  id: string;
+  requirementCode: string;
+  requiredDocumentName: string;
+  document: string;
+  documentType: string;
+  specialization: string;
+  frequencyType: FrequencyType | "";
+  selectedDays: string[];
+  interval: string;
+}
+
 type Props = {
   open: boolean;
   onClose: () => void;
-  onAdd: (requirement: NewDocumentRequirement) => void;
+  onAdd: (requirements: NewDocumentRequirement[]) => void;
 };
 
 const DOCUMENT_TYPES = [
@@ -51,16 +74,48 @@ const WEEK_DAYS = [
   "friday",
 ] as const;
 
-const INITIAL_FORM = {
-  requirementCode: "",
-  requiredDocumentName: "",
-  document: "",
-  documentType: "",
-  specialization: "",
-  frequencyType: "" as FrequencyType | "",
-  selectedDays: [] as string[],
-  interval: "",
-};
+function createEntry(): RequirementEntry {
+  return {
+    id: crypto.randomUUID(),
+    requirementCode: "",
+    requiredDocumentName: "",
+    document: "",
+    documentType: "",
+    specialization: "",
+    frequencyType: "",
+    selectedDays: [],
+    interval: "",
+  };
+}
+
+function isEntryValid(entry: RequirementEntry): boolean {
+  if (
+    !entry.requirementCode.trim() ||
+    !entry.requiredDocumentName.trim() ||
+    !entry.document.trim() ||
+    !entry.documentType ||
+    !entry.frequencyType
+  ) {
+    return false;
+  }
+  if (entry.frequencyType === "day") return entry.selectedDays.length > 0;
+  return Number(entry.interval) > 0;
+}
+
+function buildFrequency(
+  entry: RequirementEntry,
+  t: ReturnType<typeof useTranslations>,
+): string {
+  if (entry.frequencyType === "day") {
+    return entry.selectedDays
+      .map((day) => t(`weekDays.${day}` as "weekDays.saturday"))
+      .join("، ");
+  }
+  return t(
+    entry.frequencyType === "week" ? "everyWeeks" : "everyMonths",
+    { count: Number(entry.interval) },
+  );
+}
 
 export default function AddDocumentRequirementDialog({
   open,
@@ -68,191 +123,352 @@ export default function AddDocumentRequirementDialog({
   onAdd,
 }: Props) {
   const t = useTranslations("project.documentRequirements");
-  const [form, setForm] = useState(INITIAL_FORM);
+  const tValidation = useTranslations("project.documentRequirements.validation");
+  const [entries, setEntries] = useState<RequirementEntry[]>([createEntry()]);
   const [submitted, setSubmitted] = useState(false);
 
-  const isValid = useMemo(() => {
-    const baseFieldsValid =
-      form.requirementCode.trim() &&
-      form.requiredDocumentName.trim() &&
-      form.document.trim() &&
-      form.documentType &&
-      form.frequencyType;
+  const updateEntry = (
+    id: string,
+    patch: Partial<Omit<RequirementEntry, "id">>,
+  ) => {
+    setEntries((prev) =>
+      prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)),
+    );
+  };
 
-    if (!baseFieldsValid) return false;
-    if (form.frequencyType === "day") return form.selectedDays.length > 0;
-    return Number(form.interval) > 0;
-  }, [form]);
+  const addEntry = () => {
+    setEntries((prev) => [...prev, createEntry()]);
+  };
+
+  const removeEntry = (id: string) => {
+    setEntries((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((entry) => entry.id !== id);
+    });
+  };
+
+  const validEntries = useMemo(
+    () => entries.filter(isEntryValid),
+    [entries],
+  );
 
   const handleClose = () => {
-    setForm(INITIAL_FORM);
+    setEntries([createEntry()]);
     setSubmitted(false);
     onClose();
   };
 
   const handleSubmit = () => {
     setSubmitted(true);
-    if (!isValid) return;
 
-    const frequency =
-      form.frequencyType === "day"
-        ? form.selectedDays
-            .map((day) => t(`weekDays.${day}` as "weekDays.saturday"))
-            .join("، ")
-        : t(
-            form.frequencyType === "week"
-              ? "everyWeeks"
-              : "everyMonths",
-            { count: Number(form.interval) },
-          );
+    const hasFilledAnyRow = entries.some(
+      (entry) =>
+        entry.requirementCode.trim() ||
+        entry.requiredDocumentName.trim() ||
+        entry.document.trim() ||
+        entry.documentType ||
+        entry.frequencyType,
+    );
 
-    onAdd({
-      requirementCode: form.requirementCode.trim(),
-      requiredDocumentName: form.requiredDocumentName.trim(),
-      document: form.document.trim(),
-      documentType: form.documentType,
-      specialization: form.specialization,
-      frequency,
-    });
+    if (!hasFilledAnyRow) {
+      toast.error(tValidation("rowsRequired"));
+      return;
+    }
+
+    for (const entry of entries) {
+      const hasAny =
+        entry.requirementCode.trim() ||
+        entry.requiredDocumentName.trim() ||
+        entry.document.trim() ||
+        entry.documentType ||
+        entry.frequencyType;
+      if (!hasAny) continue;
+
+      if (!entry.requirementCode.trim()) {
+        toast.error(tValidation("requirementCodeRequired"));
+        return;
+      }
+      if (!entry.requiredDocumentName.trim()) {
+        toast.error(tValidation("requiredDocumentNameRequired"));
+        return;
+      }
+      if (!entry.document.trim()) {
+        toast.error(tValidation("documentRequired"));
+        return;
+      }
+      if (!entry.documentType) {
+        toast.error(tValidation("documentTypeRequired"));
+        return;
+      }
+      if (!entry.frequencyType) {
+        toast.error(tValidation("frequencyRequired"));
+        return;
+      }
+      if (entry.frequencyType === "day" && entry.selectedDays.length === 0) {
+        toast.error(tValidation("daysRequired"));
+        return;
+      }
+      if (
+        (entry.frequencyType === "week" || entry.frequencyType === "month") &&
+        Number(entry.interval) <= 0
+      ) {
+        toast.error(tValidation("intervalRequired"));
+        return;
+      }
+    }
+
+    if (validEntries.length === 0) {
+      toast.error(tValidation("rowsRequired"));
+      return;
+    }
+
+    onAdd(
+      validEntries.map((entry) => ({
+        requirementCode: entry.requirementCode.trim(),
+        requiredDocumentName: entry.requiredDocumentName.trim(),
+        document: entry.document.trim(),
+        documentType: entry.documentType,
+        specialization: entry.specialization,
+        frequency: buildFrequency(entry, t),
+      })),
+    );
     handleClose();
   };
 
+  const getFieldError = (
+    entry: RequirementEntry,
+    field: "requirementCode" | "requiredDocumentName" | "document" | "documentType" | "frequencyType",
+  ) => {
+    if (!submitted) return false;
+    if (field === "requirementCode") return !entry.requirementCode.trim();
+    if (field === "requiredDocumentName") return !entry.requiredDocumentName.trim();
+    if (field === "document") return !entry.document.trim();
+    if (field === "documentType") return !entry.documentType;
+    return !entry.frequencyType;
+  };
+
+  const getIntervalError = (entry: RequirementEntry) => {
+    if (!submitted) return false;
+    if (entry.frequencyType !== "week" && entry.frequencyType !== "month") {
+      return false;
+    }
+    return Number(entry.interval) <= 0;
+  };
+
+  const getDaysError = (entry: RequirementEntry) => {
+    if (!submitted) return false;
+    return entry.frequencyType === "day" && entry.selectedDays.length === 0;
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
       <DialogTitle>{t("addRequirement")}</DialogTitle>
       <DialogContent>
-        <Stack spacing={2.5} sx={{ pt: 1 }}>
-          <TextField
-            required
-            label={t("requirementCode")}
-            value={form.requirementCode}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                requirementCode: event.target.value,
-              }))
-            }
-            error={submitted && !form.requirementCode.trim()}
-          />
-          <TextField
-            required
-            label={t("requiredDocumentName")}
-            value={form.requiredDocumentName}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                requiredDocumentName: event.target.value,
-              }))
-            }
-            error={submitted && !form.requiredDocumentName.trim()}
-          />
-          <TextField
-            required
-            label={t("document")}
-            value={form.document}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                document: event.target.value,
-              }))
-            }
-            error={submitted && !form.document.trim()}
-          />
-          <TextField
-            required
-            select
-            label={t("documentType")}
-            value={form.documentType}
-            onChange={(event) => {
-              const selectedType = DOCUMENT_TYPES.find(
-                (type) => type.value === event.target.value,
-              );
-              setForm((current) => ({
-                ...current,
-                documentType: event.target.value,
-                specialization: selectedType?.specialization ?? "",
-              }));
+        <Stack spacing={2} sx={{ pt: 1 }}>
+          <Typography variant="subtitle1" fontWeight={700}>
+            {t("listTitle")}
+          </Typography>
+          <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+            <Box sx={{ overflowX: "auto" }}>
+              <Table size="small" sx={{ minWidth: 1200 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ minWidth: 140, whiteSpace: "nowrap" }}>
+                      {t("requirementCode")} *
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 200, whiteSpace: "nowrap" }}>
+                      {t("requiredDocumentName")} *
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 160, whiteSpace: "nowrap" }}>
+                      {t("document")} *
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 160, whiteSpace: "nowrap" }}>
+                      {t("documentType")} *
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
+                      {t("specialization")}
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
+                      {t("frequency")} *
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 200, whiteSpace: "nowrap" }}>
+                      {t("frequencyDay")} / {t("weekInterval")}
+                    </TableCell>
+                    <TableCell width={56} />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {entries.map((entry) => (
+                    <TableRow key={entry.id}>
+                      <TableCell>
+                        <TextField
+                          value={entry.requirementCode}
+                          onChange={(e) =>
+                            updateEntry(entry.id, {
+                              requirementCode: e.target.value,
+                            })
+                          }
+                          size="small"
+                          fullWidth
+                          error={getFieldError(entry, "requirementCode")}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          value={entry.requiredDocumentName}
+                          onChange={(e) =>
+                            updateEntry(entry.id, {
+                              requiredDocumentName: e.target.value,
+                            })
+                          }
+                          size="small"
+                          fullWidth
+                          error={getFieldError(entry, "requiredDocumentName")}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          value={entry.document}
+                          onChange={(e) =>
+                            updateEntry(entry.id, {
+                              document: e.target.value,
+                            })
+                          }
+                          size="small"
+                          fullWidth
+                          error={getFieldError(entry, "document")}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          select
+                          value={entry.documentType}
+                          onChange={(e) => {
+                            const selectedType = DOCUMENT_TYPES.find(
+                              (type) => type.value === e.target.value,
+                            );
+                            updateEntry(entry.id, {
+                              documentType: e.target.value,
+                              specialization: selectedType?.specialization ?? "",
+                            });
+                          }}
+                          size="small"
+                          fullWidth
+                          error={getFieldError(entry, "documentType")}
+                        >
+                          {DOCUMENT_TYPES.map((type) => (
+                            <MenuItem key={type.value} value={type.value}>
+                              {type.value}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          value={entry.specialization}
+                          size="small"
+                          fullWidth
+                          slotProps={{ input: { readOnly: true } }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          select
+                          value={entry.frequencyType}
+                          onChange={(e) =>
+                            updateEntry(entry.id, {
+                              frequencyType: e.target.value as FrequencyType,
+                              selectedDays: [],
+                              interval: "",
+                            })
+                          }
+                          size="small"
+                          fullWidth
+                          error={getFieldError(entry, "frequencyType")}
+                        >
+                          <MenuItem value="day">{t("frequencyDay")}</MenuItem>
+                          <MenuItem value="week">{t("frequencyWeek")}</MenuItem>
+                          <MenuItem value="month">{t("frequencyMonth")}</MenuItem>
+                        </TextField>
+                      </TableCell>
+                      <TableCell>
+                        {entry.frequencyType === "day" ? (
+                          <FormGroup row sx={{ gap: 0.5 }}>
+                            {WEEK_DAYS.map((day) => (
+                              <FormControlLabel
+                                key={day}
+                                label={t(`weekDays.${day}`)}
+                                sx={{ mr: 1, mb: 0 }}
+                                control={
+                                  <Checkbox
+                                    size="small"
+                                    checked={entry.selectedDays.includes(day)}
+                                    onChange={(event) =>
+                                      updateEntry(entry.id, {
+                                        selectedDays: event.target.checked
+                                          ? [...entry.selectedDays, day]
+                                          : entry.selectedDays.filter(
+                                              (selectedDay) =>
+                                                selectedDay !== day,
+                                            ),
+                                      })
+                                    }
+                                  />
+                                }
+                              />
+                            ))}
+                          </FormGroup>
+                        ) : entry.frequencyType === "week" ||
+                          entry.frequencyType === "month" ? (
+                          <TextField
+                            type="number"
+                            value={entry.interval}
+                            onChange={(e) =>
+                              updateEntry(entry.id, {
+                                interval: e.target.value,
+                              })
+                            }
+                            size="small"
+                            fullWidth
+                            error={getIntervalError(entry)}
+                            slotProps={{ htmlInput: { min: 1 } }}
+                          />
+                        ) : null}
+                        {getDaysError(entry) ? (
+                          <Typography variant="caption" color="error">
+                            {tValidation("daysRequired")}
+                          </Typography>
+                        ) : null}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          color="secondary"
+                          onClick={() => removeEntry(entry.id)}
+                          disabled={entries.length <= 1}
+                          aria-label={t("delete")}
+                        >
+                          <DeleteOutline />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Paper>
+          <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={<AddIcon />}
+            onClick={addEntry}
+            sx={{
+              alignSelf: "stretch",
+              borderStyle: "dashed",
+              py: 1.5,
             }}
-            error={submitted && !form.documentType}
           >
-            {DOCUMENT_TYPES.map((type) => (
-              <MenuItem key={type.value} value={type.value}>
-                {type.value}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label={t("specialization")}
-            value={form.specialization}
-            slotProps={{ input: { readOnly: true } }}
-          />
-          <TextField
-            required
-            select
-            label={t("frequency")}
-            value={form.frequencyType}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                frequencyType: event.target.value as FrequencyType,
-                selectedDays: [],
-                interval: "",
-              }))
-            }
-            error={submitted && !form.frequencyType}
-          >
-            <MenuItem value="day">{t("frequencyDay")}</MenuItem>
-            <MenuItem value="week">{t("frequencyWeek")}</MenuItem>
-            <MenuItem value="month">{t("frequencyMonth")}</MenuItem>
-          </TextField>
-
-          {form.frequencyType === "day" ? (
-            <FormGroup row>
-              {WEEK_DAYS.map((day) => (
-                <FormControlLabel
-                  key={day}
-                  label={t(`weekDays.${day}`)}
-                  control={
-                    <Checkbox
-                      checked={form.selectedDays.includes(day)}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          selectedDays: event.target.checked
-                            ? [...current.selectedDays, day]
-                            : current.selectedDays.filter(
-                                (selectedDay) => selectedDay !== day,
-                              ),
-                        }))
-                      }
-                    />
-                  }
-                />
-              ))}
-            </FormGroup>
-          ) : null}
-
-          {form.frequencyType === "week" ||
-          form.frequencyType === "month" ? (
-            <TextField
-              required
-              type="number"
-              label={
-                form.frequencyType === "week"
-                  ? t("weekInterval")
-                  : t("monthInterval")
-              }
-              value={form.interval}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  interval: event.target.value,
-                }))
-              }
-              error={submitted && Number(form.interval) <= 0}
-              slotProps={{ htmlInput: { min: 1 } }}
-            />
-          ) : null}
+            + {t("addNewRow")}
+          </Button>
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
