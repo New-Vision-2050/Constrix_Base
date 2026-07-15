@@ -37,6 +37,7 @@ type ClassificationForm = {
   linkedFolderName: string;
   classificationCode: string;
   documentNature: string;
+  jobAttribute: string;
   usedInDocumentCycle: boolean;
   showInAttachmentsLibrary: boolean;
   showInArchiveAfterApproval: boolean;
@@ -50,6 +51,7 @@ const defaultForm: ClassificationForm = {
   linkedFolderName: "",
   classificationCode: "",
   documentNature: "",
+  jobAttribute: "",
   usedInDocumentCycle: false,
   showInAttachmentsLibrary: false,
   showInArchiveAfterApproval: false,
@@ -108,6 +110,10 @@ export default function DocumentClassificationAddProcedureDialog({
         {
           key: "documentNature" as const,
           label: t("documentNature"),
+        },
+        {
+          key: "jobAttribute" as const,
+          label: t("jobAttribute"),
         },
       ] as const,
     [t],

@@ -10,6 +10,11 @@ export const ProjectOrderPermitsApi = {
   list: () =>
     baseApi.get<ListProjectOrderPermitsResponse>("order-permits"),
 
+  listForProject: (projectId: string | number) =>
+    baseApi.get<ListProjectOrderPermitsResponse>(
+      `projects/${projectId}/order-permits`,
+    ),
+
   listDepartments: (orderPermitId: number | string) =>
     baseApi.get<ListProjectOrderPermitDepartmentsResponse>(
       "order-permit-departments",
