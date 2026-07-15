@@ -209,12 +209,19 @@ export default function CadreTab() {
       { search: debouncedSearch || undefined },
     );
 
-  const data = engagement ? (engagementEmployees ?? []) : (employeesData ?? []);
+  const allRows = engagement
+    ? (engagementEmployees ?? [])
+    : (employeesData ?? []);
   const isLoadingEmployeesResolved = engagement
     ? isLoadingEngagementEmployees
     : isLoadingEmployees;
-  const totalPages = 1;
-  const totalItems = data.length;
+  const totalItems = allRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
+
+  const data = useMemo(() => {
+    const start = (params.page - 1) * params.limit;
+    return allRows.slice(start, start + params.limit);
+  }, [allRows, params.page, params.limit]);
 
   const columns = useMemo(() => {
     const base = [...cadreColumns];
