@@ -493,21 +493,21 @@ export default function SubTypeTabs() {
             ))}
           </Tabs>
 
-          <Button
-            variant="contained"
+          <IconButton
             color="primary"
-            startIcon={<PlusIcon className="h-4 w-4" />}
-            onClick={() => stagesViewRef.current?.addStage()}
+            onClick={() => stagesViewRef.current?.openAddProcedureDialog()}
+            aria-label={t("procedures.addProcedure")}
             sx={{
-              fontWeight: 700,
               flexShrink: 0,
-              whiteSpace: "nowrap",
-              borderRadius: 2,
-              px: 2.5,
+              width: 40,
+              height: 40,
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+              "&:hover": { bgcolor: "primary.dark" },
             }}
           >
-            {t("steps.addStage")}
-          </Button>
+            <PlusIcon className="h-5 w-5" />
+          </IconButton>
         </Paper>
       ) : (
         !(hideWorkPlanTabs && outerTabs.length <= 1) && (
