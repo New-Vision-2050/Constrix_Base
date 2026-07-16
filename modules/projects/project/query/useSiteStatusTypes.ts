@@ -41,7 +41,7 @@ export function useSiteStatusTypes(params: UseSiteStatusTypesParams) {
   return useQuery<SiteStatusTypeWithKeys[]>({
     queryKey: siteStatusTypesQueryKey(params),
     queryFn: async () => {
-      const res = await ProjectNotificationsApi.getSiteStatusTypesWithKeys({
+      const res = await ProjectNotificationsApi.getSiteStatusTypesWithKeysEndpoint({
         ...(params.projectTypeId !== undefined
           ? { project_type_id: params.projectTypeId }
           : {}),

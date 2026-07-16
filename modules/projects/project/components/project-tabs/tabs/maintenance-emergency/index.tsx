@@ -100,7 +100,7 @@ export default function MaintenanceEmergencyTab() {
 
       {activeTab === "notifications" && <ProjectNotificationsView />}
       {activeTab === "siteStatusTypes" && (
-        <SiteStatusTypesTab projectTypeId={project?.projectData?.project_type_id} />
+        <SiteStatusTypesTab projectTypeId={project?.projectData?.sub_sub_project_type_id} />
       )}
       {activeTab === "indicators" && <ProjectNotificationChartsView />}
       {(activeTab === "violations" || activeTab === "reports") && (

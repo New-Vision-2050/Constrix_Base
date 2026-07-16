@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Delete, Edit, Settings } from "@mui/icons-material";
+import { alpha } from "@mui/material/styles";
+import { Sparkles } from "lucide-react";
 import {
   forwardRef,
   useState,
@@ -387,12 +389,20 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             <Grid size={{ xs: 12, md: 3 }}>
               <Box
                 sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                  bgcolor: "background.paper",
+                  p: 2,
+                  borderRadius: "16px",
+                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.6),
+                  backdropFilter: "blur(10px)",
                   border: "1px solid",
                   borderColor: "divider",
                   minHeight: 320,
+                  backgroundImage: (theme) =>
+                    `linear-gradient(180deg, ${alpha(
+                      theme.palette.primary.main,
+                      0.04,
+                    )} 0%, transparent 100%)`,
+                  boxShadow: (theme) =>
+                    `0 4px 20px ${alpha(theme.palette.common.black, 0.2)}`,
                 }}
               >
                 {procedures.map((procedure: Stage) => (
@@ -471,16 +481,21 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 ))}
 
                 <Button
-                  variant="text"
+                  variant="contained"
                   color="primary"
                   startIcon={<AddIcon />}
                   fullWidth
                   onClick={() => setAddDialogOpen(true)}
                   sx={{
-                    justifyContent: "flex-start",
+                    justifyContent: "center",
                     mt: 1,
-                    fontWeight: 600,
-                    px: 1,
+                    fontWeight: 700,
+                    px: 1.5,
+                    py: 1,
+                    borderRadius: "12px",
+                    textTransform: "none",
+                    boxShadow: (theme) =>
+                      `0 4px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
                   }}
                 >
                   {t("procedures.addProcedure")}
@@ -492,13 +507,35 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
               <Box
                 sx={{
                   p: 3,
-                  borderRadius: 2,
-                  bgcolor: "background.paper",
+                  borderRadius: "16px",
+                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.65),
+                  backdropFilter: "blur(12px)",
                   border: "1px solid",
                   borderColor: "divider",
                   minHeight: 320,
                   display: "flex",
                   flexDirection: "column",
+                  backgroundImage: (theme) =>
+                    `linear-gradient(180deg, ${alpha(
+                      theme.palette.primary.main,
+                      0.05,
+                    )} 0%, transparent 100%)`,
+                  boxShadow: (theme) =>
+                    `0 4px 24px ${alpha(theme.palette.common.black, 0.25)}`,
+                  position: "relative",
+                  overflow: "hidden",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: -60,
+                    right: -60,
+                    width: 160,
+                    height: 160,
+                    borderRadius: "50%",
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                    filter: "blur(40px)",
+                    pointerEvents: "none",
+                  },
                 }}
               >
                 <Box
@@ -508,13 +545,56 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                     alignItems: "flex-start",
                     justifyContent: "space-between",
                     gap: 2,
+                    position: "relative",
+                    zIndex: 1,
                   }}
                 >
                   <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ mb: 0.75 }}>
-                      {t("steps.modelStagesTitle", { name: modelTabName })}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.25,
+                        mb: 0.75,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: "12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          bgcolor: (theme) =>
+                            alpha(theme.palette.primary.main, 0.12),
+                          color: "primary.main",
+                          boxShadow: (theme) =>
+                            `0 4px 14px ${alpha(theme.palette.primary.main, 0.3)}`,
+                        }}
+                      >
+                        <Sparkles size={20} />
+                      </Box>
+                      <Typography
+                        variant="h6"
+                        fontWeight={800}
+                        sx={{
+                          background: (theme) =>
+                            `linear-gradient(90deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          backgroundClip: "text",
+                        }}
+                      >
+                        {t("steps.modelStagesTitle", { name: modelTabName })}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      fontWeight={500}
+                      sx={{ maxWidth: 560, lineHeight: 1.6 }}
+                    >
                       {t("steps.modelStagesDescription")}
                     </Typography>
                   </Box>
@@ -522,14 +602,30 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleAddStep}
-                    // disabled={!selectedProcedureId}
-                    sx={{ flexShrink: 0, whiteSpace: "nowrap" }}
+                    sx={{
+                      flexShrink: 0,
+                      whiteSpace: "nowrap",
+                      borderRadius: "12px",
+                      textTransform: "none",
+                      fontWeight: 700,
+                      px: 2,
+                      boxShadow: (theme) =>
+                        `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    }}
                   >
                     {t("steps.addStage")}
                   </Button>
                 </Box>
 
-                <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    position: "relative",
+                    zIndex: 1,
+                  }}
+                >
                   {hasAnySteps ? (
                     <Box className="space-y-4">{documentStagesContent}</Box>
                   ) : (
@@ -537,14 +633,64 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                       sx={{
                         flex: 1,
                         display: "flex",
+                        flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
-                        py: 6,
+                        py: 8,
+                        gap: 2,
+                        textAlign: "center",
                       }}
                     >
-                      <Typography color="text.secondary" fontWeight={500}>
-                        {t("steps.noStagesAdded")}
-                      </Typography>
+                      <Box
+                        sx={{
+                          width: 72,
+                          height: 72,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          bgcolor: (theme) =>
+                            alpha(theme.palette.primary.main, 0.1),
+                          border: "1px solid",
+                          borderColor: (theme) =>
+                            alpha(theme.palette.primary.main, 0.25),
+                          boxShadow: (theme) =>
+                            `0 0 30px ${alpha(theme.palette.primary.main, 0.2)}`,
+                          animation: "pulse-glow 3s ease-in-out infinite",
+                          "@keyframes pulse-glow": {
+                            "0%, 100%": {
+                              boxShadow: (theme) =>
+                                `0 0 30px ${alpha(theme.palette.primary.main, 0.2)}`,
+                            },
+                            "50%": {
+                              boxShadow: (theme) =>
+                                `0 0 50px ${alpha(theme.palette.primary.main, 0.4)}`,
+                            },
+                          },
+                        }}
+                      >
+                        <Box sx={{ color: "primary.main" }}>
+                          <Sparkles size={32} strokeWidth={1.5} />
+                        </Box>
+                      </Box>
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          fontWeight={700}
+                          color="text.primary"
+                          sx={{ mb: 0.5 }}
+                        >
+                          {t("steps.noStagesAdded")}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontWeight={500}
+                          sx={{ maxWidth: 360 }}
+                        >
+                          {t("steps.modelStagesDescription")}
+                        </Typography>
+                      </Box>
                     </Box>
                   )}
                 </Box>

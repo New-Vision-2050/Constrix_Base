@@ -99,9 +99,8 @@ export default function SiteStatusTypesTab({
   const listParams = useMemo(
     () => ({
       projectTypeId,
-      projectId,
     }),
-    [projectTypeId, projectId],
+    [projectTypeId],
   );
 
   const { data, isLoading } = useSiteStatusTypes(listParams);

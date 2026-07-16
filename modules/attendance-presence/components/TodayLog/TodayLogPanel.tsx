@@ -55,8 +55,14 @@ function CircularProgress({
   const offset = circumference * (1 - clampedProgress);
 
   return (
-    <div className="relative mx-auto h-40 w-40">
+    <div className="relative mx-auto h-44 w-44">
       <svg className="h-full w-full -rotate-90" viewBox="0 0 140 140">
+        <defs>
+          <linearGradient id="todayProgress" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="#F5A623" />
+          </linearGradient>
+        </defs>
         <circle
           cx="70"
           cy="70"
@@ -64,19 +70,22 @@ function CircularProgress({
           fill="none"
           className={TODAY_LOG_PROGRESS.track}
           stroke="currentColor"
-          strokeWidth="10"
+          strokeWidth="9"
         />
         <circle
           cx="70"
           cy="70"
           r={radius}
           fill="none"
-          className={TODAY_LOG_PROGRESS.progress}
-          stroke="currentColor"
+          stroke="url(#todayProgress)"
           strokeWidth="10"
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
+          style={{
+            transition: "stroke-dashoffset 0.7s ease",
+            filter: "drop-shadow(0 0 6px hsl(var(--primary) / 0.6))",
+          }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
@@ -85,7 +94,7 @@ function CircularProgress({
           hoursShort={hoursShort}
           isRtl={isRtl}
         />
-        <span className="text-xs text-foreground/80">{subtitle}</span>
+        <span className="text-xs text-muted-foreground">{subtitle}</span>
       </div>
     </div>
   );
@@ -101,10 +110,10 @@ function StatItem({
   value: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 text-center">
+    <div className="flex flex-col items-center gap-1.5 rounded-xl border border-white/[0.05] bg-white/[0.02] py-3 text-center transition-colors hover:bg-white/[0.05]">
       {icon}
       <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium text-foreground" dir="ltr">
+      <span className="text-sm font-semibold text-foreground" dir="ltr">
         {value}
       </span>
     </div>
@@ -237,10 +246,20 @@ export default function TodayLogPanel() {
 
   return (
     <div
-      className="h-auto w-full rounded-2xl border border-border bg-sidebar p-4"
+      className="relative h-auto w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-sidebar p-4"
+      style={{
+        boxShadow:
+          "inset 0 1px 0 0 rgba(255,255,255,0.05), 0 18px 40px -24px rgba(0,0,0,0.7)",
+      }}
       dir={dir}
     >
-      <h3 className="mb-4 text-start text-base font-medium text-foreground">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -top-20 end-[-20%] h-48 w-48 rounded-full bg-primary/25 opacity-40 blur-3xl"
+      />
+
+      <h3 className="relative z-10 mb-4 flex items-center gap-2.5 text-start text-base font-semibold text-foreground">
+        <span className="h-5 w-1.5 rounded-full bg-gradient-to-b from-primary to-primary/40" />
         {t("todayLog")}
       </h3>
 
@@ -257,7 +276,7 @@ export default function TodayLogPanel() {
       ) : (
         <>
           {periods.length > 0 ? (
-            <div className="mb-5 flex border-b border-border/80">
+            <div className="relative z-10 mb-5 flex border-b border-white/10">
               {periods.map((period) => {
                 const isActive = activePeriod === period.id;
 
@@ -275,7 +294,7 @@ export default function TodayLogPanel() {
                   >
                     {period.label}
                     {isActive ? (
-                      <span className="absolute inset-x-2 bottom-0 h-1 rounded-full bg-primary" />
+                      <span className="absolute inset-x-2 bottom-0 h-1 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary))]" />
                     ) : null}
                   </button>
                 );
@@ -283,7 +302,13 @@ export default function TodayLogPanel() {
             </div>
           ) : null}
 
-          <div className={cn("mb-4 rounded-2xl px-4 py-6", TODAY_LOG_SURFACES.card)}>
+          <div
+            className="relative z-10 mb-4 rounded-2xl border border-white/[0.06] px-4 py-6"
+            style={{
+              background:
+                "radial-gradient(120% 120% at 50% 0%, hsl(var(--primary) / 0.10), hsl(var(--popover)) 60%)",
+            }}
+          >
             <CircularProgress
               minutes={elapsedMinutes}
               hoursShort={t("hoursShort")}
@@ -293,11 +318,11 @@ export default function TodayLogPanel() {
             />
           </div>
 
-          <p className="mb-5 text-center text-sm text-foreground">
+          <p className="relative z-10 mb-5 text-center text-sm text-muted-foreground">
             {t("todayGoalLabel", { hours: goalHours.toFixed(1) })}
           </p>
 
-          <div className="mb-5 grid grid-cols-3 gap-2">
+          <div className="relative z-10 mb-5 grid grid-cols-3 gap-2">
             {statItems.map((item) => (
               <StatItem
                 key={item.key}
@@ -310,7 +335,7 @@ export default function TodayLogPanel() {
 
           <div
             className={cn(
-              "mb-4 overflow-hidden rounded-xl text-sm",
+              "relative z-10 mb-4 overflow-hidden rounded-xl border border-white/[0.06] text-sm",
               TODAY_LOG_SURFACES.cardMuted,
             )}
           >
@@ -357,7 +382,7 @@ export default function TodayLogPanel() {
             </div>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="relative z-10 space-y-2.5">
             {showButton && actionPeriod && workRules?.location_work ? (
               <AttendanceActionDialogs
                 workPeriod={actionPeriod}
@@ -366,7 +391,7 @@ export default function TodayLogPanel() {
               />
             ) : showButton ? (
               <Button
-                className="h-12 w-full rounded-xl border-0 bg-primary text-base font-medium text-primary-foreground hover:bg-primary/90"
+                className="h-12 w-full rounded-xl border-0 bg-primary text-base font-medium text-primary-foreground shadow-[0_8px_24px_-8px_hsl(var(--primary))] transition-all hover:bg-primary/90"
                 disabled
               >
                 <TodayLogActionButtonContent

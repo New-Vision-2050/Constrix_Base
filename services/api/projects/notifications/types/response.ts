@@ -145,9 +145,9 @@ export interface ProjectNotification {
 
   /** Site status type linked to the notification. */
   site_status_type_id?: string | null;
-  site_status_type?: SiteStatusTypeWithKeys | null;
-  /** Values keyed by site status type key id. */
-  site_status_values?: Record<string, string | number | null> | null;
+  site_status_type?: SiteStatusTypeRef | null;
+  /** Values stored for each key of the linked site status type. */
+  site_status_values?: SiteStatusNotificationValue[] | null;
 }
 
 export interface ProjectNotificationNotesData {
@@ -344,6 +344,24 @@ export interface SiteStatusType {
   updated_at?: string;
 }
 
+export interface SiteStatusTypeRef {
+  id: string;
+  name_ar: string;
+  name_en: string;
+}
+
+export interface SiteStatusNotificationValue {
+  id: string;
+  key_id: string;
+  key: string;
+  name_ar: string;
+  name_en: string;
+  field_type: SiteStatusTypeKeyFieldType;
+  options: string[] | null;
+  show_in_site_status_updates?: boolean;
+  value: string;
+}
+
 export interface SiteStatusTypeWithKeys extends SiteStatusType {
   keys: SiteStatusTypeKey[];
 }
@@ -409,6 +427,8 @@ export interface SiteStatusUpdateSummary {
 export interface SiteStatusUpdatesData {
   items: SiteStatusUpdate[];
   summary: SiteStatusUpdateSummary;
+  site_status_type?: SiteStatusTypeRef | null;
+  notification_values?: SiteStatusNotificationValue[] | null;
 }
 
 export interface SiteStatusUpdatesResponse {

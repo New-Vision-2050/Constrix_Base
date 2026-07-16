@@ -28,24 +28,32 @@ export default function TodayGoalCard() {
 
   return (
     <SummaryCardShell
-      icon={<Target size={18} className="text-primary" />}
+      icon={<Target size={18} />}
       title={t("todayGoal")}
+      accent="#2EB88A"
       footer={
         <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>{t("hoursCompleted")}</span>
-          <span dir="ltr">
+          <span dir="ltr" className="font-medium text-foreground/90">
             {completedLabel} / {goalHours.toFixed(1)}
           </span>
         </div>
       }
     >
-      <p className="text-xl font-semibold text-foreground mb-3">
-        {goalHours.toFixed(1)} {t("hours")}
+      <p className="mb-3 text-2xl font-bold text-foreground">
+        {goalHours.toFixed(1)}{" "}
+        <span className="text-sm font-medium text-muted-foreground">
+          {t("hours")}
+        </span>
       </p>
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
+      <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
         <div
-          className="h-full bg-primary rounded-full transition-all duration-500"
-          style={{ width: `${progress * 100}%` }}
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{
+            width: `${progress * 100}%`,
+            background: "linear-gradient(90deg, #2EB88A, #4ADE80)",
+            boxShadow: "0 0 12px rgba(46,184,138,0.6)",
+          }}
         />
       </div>
     </SummaryCardShell>

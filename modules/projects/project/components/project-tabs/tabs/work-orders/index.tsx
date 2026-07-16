@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+
 import { useTranslations } from "next-intl";
+
 import {
   Alert,
   Box,
   Button,
-  Chip,
   Grid,
   MenuItem,
   Paper,
@@ -14,18 +15,28 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+
 import { FileDownloadOutlined } from "@mui/icons-material";
+
 import { Plus } from "lucide-react";
+
 import { useQueryClient } from "@tanstack/react-query";
+
 import HeadlessTableLayout from "@/components/headless/table";
+
 import CustomMenu from "@/components/headless/custom-menu";
+
 import { useProject } from "@/modules/all-project/context/ProjectContext";
+
 import {
   projectOrderPermitsQueryKey,
   useProjectOrderPermits,
 } from "@/modules/projects/project/query/useProjectOrderPermits";
+
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
+
 import type { WorkOrderFilters, WorkOrderRow } from "./types";
+
 import {
   EMPTY_WORK_ORDER_FILTERS,
   WORK_ORDER_COLUMN_KEYS,
@@ -34,99 +45,105 @@ import {
 
 const WorkOrdersTableLayout = HeadlessTableLayout<WorkOrderRow>("work-orders");
 
-const NUMERIC_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
-  "price",
-  "indebtedness",
-  "defaultValue",
-  "availableBalance",
-  "cashBalance",
-  "posMachinesCount",
-  "pcMachinesCount",
-  "totalMachinesCount",
-  "simLinesCount",
-  "pcSimLinesCount",
-  "totalLinesCount",
-  "value",
-]);
+function formatDisplayDate(isoDate: string): string {
+  if (!isoDate) return "";
 
-function formatNumber(value: number) {
-  return value.toLocaleString("en-US");
+  const [year, month, day] = isoDate.split("-").map(Number);
+
+  if (!year || !month || !day) return isoDate;
+
+  return `${day}/${month}/${year}`;
+}
+
+function formatPrice(value: number): string {
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+
+    maximumFractionDigits: 2,
+  });
 }
 
 function filterWorkOrders(
   rows: WorkOrderRow[],
+
   filters: WorkOrderFilters,
 ): WorkOrderRow[] {
   return rows.filter((row) => {
     if (
-      filters.contractCode &&
-      !row.contractCode.includes(filters.contractCode.trim())
-    ) {
-      return false;
-    }
-    if (filters.type && row.type !== filters.type) {
-      return false;
-    }
-    if (
-      filters.stationName &&
-      !row.stationName
+      filters.workOrderId &&
+      !row.workOrderId
+
         .toLowerCase()
-        .includes(filters.stationName.trim().toLowerCase())
+
+        .includes(filters.workOrderId.trim().toLowerCase())
     ) {
       return false;
     }
+
+    if (filters.workOrderType && row.workOrderType !== filters.workOrderType) {
+      return false;
+    }
+
     if (
-      filters.contractingParty &&
-      row.contractingParty !== filters.contractingParty
+      filters.location &&
+      !row.location
+        .toLowerCase()
+        .includes(filters.location.trim().toLowerCase())
     ) {
       return false;
     }
-    if (filters.paymentStatus && row.paymentStatus !== filters.paymentStatus) {
+
+    if (filters.contractor && row.contractor !== filters.contractor) {
       return false;
     }
+
     if (
-      filters.projectStartDate &&
-      row.dataUpdatedAt < filters.projectStartDate
+      filters.assignmentStartDate &&
+      row.assignmentDate < filters.assignmentStartDate
     ) {
       return false;
     }
-    if (filters.projectEndDate && row.dataUpdatedAt > filters.projectEndDate) {
+
+    if (
+      filters.assignmentEndDate &&
+      row.assignmentDate > filters.assignmentEndDate
+    ) {
       return false;
     }
+
     return true;
   });
 }
 
 function renderWorkOrderCell(
   row: WorkOrderRow,
+
   key: WorkOrderColumnKey,
+
   emptyDash: string,
-  yesLabel: string,
-  noLabel: string,
 ) {
-  if (key === "serial") {
-    return <span>{row.serial}</span>;
+  if (key === "actions") {
+    return null;
   }
 
-  if (key === "active") {
-    return (
-      <Chip
-        label={row.active ? yesLabel : noLabel}
-        size="small"
-        color={row.active ? "success" : "default"}
-        sx={{ fontWeight: 600, minWidth: 56 }}
-      />
-    );
+  if (key === "assignmentDate") {
+    const formatted = formatDisplayDate(row.assignmentDate);
+
+    return <span>{formatted || emptyDash}</span>;
   }
 
-  const value = row[key as keyof WorkOrderRow];
+  if (key === "price") {
+    if (!row.price) {
+      return <span>{emptyDash}</span>;
+    }
+
+    return <span>{formatPrice(row.price)}</span>;
+  }
+
+  const value = row[key];
 
   if (value === null || value === undefined || value === "") {
     return <span>{emptyDash}</span>;
-  }
-
-  if (typeof value === "number" && NUMERIC_COLUMN_KEYS.has(key)) {
-    return <span>{formatNumber(value)}</span>;
   }
 
   return <span>{String(value)}</span>;
@@ -134,18 +151,28 @@ function renderWorkOrderCell(
 
 export default function WorkOrdersTab() {
   const { projectId } = useProject();
+
   const queryClient = useQueryClient();
+
   const t = useTranslations("project.workOrdersTab");
+
   const tFilters = useTranslations("project.workOrdersTab.filters");
+
   const tTable = useTranslations("project.workOrdersTab.table");
+
+  const tFields = useTranslations("project.workOrdersTab.dialog.fields");
+
   const emptyDash = t("emptyDash");
 
-  const [filters, setFilters] =
-    useState<WorkOrderFilters>(EMPTY_WORK_ORDER_FILTERS);
+  const [filters, setFilters] = useState<WorkOrderFilters>(
+    EMPTY_WORK_ORDER_FILTERS,
+  );
+
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const params = WorkOrdersTableLayout.useTableParams({
     initialPage: 1,
+
     initialLimit: 10,
   });
 
@@ -153,44 +180,74 @@ export default function WorkOrdersTab() {
 
   const allRows = useMemo(
     () => workOrdersQuery.data ?? [],
+
     [workOrdersQuery.data],
   );
 
-  const typeOptions = useMemo(
-    () => [...new Set(allRows.map((row) => row.type).filter(Boolean))],
+  const workOrderTypeOptions = useMemo(
+    () => [...new Set(allRows.map((row) => row.workOrderType).filter(Boolean))],
+
     [allRows],
   );
 
-  const contractingPartyOptions = useMemo(
-    () => [...new Set(allRows.map((row) => row.contractingParty).filter(Boolean))],
-    [allRows],
-  );
+  const contractorOptions = useMemo(
+    () => [...new Set(allRows.map((row) => row.contractor).filter(Boolean))],
 
-  const paymentStatusOptions = useMemo(
-    () => [...new Set(allRows.map((row) => row.paymentStatus).filter(Boolean))],
     [allRows],
   );
 
   const filteredRows = useMemo(
     () => filterWorkOrders(allRows, filters),
+
     [allRows, filters],
   );
 
   const totalItems = filteredRows.length;
+
   const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
 
   const pageData = useMemo(() => {
     const start = (params.page - 1) * params.limit;
+
     return filteredRows.slice(start, start + params.limit);
   }, [filteredRows, params.page, params.limit]);
 
   const updateFilter = <K extends keyof WorkOrderFilters>(
     key: K,
+
     value: WorkOrderFilters[K],
   ) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+
     params.setPage(1);
   };
+
+  const columnLabels: Record<
+    Exclude<WorkOrderColumnKey, "actions">,
+    string
+  > = useMemo(
+    () => ({
+      workOrderId: tFields("workOrderId"),
+
+      workOrderType: tFields("workOrderType"),
+
+      assignmentDate: tFields("assignmentDate"),
+
+      contractor: tFields("contractor"),
+
+      management: tFields("management"),
+
+      location: tFields("location"),
+
+      latitude: tFields("latitude"),
+
+      longitude: tFields("longitude"),
+
+      price: tFields("price"),
+    }),
+
+    [tFields],
+  );
 
   const columns = useMemo(
     () =>
@@ -198,8 +255,11 @@ export default function WorkOrdersTab() {
         if (key === "actions") {
           return {
             key,
+
             name: tTable("actions"),
+
             sortable: false,
+
             render: () => (
               <CustomMenu
                 renderAnchor={({ onClick }) => (
@@ -214,6 +274,7 @@ export default function WorkOrdersTab() {
                 )}
               >
                 <MenuItem onClick={() => {}}>{tTable("view")}</MenuItem>
+
                 <MenuItem onClick={() => {}}>{tTable("edit")}</MenuItem>
               </CustomMenu>
             ),
@@ -222,41 +283,58 @@ export default function WorkOrdersTab() {
 
         return {
           key,
-          name: tTable(key),
+
+          name: columnLabels[key],
+
           sortable: false,
+
           render: (row: WorkOrderRow) =>
-            renderWorkOrderCell(row, key, emptyDash, t("yes"), t("no")),
+            renderWorkOrderCell(row, key, emptyDash),
         };
       }),
-    [tTable, emptyDash, t],
+
+    [columnLabels, tTable, emptyDash],
   );
 
   const handleExport = () => {
     // TODO: export when API is available
   };
 
+  const handleRecentlyAdded = () => {
+    // TODO: filter recently added work orders when backend is ready
+    window.location.reload();
+  };
+
   const state = WorkOrdersTableLayout.useTableState({
     data: pageData,
+
     columns,
+
     totalPages,
+
     totalItems,
+
     params,
+
     selectable: true,
+
     getRowId: (row: WorkOrderRow) => row.id,
+
     loading: workOrdersQuery.isLoading,
   });
 
   const handleWorkOrdersCreated = () => {
     if (!projectId) return;
+
     queryClient.invalidateQueries({
-      queryKey: projectOrderPermitsQueryKey(projectId),
+      queryKey: projectOrderPermitsQueryKey(),
     });
   };
 
   if (!projectId) {
     return null;
   }
-  
+
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
@@ -277,99 +355,85 @@ export default function WorkOrdersTab() {
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
-              label={tFilters("contractCode")}
-              value={filters.contractCode}
-              onChange={(e) => updateFilter("contractCode", e.target.value)}
+              label={tFilters("workOrderId")}
+              value={filters.workOrderId}
+              onChange={(e) => updateFilter("workOrderId", e.target.value)}
               fullWidth
               size="small"
             />
           </Grid>
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
               select
-              label={tFilters("type")}
-              value={filters.type}
-              onChange={(e) => updateFilter("type", e.target.value)}
+              label={tFilters("workOrderType")}
+              value={filters.workOrderType}
+              onChange={(e) => updateFilter("workOrderType", e.target.value)}
               fullWidth
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
-              {typeOptions.map((type) => (
+
+              {workOrderTypeOptions.map((type) => (
                 <MenuItem key={type} value={type}>
                   {type}
                 </MenuItem>
               ))}
             </TextField>
           </Grid>
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
-              label={tFilters("stationName")}
-              value={filters.stationName}
-              onChange={(e) => updateFilter("stationName", e.target.value)}
+              label={tFilters("location")}
+              value={filters.location}
+              onChange={(e) => updateFilter("location", e.target.value)}
               fullWidth
               size="small"
             />
           </Grid>
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
-              label={tFilters("projectStartDate")}
+              label={tFilters("assignmentStartDate")}
               type="date"
-              value={filters.projectStartDate}
+              value={filters.assignmentStartDate}
               onChange={(e) =>
-                updateFilter("projectStartDate", e.target.value)
+                updateFilter("assignmentStartDate", e.target.value)
               }
               fullWidth
               size="small"
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
-              label={tFilters("projectEndDate")}
+              label={tFilters("assignmentEndDate")}
               type="date"
-              value={filters.projectEndDate}
+              value={filters.assignmentEndDate}
               onChange={(e) =>
-                updateFilter("projectEndDate", e.target.value)
+                updateFilter("assignmentEndDate", e.target.value)
               }
               fullWidth
               size="small"
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
               select
-              label={tFilters("contractingParty")}
-              value={filters.contractingParty}
-              onChange={(e) =>
-                updateFilter("contractingParty", e.target.value)
-              }
+              label={tFilters("contractor")}
+              value={filters.contractor}
+              onChange={(e) => updateFilter("contractor", e.target.value)}
               fullWidth
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
-              {contractingPartyOptions.map((party) => (
-                <MenuItem key={party} value={party}>
-                  {party}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <TextField
-              select
-              label={tFilters("paymentStatus")}
-              value={filters.paymentStatus}
-              onChange={(e) =>
-                updateFilter("paymentStatus", e.target.value)
-              }
-              fullWidth
-              size="small"
-            >
-              <MenuItem value="">{t("all")}</MenuItem>
-              {paymentStatusOptions.map((status) => (
-                <MenuItem key={status} value={status}>
-                  {status}
+
+              {contractorOptions.map((contractor) => (
+                <MenuItem key={contractor} value={contractor}>
+                  {contractor}
                 </MenuItem>
               ))}
             </TextField>
@@ -381,10 +445,19 @@ export default function WorkOrdersTab() {
         filters={
           <WorkOrdersTableLayout.TopActions
             state={state}
-            exportLabel={t("refreshFromUds")}
-            exportDisabled
             customActions={
               <Stack direction="row" spacing={1} alignItems="center">
+                <Button
+                  variant="outlined"
+                  color="info"
+                  startIcon={<FileDownloadOutlined />}
+                  disabled
+                  onClick={() => {
+                    // TODO: refresh from UDS when API is available
+                  }}
+                >
+                  {t("refreshFromUds")}
+                </Button>
                 <Button
                   variant="contained"
                   color="primary"
@@ -393,6 +466,11 @@ export default function WorkOrdersTab() {
                 >
                   {t("addWorkOrder")}
                 </Button>
+
+                <Button variant="outlined" onClick={handleRecentlyAdded}>
+                  {t("recentlyAdded")}
+                </Button>
+
                 <Button
                   variant="outlined"
                   startIcon={<FileDownloadOutlined />}

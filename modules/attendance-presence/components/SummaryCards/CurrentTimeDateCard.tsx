@@ -15,22 +15,25 @@ export default function CurrentTimeDateCard() {
 
   return (
     <SummaryCardShell
-      icon={<CalendarDays size={18} className="text-chart-4" />}
+      icon={<CalendarDays size={18} />}
       title={t("currentTimeDate")}
+      accent="#F5A623"
       footer={
         <div className="flex justify-center">
-          <span className="inline-block rounded-lg bg-muted/80 px-3 py-1.5 text-xs text-foreground">
+          <span className="inline-block rounded-lg border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs text-foreground">
             {formatFullDate(now, locale)}
           </span>
         </div>
       }
     >
       <div className="flex items-baseline justify-center gap-1.5" dir="ltr">
-        <span className="text-3xl font-bold text-foreground tracking-tight">
+        <span className="text-3xl font-bold tracking-tight text-foreground tabular-nums">
           {time}
         </span>
         {period ? (
-          <span className="text-xl font-bold text-chart-4">{period}</span>
+          <span className="text-xl font-bold" style={{ color: "#F5A623" }}>
+            {period}
+          </span>
         ) : null}
       </div>
     </SummaryCardShell>

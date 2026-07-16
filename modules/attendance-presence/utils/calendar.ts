@@ -106,13 +106,43 @@ export const CALENDAR_LEGEND_ITEMS: SummaryLegendItem[] = [
     dotColor: STATUS_HEX_COLORS.required,
     labelKey: "required",
   },
+  {
+    key: "on_task_count",
+    dotColor: STATUS_HEX_COLORS.on_task,
+    labelKey: "onTask",
+  },
 ];
 
 export function shouldShowStatusLabel(statusKey?: string, hours?: string) {
-  if (hours) return false;
-  return statusKey === "off" || statusKey === "absent" || statusKey === "leave";
+  // Show the API status label for any day that has no work hours,
+  // so newly added statuses render dynamically without code changes.
+  return !hours;
 }
 
 export function shouldShowHours(statusKey?: string, hours?: string) {
   return Boolean(hours && statusKey !== "off");
+}
+
+export interface CalendarLegendEntry {
+  statusKey: string;
+  statusLabel: string;
+  dotColor: string;
+}
+
+/** Build the calendar footer legend from the statuses present in the response. */
+export function buildCalendarLegend(
+  days: UserAttendanceCalendarDay[],
+): CalendarLegendEntry[] {
+  const seen = new Map<string, CalendarLegendEntry>();
+
+  days.forEach((day) => {
+    if (!day.status_key || seen.has(day.status_key)) return;
+    seen.set(day.status_key, {
+      statusKey: day.status_key,
+      statusLabel: day.status,
+      dotColor: day.dot_color,
+    });
+  });
+
+  return Array.from(seen.values());
 }

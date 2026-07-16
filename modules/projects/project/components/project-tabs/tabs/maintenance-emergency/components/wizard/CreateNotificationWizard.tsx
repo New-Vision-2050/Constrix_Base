@@ -115,7 +115,7 @@ export default function CreateNotificationWizard({
   const notificationTypes = notificationTypesQuery.data ?? [];
 
   const project = useOptionalProject();
-  const projectTypeId = project?.projectData?.project_type_id;
+  const projectTypeId = project?.projectData?.sub_sub_project_type_id;
   const siteStatusTypesQuery = useSiteStatusTypes({
     projectTypeId,
     projectId,

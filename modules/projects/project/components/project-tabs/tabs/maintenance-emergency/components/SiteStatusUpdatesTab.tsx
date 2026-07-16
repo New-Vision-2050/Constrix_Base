@@ -84,11 +84,6 @@ function isImageAttachment(att: SiteStatusUpdateAttachment): boolean {
   return false;
 }
 
-function formatSiteStatusValue(value: unknown): string {
-  if (value === null || value === undefined) return "";
-  return String(value);
-}
-
 function buildCopyText(
   notification: ProjectNotification,
   update: SiteStatusUpdate,
@@ -110,15 +105,12 @@ function buildCopyText(
     `🗺️ رابط الموقع (Google Maps):   ${notification.location_link ?? ""}`,
   ];
 
-  const siteStatusKeys = notification.site_status_type?.keys ?? [];
-  const siteStatusValues = notification.site_status_values ?? {};
-  if (siteStatusKeys.length > 0) {
-    lines.push("");
-    lines.push(`📊 ${notification.site_status_type?.name_ar ?? notification.site_status_type?.name_en ?? ""}`);
-    siteStatusKeys.forEach((key) => {
-      const value = formatSiteStatusValue(siteStatusValues[key.id]);
-      if (!value) return;
-      lines.push(`${key.name_ar || key.name_en || key.key}: ${value}`);
+  const siteStatusType = notification.site_status_type;
+  const siteStatusValues = notification.site_status_values ?? [];
+  if (siteStatusType && siteStatusValues.length > 0) {
+    siteStatusValues.forEach((v) => {
+      if (!v.value) return;
+      lines.push(`${v.name_ar || v.name_en || v.key}: ${v.value}`);
     });
   }
 
@@ -641,14 +633,13 @@ function SiteStatusValuesSection({
 }) {
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const siteStatusType = notification.site_status_type;
-  const keys = siteStatusType?.keys ?? [];
-  const values = notification.site_status_values ?? {};
+  const values = notification.site_status_values ?? [];
 
-  const visibleKeys = keys.filter(
-    (key) => key.show_in_site_status_updates && values[key.id] !== undefined && values[key.id] !== null && String(values[key.id]) !== "",
+  const visibleValues = values.filter(
+    (v) => v.show_in_site_status_updates !== false && v.value !== undefined && v.value !== null && v.value !== "",
   );
 
-  if (!siteStatusType || visibleKeys.length === 0) return null;
+  if (!siteStatusType || visibleValues.length === 0) return null;
 
   async function copyValue(text: string, keyId: string) {
     try {
@@ -675,12 +666,11 @@ function SiteStatusValuesSection({
         {t("siteStatusType", { defaultValue: "نوع حالة الموقع" })}: {siteStatusType.name_ar || siteStatusType.name_en}
       </Typography>
       <Stack spacing={1}>
-        {visibleKeys.map((key) => {
-          const value = formatSiteStatusValue(values[key.id]);
-          const isCopied = copiedKeyId === key.id;
+        {visibleValues.map((v) => {
+          const isCopied = copiedKeyId === v.key_id;
           return (
             <Box
-              key={key.id}
+              key={v.id ?? v.key_id}
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -690,16 +680,16 @@ function SiteStatusValuesSection({
             >
               <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Typography variant="caption" color="text.secondary" display="block">
-                  {key.name_ar || key.name_en || key.key}
+                  {v.name_ar || v.name_en || v.key}
                 </Typography>
                 <Typography variant="body2" fontWeight={600} sx={{ wordBreak: "break-word" }}>
-                  {value}
+                  {v.value}
                 </Typography>
               </Box>
               <Tooltip title={t("copyReport")}>
                 <IconButton
                   size="small"
-                  onClick={() => copyValue(value, key.id)}
+                  onClick={() => copyValue(v.value, v.key_id)}
                   sx={{ color: isCopied ? "success.main" : "text.secondary" }}
                 >
                   {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

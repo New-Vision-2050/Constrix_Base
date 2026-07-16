@@ -75,8 +75,9 @@ export default function CurrentPeriodCard() {
 
   return (
     <SummaryCardShell
-      icon={<LayoutList size={18} className="text-primary" />}
+      icon={<LayoutList size={18} />}
       title={t("currentPeriod")}
+      accent="#3B9EFF"
       className="relative"
       footer={
         <div className="flex justify-center pt-1">
