@@ -3,6 +3,8 @@ import type {
   CopySiteStatusUpdateArgs,
   CreateProjectNotificationArgs,
   CreateProjectNotificationNoteArgs,
+  CreateSiteStatusTypeArgs,
+  CreateSiteStatusTypeKeyArgs,
   ProjectNotificationsChartsArgs,
   ProjectNotificationsEmployeesLocationsArgs,
   ProjectNotificationsExportArgs,
@@ -15,6 +17,8 @@ import type {
   ProjectNotificationRejectArgs,
   ProjectNotificationScopeArgs,
   UpdateProjectNotificationArgs,
+  UpdateSiteStatusTypeArgs,
+  UpdateSiteStatusTypeKeyArgs,
 } from "./types/args";
 import type {
   NotificationChartsResponse,
@@ -32,6 +36,9 @@ import type {
   ProjectNotificationSingleResponse,
   ProjectNotificationTypesResponse,
   ProjectNotificationsListResponse,
+  SiteStatusTypeKeysResponse,
+  SiteStatusTypeSingleResponse,
+  SiteStatusTypesResponse,
   SiteStatusUpdatesResponse,
 } from "./types/response";
 
@@ -198,6 +205,60 @@ export const ProjectNotificationsApi = {
   getNotificationTypes: () =>
     baseApi.get<ProjectNotificationTypesResponse>(
       "projects/notifications/notification-types",
+    ),
+
+  getSiteStatusTypesWithKeys: (args: {
+    project_type_id?: string | number;
+    project_id?: string;
+  }) =>
+    baseApi.get<SiteStatusTypesResponse>("projects/site-status-types", {
+      params: args,
+    }),
+
+  getSiteStatusTypeById: (id: string) =>
+    baseApi.get<SiteStatusTypeSingleResponse>(`projects/site-status-types/${encodeURIComponent(id)}`),
+
+  createSiteStatusType: (args: CreateSiteStatusTypeArgs) =>
+    baseApi.post<SiteStatusTypeSingleResponse>("projects/site-status-types", args),
+
+  updateSiteStatusType: (id: string, args: UpdateSiteStatusTypeArgs) =>
+    baseApi.put<SiteStatusTypeSingleResponse>(
+      `projects/site-status-types/${encodeURIComponent(id)}`,
+      args,
+    ),
+
+  deleteSiteStatusType: (id: string) =>
+    baseApi.delete<ProjectNotificationDeleteResponse>(
+      `projects/site-status-types/${encodeURIComponent(id)}`,
+    ),
+
+  getSiteStatusTypeKeys: (siteStatusTypeId: string) =>
+    baseApi.get<SiteStatusTypeKeysResponse>(
+      `projects/site-status-types/${encodeURIComponent(siteStatusTypeId)}/keys`,
+    ),
+
+  createSiteStatusTypeKey: (
+    siteStatusTypeId: string,
+    args: CreateSiteStatusTypeKeyArgs,
+  ) =>
+    baseApi.post<SiteStatusTypeKeysResponse>(
+      `projects/site-status-types/${encodeURIComponent(siteStatusTypeId)}/keys`,
+      args,
+    ),
+
+  updateSiteStatusTypeKey: (
+    siteStatusTypeId: string,
+    keyId: string,
+    args: UpdateSiteStatusTypeKeyArgs,
+  ) =>
+    baseApi.put<SiteStatusTypeKeysResponse>(
+      `projects/site-status-types/${encodeURIComponent(siteStatusTypeId)}/keys/${encodeURIComponent(keyId)}`,
+      args,
+    ),
+
+  deleteSiteStatusTypeKey: (siteStatusTypeId: string, keyId: string) =>
+    baseApi.delete<ProjectNotificationDeleteResponse>(
+      `projects/site-status-types/${encodeURIComponent(siteStatusTypeId)}/keys/${encodeURIComponent(keyId)}`,
     ),
 
   getSiteStatusUpdates: (notificationId: string) =>

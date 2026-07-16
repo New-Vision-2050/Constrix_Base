@@ -84,6 +84,11 @@ function isImageAttachment(att: SiteStatusUpdateAttachment): boolean {
   return false;
 }
 
+function formatSiteStatusValue(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value);
+}
+
 function buildCopyText(
   notification: ProjectNotification,
   update: SiteStatusUpdate,
@@ -103,9 +108,22 @@ function buildCopyText(
     `⏱️ الوقت المتوقع لإنهاء العمل: ${notification.duration_hours ?? ""}`,
     `📍 الموقع الجغرافي: ${notification.repair_point ?? ""}`,
     `🗺️ رابط الموقع (Google Maps):   ${notification.location_link ?? ""}`,
-    "",
-    `حالة العطل:  ${update.description ?? ""}`,
   ];
+
+  const siteStatusKeys = notification.site_status_type?.keys ?? [];
+  const siteStatusValues = notification.site_status_values ?? {};
+  if (siteStatusKeys.length > 0) {
+    lines.push("");
+    lines.push(`📊 ${notification.site_status_type?.name_ar ?? notification.site_status_type?.name_en ?? ""}`);
+    siteStatusKeys.forEach((key) => {
+      const value = formatSiteStatusValue(siteStatusValues[key.id]);
+      if (!value) return;
+      lines.push(`${key.name_ar || key.name_en || key.key}: ${value}`);
+    });
+  }
+
+  lines.push("");
+  lines.push(`حالة العطل:  ${update.description ?? ""}`);
   return lines.join("\n");
 }
 
@@ -443,6 +461,9 @@ function SiteStatusCard({
           </Typography>
         </Box>
 
+        {/* Site Status Type Values */}
+        <SiteStatusValuesSection notification={notification} t={t} />
+
         {/* Requested by / Reviewed by */}
         <Grid container spacing={2}>
           <Grid size={{ xs: 6 }}>
@@ -607,6 +628,87 @@ function ReportField({
       <Typography variant="body2" fontWeight={600} color="text.primary" component="span">
         {value || "—"}
       </Typography>
+    </Box>
+  );
+}
+
+function SiteStatusValuesSection({
+  notification,
+  t,
+}: {
+  notification: ProjectNotification;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
+  const siteStatusType = notification.site_status_type;
+  const keys = siteStatusType?.keys ?? [];
+  const values = notification.site_status_values ?? {};
+
+  const visibleKeys = keys.filter(
+    (key) => key.show_in_site_status_updates && values[key.id] !== undefined && values[key.id] !== null && String(values[key.id]) !== "",
+  );
+
+  if (!siteStatusType || visibleKeys.length === 0) return null;
+
+  async function copyValue(text: string, keyId: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKeyId(keyId);
+      toast.success(t("copiedToClipboard"));
+      setTimeout(() => setCopiedKeyId(null), 1500);
+    } catch {
+      toast.error(t("copyFailed"));
+    }
+  }
+
+  return (
+    <Box
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        bgcolor: "action.hover",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <Typography variant="caption" color="text.secondary" fontWeight={700} display="block" sx={{ mb: 1 }}>
+        {t("siteStatusType", { defaultValue: "نوع حالة الموقع" })}: {siteStatusType.name_ar || siteStatusType.name_en}
+      </Typography>
+      <Stack spacing={1}>
+        {visibleKeys.map((key) => {
+          const value = formatSiteStatusValue(values[key.id]);
+          const isCopied = copiedKeyId === key.id;
+          return (
+            <Box
+              key={key.id}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 1,
+              }}
+            >
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Typography variant="caption" color="text.secondary" display="block">
+                  {key.name_ar || key.name_en || key.key}
+                </Typography>
+                <Typography variant="body2" fontWeight={600} sx={{ wordBreak: "break-word" }}>
+                  {value}
+                </Typography>
+              </Box>
+              <Tooltip title={t("copyReport")}>
+                <IconButton
+                  size="small"
+                  onClick={() => copyValue(value, key.id)}
+                  sx={{ color: isCopied ? "success.main" : "text.secondary" }}
+                >
+                  {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </IconButton>
+              </Tooltip>
+            </Box>
+          );
+        })}
+      </Stack>
     </Box>
   );
 }

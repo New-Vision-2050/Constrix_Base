@@ -176,5 +176,6 @@ export const projectTypesMessages = new MessagesGroup({
       "الرجاء اختيار نوع مشروع",
     ),
     loading: _m("Loading...", "جاري التحميل..."),
+    siteStatusTypes: _m("Site Status Types", "أنواع حالة الموقع"),
   }),
 });

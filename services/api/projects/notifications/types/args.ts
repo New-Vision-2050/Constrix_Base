@@ -127,3 +127,43 @@ export interface ProjectNotificationsChartsArgs {
   date_to?: string;
   search?: string;
 }
+
+/* ── Site Status Types ── */
+
+export interface CreateSiteStatusTypeArgs {
+  project_type_id: string | number;
+  name_ar: string;
+  name_en?: string;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface UpdateSiteStatusTypeArgs {
+  name_ar?: string;
+  name_en?: string;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface CreateSiteStatusTypeKeyArgs {
+  site_status_type_id?: string;
+  name_ar: string;
+  name_en?: string;
+  key?: string;
+  field_type: "text" | "number" | "date" | "select";
+  options?: string[] | null;
+  show_in_site_status_updates?: boolean;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface UpdateSiteStatusTypeKeyArgs {
+  name_ar?: string;
+  name_en?: string;
+  key?: string;
+  field_type?: "text" | "number" | "date" | "select";
+  options?: string[] | null;
+  show_in_site_status_updates?: boolean;
+  sort_order?: number;
+  is_active?: boolean;
+}
