@@ -109,11 +109,11 @@ export async function middleware(req: NextRequest) {
       }
 
       if (
-        !!company?.payload.is_central_company &&
+        !company?.payload.is_central_company &&
         protectedCentralPages.includes(pathnameWithoutLocale)
       ) {
         return NextResponse.redirect(
-          new URL(`/${locale}/user-profile`, req.url),
+          new URL(`/${locale}/attendance-presence`, req.url),
         );
       }
     } catch (error) {
