@@ -24,7 +24,7 @@ import OtpHub from "../resend-otp/otp-hub";
 import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "@i18n/navigation";
 import { setCookie } from "cookies-next";
-import { ROUTER } from "@/router";
+import { getPostLoginRedirectPath } from "@/utils/get-post-login-redirect-path";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useModal } from "@/hooks/use-modal";
@@ -79,7 +79,7 @@ const ValidatePhonePhase = ({
               maxAge: 7 * 24 * 60 * 60,
               path: "/",
             });
-            router.push(ROUTER.USER_PROFILE);
+            router.push(getPostLoginRedirectPath());
             return;
           }
           const nextStep = data.payload.login_way.step?.login_option;

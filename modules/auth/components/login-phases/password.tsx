@@ -16,7 +16,7 @@ import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useForgetPassword, useLoginSteps } from "../../store/mutations";
 import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "@i18n/navigation";
-import { ROUTER } from "@/router";
+import { getPostLoginRedirectPath } from "@/utils/get-post-login-redirect-path";
 import { setCookie } from "cookies-next";
 import AnotherCheckingWay from "../another-checking-way";
 import { useEffect, useState } from "react";
@@ -94,7 +94,7 @@ const PasswordPhase = ({
             });
 
             // handle redirect based on user type
-            router.push(ROUTER.USER_PROFILE);
+            router.push(getPostLoginRedirectPath());
             return;
           }
           switch (nextStep) {
