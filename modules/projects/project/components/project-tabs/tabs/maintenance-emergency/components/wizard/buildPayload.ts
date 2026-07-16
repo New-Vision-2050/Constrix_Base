@@ -16,6 +16,10 @@ function wizardDataToNotificationFields(data: WizardFormData) {
     task_date: data.task_date || null,
     duration_hours: data.duration_hours || null,
     notes: data.notes || null,
+    site_status_type_id: data.site_status_type_id || null,
+    site_status_type_values: Object.entries(data.site_status_values)
+      .filter(([, v]) => v !== "" && v !== undefined && v !== null)
+      .map(([key_id, value]) => ({ key_id, value: String(value) })),
 
     contractor_id: data.contractor_id || null,
     contractor_name: data.contractor_name || null,

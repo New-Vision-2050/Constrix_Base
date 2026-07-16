@@ -71,6 +71,8 @@ export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {
   notes?: string | null;
   machine_number?: string | null;
   is_draft?: boolean;
+  site_status_type_id?: string | null;
+  site_status_type_values?: SiteStatusTypeValue[];
 };
 
 export type UpdateProjectNotificationArgs = {
@@ -78,9 +80,9 @@ export type UpdateProjectNotificationArgs = {
 } & {
   id: string;
   project_id?: string;
-  contractual_engagement_key?: string;
-  files?: File[];
   deleted_media_ids?: (string | number)[];
+  files?: File[];
+  contractual_engagement_key?: string;
 };
 
 export interface ProjectNotificationRejectArgs {
@@ -126,4 +128,63 @@ export interface ProjectNotificationsChartsArgs {
   date_from?: string;
   date_to?: string;
   search?: string;
+}
+
+/* ── Site Status Types ── */
+
+export interface SiteStatusTypeValue {
+  key_id: string;
+  value: string;
+}
+
+export interface SiteStatusTypeKeyInput {
+  id?: string;
+  name_ar: string;
+  name_en?: string;
+  key?: string;
+  field_type: "text" | "number" | "date" | "select";
+  options?: string[] | null;
+  show_in_site_status_updates?: boolean;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface CreateSiteStatusTypeArgs {
+  project_type_id: string | number;
+  name_ar: string;
+  name_en?: string;
+  sort_order?: number;
+  is_active?: boolean;
+  keys?: SiteStatusTypeKeyInput[];
+}
+
+export interface UpdateSiteStatusTypeArgs {
+  name_ar?: string;
+  name_en?: string;
+  sort_order?: number;
+  is_active?: boolean;
+  keys?: SiteStatusTypeKeyInput[];
+}
+
+export interface CreateSiteStatusTypeKeyArgs {
+  site_status_type_id?: string;
+  name_ar: string;
+  name_en?: string;
+  key?: string;
+  field_type: "text" | "number" | "date" | "select";
+  options?: string[] | null;
+  show_in_site_status_updates?: boolean;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface UpdateSiteStatusTypeKeyArgs {
+  name_ar?: string;
+  name_en?: string;
+  key?: string;
+  field_type?: "text" | "number" | "date" | "select";
+  options?: string[] | null;
+  show_in_site_status_updates?: boolean;
+  sort_order?: number;
+  is_active?: boolean;
 }

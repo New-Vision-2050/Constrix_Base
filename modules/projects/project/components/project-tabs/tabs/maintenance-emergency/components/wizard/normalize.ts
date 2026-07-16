@@ -14,6 +14,8 @@ export function notificationToWizardForm(
       task_date: new Date().toISOString().split("T")[0],
       duration_hours: 4,
       notes: "",
+      site_status_type_id: "",
+      site_status_values: {},
       contractor_id: "",
       contractor_name: "",
       contractor_technical_name: "",
@@ -43,6 +45,10 @@ export function notificationToWizardForm(
     task_date: notification.task_date ?? new Date().toISOString().split("T")[0],
     duration_hours: notification.duration_hours ?? 4,
     notes: notification.notes ?? "",
+    site_status_type_id: notification.site_status_type_id ?? "",
+    site_status_values: Object.fromEntries(
+      (notification.site_status_values ?? []).map((v) => [v.key_id, v.value]),
+    ),
 
     contractor_id: notification.contractor_id ?? "",
     contractor_name: notification.contractor_name ?? "",

@@ -35,6 +35,7 @@ import {
 import { Close } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
 import {
   useCreateProjectNotificationMutation,
@@ -45,7 +46,12 @@ import {
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
-import type { ProjectNotificationEmployee, ProjectNotificationType } from "@/services/api/projects/notifications/types/response";
+import { useSiteStatusTypes } from "@/modules/projects/project/query/useSiteStatusTypes";
+import type {
+  ProjectNotificationEmployee,
+  ProjectNotificationType,
+  SiteStatusTypeWithKeys,
+} from "@/services/api/projects/notifications/types/response";
 import { useGoogleRouteDistances } from "./useGoogleRouteDistances";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 import {
@@ -107,6 +113,14 @@ export default function CreateNotificationWizard({
     createMutation.isPending || updateMutation.isPending;
   const notificationTypesQuery = useProjectNotificationTypes();
   const notificationTypes = notificationTypesQuery.data ?? [];
+
+  const project = useOptionalProject();
+  const projectTypeId = project?.projectData?.sub_sub_project_type_id;
+  const siteStatusTypesQuery = useSiteStatusTypes({
+    projectTypeId,
+    projectId,
+  });
+  const siteStatusTypes = siteStatusTypesQuery.data ?? [];
 
   const employeeQuery = useProjectNotificationEmployees({
     projectId,
@@ -394,7 +408,14 @@ export default function CreateNotificationWizard({
             </Stepper>
 
             {step === 1 && (
-              <Step1Form data={data} errors={errors} onChange={updateField} t={t} notificationTypes={notificationTypes} />
+              <Step1Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                notificationTypes={notificationTypes}
+                siteStatusTypes={siteStatusTypes}
+              />
             )}
             {step === 2 && (
               <Step2Form data={data} errors={errors} onChange={updateField} t={t} />
@@ -424,6 +445,7 @@ export default function CreateNotificationWizard({
               <Step5Form
                 data={data}
                 employees={employees}
+                siteStatusTypes={siteStatusTypes}
                 confirmed={confirmed}
                 onChangeConfirmed={(value) => setConfirmed(value)}
                 t={t}
@@ -478,12 +500,14 @@ function Step1Form({
   onChange,
   t,
   notificationTypes,
+  siteStatusTypes,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: ReturnType<typeof useTranslations>;
   notificationTypes: ProjectNotificationType[];
+  siteStatusTypes: SiteStatusTypeWithKeys[];
 }) {
   return (
     <Grid container spacing={2}>
@@ -589,8 +613,148 @@ function Step1Form({
           onChange={(e) => onChange("notes", e.target.value)}
         />
       </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("siteStatusType", { defaultValue: "نوع حالة الموقع" })}
+          value={data.site_status_type_id}
+          onChange={(e) => {
+            onChange("site_status_type_id", e.target.value);
+            onChange("site_status_values", {});
+          }}
+          disabled={siteStatusTypes.length === 0}
+        >
+          <MenuItem value="">
+            {t("selectSiteStatusType", { defaultValue: "اختر نوع حالة الموقع" })}
+          </MenuItem>
+          {siteStatusTypes.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name_ar || type.name_en}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      {data.site_status_type_id && (
+        <SiteStatusValueInputs
+          siteStatusTypeId={data.site_status_type_id}
+          siteStatusTypes={siteStatusTypes}
+          values={data.site_status_values}
+          onChange={(values) => onChange("site_status_values", values)}
+          t={t}
+        />
+      )}
     </Grid>
   );
+}
+
+function SiteStatusSummaryCard({
+  siteStatusTypeId,
+  siteStatusTypes,
+  values,
+  t,
+}: {
+  siteStatusTypeId: string;
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+  values: Record<string, string>;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const selectedType = siteStatusTypes.find((type) => type.id === siteStatusTypeId);
+  const rows = (selectedType?.keys ?? [])
+    .filter((key) => values[key.id] !== undefined && values[key.id] !== "")
+    .map((key) => ({
+      label: key.name_ar || key.name_en || key.key,
+      value: values[key.id],
+    }));
+
+  return (
+    <SummaryCard
+      title={t("summarySiteStatus", { defaultValue: "حالة الموقع" })}
+      rows={[
+        {
+          label: t("siteStatusType", { defaultValue: "نوع حالة الموقع" }),
+          value: selectedType?.name_ar || selectedType?.name_en || "—",
+        },
+        ...rows,
+      ]}
+    />
+  );
+}
+
+function SiteStatusValueInputs({
+  siteStatusTypeId,
+  siteStatusTypes,
+  values,
+  onChange,
+  t,
+}: {
+  siteStatusTypeId: string;
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+  values: Record<string, string>;
+  onChange: (values: Record<string, string>) => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const selectedType = siteStatusTypes.find((type) => type.id === siteStatusTypeId);
+  const keys = selectedType?.keys ?? [];
+
+  function updateValue(keyId: string, value: string) {
+    onChange({ ...values, [keyId]: value });
+  }
+
+  if (!keys.length) {
+    return (
+      <Grid size={{ xs: 12 }}>
+        <Typography variant="body2" color="text.secondary">
+          {t("noKeys", { defaultValue: "لا توجد مفاتيح محددة" })}
+        </Typography>
+      </Grid>
+    );
+  }
+
+  return keys.map((key) => {
+    const label = key.name_ar || key.name_en || key.key;
+    const value = values[key.id] ?? "";
+
+    if (key.field_type === "select" && (key.options ?? []).length > 0) {
+      return (
+        <Grid size={{ xs: 12, md: 6 }} key={key.id}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={label}
+            value={value}
+            onChange={(e) => updateValue(key.id, e.target.value)}
+          >
+            {(key.options ?? []).map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+      );
+    }
+
+    const inputType = key.field_type === "number" ? "number" : key.field_type === "date" ? "date" : "text";
+
+    return (
+      <Grid size={{ xs: 12, md: 6 }} key={key.id}>
+        <TextField
+          fullWidth
+          size="small"
+          type={inputType}
+          label={label}
+          value={value}
+          onChange={(e) => updateValue(key.id, e.target.value)}
+          InputLabelProps={inputType === "date" ? { shrink: true } : undefined}
+        />
+      </Grid>
+    );
+  });
 }
 
 // ============================================================================
@@ -1166,12 +1330,14 @@ function Step4Form({
 function Step5Form({
   data,
   employees,
+  siteStatusTypes,
   confirmed,
   onChangeConfirmed,
   t,
 }: {
   data: WizardFormData;
   employees: ProjectNotificationEmployee[];
+  siteStatusTypes: SiteStatusTypeWithKeys[];
   confirmed: { dataReviewed: boolean; readyToSend: boolean };
   onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
   t: ReturnType<typeof useTranslations>;
@@ -1198,6 +1364,15 @@ function Step5Form({
           { label: t("description"), value: data.work_description },
         ]}
       />
+
+      {data.site_status_type_id && (
+        <SiteStatusSummaryCard
+          siteStatusTypeId={data.site_status_type_id}
+          siteStatusTypes={siteStatusTypes}
+          values={data.site_status_values}
+          t={t}
+        />
+      )}
 
       <SummaryCard
         title={t("summaryContractor")}
