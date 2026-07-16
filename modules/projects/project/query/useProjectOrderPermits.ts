@@ -17,9 +17,7 @@ export function useProjectOrderPermits(projectId: string | undefined) {
       if (!Array.isArray(payload)) {
         return [] as WorkOrderRow[];
       }
-      return payload.map((item, index) =>
-        mapProjectOrderPermitDto(item, index + 1),
-      );
+      return payload.map((item) => mapProjectOrderPermitDto(item));
     },
     enabled: !!projectId,
     retry: false,
