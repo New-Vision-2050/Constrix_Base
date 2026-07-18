@@ -63,6 +63,7 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       assignmentDate: _m("Assignment date", "تاريخ الإسناد"),
       contractor: _m("Contractor", "المقاول"),
       management: _m("Management", "الادارة"),
+      district: _m("District", "المنطقة"),
       location: _m("Location", "الموقع"),
       latitude: _m("Latitude", "خط العرض"),
       longitude: _m("Longitude", "خط الطول"),
@@ -71,6 +72,7 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       selectType: _m("Select type", "اختر النوع"),
       selectContractor: _m("Select contractor", "اختر المقاول"),
       selectManagement: _m("Select management", "اختر الادارة"),
+      selectDistrict: _m("Select district", "اختر المنطقة"),
       selectLocation: _m("Select location", "اختر الموقع"),
     }),
     review: new MessagesGroup({

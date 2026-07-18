@@ -32,9 +32,9 @@ export function mapProjectOrderPermitDto(
     id: String(dto.id),
     workOrderId: pickString(dto.name),
     workOrderType: pickString(
-      dto.order_permit?.type,
-      dto.order_permit?.description,
       dto.order_permit?.code,
+      dto.order_permit?.description,
+      dto.order_permit?.type,
       dto.type,
     ),
     assignmentDate: resolveDate(dto.assigned_date),
@@ -44,10 +44,15 @@ export function mapProjectOrderPermitDto(
       dto.contractor?.contractor_name,
     ),
     management: pickString(
+      dto.project_management_name,
       dto.order_permit_department?.description,
       dto.order_permit_department?.code,
     ),
-    location: pickString(dto.state_name, dto.state?.name),
+    location: pickString(
+      dto.projects_district_name,
+      dto.state_name,
+      dto.state?.name,
+    ),
     latitude: resolveCoordinate(dto.lat),
     longitude: resolveCoordinate(dto.long),
     price: toNumber(dto.price),
