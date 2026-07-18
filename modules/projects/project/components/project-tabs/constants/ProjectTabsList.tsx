@@ -14,6 +14,7 @@ import {
   Wrench,
   HardHat,
   Building2,
+  MapPin,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -39,6 +40,8 @@ import ShareTab from "../tabs/share";
 import ContractorsTab from "../tabs/contractors";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 import WorkOrdersTab from "../tabs/work-orders";
+import ManagementsTab from "../tabs/managements";
+import DistrictsTab from "../tabs/districts";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
@@ -82,6 +85,18 @@ function createStakeholderSubTabs(
       title: tProject("tabs.sharedEntities"),
       icon: <Share2 className="w-4 h-4" />,
       content: <ShareTab />,
+    },
+    {
+      id: "project-tab-managements",
+      title: tProject("tabs.managements"),
+      icon: <Building2 className="w-4 h-4" />,
+      content: <ManagementsTab />,
+    },
+    {
+      id: "project-tab-districts",
+      title: tProject("tabs.districts"),
+      icon: <MapPin className="w-4 h-4" />,
+      content: <DistrictsTab />,
     },
   ];
 }

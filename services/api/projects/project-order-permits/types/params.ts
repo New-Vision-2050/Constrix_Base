@@ -6,6 +6,8 @@ export interface CreateProjectOrderPermitWorkOrderArgs {
   price: number;
   order_permit_id?: number;
   order_permit_department_id?: number;
+  project_management_id?: number;
+  projects_district_id?: number;
   state_id?: string;
   lat?: number;
   long?: number;

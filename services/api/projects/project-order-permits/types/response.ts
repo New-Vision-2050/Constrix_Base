@@ -58,6 +58,10 @@ export interface ProjectOrderPermitWorkOrderDto {
   contractor_name?: string | null;
   state_id?: string | number | null;
   state_name?: string | null;
+  project_management_id?: number | null;
+  project_management_name?: string | null;
+  projects_district_id?: number | null;
+  projects_district_name?: string | null;
   lat?: number | string | null;
   long?: number | string | null;
   price?: number | string | null;
