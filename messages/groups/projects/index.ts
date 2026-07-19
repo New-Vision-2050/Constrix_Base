@@ -674,8 +674,8 @@ export const projectMessages = new MessagesGroup({
       taskDate: _m("Task Date", "تاريخ المهمة"),
       durationHours: _m("Duration (hours)", "المدة (ساعات)"),
       notes: _m("Notes", "ملاحظات"),
-      siteStatusType: _m("Site Status Type", "نوع حالة الموقع"),
-      selectSiteStatusType: _m("Select site status type", "اختر نوع حالة الموقع"),
+      siteStatusType: _m("Notification Format", "صيغة الإشعار"),
+      selectSiteStatusType: _m("Select notification format", "اختر صيغة الإشعار"),
       summaryNotification: _m("Notification Summary", "ملخص الإشعار"),
       summarySiteStatus: _m("Site Status", "حالة الموقع"),
       summaryContractor: _m("Contractor Summary", "ملخص المقاول"),
@@ -914,6 +914,11 @@ export const projectMessages = new MessagesGroup({
       selectSiteStatusType: _m(
         "Select Site Status Type",
         "اختر نوع حالة الموقع",
+      ),
+      notificationTypes: _m("Notification Types", "أنواع الإشعارات"),
+      selectNotificationTypes: _m(
+        "Select Notification Types",
+        "اختر أنواع الإشعارات",
       ),
       fieldTypes: new MessagesGroup({
         text: _m("Text", "نص"),

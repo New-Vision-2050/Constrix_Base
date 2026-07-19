@@ -21,6 +21,7 @@ export const SITE_STATUS_TYPE_KEYS_QUERY_KEY = "site-status-type-keys" as const;
 export interface UseSiteStatusTypesParams {
   projectTypeId?: string | number;
   projectId?: string;
+  notificationTypeId?: string;
 }
 
 export function siteStatusTypesQueryKey(params: UseSiteStatusTypesParams) {
@@ -46,6 +47,9 @@ export function useSiteStatusTypes(params: UseSiteStatusTypesParams) {
           ? { project_type_id: params.projectTypeId }
           : {}),
         ...(params.projectId ? { project_id: params.projectId } : {}),
+        ...(params.notificationTypeId
+          ? { notification_type_id: params.notificationTypeId }
+          : {}),
       });
       return res.data.payload ?? [];
     },

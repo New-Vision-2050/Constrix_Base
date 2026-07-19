@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  Autocomplete,
   Box,
   Button,
+  Checkbox,
   Drawer,
   FormControlLabel,
   IconButton,
@@ -20,7 +22,11 @@ import {
   useCreateSiteStatusTypeMutation,
   useUpdateSiteStatusTypeMutation,
 } from "@/modules/projects/project/query/useSiteStatusTypes";
-import type { SiteStatusTypeWithKeys } from "@/services/api/projects/notifications/types/response";
+import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
+import type {
+  ProjectNotificationType,
+  SiteStatusTypeWithKeys,
+} from "@/services/api/projects/notifications/types/response";
 import type { SiteStatusTypeKeyInput } from "@/services/api/projects/notifications/types/args";
 
 interface SiteStatusTypeDrawerProps {
@@ -39,6 +45,7 @@ interface FormData {
   name_en: string;
   sort_order: number;
   is_active: boolean;
+  notification_types: string[];
   keys: KeyRow[];
 }
 
@@ -69,12 +76,15 @@ export default function SiteStatusTypeDrawer({
 
   const createMutation = useCreateSiteStatusTypeMutation(listParams);
   const updateMutation = useUpdateSiteStatusTypeMutation(listParams);
+  const notificationTypesQuery = useProjectNotificationTypes();
+  const notificationTypes = notificationTypesQuery.data ?? [];
 
   const [formData, setFormData] = useState<FormData>({
     name_ar: "",
     name_en: "",
     sort_order: 1,
     is_active: true,
+    notification_types: [],
     keys: [],
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -86,6 +96,9 @@ export default function SiteStatusTypeDrawer({
         name_en: editType.name_en,
         sort_order: editType.sort_order,
         is_active: editType.is_active,
+        notification_types: (editType.notification_types ?? []).map(
+          (nt) => nt.id,
+        ),
         keys: (editType.keys ?? []).map((k) => ({
           _tempId: k.id,
           id: k.id,
@@ -105,6 +118,7 @@ export default function SiteStatusTypeDrawer({
         name_en: "",
         sort_order: 1,
         is_active: true,
+        notification_types: [],
         keys: [],
       });
     }
@@ -231,6 +245,7 @@ export default function SiteStatusTypeDrawer({
             name_en: formData.name_en,
             sort_order: formData.sort_order,
             is_active: formData.is_active,
+            notification_types: formData.notification_types,
             keys: keysPayload,
           },
         });
@@ -242,6 +257,7 @@ export default function SiteStatusTypeDrawer({
           name_en: formData.name_en,
           sort_order: formData.sort_order,
           is_active: formData.is_active,
+          notification_types: formData.notification_types,
           keys: keysPayload,
         });
         toast.success(t("typeCreated"));
@@ -309,6 +325,50 @@ export default function SiteStatusTypeDrawer({
               />
             }
             label={t("isActive")}
+          />
+
+          <Autocomplete
+            multiple
+            size="small"
+            options={notificationTypes}
+            getOptionLabel={(option: ProjectNotificationType) =>
+              option.name_ar || option.name_en || option.value
+            }
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={notificationTypes.filter((nt) =>
+              formData.notification_types.includes(nt.id),
+            )}
+            onChange={(_e, newValue) =>
+              setFormData((prev) => ({
+                ...prev,
+                notification_types: newValue.map((nt) => nt.id),
+              }))
+            }
+            disableCloseOnSelect
+            renderOption={(props, option, { selected }) => {
+              const { key, ...optionProps } = props;
+              return (
+                <li key={option.id} {...optionProps}>
+                  <Checkbox
+                    size="small"
+                    checked={selected}
+                    sx={{ p: 0.5, mr: 1 }}
+                  />
+                  {option.name_ar || option.name_en || option.value}
+                </li>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("notificationTypes", {
+                  defaultValue: "أنواع الإشعارات",
+                })}
+                placeholder={t("selectNotificationTypes", {
+                  defaultValue: "اختر أنواع الإشعارات",
+                })}
+              />
+            )}
           />
 
           <Box sx={{ mt: 2 }}>

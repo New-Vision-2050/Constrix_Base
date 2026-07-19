@@ -333,6 +333,12 @@ export interface SiteStatusTypeKey {
   updated_at?: string;
 }
 
+export interface SiteStatusTypeNotificationTypeRef {
+  id: string;
+  name_ar: string;
+  name_en: string;
+}
+
 export interface SiteStatusType {
   id: string;
   project_type_id: string | number;
@@ -340,6 +346,7 @@ export interface SiteStatusType {
   name_en: string;
   sort_order: number;
   is_active: boolean;
+  notification_types?: SiteStatusTypeNotificationTypeRef[] | null;
   created_at?: string;
   updated_at?: string;
 }
