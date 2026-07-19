@@ -542,28 +542,6 @@ function Step1Form({
         </TextField>
       </Grid>
 
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("feeder_number", { defaultValue: "رقم المغذي" })}
-          value={data.feeder_number}
-          onChange={(e) => onChange("feeder_number", e.target.value)}
-          error={Boolean(errors.feeder_number)}
-          helperText={errors.feeder_number}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("machineNumber", { defaultValue: "رقم المعدة" })}
-          value={data.machine_number}
-          onChange={(e) => onChange("machine_number", e.target.value)}
-        />
-      </Grid>
-
       <Grid size={{ xs: 12 }}>
         <TextField
           fullWidth
@@ -622,8 +600,14 @@ function Step1Form({
           label={t("siteStatusType", { defaultValue: "نوع حالة الموقع" })}
           value={data.site_status_type_id}
           onChange={(e) => {
-            onChange("site_status_type_id", e.target.value);
-            onChange("site_status_values", {});
+            const selectedId = e.target.value;
+            onChange("site_status_type_id", selectedId);
+            const selectedType = siteStatusTypes.find((type) => type.id === selectedId);
+            const initialValues: Record<string, string> = {};
+            (selectedType?.keys ?? []).forEach((key) => {
+              initialValues[key.id] = "";
+            });
+            onChange("site_status_values", initialValues);
           }}
           disabled={siteStatusTypes.length === 0}
         >
@@ -822,26 +806,6 @@ function Step2Form({
           label={t("contractorTechnicalNumber")}
           value={data.contractor_technical_number}
           onChange={(e) => onChange("contractor_technical_number", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("permitSource", { defaultValue: "Permit Source" })}
-          value={data.permit_source}
-          onChange={(e) => onChange("permit_source", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("permitRecipient", { defaultValue: "Permit Recipient" })}
-          value={data.permit_recipient}
-          onChange={(e) => onChange("permit_recipient", e.target.value)}
         />
       </Grid>
 
@@ -1359,8 +1323,6 @@ function Step5Form({
         rows={[
           { label: t("notification_number", { defaultValue: "رقم الإشعار" }), value: data.notification_number },
           { label: t("notificationType", { defaultValue: "نوع الاشعار" }), value: data.notification_type },
-          { label: t("feeder_number", { defaultValue: "رقم المغذي" }), value: data.feeder_number },
-          { label: t("machineNumber", { defaultValue: "رقم المعدة" }), value: data.machine_number },
           { label: t("description"), value: data.work_description },
         ]}
       />
@@ -1380,8 +1342,6 @@ function Step5Form({
           { label: t("contractor"), value: data.contractor_name },
           { label: t("contractorTechnicalName", { defaultValue: "Contractor technical name" }), value: data.contractor_technical_name },
           { label: t("contractorTechnicalNumber"), value: data.contractor_technical_number },
-          { label: t("permitSource", { defaultValue: "Permit Source" }), value: data.permit_source },
-          { label: t("permitRecipient", { defaultValue: "Permit Recipient" }), value: data.permit_recipient },
         ]}
       />
 

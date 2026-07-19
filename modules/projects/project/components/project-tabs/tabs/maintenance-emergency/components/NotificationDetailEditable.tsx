@@ -166,10 +166,7 @@ export default function NotificationDetailEditable({
   const notificationReadFields = [
     { caption: t("notificationNumber"), value: notification.notification_number ?? tDash },
     { caption: t("notificationType"), value: notification.notification_type },
-    { caption: t("workType"), value: notification.work_type ?? tDash },
     { caption: t("severity"), value: t(SEVERITY_CONFIG[notification.severity]?.labelKey ?? "severities.medium") },
-    { caption: t("feeder_number"), value: notification.feeder_number ?? tDash },
-    { caption: t("machineNumber", { defaultValue: "رقم المعدة" }), value: notification.machine_number ?? tDash },
     { caption: t("taskDate"), value: formatDateOnly(notification.task_date) },
     {
       caption: t("durationHours"),
@@ -204,24 +201,6 @@ export default function NotificationDetailEditable({
             </MenuItem>
           ))}
         </TextField>
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("feeder_number")}
-          value={formData.feeder_number}
-          onChange={(e) => updateField("feeder_number", e.target.value)}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("machineNumber", { defaultValue: "رقم المعدة" })}
-          value={formData.machine_number}
-          onChange={(e) => updateField("machine_number", e.target.value)}
-        />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
@@ -278,8 +257,6 @@ export default function NotificationDetailEditable({
     { caption: t("contractorTechnicalName"), value: notification.contractor_technical_name ?? tDash },
     { caption: t("contractorTechnicalNumber"), value: notification.contractor_technical_number ?? tDash },
     { caption: t("contractorCategory"), value: notification.contractor_category ?? tDash },
-    { caption: t("permitSource", { defaultValue: "Permit Source" }), value: notification.permit_source ?? tDash },
-    { caption: t("permitRecipient", { defaultValue: "Permit Recipient" }), value: notification.permit_recipient ?? tDash },
     { caption: t("contractorNotes"), value: notification.contractor_notes ?? tDash },
   ];
 
@@ -335,24 +312,6 @@ export default function NotificationDetailEditable({
           label={t("contractorCategory")}
           value={formData.contractor_category}
           onChange={(e) => updateField("contractor_category", e.target.value)}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("permitSource", { defaultValue: "Permit Source" })}
-          value={formData.permit_source}
-          onChange={(e) => updateField("permit_source", e.target.value)}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("permitRecipient", { defaultValue: "Permit Recipient" })}
-          value={formData.permit_recipient}
-          onChange={(e) => updateField("permit_recipient", e.target.value)}
         />
       </Grid>
       <Grid size={{ xs: 12 }}>
