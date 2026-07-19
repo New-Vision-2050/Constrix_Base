@@ -616,7 +616,7 @@ function Step1Form({
           select
           fullWidth
           size="small"
-          label={t("siteStatusType", { defaultValue: "نوع حالة الموقع" })}
+          label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
           value={data.site_status_type_id}
           onChange={(e) => {
             const selectedId = e.target.value;
@@ -631,7 +631,7 @@ function Step1Form({
           disabled={siteStatusTypes.length === 0}
         >
           <MenuItem value="">
-            {t("selectSiteStatusType", { defaultValue: "اختر نوع حالة الموقع" })}
+            {t("selectSiteStatusType", { defaultValue: "اختر صيغة الإشعار" })}
           </MenuItem>
           {siteStatusTypes.map((type) => (
             <MenuItem key={type.id} value={type.id}>
@@ -678,7 +678,7 @@ function SiteStatusSummaryCard({
       title={t("summarySiteStatus", { defaultValue: "حالة الموقع" })}
       rows={[
         {
-          label: t("siteStatusType", { defaultValue: "نوع حالة الموقع" }),
+          label: t("siteStatusType", { defaultValue: "صيغة الإشعار" }),
           value: selectedType?.name_ar || selectedType?.name_en || "—",
         },
         ...rows,
