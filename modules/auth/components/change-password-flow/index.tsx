@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +15,9 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import InputAdornment from "@mui/material/InputAdornment";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import {
   useLoginWays,
@@ -50,6 +54,9 @@ const ChangePasswordFlow = () => {
 
   const isPending =
     isLoginWaysPending || isLoginStepsPending || isResetPasswordPending;
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const {
     register,
@@ -145,16 +152,29 @@ const ChangePasswordFlow = () => {
           </Typography>
 
           <TextField
-            type="password"
+            type={showCurrentPassword ? "text" : "password"}
             label={t("ResetPassword.CurrentPassword")}
             {...register("old_password")}
             error={!!errors.old_password}
             helperText={errors.old_password?.message}
             fullWidth
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    edge="end"
+                    aria-label="toggle password visibility"
+                  >
+                    {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <TextField
-            type="password"
+            type={showNewPassword ? "text" : "password"}
             label={t("ResetPassword.NewPassword")}
             {...register("newPassword", {
               onChange: () => trigger("newPassword"),
@@ -162,6 +182,19 @@ const ChangePasswordFlow = () => {
             error={!!errors.newPassword}
             helperText={errors.newPassword?.message}
             fullWidth
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    edge="end"
+                    aria-label="toggle password visibility"
+                  >
+                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <Typography color="text.secondary" sx={{ opacity: 0.7, fontSize: "0.85rem" }}>
