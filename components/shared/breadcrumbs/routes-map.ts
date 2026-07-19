@@ -157,6 +157,7 @@ export const getRoutesMap = (
     "content-management-system/themes": getText("cms_themes", "المظاهر"),
     "content-management-system/communication-settings": getText("cms_communication-settings", "اعدادات التواصل"),
     "content-management-system/about-setting": getText("cms_about-setting", "اعدادات النبذة"),
+    "change-password": getText("change-password", "تغيير كلمة المرور"),
   };
 
   return appRoutesMap;
