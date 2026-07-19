@@ -155,6 +155,7 @@ export interface CreateSiteStatusTypeArgs {
   name_en?: string;
   sort_order?: number;
   is_active?: boolean;
+  notification_types?: string[];
   keys?: SiteStatusTypeKeyInput[];
 }
 
@@ -163,6 +164,7 @@ export interface UpdateSiteStatusTypeArgs {
   name_en?: string;
   sort_order?: number;
   is_active?: boolean;
+  notification_types?: string[];
   keys?: SiteStatusTypeKeyInput[];
 }
 

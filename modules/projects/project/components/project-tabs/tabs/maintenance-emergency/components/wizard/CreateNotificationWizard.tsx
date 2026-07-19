@@ -116,9 +116,18 @@ export default function CreateNotificationWizard({
 
   const project = useOptionalProject();
   const projectTypeId = project?.projectData?.sub_sub_project_type_id;
+
+  const selectedNotificationTypeId = useMemo(() => {
+    const match = notificationTypes.find(
+      (nt) => nt.value === data.notification_type,
+    );
+    return match?.id;
+  }, [notificationTypes, data.notification_type]);
+
   const siteStatusTypesQuery = useSiteStatusTypes({
     projectTypeId,
     projectId,
+    notificationTypeId: selectedNotificationTypeId,
   });
   const siteStatusTypes = siteStatusTypesQuery.data ?? [];
 
@@ -536,7 +545,11 @@ function Step1Form({
           size="small"
           label={t("notificationType", { defaultValue: "نوع الاشعار" })}
           value={data.notification_type}
-          onChange={(e) => onChange("notification_type", e.target.value)}
+          onChange={(e) => {
+            onChange("notification_type", e.target.value);
+            onChange("site_status_type_id", "");
+            onChange("site_status_values", {});
+          }}
           error={Boolean(errors.notification_type)}
           helperText={errors.notification_type}
         >
@@ -603,7 +616,7 @@ function Step1Form({
           select
           fullWidth
           size="small"
-          label={t("siteStatusType", { defaultValue: "نوع حالة الموقع" })}
+          label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
           value={data.site_status_type_id}
           onChange={(e) => {
             const selectedId = e.target.value;
@@ -618,7 +631,7 @@ function Step1Form({
           disabled={siteStatusTypes.length === 0}
         >
           <MenuItem value="">
-            {t("selectSiteStatusType", { defaultValue: "اختر نوع حالة الموقع" })}
+            {t("selectSiteStatusType", { defaultValue: "اختر صيغة الإشعار" })}
           </MenuItem>
           {siteStatusTypes.map((type) => (
             <MenuItem key={type.id} value={type.id}>
@@ -665,7 +678,7 @@ function SiteStatusSummaryCard({
       title={t("summarySiteStatus", { defaultValue: "حالة الموقع" })}
       rows={[
         {
-          label: t("siteStatusType", { defaultValue: "نوع حالة الموقع" }),
+          label: t("siteStatusType", { defaultValue: "صيغة الإشعار" }),
           value: selectedType?.name_ar || selectedType?.name_en || "—",
         },
         ...rows,

@@ -210,6 +210,7 @@ export const ProjectNotificationsApi = {
   getSiteStatusTypesWithKeys: (args: {
     project_type_id?: string | number;
     project_id?: string;
+    notification_type_id?: string;
   }) =>
     baseApi.get<SiteStatusTypesResponse>("projects/notifications/site-status-types", {
       params: args,
@@ -218,6 +219,7 @@ export const ProjectNotificationsApi = {
   getSiteStatusTypesWithKeysEndpoint: (args: {
     project_type_id?: string | number;
     project_id?: string;
+    notification_type_id?: string;
   }) =>
     baseApi.get<SiteStatusTypesResponse>("projects/notifications/site-status-types/with-keys", {
       params: args,
