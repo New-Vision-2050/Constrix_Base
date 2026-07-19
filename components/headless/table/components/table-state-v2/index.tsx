@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { TableStateV2, TableStateV2Options } from "./types";
 import { createColumnVisibilityHook } from "../column-visibility";
+import { createColumnPinningHook } from "../column-pinning";
 
 // ============================================================================
 // Table State Hook V2 (After Query)
@@ -10,6 +11,11 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
   // Create column visibility hook if prefix is provided, otherwise create a no-op hook
   const useColumnVisibilityHook = prefix
     ? createColumnVisibilityHook<TRow>(prefix)
+    : () => null;
+
+  // Create column pinning hook if prefix is provided, otherwise create a no-op hook
+  const useColumnPinningHook = prefix
+    ? createColumnPinningHook<TRow>(prefix)
     : () => null;
 
   return function useTableState(
@@ -30,6 +36,7 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
       onExport,
       onDelete,
       columnVisibility: externalColumnVisibility,
+      columnPinning: externalColumnPinning,
     } = options;
 
     // Automatically create column visibility if prefix exists and not provided externally
@@ -38,8 +45,33 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
     const columnVisibility =
       externalColumnVisibility ?? internalColumnVisibility ?? undefined;
 
+    // Automatically create column pinning if prefix exists and not provided externally
+    // Hook is always called unconditionally (returns null if no prefix)
+    const internalColumnPinning = useColumnPinningHook(columns);
+    const columnPinning =
+      externalColumnPinning ?? internalColumnPinning ?? undefined;
+
     // Use visible columns if column visibility is enabled, otherwise use all columns
-    const activeColumns = columnVisibility?.visibleColumns ?? columns;
+    const visibleColumns = columnVisibility?.visibleColumns ?? columns;
+
+    // Pinned columns must also be currently visible; move them to the front
+    // (in pin order), keeping the rest of the visible columns after them.
+    const pinnedKeySet = new Set(
+      (columnPinning?.pinnedColumns ?? [])
+        .filter((col) => visibleColumns.some((v) => v.key === col.key))
+        .map((col) => col.key),
+    );
+    const pinnedVisibleColumns = (columnPinning?.pinnedColumns ?? []).filter(
+      (col) => pinnedKeySet.has(col.key),
+    );
+    const unpinnedVisibleColumns = visibleColumns.filter(
+      (col) => !pinnedKeySet.has(col.key),
+    );
+    const activeColumns =
+      pinnedVisibleColumns.length > 0
+        ? [...pinnedVisibleColumns, ...unpinnedVisibleColumns]
+        : visibleColumns;
+    const pinnedColumnCount = pinnedVisibleColumns.length;
 
     // Selection state
     const [selectedRows, setSelectedRows] = useState<TRow[]>([]);
@@ -163,8 +195,10 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
         selectable,
         searchable,
         getRowSx,
+        pinnedColumnCount,
       },
       columnVisibility,
+      columnPinning,
       pagination: {
         page: params.page,
         limit: params.limit,
