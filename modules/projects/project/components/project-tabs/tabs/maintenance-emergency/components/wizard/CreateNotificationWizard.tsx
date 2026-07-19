@@ -418,7 +418,13 @@ export default function CreateNotificationWizard({
               />
             )}
             {step === 2 && (
-              <Step2Form data={data} errors={errors} onChange={updateField} t={t} />
+              <Step2Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                projectId={projectId}
+              />
             )}
             {step === 3 && (
               <Step3Form
@@ -750,13 +756,15 @@ function Step2Form({
   errors,
   onChange,
   t,
+  projectId,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: ReturnType<typeof useTranslations>;
+  projectId: string | undefined;
 }) {
-  const contractorsQuery = useProjectNotificationContractors();
+  const contractorsQuery = useProjectNotificationContractors(projectId);
   const contractors = contractorsQuery.data ?? [];
 
   function handleContractorChange(contractorId: string) {

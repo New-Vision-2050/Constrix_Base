@@ -1,18 +1,30 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ProjectNotificationsApi } from "@/services/api/projects/notifications";
+import { ProjectContractorsApi } from "@/services/api/projects/project-contractors";
+import type { ProjectNotificationContractor } from "@/services/api/projects/notifications/types/response";
 
 export const PROJECT_NOTIFICATION_CONTRACTORS_QUERY_KEY =
   "project-notification-contractors" as const;
 
-export function useProjectNotificationContractors() {
+export function useProjectNotificationContractors(projectId?: string) {
   return useQuery({
-    queryKey: [PROJECT_NOTIFICATION_CONTRACTORS_QUERY_KEY],
+    queryKey: [PROJECT_NOTIFICATION_CONTRACTORS_QUERY_KEY, projectId ?? ""],
     queryFn: async () => {
-      const res = await ProjectNotificationsApi.getContractors();
-      return res.data.payload ?? [];
+      const res = await ProjectContractorsApi.listForProject(projectId!);
+      const payload = res.data?.payload;
+      if (!Array.isArray(payload)) return [];
+      return payload.map(
+        (dto): ProjectNotificationContractor => ({
+          id: String(dto.id),
+          name: dto.name ?? dto.contractor_name ?? "",
+          number: dto.mobile ?? dto.phone ?? "",
+          mobile: dto.mobile ?? null,
+          notes: null,
+        }),
+      );
     },
+    enabled: !!projectId,
     staleTime: 5 * 60 * 1000,
   });
 }
