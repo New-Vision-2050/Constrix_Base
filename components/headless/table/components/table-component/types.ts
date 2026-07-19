@@ -6,6 +6,7 @@ export type ColumnDef<TRow> = {
   name: string; // Display name for the column header
   sortable?: boolean; // Whether this column can be sorted
   align?: "left" | "center" | "right" | "justify"; // Alignment for header and body cells
+  minWidth?: number; // Minimum column width in px (default: DEFAULT_COLUMN_MIN_WIDTH)
   render: (
     row: TRow,
     index: number,
@@ -40,6 +41,7 @@ export type TablePropsWithoutState<TRow> = {
   loading?: boolean;
   loadingOptions?: LoadingOptions;
   selectable?: SelectionConfig<TRow>;
+  pinnedColumnCount?: number;
   state?: never;
 };
 
