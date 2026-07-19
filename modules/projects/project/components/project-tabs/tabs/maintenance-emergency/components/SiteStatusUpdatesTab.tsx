@@ -95,13 +95,6 @@ function buildCopyText(
     `المقاول: ${notification.contractor_name ?? ""}`,
     `📅 التاريخ:  ${date}`,
     `🔢 رقم البلاغ: ${notification.notification_number ?? ""}`,
-    `🔌 المغذي: ${notification.feeder_number ?? ""}`,
-    `⚙️ رقم المعدة: ${notification.machine_number ?? ""}`,
-    `🏗️ طبيعة العمل: ${notification.work_type ?? ""}`,
-    `✍️ مصدر التصريح: ${notification.permit_source ?? ""}`,
-    `👤 مستلم التصريح: ${notification.permit_recipient ?? ""}`,
-    `⏱️ الوقت المتوقع لإنهاء العمل: ${notification.duration_hours ?? ""}`,
-    `📍 الموقع الجغرافي: ${notification.repair_point ?? ""}`,
     `🗺️ رابط الموقع (Google Maps):   ${notification.location_link ?? ""}`,
   ];
 
@@ -394,25 +387,6 @@ function SiteStatusCard({
           <ReportField icon="🏗️" label={t("reportContractor")} value={notification.contractor_name} />
           <ReportField icon="📅" label={t("reportDate")} value={dateLabel} />
           <ReportField icon="🔢" label={t("reportNotificationNumber")} value={notification.notification_number} />
-          <ReportField icon="🔌" label={t("reportFeeder")} value={notification.feeder_number} />
-          <ReportField icon="⚙️" label={t("reportEquipmentNumber")} value={notification.machine_number} />
-          <ReportField icon="🏗️" label={t("reportWorkType")} value={notification.work_type} />
-          <ReportField
-            icon="✍️"
-            label={t("reportAuthorizationSource")}
-            value={notification.permit_source}
-          />
-          <ReportField
-            icon="👤"
-            label={t("reportAuthorizationReceiver")}
-            value={notification.permit_recipient}
-          />
-          <ReportField
-            icon="⏱️"
-            label={t("reportEstimatedTime")}
-            value={notification.duration_hours ? String(notification.duration_hours) : null}
-          />
-          <ReportField icon="📍" label={t("reportLocation")} value={notification.repair_point} />
           {notification.location_link && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
               <Typography variant="body2" fontWeight={600} color="text.secondary" component="span">
