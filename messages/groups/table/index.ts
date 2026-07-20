@@ -48,4 +48,20 @@ export const tableMessages = new MessagesGroup({
   HideAll: _m("Hide All", "إخفاء الكل"),
   Reset: _m("Reset", "إعادة تعيين"),
   Close: _m("Close", "إغلاق"),
+
+  // Column Pinning translations
+  PinColumn: _m("Pin column", "تثبيت العمود"),
+  UnpinColumn: _m("Unpin column", "إلغاء تثبيت العمود"),
+  PinnedColumnsDescription: _m(
+    "Fixed columns: {pinned}/{max}",
+    "الأعمدة الثابتة: {pinned}/{max}",
+  ),
+  MaxPinnedReached: _m(
+    "You can fix up to {max} columns",
+    "يمكنك تثبيت حتى {max} أعمدة",
+  ),
+  PinColumnDisabledHidden: _m(
+    "Show this column before fixing it",
+    "أظهر هذا العمود قبل تثبيته",
+  ),
 });

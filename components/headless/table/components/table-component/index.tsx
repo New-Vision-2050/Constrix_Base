@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import {
   Table,
   TableBody,
@@ -17,11 +23,16 @@ import {
 import { InboxOutlined, SearchOff } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { TableProps } from "./types";
+import { ColumnDef, TableProps } from "./types";
 
 // ============================================================================
 // Table Component Factory
 // ============================================================================
+
+// Prevents tableLayout: "auto" from shrinking columns indefinitely when there
+// are many of them — once column minimums exceed the container, the table
+// overflows and TableContainer's overflow-x scrolls instead of cramping cells.
+const DEFAULT_COLUMN_MIN_WIDTH = 120;
 
 export function createTableComponent<TRow>() {
   const TableComponent = (props: TableProps<TRow>) => {
@@ -55,6 +66,9 @@ export function createTableComponent<TRow>() {
     const getRowSx = isUsingState
       ? props.state.table.getRowSx
       : undefined;
+    const pinnedColumnCount = isUsingState
+      ? props.state.table.pinnedColumnCount
+      : props.pinnedColumnCount || 0;
     const loadingOptions = props.loadingOptions || { rows: 5 };
 
     // Selection config
@@ -85,6 +99,82 @@ export function createTableComponent<TRow>() {
         handleSort(columnKey);
       }
     };
+
+    // Fixed/pinned columns: the selection checkbox column (if present) is
+    // treated as sticky alongside the leading pinned data columns, but only
+    // once at least one column is actually pinned, so tables that don't use
+    // this feature render exactly as before.
+    const stickyCount =
+      pinnedColumnCount > 0
+        ? (selectable ? 1 : 0) + pinnedColumnCount
+        : 0;
+
+    const headerCellRefs = useRef<Array<HTMLTableCellElement | null>>([]);
+    const [stickyOffsets, setStickyOffsets] = useState<number[]>([]);
+
+    const measureStickyOffsets = useCallback(() => {
+      const offsets: number[] = [];
+      let cumulative = 0;
+      for (let i = 0; i < stickyCount; i++) {
+        offsets.push(cumulative);
+        cumulative += headerCellRefs.current[i]?.getBoundingClientRect().width ?? 0;
+      }
+      setStickyOffsets(offsets);
+    }, [stickyCount]);
+
+    // Column widths are content-driven (tableLayout: "auto"), so re-measure
+    // whenever the sticky column set, data, or loading state changes.
+    useLayoutEffect(() => {
+      measureStickyOffsets();
+    }, [measureStickyOffsets, columns, data, loading]);
+
+    useEffect(() => {
+      if (stickyCount === 0) return undefined;
+      const cells = headerCellRefs.current.slice(0, stickyCount);
+      const observer = new ResizeObserver(() => measureStickyOffsets());
+      cells.forEach((cell) => {
+        if (cell) observer.observe(cell);
+      });
+      return () => observer.disconnect();
+    }, [stickyCount, measureStickyOffsets]);
+
+    // minWidth stops the column from shrinking away; overflowWrap lets long
+    // unbroken content (emails, IDs, URLs) break and wrap within that width
+    // instead of spilling out of the cell.
+    const getColumnSizingSx = (column: ColumnDef<TRow>) => ({
+      minWidth: column.minWidth ?? DEFAULT_COLUMN_MIN_WIDTH,
+      overflowWrap: "anywhere" as const,
+    });
+
+    const getStickyHeaderSx = (index: number) =>
+      index < stickyCount
+        ? {
+            position: "sticky" as const,
+            left: stickyOffsets[index] ?? 0,
+            zIndex: 3,
+            backgroundColor: isGreenTheme
+              ? "primary.main"
+              : "background.default",
+            ...(index === stickyCount - 1 && {
+              borderRight: "1px solid",
+              borderRightColor: "divider",
+            }),
+          }
+        : undefined;
+
+    const getStickyBodySx = (index: number) =>
+      index < stickyCount
+        ? {
+            position: "sticky" as const,
+            left: stickyOffsets[index] ?? 0,
+            zIndex: 1,
+            backgroundColor: "inherit",
+            ...(index === stickyCount - 1 && {
+              borderRight: "1px solid",
+              borderRightColor: "divider",
+            }),
+          }
+        : undefined;
 
     // Selection helpers
     const getRowId = (row: TRow, index: number): string | number => {
@@ -165,14 +255,20 @@ export function createTableComponent<TRow>() {
       return (
         <>
           {Array.from({ length: skeletonRows }).map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
+            <TableRow key={rowIndex} sx={{ backgroundColor: "background.paper" }}>
               {selectable && (
-                <TableCell padding="checkbox">
+                <TableCell padding="checkbox" sx={getStickyBodySx(0)}>
                   <Skeleton variant="rectangular" width={42} height={42} />
                 </TableCell>
               )}
-              {columns.map((column) => (
-                <TableCell key={column.key}>
+              {columns.map((column, columnIndex) => (
+                <TableCell
+                  key={column.key}
+                  sx={{
+                    ...getColumnSizingSx(column),
+                    ...getStickyBodySx((selectable ? 1 : 0) + columnIndex),
+                  }}
+                >
                   <Skeleton width={"100px"} variant="text" animation="wave" />
                 </TableCell>
               ))}
@@ -285,7 +381,13 @@ export function createTableComponent<TRow>() {
               }}
             >
               {selectable && (
-                <TableCell padding="checkbox">
+                <TableCell
+                  padding="checkbox"
+                  ref={(el: HTMLTableCellElement | null) => {
+                    headerCellRefs.current[0] = el;
+                  }}
+                  sx={getStickyHeaderSx(0)}
+                >
                   <Checkbox
                     indeterminate={isSomeSelected}
                     checked={isAllSelected}
@@ -307,8 +409,22 @@ export function createTableComponent<TRow>() {
                   />
                 </TableCell>
               )}
-              {columns.map((column) => (
-                <TableCell key={column.key} align={column.align || "left"}>
+              {columns.map((column, columnIndex) => {
+                const stickyIndex = (selectable ? 1 : 0) + columnIndex;
+                return (
+                <TableCell
+                  key={column.key}
+                  align={column.align || "left"}
+                  ref={(el: HTMLTableCellElement | null) => {
+                    if (stickyIndex < stickyCount) {
+                      headerCellRefs.current[stickyIndex] = el;
+                    }
+                  }}
+                  sx={{
+                    ...getColumnSizingSx(column),
+                    ...getStickyHeaderSx(stickyIndex),
+                  }}
+                >
                   {column.sortable ? (
                     <TableSortLabel
                       active={sortBy === column.key}
@@ -336,7 +452,8 @@ export function createTableComponent<TRow>() {
                     column.name
                   )}
                 </TableCell>
-              ))}
+                );
+              })}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -356,6 +473,13 @@ export function createTableComponent<TRow>() {
                         selected={selected}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
+                          // Sticky cells use backgroundColor: "inherit", so the
+                          // row needs an opaque baseline whenever columns are
+                          // fixed, otherwise scrolled-under content bleeds
+                          // through the sticky cells in the default row state.
+                          ...(stickyCount > 0 && {
+                            backgroundColor: "background.paper",
+                          }),
                           ...(isGreenTheme &&
                             !selected &&
                             index % 2 === 1 && {
@@ -373,15 +497,24 @@ export function createTableComponent<TRow>() {
                         }}
                       >
                         {selectable && (
-                          <TableCell padding="checkbox">
+                          <TableCell padding="checkbox" sx={getStickyBodySx(0)}>
                             <Checkbox
                               checked={selected}
                               onChange={() => handleRowSelect(row, index)}
                             />
                           </TableCell>
                         )}
-                        {columns.map((column) => (
-                          <TableCell key={column.key} align={column.align || "left"}>
+                        {columns.map((column, columnIndex) => (
+                          <TableCell
+                            key={column.key}
+                            align={column.align || "left"}
+                            sx={{
+                              ...getColumnSizingSx(column),
+                              ...getStickyBodySx(
+                                (selectable ? 1 : 0) + columnIndex,
+                              ),
+                            }}
+                          >
                             {column.render(row, index, column)}
                           </TableCell>
                         ))}
