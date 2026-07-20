@@ -56,5 +56,21 @@ export function mapProjectOrderPermitDto(
     latitude: resolveCoordinate(dto.lat),
     longitude: resolveCoordinate(dto.long),
     price: toNumber(dto.price),
+    executingEntity: pickString(dto.executing_entity),
+    office: pickString(dto.office),
+    consultantCurrentBasket: pickString(dto.consultant_current_basket),
+    consultantAssignmentDate: resolveDate(dto.consultant_assignment_date),
+    consultantLastProcedureCode: pickString(dto.consultant_last_procedure_code),
+    consultantLastProcedureDate: resolveDate(dto.consultant_last_procedure_date),
+    consultantColumn155EntryDate: resolveDate(dto.consultant_column_155_entry_date),
+    contractorLastProcedureCode: pickString(dto.contractor_last_procedure_code),
+    contractorLastProcedureDate: resolveDate(dto.contractor_last_procedure_date),
+    contractorColumn155EntryDate: resolveDate(dto.contractor_column_155_entry_date),
+    materialBalanceElecContractor: resolveCoordinate(
+      dto.material_balance_elec_contractor,
+    ),
+    contractorWorkOrderStatus: pickString(dto.contractor_work_order_status),
+    contractorBasket: pickString(dto.contractor_basket),
+    consultantPrice: toNumber(dto.consultant_price),
   };
 }

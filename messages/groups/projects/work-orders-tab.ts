@@ -37,6 +37,50 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
     latitude: _m("Latitude", "خط العرض"),
     longitude: _m("Longitude", "خط الطول"),
     price: _m("Price (SAR)", "السعر (ريال)"),
+    executingEntity: _m("Executing entity", "جهة التنفيذ"),
+    office: _m("Office", "المكتب"),
+    consultantCurrentBasket: _m(
+      "Consultant current basket",
+      "سلة الجهة الحالية للاستشاري",
+    ),
+    consultantAssignmentDate: _m(
+      "Consultant assignment date",
+      "تاريخ الاسناد للاستشاري",
+    ),
+    consultantLastProcedureCode: _m(
+      "Consultant last procedure code",
+      "رمز اخر اجراء للاستشاري",
+    ),
+    consultantLastProcedureDate: _m(
+      "Consultant last procedure date",
+      "تاريخ اخر اجراء للاستشاري",
+    ),
+    consultantColumn155EntryDate: _m(
+      "Consultant column 155 entry date",
+      "تاريخ ادخال عامود 155 للاستشاري",
+    ),
+    contractorLastProcedureCode: _m(
+      "Contractor last procedure code",
+      "رمز اخر اجراء للمقاول",
+    ),
+    contractorLastProcedureDate: _m(
+      "Contractor last procedure date",
+      "تاريخ اخر اجراء للمقاول",
+    ),
+    contractorColumn155EntryDate: _m(
+      "Contractor column 155 entry date",
+      "تاريخ ادخال عامود 155 للمقاول",
+    ),
+    materialBalanceElecContractor: _m(
+      "Material balance (electricity & contractor)",
+      "توازن المواد بين الكهرباء والمقاول",
+    ),
+    contractorWorkOrderStatus: _m(
+      "Contractor work order status",
+      "موقف امر العمل للمقاول",
+    ),
+    contractorBasket: _m("Contractor basket", "سلة جهة المقاول"),
+    consultantPrice: _m("Consultant price", "سعر الاستشاري"),
     actions: _m("Actions", "الإجراءات"),
     action: _m("Action", "اجراء"),
     edit: _m("Edit", "تعديل"),
@@ -68,6 +112,50 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       latitude: _m("Latitude", "خط العرض"),
       longitude: _m("Longitude", "خط الطول"),
       price: _m("Price (SAR)", "السعر (ريال)"),
+      executingEntity: _m("Executing entity", "جهة التنفيذ"),
+      office: _m("Office", "المكتب"),
+      consultantCurrentBasket: _m(
+        "Consultant current basket",
+        "سلة الجهة الحالية للاستشاري",
+      ),
+      consultantAssignmentDate: _m(
+        "Consultant assignment date",
+        "تاريخ الاسناد للاستشاري",
+      ),
+      consultantLastProcedureCode: _m(
+        "Consultant last procedure code",
+        "رمز اخر اجراء للاستشاري",
+      ),
+      consultantLastProcedureDate: _m(
+        "Consultant last procedure date",
+        "تاريخ اخر اجراء للاستشاري",
+      ),
+      consultantColumn155EntryDate: _m(
+        "Consultant column 155 entry date",
+        "تاريخ ادخال عامود 155 للاستشاري",
+      ),
+      contractorLastProcedureCode: _m(
+        "Contractor last procedure code",
+        "رمز اخر اجراء للمقاول",
+      ),
+      contractorLastProcedureDate: _m(
+        "Contractor last procedure date",
+        "تاريخ اخر اجراء للمقاول",
+      ),
+      contractorColumn155EntryDate: _m(
+        "Contractor column 155 entry date",
+        "تاريخ ادخال عامود 155 للمقاول",
+      ),
+      materialBalanceElecContractor: _m(
+        "Material balance (electricity & contractor)",
+        "توازن المواد بين الكهرباء والمقاول",
+      ),
+      contractorWorkOrderStatus: _m(
+        "Contractor work order status",
+        "موقف امر العمل للمقاول",
+      ),
+      contractorBasket: _m("Contractor basket", "سلة جهة المقاول"),
+      consultantPrice: _m("Consultant price", "سعر الاستشاري"),
       delete: _m("Remove", "الغاء"),
       selectType: _m("Select type", "اختر النوع"),
       selectContractor: _m("Select contractor", "اختر المقاول"),
