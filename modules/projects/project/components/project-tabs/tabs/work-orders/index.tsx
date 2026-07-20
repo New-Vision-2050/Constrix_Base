@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -8,6 +8,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Grid,
   MenuItem,
   Paper,
@@ -22,6 +23,8 @@ import { Plus } from "lucide-react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
+import { toast } from "sonner";
+
 import HeadlessTableLayout from "@/components/headless/table";
 
 import CustomMenu from "@/components/headless/custom-menu";
@@ -32,6 +35,8 @@ import {
   projectOrderPermitsQueryKey,
   useProjectOrderPermits,
 } from "@/modules/projects/project/query/useProjectOrderPermits";
+
+import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
 
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
 
@@ -45,6 +50,19 @@ import {
 
 const WorkOrdersTableLayout = HeadlessTableLayout<WorkOrderRow>("work-orders");
 
+const EXCEL_FILE_ACCEPT =
+  ".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+function isExcelFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  return (
+    name.endsWith(".xls") ||
+    name.endsWith(".xlsx") ||
+    file.type === "application/vnd.ms-excel" ||
+    file.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+}
 function formatDisplayDate(isoDate: string): string {
   if (!isoDate) return "";
 
@@ -169,6 +187,10 @@ export default function WorkOrdersTab() {
   );
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+  const [isImporting, setIsImporting] = useState(false);
+
+  const importFileInputRef = useRef<HTMLInputElement>(null);
 
   const params = WorkOrdersTableLayout.useTableParams({
     initialPage: 1,
@@ -331,6 +353,39 @@ export default function WorkOrdersTab() {
     });
   };
 
+  const handleImportClick = () => {
+    if (isImporting) return;
+    importFileInputRef.current?.click();
+  };
+
+  const handleImportFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file || !projectId) return;
+
+    if (!isExcelFile(file)) {
+      toast.error(t("invalidImportFile"));
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const res = await ProjectOrderPermitsApi.import(projectId, file);
+      toast.success(res.data?.message ?? t("importSuccess"));
+      await queryClient.invalidateQueries({
+        queryKey: projectOrderPermitsQueryKey(projectId),
+      });
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message ?? t("importError"));
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   if (!projectId) {
     return null;
   }
@@ -447,14 +502,25 @@ export default function WorkOrdersTab() {
             state={state}
             customActions={
               <Stack direction="row" spacing={1} alignItems="center">
+                <input
+                  ref={importFileInputRef}
+                  type="file"
+                  accept={EXCEL_FILE_ACCEPT}
+                  hidden
+                  onChange={handleImportFileChange}
+                />
                 <Button
                   variant="outlined"
                   color="info"
-                  startIcon={<FileDownloadOutlined />}
-                  disabled
-                  onClick={() => {
-                    // TODO: refresh from UDS when API is available
-                  }}
+                  startIcon={
+                    isImporting ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      <FileDownloadOutlined />
+                    )
+                  }
+                  disabled={isImporting}
+                  onClick={handleImportClick}
                 >
                   {t("refreshFromUds")}
                 </Button>

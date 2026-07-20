@@ -2,6 +2,7 @@ import { baseApi } from "@/config/axios/instances/base";
 import type { CreateProjectOrderPermitsArgs } from "./types/params";
 import type {
   CreateProjectOrderPermitsResponse,
+  ImportProjectOrderPermitsResponse,
   ListProjectOrderPermitDepartmentsResponse,
   ListProjectOrderPermitsResponse,
 } from "./types/response";
@@ -26,4 +27,17 @@ export const ProjectOrderPermitsApi = {
       `projects/${projectId}/order-permits`,
       body,
     ),
+
+  import: (projectId: string | number, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return baseApi.post<ImportProjectOrderPermitsResponse>(
+      `projects/${projectId}/order-permits/import`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
+  },
 };
