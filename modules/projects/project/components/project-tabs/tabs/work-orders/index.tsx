@@ -133,6 +133,15 @@ function filterWorkOrders(
   });
 }
 
+const WORK_ORDER_DATE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "assignmentDate",
+  "consultantAssignmentDate",
+  "consultantLastProcedureDate",
+  "consultantColumn155EntryDate",
+  "contractorLastProcedureDate",
+  "contractorColumn155EntryDate",
+]);
+
 function renderWorkOrderCell(
   row: WorkOrderRow,
 
@@ -144,18 +153,20 @@ function renderWorkOrderCell(
     return null;
   }
 
-  if (key === "assignmentDate") {
-    const formatted = formatDisplayDate(row.assignmentDate);
+  if (WORK_ORDER_DATE_COLUMN_KEYS.has(key)) {
+    const formatted = formatDisplayDate(String(row[key]));
 
     return <span>{formatted || emptyDash}</span>;
   }
 
-  if (key === "price") {
-    if (!row.price) {
+  if (key === "price" || key === "consultantPrice") {
+    const amount = row[key];
+
+    if (!amount) {
       return <span>{emptyDash}</span>;
     }
 
-    return <span>{formatPrice(row.price)}</span>;
+    return <span>{formatPrice(amount)}</span>;
   }
 
   const value = row[key];
@@ -266,6 +277,34 @@ export default function WorkOrdersTab() {
       longitude: tFields("longitude"),
 
       price: tFields("price"),
+
+      executingEntity: tFields("executingEntity"),
+
+      office: tFields("office"),
+
+      consultantCurrentBasket: tFields("consultantCurrentBasket"),
+
+      consultantAssignmentDate: tFields("consultantAssignmentDate"),
+
+      consultantLastProcedureCode: tFields("consultantLastProcedureCode"),
+
+      consultantLastProcedureDate: tFields("consultantLastProcedureDate"),
+
+      consultantColumn155EntryDate: tFields("consultantColumn155EntryDate"),
+
+      contractorLastProcedureCode: tFields("contractorLastProcedureCode"),
+
+      contractorLastProcedureDate: tFields("contractorLastProcedureDate"),
+
+      contractorColumn155EntryDate: tFields("contractorColumn155EntryDate"),
+
+      materialBalanceElecContractor: tFields("materialBalanceElecContractor"),
+
+      contractorWorkOrderStatus: tFields("contractorWorkOrderStatus"),
+
+      contractorBasket: tFields("contractorBasket"),
+
+      consultantPrice: tFields("consultantPrice"),
     }),
 
     [tFields],

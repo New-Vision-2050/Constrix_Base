@@ -34,7 +34,7 @@ const ProjectNotificationChartsView = dynamic(
 
 const TABS = [
   { id: "notifications", labelKey: "notifications" },
-  { id: "siteStatusTypes", labelKey: "siteStatusTypes" },
+  // { id: "siteStatusTypes", labelKey: "siteStatusTypes" },
   { id: "violations", labelKey: "violations" },
   { id: "reports", labelKey: "reports" },
   { id: "indicators", labelKey: "indicators" },

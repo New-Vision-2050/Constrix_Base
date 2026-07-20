@@ -105,6 +105,20 @@ export interface ProjectOrderPermitWorkOrderDto {
   order_permit?: ProjectOrderPermitNestedDto | null;
   order_permit_department?: ProjectOrderPermitNestedDto | null;
   state?: ProjectOrderPermitStateDto | null;
+  executing_entity?: string | null;
+  office?: string | null;
+  consultant_current_basket?: string | null;
+  consultant_assignment_date?: string | null;
+  consultant_last_procedure_code?: string | null;
+  consultant_last_procedure_date?: string | null;
+  consultant_column_155_entry_date?: string | null;
+  contractor_last_procedure_code?: string | null;
+  contractor_last_procedure_date?: string | null;
+  contractor_column_155_entry_date?: string | null;
+  material_balance_elec_contractor?: string | number | null;
+  contractor_work_order_status?: string | null;
+  contractor_basket?: string | null;
+  consultant_price?: number | string | null;
 }
 
 export interface ListProjectOrderPermitsResponse {

@@ -9,6 +9,20 @@ export interface WorkOrderRow {
   latitude: string;
   longitude: string;
   price: number;
+  executingEntity: string;
+  office: string;
+  consultantCurrentBasket: string;
+  consultantAssignmentDate: string;
+  consultantLastProcedureCode: string;
+  consultantLastProcedureDate: string;
+  consultantColumn155EntryDate: string;
+  contractorLastProcedureCode: string;
+  contractorLastProcedureDate: string;
+  contractorColumn155EntryDate: string;
+  materialBalanceElecContractor: string;
+  contractorWorkOrderStatus: string;
+  contractorBasket: string;
+  consultantPrice: number;
 }
 
 export interface WorkOrderFilters {
@@ -39,6 +53,20 @@ export type WorkOrderColumnKey =
   | "latitude"
   | "longitude"
   | "price"
+  | "executingEntity"
+  | "office"
+  | "consultantCurrentBasket"
+  | "consultantAssignmentDate"
+  | "consultantLastProcedureCode"
+  | "consultantLastProcedureDate"
+  | "consultantColumn155EntryDate"
+  | "contractorLastProcedureCode"
+  | "contractorLastProcedureDate"
+  | "contractorColumn155EntryDate"
+  | "materialBalanceElecContractor"
+  | "contractorWorkOrderStatus"
+  | "contractorBasket"
+  | "consultantPrice"
   | "actions";
 
 /** Column order: right → left (RTL). */
@@ -52,5 +80,19 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "latitude",
   "longitude",
   "price",
+  "executingEntity",
+  "office",
+  "consultantCurrentBasket",
+  "consultantAssignmentDate",
+  "consultantLastProcedureCode",
+  "consultantLastProcedureDate",
+  "consultantColumn155EntryDate",
+  "contractorLastProcedureCode",
+  "contractorLastProcedureDate",
+  "contractorColumn155EntryDate",
+  "materialBalanceElecContractor",
+  "contractorWorkOrderStatus",
+  "contractorBasket",
+  "consultantPrice",
   "actions",
 ];

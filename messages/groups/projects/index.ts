@@ -828,7 +828,7 @@ export const projectMessages = new MessagesGroup({
         filterAssignedUser: _m("Assigned User", "الشخص المسند"),
         filterContractor: _m("Contractor", "المقاول"),
       }),
-      siteStatusType: _m("Site Status Type", "نوع حالة الموقع"),
+      siteStatusType: _m("Notification Format", "صيغة الإشعار"),
       selectSiteStatusType: _m(
         "Select Site Status Type",
         "اختر نوع حالة الموقع",
