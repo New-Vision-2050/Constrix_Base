@@ -805,6 +805,11 @@ function Step2Form({
           isOptionEqualToValue={(option, value) => option.id === value?.id}
           value={contractors.find((c) => c.id === data.contractor_id) ?? null}
           onChange={(_e, value) => handleContractorChange(value?.id ?? "")}
+          renderOption={(props, option) => (
+            <li {...props} key={option.id}>
+              {option.name}
+            </li>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}
