@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -8,6 +8,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Grid,
   MenuItem,
   Paper,
@@ -22,6 +23,8 @@ import { Plus } from "lucide-react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
+import { toast } from "sonner";
+
 import HeadlessTableLayout from "@/components/headless/table";
 
 import CustomMenu from "@/components/headless/custom-menu";
@@ -32,6 +35,8 @@ import {
   projectOrderPermitsQueryKey,
   useProjectOrderPermits,
 } from "@/modules/projects/project/query/useProjectOrderPermits";
+
+import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
 
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
 
@@ -45,6 +50,19 @@ import {
 
 const WorkOrdersTableLayout = HeadlessTableLayout<WorkOrderRow>("work-orders");
 
+const EXCEL_FILE_ACCEPT =
+  ".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+function isExcelFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  return (
+    name.endsWith(".xls") ||
+    name.endsWith(".xlsx") ||
+    file.type === "application/vnd.ms-excel" ||
+    file.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+}
 function formatDisplayDate(isoDate: string): string {
   if (!isoDate) return "";
 
@@ -115,6 +133,15 @@ function filterWorkOrders(
   });
 }
 
+const WORK_ORDER_DATE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "assignmentDate",
+  "consultantAssignmentDate",
+  "consultantLastProcedureDate",
+  "consultantColumn155EntryDate",
+  "contractorLastProcedureDate",
+  "contractorColumn155EntryDate",
+]);
+
 function renderWorkOrderCell(
   row: WorkOrderRow,
 
@@ -126,18 +153,20 @@ function renderWorkOrderCell(
     return null;
   }
 
-  if (key === "assignmentDate") {
-    const formatted = formatDisplayDate(row.assignmentDate);
+  if (WORK_ORDER_DATE_COLUMN_KEYS.has(key)) {
+    const formatted = formatDisplayDate(String(row[key]));
 
     return <span>{formatted || emptyDash}</span>;
   }
 
-  if (key === "price") {
-    if (!row.price) {
+  if (key === "price" || key === "consultantPrice") {
+    const amount = row[key];
+
+    if (!amount) {
       return <span>{emptyDash}</span>;
     }
 
-    return <span>{formatPrice(row.price)}</span>;
+    return <span>{formatPrice(amount)}</span>;
   }
 
   const value = row[key];
@@ -169,6 +198,10 @@ export default function WorkOrdersTab() {
   );
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+  const [isImporting, setIsImporting] = useState(false);
+
+  const importFileInputRef = useRef<HTMLInputElement>(null);
 
   const params = WorkOrdersTableLayout.useTableParams({
     initialPage: 1,
@@ -244,6 +277,34 @@ export default function WorkOrdersTab() {
       longitude: tFields("longitude"),
 
       price: tFields("price"),
+
+      executingEntity: tFields("executingEntity"),
+
+      office: tFields("office"),
+
+      consultantCurrentBasket: tFields("consultantCurrentBasket"),
+
+      consultantAssignmentDate: tFields("consultantAssignmentDate"),
+
+      consultantLastProcedureCode: tFields("consultantLastProcedureCode"),
+
+      consultantLastProcedureDate: tFields("consultantLastProcedureDate"),
+
+      consultantColumn155EntryDate: tFields("consultantColumn155EntryDate"),
+
+      contractorLastProcedureCode: tFields("contractorLastProcedureCode"),
+
+      contractorLastProcedureDate: tFields("contractorLastProcedureDate"),
+
+      contractorColumn155EntryDate: tFields("contractorColumn155EntryDate"),
+
+      materialBalanceElecContractor: tFields("materialBalanceElecContractor"),
+
+      contractorWorkOrderStatus: tFields("contractorWorkOrderStatus"),
+
+      contractorBasket: tFields("contractorBasket"),
+
+      consultantPrice: tFields("consultantPrice"),
     }),
 
     [tFields],
@@ -329,6 +390,39 @@ export default function WorkOrdersTab() {
     queryClient.invalidateQueries({
       queryKey: projectOrderPermitsQueryKey(),
     });
+  };
+
+  const handleImportClick = () => {
+    if (isImporting) return;
+    importFileInputRef.current?.click();
+  };
+
+  const handleImportFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file || !projectId) return;
+
+    if (!isExcelFile(file)) {
+      toast.error(t("invalidImportFile"));
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const res = await ProjectOrderPermitsApi.import(projectId, file);
+      toast.success(res.data?.message ?? t("importSuccess"));
+      await queryClient.invalidateQueries({
+        queryKey: projectOrderPermitsQueryKey(projectId),
+      });
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message ?? t("importError"));
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   if (!projectId) {
@@ -447,14 +541,25 @@ export default function WorkOrdersTab() {
             state={state}
             customActions={
               <Stack direction="row" spacing={1} alignItems="center">
+                <input
+                  ref={importFileInputRef}
+                  type="file"
+                  accept={EXCEL_FILE_ACCEPT}
+                  hidden
+                  onChange={handleImportFileChange}
+                />
                 <Button
                   variant="outlined"
                   color="info"
-                  startIcon={<FileDownloadOutlined />}
-                  disabled
-                  onClick={() => {
-                    // TODO: refresh from UDS when API is available
-                  }}
+                  startIcon={
+                    isImporting ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      <FileDownloadOutlined />
+                    )
+                  }
+                  disabled={isImporting}
+                  onClick={handleImportClick}
                 >
                   {t("refreshFromUds")}
                 </Button>

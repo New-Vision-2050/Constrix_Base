@@ -3,6 +3,14 @@ import { ColumnDef } from "../table-component/types";
 import { TableParams } from "../table-params/types";
 import { ColumnVisibilityState } from "../column-visibility";
 import { ColumnPinningState } from "../column-pinning";
+import { ColumnOrderState } from "../column-order";
+
+export type ColumnOrderBag<TRow> = {
+  columnOrder: ColumnOrderState;
+  orderedColumns: ColumnDef<TRow>[];
+  moveColumn: (activeKey: string, overKey: string) => void;
+  resetColumnOrder: () => void;
+};
 
 export type ColumnVisibilityBag<TRow> = {
   columnVisibility: ColumnVisibilityState;
@@ -59,6 +67,9 @@ export type TableStateV2Options<TRow> = {
   // Column Pinning
   columnPinning?: ColumnPinningBag<TRow>;
 
+  // Column Order
+  columnOrder?: ColumnOrderBag<TRow>;
+
   // Loading & Filtering
   loading?: boolean;
   filtered?: boolean;
@@ -90,6 +101,9 @@ export type TableStateV2<TRow> = {
 
   // Column Pinning state (optional, only if prefix provided)
   columnPinning?: ColumnPinningBag<TRow>;
+
+  // Column Order state (optional, only if prefix provided)
+  columnOrder?: ColumnOrderBag<TRow>;
 
   // Pagination state
   pagination: {
