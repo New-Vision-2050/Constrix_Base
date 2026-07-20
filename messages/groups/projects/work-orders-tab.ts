@@ -12,6 +12,12 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   recentlyAdded: _m("Recently added", "المضافة حديثاً"),
   export: _m("Export", "تصدير"),
   refreshFromUds: _m("Refresh data from UDS", "تحديث البيانات من UDS"),
+  importSuccess: _m("Work orders updated successfully", "تم تحديث أوامر العمل بنجاح"),
+  importError: _m("Could not import work orders", "تعذر استيراد أوامر العمل"),
+  invalidImportFile: _m(
+    "Please select a valid Excel file (.xls or .xlsx)",
+    "يرجى اختيار ملف Excel صالح (.xls أو .xlsx)",
+  ),
   print: _m("Print", "طباعة"),
   totalCount: _m("Total count", "المجموع الكلي"),
   loadError: _m("Could not load work orders", "تعذر تحميل أوامر العمل"),

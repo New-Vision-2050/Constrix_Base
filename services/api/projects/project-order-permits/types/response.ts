@@ -118,3 +118,9 @@ export interface CreateProjectOrderPermitsResponse {
   message: string | null;
   payload?: unknown;
 }
+
+export interface ImportProjectOrderPermitsResponse {
+  code: string;
+  message: string | null;
+  payload?: unknown;
+}
