@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import { Button } from "@/components/ui/button";
@@ -216,6 +216,8 @@ export default function MapSettingsSection({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.maps",
   );
+  const locale = useLocale();
+  const isRTL = locale === "ar";
 
   const queryClient = useQueryClient();
 
@@ -392,37 +394,53 @@ export default function MapSettingsSection({
         key: "longitude",
         name: t("columnLongitude"),
         sortable: false,
-        align: "center",
+        align: "left",
         render: (row: MapLocationRow) => (
-          <span className="p-2 text-sm tabular-nums">{row.longitude}</span>
+          <div className={`flex ${
+            isRTL
+              ? "text-right"
+              : "text-left"
+          } p-2 text-sm tabular-nums`}>{row.longitude}</div>
         ),
       },
       {
         key: "latitude",
         name: t("columnLatitude"),
         sortable: false,
-        align: "center",
+        align: "left",
         render: (row: MapLocationRow) => (
-          <span className="p-2 text-sm tabular-nums">{row.latitude}</span>
+          <div className={`flex ${
+            isRTL
+              ? "text-right"
+              : "text-left"
+          } p-2 text-sm tabular-nums`}>{row.latitude}</div>
         ),
       },
       {
         key: "location",
         name: t("columnLocation"),
         sortable: false,
-        align: "center",
+        align: "left",
         render: (row: MapLocationRow) => (
-          <span className="p-2 text-sm">{row.location}</span>
+          <div className={`flex ${
+            isRTL
+              ? "text-right"
+              : "text-left"
+          } p-2 text-sm`}>{row.location}</div>
         ),
       },
       {
         key: "actions",
         name: t("columnActions"),
         sortable: false,
-        align: "center",
+        align: "left",
         render: (row: MapLocationRow) => (
-          <div className="flex  justify-center  p-2">
-            <DropdownMenu dir="rtl">
+          <div className={`flex ${
+            isRTL
+              ? "text-right"
+              : "text-left"
+          } p-2`}>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
@@ -436,13 +454,12 @@ export default function MapSettingsSection({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[10rem]">
                 <DropdownMenuItem
-                  className="justify-end"
                   onSelect={() => openEditMap(row)}
                 >
                   {t("editAction")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="justify-end text-destructive focus:text-destructive"
+                  className="text-destructive focus:text-destructive"
                   onSelect={() => openDeleteConfirm(row)}
                 >
                   {t("deleteAction")}
@@ -453,7 +470,7 @@ export default function MapSettingsSection({
         ),
       },
     ],
-    [openDeleteConfirm, openEditMap, t],
+    [isRTL, openDeleteConfirm, openEditMap, t],
   );
 
   const state = MapLocationsTable.useTableState({
@@ -470,7 +487,7 @@ export default function MapSettingsSection({
   });
 
   return (
-    <div dir="rtl" className="min-w-0 flex-1">
+    <div className="min-w-0 flex-1">
       <MapLocationsTable
         filters={
           <MapLocationsTable.TopActions
@@ -510,10 +527,10 @@ export default function MapSettingsSection({
         open={pendingDeleteRow != null}
         onOpenChange={(open) => !open && closeDeleteConfirm()}
       >
-        <DialogContent dir="rtl" className="max-w-md sm:max-w-md">
-          <DialogHeader className="text-right sm:text-right">
+        <DialogContent className="max-w-md sm:max-w-md">
+          <DialogHeader className={`${isRTL ? "text-right" : "text-left"} sm:${isRTL ? "text-right" : "text-left"}`}>
             <DialogTitle>{t("confirmDeleteTitle")}</DialogTitle>
-            <DialogDescription className="text-right">
+            <DialogDescription className={isRTL ? "text-right" : "text-left"}>
               {t("confirmDeleteDescription")}
               {pendingDeleteRow ? (
                 <span className="mt-2 block font-medium text-foreground">
@@ -523,11 +540,11 @@ export default function MapSettingsSection({
             </DialogDescription>
           </DialogHeader>
           {deleteErrorMessage ? (
-            <p className="text-sm text-destructive text-right" role="alert">
+            <p className={`text-sm text-destructive ${isRTL ? "text-right" : "text-left"}`} role="alert">
               {deleteErrorMessage}
             </p>
           ) : null}
-          <DialogFooter className="flex-row-reverse gap-2 sm:flex-row-reverse">
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="destructive"

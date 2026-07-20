@@ -199,9 +199,7 @@ export function createTableComponent<TRow>() {
     const loading = isUsingState
       ? props.state.table.loading
       : props.loading || false;
-    const getRowSx = isUsingState
-      ? props.state.table.getRowSx
-      : undefined;
+    const getRowSx = isUsingState ? props.state.table.getRowSx : undefined;
     const pinnedColumnCount = isUsingState
       ? props.state.table.pinnedColumnCount
       : props.pinnedColumnCount || 0;
@@ -241,9 +239,7 @@ export function createTableComponent<TRow>() {
     // once at least one column is actually pinned, so tables that don't use
     // this feature render exactly as before.
     const stickyCount =
-      pinnedColumnCount > 0
-        ? (selectable ? 1 : 0) + pinnedColumnCount
-        : 0;
+      pinnedColumnCount > 0 ? (selectable ? 1 : 0) + pinnedColumnCount : 0;
 
     const headerCellRefs = useRef<Array<HTMLTableCellElement | null>>([]);
     const [stickyOffsets, setStickyOffsets] = useState<number[]>([]);
@@ -253,7 +249,8 @@ export function createTableComponent<TRow>() {
       let cumulative = 0;
       for (let i = 0; i < stickyCount; i++) {
         offsets.push(cumulative);
-        cumulative += headerCellRefs.current[i]?.getBoundingClientRect().width ?? 0;
+        cumulative +=
+          headerCellRefs.current[i]?.getBoundingClientRect().width ?? 0;
       }
       setStickyOffsets(offsets);
     }, [stickyCount]);
@@ -410,7 +407,10 @@ export function createTableComponent<TRow>() {
       return (
         <>
           {Array.from({ length: skeletonRows }).map((_, rowIndex) => (
-            <TableRow key={rowIndex} sx={{ backgroundColor: "background.paper" }}>
+            <TableRow
+              key={rowIndex}
+              sx={{ backgroundColor: "background.paper" }}
+            >
               {selectable && (
                 <TableCell
                   padding="checkbox"
@@ -510,139 +510,141 @@ export function createTableComponent<TRow>() {
           </Alert>
         )}
         <TableContainer>
-        <Table
-          sx={{
-            tableLayout: "auto",
-            borderTopWidth: 1,
-            borderTopColor: "divider",
-            borderTopStyle: "solid",
-            borderBottomWidth: 1,
-            borderBottomColor: "divider",
-            borderBottomStyle: "solid",
-            ".MuiTableCell-root": {
+          <Table
+            sx={{
+              tableLayout: "auto",
+              borderTopWidth: 1,
+              borderTopColor: "divider",
+              borderTopStyle: "solid",
               borderBottomWidth: 1,
               borderBottomColor: "divider",
               borderBottomStyle: "solid",
-              padding: 1,
-            },
-          }}
-        >
-          <TableHead>
-            <TableRow
-              sx={{
-                ".MuiTableCell-root": {
-                  fontWeight: 600,
-                  backgroundColor: isGreenTheme
-                    ? "primary.main"
-                    : "background.default",
-                  color: isGreenTheme
-                    ? "primary.contrastText"
-                    : "text.primary",
-                },
-              }}
-            >
-              {selectable && (
-                <TableCell
-                  padding="checkbox"
-                  ref={(el: HTMLTableCellElement | null) => {
-                    headerCellRefs.current[0] = el;
-                  }}
-                  sx={getStickyHeaderSx(0)}
-                >
-                  <Checkbox
-                    indeterminate={isSomeSelected}
-                    checked={isAllSelected}
-                    onChange={handleSelectAll}
-                    disabled={loading || data.length === 0}
-                    sx={
-                      isGreenTheme
-                        ? {
-                            color: "primary.contrastText",
-                            "&.Mui-checked": {
-                              color: "primary.contrastText",
-                            },
-                            "&.MuiCheckbox-indeterminate": {
-                              color: "primary.contrastText",
-                            },
-                          }
-                        : {}
-                    }
-                  />
-                </TableCell>
-              )}
-              {columns.map((column, columnIndex) => {
-                const stickyIndex = (selectable ? 1 : 0) + columnIndex;
-                return (
-                <TableCell
-                  key={column.key}
-                  align={column.align || "left"}
-                  ref={(el: HTMLTableCellElement | null) => {
-                    if (stickyIndex < stickyCount) {
-                      headerCellRefs.current[stickyIndex] = el;
-                    }
-                  }}
-                  sx={{
-                    ...getColumnSizingSx(column),
-                    ...getStickyHeaderSx(stickyIndex),
-                  }}
-                >
-                  {column.sortable ? (
-                    <TableSortLabel
-                      active={sortBy === column.key}
-                      direction={sortBy === column.key ? sort || "asc" : "asc"}
-                      onClick={() =>
-                        handleColumnSort(column.key, column.sortable)
-                      }
+              ".MuiTableCell-root": {
+                borderBottomWidth: 1,
+                borderBottomColor: "divider",
+                borderBottomStyle: "solid",
+                padding: 1,
+              },
+            }}
+          >
+            <TableHead>
+              <TableRow
+                sx={{
+                  ".MuiTableCell-root": {
+                    fontWeight: 600,
+                    backgroundColor: isGreenTheme
+                      ? "primary.main"
+                      : "background.default",
+                    color: isGreenTheme
+                      ? "primary.contrastText"
+                      : "text.primary",
+                  },
+                }}
+              >
+                {selectable && (
+                  <TableCell
+                    padding="checkbox"
+                    ref={(el: HTMLTableCellElement | null) => {
+                      headerCellRefs.current[0] = el;
+                    }}
+                    sx={getStickyHeaderSx(0)}
+                  >
+                    <Checkbox
+                      indeterminate={isSomeSelected}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      disabled={loading || data.length === 0}
                       sx={
                         isGreenTheme
                           ? {
-                              color: "primary.contrastText !important",
-                              "&.Mui-active": {
-                                color: "primary.contrastText !important",
+                              color: "primary.contrastText",
+                              "&.Mui-checked": {
+                                color: "primary.contrastText",
                               },
-                              "& .MuiTableSortLabel-icon": {
-                                color: "primary.contrastText !important",
+                              "&.MuiCheckbox-indeterminate": {
+                                color: "primary.contrastText",
                               },
                             }
                           : {}
                       }
-                    >
-                      {column.name}
-                    </TableSortLabel>
-                  ) : (
-                    column.name
-                  )}
-                </TableCell>
-                );
-              })}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading
-              ? renderLoadingState()
-              : data.length === 0
-                ? renderEmptyState()
-                : data.map((row, index) => (
-                    <DataRow
-                      key={getRowKey(row, index)}
-                      row={row}
-                      index={index}
-                      columns={columns}
-                      selectable={!!selectable}
-                      selected={isRowSelected(row, index)}
-                      isCrossPageSticky={
-                        stateSelection?.isRowFromOtherPage(row) || false
-                      }
-                      isGreenTheme={isGreenTheme}
-                      currentTheme={currentTheme}
-                      getStickyBodySx={getStickyBodySx}
-                      getColumnSizingSx={getColumnSizingSx}
-                      rowSx={getRowSx ? getRowSx(row, index) : undefined}
-                      onToggleSelect={() => handleRowSelect(row, index)}
                     />
-                  ))}
-          </TableBody>
-        </Table>
+                  </TableCell>
+                )}
+                {columns.map((column, columnIndex) => {
+                  const stickyIndex = (selectable ? 1 : 0) + columnIndex;
+                  return (
+                    <TableCell
+                      key={column.key}
+                      align={column.align || "left"}
+                      ref={(el: HTMLTableCellElement | null) => {
+                        if (stickyIndex < stickyCount) {
+                          headerCellRefs.current[stickyIndex] = el;
+                        }
+                      }}
+                      sx={{
+                        ...getColumnSizingSx(column),
+                        ...getStickyHeaderSx(stickyIndex),
+                      }}
+                    >
+                      {column.sortable ? (
+                        <TableSortLabel
+                          active={sortBy === column.key}
+                          direction={
+                            sortBy === column.key ? sort || "asc" : "asc"
+                          }
+                          onClick={() =>
+                            handleColumnSort(column.key, column.sortable)
+                          }
+                          sx={
+                            isGreenTheme
+                              ? {
+                                  color: "primary.contrastText !important",
+                                  "&.Mui-active": {
+                                    color: "primary.contrastText !important",
+                                  },
+                                  "& .MuiTableSortLabel-icon": {
+                                    color: "primary.contrastText !important",
+                                  },
+                                }
+                              : {}
+                          }
+                        >
+                          {column.name}
+                        </TableSortLabel>
+                      ) : (
+                        column.name
+                      )}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading
+                ? renderLoadingState()
+                : data.length === 0
+                  ? renderEmptyState()
+                  : data.map((row, index) => (
+                      <DataRow
+                        key={getRowKey(row, index)}
+                        row={row}
+                        index={index}
+                        columns={columns}
+                        selectable={!!selectable}
+                        selected={isRowSelected(row, index)}
+                        isCrossPageSticky={
+                          stateSelection?.isRowFromOtherPage(row) || false
+                        }
+                        isGreenTheme={isGreenTheme}
+                        currentTheme={currentTheme}
+                        getStickyBodySx={getStickyBodySx}
+                        getColumnSizingSx={getColumnSizingSx}
+                        rowSx={getRowSx ? getRowSx(row, index) : undefined}
+                        onToggleSelect={() => handleRowSelect(row, index)}
+                      />
+                    ))}
+            </TableBody>
+          </Table>
         </TableContainer>
       </>
     );

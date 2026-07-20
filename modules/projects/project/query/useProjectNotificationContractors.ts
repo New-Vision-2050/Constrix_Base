@@ -2,7 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ProjectContractorsApi } from "@/services/api/projects/project-contractors";
-import type { ProjectNotificationContractor } from "@/services/api/projects/notifications/types/response";
+import type {
+  ContractorRepresentative,
+  ProjectNotificationContractor,
+} from "@/services/api/projects/notifications/types/response";
 
 export const PROJECT_NOTIFICATION_CONTRACTORS_QUERY_KEY =
   "project-notification-contractors" as const;
@@ -21,6 +24,14 @@ export function useProjectNotificationContractors(projectId?: string) {
           number: dto.mobile ?? dto.phone ?? "",
           mobile: dto.mobile ?? null,
           notes: null,
+          representatives: (dto.representatives ?? []).map(
+            (rep): ContractorRepresentative => ({
+              id: String(rep.id),
+              name: rep.name ?? "",
+              mobile: rep.mobile ?? null,
+              nationality: rep.nationality ?? null,
+            }),
+          ),
         }),
       );
     },

@@ -49,8 +49,7 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
     // Automatically create column order if prefix exists and not provided externally
     // Hook is always called unconditionally (returns null if no prefix)
     const internalColumnOrder = useColumnOrderHook(columns);
-    const columnOrder =
-      externalColumnOrder ?? internalColumnOrder ?? undefined;
+    const columnOrder = externalColumnOrder ?? internalColumnOrder ?? undefined;
 
     // Custom order (if any) becomes the base list visibility/pinning operate on,
     // so drag order is the single source of truth for everything downstream.

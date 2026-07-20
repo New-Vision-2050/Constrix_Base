@@ -18,8 +18,7 @@ export interface WizardFormData {
   // Step 2
   contractor_id: string;
   contractor_name: string;
-  contractor_technical_name: string;
-  contractor_technical_number: string;
+  contractor_representative_id: string;
   contractor_category: string;
   contractor_notes: string;
   permit_source: string;
@@ -57,8 +56,7 @@ export const EMPTY_FORM: WizardFormData = {
 
   contractor_id: "",
   contractor_name: "",
-  contractor_technical_name: "",
-  contractor_technical_number: "",
+  contractor_representative_id: "",
   contractor_category: "",
   contractor_notes: "",
   permit_source: "",
