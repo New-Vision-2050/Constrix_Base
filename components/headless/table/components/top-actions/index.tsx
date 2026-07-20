@@ -31,7 +31,7 @@ export function createTopActionsComponent<TRow>(
     searchComponent,
     children,
   }: TopActionsProps<TRow>) => {
-    const { actions, columnVisibility, columnPinning } = state;
+    const { actions, columnVisibility, columnPinning, columnOrder } = state;
     const t = useTranslations("Table");
     const [columnDialogOpen, setColumnDialogOpen] = useState(false);
 
@@ -115,6 +115,7 @@ export function createTopActionsComponent<TRow>(
             togglePin={columnPinning?.togglePin}
             canPinMore={columnPinning?.canPinMore}
             maxPinned={columnPinning?.maxPinned}
+            onReorder={columnOrder?.moveColumn}
           />
         )}
       </Stack>
