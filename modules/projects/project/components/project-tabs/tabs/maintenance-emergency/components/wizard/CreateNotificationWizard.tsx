@@ -48,6 +48,7 @@ import { useProjectNotificationContractors } from "@/modules/projects/project/qu
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
 import { useSiteStatusTypes } from "@/modules/projects/project/query/useSiteStatusTypes";
 import type {
+  ProjectNotification,
   ProjectNotificationEmployee,
   ProjectNotificationType,
   SiteStatusTypeWithKeys,
@@ -464,6 +465,8 @@ export default function CreateNotificationWizard({
                 confirmed={confirmed}
                 onChangeConfirmed={(value) => setConfirmed(value)}
                 t={t}
+                projectId={projectId}
+                existingNotification={existingNotification}
               />
             )}
           </>
@@ -784,7 +787,11 @@ function Step2Form({
     const selected = contractors.find((c) => c.id === contractorId);
     onChange("contractor_id", contractorId);
     onChange("contractor_name", selected?.name ?? "");
+    onChange("contractor_representative_id", "");
   }
+
+  const selectedContractor = contractors.find((c) => c.id === data.contractor_id);
+  const representatives = selectedContractor?.representatives ?? [];
 
   return (
     <Grid container spacing={2}>
@@ -812,22 +819,23 @@ function Step2Form({
 
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
+          select
           fullWidth
           size="small"
-          label={t("contractorTechnicalName", { defaultValue: "Contractor technical name" })}
-          value={data.contractor_technical_name}
-          onChange={(e) => onChange("contractor_technical_name", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("contractorTechnicalNumber")}
-          value={data.contractor_technical_number}
-          onChange={(e) => onChange("contractor_technical_number", e.target.value)}
-        />
+          label={t("contractorRepresentative", { defaultValue: "Contractor Representative" })}
+          value={data.contractor_representative_id}
+          onChange={(e) => onChange("contractor_representative_id", e.target.value)}
+          disabled={!data.contractor_id || representatives.length === 0}
+        >
+          <MenuItem value="">
+            {t("chooseRepresentative", { defaultValue: "Choose representative" })}
+          </MenuItem>
+          {representatives.map((rep) => (
+            <MenuItem key={rep.id} value={rep.id}>
+              {rep.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -1319,6 +1327,8 @@ function Step5Form({
   confirmed,
   onChangeConfirmed,
   t,
+  projectId,
+  existingNotification,
 }: {
   data: WizardFormData;
   employees: ProjectNotificationEmployee[];
@@ -1326,7 +1336,13 @@ function Step5Form({
   confirmed: { dataReviewed: boolean; readyToSend: boolean };
   onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
   t: ReturnType<typeof useTranslations>;
+  projectId: string | undefined;
+  existingNotification: ProjectNotification | null | undefined;
 }) {
+  const contractorsQuery = useProjectNotificationContractors(projectId);
+  const contractors = contractorsQuery.data ?? [];
+  const selectedContractor = contractors.find((c) => c.id === data.contractor_id);
+  const representatives = selectedContractor?.representatives ?? [];
   const selectedEmployees = useMemo(
     () => employees.filter((e) => data.assigned_user_ids.includes(e.user_id)),
     [employees, data.assigned_user_ids],
@@ -1361,8 +1377,13 @@ function Step5Form({
         title={t("summaryContractor")}
         rows={[
           { label: t("contractor"), value: data.contractor_name },
-          { label: t("contractorTechnicalName", { defaultValue: "Contractor technical name" }), value: data.contractor_technical_name },
-          { label: t("contractorTechnicalNumber"), value: data.contractor_technical_number },
+          {
+            label: t("contractorRepresentative", { defaultValue: "Contractor Representative" }),
+            value:
+              representatives.find((r) => r.id === data.contractor_representative_id)?.name ??
+              existingNotification?.contractor_representative_name ??
+              "-",
+          },
         ]}
       />
 
