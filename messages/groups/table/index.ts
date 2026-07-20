@@ -64,4 +64,7 @@ export const tableMessages = new MessagesGroup({
     "Show this column before fixing it",
     "أظهر هذا العمود قبل تثبيته",
   ),
+
+  // Column Order translations
+  DragToReorder: _m("Drag to reorder column", "اسحب لإعادة ترتيب العمود"),
 });
