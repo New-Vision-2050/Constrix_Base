@@ -514,6 +514,8 @@ export const projectMessages = new MessagesGroup({
       selectContractor: _m("Select contractor", "اختر المقاول"),
       chooseContractor: _m("Choose contractor", "اختر المقاول"),
       contractorTechnicalName: _m("Contractor Technical Name", "فني المقاول"),
+      contractorRepresentative: _m("Contractor Representative", "ممثل المقاول"),
+      chooseRepresentative: _m("Choose representative", "اختر ممثل المقاول"),
       selectEngineer: _m("Select engineer", "اختر المهندس"),
       fromDate: _m("From date", "من تاريخ"),
       toDate: _m("To date", "إلى تاريخ"),

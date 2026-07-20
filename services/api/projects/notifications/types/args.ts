@@ -52,8 +52,7 @@ export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {
   work_description?: string | null;
   contractor_id?: string | null;
   contractor_name?: string | null;
-  contractor_technical_name?: string | null;
-  contractor_technical_number?: string | null;
+  contractor_representative_id?: string | null;
   contractor_category?: string | null;
   contractor_notes?: string | null;
   permit_source?: string | null;

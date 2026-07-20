@@ -254,8 +254,7 @@ export default function NotificationDetailEditable({
   // ===========================================================================
   const contractorReadFields = [
     { caption: t("contractor"), value: notification.contractor_name ?? tDash },
-    { caption: t("contractorTechnicalName"), value: notification.contractor_technical_name ?? tDash },
-    { caption: t("contractorTechnicalNumber"), value: notification.contractor_technical_number ?? tDash },
+    { caption: t("contractorRepresentative", { defaultValue: "Contractor Representative" }), value: notification.contractor_representative_name ?? tDash },
     { caption: t("contractorCategory"), value: notification.contractor_category ?? tDash },
     { caption: t("contractorNotes"), value: notification.contractor_notes ?? tDash },
   ];
@@ -264,7 +263,11 @@ export default function NotificationDetailEditable({
     const selected = contractors.find((c) => c.id === contractorId);
     updateField("contractor_id", contractorId);
     updateField("contractor_name", selected?.name ?? "");
+    updateField("contractor_representative_id", "");
   }
+
+  const selectedContractor = contractors.find((c) => c.id === formData.contractor_id);
+  const representatives = selectedContractor?.representatives ?? [];
 
   const contractorEditFields = (
     <Grid container spacing={2}>
@@ -278,6 +281,11 @@ export default function NotificationDetailEditable({
           isOptionEqualToValue={(option, value) => option.id === value?.id}
           value={contractors.find((c) => c.id === formData.contractor_id) ?? null}
           onChange={(_e, value) => handleContractorChange(value?.id ?? "")}
+          renderOption={(props, option) => (
+            <li {...props} key={option.id}>
+              {option.name}
+            </li>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -289,21 +297,23 @@ export default function NotificationDetailEditable({
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
+          select
           fullWidth
           size="small"
-          label={t("contractorTechnicalName")}
-          value={formData.contractor_technical_name}
-          onChange={(e) => updateField("contractor_technical_name", e.target.value)}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("contractorTechnicalNumber")}
-          value={formData.contractor_technical_number}
-          onChange={(e) => updateField("contractor_technical_number", e.target.value)}
-        />
+          label={t("contractorRepresentative", { defaultValue: "Contractor Representative" })}
+          value={formData.contractor_representative_id}
+          onChange={(e) => updateField("contractor_representative_id", e.target.value)}
+          disabled={!formData.contractor_id || representatives.length === 0}
+        >
+          <MenuItem value="">
+            {t("chooseRepresentative", { defaultValue: "Choose representative" })}
+          </MenuItem>
+          {representatives.map((rep) => (
+            <MenuItem key={rep.id} value={rep.id}>
+              {rep.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
