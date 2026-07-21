@@ -42,6 +42,7 @@ export interface ProjectOrderPermitNestedDto {
   department_name?: string | null;
   uds_period?: string | null;
   code?: string | null;
+  order_permit_type_name?: string | null;
 }
 
 export interface ProjectOrderPermitStateDto {
