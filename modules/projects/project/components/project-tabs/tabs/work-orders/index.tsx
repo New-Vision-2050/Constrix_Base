@@ -264,6 +264,14 @@ export default function WorkOrdersTab() {
 
       workOrderType: tFields("workOrderType"),
 
+      consultantWorkOrderType: tFields("consultantWorkOrderType"),
+
+      departmentName: tFields("departmentName"),
+
+      orderPermitDescription: tFields("orderPermitDescription"),
+
+      udsPeriod: tFields("udsPeriod"),
+
       assignmentDate: tFields("assignmentDate"),
 
       contractor: tFields("contractor"),
