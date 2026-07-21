@@ -36,6 +36,13 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   table: new MessagesGroup({
     workOrderId: _m("Work order", "امر العمل"),
     workOrderType: _m("Work order type", "نوع امر العمل"),
+    consultantWorkOrderType: _m(
+      "Consultant work order",
+      "امر عمل الاستشاري",
+    ),
+    departmentName: _m("Department name", "اسم القسم"),
+    orderPermitDescription: _m("Description", "الوصف"),
+    udsPeriod: _m("UDS period", "فترة UDS"),
     assignmentDate: _m("Assignment date", "تاريخ الإسناد"),
     contractor: _m("Contractor", "المقاول"),
     management: _m("Management", "الادارة"),
@@ -110,6 +117,13 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
     fields: new MessagesGroup({
       workOrderId: _m("Work order", "امر العمل"),
       workOrderType: _m("Work order type", "نوع امر العمل"),
+      consultantWorkOrderType: _m(
+        "Consultant work order",
+        "امر عمل الاستشاري",
+      ),
+      departmentName: _m("Department name", "اسم القسم"),
+      orderPermitDescription: _m("Description", "الوصف"),
+      udsPeriod: _m("UDS period", "فترة UDS"),
       assignmentDate: _m("Assignment date", "تاريخ الإسناد"),
       contractor: _m("Contractor", "المقاول"),
       management: _m("Management", "الادارة"),
