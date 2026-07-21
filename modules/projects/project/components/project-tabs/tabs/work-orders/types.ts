@@ -2,6 +2,10 @@ export interface WorkOrderRow {
   id: string;
   workOrderId: string;
   workOrderType: string;
+  consultantWorkOrderType: string;
+  departmentName: string;
+  orderPermitDescription: string;
+  udsPeriod: string;
   assignmentDate: string;
   contractor: string;
   management: string;
@@ -46,6 +50,10 @@ export const EMPTY_WORK_ORDER_FILTERS: WorkOrderFilters = {
 export type WorkOrderColumnKey =
   | "workOrderId"
   | "workOrderType"
+  | "consultantWorkOrderType"
+  | "departmentName"
+  | "orderPermitDescription"
+  | "udsPeriod"
   | "assignmentDate"
   | "contractor"
   | "management"
@@ -73,6 +81,10 @@ export type WorkOrderColumnKey =
 export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "workOrderId",
   "workOrderType",
+  "consultantWorkOrderType",
+  "departmentName",
+  "orderPermitDescription",
+  "udsPeriod",
   "assignmentDate",
   "contractor",
   "management",

@@ -37,6 +37,10 @@ export function mapProjectOrderPermitDto(
       dto.order_permit?.type,
       dto.type,
     ),
+    consultantWorkOrderType: pickString(dto.order_permit?.type),
+    departmentName: pickString(dto.order_permit?.department_name),
+    orderPermitDescription: pickString(dto.order_permit?.description),
+    udsPeriod: pickString(dto.order_permit?.uds_period),
     assignmentDate: resolveDate(dto.assigned_date),
     contractor: pickString(
       dto.contractor_name,
