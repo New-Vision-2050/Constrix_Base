@@ -5,6 +5,7 @@ export interface WorkOrderRow {
   consultantWorkOrderType: string;
   departmentName: string;
   orderPermitDescription: string;
+  orderPermitTypeName: string;
   udsPeriod: string;
   assignmentDate: string;
   contractor: string;
@@ -53,6 +54,7 @@ export type WorkOrderColumnKey =
   | "consultantWorkOrderType"
   | "departmentName"
   | "orderPermitDescription"
+  | "orderPermitTypeName"
   | "udsPeriod"
   | "assignmentDate"
   | "contractor"
@@ -84,6 +86,7 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "consultantWorkOrderType",
   "departmentName",
   "orderPermitDescription",
+  "orderPermitTypeName",
   "udsPeriod",
   "assignmentDate",
   "contractor",

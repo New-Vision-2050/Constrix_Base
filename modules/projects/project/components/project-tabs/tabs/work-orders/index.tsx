@@ -270,6 +270,8 @@ export default function WorkOrdersTab() {
 
       orderPermitDescription: tFields("orderPermitDescription"),
 
+      orderPermitTypeName: tFields("orderPermitTypeName"),
+
       udsPeriod: tFields("udsPeriod"),
 
       assignmentDate: tFields("assignmentDate"),
