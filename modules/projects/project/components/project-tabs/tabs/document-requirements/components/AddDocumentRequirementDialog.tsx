@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -26,34 +27,14 @@ import {
 import { Add as AddIcon, DeleteOutline } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-
-export type NewDocumentRequirement = {
-  requirementCode: string;
-  requiredDocumentName: string;
-  document: string;
-  documentType: string;
-  specialization: string;
-  frequency: string;
-};
-
-type FrequencyType = "day" | "week" | "month";
-
-interface RequirementEntry {
-  id: string;
-  requirementCode: string;
-  requiredDocumentName: string;
-  document: string;
-  documentType: string;
-  specialization: string;
-  frequencyType: FrequencyType | "";
-  selectedDays: string[];
-  interval: string;
-}
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useCreateProjectRequirements } from "@/modules/projects/project/query/useProjectRequirements";
+import { buildCreateRequirementsPayload } from "../buildCreatePayload";
+import type { RequirementEntry, RequirementFrequencyType } from "../types";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  onAdd: (requirements: NewDocumentRequirement[]) => void;
 };
 
 const DOCUMENT_TYPES = [
@@ -102,28 +83,15 @@ function isEntryValid(entry: RequirementEntry): boolean {
   return Number(entry.interval) > 0;
 }
 
-function buildFrequency(
-  entry: RequirementEntry,
-  t: ReturnType<typeof useTranslations>,
-): string {
-  if (entry.frequencyType === "day") {
-    return entry.selectedDays
-      .map((day) => t(`weekDays.${day}` as "weekDays.saturday"))
-      .join("، ");
-  }
-  return t(
-    entry.frequencyType === "week" ? "everyWeeks" : "everyMonths",
-    { count: Number(entry.interval) },
-  );
-}
-
 export default function AddDocumentRequirementDialog({
   open,
   onClose,
-  onAdd,
 }: Props) {
   const t = useTranslations("project.documentRequirements");
   const tValidation = useTranslations("project.documentRequirements.validation");
+  const { projectId } = useProject();
+  const createMutation = useCreateProjectRequirements(projectId);
+
   const [entries, setEntries] = useState<RequirementEntry[]>([createEntry()]);
   const [submitted, setSubmitted] = useState(false);
 
@@ -153,13 +121,19 @@ export default function AddDocumentRequirementDialog({
   );
 
   const handleClose = () => {
+    if (createMutation.isPending) return;
     setEntries([createEntry()]);
     setSubmitted(false);
     onClose();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setSubmitted(true);
+
+    if (!projectId) {
+      toast.error(tValidation("projectRequired"));
+      return;
+    }
 
     const hasFilledAnyRow = entries.some(
       (entry) =>
@@ -222,22 +196,30 @@ export default function AddDocumentRequirementDialog({
       return;
     }
 
-    onAdd(
-      validEntries.map((entry) => ({
-        requirementCode: entry.requirementCode.trim(),
-        requiredDocumentName: entry.requiredDocumentName.trim(),
-        document: entry.document.trim(),
-        documentType: entry.documentType,
-        specialization: entry.specialization,
-        frequency: buildFrequency(entry, t),
-      })),
-    );
-    handleClose();
+    try {
+      const res = await createMutation.mutateAsync(
+        buildCreateRequirementsPayload(validEntries),
+      );
+      toast.success(res.data?.message ?? t("submitSuccess"));
+      setEntries([createEntry()]);
+      setSubmitted(false);
+      onClose();
+    } catch (error) {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? t("submitError");
+      toast.error(message);
+    }
   };
 
   const getFieldError = (
     entry: RequirementEntry,
-    field: "requirementCode" | "requiredDocumentName" | "document" | "documentType" | "frequencyType",
+    field:
+      | "requirementCode"
+      | "requiredDocumentName"
+      | "document"
+      | "documentType"
+      | "frequencyType",
   ) => {
     if (!submitted) return false;
     if (field === "requirementCode") return !entry.requirementCode.trim();
@@ -377,7 +359,8 @@ export default function AddDocumentRequirementDialog({
                           value={entry.frequencyType}
                           onChange={(e) =>
                             updateEntry(entry.id, {
-                              frequencyType: e.target.value as FrequencyType,
+                              frequencyType: e.target
+                                .value as RequirementFrequencyType,
                               selectedDays: [],
                               interval: "",
                             })
@@ -444,7 +427,9 @@ export default function AddDocumentRequirementDialog({
                         <IconButton
                           color="secondary"
                           onClick={() => removeEntry(entry.id)}
-                          disabled={entries.length <= 1}
+                          disabled={
+                            entries.length <= 1 || createMutation.isPending
+                          }
                           aria-label={t("delete")}
                         >
                           <DeleteOutline />
@@ -461,6 +446,7 @@ export default function AddDocumentRequirementDialog({
             color="secondary"
             startIcon={<AddIcon />}
             onClick={addEntry}
+            disabled={createMutation.isPending}
             sx={{
               alignSelf: "stretch",
               borderStyle: "dashed",
@@ -472,8 +458,19 @@ export default function AddDocumentRequirementDialog({
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleClose}>{t("cancel")}</Button>
-        <Button variant="contained" onClick={handleSubmit}>
+        <Button onClick={handleClose} disabled={createMutation.isPending}>
+          {t("cancel")}
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={createMutation.isPending}
+          startIcon={
+            createMutation.isPending ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : undefined
+          }
+        >
           {t("add")}
         </Button>
       </DialogActions>

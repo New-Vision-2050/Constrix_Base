@@ -34,3 +34,17 @@ export interface DocumentRequirementStat {
   count: number;
   percent: number;
 }
+
+export type RequirementFrequencyType = "day" | "week" | "month";
+
+export interface RequirementEntry {
+  id: string;
+  requirementCode: string;
+  requiredDocumentName: string;
+  document: string;
+  documentType: string;
+  specialization: string;
+  frequencyType: RequirementFrequencyType | "";
+  selectedDays: string[];
+  interval: string;
+}

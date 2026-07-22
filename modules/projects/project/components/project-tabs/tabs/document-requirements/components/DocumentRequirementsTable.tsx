@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -23,15 +23,12 @@ import { alpha } from "@mui/material/styles";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useProjectRequirements } from "@/modules/projects/project/query/useProjectRequirements";
 import RequirementStatsCards from "./RequirementStatsCards";
 import SubmissionStatusBadge from "./SubmissionStatusBadge";
-import AddDocumentRequirementDialog, {
-  type NewDocumentRequirement,
-} from "./AddDocumentRequirementDialog";
-import {
-  DOCUMENT_REQUIREMENT_MOCK_ROWS,
-  DOCUMENT_REQUIREMENT_STATS,
-} from "../constants/mock-data";
+import AddDocumentRequirementDialog from "./AddDocumentRequirementDialog";
+import { DOCUMENT_REQUIREMENT_STATS } from "../constants/mock-data";
 import type { DocumentRequirementRow } from "../types";
 
 const TableLayout = HeadlessTableLayout<DocumentRequirementRow>(
@@ -100,14 +97,12 @@ function CompletionCell({ percent }: { percent: number }) {
 
 export default function DocumentRequirementsTable() {
   const t = useTranslations("project.documentRequirements");
+  const { projectId } = useProject();
 
   const [filterSpecialization, setFilterSpecialization] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterPhase, setFilterPhase] = useState("");
   const [filterEntity, setFilterEntity] = useState("");
-  const [rows, setRows] = useState<DocumentRequirementRow[]>(
-    DOCUMENT_REQUIREMENT_MOCK_ROWS,
-  );
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const params = TableLayout.useTableParams({
@@ -115,39 +110,39 @@ export default function DocumentRequirementsTable() {
     initialLimit: 10,
   });
 
+  const requirementsQuery = useProjectRequirements({
+    projectId,
+    page: params.page,
+    perPage: params.limit,
+  });
+
+  const rows = requirementsQuery.data?.data ?? [];
+  const totalItems = requirementsQuery.data?.totalItems ?? 0;
+  const totalPages = Math.max(1, requirementsQuery.data?.totalPages ?? 1);
+
   const specializations = useMemo(
-    () =>
-      Array.from(
-        new Set(rows.map((r) => r.specialization)),
-      ),
+    () => Array.from(new Set(rows.map((r) => r.specialization))),
     [rows],
   );
   const documentTypes = useMemo(
-    () =>
-      Array.from(
-        new Set(rows.map((r) => r.documentType)),
-      ),
+    () => Array.from(new Set(rows.map((r) => r.documentType))),
     [rows],
   );
   const phases = useMemo(
-    () =>
-      Array.from(new Set(rows.map((r) => r.phase))),
+    () => Array.from(new Set(rows.map((r) => r.phase))),
     [rows],
   );
   const entities = useMemo(
     () =>
       Array.from(
         new Set(
-          rows.flatMap((r) => [
-            r.sendingEntity,
-            r.reviewingEntity,
-          ]),
+          rows.flatMap((r) => [r.sendingEntity, r.reviewingEntity]),
         ),
       ),
     [rows],
   );
 
-  const filteredRows = useMemo(() => {
+  const data = useMemo(() => {
     const search = params.search.trim().toLowerCase();
     return rows.filter((row) => {
       if (filterSpecialization && row.specialization !== filterSpecialization) {
@@ -180,44 +175,12 @@ export default function DocumentRequirementsTable() {
     rows,
   ]);
 
-  const totalItems = filteredRows.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
-
-  useEffect(() => {
-    if (params.page > totalPages) {
-      params.setPage(totalPages);
-    }
-  }, [params, totalPages]);
-
-  const data = useMemo(() => {
-    const safePage = Math.min(params.page, totalPages);
-    const start = (safePage - 1) * params.limit;
-    return filteredRows.slice(start, start + params.limit);
-  }, [filteredRows, params.page, params.limit, totalPages]);
-
   const clearFilters = () => {
     setFilterSpecialization("");
     setFilterType("");
     setFilterPhase("");
     setFilterEntity("");
     params.setSearch("");
-    params.setPage(1);
-  };
-
-  const addRequirement = (requirements: NewDocumentRequirement[]) => {
-    setRows((currentRows) => [
-      ...requirements.map((requirement, index) => ({
-        id: `requirement-${Date.now()}-${index}`,
-        ...requirement,
-        phase: "—",
-        sendingEntity: "—",
-        reviewingEntity: "—",
-        submissionStatus: "awaiting_acceptance" as const,
-        linkedDocument: "—",
-        completionPercent: 0,
-      })),
-      ...currentRows,
-    ]);
     params.setPage(1);
   };
 
@@ -297,7 +260,11 @@ export default function DocumentRequirementsTable() {
         key: "frequency",
         name: t("frequency"),
         sortable: false,
-        render: (row: DocumentRequirementRow) => <span>{row.frequency}</span>,
+        render: (row: DocumentRequirementRow) => (
+          <span>
+            {row.frequency === "once" ? t("once") : row.frequency}
+          </span>
+        ),
       },
       {
         key: "submissionStatus",
@@ -372,7 +339,7 @@ export default function DocumentRequirementsTable() {
     params,
     selectable: true,
     getRowId: (row: DocumentRequirementRow) => row.id,
-    loading: false,
+    loading: !!projectId && (requirementsQuery.isLoading || requirementsQuery.isFetching),
     searchable: false,
     onExport: async () => {},
     getRowSx: (_row: DocumentRequirementRow, index: number) => ({
@@ -598,12 +565,6 @@ export default function DocumentRequirementsTable() {
       <AddDocumentRequirementDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
-        onAdd={addRequirement}
-      />
-      <AddDocumentRequirementDialog
-        open={addDialogOpen}
-        onClose={() => setAddDialogOpen(false)}
-        onAdd={addRequirement}
       />
     </Box>
   );

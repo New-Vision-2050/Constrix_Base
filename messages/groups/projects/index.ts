@@ -970,6 +970,18 @@ export const projectMessages = new MessagesGroup({
     monthInterval: _m("Repeat every (months)", "التكرار كل (عدد الشهور)"),
     everyWeeks: _m("Every {count} week(s)", "كل {count} أسبوع"),
     everyMonths: _m("Every {count} month(s)", "كل {count} شهر"),
+    submitSuccess: _m(
+      "Requirements created successfully",
+      "تم إنشاء المتطلبات بنجاح",
+    ),
+    submitError: _m(
+      "Failed to create requirements",
+      "فشل إنشاء المتطلبات",
+    ),
+    loadError: _m(
+      "Failed to load document requirements",
+      "فشل تحميل متطلبات الوثائق",
+    ),
     validation: new MessagesGroup({
       rowsRequired: _m("Add at least one requirement", "أضف متطلباً واحداً على الأقل"),
       requirementCodeRequired: _m("Requirement code is required", "كود المتطلب مطلوب"),
@@ -979,6 +991,7 @@ export const projectMessages = new MessagesGroup({
       frequencyRequired: _m("Frequency is required", "التكرار مطلوب"),
       intervalRequired: _m("Interval is required", "الفاصل الزمني مطلوب"),
       daysRequired: _m("Select at least one day", "اختر يوماً واحداً على الأقل"),
+      projectRequired: _m("Project is required", "المشروع مطلوب"),
     }),
     weekDays: new MessagesGroup({
       saturday: _m("Saturday", "السبت"),
