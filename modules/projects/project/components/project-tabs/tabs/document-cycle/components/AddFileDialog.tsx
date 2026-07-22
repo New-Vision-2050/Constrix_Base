@@ -53,9 +53,6 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
         date: z.string().min(1, t("creationDate")),
         receiver_company_id: z.string().min(1, t("selectCompany")),
         serial_number: z.string().optional(),
-        attachment_type_id: z.string().optional(),
-        attachment_sub_type_id: z.string().optional(),
-        attachment_sub_sub_type_id: z.string().optional(),
         notes: z.string().optional(),
       }),
     [t],
@@ -77,72 +74,31 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
       date: "",
       receiver_company_id: "",
       serial_number: "",
-      attachment_type_id: "",
-      attachment_sub_type_id: "",
-      attachment_sub_sub_type_id: "",
       notes: "",
     },
   });
 
-  const watchTypeId = watch("attachment_type_id");
-  const watchSubTypeId = watch("attachment_sub_type_id");
-
-  /* ── Shared companies (receiver dropdown) ───────────────────────────── */
-  const { data: sharedCompanies = [], isLoading: loadingCompanies } = useQuery({
-    queryKey: ["shared-companies", projectId],
-    queryFn: async () => {
-      const res = await ProjectSharingApi.getSharedCompanies(projectId);
-      return res.data.payload ?? [];
-    },
-    enabled: !!projectId,
+  /* ── Shared companies (receiver dropdown) via project shares ───────── */
+  const { data: sharesData, isLoading: loadingCompanies } = useQuery({
+    queryKey: ["project-shares", projectId],
+    queryFn: () => ProjectSharingApi.listForProject(projectId!),
+    enabled: !!projectId && open,
   });
 
-  /* ── Cascading folder queries — all use the same endpoint ──────────── */
-  //  Level 1: parent_id = projectId  (root folders for this project)
-  //  Level 2: parent_id = attachment_type_id
-  //  Level 3: parent_id = attachment_sub_type_id
+  const sharedCompanies = useMemo(() => {
+    const shares = sharesData?.data?.payload ?? [];
+    const companies = shares
+      .map((share) => share.shared_with_company)
+      .filter((c): c is NonNullable<typeof c> => !!c?.id && !!c.name);
 
-  const { data: rootTypes = [], isLoading: loadingRoots } = useQuery({
-    queryKey: ["attachment-folders", "root", projectId],
-    queryFn: async () => {
-      const res = await AttachmentRequestsApi.getFolderChildren(projectId);
-      return res.data.payload ?? [];
-    },
-    enabled: !!projectId,
-  });
-
-  const { data: subTypes = [], isLoading: loadingSubs } = useQuery({
-    queryKey: ["attachment-folders", "sub", watchTypeId],
-    queryFn: async () => {
-      const res = await AttachmentRequestsApi.getFolderChildren(watchTypeId!);
-      return res.data.payload ?? [];
-    },
-    enabled: !!watchTypeId,
-  });
-
-  const { data: subSubTypes = [], isLoading: loadingSubSubs } = useQuery({
-    queryKey: ["attachment-folders", "sub-sub", watchSubTypeId],
-    queryFn: async () => {
-      const res = await AttachmentRequestsApi.getFolderChildren(
-        watchSubTypeId!,
-      );
-      return res.data.payload ?? [];
-    },
-    enabled: !!watchSubTypeId,
-  });
-
-  /* ── Cascade resets ─────────────────────────────────────────────────── */
-
-  // When level-1 changes → clear level-2 and level-3
-  useEffect(() => {
-    setValue("attachment_sub_type_id", "");
-    setValue("attachment_sub_sub_type_id", "");
-  }, [watchTypeId, setValue]);
-
-  // When level-2 changes → clear level-3
-  useEffect(() => {
-    setValue("attachment_sub_sub_type_id", "");
-  }, [watchSubTypeId, setValue]);
+    const seen = new Set<string>();
+    return companies.filter((company) => {
+      const id = String(company.id);
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  }, [sharesData]);
 
   /* ── File state ─────────────────────────────────────────────────────── */
   const [files, setFiles] = React.useState<File[]>([]);
@@ -156,6 +112,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
   /* ── Mutation ───────────────────────────────────────────────────────── */
   const mutation = useMutation({
     mutationFn: async (data: FormValues) => {
+      if (!projectId) throw new Error("Missing project id");
       setUploadPercent(0);
       return AttachmentRequestsApi.create(
         {
@@ -164,10 +121,6 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
           project_id: projectId,
           receiver_company_id: data.receiver_company_id,
           serial_number: data.serial_number || undefined,
-          attachment_type_id: data.attachment_type_id || undefined,
-          attachment_sub_type_id: data.attachment_sub_type_id || undefined,
-          attachment_sub_sub_type_id:
-            data.attachment_sub_sub_type_id || undefined,
           attachments: files,
           notes: data.notes || undefined,
         },
@@ -313,87 +266,6 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
             )}
           </FormControl>
 
-          {/* attachment_type_id — Level 1 */}
-          <FormControl fullWidth disabled={isPending || loadingRoots}>
-            <InputLabel>
-              {loadingRoots ? (
-                <CircularProgress size={14} sx={{ mr: 1 }} />
-              ) : null}
-              {t("mainClassification")}
-            </InputLabel>
-            <Select
-              label={t("mainClassification")}
-              value={watch("attachment_type_id")}
-              onChange={(e) =>
-                setValue("attachment_type_id", String(e.target.value), {
-                  shouldValidate: true,
-                })
-              }
-            >
-              {rootTypes.map((type) => (
-                <MenuItem key={type.id} value={String(type.id)}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* attachment_sub_type_id — Level 2 (enabled after level-1 chosen) */}
-          <FormControl
-            fullWidth
-            disabled={isPending || !watchTypeId || loadingSubs}
-          >
-            <InputLabel>
-              {loadingSubs ? (
-                <CircularProgress size={14} sx={{ mr: 1 }} />
-              ) : null}
-              {t("subClassification")}
-            </InputLabel>
-            <Select
-              label={t("subClassification")}
-              value={watch("attachment_sub_type_id")}
-              onChange={(e) =>
-                setValue("attachment_sub_type_id", String(e.target.value), {
-                  shouldValidate: true,
-                })
-              }
-            >
-              {subTypes.map((type) => (
-                <MenuItem key={type.id} value={String(type.id)}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* attachment_sub_sub_type_id — Level 3 (enabled after level-2 chosen) */}
-          <FormControl
-            fullWidth
-            disabled={isPending || !watchSubTypeId || loadingSubSubs}
-          >
-            <InputLabel>
-              {loadingSubSubs ? (
-                <CircularProgress size={14} sx={{ mr: 1 }} />
-              ) : null}
-              {t("subSubClassification")}
-            </InputLabel>
-            <Select
-              label={t("subSubClassification")}
-              value={watch("attachment_sub_sub_type_id")}
-              onChange={(e) =>
-                setValue("attachment_sub_sub_type_id", String(e.target.value), {
-                  shouldValidate: true,
-                })
-              }
-            >
-              {subSubTypes.map((type) => (
-                <MenuItem key={type.id} value={String(type.id)}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
           {/* notes */}
           <TextField
             {...register("notes")}
@@ -498,7 +370,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
                 </>
               ) : (
                 <>
-                  <AddIcon sx={{color: "text.secondary", fontSize: 20 }} />
+                  <AddIcon sx={{ color: "text.secondary", fontSize: 20 }} />
                   <Typography variant="body2" color="text.secondary">
                     {t("attachFile")}
                   </Typography>
