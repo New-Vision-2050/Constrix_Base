@@ -9,6 +9,7 @@ import { createSearchComponent } from "./components/search";
 import { createColumnVisibilityHook } from "./components/column-visibility";
 import { createColumnPinningHook } from "./components/column-pinning";
 import { createColumnOrderHook } from "./components/column-order";
+import { createColumnGroupingHook } from "./components/column-grouping";
 
 // Re-export types
 export type {
@@ -30,6 +31,10 @@ export type { SearchProps } from "./components/search/types";
 export type { ColumnVisibilityState } from "./components/column-visibility";
 export type { ColumnPinningState } from "./components/column-pinning";
 export type { ColumnOrderState } from "./components/column-order";
+export type {
+  ColumnGroupingState,
+  ColumnGroupDef,
+} from "./components/column-grouping";
 
 // ============================================================================
 // Headless Table Factory
@@ -44,6 +49,7 @@ export function HeadlessTableLayout<TRow>(prefix?: string) {
   const useColumnVisibility = createColumnVisibilityHook<TRow>(prefix);
   const useColumnPinning = createColumnPinningHook<TRow>(prefix);
   const useColumnOrder = createColumnOrderHook<TRow>(prefix);
+  const useColumnGrouping = createColumnGroupingHook<TRow>(prefix);
   const TopActionsComponent = createTopActionsComponent<TRow>(SearchComponent);
 
   // Create a new Layout component instance for each call
@@ -61,6 +67,7 @@ export function HeadlessTableLayout<TRow>(prefix?: string) {
       useColumnVisibility: useColumnVisibility,
       useColumnPinning: useColumnPinning,
       useColumnOrder: useColumnOrder,
+      useColumnGrouping: useColumnGrouping,
     },
   );
 
@@ -74,6 +81,7 @@ export function HeadlessTableLayout<TRow>(prefix?: string) {
     useColumnVisibility: typeof useColumnVisibility;
     useColumnPinning: typeof useColumnPinning;
     useColumnOrder: typeof useColumnOrder;
+    useColumnGrouping: typeof useColumnGrouping;
   };
 }
 

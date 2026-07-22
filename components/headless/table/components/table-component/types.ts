@@ -1,5 +1,6 @@
 import React from "react";
 import { TableState } from "../..";
+import type { ColumnGroupDef } from "../column-grouping";
 
 export type ColumnDef<TRow> = {
   key: string; // Unique identifier for the column (used for sorting)
@@ -42,6 +43,8 @@ export type TablePropsWithoutState<TRow> = {
   loadingOptions?: LoadingOptions;
   selectable?: SelectionConfig<TRow>;
   pinnedColumnCount?: number;
+  columnGroups?: ColumnGroupDef[];
+  columnGroupMap?: Record<string, string>;
   state?: never;
 };
 
