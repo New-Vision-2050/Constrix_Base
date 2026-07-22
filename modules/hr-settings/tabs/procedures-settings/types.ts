@@ -1,7 +1,10 @@
 export interface ProceduresSettingsOuterTab {
   id: number;
+  /** i18n key under `subTabs` when `label` is absent. */
   name: string;
   type: string;
+  /** Resolved display label from API (preferred over i18n `name`). */
+  label?: string;
 }
 
 export type ProceduresAddProcedureVariant = "default" | "document-classification";

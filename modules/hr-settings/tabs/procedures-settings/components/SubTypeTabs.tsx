@@ -73,6 +73,18 @@ function getOuterTabIcon(type: string) {
   return <Icon size={16} strokeWidth={2} />;
 }
 
+function resolveOuterTabLabel(
+  tab: { name: string; type: string; label?: string },
+  ts: (key: string) => string,
+): string {
+  if (tab.label) return tab.label;
+  try {
+    return ts(tab.name);
+  } catch {
+    return tab.name || tab.type;
+  }
+}
+
 export default function SubTypeTabs() {
   const { t, ts } = useProceduresSettingsTranslations();
   const { outerTabs, hideWorkPlanTabs, addProcedureVariant } =
@@ -112,9 +124,19 @@ export default function SubTypeTabs() {
     refetch: refetchInternalProcedures,
   } = useQuery({
     queryKey: ["internal-procedures", currentTabType],
-    queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedures(currentTabType),
+    queryFn: async () => {
+      try {
+        return await InternalProcedureSettingsApi.getInternalProcedures(
+          currentTabType,
+        );
+      } catch {
+        // Backend may not have registered document types yet (422).
+        // Keep CRM flow; allow empty list so user can create the first procedure.
+        return [];
+      }
+    },
     enabled: !!currentTabType,
+    retry: false,
   });
 
   const rootProcedure = useMemo(
@@ -572,7 +594,7 @@ export default function SubTypeTabs() {
                     }}
                   >
                     {getOuterTabIcon(tab.type)}
-                    <span>{ts(tab.name)}</span>
+                    <span>{resolveOuterTabLabel(tab, ts)}</span>
                   </Box>
                 }
               />
@@ -583,7 +605,7 @@ export default function SubTypeTabs() {
             variant="contained"
             size="small"
             startIcon={<PlusIcon className="h-4 w-4" />}
-            onClick={() => stagesViewRef.current?.openAddProcedureDialog()}
+            onClick={openAddTaskDialog}
             aria-label={t("procedures.addProcedure")}
             sx={{
               borderRadius: "12px",
@@ -612,7 +634,11 @@ export default function SubTypeTabs() {
               scrollButtons="auto"
             >
               {outerTabs.map((tab) => (
-                <Tab key={tab.id} value={tab.id} label={ts(tab.name)} />
+                <Tab
+                  key={tab.id}
+                  value={tab.id}
+                  label={resolveOuterTabLabel(tab, ts)}
+                />
               ))}
             </Tabs>
           </Paper>

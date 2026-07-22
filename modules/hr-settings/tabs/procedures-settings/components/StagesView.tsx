@@ -37,6 +37,7 @@ import DocumentStageCard from "./DocumentStageCard";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import {
   Stage,
   GetStagesResponse,
@@ -44,6 +45,7 @@ import {
   GetStepsResponse,
 } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useProceduresSettings } from "../context/ProceduresSettingsContext";
+import { mapTaskActionToCreateInternalProcedure } from "../utils/mapTaskActionToInternalProcedure";
 
 interface StagesViewProps {
   parentId?: string;
@@ -63,7 +65,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     ref,
   ) {
     const { t, ts } = useProceduresSettingsTranslations();
-    const { addProcedureVariant } = useProceduresSettings();
+    const { addProcedureVariant, outerTabs } = useProceduresSettings();
     const useDocumentAddDialog =
       addProcedureVariant === "document-classification";
     const tConfirm = useTranslations("common.deleteConfirmation");
@@ -322,17 +324,17 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
 
     const modelTabName = useMemo(() => {
       if (!currentTabType) return "";
-      try {
-        if (currentTabType === "correspondence") return ts("correspondence");
-        if (currentTabType === "technical_submittal")
-          return ts("technicalSubmittal");
-        if (currentTabType === "ncr") return ts("ncr");
-        if (currentTabType === "vo") return ts("vo");
-      } catch {
-        /* fallback below */
+      const tab = outerTabs.find((item) => item.type === currentTabType);
+      if (tab?.label) return tab.label;
+      if (tab?.name) {
+        try {
+          return ts(tab.name);
+        } catch {
+          return tab.name;
+        }
       }
       return currentTabType;
-    }, [currentTabType, ts]);
+    }, [currentTabType, outerTabs, ts]);
 
     const documentStagesContent = (
       <>
@@ -712,16 +714,46 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onClose={() => setClassificationDialogOpen(false)}
             procedureType={currentTabType ?? ""}
             onSave={async (values) => {
-              await handleCreateProcedure({
-                name: values.name,
-                type: currentTabType ?? "",
-                execute_type: "sequence",
-                icon: "settings",
-                percentage: 0,
-                deadline_days: 1,
-                deadline_hours: 0,
-                escalation_management_hierarchy_id: "",
-              });
+              if (!currentTabType) {
+                toast({
+                  title: t("actions.add"),
+                  description: t("messages.error"),
+                  variant: "destructive",
+                });
+                throw new Error("Missing procedure type");
+              }
+
+              try {
+                // Same API as CRM إعداد إجراءات الطلبات
+                await InternalProcedureSettingsApi.createInternalProcedure(
+                  mapTaskActionToCreateInternalProcedure(values, {
+                    procedureType: currentTabType,
+                    sortOrder: 1,
+                    parentId: parentId ?? null,
+                  }),
+                );
+
+                await queryClient.invalidateQueries({
+                  queryKey: ["internal-procedures", currentTabType],
+                });
+                await queryClient.invalidateQueries({
+                  queryKey: ["procedure-settings", "stages", parentId],
+                });
+
+                toast({
+                  title: t("actions.add"),
+                  description: t("messages.procedureAdded"),
+                  variant: "default",
+                });
+              } catch (error) {
+                console.error("Error creating internal procedure:", error);
+                toast({
+                  title: t("actions.add"),
+                  description: t("messages.error"),
+                  variant: "destructive",
+                });
+                throw error;
+              }
             }}
           />
           <EditStageDialog

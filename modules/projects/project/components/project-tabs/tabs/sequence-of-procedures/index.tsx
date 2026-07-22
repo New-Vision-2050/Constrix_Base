@@ -2,22 +2,40 @@
 
 import SubTypeTabs from "@/modules/hr-settings/tabs/procedures-settings/components/SubTypeTabs";
 import { ProceduresSettingsProvider } from "@/modules/hr-settings/tabs/procedures-settings";
-import type { ProceduresSettingsOuterTab } from "@/modules/hr-settings/tabs/procedures-settings";
-import { Box } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { useTranslations } from "next-intl";
+import { useDocumentSequenceOuterTabs } from "./useDocumentSequenceOuterTabs";
 
-const DOCUMENT_SEQUENCE_OUTER_TABS: ProceduresSettingsOuterTab[] = [
-  { id: 0, name: "correspondence", type: "correspondence" },
-  { id: 1, name: "technicalSubmittal", type: "technical_submittal" },
-  { id: 2, name: "ncr", type: "ncr" },
-  { id: 3, name: "vo", type: "vo" },
-];
-
+/**
+ * Document Management → Sequence of procedures.
+ * Outer tabs come from GET procedure-settings/types (dynamic).
+ * Same procedure APIs as CRM إعداد إجراءات الطلبات; document-classification add dialog.
+ */
 export default function SequenceOfProceduresTab() {
+  const tc = useTranslations("CRMSettingsModule.proceduresSettings.common");
+  const { outerTabs, isLoading, isError } = useDocumentSequenceOuterTabs();
+
+  if (isLoading) {
+    return (
+      <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  if (isError || outerTabs.length === 0) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography color="text.secondary">{tc("loadError")}</Typography>
+      </Box>
+    );
+  }
+
   return (
     <ProceduresSettingsProvider
       config={{
         translationNamespace: "CRMSettingsModule.proceduresSettings",
-        outerTabs: DOCUMENT_SEQUENCE_OUTER_TABS,
+        outerTabs,
         hideWorkPlanTabs: true,
         addProcedureVariant: "document-classification",
       }}

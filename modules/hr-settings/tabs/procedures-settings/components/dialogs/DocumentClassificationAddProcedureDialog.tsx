@@ -76,14 +76,21 @@ export default function DocumentClassificationAddProcedureDialog({
   const [nameError, setNameError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  // Same forms API used by CRM AddTaskActionDialog
   const { data: forms = [] } = useQuery({
     queryKey: ["internal_procedure_setting_forms", procedureType, locale],
-    queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedureSettingForms(
-        procedureType,
-        locale,
-      ),
+    queryFn: async () => {
+      try {
+        return await InternalProcedureSettingsApi.getInternalProcedureSettingForms(
+          procedureType,
+          locale,
+        );
+      } catch {
+        return [];
+      }
+    },
     enabled: open && !!procedureType,
+    retry: false,
   });
 
   useEffect(() => {

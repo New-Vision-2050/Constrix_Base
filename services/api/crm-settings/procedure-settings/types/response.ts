@@ -121,3 +121,27 @@ export interface GetStepsResponse {
   message: string | null;
   payload: ProcedureStep[];
 }
+
+/** Item from GET /procedure-settings/types */
+export interface ProcedureSettingTypeDto {
+  id?: number | string;
+  type?: string;
+  key?: string;
+  slug?: string;
+  name?: string;
+  name_ar?: string;
+  name_en?: string;
+  label?: string;
+  label_ar?: string;
+  label_en?: string;
+  group?: string;
+  category?: string;
+  module?: string;
+}
+
+export interface GetProcedureSettingTypesResponse {
+  code?: string;
+  message?: string | null;
+  payload?: ProcedureSettingTypeDto[];
+  data?: ProcedureSettingTypeDto[];
+}

@@ -54,6 +54,10 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "يجب إدخال ساعات أو أيام",
     ),
     searchManagement: _m("Search for department...", "البحث عن اداره..."),
+    loadError: _m(
+      "Failed to load procedure types",
+      "فشل تحميل أنواع الإجراءات",
+    ),
   }),
   stages: new MessagesGroup({
     title: _m("Stages", "المراحل"),
