@@ -1,5 +1,6 @@
 export interface WorkOrderRow {
   id: string;
+  orderPermitDepartmentId: number | null;
   workOrderId: string;
   workOrderType: string;
   consultantWorkOrderType: string;

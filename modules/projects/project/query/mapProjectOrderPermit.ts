@@ -30,6 +30,10 @@ export function mapProjectOrderPermitDto(
 ): WorkOrderRow {
   return {
     id: String(dto.id),
+    orderPermitDepartmentId:
+      dto.order_permit_department_id != null
+        ? Number(dto.order_permit_department_id)
+        : null,
     workOrderId: pickString(dto.name),
     workOrderType: pickString(
       dto.order_permit?.code,

@@ -11,7 +11,7 @@ import {
   UsersRound,
   Wrench,
   HardHat,
-  ClipboardList,
+  Building2,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import AttachmentsTab from "../tabs/attachments";
@@ -22,13 +22,15 @@ import DocumentCycleTab from "../tabs/document-cycle";
 import DocumentRequirementsTab from "../tabs/document-requirements";
 import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
-import WorkOrdersTab from "../tabs/work-orders";
+import { useConstructionsNestedTabs } from "./useConstructionsNestedTabs";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "engagement-tab-document-management";
+const CONSTRUCTIONS_GROUP_ID = "engagement-tab-constructions";
 
 export function useContractualEngagementTabsList(): SystemTab[] {
   const tProject = useTranslations("project");
+  const constructionsNestedTabs = useConstructionsNestedTabs("engagement");
 
   return useMemo(() => {
     const attachmentsTab: SystemTab = {
@@ -92,11 +94,12 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       ],
     };
 
-    const workOrdersTab: SystemTab = {
-      id: "engagement-tab-work-orders",
-      title: tProject("tabs.workOrders"),
-      icon: <ClipboardList className="w-4 h-4" />,
-      content: <WorkOrdersTab />,
+    const constructionsTab: SystemTab = {
+      id: CONSTRUCTIONS_GROUP_ID,
+      title: tProject("tabs.constructions"),
+      icon: <Building2 className="w-4 h-4" />,
+      content: <></>,
+      nestedTabs: constructionsNestedTabs,
     };
 
     const maintenanceTab: SystemTab = {
@@ -109,9 +112,9 @@ export function useContractualEngagementTabsList(): SystemTab[] {
     return [
       attachmentsTab,
       stakeholdersTab,
-      workOrdersTab,
+      constructionsTab,
       documentManagementTab,
       maintenanceTab,
     ];
-  }, [tProject]);
+  }, [tProject, constructionsNestedTabs]);
 }

@@ -1,6 +1,7 @@
 export interface ProjectSharingDepartmentPayload {
   id: number;
   project_type_id: number;
+  name: string;
   code: string;
   description: string;
   created_at: string;

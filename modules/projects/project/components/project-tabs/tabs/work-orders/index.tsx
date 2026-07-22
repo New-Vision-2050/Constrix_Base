@@ -178,7 +178,11 @@ function renderWorkOrderCell(
   return <span>{String(value)}</span>;
 }
 
-export default function WorkOrdersTab() {
+export default function WorkOrdersTab({
+  departmentId,
+}: {
+  departmentId?: number;
+} = {}) {
   const { projectId } = useProject();
 
   const queryClient = useQueryClient();
@@ -209,11 +213,10 @@ export default function WorkOrdersTab() {
     initialLimit: 10,
   });
 
-  const workOrdersQuery = useProjectOrderPermits(projectId);
+  const workOrdersQuery = useProjectOrderPermits(projectId, departmentId);
 
   const allRows = useMemo(
     () => workOrdersQuery.data ?? [],
-
     [workOrdersQuery.data],
   );
 
@@ -398,7 +401,7 @@ export default function WorkOrdersTab() {
     if (!projectId) return;
 
     queryClient.invalidateQueries({
-      queryKey: projectOrderPermitsQueryKey(),
+      queryKey: ["project-order-permits", projectId],
     });
   };
 
