@@ -1,5 +1,8 @@
 import { baseApi } from "@/config/axios/instances/base";
-import type { CreateProjectOrderPermitsArgs } from "./types/params";
+import type {
+  CreateProjectOrderPermitsArgs,
+  ListProjectOrderPermitsParams,
+} from "./types/params";
 import type {
   CreateProjectOrderPermitsResponse,
   ImportProjectOrderPermitsResponse,
@@ -11,9 +14,19 @@ export const ProjectOrderPermitsApi = {
   list: () =>
     baseApi.get<ListProjectOrderPermitsResponse>("order-permits"),
 
-  listForProject: (projectId: string | number) =>
+  listForProject: (
+    projectId: string | number,
+    params?: ListProjectOrderPermitsParams,
+  ) =>
     baseApi.get<ListProjectOrderPermitsResponse>(
       `projects/${projectId}/order-permits`,
+      params?.order_permit_department_id != null
+        ? {
+            params: {
+              order_permit_department_id: params.order_permit_department_id,
+            },
+          }
+        : undefined,
     ),
 
   listDepartments: (orderPermitId: number | string) =>

@@ -17,3 +17,7 @@ export interface CreateProjectOrderPermitsArgs {
   project_id: string;
   work_orders: CreateProjectOrderPermitWorkOrderArgs[];
 }
+
+export interface ListProjectOrderPermitsParams {
+  order_permit_department_id?: number;
+}

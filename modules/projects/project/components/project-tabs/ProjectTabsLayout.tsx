@@ -33,6 +33,7 @@ export default function ProjectTabsLayout({
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const [activeTab, setActiveTab] = useState<string>("");
   const [activeNestedTab, setActiveNestedTab] = useState<string>("");
+  const [activeDeepNestedTab, setActiveDeepNestedTab] = useState<string>("");
   const searchParams = useSearchParams();
   const userSelected = useRef(false);
 
@@ -69,6 +70,15 @@ export default function ProjectTabsLayout({
 
   const nestedTabs = activeMainTab?.nestedTabs;
 
+  const activeNestedTabObj = useMemo(() => {
+    if (!nestedTabs?.length) return undefined;
+    return (
+      nestedTabs.find((tab) => tab.id === activeNestedTab) ?? nestedTabs[0]
+    );
+  }, [nestedTabs, activeNestedTab]);
+
+  const deepNestedTabs = activeNestedTabObj?.nestedTabs;
+
   useEffect(() => {
     if (!nestedTabs?.length) return;
     setActiveNestedTab((prev) =>
@@ -76,16 +86,29 @@ export default function ProjectTabsLayout({
     );
   }, [value, nestedTabs]);
 
+  useEffect(() => {
+    if (!deepNestedTabs?.length) return;
+    setActiveDeepNestedTab((prev) =>
+      deepNestedTabs.some((t) => t.id === prev) ? prev : deepNestedTabs[0].id,
+    );
+  }, [activeNestedTab, deepNestedTabs]);
+
   const activeContent = useMemo(() => {
     if (nestedTabs?.length) {
-      const sub =
-        nestedTabs.find((t) => t.id === activeNestedTab) ?? nestedTabs[0];
+      const sub = activeNestedTabObj ?? nestedTabs[0];
+      if (sub.nestedTabs?.length) {
+        const deep =
+          sub.nestedTabs.find((tab) => tab.id === activeDeepNestedTab) ??
+          sub.nestedTabs[0];
+        return deep.content;
+      }
       return sub.content;
     }
     return activeMainTab?.content ?? null;
-  }, [activeMainTab, nestedTabs, activeNestedTab]);
+  }, [activeMainTab, nestedTabs, activeNestedTabObj, activeDeepNestedTab]);
 
   const showNestedTabsRow = Boolean(nestedTabs?.length);
+  const showDeepNestedTabsRow = Boolean(deepNestedTabs?.length);
 
   if (!tabsList.length) {
     return null;
@@ -301,6 +324,109 @@ export default function ProjectTabsLayout({
                         "& svg": {
                           width: 16,
                           height: 16,
+                        },
+                      }}
+                    >
+                      {tab.icon}
+                      <span>{tab.title}</span>
+                    </Box>
+                  }
+                />
+              ))}
+            </Tabs>
+          </Box>
+        </Paper>
+      )}
+
+      {showDeepNestedTabsRow && (
+        <Paper
+          elevation={0}
+          sx={{
+            width: "100%",
+            maxWidth: "100%",
+            overflow: "hidden",
+            borderRadius: "12px",
+            border: "1px solid",
+            borderColor: "divider",
+            bgcolor: (theme) => alpha(theme.palette.background.paper, 0.45),
+            backdropFilter: "blur(8px)",
+            mt: 1.5,
+            boxShadow: (theme) =>
+              `0 4px 16px ${alpha(theme.palette.common.black, 0.16)}`,
+          }}
+        >
+          <Box sx={{ px: 1, py: 0.75 }}>
+            <Tabs
+              value={
+                deepNestedTabs!.some((tab) => tab.id === activeDeepNestedTab)
+                  ? activeDeepNestedTab
+                  : deepNestedTabs![0].id
+              }
+              onChange={(_, v: string) => setActiveDeepNestedTab(v)}
+              variant={isMdUp ? "fullWidth" : "scrollable"}
+              scrollButtons={isMdUp ? false : "auto"}
+              allowScrollButtonsMobile
+              TabIndicatorProps={{
+                sx: {
+                  ...pillIndicatorSx,
+                  borderRadius: "8px",
+                },
+              }}
+              sx={{
+                "& .MuiTabs-flexContainer": {
+                  gap: 0.5,
+                },
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  minHeight: 36,
+                  px: 1.75,
+                  py: 0.5,
+                  borderRadius: "8px",
+                  color: "text.secondary",
+                  fontWeight: 600,
+                  fontSize: "0.8125rem",
+                  transition: "all 0.2s ease",
+                  zIndex: 1,
+                  flexShrink: 0,
+                  maxWidth: "none",
+                  "&:hover": {
+                    color: "text.primary",
+                    bgcolor: "rgba(255, 255, 255, 0.03)",
+                  },
+                  "&.Mui-selected": {
+                    color: "primary.main",
+                    fontWeight: 700,
+                  },
+                },
+                ...(!isMdUp && {
+                  "& .MuiTabScrollButton-root": { flexShrink: 0 },
+                  "& .MuiTabs-scroller": {
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                    "&::-webkit-scrollbar": { display: "none" },
+                  },
+                }),
+              }}
+            >
+              {deepNestedTabs!.map((tab) => (
+                <Tab
+                  key={tab.id}
+                  value={tab.id}
+                  sx={{
+                    flexShrink: 0,
+                    maxWidth: "none",
+                  }}
+                  label={
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 0.75,
+                        position: "relative",
+                        "& svg": {
+                          width: 14,
+                          height: 14,
                         },
                       }}
                     >
