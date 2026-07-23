@@ -6,10 +6,12 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
+  Chip,
   Divider,
   FormControlLabel,
   Grid,
   IconButton,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -17,6 +19,7 @@ import { Add, Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
+import { useProceduresSettings } from "../context/ProceduresSettingsContext";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useAllEmployees } from "@/modules/hr-settings/tabs/procedures-settings/hooks/useAllEmployees";
@@ -33,6 +36,7 @@ import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/t
 import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 
 // ─── Option value constants (labels from i18n inside component) ───────────────
 const ORG_BASE_OPTION_DEFS = [
@@ -70,6 +74,10 @@ const ACTION_TAKER_TYPE_OPTION_DEFS = [
   },
   { value: "assigned_user", labelKey: "actionTakerType.assignedUser" as const },
   { value: "himself", labelKey: "actionTakerType.himself" as const },
+  {
+    value: "receiver_company",
+    labelKey: "actionTakerType.receiverCompany" as const,
+  },
 ] as const;
 
 const MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS = [
@@ -132,6 +140,7 @@ interface StepFormData {
   actionTakerType: string;
   actionTakerManagementHierarchyRows: ManagementHierarchyRow[];
   actionTakerSpecificProcedureRows: SpecificProcedureRow[];
+  receiverCompanyIds: string[];
   branchId: string;
   managementId: string;
   actionTakerId: string;
@@ -309,6 +318,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       actionTakerManagementHierarchyRows:
         normalizeManagementHierarchyRows(serverStep),
       actionTakerSpecificProcedureRows: normalizeSpecificProcedureRows(serverStep),
+      receiverCompanyIds: (serverStep.receiver_company_ids ?? []).map(String),
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
@@ -329,6 +339,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     actionTakerType: "specific_user",
     actionTakerManagementHierarchyRows: [{ type: "", isDeputyDirector: false }],
     actionTakerSpecificProcedureRows: [{ type: "", id: "" }],
+    receiverCompanyIds: [],
     branchId: "",
     managementId: "",
     actionTakerId: "",
@@ -350,6 +361,7 @@ export default function StepCard({
   onDelete,
 }: StepCardProps) {
   const { t, tStepCard: ts, tc } = useProceduresSettingsTranslations();
+  const { projectId } = useProceduresSettings();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(!serverStep);
@@ -466,11 +478,32 @@ export default function StepCard({
 
   const actionTakerTypeOptions = useMemo(
     () =>
-      ACTION_TAKER_TYPE_OPTION_DEFS.map((o) => ({
+      ACTION_TAKER_TYPE_OPTION_DEFS.filter(
+        (option) => option.value !== "receiver_company" || !!projectId,
+      ).map((o) => ({
         value: o.value,
         label: ts(`options.${o.labelKey}`),
       })),
-    [ts],
+    [projectId, ts],
+  );
+
+  const { data: sharedCompanies = [], isLoading: isLoadingCompanies } =
+    useQuery({
+      queryKey: ["shared-companies", projectId, "step-card"],
+      queryFn: async () => {
+        const res = await ProjectSharingApi.getSharedCompanies(projectId!);
+        return res.data.payload ?? [];
+      },
+      enabled: !!projectId,
+    });
+
+  const companyOptions = useMemo(
+    () =>
+      sharedCompanies.map((company) => ({
+        value: String(company.id),
+        label: company.name,
+      })),
+    [sharedCompanies],
   );
 
   const branchSelectOptions = useMemo(
@@ -644,6 +677,17 @@ export default function StepCard({
       }
     }
     if (
+      data.actionTakerType === "receiver_company" &&
+      data.receiverCompanyIds.length === 0
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.selectReceiverCompanies"),
+        variant: "destructive",
+      });
+      return;
+    }
+    if (
       data.orgBase.includes("approve_timed") &&
       (!skippingPeriod.trim() || Number(skippingPeriod) <= 0)
     ) {
@@ -682,6 +726,9 @@ export default function StepCard({
             action_taker_specific_procedure_type: validSpecificRows.map((r) => r.type),
             action_taker_specific_procedure_id: validSpecificRows.map((r) => r.id),
           }
+        : {}),
+      ...(data.actionTakerType === "receiver_company"
+        ? { receiver_company_ids: data.receiverCompanyIds }
         : {}),
       action_taker_user_ids:
         data.actionTakerType === "specific_user" && data.actionTakerId
@@ -1158,6 +1205,128 @@ export default function StepCard({
             )}
           />
         </Box>
+
+        {actionTakerType === "receiver_company" && (
+          <Box sx={{ mb: 2.5 }}>
+            <SectionLabel>{ts("receiverCompanies")}</SectionLabel>
+            <Controller
+              name="receiverCompanyIds"
+              control={control}
+              render={({ field }) => {
+                const selectedIds = field.value ?? [];
+                const hasSelection = selectedIds.length > 0;
+
+                return (
+                  <TextField
+                    select
+                    size="small"
+                    fullWidth
+                    disabled={fieldsDisabled || isLoadingCompanies}
+                    value={selectedIds}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      field.onChange(
+                        typeof value === "string" ? value.split(",") : value,
+                      );
+                    }}
+                    SelectProps={{
+                      multiple: true,
+                      displayEmpty: true,
+                      renderValue: (selected) => {
+                        const ids = selected as string[];
+                        if (!ids.length) {
+                          return (
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              sx={{
+                                color: "text.secondary",
+                                lineHeight: "24px",
+                              }}
+                            >
+                              {isLoadingCompanies
+                                ? tc("loading")
+                                : ts("selectReceiverCompanies")}
+                            </Typography>
+                          );
+                        }
+                        return (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 0.5,
+                              alignItems: "center",
+                            }}
+                          >
+                            {ids.map((id) => {
+                              const optionLabel =
+                                companyOptions.find(
+                                  (option) =>
+                                    String(option.value) === String(id),
+                                )?.label ?? id;
+                              return (
+                                <Chip
+                                  key={id}
+                                  size="small"
+                                  label={optionLabel}
+                                  sx={{
+                                    maxWidth: 200,
+                                    height: 24,
+                                    "& .MuiChip-label": { px: 1 },
+                                  }}
+                                />
+                              );
+                            })}
+                          </Box>
+                        );
+                      },
+                      MenuProps: {
+                        PaperProps: {
+                          sx: { maxHeight: 280 },
+                        },
+                      },
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        minHeight: 40,
+                        alignItems: hasSelection ? "flex-start" : "center",
+                        borderRadius: "8px",
+                      },
+                      "& .MuiSelect-select": {
+                        py: hasSelection ? 1 : 1.05,
+                        display: "flex",
+                        alignItems: "center",
+                        minHeight: "24px !important",
+                      },
+                    }}
+                  >
+                    {companyOptions.length === 0 ? (
+                      <MenuItem disabled value="__empty__">
+                        {isLoadingCompanies ? tc("loading") : tc("noResults")}
+                      </MenuItem>
+                    ) : (
+                      companyOptions.map((option) => (
+                        <MenuItem
+                          key={option.value}
+                          value={String(option.value)}
+                        >
+                          <Checkbox
+                            size="small"
+                            checked={selectedIds.includes(
+                              String(option.value),
+                            )}
+                          />
+                          {option.label}
+                        </MenuItem>
+                      ))
+                    )}
+                  </TextField>
+                );
+              }}
+            />
+          </Box>
+        )}
 
         {/* ── نوع الهيكل التنظيمي (conditional) ── */}
         {actionTakerType === "management_hierarchy" && (

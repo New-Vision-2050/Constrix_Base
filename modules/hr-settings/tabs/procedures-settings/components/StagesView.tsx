@@ -33,7 +33,6 @@ import AddStageDialog from "./dialogs/AddStageDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
 import DocumentSequenceAddProcedureDialog from "./dialogs/DocumentSequenceAddProcedureDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
-import DocumentStageCard from "./DocumentStageCard";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
@@ -346,7 +345,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     const documentStagesContent = (
       <>
         {pendingDraftKeys.map((draftKey, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`pending-${draftKey}`}
             procedureSettingId={selectedProcedureId ?? ""}
             serverStep={null}
@@ -361,11 +360,10 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onDelete={() =>
               setPendingDraftKeys((prev) => prev.filter((k) => k !== draftKey))
             }
-            onCopy={handleAddStep}
           />
         ))}
         {serverSteps.map((step, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`server-${step.id}`}
             procedureSettingId={selectedProcedureId!}
             serverStep={step}
@@ -374,18 +372,16 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onDelete={() =>
               handleDeleteServerStep(selectedProcedureId!, step.id)
             }
-            onCopy={handleAddStep}
           />
         ))}
         {currentDraftKeys.map((draftKey, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`draft-${draftKey}`}
             procedureSettingId={selectedProcedureId!}
             serverStep={null}
             stepIndex={pendingDraftKeys.length + serverSteps.length + index + 1}
             onSaved={() => handleStepSaved(selectedProcedureId!, draftKey)}
             onDelete={() => removeDraftStep(selectedProcedureId!, draftKey)}
-            onCopy={handleAddStep}
           />
         ))}
       </>
