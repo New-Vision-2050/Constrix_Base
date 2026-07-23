@@ -32,7 +32,10 @@ import CancelButton from "@/components/shared/buttons/cancel";
 import FormDatePicker from "@/components/shared/FormDatePicker";
 import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
-import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
+import { useParams } from "next/navigation";
+
+const DOCUMENT_TYPE_PROCEDURE = "project_procedure";
 
 interface AddFileDialogProps {
   open: boolean;
@@ -41,7 +44,11 @@ interface AddFileDialogProps {
 
 export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
   const t = useTranslations("project.documentCycle");
-  const projectId = useOptionalProject()?.projectId;
+  const routeParams = useParams();
+  const projectIdFromRoute =
+    typeof routeParams?.id === "string" ? routeParams.id : undefined;
+  const projectId =
+    useOptionalProject()?.projectId ?? projectIdFromRoute;
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -51,7 +58,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
       z.object({
         name: z.string().min(1, t("fileName")),
         date: z.string().min(1, t("creationDate")),
-        receiver_company_id: z.string().min(1, t("selectCompany")),
+        attachment_type_id: z.string().min(1, t("documentTypeRequired")),
         serial_number: z.string().optional(),
         notes: z.string().optional(),
       }),
@@ -72,33 +79,29 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
     defaultValues: {
       name: "",
       date: "",
-      receiver_company_id: "",
+      attachment_type_id: "",
       serial_number: "",
       notes: "",
     },
   });
 
-  /* ── Shared companies (receiver dropdown) via project shares ───────── */
-  const { data: sharesData, isLoading: loadingCompanies } = useQuery({
-    queryKey: ["project-shares", projectId],
-    queryFn: () => ProjectSharingApi.listForProject(projectId!),
-    enabled: !!projectId && open,
-  });
-
-  const sharedCompanies = useMemo(() => {
-    const shares = sharesData?.data?.payload ?? [];
-    const companies = shares
-      .map((share) => share.shared_with_company)
-      .filter((c): c is NonNullable<typeof c> => !!c?.id && !!c.name);
-
-    const seen = new Set<string>();
-    return companies.filter((company) => {
-      const id = String(company.id);
-      if (seen.has(id)) return false;
-      seen.add(id);
-      return true;
+  /* ── Document types: GET internal-procedures?type=project_procedure&project_id=… ─ */
+  const { data: documentTypes = [], isLoading: loadingDocumentTypes } =
+    useQuery({
+      queryKey: [
+        "internal-procedures",
+        DOCUMENT_TYPE_PROCEDURE,
+        projectId,
+      ],
+      queryFn: async () => {
+        if (!projectId) return [];
+        return InternalProcedureSettingsApi.getInternalProcedures(
+          DOCUMENT_TYPE_PROCEDURE,
+          { projectId },
+        );
+      },
+      enabled: !!projectId && open,
     });
-  }, [sharesData]);
 
   /* ── File state ─────────────────────────────────────────────────────── */
   const [files, setFiles] = React.useState<File[]>([]);
@@ -119,8 +122,8 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
           name: data.name,
           date: data.date,
           project_id: projectId,
-          receiver_company_id: data.receiver_company_id,
           serial_number: data.serial_number || undefined,
+          attachment_type_id: data.attachment_type_id || undefined,
           attachments: files,
           notes: data.notes || undefined,
         },
@@ -232,36 +235,36 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
             disabled={isPending}
           />
 
-          {/* receiver_company_id */}
+          {/* document type */}
           <FormControl
             fullWidth
-            error={!!errors.receiver_company_id}
-            disabled={isPending || loadingCompanies}
+            error={!!errors.attachment_type_id}
+            disabled={isPending || loadingDocumentTypes || !projectId}
           >
             <InputLabel>
-              {loadingCompanies ? (
+              {loadingDocumentTypes ? (
                 <CircularProgress size={14} sx={{ mr: 1 }} />
               ) : null}
-              {t("selectCompany")}
+              {t("documentType")}
             </InputLabel>
             <Select
-              label={t("selectCompany")}
-              value={watch("receiver_company_id")}
+              label={t("documentType")}
+              value={watch("attachment_type_id")}
               onChange={(e) =>
-                setValue("receiver_company_id", String(e.target.value), {
+                setValue("attachment_type_id", String(e.target.value), {
                   shouldValidate: true,
                 })
               }
             >
-              {sharedCompanies.map((company) => (
-                <MenuItem key={company.id} value={String(company.id)}>
-                  {company.name}
+              {documentTypes.map((type) => (
+                <MenuItem key={type.id} value={String(type.id)}>
+                  {type.name}
                 </MenuItem>
               ))}
             </Select>
-            {errors.receiver_company_id && (
+            {errors.attachment_type_id && (
               <FormHelperText error>
-                {errors.receiver_company_id.message}
+                {errors.attachment_type_id.message}
               </FormHelperText>
             )}
           </FormControl>

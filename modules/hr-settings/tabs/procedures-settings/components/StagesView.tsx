@@ -65,7 +65,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     ref,
   ) {
     const { t, ts } = useProceduresSettingsTranslations();
-    const { addProcedureVariant, outerTabs } = useProceduresSettings();
+    const { addProcedureVariant, outerTabs, projectId } =
+      useProceduresSettings();
     const useDocumentAddDialog =
       addProcedureVariant === "document-classification";
     const tConfirm = useTranslations("common.deleteConfirmation");
@@ -181,7 +182,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
       deadline_hours: number;
       escalation_management_hierarchy_id: string;
     }) => {
-      if (!parentId || !workFlowId) {
+      if (!parentId) {
         toast({
           title: t("actions.add"),
           description: t("messages.error"),
@@ -193,7 +194,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
         await ProcedureSettingsApi.createStage({
           ...payload,
           parent_id: parentId,
-          work_flow_id: workFlowId,
+          ...(workFlowId ? { work_flow_id: workFlowId } : {}),
         });
         await refetch();
         toast({
@@ -203,9 +204,15 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
         });
       } catch (error) {
         console.error("Error creating procedure:", error);
+        const apiMessage = (
+          error as { response?: { data?: { message?: string } } }
+        )?.response?.data?.message;
         toast({
           title: t("actions.add"),
-          description: t("messages.error"),
+          description:
+            typeof apiMessage === "string" && apiMessage.trim()
+              ? apiMessage
+              : t("messages.error"),
           variant: "destructive",
         });
       }
@@ -730,6 +737,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                     procedureType: currentTabType,
                     sortOrder: 1,
                     parentId: parentId ?? null,
+                    projectId,
                   }),
                 );
 
@@ -747,9 +755,15 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 });
               } catch (error) {
                 console.error("Error creating internal procedure:", error);
+                const apiMessage = (
+                  error as { response?: { data?: { message?: string } } }
+                )?.response?.data?.message;
                 toast({
                   title: t("actions.add"),
-                  description: t("messages.error"),
+                  description:
+                    typeof apiMessage === "string" && apiMessage.trim()
+                      ? apiMessage
+                      : t("messages.error"),
                   variant: "destructive",
                 });
                 throw error;

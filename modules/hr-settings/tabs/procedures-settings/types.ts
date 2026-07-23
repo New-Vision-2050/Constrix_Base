@@ -16,6 +16,8 @@ export interface ProceduresSettingsConfig {
   hideWorkPlanTabs?: boolean;
   /** Controls which "Add procedure" dialog is shown. */
   addProcedureVariant?: ProceduresAddProcedureVariant;
+  /** When set, passed as `project_id` on internal-procedures requests. */
+  projectId?: string;
 }
 
 export interface ProceduresSettingsViewProps {
@@ -23,6 +25,7 @@ export interface ProceduresSettingsViewProps {
   translationNamespace?: string;
   hideWorkPlanTabs?: boolean;
   addProcedureVariant?: ProceduresAddProcedureVariant;
+  projectId?: string;
 }
 
 export interface MapPolygonPoint {

@@ -350,10 +350,12 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "Classification and linking data",
       "بيانات التصنيف والربط",
     ),
-    classificationName: _m("Classification name", "اسم التصنيف"),
-    linkedFolderName: _m("Linked folder name", "اسم المجلد المرتبط"),
-    classificationCode: _m("Classification code", "كود التصنيف"),
-    documentNature: _m("Document nature", "طبيعة المستند"),
+    mainClassification: _m("Main Classification", "تصنيف رئيسي"),
+    subClassification: _m("Sub Classification", "تصنيف فرعي"),
+    subSubClassification: _m(
+      "Sub Sub Classification",
+      "تصنيف فرعي فرعي",
+    ),
     jobAttribute: _m("Job attribute", "سمة الوظيفة"),
     usedInDocumentCycle: _m(
       "Used in document cycle",

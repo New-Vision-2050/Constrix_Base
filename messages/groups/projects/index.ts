@@ -112,7 +112,11 @@ export const projectMessages = new MessagesGroup({
     requestDirectionFilter: _m("Direction", "الاتجاه"),
     addFile: _m("Add File", "اضافة ملف"),
     documentName: _m("Document Name", "اسم المستند"),
-    documentType: _m("Document Type", "نوع المستند"),
+    documentType: _m("Document Type", "نوع الوثيقة"),
+    documentTypeRequired: _m(
+      "Please select a document type",
+      "يرجى اختيار نوع الوثيقة",
+    ),
     type: _m("Type", "النوع"),
     endDate: _m("End Date", "تاريخ النهاية"),
     fileSize: _m("File Size", "حجم الملف"),

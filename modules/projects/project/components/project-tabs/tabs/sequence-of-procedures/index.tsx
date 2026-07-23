@@ -4,6 +4,8 @@ import SubTypeTabs from "@/modules/hr-settings/tabs/procedures-settings/componen
 import { ProceduresSettingsProvider } from "@/modules/hr-settings/tabs/procedures-settings";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { useDocumentSequenceOuterTabs } from "./useDocumentSequenceOuterTabs";
 
 /**
@@ -14,6 +16,11 @@ import { useDocumentSequenceOuterTabs } from "./useDocumentSequenceOuterTabs";
 export default function SequenceOfProceduresTab() {
   const tc = useTranslations("CRMSettingsModule.proceduresSettings.common");
   const { outerTabs, isLoading, isError } = useDocumentSequenceOuterTabs();
+  const routeParams = useParams();
+  const projectIdFromRoute =
+    typeof routeParams?.id === "string" ? routeParams.id : undefined;
+  const projectId =
+    useOptionalProject()?.projectId ?? projectIdFromRoute;
 
   if (isLoading) {
     return (
@@ -38,6 +45,7 @@ export default function SequenceOfProceduresTab() {
         outerTabs,
         hideWorkPlanTabs: true,
         addProcedureVariant: "document-classification",
+        projectId,
       }}
     >
       <Box sx={{ p: 3 }}>

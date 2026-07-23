@@ -87,7 +87,7 @@ function resolveOuterTabLabel(
 
 export default function SubTypeTabs() {
   const { t, ts } = useProceduresSettingsTranslations();
-  const { outerTabs, hideWorkPlanTabs, addProcedureVariant } =
+  const { outerTabs, hideWorkPlanTabs, addProcedureVariant, projectId } =
     useProceduresSettings();
   const useDocumentSequenceLayout =
     hideWorkPlanTabs && addProcedureVariant === "document-classification";
@@ -123,11 +123,12 @@ export default function SubTypeTabs() {
     isLoading: isLoadingInternalProcedures,
     refetch: refetchInternalProcedures,
   } = useQuery({
-    queryKey: ["internal-procedures", currentTabType],
+    queryKey: ["internal-procedures", currentTabType, projectId],
     queryFn: async () => {
       try {
         return await InternalProcedureSettingsApi.getInternalProcedures(
           currentTabType,
+          projectId ? { projectId } : undefined,
         );
       } catch {
         // Backend may not have registered document types yet (422).
@@ -339,6 +340,7 @@ export default function SubTypeTabs() {
             procedureType: currentTabType,
             sortOrder: editingProcedure.sort_order ?? 1,
             parentId: editingProcedure.parent_id ?? null,
+            projectId,
           }),
         );
 
@@ -365,6 +367,7 @@ export default function SubTypeTabs() {
     [
       editingProcedure,
       currentTabType,
+      projectId,
       refetchInternalProcedures,
       queryClient,
       t,
@@ -382,6 +385,7 @@ export default function SubTypeTabs() {
               procedureType: currentTabType,
               sortOrder,
               parentId: rootProcedure?.id ?? null,
+              projectId,
             }),
           );
 
@@ -400,9 +404,15 @@ export default function SubTypeTabs() {
         });
       } catch (error) {
         console.error("Error creating internal procedure:", error);
+        const apiMessage = (
+          error as { response?: { data?: { message?: string } } }
+        )?.response?.data?.message;
         toast({
           title: t("actions.add"),
-          description: t("messages.error"),
+          description:
+            typeof apiMessage === "string" && apiMessage.trim()
+              ? apiMessage
+              : t("messages.error"),
           variant: "destructive",
         });
         throw error;
@@ -412,6 +422,7 @@ export default function SubTypeTabs() {
       childProcedures.length,
       currentTabType,
       rootProcedure?.id,
+      projectId,
       refetchInternalProcedures,
       queryClient,
       t,
