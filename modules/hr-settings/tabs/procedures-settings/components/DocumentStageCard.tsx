@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   FormControlLabel,
   MenuItem,
   TextField,
@@ -19,11 +20,17 @@ import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-sett
 import type { ProcedureStep } from "@/services/api/crm-settings/procedure-settings/types/response";
 import type { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import {
+  formsKindToStepCardUi,
+  parseProcedureStepFormsKind,
+} from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
+import {
   fetchManagementHierarchyOptions,
   type ManagementHierarchyOption,
 } from "@/utils/fetchDropdownOptions";
 import { baseURL } from "@/config/axios-config";
 import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
+import { useProceduresSettings } from "../context/ProceduresSettingsContext";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 
 interface DocumentStageCardProps {
   procedureSettingId: string;
@@ -37,6 +44,9 @@ interface DocumentStageCardProps {
 type DocumentStageForm = {
   procedureName: string;
   actionTakerType: string;
+  managementHierarchyType: string;
+  isDeputyDirector: boolean;
+  receiverCompanyIds: string[];
   procedureOrder: string;
   orgRule: string;
   orgTemplate: string;
@@ -52,9 +62,27 @@ type DocumentStageForm = {
   escalationEntity: string;
 };
 
+const MANAGEMENT_HIERARCHY_TYPE_OPTIONS = [
+  {
+    value: "project_manager",
+    labelKey: "options.managementHierarchy.projectManager" as const,
+  },
+  {
+    value: "branch_manager",
+    labelKey: "options.managementHierarchy.branchManager" as const,
+  },
+  {
+    value: "management_manager",
+    labelKey: "options.managementHierarchy.managementManager" as const,
+  },
+] as const;
+
 const defaultValues: DocumentStageForm = {
   procedureName: "",
   actionTakerType: "",
+  managementHierarchyType: "",
+  isDeputyDirector: false,
+  receiverCompanyIds: [],
   procedureOrder: "1",
   orgRule: "",
   orgTemplate: "",
@@ -91,6 +119,7 @@ export default function DocumentStageCard({
 }: DocumentStageCardProps) {
   const { t, tc, tStepCard: ts } = useProceduresSettingsTranslations();
   const { toast } = useToast();
+  const { projectId } = useProceduresSettings();
   const [isEditing, setIsEditing] = useState(!serverStep);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -102,6 +131,7 @@ export default function DocumentStageCard({
   });
 
   const fieldsDisabled = !isEditing || isSaving;
+  const actionTakerType = watch("actionTakerType");
 
   const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
     queryKey: ["managements", "hierarchy", "management", "document-stage"],
@@ -110,6 +140,29 @@ export default function DocumentStageCard({
         `${baseURL}/management_hierarchies/list?type=management`,
       ),
   });
+
+  const { data: sharedCompanies = [], isLoading: isLoadingCompanies } =
+    useQuery({
+      queryKey: ["project-shares", projectId, "document-stage"],
+      queryFn: async () => {
+        const res = await ProjectSharingApi.listForProject(projectId!);
+        const shares = res.data.payload ?? [];
+        const companies = shares
+          .map((share) => share.shared_with_company)
+          .filter(
+            (company): company is NonNullable<typeof company> =>
+              !!company?.id && !!company.name,
+          );
+        const seen = new Set<string>();
+        return companies.filter((company) => {
+          const id = String(company.id);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
+      },
+      enabled: !!projectId,
+    });
 
   useEffect(() => {
     if (!serverStep) {
@@ -122,9 +175,25 @@ export default function DocumentStageCard({
       return;
     }
 
+    const hierarchyRow = serverStep.action_taker_management_hierarchies?.[0];
+    const hierarchyType =
+      hierarchyRow?.action_taker_management_hierarchy_type ??
+      serverStep.action_taker_management_hierarchy_type ??
+      "";
+
+    const formsKind = formsKindToStepCardUi(
+      parseProcedureStepFormsKind(serverStep),
+    );
+
     reset({
       procedureName: serverStep.name ?? "",
       actionTakerType: serverStep.action_taker_type ?? "",
+      managementHierarchyType:
+        hierarchyType === "deputy_manager" ? "" : hierarchyType,
+      isDeputyDirector:
+        Boolean(hierarchyRow?.is_Deputy_Director) ||
+        hierarchyType === "deputy_manager",
+      receiverCompanyIds: (serverStep.receiver_company_ids ?? []).map(String),
       procedureOrder: String(stepIndex),
       orgRule: serverStep.is_approve
         ? "approve"
@@ -133,8 +202,8 @@ export default function DocumentStageCard({
           : serverStep.is_return_with_notes
             ? "return_with_notes"
             : "approve",
-      orgTemplate: serverStep.forms || "approve",
-      model: serverStep.forms || "",
+      orgTemplate: formsKind,
+      model: formsKind,
       description: "",
       notifyMobileApp: Boolean(serverStep.notify_by_push),
       notifyWorkAlert: Boolean(serverStep.notify_by_sms),
@@ -163,7 +232,29 @@ export default function DocumentStageCard({
         label: ts("options.actionTakerType.assignedUser"),
       },
       { value: "himself", label: ts("options.actionTakerType.himself") },
+      {
+        value: "receiver_company",
+        label: ts("options.actionTakerType.receiverCompany"),
+      },
     ],
+    [ts],
+  );
+
+  const companyOptions = useMemo(
+    () =>
+      sharedCompanies.map((company) => ({
+        value: String(company.id),
+        label: company.name,
+      })),
+    [sharedCompanies],
+  );
+
+  const managementHierarchyOptions = useMemo(
+    () =>
+      MANAGEMENT_HIERARCHY_TYPE_OPTIONS.map((option) => ({
+        value: option.value,
+        label: ts(option.labelKey),
+      })),
     [ts],
   );
 
@@ -210,8 +301,7 @@ export default function DocumentStageCard({
     if (
       procedureNameValue &&
       !base.some(
-        (o) =>
-          o.value === procedureNameValue || o.label === procedureNameValue,
+        (o) => o.value === procedureNameValue || o.label === procedureNameValue,
       )
     ) {
       return [
@@ -232,13 +322,55 @@ export default function DocumentStageCard({
       return;
     }
 
+    if (
+      data.actionTakerType === "management_hierarchy" &&
+      !data.managementHierarchyType
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.selectManagementHierarchy"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (
+      data.actionTakerType === "receiver_company" &&
+      data.receiverCompanyIds.length === 0
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.selectReceiverCompanies"),
+        variant: "destructive",
+      });
+      return;
+    }
+
     const body: CreateStepArgs = {
       name: data.procedureName.trim(),
       action_taker_type: data.actionTakerType,
+      ...(data.actionTakerType === "management_hierarchy"
+        ? {
+            action_taker_management_hierarchies: [
+              {
+                action_taker_management_hierarchy_type:
+                  data.managementHierarchyType,
+                is_Deputy_Director: data.isDeputyDirector,
+              },
+            ],
+          }
+        : {}),
+      ...(data.actionTakerType === "receiver_company"
+        ? {
+            receiver_company_ids: data.receiverCompanyIds,
+            ...(projectId ? { project_id: projectId } : {}),
+          }
+        : {}),
       action_taker_user_ids: [],
       concerned_management_hierarchy_ids: [],
       is_accept: data.orgTemplate === "accept",
-      is_approve: data.orgRule === "approve" || data.orgRule === "approve_timed",
+      is_approve:
+        data.orgRule === "approve" || data.orgRule === "approve_timed",
       is_view_only: data.orgRule === "view_only",
       is_return_with_notes: data.orgRule === "return_with_notes",
       requires_approval_within_period: data.orgRule === "approve_timed",
@@ -277,9 +409,25 @@ export default function DocumentStageCard({
       onSaved();
     } catch (error) {
       console.error("Error saving document stage:", error);
+      const apiMessage = (
+        error as {
+          response?: {
+            data?: {
+              message?: string;
+              errors?: Record<string, string[]>;
+            };
+          };
+        }
+      )?.response?.data;
+      const firstFieldError = apiMessage?.errors
+        ? Object.values(apiMessage.errors).flat()[0]
+        : undefined;
       toast({
         title: t("actions.save"),
-        description: t("messages.error"),
+        description:
+          (typeof firstFieldError === "string" && firstFieldError) ||
+          (typeof apiMessage?.message === "string" && apiMessage.message) ||
+          t("messages.error"),
         variant: "destructive",
       });
     } finally {
@@ -397,6 +545,51 @@ export default function DocumentStageCard({
           )}
         />
 
+        {actionTakerType === "management_hierarchy" ? (
+          <>
+            <Controller
+              name="managementHierarchyType"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  size="small"
+                  label={
+                    <RequiredLabel label={ts("managementHierarchyType")} />
+                  }
+                  disabled={fieldsDisabled}
+                  sx={fieldSx}
+                >
+                  <MenuItem value="">{tc("select")}</MenuItem>
+                  {managementHierarchyOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+            <Controller
+              name="isDeputyDirector"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  sx={{ m: 0, alignSelf: "center" }}
+                  control={
+                    <Checkbox
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={fieldsDisabled}
+                    />
+                  }
+                  label={ts("options.managementHierarchy.deputyManager")}
+                />
+              )}
+            />
+          </>
+        ) : null}
+
         <Controller
           name="procedureOrder"
           control={control}
@@ -418,6 +611,118 @@ export default function DocumentStageCard({
           )}
         />
       </Box>
+
+      {actionTakerType === "receiver_company" ? (
+        <Controller
+          name="receiverCompanyIds"
+          control={control}
+          render={({ field }) => {
+            const selectedIds = field.value ?? [];
+            const hasSelection = selectedIds.length > 0;
+
+            return (
+              <TextField
+                select
+                size="small"
+                fullWidth
+                label={<RequiredLabel label={ts("receiverCompanies")} />}
+                disabled={fieldsDisabled || isLoadingCompanies}
+                value={selectedIds}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  field.onChange(
+                    typeof value === "string" ? value.split(",") : value,
+                  );
+                }}
+                InputLabelProps={{ shrink: true }}
+                SelectProps={{
+                  multiple: true,
+                  displayEmpty: true,
+                  renderValue: (selected) => {
+                    const ids = selected as string[];
+                    if (!ids.length) {
+                      return (
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ color: "text.secondary", lineHeight: "24px" }}
+                        >
+                          {isLoadingCompanies
+                            ? tc("loading")
+                            : ts("selectReceiverCompanies")}
+                        </Typography>
+                      );
+                    }
+                    return (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 0.5,
+                          alignItems: "center",
+                        }}
+                      >
+                        {ids.map((id) => {
+                          const optionLabel =
+                            companyOptions.find(
+                              (option) => String(option.value) === String(id),
+                            )?.label ?? id;
+                          return (
+                            <Chip
+                              key={id}
+                              size="small"
+                              label={optionLabel}
+                              sx={{
+                                maxWidth: 200,
+                                height: 24,
+                                "& .MuiChip-label": { px: 1 },
+                              }}
+                            />
+                          );
+                        })}
+                      </Box>
+                    );
+                  },
+                  MenuProps: {
+                    PaperProps: {
+                      sx: { maxHeight: 280 },
+                    },
+                  },
+                }}
+                sx={{
+                  ...fieldSx,
+                  "& .MuiOutlinedInput-root": {
+                    minHeight: 40,
+                    alignItems: hasSelection ? "flex-start" : "center",
+                  },
+                  "& .MuiSelect-select": {
+                    py: hasSelection ? 1 : 1.05,
+                    display: "flex",
+                    alignItems: "center",
+                    minHeight: "24px !important",
+                  },
+                }}
+              >
+                {companyOptions.length === 0 ? (
+                  <MenuItem disabled value="__empty__">
+                    {isLoadingCompanies ? tc("loading") : tc("noResults")}
+                  </MenuItem>
+                ) : (
+                  companyOptions.map((option) => (
+                    <MenuItem key={option.value} value={String(option.value)}>
+                      <Checkbox
+                        size="small"
+                        checked={selectedIds.includes(String(option.value))}
+                      />
+                      {option.label}
+                    </MenuItem>
+                  ))
+                )}
+              </TextField>
+            );
+          }}
+        />
+      ) : null}
 
       <Box
         sx={{

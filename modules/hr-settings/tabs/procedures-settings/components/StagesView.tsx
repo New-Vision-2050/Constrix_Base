@@ -33,10 +33,10 @@ import AddStageDialog from "./dialogs/AddStageDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
 import DocumentSequenceAddProcedureDialog from "./dialogs/DocumentSequenceAddProcedureDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
-import DocumentStageCard from "./DocumentStageCard";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import {
   Stage,
   GetStagesResponse,
@@ -44,6 +44,7 @@ import {
   GetStepsResponse,
 } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useProceduresSettings } from "../context/ProceduresSettingsContext";
+import { mapTaskActionToCreateInternalProcedure } from "../utils/mapTaskActionToInternalProcedure";
 
 interface StagesViewProps {
   parentId?: string;
@@ -63,7 +64,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     ref,
   ) {
     const { t, ts } = useProceduresSettingsTranslations();
-    const { addProcedureVariant } = useProceduresSettings();
+    const { addProcedureVariant, outerTabs, projectId } =
+      useProceduresSettings();
     const useDocumentAddDialog =
       addProcedureVariant === "document-classification";
     const tConfirm = useTranslations("common.deleteConfirmation");
@@ -179,7 +181,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
       deadline_hours: number;
       escalation_management_hierarchy_id: string;
     }) => {
-      if (!parentId || !workFlowId) {
+      if (!parentId) {
         toast({
           title: t("actions.add"),
           description: t("messages.error"),
@@ -191,7 +193,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
         await ProcedureSettingsApi.createStage({
           ...payload,
           parent_id: parentId,
-          work_flow_id: workFlowId,
+          ...(workFlowId ? { work_flow_id: workFlowId } : {}),
         });
         await refetch();
         toast({
@@ -201,9 +203,15 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
         });
       } catch (error) {
         console.error("Error creating procedure:", error);
+        const apiMessage = (
+          error as { response?: { data?: { message?: string } } }
+        )?.response?.data?.message;
         toast({
           title: t("actions.add"),
-          description: t("messages.error"),
+          description:
+            typeof apiMessage === "string" && apiMessage.trim()
+              ? apiMessage
+              : t("messages.error"),
           variant: "destructive",
         });
       }
@@ -322,22 +330,22 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
 
     const modelTabName = useMemo(() => {
       if (!currentTabType) return "";
-      try {
-        if (currentTabType === "correspondence") return ts("correspondence");
-        if (currentTabType === "technical_submittal")
-          return ts("technicalSubmittal");
-        if (currentTabType === "ncr") return ts("ncr");
-        if (currentTabType === "vo") return ts("vo");
-      } catch {
-        /* fallback below */
+      const tab = outerTabs.find((item) => item.type === currentTabType);
+      if (tab?.label) return tab.label;
+      if (tab?.name) {
+        try {
+          return ts(tab.name);
+        } catch {
+          return tab.name;
+        }
       }
       return currentTabType;
-    }, [currentTabType, ts]);
+    }, [currentTabType, outerTabs, ts]);
 
     const documentStagesContent = (
       <>
         {pendingDraftKeys.map((draftKey, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`pending-${draftKey}`}
             procedureSettingId={selectedProcedureId ?? ""}
             serverStep={null}
@@ -352,11 +360,10 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onDelete={() =>
               setPendingDraftKeys((prev) => prev.filter((k) => k !== draftKey))
             }
-            onCopy={handleAddStep}
           />
         ))}
         {serverSteps.map((step, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`server-${step.id}`}
             procedureSettingId={selectedProcedureId!}
             serverStep={step}
@@ -365,18 +372,16 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onDelete={() =>
               handleDeleteServerStep(selectedProcedureId!, step.id)
             }
-            onCopy={handleAddStep}
           />
         ))}
         {currentDraftKeys.map((draftKey, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`draft-${draftKey}`}
             procedureSettingId={selectedProcedureId!}
             serverStep={null}
             stepIndex={pendingDraftKeys.length + serverSteps.length + index + 1}
             onSaved={() => handleStepSaved(selectedProcedureId!, draftKey)}
             onDelete={() => removeDraftStep(selectedProcedureId!, draftKey)}
-            onCopy={handleAddStep}
           />
         ))}
       </>
@@ -391,7 +396,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 sx={{
                   p: 2,
                   borderRadius: "16px",
-                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.6),
+                  bgcolor: (theme) =>
+                    alpha(theme.palette.background.paper, 0.6),
                   backdropFilter: "blur(10px)",
                   border: "1px solid",
                   borderColor: "divider",
@@ -508,7 +514,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 sx={{
                   p: 3,
                   borderRadius: "16px",
-                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.65),
+                  bgcolor: (theme) =>
+                    alpha(theme.palette.background.paper, 0.65),
                   backdropFilter: "blur(12px)",
                   border: "1px solid",
                   borderColor: "divider",
@@ -712,16 +719,53 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onClose={() => setClassificationDialogOpen(false)}
             procedureType={currentTabType ?? ""}
             onSave={async (values) => {
-              await handleCreateProcedure({
-                name: values.name,
-                type: currentTabType ?? "",
-                execute_type: "sequence",
-                icon: "settings",
-                percentage: 0,
-                deadline_days: 1,
-                deadline_hours: 0,
-                escalation_management_hierarchy_id: "",
-              });
+              if (!currentTabType) {
+                toast({
+                  title: t("actions.add"),
+                  description: t("messages.error"),
+                  variant: "destructive",
+                });
+                throw new Error("Missing procedure type");
+              }
+
+              try {
+                // Same API as CRM إعداد إجراءات الطلبات
+                await InternalProcedureSettingsApi.createInternalProcedure(
+                  mapTaskActionToCreateInternalProcedure(values, {
+                    procedureType: currentTabType,
+                    sortOrder: 1,
+                    parentId: parentId ?? null,
+                    projectId,
+                  }),
+                );
+
+                await queryClient.invalidateQueries({
+                  queryKey: ["internal-procedures", currentTabType],
+                });
+                await queryClient.invalidateQueries({
+                  queryKey: ["procedure-settings", "stages", parentId],
+                });
+
+                toast({
+                  title: t("actions.add"),
+                  description: t("messages.procedureAdded"),
+                  variant: "default",
+                });
+              } catch (error) {
+                console.error("Error creating internal procedure:", error);
+                const apiMessage = (
+                  error as { response?: { data?: { message?: string } } }
+                )?.response?.data?.message;
+                toast({
+                  title: t("actions.add"),
+                  description:
+                    typeof apiMessage === "string" && apiMessage.trim()
+                      ? apiMessage
+                      : t("messages.error"),
+                  variant: "destructive",
+                });
+                throw error;
+              }
             }}
           />
           <EditStageDialog

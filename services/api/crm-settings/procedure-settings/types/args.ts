@@ -21,6 +21,7 @@ export interface UpdateStageArgs {
   deadline_hours?: number;
   escalation_management_hierarchy_id?: string;
   work_flow_id?: string;
+  project_id?: string;
 }
 
 export interface ActionTakerManagementHierarchyItem {
@@ -44,6 +45,12 @@ export interface CreateStepArgs {
   management_id?: number;
   action_taker_user_ids: string[];
   concerned_management_hierarchy_ids: string[];
+  /** Project-employee assignment ids (e.g. with receiver_company). */
+  project_employee_ids?: string[];
+  /** Required when action_taker_type is receiver_company (single company as one-item array). */
+  receiver_company_ids?: string[];
+  /** Project context for project-procedure steps (receiver_company). */
+  project_id?: string;
   is_accept: boolean;
   is_approve: boolean;
   is_view_only: boolean;

@@ -151,3 +151,18 @@ export interface GetInternalProcedureResponse {
   message: string | null;
   payload: InternalProcedure;
 }
+
+/** Item from GET /procedure-settings/job-attributes */
+export interface ProcedureJobAttribute {
+  id: string;
+  name: string;
+  code: string;
+  is_active: boolean;
+}
+
+export interface GetProcedureJobAttributesResponse {
+  code?: string;
+  message?: string | null;
+  payload?: ProcedureJobAttribute[];
+  data?: ProcedureJobAttribute[];
+}
