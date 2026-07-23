@@ -109,7 +109,6 @@ export type WorkOrderColumnKey =
   | "startPermitDate"
   | "endPermitDate"
   | "noteFromPermitToDepartments"
-  | "isTakedAction"
   | "countOfDaysFromAssignedDate"
   | "evaluationPermitStatus"
   | "employeeName"
@@ -122,7 +121,6 @@ export type WorkOrderColumnKey =
   | "descriptionDetails"
   | "consultantStatement"
   | "lastDateConsultantStatement"
-  | "consultnatStatementStatus"
   | "officialProjectHours"
   | "numberOfDaysToAchieveColumn155"
   | "percentageTime"
@@ -164,7 +162,6 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "startPermitDate",
   "endPermitDate",
   "noteFromPermitToDepartments",
-  "isTakedAction",
   "countOfDaysFromAssignedDate",
   "evaluationPermitStatus",
   "employeeName",
@@ -177,7 +174,6 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "descriptionDetails",
   "consultantStatement",
   "lastDateConsultantStatement",
-  "consultnatStatementStatus",
   "officialProjectHours",
   "numberOfDaysToAchieveColumn155",
   "percentageTime",
