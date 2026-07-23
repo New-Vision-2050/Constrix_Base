@@ -153,7 +153,6 @@ const PERMIT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "startPermitDate",
   "endPermitDate",
   "noteFromPermitToDepartments",
-  "isTakedAction",
 ]);
 
 const NON_PERMIT_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
@@ -167,7 +166,6 @@ const NON_PERMIT_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "descriptionDetails",
   "consultantStatement",
   "lastDateConsultantStatement",
-  "consultnatStatementStatus",
   "officialProjectHours",
   "numberOfDaysToAchieveColumn155",
   "percentageTime",
@@ -201,10 +199,6 @@ function renderWorkOrderCell(
 
   if (key === "permitStatus") {
     return <span>{row.permitStatusName || emptyDash}</span>;
-  }
-
-  if (key === "isTakedAction") {
-    return <Checkbox checked={row.isTakedAction === "yes"} size="small" sx={{ padding: "4px" }} disabled />;
   }
 
   if (key === "completionPhase") {
@@ -416,8 +410,6 @@ export default function WorkOrdersTab({
 
       noteFromPermitToDepartments: tFields("noteFromPermitToDepartments"),
 
-      isTakedAction: tFields("isTakedAction"),
-
       countOfDaysFromAssignedDate: tFields("countOfDaysFromAssignedDate"),
 
       evaluationPermitStatus: tFields("evaluationPermitStatus"),
@@ -441,8 +433,6 @@ export default function WorkOrdersTab({
       consultantStatement: tFields("consultantStatement"),
 
       lastDateConsultantStatement: tFields("lastDateConsultantStatement"),
-
-      consultnatStatementStatus: tFields("consultnatStatementStatus"),
 
       officialProjectHours: tFields("officialProjectHours"),
 
@@ -530,10 +520,6 @@ export default function WorkOrdersTab({
               return (
                 <span>{row.permitStatusName || emptyDash}</span>
               );
-            }
-
-            if (key === "isTakedAction") {
-              return <Checkbox checked={row.isTakedAction === "yes"} size="small" sx={{ padding: "4px" }} disabled />;
             }
 
             return renderWorkOrderCell(row, key, emptyDash);
