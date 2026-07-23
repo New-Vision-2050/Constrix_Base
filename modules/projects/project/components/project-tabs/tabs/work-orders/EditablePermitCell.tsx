@@ -4,10 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Checkbox, IconButton, MenuItem, Select, TextField, Tooltip } from "@mui/material";
 import { Check, X } from "lucide-react";
 import type { WorkOrderRow } from "./types";
-import type { CompletionPhaseStatus } from "@/services/api/projects/project-order-permits/types/response";
+import type { CompletionPhase, CompletionPhaseStatus } from "@/services/api/projects/project-order-permits/types/response";
 import {
   useCompletionData,
   flattenCompletionStatuses,
+  getCompletionPhases,
+  getAllCompletionStatuses,
 } from "@/modules/projects/project/query/useCompletionData";
 
 export type EditablePermitField =
@@ -17,7 +19,17 @@ export type EditablePermitField =
   | "noteFromPermitToDepartments"
   | "isTakedAction"
   | "countOfDaysFromAssignedDate"
-  | "evaluationPermitStatus";
+  | "evaluationPermitStatus"
+  | "employeeName"
+  | "completionPhase"
+  | "phaseStatus"
+  | "targetDrilling"
+  | "achievedDrilling"
+  | "targetExtention"
+  | "achievedExtention"
+  | "descriptionDetails"
+  | "consultantStatement"
+  | "lastDateConsultantStatement";
 
 interface EditablePermitCellProps {
   row: WorkOrderRow;
@@ -26,6 +38,8 @@ interface EditablePermitCellProps {
   yesLabel: string;
   noLabel: string;
   permitStatusOptions: CompletionPhaseStatus[];
+  completionPhases: CompletionPhase[];
+  completionStatuses: CompletionPhaseStatus[];
   onSave: (id: string, body: Record<string, unknown>) => void;
 }
 
@@ -45,6 +59,26 @@ function getRowValue(row: WorkOrderRow, field: EditablePermitField): string {
       return row.countOfDaysFromAssignedDate;
     case "evaluationPermitStatus":
       return row.evaluationPermitStatus;
+    case "employeeName":
+      return row.employeeName;
+    case "completionPhase":
+      return row.completionPhaseId != null ? String(row.completionPhaseId) : "";
+    case "phaseStatus":
+      return row.phaseStatusId != null ? String(row.phaseStatusId) : "";
+    case "targetDrilling":
+      return row.targetDrilling;
+    case "achievedDrilling":
+      return row.achievedDrilling;
+    case "targetExtention":
+      return row.targetExtention;
+    case "achievedExtention":
+      return row.achievedExtention;
+    case "descriptionDetails":
+      return row.descriptionDetails;
+    case "consultantStatement":
+      return row.consultantStatement;
+    case "lastDateConsultantStatement":
+      return row.lastDateConsultantStatement;
   }
 }
 
@@ -72,6 +106,26 @@ function buildBody(
       };
     case "evaluationPermitStatus":
       return { evaluation_permit_status: value || null };
+    case "employeeName":
+      return { employee_name: value || null };
+    case "completionPhase":
+      return { completion_phase_id: value ? Number(value) : null };
+    case "phaseStatus":
+      return { phase_status_id: value ? Number(value) : null };
+    case "targetDrilling":
+      return { target_drilling: value ? Number(value) : null };
+    case "achievedDrilling":
+      return { achieved_drilling: value ? Number(value) : null };
+    case "targetExtention":
+      return { target_extention: value ? Number(value) : null };
+    case "achievedExtention":
+      return { achieved_extention: value ? Number(value) : null };
+    case "descriptionDetails":
+      return { description_details: value || null };
+    case "consultantStatement":
+      return { consultant_statement: value || null };
+    case "lastDateConsultantStatement":
+      return { last_date_consultant_statement: value || null };
   }
 }
 
@@ -82,10 +136,18 @@ export function PerRowEditablePermitCell({
   yesLabel,
   noLabel,
   onSave,
-}: Omit<EditablePermitCellProps, "permitStatusOptions">) {
+}: Omit<EditablePermitCellProps, "permitStatusOptions" | "completionPhases" | "completionStatuses">) {
   const completionDataQuery = useCompletionData(Number(row.id));
   const permitStatusOptions = useMemo(
     () => flattenCompletionStatuses(completionDataQuery.data),
+    [completionDataQuery.data],
+  );
+  const completionPhases = useMemo(
+    () => getCompletionPhases(completionDataQuery.data),
+    [completionDataQuery.data],
+  );
+  const completionStatuses = useMemo(
+    () => getAllCompletionStatuses(completionDataQuery.data),
     [completionDataQuery.data],
   );
   return (
@@ -96,6 +158,8 @@ export function PerRowEditablePermitCell({
       yesLabel={yesLabel}
       noLabel={noLabel}
       permitStatusOptions={permitStatusOptions}
+      completionPhases={completionPhases}
+      completionStatuses={completionStatuses}
       onSave={onSave}
     />
   );
@@ -108,6 +172,8 @@ export default function EditablePermitCell({
   yesLabel,
   noLabel,
   permitStatusOptions,
+  completionPhases,
+  completionStatuses,
   onSave,
 }: EditablePermitCellProps) {
   const [editing, setEditing] = useState(false);
@@ -169,6 +235,17 @@ export default function EditablePermitCell({
         permitStatusOptions.find((s) => s.id === row.permitStatusId)?.name ??
         row.permitStatusName ??
         "";
+    } else if (field === "completionPhase") {
+      display =
+        completionPhases.find((p) => p.id === row.completionPhaseId)?.name ??
+        row.completionPhaseName ??
+        "";
+    } else if (field === "phaseStatus") {
+      const phaseStatuses = completionPhases.find((p) => p.id === row.completionPhaseId)?.statuses ?? [];
+      display =
+        phaseStatuses.find((s) => s.id === row.phaseStatusId)?.name ??
+        row.phaseStatusName ??
+        "";
     } else {
       display = currentValue;
     }
@@ -219,9 +296,9 @@ export default function EditablePermitCell({
             }
             setEditing(false);
           }}
+          onClose={() => setEditing(false)}
           sx={commonSx}
           autoFocus
-          open={true}
         >
           <MenuItem value="">
             <em>{emptyDash}</em>
@@ -234,7 +311,7 @@ export default function EditablePermitCell({
         </Select>
       )}
 
-      {(field === "startPermitDate" || field === "endPermitDate") && (
+      {(field === "startPermitDate" || field === "endPermitDate" || field === "lastDateConsultantStatement") && (
         <TextField
           size="small"
           type="date"
@@ -257,8 +334,22 @@ export default function EditablePermitCell({
         />
       )}
 
+      {(field === "targetDrilling" || field === "achievedDrilling" || field === "targetExtention" || field === "achievedExtention") && (
+        <TextField
+          size="small"
+          type="number"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          sx={commonSx}
+          autoFocus
+        />
+      )}
+
       {(field === "noteFromPermitToDepartments" ||
-        field === "evaluationPermitStatus") && (
+        field === "evaluationPermitStatus" ||
+        field === "employeeName" ||
+        field === "descriptionDetails" ||
+        field === "consultantStatement") && (
         <TextField
           size="small"
           value={value}
@@ -266,6 +357,58 @@ export default function EditablePermitCell({
           sx={commonSx}
           autoFocus
         />
+      )}
+
+      {field === "completionPhase" && (
+        <Select
+          size="small"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            if (e.target.value !== currentValue) {
+              onSave(row.id, buildBody(field, e.target.value));
+            }
+            setEditing(false);
+          }}
+          onClose={() => setEditing(false)}
+          sx={commonSx}
+          autoFocus
+        >
+          <MenuItem value="">
+            <em>{emptyDash}</em>
+          </MenuItem>
+          {completionPhases.map((opt) => (
+            <MenuItem key={opt.id} value={String(opt.id)}>
+              {opt.name}
+            </MenuItem>
+          ))}
+        </Select>
+      )}
+
+      {field === "phaseStatus" && (
+        <Select
+          size="small"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            if (e.target.value !== currentValue) {
+              onSave(row.id, buildBody(field, e.target.value));
+            }
+            setEditing(false);
+          }}
+          onClose={() => setEditing(false)}
+          sx={commonSx}
+          autoFocus
+        >
+          <MenuItem value="">
+            <em>{emptyDash}</em>
+          </MenuItem>
+          {(completionPhases.find((p) => p.id === row.completionPhaseId)?.statuses ?? []).map((opt) => (
+            <MenuItem key={opt.id} value={String(opt.id)}>
+              {opt.name}
+            </MenuItem>
+          ))}
+        </Select>
       )}
 
       <Tooltip title="Save">

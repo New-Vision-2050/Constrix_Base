@@ -130,6 +130,25 @@ export interface ProjectOrderPermitWorkOrderDto {
   is_taked_action?: boolean | number | null;
   count_of_days_from_assigned_date?: number | string | null;
   evaluation_permit_status?: string | null;
+  employee_id?: string | number | null;
+  employee_name?: string | null;
+  target_drilling?: number | null;
+  achieved_drilling?: number | null;
+  target_extention?: number | null;
+  achieved_extention?: number | null;
+  description_details?: string | null;
+  consultant_statement?: string | null;
+  last_date_consultant_statement?: string | null;
+  consultnat_statement_status?: string | null;
+  official_project_hours?: number | string | null;
+  number_of_days_to_achieve_column_155?: number | string | null;
+  percentage_time?: number | string | null;
+  percentage_achieve_drilling?: number | string | null;
+  percentage_achieve_extention?: number | string | null;
+  completion_phase_id?: number | null;
+  completion_phase_name?: string | null;
+  phase_status_id?: number | null;
+  phase_status_name?: string | null;
 }
 
 export interface CompletionPhaseStatus {

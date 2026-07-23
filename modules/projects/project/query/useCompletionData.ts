@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
-import type { CompletionPhaseStatus } from "@/services/api/projects/project-order-permits/types/response";
+import type { CompletionPhase, CompletionPhaseStatus } from "@/services/api/projects/project-order-permits/types/response";
 
 export const completionDataQueryKey = (orderPermitId: number | string) =>
   ["completion-data", orderPermitId] as const;
@@ -27,4 +27,17 @@ export function flattenCompletionStatuses(
     (phase) => phase.id === 1,
   );
   return permitPhase?.statuses ?? [];
+}
+
+export function getCompletionPhases(
+  data: ReturnType<typeof useCompletionData>["data"],
+): CompletionPhase[] {
+  return data?.data?.completion_phases ?? [];
+}
+
+export function getAllCompletionStatuses(
+  data: ReturnType<typeof useCompletionData>["data"],
+): CompletionPhaseStatus[] {
+  if (!data?.data?.completion_phases) return [];
+  return data.data.completion_phases.flatMap((phase) => phase.statuses ?? []);
 }

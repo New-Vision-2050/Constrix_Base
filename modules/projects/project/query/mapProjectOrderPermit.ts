@@ -100,5 +100,40 @@ export function mapProjectOrderPermitDto(
         ? String(dto.count_of_days_from_assigned_date)
         : "",
     evaluationPermitStatus: pickString(dto.evaluation_permit_status),
+    employeeName: pickString(dto.employee_name),
+    completionPhaseId:
+      dto.completion_phase_id != null ? Number(dto.completion_phase_id) : null,
+    completionPhaseName: pickString(dto.completion_phase_name),
+    phaseStatusId:
+      dto.phase_status_id != null ? Number(dto.phase_status_id) : null,
+    phaseStatusName: pickString(dto.phase_status_name),
+    targetDrilling:
+      dto.target_drilling != null ? String(dto.target_drilling) : "",
+    achievedDrilling:
+      dto.achieved_drilling != null ? String(dto.achieved_drilling) : "",
+    targetExtention:
+      dto.target_extention != null ? String(dto.target_extention) : "",
+    achievedExtention:
+      dto.achieved_extention != null ? String(dto.achieved_extention) : "",
+    descriptionDetails: pickString(dto.description_details),
+    consultantStatement: pickString(dto.consultant_statement),
+    lastDateConsultantStatement: resolveDate(dto.last_date_consultant_statement),
+    consultnatStatementStatus: pickString(dto.consultnat_statement_status),
+    officialProjectHours:
+      dto.official_project_hours != null ? String(dto.official_project_hours) : "",
+    numberOfDaysToAchieveColumn155:
+      dto.number_of_days_to_achieve_column_155 != null
+        ? String(dto.number_of_days_to_achieve_column_155)
+        : "",
+    percentageTime:
+      dto.percentage_time != null ? String(dto.percentage_time) : "",
+    percentageAchieveDrilling:
+      dto.percentage_achieve_drilling != null
+        ? String(dto.percentage_achieve_drilling)
+        : "",
+    percentageAchieveExtention:
+      dto.percentage_achieve_extention != null
+        ? String(dto.percentage_achieve_extention)
+        : "",
   };
 }

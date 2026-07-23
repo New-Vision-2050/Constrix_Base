@@ -145,6 +145,7 @@ const WORK_ORDER_DATE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "contractorColumn155EntryDate",
   "startPermitDate",
   "endPermitDate",
+  "lastDateConsultantStatement",
 ]);
 
 const PERMIT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
@@ -153,6 +154,38 @@ const PERMIT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "endPermitDate",
   "noteFromPermitToDepartments",
   "isTakedAction",
+]);
+
+const NON_PERMIT_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "employeeName",
+  "completionPhase",
+  "phaseStatus",
+  "targetDrilling",
+  "achievedDrilling",
+  "targetExtention",
+  "achievedExtention",
+  "descriptionDetails",
+  "consultantStatement",
+  "lastDateConsultantStatement",
+  "consultnatStatementStatus",
+  "officialProjectHours",
+  "numberOfDaysToAchieveColumn155",
+  "percentageTime",
+  "percentageAchieveDrilling",
+  "percentageAchieveExtention",
+]);
+
+const PROJECT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "employeeName",
+  "completionPhase",
+  "phaseStatus",
+  "targetDrilling",
+  "achievedDrilling",
+  "targetExtention",
+  "achievedExtention",
+  "descriptionDetails",
+  "consultantStatement",
+  "lastDateConsultantStatement",
 ]);
 
 function renderWorkOrderCell(
@@ -172,6 +205,14 @@ function renderWorkOrderCell(
 
   if (key === "isTakedAction") {
     return <Checkbox checked={row.isTakedAction === "yes"} size="small" sx={{ padding: "4px" }} disabled />;
+  }
+
+  if (key === "completionPhase") {
+    return <span>{row.completionPhaseName || emptyDash}</span>;
+  }
+
+  if (key === "phaseStatus") {
+    return <span>{row.phaseStatusName || emptyDash}</span>;
   }
 
   if (WORK_ORDER_DATE_COLUMN_KEYS.has(key)) {
@@ -202,9 +243,11 @@ function renderWorkOrderCell(
 export default function WorkOrdersTab({
   departmentId,
   isEditable = false,
+  isProjectEditable = false,
 }: {
   departmentId?: number;
   isEditable?: boolean;
+  isProjectEditable?: boolean;
 } = {}) {
   const { projectId } = useProject();
 
@@ -378,6 +421,38 @@ export default function WorkOrdersTab({
       countOfDaysFromAssignedDate: tFields("countOfDaysFromAssignedDate"),
 
       evaluationPermitStatus: tFields("evaluationPermitStatus"),
+
+      employeeName: tFields("employeeName"),
+
+      completionPhase: tFields("completionPhase"),
+
+      phaseStatus: tFields("phaseStatus"),
+
+      targetDrilling: tFields("targetDrilling"),
+
+      achievedDrilling: tFields("achievedDrilling"),
+
+      targetExtention: tFields("targetExtention"),
+
+      achievedExtention: tFields("achievedExtention"),
+
+      descriptionDetails: tFields("descriptionDetails"),
+
+      consultantStatement: tFields("consultantStatement"),
+
+      lastDateConsultantStatement: tFields("lastDateConsultantStatement"),
+
+      consultnatStatementStatus: tFields("consultnatStatementStatus"),
+
+      officialProjectHours: tFields("officialProjectHours"),
+
+      numberOfDaysToAchieveColumn155: tFields("numberOfDaysToAchieveColumn155"),
+
+      percentageTime: tFields("percentageTime"),
+
+      percentageAchieveDrilling: tFields("percentageAchieveDrilling"),
+
+      percentageAchieveExtention: tFields("percentageAchieveExtention"),
     }),
 
     [tFields],
@@ -385,7 +460,9 @@ export default function WorkOrdersTab({
 
   const columns = useMemo(
     () =>
-      WORK_ORDER_COLUMN_KEYS.map((key) => {
+      WORK_ORDER_COLUMN_KEYS.filter(
+        (key) => !(isEditable && NON_PERMIT_COLUMN_KEYS.has(key)),
+      ).map((key) => {
         if (key === "actions") {
           return {
             key,
@@ -436,6 +513,19 @@ export default function WorkOrdersTab({
               );
             }
 
+            if (isProjectEditable && PROJECT_EDITABLE_COLUMN_KEYS.has(key)) {
+              return (
+                <PerRowEditablePermitCell
+                  row={row}
+                  field={key as EditablePermitField}
+                  emptyDash={emptyDash}
+                  yesLabel={yesLabel}
+                  noLabel={noLabel}
+                  onSave={handlePermitSave}
+                />
+              );
+            }
+
             if (key === "permitStatus") {
               return (
                 <span>{row.permitStatusName || emptyDash}</span>
@@ -451,7 +541,7 @@ export default function WorkOrdersTab({
         };
       }),
 
-    [columnLabels, tTable, emptyDash, isEditable, handlePermitSave, yesLabel, noLabel],
+    [columnLabels, tTable, emptyDash, isEditable, isProjectEditable, handlePermitSave, yesLabel, noLabel],
   );
 
   const handleExport = () => {

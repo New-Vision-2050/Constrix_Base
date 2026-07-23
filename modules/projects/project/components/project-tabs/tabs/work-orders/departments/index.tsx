@@ -9,5 +9,5 @@ type WorkOrdersDepartmentTabProps = {
 export default function WorkOrdersDepartmentTab({
   departmentId,
 }: WorkOrdersDepartmentTabProps) {
-  return <WorkOrdersTab departmentId={departmentId} />;
+  return <WorkOrdersTab departmentId={departmentId} isProjectEditable />;
 }

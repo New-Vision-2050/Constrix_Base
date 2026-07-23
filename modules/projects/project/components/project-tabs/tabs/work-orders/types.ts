@@ -38,6 +38,24 @@ export interface WorkOrderRow {
   isTakedAction: string;
   countOfDaysFromAssignedDate: string;
   evaluationPermitStatus: string;
+  employeeName: string;
+  completionPhaseId: number | null;
+  completionPhaseName: string;
+  phaseStatusId: number | null;
+  phaseStatusName: string;
+  targetDrilling: string;
+  achievedDrilling: string;
+  targetExtention: string;
+  achievedExtention: string;
+  descriptionDetails: string;
+  consultantStatement: string;
+  lastDateConsultantStatement: string;
+  consultnatStatementStatus: string;
+  officialProjectHours: string;
+  numberOfDaysToAchieveColumn155: string;
+  percentageTime: string;
+  percentageAchieveDrilling: string;
+  percentageAchieveExtention: string;
 }
 
 export interface WorkOrderFilters {
@@ -94,6 +112,22 @@ export type WorkOrderColumnKey =
   | "isTakedAction"
   | "countOfDaysFromAssignedDate"
   | "evaluationPermitStatus"
+  | "employeeName"
+  | "completionPhase"
+  | "phaseStatus"
+  | "targetDrilling"
+  | "achievedDrilling"
+  | "targetExtention"
+  | "achievedExtention"
+  | "descriptionDetails"
+  | "consultantStatement"
+  | "lastDateConsultantStatement"
+  | "consultnatStatementStatus"
+  | "officialProjectHours"
+  | "numberOfDaysToAchieveColumn155"
+  | "percentageTime"
+  | "percentageAchieveDrilling"
+  | "percentageAchieveExtention"
   | "actions";
 
 /** Column order: right → left (RTL). */
@@ -133,5 +167,21 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "isTakedAction",
   "countOfDaysFromAssignedDate",
   "evaluationPermitStatus",
+  "employeeName",
+  "completionPhase",
+  "phaseStatus",
+  "targetDrilling",
+  "achievedDrilling",
+  "targetExtention",
+  "achievedExtention",
+  "descriptionDetails",
+  "consultantStatement",
+  "lastDateConsultantStatement",
+  "consultnatStatementStatus",
+  "officialProjectHours",
+  "numberOfDaysToAchieveColumn155",
+  "percentageTime",
+  "percentageAchieveDrilling",
+  "percentageAchieveExtention",
   "actions",
 ];
