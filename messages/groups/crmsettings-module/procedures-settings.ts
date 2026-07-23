@@ -17,6 +17,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
     technicalSubmittal: _m("Technical Submittal", "Technical Submittal"),
     ncr: _m("NCR", "NCR"),
     vo: _m("VO", "VO"),
+    projectProcedure: _m("Project procedures", "إجراءات المشروع"),
   }),
   tabTitles: new MessagesGroup({
     contract: _m("Contract procedures settings", "اعداد إجراءات العقود"),

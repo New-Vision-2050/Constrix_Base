@@ -132,12 +132,12 @@ export default function EditStageDialog({
       await ProcedureSettingsApi.updateStage(procedure.id, {
         name: name.trim(),
         execute_type: sequentialApproval ? "sequence" : "parallel",
-        icon: selectedIcon || procedure.icon,
+        icon: selectedIcon || procedure.icon || "approval-icon",
         percentage: percentageValue,
         type: procedure.type,
-        deadline_days: parseInt(deadlineDays) || 0,
-        deadline_hours: parseInt(deadlineHours) || 0,
-        escalation_management_hierarchy_id: escalationUserId,
+        deadline_days: parseInt(deadlineDays, 10) || 0,
+        deadline_hours: parseInt(deadlineHours, 10) || 0,
+        escalation_management_hierarchy_id: escalationUserId || "",
       });
       toast({
         title: tRoot("actions.edit"),

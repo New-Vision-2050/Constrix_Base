@@ -27,7 +27,7 @@ import {
   FileEdit,
   Layers,
 } from "lucide-react";
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CustomMenu from "@/components/headless/custom-menu";
@@ -59,6 +59,9 @@ import AddTaskActionDialog from "./dialogs/AddTaskActionDialog";
 import EditTaskActionDialog from "./dialogs/EditTaskActionDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
 
+/** Keep in sync with useDocumentSequenceOuterTabs query key. */
+const DOCUMENT_SEQUENCE_TABS_QUERY_KEY =
+  "document-sequence-internal-procedures" as const;
 const WORK_PLAN_TAB = "work_plan";
 
 const OUTER_TAB_ICONS: Record<string, typeof Mail> = {
@@ -118,6 +121,27 @@ export default function SubTypeTabs() {
 
   const currentTabType = activeOuterTab?.type ?? outerTabs[0]?.type ?? "";
 
+  useEffect(() => {
+    if (useDocumentSequenceLayout && selectedProcedureId) {
+      const match = outerTabs.find(
+        (tab) => tab.procedureId === selectedProcedureId,
+      );
+      if (match && match.id !== selectedOuter) {
+        setSelectedOuter(match.id);
+        return;
+      }
+    }
+
+    if (!outerTabs.some((tab) => tab.id === selectedOuter)) {
+      setSelectedOuter(outerTabs[0]?.id ?? 0);
+    }
+  }, [
+    useDocumentSequenceLayout,
+    outerTabs,
+    selectedOuter,
+    selectedProcedureId,
+  ]);
+
   const {
     data: internalProcedures = [],
     isLoading: isLoadingInternalProcedures,
@@ -151,7 +175,12 @@ export default function SubTypeTabs() {
   );
 
   const defaultProcedureId = childProcedures[0]?.id ?? null;
-  const activeProcedureId = selectedProcedureId ?? defaultProcedureId;
+  const activeProcedureId =
+    (useDocumentSequenceLayout
+      ? activeOuterTab?.procedureId
+      : null) ??
+    selectedProcedureId ??
+    defaultProcedureId;
   const stagesParentId = activeProcedureId ?? rootProcedure?.id ?? undefined;
 
   const existingActions = useMemo(
@@ -287,6 +316,11 @@ export default function SubTypeTabs() {
         await queryClient.invalidateQueries({
           queryKey: ["procedure-settings", "stages", procedure.id],
         });
+        if (useDocumentSequenceLayout) {
+          await queryClient.invalidateQueries({
+            queryKey: [DOCUMENT_SEQUENCE_TABS_QUERY_KEY],
+          });
+        }
 
         if (selectedProcedureId === procedure.id) {
           setSelectedProcedureId(null);
@@ -315,6 +349,7 @@ export default function SubTypeTabs() {
       queryClient,
       selectedProcedureId,
       internalProcedures,
+      useDocumentSequenceLayout,
       closeDeleteConfirm,
       t,
       toast,
@@ -396,6 +431,11 @@ export default function SubTypeTabs() {
         await queryClient.invalidateQueries({
           queryKey: ["procedure-settings", "stages", created.id],
         });
+        if (useDocumentSequenceLayout) {
+          await queryClient.invalidateQueries({
+            queryKey: [DOCUMENT_SEQUENCE_TABS_QUERY_KEY],
+          });
+        }
 
         toast({
           title: t("actions.add"),
@@ -425,6 +465,7 @@ export default function SubTypeTabs() {
       projectId,
       refetchInternalProcedures,
       queryClient,
+      useDocumentSequenceLayout,
       t,
       toast,
     ],
@@ -752,11 +793,7 @@ export default function SubTypeTabs() {
           {showStagesView ? (
             <StagesView
               ref={stagesViewRef}
-              parentId={
-                useDocumentSequenceLayout
-                  ? (rootProcedure?.id ?? stagesParentId)
-                  : stagesParentId
-              }
+              parentId={stagesParentId}
               workFlowId={
                 hideWorkPlanTabs || selectedInner === WORK_PLAN_TAB
                   ? workFlowId

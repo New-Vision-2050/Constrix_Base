@@ -10,17 +10,27 @@ import { useDocumentSequenceOuterTabs } from "./useDocumentSequenceOuterTabs";
 
 /**
  * Document Management → Sequence of procedures.
- * Outer tabs come from GET procedure-settings/types (dynamic).
- * Same procedure APIs as CRM إعداد إجراءات الطلبات; document-classification add dialog.
+ * Outer tabs come from:
+ * GET procedure-settings/internal-procedures?type=project_procedure&project_id=…
  */
 export default function SequenceOfProceduresTab() {
   const tc = useTranslations("CRMSettingsModule.proceduresSettings.common");
-  const { outerTabs, isLoading, isError } = useDocumentSequenceOuterTabs();
   const routeParams = useParams();
   const projectIdFromRoute =
     typeof routeParams?.id === "string" ? routeParams.id : undefined;
   const projectId =
     useOptionalProject()?.projectId ?? projectIdFromRoute;
+
+  const { outerTabs, isLoading, isError } =
+    useDocumentSequenceOuterTabs(projectId);
+
+  if (!projectId) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography color="text.secondary">{tc("loadError")}</Typography>
+      </Box>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -30,7 +40,7 @@ export default function SequenceOfProceduresTab() {
     );
   }
 
-  if (isError || outerTabs.length === 0) {
+  if (isError) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography color="text.secondary">{tc("loadError")}</Typography>

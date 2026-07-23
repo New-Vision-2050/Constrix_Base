@@ -5,6 +5,8 @@ export interface ProceduresSettingsOuterTab {
   type: string;
   /** Resolved display label from API (preferred over i18n `name`). */
   label?: string;
+  /** When set, this tab represents a concrete internal procedure. */
+  procedureId?: string;
 }
 
 export type ProceduresAddProcedureVariant = "default" | "document-classification";
