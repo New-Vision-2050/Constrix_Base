@@ -183,7 +183,7 @@ export default function EditablePermitCell({
   const currentValue = getRowValue(row, field);
 
   const startEditing = useCallback(() => {
-    setValue(currentValue);
+    setValue(currentValue ?? "");
     setEditing(true);
   }, [currentValue]);
 
@@ -288,7 +288,7 @@ export default function EditablePermitCell({
       {field === "permitStatus" && (
         <Select
           size="small"
-          value={value}
+          value={value || ""}
           onChange={(e) => {
             setValue(e.target.value);
             if (e.target.value !== currentValue) {
@@ -315,7 +315,7 @@ export default function EditablePermitCell({
         <TextField
           size="small"
           type="date"
-          value={value}
+          value={value || ""}
           onChange={(e) => setValue(e.target.value)}
           sx={commonSx}
           autoFocus
@@ -327,7 +327,7 @@ export default function EditablePermitCell({
         <TextField
           size="small"
           type="number"
-          value={value}
+          value={value || ""}
           onChange={(e) => setValue(e.target.value)}
           sx={commonSx}
           autoFocus
@@ -338,7 +338,7 @@ export default function EditablePermitCell({
         <TextField
           size="small"
           type="number"
-          value={value}
+          value={value || ""}
           onChange={(e) => setValue(e.target.value)}
           sx={commonSx}
           autoFocus
@@ -352,7 +352,7 @@ export default function EditablePermitCell({
         field === "consultantStatement") && (
         <TextField
           size="small"
-          value={value}
+          value={value || ""}
           onChange={(e) => setValue(e.target.value)}
           sx={commonSx}
           autoFocus
@@ -362,7 +362,7 @@ export default function EditablePermitCell({
       {field === "completionPhase" && (
         <Select
           size="small"
-          value={value}
+          value={value || ""}
           onChange={(e) => {
             setValue(e.target.value);
             if (e.target.value !== currentValue) {
@@ -388,7 +388,7 @@ export default function EditablePermitCell({
       {field === "phaseStatus" && (
         <Select
           size="small"
-          value={value}
+          value={value || ""}
           onChange={(e) => {
             setValue(e.target.value);
             if (e.target.value !== currentValue) {
