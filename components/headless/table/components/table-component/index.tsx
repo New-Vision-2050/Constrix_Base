@@ -25,6 +25,8 @@ import type { SxProps, Theme } from "@mui/material/styles";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { ColumnDef, TableProps } from "./types";
+import { computeColumnRuns } from "../column-grouping";
+import type { ColumnGroupDef } from "../column-grouping";
 
 // ============================================================================
 // Table Component Factory
@@ -81,6 +83,7 @@ type DataRowProps<TRow> = {
     backgroundColor: string,
   ) => Record<string, unknown> | undefined;
   getColumnSizingSx: (column: ColumnDef<TRow>) => Record<string, unknown>;
+  getColumnGroup: (columnKey: string) => ColumnGroupDef | undefined;
   rowSx?: SxProps<Theme>;
   onToggleSelect: () => void;
 };
@@ -102,6 +105,7 @@ function DataRow<TRow>({
   currentTheme,
   getStickyBodySx,
   getColumnSizingSx,
+  getColumnGroup,
   rowSx,
   onToggleSelect,
 }: DataRowProps<TRow>) {
@@ -148,9 +152,16 @@ function DataRow<TRow>({
           );
         })()}
       {columns.map((column, columnIndex) => {
+        // A grouped column always shows its group's colors (group colors
+        // come from a native <input type="color"> so they're always fully
+        // opaque — no bleed-through risk, unlike the semi-transparent
+        // "action.*" row tints, so they can just replace the resting tint
+        // directly rather than needing the opaqueTintSx wash treatment).
+        const group = getColumnGroup(column.key);
+        const tintColor = group?.backgroundColor ?? restingBackgroundColor;
         const stickySx = getStickyBodySx(
           (selectable ? 1 : 0) + columnIndex,
-          restingBackgroundColor,
+          tintColor,
         );
         return (
           <TableCell
@@ -159,7 +170,9 @@ function DataRow<TRow>({
             className={stickySx ? STICKY_CELL_CLASS : undefined}
             sx={{
               ...getColumnSizingSx(column),
-              ...stickySx,
+              ...(stickySx ??
+                (group ? { backgroundColor: group.backgroundColor } : {})),
+              ...(group && { color: group.textColor }),
             }}
           >
             {column.render(row, index, column)}
@@ -203,6 +216,12 @@ export function createTableComponent<TRow>() {
     const pinnedColumnCount = isUsingState
       ? props.state.table.pinnedColumnCount
       : props.pinnedColumnCount || 0;
+    const columnGroups = isUsingState
+      ? props.state.columnGrouping?.groups
+      : props.columnGroups;
+    const columnGroupMap = isUsingState
+      ? props.state.columnGrouping?.columnGroupMap
+      : props.columnGroupMap;
     const loadingOptions = props.loadingOptions || { rows: 5 };
 
     // Selection config
@@ -240,6 +259,27 @@ export function createTableComponent<TRow>() {
     // this feature render exactly as before.
     const stickyCount =
       pinnedColumnCount > 0 ? (selectable ? 1 : 0) + pinnedColumnCount : 0;
+
+    // Column grouping: split the final rendered column order into "runs" of
+    // consecutive same-group columns (each becomes one spanning header
+    // cell) and standalone "root" columns (each keeps its own cell). Pass
+    // stickyCount as the forced boundary so a run can never straddle the
+    // pinned/scrollable edge — see column-grouping/columnRuns.ts.
+    const groupsById = new Map(
+      (columnGroups ?? []).map((group) => [group.id, group]),
+    );
+    const groupIdForColumn = (key: string) => columnGroupMap?.[key];
+    const getColumnGroup = (key: string) => {
+      const groupId = groupIdForColumn(key);
+      return groupId ? groupsById.get(groupId) : undefined;
+    };
+    const headerRuns = computeColumnRuns(
+      columns,
+      groupIdForColumn,
+      groupsById,
+      stickyCount,
+    );
+    const hasAnyGroups = headerRuns.some((run) => run.type === "group");
 
     const headerCellRefs = useRef<Array<HTMLTableCellElement | null>>([]);
     const [stickyOffsets, setStickyOffsets] = useState<number[]>([]);
@@ -401,6 +441,87 @@ export function createTableComponent<TRow>() {
         selectable.selectedRows.length < data.length
       : false;
 
+    // Renders one column's normal header cell (name + sort label). Shared
+    // between the grouped-header row (root columns, rowSpan=2) and the
+    // regular header row (ungrouped tables, and grouped columns), so the
+    // sort-label markup and sticky-ref wiring only exist in one place.
+    const renderColumnHeaderCell = (
+      column: ColumnDef<TRow>,
+      stickyIndex: number,
+      rowSpan?: number,
+    ) => (
+      <TableCell
+        key={column.key}
+        align={column.align || "left"}
+        rowSpan={rowSpan}
+        ref={(el: HTMLTableCellElement | null) => {
+          if (stickyIndex < stickyCount) {
+            headerCellRefs.current[stickyIndex] = el;
+          }
+        }}
+        sx={{
+          ...getColumnSizingSx(column),
+          ...getStickyHeaderSx(stickyIndex),
+        }}
+      >
+        {column.sortable ? (
+          <TableSortLabel
+            active={sortBy === column.key}
+            direction={sortBy === column.key ? sort || "asc" : "asc"}
+            onClick={() => handleColumnSort(column.key, column.sortable)}
+            sx={
+              isGreenTheme
+                ? {
+                    color: "primary.contrastText !important",
+                    "&.Mui-active": {
+                      color: "primary.contrastText !important",
+                    },
+                    "& .MuiTableSortLabel-icon": {
+                      color: "primary.contrastText !important",
+                    },
+                  }
+                : {}
+            }
+          >
+            {column.name}
+          </TableSortLabel>
+        ) : (
+          column.name
+        )}
+      </TableCell>
+    );
+
+    const renderCheckboxHeaderCell = (rowSpan?: number) => (
+      <TableCell
+        padding="checkbox"
+        rowSpan={rowSpan}
+        ref={(el: HTMLTableCellElement | null) => {
+          headerCellRefs.current[0] = el;
+        }}
+        sx={getStickyHeaderSx(0)}
+      >
+        <Checkbox
+          indeterminate={isSomeSelected}
+          checked={isAllSelected}
+          onChange={handleSelectAll}
+          disabled={loading || data.length === 0}
+          sx={
+            isGreenTheme
+              ? {
+                  color: "primary.contrastText",
+                  "&.Mui-checked": {
+                    color: "primary.contrastText",
+                  },
+                  "&.MuiCheckbox-indeterminate": {
+                    color: "primary.contrastText",
+                  },
+                }
+              : {}
+          }
+        />
+      </TableCell>
+    );
+
     // Render Loading State in Table Body
     const renderLoadingState = () => {
       const skeletonRows = loadingOptions.rows || 5;
@@ -528,6 +649,43 @@ export function createTableComponent<TRow>() {
             }}
           >
             <TableHead>
+              {hasAnyGroups && (
+                <TableRow
+                  sx={{
+                    ".MuiTableCell-root": {
+                      fontWeight: 600,
+                      backgroundColor: isGreenTheme
+                        ? "primary.main"
+                        : "background.default",
+                      color: isGreenTheme
+                        ? "primary.contrastText"
+                        : "text.primary",
+                    },
+                  }}
+                >
+                  {selectable && renderCheckboxHeaderCell(2)}
+                  {headerRuns.map((run) => {
+                    const stickyIndex = (selectable ? 1 : 0) + run.startIndex;
+                    if (run.type === "root") {
+                      return renderColumnHeaderCell(run.column, stickyIndex, 2);
+                    }
+                    return (
+                      <TableCell
+                        key={`group-${run.groupId}-${run.startIndex}`}
+                        colSpan={run.columns.length}
+                        sx={{
+                          ...getStickyHeaderSx(stickyIndex),
+                          ...opaqueTintSx(run.group.backgroundColor),
+                          color: run.group.textColor,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {run.group.name}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              )}
               <TableRow
                 sx={{
                   ".MuiTableCell-root": {
@@ -541,82 +699,24 @@ export function createTableComponent<TRow>() {
                   },
                 }}
               >
-                {selectable && (
-                  <TableCell
-                    padding="checkbox"
-                    ref={(el: HTMLTableCellElement | null) => {
-                      headerCellRefs.current[0] = el;
-                    }}
-                    sx={getStickyHeaderSx(0)}
-                  >
-                    <Checkbox
-                      indeterminate={isSomeSelected}
-                      checked={isAllSelected}
-                      onChange={handleSelectAll}
-                      disabled={loading || data.length === 0}
-                      sx={
-                        isGreenTheme
-                          ? {
-                              color: "primary.contrastText",
-                              "&.Mui-checked": {
-                                color: "primary.contrastText",
-                              },
-                              "&.MuiCheckbox-indeterminate": {
-                                color: "primary.contrastText",
-                              },
-                            }
-                          : {}
-                      }
-                    />
-                  </TableCell>
-                )}
-                {columns.map((column, columnIndex) => {
-                  const stickyIndex = (selectable ? 1 : 0) + columnIndex;
-                  return (
-                    <TableCell
-                      key={column.key}
-                      align={column.align || "left"}
-                      ref={(el: HTMLTableCellElement | null) => {
-                        if (stickyIndex < stickyCount) {
-                          headerCellRefs.current[stickyIndex] = el;
-                        }
-                      }}
-                      sx={{
-                        ...getColumnSizingSx(column),
-                        ...getStickyHeaderSx(stickyIndex),
-                      }}
-                    >
-                      {column.sortable ? (
-                        <TableSortLabel
-                          active={sortBy === column.key}
-                          direction={
-                            sortBy === column.key ? sort || "asc" : "asc"
-                          }
-                          onClick={() =>
-                            handleColumnSort(column.key, column.sortable)
-                          }
-                          sx={
-                            isGreenTheme
-                              ? {
-                                  color: "primary.contrastText !important",
-                                  "&.Mui-active": {
-                                    color: "primary.contrastText !important",
-                                  },
-                                  "& .MuiTableSortLabel-icon": {
-                                    color: "primary.contrastText !important",
-                                  },
-                                }
-                              : {}
-                          }
-                        >
-                          {column.name}
-                        </TableSortLabel>
-                      ) : (
-                        column.name
-                      )}
-                    </TableCell>
-                  );
-                })}
+                {!hasAnyGroups && selectable && renderCheckboxHeaderCell()}
+                {hasAnyGroups
+                  ? headerRuns.flatMap((run) =>
+                      run.type === "group"
+                        ? run.columns.map((column, offset) =>
+                            renderColumnHeaderCell(
+                              column,
+                              (selectable ? 1 : 0) + run.startIndex + offset,
+                            ),
+                          )
+                        : [],
+                    )
+                  : columns.map((column, columnIndex) =>
+                      renderColumnHeaderCell(
+                        column,
+                        (selectable ? 1 : 0) + columnIndex,
+                      ),
+                    )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -639,6 +739,7 @@ export function createTableComponent<TRow>() {
                         currentTheme={currentTheme}
                         getStickyBodySx={getStickyBodySx}
                         getColumnSizingSx={getColumnSizingSx}
+                        getColumnGroup={getColumnGroup}
                         rowSx={getRowSx ? getRowSx(row, index) : undefined}
                         onToggleSelect={() => handleRowSelect(row, index)}
                       />

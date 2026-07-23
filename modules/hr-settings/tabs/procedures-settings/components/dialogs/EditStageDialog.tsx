@@ -29,6 +29,7 @@ import { Stage } from "@/services/api/crm-settings/procedure-settings/types/resp
 import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { getProcedureEditTabTitle } from "../../utils/getProcedureTabTitle";
+import { useProceduresSettings } from "../../context/ProceduresSettingsContext";
 
 const PROCEDURE_DIALOG_ICON_IDS = [
   "person-outline",
@@ -64,6 +65,7 @@ export default function EditStageDialog({
 }: EditStageDialogProps) {
   const { t: tRoot, tStages: t, tc } = useProceduresSettingsTranslations();
   const { toast } = useToast();
+  const { projectId } = useProceduresSettings();
 
   const [name, setName] = useState("");
   const [sequentialApproval, setSequentialApproval] = useState(true);
@@ -132,12 +134,13 @@ export default function EditStageDialog({
       await ProcedureSettingsApi.updateStage(procedure.id, {
         name: name.trim(),
         execute_type: sequentialApproval ? "sequence" : "parallel",
-        icon: selectedIcon || procedure.icon,
+        icon: selectedIcon || procedure.icon || "approval-icon",
         percentage: percentageValue,
         type: procedure.type,
-        deadline_days: parseInt(deadlineDays) || 0,
-        deadline_hours: parseInt(deadlineHours) || 0,
-        escalation_management_hierarchy_id: escalationUserId,
+        deadline_days: parseInt(deadlineDays, 10) || 0,
+        deadline_hours: parseInt(deadlineHours, 10) || 0,
+        escalation_management_hierarchy_id: escalationUserId || "",
+        ...(projectId ? { project_id: projectId } : {}),
       });
       toast({
         title: tRoot("actions.edit"),

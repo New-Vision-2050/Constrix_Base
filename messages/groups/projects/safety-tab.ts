@@ -1,0 +1,92 @@
+import { MessagesGroup, _m } from "../../types";
+
+export const projectSafetyTabMessages = new MessagesGroup({
+  title: _m("Safety", "السلامة"),
+  comingSoon: _m("Coming soon", "قريباً"),
+  tabs: new MessagesGroup({
+    safetyReports: _m("Safety Reports", "تقارير السلامة"),
+    visits: _m("Visits", "الزيارات"),
+    reports: _m("Reports", "التقارير"),
+    indicators: _m("Indicators", "المؤشرات"),
+  }),
+  visits: new MessagesGroup({
+    filtersTitle: _m("Search filter", "فلتر البحث"),
+    all: _m("All", "الكل"),
+    addWorkOrder: _m("Add work order", "إضافة أمر عمل"),
+    uploadExcel: _m("Upload Excel file", "رفع ملف Excel"),
+    clearFilters: _m("Clear filter", "مسح التصفية"),
+    loadError: _m("Could not load safety visits", "تعذر تحميل زيارات السلامة"),
+    export: _m("Export", "تصدير"),
+    exportComingSoon: _m("Export will be available soon", "سيتوفر التصدير قريباً"),
+    addWorkOrderComingSoon: _m(
+      "Add work order will be available soon",
+      "سيتوفر إضافة أمر العمل قريباً",
+    ),
+    importComingSoon: _m(
+      "Excel import will be available soon",
+      "سيتوفر استيراد Excel قريباً",
+    ),
+    invalidImportFile: _m(
+      "Please select a valid Excel file (.xls or .xlsx)",
+      "يرجى اختيار ملف Excel صالح (.xls أو .xlsx)",
+    ),
+    filters: new MessagesGroup({
+      orderNumber: _m("Order number", "رقم الامر"),
+      contractor: _m("Contractor", "المقاول"),
+      consultant: _m("Consultant", "الاستشاري"),
+      engineer: _m("Engineer", "المهندس"),
+      date: _m("Date", "التاريخ"),
+    }),
+    workOrderTypes: new MessagesGroup({
+      construction: _m("Construction", "انشاء"),
+      emergency: _m("Emergency", "طوارئ"),
+    }),
+    table: new MessagesGroup({
+      workOrderNumber: _m(
+        "Notification number",
+        "رقم الاشعار",
+      ),
+      workOrderType: _m("Work order type", "نوع أمر العمل"),
+      date: _m("Date", "التاريخ"),
+      time: _m("Time", "الوقت"),
+      requiredGrade: _m("Required grade", "الدرجة المطلوبة"),
+      earnedGrade: _m("Earned grade", "الدرجة المستحقة"),
+      percentage: _m("Percentage", "النسبة المئوية"),
+      consultantEngineer: _m("Consultant engineer", "مهندس الاستشاري"),
+      consultant: _m("Consultant", "الاستشاري"),
+      contractor: _m("Contractor", "المقاول"),
+    }),
+  }),
+  reports: new MessagesGroup({
+    filtersTitle: _m("Search filter", "فلتر البحث"),
+    all: _m("All", "الكل"),
+    clearFilters: _m("Clear filter", "مسح التصفية"),
+    export: _m("Export", "تصدير"),
+    exportComingSoon: _m("Export will be available soon", "سيتوفر التصدير قريباً"),
+    viewComingSoon: _m("View will be available soon", "سيتوفر العرض قريباً"),
+    loadError: _m("Could not load safety reports", "تعذر تحميل تقارير السلامة"),
+    filters: new MessagesGroup({
+      orderNumber: _m("Order number", "رقم الأمر"),
+      contractor: _m("Contractor", "المقاول"),
+      consultant: _m("Consultant", "الاستشاري"),
+      engineer: _m("Engineer", "المهندس"),
+    }),
+    statuses: new MessagesGroup({
+      inProgress: _m("In progress", "قيد المعالجة"),
+      completed: _m("Completed", "مكتملة"),
+      late: _m("Late", "متأخر"),
+    }),
+    table: new MessagesGroup({
+      orderNumber: _m("Order number", "رقم الأمر"),
+      orderStatus: _m("Order status", "حالة الأمر"),
+      safetyVisitsCount: _m("Safety visits count", "عدد زيارات السلامة"),
+      observationsCount: _m("Observations count", "عدد الملاحظات"),
+      siteVisitFormsCount: _m("Site visit forms", "نماذج زيارة الموقع"),
+      contractorName: _m("Contractor name", "اسم المقاول"),
+      consultantName: _m("Consultant name", "اسم الاستشاري"),
+      actions: _m("Actions", "الإجراءات"),
+      action: _m("Action", "إجراء"),
+      view: _m("View", "عرض"),
+    }),
+  }),
+});

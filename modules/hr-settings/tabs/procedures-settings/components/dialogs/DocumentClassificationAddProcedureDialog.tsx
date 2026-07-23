@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -20,6 +21,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
+import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
 import type { TaskActionFormValues } from "../../types";
 
@@ -33,10 +36,9 @@ interface DocumentClassificationAddProcedureDialogProps {
 type ClassificationForm = {
   name: string;
   isActive: boolean;
-  classificationName: string;
-  linkedFolderName: string;
-  classificationCode: string;
-  documentNature: string;
+  mainClassificationId: string;
+  subClassificationId: string;
+  subSubClassificationId: string;
   jobAttribute: string;
   usedInDocumentCycle: boolean;
   showInAttachmentsLibrary: boolean;
@@ -47,18 +49,15 @@ type ClassificationForm = {
 const defaultForm: ClassificationForm = {
   name: "",
   isActive: true,
-  classificationName: "",
-  linkedFolderName: "",
-  classificationCode: "",
-  documentNature: "",
+  mainClassificationId: "",
+  subClassificationId: "",
+  subSubClassificationId: "",
   jobAttribute: "",
   usedInDocumentCycle: false,
   showInAttachmentsLibrary: false,
   showInArchiveAfterApproval: false,
   requiresAssetId: false,
 };
-
-const SELECT_OPTIONS = ["Option A", "Option B", "Option C"] as const;
 
 export default function DocumentClassificationAddProcedureDialog({
   open,
@@ -71,19 +70,76 @@ export default function DocumentClassificationAddProcedureDialog({
     "CRMSettingsModule.proceduresSettings.documentAddProcedureDialog",
   );
   const locale = useLocale();
+  const projectId = useOptionalProject()?.projectId;
 
   const [form, setForm] = useState<ClassificationForm>(defaultForm);
   const [nameError, setNameError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  // Same forms API used by CRM AddTaskActionDialog
   const { data: forms = [] } = useQuery({
     queryKey: ["internal_procedure_setting_forms", procedureType, locale],
-    queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedureSettingForms(
-        procedureType,
-        locale,
-      ),
+    queryFn: async () => {
+      try {
+        return await InternalProcedureSettingsApi.getInternalProcedureSettingForms(
+          procedureType,
+          locale,
+        );
+      } catch {
+        return [];
+      }
+    },
     enabled: open && !!procedureType,
+    retry: false,
+  });
+
+  const { data: jobAttributes = [], isLoading: loadingJobAttributes } =
+    useQuery({
+      queryKey: ["procedure-settings-job-attributes"],
+      queryFn: () => InternalProcedureSettingsApi.getJobAttributes(),
+      enabled: open,
+      staleTime: 5 * 60 * 1000,
+    });
+
+  const activeJobAttributes = useMemo(
+    () => jobAttributes.filter((item) => item.is_active !== false),
+    [jobAttributes],
+  );
+
+  /* ── Cascading folder classifications (same as AddFileDialog) ───────── */
+  // Level 1: parent_id = projectId
+  // Level 2: parent_id = mainClassificationId
+  // Level 3: parent_id = subClassificationId
+
+  const { data: rootTypes = [], isLoading: loadingRoots } = useQuery({
+    queryKey: ["attachment-folders", "root", projectId],
+    queryFn: async () => {
+      const res = await AttachmentRequestsApi.getFolderChildren(projectId!);
+      return res.data.payload ?? [];
+    },
+    enabled: open && !!projectId,
+  });
+
+  const { data: subTypes = [], isLoading: loadingSubs } = useQuery({
+    queryKey: ["attachment-folders", "sub", form.mainClassificationId],
+    queryFn: async () => {
+      const res = await AttachmentRequestsApi.getFolderChildren(
+        form.mainClassificationId,
+      );
+      return res.data.payload ?? [];
+    },
+    enabled: open && !!form.mainClassificationId,
+  });
+
+  const { data: subSubTypes = [], isLoading: loadingSubSubs } = useQuery({
+    queryKey: ["attachment-folders", "sub-sub", form.subClassificationId],
+    queryFn: async () => {
+      const res = await AttachmentRequestsApi.getFolderChildren(
+        form.subClassificationId,
+      );
+      return res.data.payload ?? [];
+    },
+    enabled: open && !!form.subClassificationId,
   });
 
   useEffect(() => {
@@ -91,33 +147,6 @@ export default function DocumentClassificationAddProcedureDialog({
     setForm(defaultForm);
     setNameError("");
   }, [open]);
-
-  const selectFields = useMemo(
-    () =>
-      [
-        {
-          key: "classificationName" as const,
-          label: t("classificationName"),
-        },
-        {
-          key: "linkedFolderName" as const,
-          label: t("linkedFolderName"),
-        },
-        {
-          key: "classificationCode" as const,
-          label: t("classificationCode"),
-        },
-        {
-          key: "documentNature" as const,
-          label: t("documentNature"),
-        },
-        {
-          key: "jobAttribute" as const,
-          label: t("jobAttribute"),
-        },
-      ] as const,
-    [t],
-  );
 
   const checkboxFields = useMemo(
     () =>
@@ -242,32 +271,138 @@ export default function DocumentClassificationAddProcedureDialog({
               gridTemplateColumns: {
                 xs: "1fr",
                 sm: "repeat(2, 1fr)",
-                md: "repeat(4, 1fr)",
+                md: "repeat(3, 1fr)",
               },
               gap: 1.5,
               mb: 2,
             }}
           >
-            {selectFields.map((field) => (
-              <TextField
-                key={field.key}
-                select
-                size="small"
-                label={field.label}
-                value={form[field.key]}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, [field.key]: e.target.value }))
-                }
-                disabled={isSaving}
-              >
-                <MenuItem value="">{t("select")}</MenuItem>
-                {SELECT_OPTIONS.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            ))}
+            {/* Level 1 — main classification */}
+            <TextField
+              select
+              size="small"
+              label={t("mainClassification")}
+              value={form.mainClassificationId}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  mainClassificationId: e.target.value,
+                  subClassificationId: "",
+                  subSubClassificationId: "",
+                }))
+              }
+              disabled={isSaving || loadingRoots || !projectId}
+              InputProps={{
+                startAdornment: loadingRoots ? (
+                  <CircularProgress size={14} sx={{ mr: 1 }} />
+                ) : undefined,
+              }}
+            >
+              <MenuItem value="">{t("select")}</MenuItem>
+              {rootTypes.map((type) => (
+                <MenuItem key={type.id} value={String(type.id)}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            {/* Level 2 — sub classification */}
+            <TextField
+              select
+              size="small"
+              label={t("subClassification")}
+              value={form.subClassificationId}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  subClassificationId: e.target.value,
+                  subSubClassificationId: "",
+                }))
+              }
+              disabled={
+                isSaving || !form.mainClassificationId || loadingSubs
+              }
+              InputProps={{
+                startAdornment: loadingSubs ? (
+                  <CircularProgress size={14} sx={{ mr: 1 }} />
+                ) : undefined,
+              }}
+            >
+              <MenuItem value="">{t("select")}</MenuItem>
+              {subTypes.map((type) => (
+                <MenuItem key={type.id} value={String(type.id)}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            {/* Level 3 — sub-sub classification */}
+            <TextField
+              select
+              size="small"
+              label={t("subSubClassification")}
+              value={form.subSubClassificationId}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  subSubClassificationId: e.target.value,
+                }))
+              }
+              disabled={
+                isSaving || !form.subClassificationId || loadingSubSubs
+              }
+              InputProps={{
+                startAdornment: loadingSubSubs ? (
+                  <CircularProgress size={14} sx={{ mr: 1 }} />
+                ) : undefined,
+              }}
+            >
+              <MenuItem value="">{t("select")}</MenuItem>
+              {subSubTypes.map((type) => (
+                <MenuItem key={type.id} value={String(type.id)}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
+              gap: 1.5,
+              mb: 2,
+            }}
+          >
+            <TextField
+              select
+              size="small"
+              label={t("jobAttribute")}
+              value={form.jobAttribute}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  jobAttribute: e.target.value,
+                }))
+              }
+              disabled={isSaving || loadingJobAttributes}
+              InputProps={{
+                startAdornment: loadingJobAttributes ? (
+                  <CircularProgress size={14} sx={{ mr: 1 }} />
+                ) : undefined,
+              }}
+            >
+              <MenuItem value="">{t("select")}</MenuItem>
+              {activeJobAttributes.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Box>
 
           <Box

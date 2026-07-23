@@ -6,10 +6,12 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
+  Chip,
   Divider,
   FormControlLabel,
   Grid,
   IconButton,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -17,6 +19,7 @@ import { Add, Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
+import { useProceduresSettings } from "../context/ProceduresSettingsContext";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useAllEmployees } from "@/modules/hr-settings/tabs/procedures-settings/hooks/useAllEmployees";
@@ -33,6 +36,8 @@ import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/t
 import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
+import { AllProjectsApi } from "@/services/api/projects/all-projects";
 
 // ─── Option value constants (labels from i18n inside component) ───────────────
 const ORG_BASE_OPTION_DEFS = [
@@ -70,6 +75,10 @@ const ACTION_TAKER_TYPE_OPTION_DEFS = [
   },
   { value: "assigned_user", labelKey: "actionTakerType.assignedUser" as const },
   { value: "himself", labelKey: "actionTakerType.himself" as const },
+  {
+    value: "receiver_company",
+    labelKey: "actionTakerType.receiverCompany" as const,
+  },
 ] as const;
 
 const MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS = [
@@ -132,6 +141,8 @@ interface StepFormData {
   actionTakerType: string;
   actionTakerManagementHierarchyRows: ManagementHierarchyRow[];
   actionTakerSpecificProcedureRows: SpecificProcedureRow[];
+  receiverCompanyIds: string[];
+  projectEmployeeIds: string[];
   branchId: string;
   managementId: string;
   actionTakerId: string;
@@ -142,6 +153,13 @@ interface StepFormData {
   deadlineDays: string;
   deadlineHours: string;
   escalationUserId: string;
+}
+
+function projectEmployeeIdsFromStep(step: ProcedureStep): string[] {
+  if (step.project_employee_ids?.length) {
+    return step.project_employee_ids.map(String);
+  }
+  return [];
 }
 
 function toStringArray(val: string | string[] | null | undefined): string[] {
@@ -309,6 +327,10 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       actionTakerManagementHierarchyRows:
         normalizeManagementHierarchyRows(serverStep),
       actionTakerSpecificProcedureRows: normalizeSpecificProcedureRows(serverStep),
+      receiverCompanyIds: serverStep.receiver_company_ids?.[0]
+        ? [String(serverStep.receiver_company_ids[0])]
+        : [],
+      projectEmployeeIds: projectEmployeeIdsFromStep(serverStep),
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
@@ -329,6 +351,8 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     actionTakerType: "specific_user",
     actionTakerManagementHierarchyRows: [{ type: "", isDeputyDirector: false }],
     actionTakerSpecificProcedureRows: [{ type: "", id: "" }],
+    receiverCompanyIds: [],
+    projectEmployeeIds: [],
     branchId: "",
     managementId: "",
     actionTakerId: "",
@@ -350,6 +374,7 @@ export default function StepCard({
   onDelete,
 }: StepCardProps) {
   const { t, tStepCard: ts, tc } = useProceduresSettingsTranslations();
+  const { projectId } = useProceduresSettings();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(!serverStep);
@@ -358,7 +383,7 @@ export default function StepCard({
     () => String(serverStep?.skipping_period ?? 0),
   );
 
-  const { control, handleSubmit, reset, watch } =
+  const { control, handleSubmit, reset, watch, setValue } =
     useForm<StepFormData>({
       defaultValues: getDefaultValues(serverStep),
     });
@@ -371,6 +396,8 @@ export default function StepCard({
   const branchId = watch("branchId");
   const actionTakerIdW = watch("actionTakerId");
   const concernedUserIdW = watch("concernedUserId");
+  const receiverCompanyIdsW = watch("receiverCompanyIds");
+  const selectedReceiverCompanyId = receiverCompanyIdsW?.[0] ?? "";
   const fieldsDisabled = !!serverStep && !isEditing;
 
   const syncFromServer = useCallback(() => {
@@ -466,12 +493,83 @@ export default function StepCard({
 
   const actionTakerTypeOptions = useMemo(
     () =>
-      ACTION_TAKER_TYPE_OPTION_DEFS.map((o) => ({
+      ACTION_TAKER_TYPE_OPTION_DEFS.filter(
+        (option) => option.value !== "receiver_company" || !!projectId,
+      ).map((o) => ({
         value: o.value,
         label: ts(`options.${o.labelKey}`),
       })),
-    [ts],
+    [projectId, ts],
   );
+
+  const { data: sharedCompanies = [], isLoading: isLoadingCompanies } =
+    useQuery({
+      queryKey: ["project-shares", projectId, "step-card"],
+      queryFn: async () => {
+        const res = await ProjectSharingApi.listForProject(projectId!);
+        const shares = res.data.payload ?? [];
+        const companies = shares
+          .map((share) => share.shared_with_company)
+          .filter(
+            (company): company is NonNullable<typeof company> =>
+              !!company?.id && !!company.name,
+          );
+        const seen = new Set<string>();
+        return companies.filter((company) => {
+          const id = String(company.id);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
+      },
+      enabled: !!projectId,
+    });
+
+  const { data: projectEmployees = [], isLoading: isLoadingEmployees } =
+    useQuery({
+      queryKey: [
+        "project-employees",
+        projectId,
+        selectedReceiverCompanyId,
+        "step-card-concerned",
+      ],
+      queryFn: async () => {
+        const res = await AllProjectsApi.getProjectEmployees(projectId!, {
+          ...(selectedReceiverCompanyId
+            ? { company_id: selectedReceiverCompanyId }
+            : {}),
+        });
+        return res.data.payload ?? [];
+      },
+      enabled:
+        !!projectId &&
+        actionTakerType === "receiver_company" &&
+        !!selectedReceiverCompanyId,
+    });
+
+  const companyOptions = useMemo(
+    () =>
+      sharedCompanies.map((company) => ({
+        value: String(company.id),
+        label: company.name,
+      })),
+    [sharedCompanies],
+  );
+
+  const projectEmployeeOptions = useMemo(() => {
+    const byId = new Map<string, { value: string; label: string }>();
+    for (const row of projectEmployees) {
+      // Keep only employees belonging to this project assignment list
+      if (projectId && row.project_id && String(row.project_id) !== projectId) {
+        continue;
+      }
+      const id = String(row.id ?? "");
+      const name = row.user?.name?.trim();
+      if (!id || !name || byId.has(id)) continue;
+      byId.set(id, { value: id, label: name });
+    }
+    return Array.from(byId.values());
+  }, [projectEmployees, projectId]);
 
   const branchSelectOptions = useMemo(
     () =>
@@ -644,6 +742,17 @@ export default function StepCard({
       }
     }
     if (
+      data.actionTakerType === "receiver_company" &&
+      data.receiverCompanyIds.length === 0
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.selectReceiverCompany"),
+        variant: "destructive",
+      });
+      return;
+    }
+    if (
       data.orgBase.includes("approve_timed") &&
       (!skippingPeriod.trim() || Number(skippingPeriod) <= 0)
     ) {
@@ -683,13 +792,23 @@ export default function StepCard({
             action_taker_specific_procedure_id: validSpecificRows.map((r) => r.id),
           }
         : {}),
+      ...(data.actionTakerType === "receiver_company"
+        ? {
+            receiver_company_ids: data.receiverCompanyIds.slice(0, 1),
+            project_employee_ids: data.projectEmployeeIds,
+            ...(projectId ? { project_id: projectId } : {}),
+          }
+        : {}),
       action_taker_user_ids:
         data.actionTakerType === "specific_user" && data.actionTakerId
           ? [data.actionTakerId]
           : [],
-      concerned_management_hierarchy_ids: data.concernedUserId
-        ? [data.concernedUserId]
-        : [],
+      concerned_management_hierarchy_ids:
+        data.actionTakerType === "receiver_company"
+          ? []
+          : data.concernedUserId
+            ? [data.concernedUserId]
+            : [],
       is_approve: data.orgBase.includes("approve"),
       is_accept: data.orgBase.includes("accept"),
       is_view_only: data.orgBase.includes("view_only"),
@@ -1158,6 +1277,73 @@ export default function StepCard({
             )}
           />
         </Box>
+
+        {actionTakerType === "receiver_company" && (
+          <Box sx={{ mb: 2.5, display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box>
+              <SectionLabel>{ts("receiverCompany")}</SectionLabel>
+              <Controller
+                name="receiverCompanyIds"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={{ width: "100%" }}>
+                    <SearchableSelect
+                      options={companyOptions}
+                      value={field.value?.[0] ?? ""}
+                      onChange={(v) => {
+                        const id = String(v ?? "").trim();
+                        field.onChange(id ? [id] : []);
+                        setValue("projectEmployeeIds", []);
+                      }}
+                      placeholder={
+                        isLoadingCompanies
+                          ? tc("loading")
+                          : ts("selectReceiverCompany")
+                      }
+                      searchPlaceholder={tc("search")}
+                      noResultsText={tc("noResults")}
+                      disabled={fieldsDisabled || isLoadingCompanies}
+                    />
+                  </Box>
+                )}
+              />
+            </Box>
+
+            <Box>
+              <SectionLabel>{ts("concernedUsers")}</SectionLabel>
+              <Controller
+                name="projectEmployeeIds"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={{ width: "100%" }}>
+                    <SearchableSelect
+                      multiple
+                      options={projectEmployeeOptions}
+                      value={field.value ?? []}
+                      onChange={(value) =>
+                        field.onChange(value.map(String))
+                      }
+                      placeholder={
+                        !selectedReceiverCompanyId
+                          ? ts("selectReceiverCompany")
+                          : isLoadingEmployees
+                            ? tc("loading")
+                            : ts("selectConcernedUsers")
+                      }
+                      searchPlaceholder={tc("search")}
+                      noResultsText={tc("noResults")}
+                      disabled={
+                        fieldsDisabled ||
+                        isLoadingEmployees ||
+                        !selectedReceiverCompanyId
+                      }
+                    />
+                  </Box>
+                )}
+              />
+            </Box>
+          </Box>
+        )}
 
         {/* ── نوع الهيكل التنظيمي (conditional) ── */}
         {actionTakerType === "management_hierarchy" && (
