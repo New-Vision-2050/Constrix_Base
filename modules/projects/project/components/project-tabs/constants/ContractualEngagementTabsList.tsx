@@ -12,6 +12,7 @@ import {
   Wrench,
   HardHat,
   Building2,
+  ShieldPlus,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import AttachmentsTab from "../tabs/attachments";
@@ -22,6 +23,7 @@ import DocumentCycleTab from "../tabs/document-cycle";
 import DocumentRequirementsTab from "../tabs/document-requirements";
 import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
+import SafetyTab from "../tabs/safety";
 import { useConstructionsNestedTabs } from "./useConstructionsNestedTabs";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
@@ -109,10 +111,18 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       content: <MaintenanceEmergencyTab />,
     };
 
+    const safetyTab: SystemTab = {
+      id: "engagement-tab-safety",
+      title: tProject("tabs.safety"),
+      icon: <ShieldPlus className="w-4 h-4" />,
+      content: <SafetyTab />,
+    };
+
     return [
       attachmentsTab,
       stakeholdersTab,
       constructionsTab,
+      safetyTab,
       documentManagementTab,
       maintenanceTab,
     ];
