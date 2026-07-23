@@ -25,10 +25,14 @@ import {
   Typography,
 } from "@mui/material";
 import { Add as AddIcon, DeleteOutline } from "@mui/icons-material";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import SearchableSelect from "@/components/shared/SearchableSelect";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useCreateProjectRequirements } from "@/modules/projects/project/query/useProjectRequirements";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 import { buildCreateRequirementsPayload } from "../buildCreatePayload";
 import type { RequirementEntry, RequirementFrequencyType } from "../types";
 
@@ -37,13 +41,7 @@ type Props = {
   onClose: () => void;
 };
 
-const DOCUMENT_TYPES = [
-  { value: "Technical Submittal", specialization: "كهرباء" },
-  { value: "Material Submittal", specialization: "كهرباء" },
-  { value: "As-Built", specialization: "ميكانيكا" },
-  { value: "Method Statement", specialization: "مدني" },
-  { value: "Inspection", specialization: "مدني" },
-] as const;
+const DOCUMENT_TYPE_PROCEDURE = "project_procedure";
 
 const WEEK_DAYS = [
   "saturday",
@@ -62,7 +60,9 @@ function createEntry(): RequirementEntry {
     requiredDocumentName: "",
     document: "",
     documentType: "",
+    documentTypeId: "",
     specialization: "",
+    receiverCompanyIds: [],
     frequencyType: "",
     selectedDays: [],
     interval: "",
@@ -74,7 +74,7 @@ function isEntryValid(entry: RequirementEntry): boolean {
     !entry.requirementCode.trim() ||
     !entry.requiredDocumentName.trim() ||
     !entry.document.trim() ||
-    !entry.documentType ||
+    !entry.documentTypeId ||
     !entry.frequencyType
   ) {
     return false;
@@ -94,6 +94,47 @@ export default function AddDocumentRequirementDialog({
 
   const [entries, setEntries] = useState<RequirementEntry[]>([createEntry()]);
   const [submitted, setSubmitted] = useState(false);
+
+  const { data: documentTypes = [], isLoading: loadingDocumentTypes } =
+    useQuery({
+      queryKey: ["internal-procedures", DOCUMENT_TYPE_PROCEDURE, projectId],
+      queryFn: async () => {
+        if (!projectId) return [];
+        return InternalProcedureSettingsApi.getInternalProcedures(
+          DOCUMENT_TYPE_PROCEDURE,
+          { projectId },
+        );
+      },
+      enabled: !!projectId && open,
+    });
+
+  const { data: sharedCompanies = [], isLoading: loadingCompanies } = useQuery({
+    queryKey: ["shared-companies", projectId, "document-requirements"],
+    queryFn: async () => {
+      if (!projectId) return [];
+      const res = await ProjectSharingApi.getSharedCompanies(projectId);
+      return res.data.payload ?? [];
+    },
+    enabled: !!projectId && open,
+  });
+
+  const documentTypeOptions = useMemo(
+    () =>
+      documentTypes.map((procedure) => ({
+        value: procedure.id,
+        label: procedure.name || procedure.id,
+      })),
+    [documentTypes],
+  );
+
+  const companyOptions = useMemo(
+    () =>
+      sharedCompanies.map((company) => ({
+        value: String(company.id),
+        label: company.name,
+      })),
+    [sharedCompanies],
+  );
 
   const updateEntry = (
     id: string,
@@ -140,7 +181,7 @@ export default function AddDocumentRequirementDialog({
         entry.requirementCode.trim() ||
         entry.requiredDocumentName.trim() ||
         entry.document.trim() ||
-        entry.documentType ||
+        entry.documentTypeId ||
         entry.frequencyType,
     );
 
@@ -154,7 +195,7 @@ export default function AddDocumentRequirementDialog({
         entry.requirementCode.trim() ||
         entry.requiredDocumentName.trim() ||
         entry.document.trim() ||
-        entry.documentType ||
+        entry.documentTypeId ||
         entry.frequencyType;
       if (!hasAny) continue;
 
@@ -170,7 +211,7 @@ export default function AddDocumentRequirementDialog({
         toast.error(tValidation("documentRequired"));
         return;
       }
-      if (!entry.documentType) {
+      if (!entry.documentTypeId) {
         toast.error(tValidation("documentTypeRequired"));
         return;
       }
@@ -223,9 +264,10 @@ export default function AddDocumentRequirementDialog({
   ) => {
     if (!submitted) return false;
     if (field === "requirementCode") return !entry.requirementCode.trim();
-    if (field === "requiredDocumentName") return !entry.requiredDocumentName.trim();
+    if (field === "requiredDocumentName")
+      return !entry.requiredDocumentName.trim();
     if (field === "document") return !entry.document.trim();
-    if (field === "documentType") return !entry.documentType;
+    if (field === "documentType") return !entry.documentTypeId;
     return !entry.frequencyType;
   };
 
@@ -252,7 +294,7 @@ export default function AddDocumentRequirementDialog({
           </Typography>
           <Paper variant="outlined" sx={{ overflow: "hidden" }}>
             <Box sx={{ overflowX: "auto" }}>
-              <Table size="small" sx={{ minWidth: 1200 }}>
+              <Table size="small" sx={{ minWidth: 1500 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ minWidth: 140, whiteSpace: "nowrap" }}>
@@ -264,11 +306,14 @@ export default function AddDocumentRequirementDialog({
                     <TableCell sx={{ minWidth: 160, whiteSpace: "nowrap" }}>
                       {t("document")} *
                     </TableCell>
-                    <TableCell sx={{ minWidth: 160, whiteSpace: "nowrap" }}>
+                    <TableCell sx={{ minWidth: 200, whiteSpace: "nowrap" }}>
                       {t("documentType")} *
                     </TableCell>
-                    <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
+                    <TableCell sx={{ minWidth: 140, whiteSpace: "nowrap" }}>
                       {t("specialization")}
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 220, whiteSpace: "nowrap" }}>
+                      {t("receiverCompanies")}
                     </TableCell>
                     <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
                       {t("frequency")} *
@@ -324,23 +369,29 @@ export default function AddDocumentRequirementDialog({
                       <TableCell>
                         <TextField
                           select
-                          value={entry.documentType}
+                          value={entry.documentTypeId}
                           onChange={(e) => {
-                            const selectedType = DOCUMENT_TYPES.find(
-                              (type) => type.value === e.target.value,
+                            const selected = documentTypeOptions.find(
+                              (option) => option.value === e.target.value,
                             );
                             updateEntry(entry.id, {
-                              documentType: e.target.value,
-                              specialization: selectedType?.specialization ?? "",
+                              documentTypeId: e.target.value,
+                              documentType: selected?.label ?? "",
                             });
                           }}
                           size="small"
                           fullWidth
+                          disabled={loadingDocumentTypes}
                           error={getFieldError(entry, "documentType")}
                         >
-                          {DOCUMENT_TYPES.map((type) => (
-                            <MenuItem key={type.value} value={type.value}>
-                              {type.value}
+                          <MenuItem value="" disabled>
+                            {loadingDocumentTypes
+                              ? t("loading")
+                              : t("selectDocumentType")}
+                          </MenuItem>
+                          {documentTypeOptions.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
                             </MenuItem>
                           ))}
                         </TextField>
@@ -348,10 +399,38 @@ export default function AddDocumentRequirementDialog({
                       <TableCell>
                         <TextField
                           value={entry.specialization}
+                          onChange={(e) =>
+                            updateEntry(entry.id, {
+                              specialization: e.target.value,
+                            })
+                          }
                           size="small"
                           fullWidth
-                          slotProps={{ input: { readOnly: true } }}
                         />
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ minWidth: 200 }}>
+                          <SearchableSelect
+                            multiple
+                            options={companyOptions}
+                            value={entry.receiverCompanyIds}
+                            onChange={(value) =>
+                              updateEntry(entry.id, {
+                                receiverCompanyIds: value.map(String),
+                              })
+                            }
+                            placeholder={
+                              loadingCompanies
+                                ? t("loading")
+                                : t("selectReceiverCompanies")
+                            }
+                            searchPlaceholder={t("search")}
+                            noResultsText={t("noResults")}
+                            disabled={
+                              loadingCompanies || createMutation.isPending
+                            }
+                          />
+                        </Box>
                       </TableCell>
                       <TableCell>
                         <TextField

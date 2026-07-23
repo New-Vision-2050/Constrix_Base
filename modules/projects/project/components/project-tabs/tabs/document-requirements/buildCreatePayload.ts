@@ -26,11 +26,12 @@ function buildRequirementArgs(
     required_document_name: entry.requiredDocumentName.trim(),
     document: entry.document.trim(),
     document_type: entry.documentType,
-    specialization: entry.specialization || null,
+    document_type_id: entry.documentTypeId || null,
+    specialization: entry.specialization.trim() || null,
     stage: DEFAULT_STAGE,
     sending_entity: DEFAULT_SENDING_ENTITY,
     review_entity: DEFAULT_REVIEW_ENTITY,
-    receiver_company_ids: [],
+    receiver_company_ids: entry.receiverCompanyIds,
     repetition: mapRepetition(entry),
   };
 

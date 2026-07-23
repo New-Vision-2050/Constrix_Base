@@ -74,8 +74,13 @@ export interface RequirementEntry {
   requirementCode: string;
   requiredDocumentName: string;
   document: string;
+  /** Display name of the selected document type / procedure */
   documentType: string;
+  /** Procedure setting id from project_procedure API */
+  documentTypeId: string;
   specialization: string;
+  /** Shared company ids assigned as receivers */
+  receiverCompanyIds: string[];
   frequencyType: RequirementFrequencyType | "";
   selectedDays: string[];
   interval: string;
