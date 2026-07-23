@@ -25,8 +25,8 @@ function buildRequirementArgs(
     requirement_code: entry.requirementCode.trim(),
     required_document_name: entry.requiredDocumentName.trim(),
     document: entry.document.trim(),
+    procedure_setting_id: entry.procedureSettingId,
     document_type: entry.documentType,
-    document_type_id: entry.documentTypeId || null,
     specialization: entry.specialization.trim() || null,
     stage: DEFAULT_STAGE,
     sending_entity: DEFAULT_SENDING_ENTITY,
@@ -42,12 +42,10 @@ function buildRequirementArgs(
   }
 
   if (entry.frequencyType === "week") {
-    base.repetition = "weekly";
     base.repetition_interval_type = "week";
   }
 
   if (entry.frequencyType === "month") {
-    base.repetition = "monthly";
     base.repetition_interval_type = "month";
   }
 
@@ -56,6 +54,8 @@ function buildRequirementArgs(
 
 function mapRepetition(entry: RequirementEntry): ProjectRequirementRepetition {
   switch (entry.frequencyType) {
+    case "once":
+      return "once";
     case "day":
       return "daily";
     case "week":

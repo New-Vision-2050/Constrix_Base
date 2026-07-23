@@ -19,8 +19,8 @@ export interface CreateProjectRequirementArgs {
   requirement_code: string;
   required_document_name: string;
   document: string;
+  procedure_setting_id: string;
   document_type: string;
-  document_type_id?: string | null;
   specialization?: string | null;
   specialization_id?: string | null;
   stage: string;

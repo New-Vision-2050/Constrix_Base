@@ -48,6 +48,7 @@ export interface ProjectRequirementDto {
   requirement_code?: string | null;
   required_document_name?: string | null;
   document?: string | null;
+  procedure_setting_id?: string | null;
   document_type?: string | null;
   document_type_id?: string | number | null;
   specialization?: string | null;
@@ -69,11 +70,21 @@ export interface ProjectRequirementDto {
   updated_at?: string | null;
 }
 
+export interface ProjectRequirementsSummary {
+  total?: number;
+  approved?: number;
+  in_progress?: number;
+  rejected?: number;
+  pending_acceptance?: number;
+  under_review?: number;
+}
+
 export interface ListProjectRequirementsResponse {
   code?: string;
   message?: string | null;
   payload?: ProjectRequirementDto[];
   data?: ProjectRequirementDto[];
+  summary?: ProjectRequirementsSummary | null;
   pagination?: {
     page?: number;
     next_page?: number;

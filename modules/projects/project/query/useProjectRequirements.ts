@@ -5,8 +5,12 @@ import type {
   CreateProjectRequirementsArgs,
 } from "@/services/api/projects/project-requirements/types/params";
 import type { ProjectRequirementDto } from "@/services/api/projects/project-requirements/types/response";
-import type { DocumentRequirementRow } from "@/modules/projects/project/components/project-tabs/tabs/document-requirements/types";
+import type {
+  DocumentRequirementRow,
+  DocumentRequirementStat,
+} from "@/modules/projects/project/components/project-tabs/tabs/document-requirements/types";
 import { mapProjectRequirementDto } from "./mapProjectRequirement";
+import { mapRequirementsSummaryToStats } from "./mapRequirementsSummary";
 
 export const PROJECT_REQUIREMENTS_QUERY_KEY = "project-requirements" as const;
 
@@ -43,6 +47,7 @@ export interface ProjectRequirementsResult {
   data: DocumentRequirementRow[];
   totalPages: number;
   totalItems: number;
+  stats: DocumentRequirementStat[];
 }
 
 export function useProjectRequirements(params: UseProjectRequirementsParams) {
@@ -67,6 +72,7 @@ export function useProjectRequirements(params: UseProjectRequirementsParams) {
         totalPages: body.last_page ?? body.pagination?.last_page ?? 1,
         totalItems:
           body.total ?? body.pagination?.result_count ?? rows.length,
+        stats: mapRequirementsSummaryToStats(body.summary),
       };
     },
     enabled: !!projectId,

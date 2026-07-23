@@ -36,8 +36,8 @@ import AddDocumentRequirementDialog from "./AddDocumentRequirementDialog";
 import UploadRequirementFilesDialog from "./UploadRequirementFilesDialog";
 import SubmissionHistoryDialog from "./SubmissionHistoryDialog";
 import LatestSubmissionPreview from "./LatestSubmissionPreview";
-import { DOCUMENT_REQUIREMENT_STATS } from "../constants/mock-data";
 import type { DocumentRequirementRow } from "../types";
+import { mapRequirementsSummaryToStats } from "@/modules/projects/project/query/mapRequirementsSummary";
 import { getUploadDisabledReasonKey } from "../utils/uploadStatus";
 
 const TableLayout = HeadlessTableLayout<DocumentRequirementRow>(
@@ -132,6 +132,8 @@ export default function DocumentRequirementsTable() {
   const rows = requirementsQuery.data?.data ?? [];
   const totalItems = requirementsQuery.data?.totalItems ?? 0;
   const totalPages = Math.max(1, requirementsQuery.data?.totalPages ?? 1);
+  const stats =
+    requirementsQuery.data?.stats ?? mapRequirementsSummaryToStats(null);
 
   const specializations = useMemo(
     () => Array.from(new Set(rows.map((r) => r.specialization))),
@@ -485,7 +487,7 @@ export default function DocumentRequirementsTable() {
 
   return (
     <Box>
-      <RequirementStatsCards stats={DOCUMENT_REQUIREMENT_STATS} />
+      <RequirementStatsCards stats={stats} />
 
       <Paper
         elevation={0}

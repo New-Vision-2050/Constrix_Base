@@ -67,17 +67,17 @@ export interface DocumentRequirementStat {
   percent: number;
 }
 
-export type RequirementFrequencyType = "day" | "week" | "month";
+export type RequirementFrequencyType = "once" | "day" | "week" | "month";
 
 export interface RequirementEntry {
   id: string;
   requirementCode: string;
   requiredDocumentName: string;
   document: string;
-  /** Display name of the selected document type / procedure */
+  /** Display name sent as `document_type` */
   documentType: string;
-  /** Procedure setting id from project_procedure API */
-  documentTypeId: string;
+  /** UUID sent as `procedure_setting_id` */
+  procedureSettingId: string;
   specialization: string;
   /** Shared company ids assigned as receivers */
   receiverCompanyIds: string[];

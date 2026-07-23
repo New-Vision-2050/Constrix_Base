@@ -60,7 +60,7 @@ function createEntry(): RequirementEntry {
     requiredDocumentName: "",
     document: "",
     documentType: "",
-    documentTypeId: "",
+    procedureSettingId: "",
     specialization: "",
     receiverCompanyIds: [],
     frequencyType: "",
@@ -74,11 +74,12 @@ function isEntryValid(entry: RequirementEntry): boolean {
     !entry.requirementCode.trim() ||
     !entry.requiredDocumentName.trim() ||
     !entry.document.trim() ||
-    !entry.documentTypeId ||
+    !entry.procedureSettingId ||
     !entry.frequencyType
   ) {
     return false;
   }
+  if (entry.frequencyType === "once") return true;
   if (entry.frequencyType === "day") return entry.selectedDays.length > 0;
   return Number(entry.interval) > 0;
 }
@@ -181,7 +182,7 @@ export default function AddDocumentRequirementDialog({
         entry.requirementCode.trim() ||
         entry.requiredDocumentName.trim() ||
         entry.document.trim() ||
-        entry.documentTypeId ||
+        entry.procedureSettingId ||
         entry.frequencyType,
     );
 
@@ -195,7 +196,7 @@ export default function AddDocumentRequirementDialog({
         entry.requirementCode.trim() ||
         entry.requiredDocumentName.trim() ||
         entry.document.trim() ||
-        entry.documentTypeId ||
+        entry.procedureSettingId ||
         entry.frequencyType;
       if (!hasAny) continue;
 
@@ -211,7 +212,7 @@ export default function AddDocumentRequirementDialog({
         toast.error(tValidation("documentRequired"));
         return;
       }
-      if (!entry.documentTypeId) {
+      if (!entry.procedureSettingId) {
         toast.error(tValidation("documentTypeRequired"));
         return;
       }
@@ -267,7 +268,7 @@ export default function AddDocumentRequirementDialog({
     if (field === "requiredDocumentName")
       return !entry.requiredDocumentName.trim();
     if (field === "document") return !entry.document.trim();
-    if (field === "documentType") return !entry.documentTypeId;
+    if (field === "documentType") return !entry.procedureSettingId;
     return !entry.frequencyType;
   };
 
@@ -369,13 +370,13 @@ export default function AddDocumentRequirementDialog({
                       <TableCell>
                         <TextField
                           select
-                          value={entry.documentTypeId}
+                          value={entry.procedureSettingId}
                           onChange={(e) => {
                             const selected = documentTypeOptions.find(
                               (option) => option.value === e.target.value,
                             );
                             updateEntry(entry.id, {
-                              documentTypeId: e.target.value,
+                              procedureSettingId: e.target.value,
                               documentType: selected?.label ?? "",
                             });
                           }}
@@ -448,6 +449,7 @@ export default function AddDocumentRequirementDialog({
                           fullWidth
                           error={getFieldError(entry, "frequencyType")}
                         >
+                          <MenuItem value="once">{t("once")}</MenuItem>
                           <MenuItem value="day">{t("frequencyDay")}</MenuItem>
                           <MenuItem value="week">{t("frequencyWeek")}</MenuItem>
                           <MenuItem value="month">{t("frequencyMonth")}</MenuItem>
