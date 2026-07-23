@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Alert, Box, Tab, Tabs } from "@mui/material";
 import { useTranslations } from "next-intl";
 import SafetyVisitsView from "./components/SafetyVisitsView";
+import SafetyReportsView from "./components/SafetyReportsView";
 
 const TABS = [
   { id: "safetyReports", labelKey: "safetyReports" },
@@ -14,7 +15,7 @@ const TABS = [
 
 export default function SafetyTab() {
   const t = useTranslations("project.safetyTab");
-  const [activeTab, setActiveTab] = useState<string>("visits");
+  const [activeTab, setActiveTab] = useState<string>("safetyReports");
 
   return (
     <Box sx={{ p: 3 }}>
@@ -28,10 +29,9 @@ export default function SafetyTab() {
         ))}
       </Tabs>
 
+      {activeTab === "safetyReports" && <SafetyReportsView />}
       {activeTab === "visits" && <SafetyVisitsView />}
-      {(activeTab === "safetyReports" ||
-        activeTab === "reports" ||
-        activeTab === "indicators") && (
+      {(activeTab === "reports" || activeTab === "indicators") && (
         <Box sx={{ p: 4, textAlign: "center" }}>
           <Alert severity="info">{t("comingSoon")}</Alert>
         </Box>
