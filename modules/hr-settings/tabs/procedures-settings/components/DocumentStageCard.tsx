@@ -143,10 +143,23 @@ export default function DocumentStageCard({
 
   const { data: sharedCompanies = [], isLoading: isLoadingCompanies } =
     useQuery({
-      queryKey: ["shared-companies", projectId, "document-stage"],
+      queryKey: ["project-shares", projectId, "document-stage"],
       queryFn: async () => {
-        const res = await ProjectSharingApi.getSharedCompanies(projectId!);
-        return res.data.payload ?? [];
+        const res = await ProjectSharingApi.listForProject(projectId!);
+        const shares = res.data.payload ?? [];
+        const companies = shares
+          .map((share) => share.shared_with_company)
+          .filter(
+            (company): company is NonNullable<typeof company> =>
+              !!company?.id && !!company.name,
+          );
+        const seen = new Set<string>();
+        return companies.filter((company) => {
+          const id = String(company.id);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
       },
       enabled: !!projectId,
     });
@@ -348,7 +361,10 @@ export default function DocumentStageCard({
           }
         : {}),
       ...(data.actionTakerType === "receiver_company"
-        ? { receiver_company_ids: data.receiverCompanyIds }
+        ? {
+            receiver_company_ids: data.receiverCompanyIds,
+            ...(projectId ? { project_id: projectId } : {}),
+          }
         : {}),
       action_taker_user_ids: [],
       concerned_management_hierarchy_ids: [],

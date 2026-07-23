@@ -110,11 +110,24 @@ export default function AddDocumentRequirementDialog({
     });
 
   const { data: sharedCompanies = [], isLoading: loadingCompanies } = useQuery({
-    queryKey: ["shared-companies", projectId, "document-requirements"],
+    queryKey: ["project-shares", projectId, "document-requirements"],
     queryFn: async () => {
       if (!projectId) return [];
-      const res = await ProjectSharingApi.getSharedCompanies(projectId);
-      return res.data.payload ?? [];
+      const res = await ProjectSharingApi.listForProject(projectId);
+      const shares = res.data.payload ?? [];
+      const companies = shares
+        .map((share) => share.shared_with_company)
+        .filter(
+          (company): company is NonNullable<typeof company> =>
+            !!company?.id && !!company.name,
+        );
+      const seen = new Set<string>();
+      return companies.filter((company) => {
+        const id = String(company.id);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
     },
     enabled: !!projectId && open,
   });

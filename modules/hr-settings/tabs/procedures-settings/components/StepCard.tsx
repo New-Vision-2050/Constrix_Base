@@ -383,7 +383,7 @@ export default function StepCard({
     () => String(serverStep?.skipping_period ?? 0),
   );
 
-  const { control, handleSubmit, reset, watch } =
+  const { control, handleSubmit, reset, watch, setValue } =
     useForm<StepFormData>({
       defaultValues: getDefaultValues(serverStep),
     });
@@ -396,6 +396,8 @@ export default function StepCard({
   const branchId = watch("branchId");
   const actionTakerIdW = watch("actionTakerId");
   const concernedUserIdW = watch("concernedUserId");
+  const receiverCompanyIdsW = watch("receiverCompanyIds");
+  const selectedReceiverCompanyId = receiverCompanyIdsW?.[0] ?? "";
   const fieldsDisabled = !!serverStep && !isEditing;
 
   const syncFromServer = useCallback(() => {
@@ -502,22 +504,47 @@ export default function StepCard({
 
   const { data: sharedCompanies = [], isLoading: isLoadingCompanies } =
     useQuery({
-      queryKey: ["shared-companies", projectId, "step-card"],
+      queryKey: ["project-shares", projectId, "step-card"],
       queryFn: async () => {
-        const res = await ProjectSharingApi.getSharedCompanies(projectId!);
-        return res.data.payload ?? [];
+        const res = await ProjectSharingApi.listForProject(projectId!);
+        const shares = res.data.payload ?? [];
+        const companies = shares
+          .map((share) => share.shared_with_company)
+          .filter(
+            (company): company is NonNullable<typeof company> =>
+              !!company?.id && !!company.name,
+          );
+        const seen = new Set<string>();
+        return companies.filter((company) => {
+          const id = String(company.id);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
       },
       enabled: !!projectId,
     });
 
   const { data: projectEmployees = [], isLoading: isLoadingEmployees } =
     useQuery({
-      queryKey: ["project-employees", projectId, "step-card-concerned"],
+      queryKey: [
+        "project-employees",
+        projectId,
+        selectedReceiverCompanyId,
+        "step-card-concerned",
+      ],
       queryFn: async () => {
-        const res = await AllProjectsApi.getProjectEmployees(projectId!);
+        const res = await AllProjectsApi.getProjectEmployees(projectId!, {
+          ...(selectedReceiverCompanyId
+            ? { company_id: selectedReceiverCompanyId }
+            : {}),
+        });
         return res.data.payload ?? [];
       },
-      enabled: !!projectId && actionTakerType === "receiver_company",
+      enabled:
+        !!projectId &&
+        actionTakerType === "receiver_company" &&
+        !!selectedReceiverCompanyId,
     });
 
   const companyOptions = useMemo(
@@ -532,13 +559,17 @@ export default function StepCard({
   const projectEmployeeOptions = useMemo(() => {
     const byId = new Map<string, { value: string; label: string }>();
     for (const row of projectEmployees) {
+      // Keep only employees belonging to this project assignment list
+      if (projectId && row.project_id && String(row.project_id) !== projectId) {
+        continue;
+      }
       const id = String(row.id ?? "");
       const name = row.user?.name?.trim();
       if (!id || !name || byId.has(id)) continue;
       byId.set(id, { value: id, label: name });
     }
     return Array.from(byId.values());
-  }, [projectEmployees]);
+  }, [projectEmployees, projectId]);
 
   const branchSelectOptions = useMemo(
     () =>
@@ -765,6 +796,7 @@ export default function StepCard({
         ? {
             receiver_company_ids: data.receiverCompanyIds.slice(0, 1),
             project_employee_ids: data.projectEmployeeIds,
+            ...(projectId ? { project_id: projectId } : {}),
           }
         : {}),
       action_taker_user_ids:
@@ -1261,6 +1293,7 @@ export default function StepCard({
                       onChange={(v) => {
                         const id = String(v ?? "").trim();
                         field.onChange(id ? [id] : []);
+                        setValue("projectEmployeeIds", []);
                       }}
                       placeholder={
                         isLoadingCompanies
@@ -1291,13 +1324,19 @@ export default function StepCard({
                         field.onChange(value.map(String))
                       }
                       placeholder={
-                        isLoadingEmployees
-                          ? tc("loading")
-                          : ts("selectConcernedUsers")
+                        !selectedReceiverCompanyId
+                          ? ts("selectReceiverCompany")
+                          : isLoadingEmployees
+                            ? tc("loading")
+                            : ts("selectConcernedUsers")
                       }
                       searchPlaceholder={tc("search")}
                       noResultsText={tc("noResults")}
-                      disabled={fieldsDisabled || isLoadingEmployees}
+                      disabled={
+                        fieldsDisabled ||
+                        isLoadingEmployees ||
+                        !selectedReceiverCompanyId
+                      }
                     />
                   </Box>
                 )}
