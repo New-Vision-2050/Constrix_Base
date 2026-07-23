@@ -123,7 +123,7 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
           date: data.date,
           project_id: projectId,
           serial_number: data.serial_number || undefined,
-          attachment_type_id: data.attachment_type_id || undefined,
+          procedure_setting_id: data.attachment_type_id || undefined,
           attachments: files,
           notes: data.notes || undefined,
         },
