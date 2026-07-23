@@ -216,7 +216,13 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
       "اختر الهيكل التنظيمي",
     ),
     receiverCompanies: _m("Receiver companies", "الشركات المستلمة"),
+    receiverCompany: _m("Receiver company", "الشركة المستلمة"),
     selectReceiverCompanies: _m("Select companies", "اختر الشركات"),
+    selectReceiverCompany: _m("Select company", "اختر الشركة"),
+    selectConcernedUsers: _m(
+      "Select concerned users",
+      "اختر المعنيين",
+    ),
     removeSpecificProcedureRow: _m("Remove", "إزالة"),
     validation: new MessagesGroup({
       selectEmployees: _m("Please select employees", "يرجى اختيار الموظفين"),
@@ -240,6 +246,10 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
       selectReceiverCompanies: _m(
         "Please select at least one company",
         "يرجى اختيار شركة واحدة على الأقل",
+      ),
+      selectReceiverCompany: _m(
+        "Please select a company",
+        "يرجى اختيار شركة",
       ),
       enterSkippingPeriod: _m(
         "Please enter skipping period",

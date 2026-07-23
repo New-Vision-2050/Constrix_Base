@@ -89,6 +89,7 @@ export interface ProcedureStep {
   action_taker_specific_procedures?: { type: string; id: string }[] | null;
   action_taker_user_ids?: string[];
   concerned_management_hierarchy_ids?: string[];
+  project_employee_ids?: string[] | null;
   receiver_company_ids?: string[] | null;
   /** API may send boolean or 0/1 */
   is_accept: boolean | number;

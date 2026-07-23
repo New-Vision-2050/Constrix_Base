@@ -37,6 +37,7 @@ import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
 import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
+import { AllProjectsApi } from "@/services/api/projects/all-projects";
 
 // ─── Option value constants (labels from i18n inside component) ───────────────
 const ORG_BASE_OPTION_DEFS = [
@@ -141,6 +142,7 @@ interface StepFormData {
   actionTakerManagementHierarchyRows: ManagementHierarchyRow[];
   actionTakerSpecificProcedureRows: SpecificProcedureRow[];
   receiverCompanyIds: string[];
+  projectEmployeeIds: string[];
   branchId: string;
   managementId: string;
   actionTakerId: string;
@@ -151,6 +153,13 @@ interface StepFormData {
   deadlineDays: string;
   deadlineHours: string;
   escalationUserId: string;
+}
+
+function projectEmployeeIdsFromStep(step: ProcedureStep): string[] {
+  if (step.project_employee_ids?.length) {
+    return step.project_employee_ids.map(String);
+  }
+  return [];
 }
 
 function toStringArray(val: string | string[] | null | undefined): string[] {
@@ -318,7 +327,10 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       actionTakerManagementHierarchyRows:
         normalizeManagementHierarchyRows(serverStep),
       actionTakerSpecificProcedureRows: normalizeSpecificProcedureRows(serverStep),
-      receiverCompanyIds: (serverStep.receiver_company_ids ?? []).map(String),
+      receiverCompanyIds: serverStep.receiver_company_ids?.[0]
+        ? [String(serverStep.receiver_company_ids[0])]
+        : [],
+      projectEmployeeIds: projectEmployeeIdsFromStep(serverStep),
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
@@ -340,6 +352,7 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     actionTakerManagementHierarchyRows: [{ type: "", isDeputyDirector: false }],
     actionTakerSpecificProcedureRows: [{ type: "", id: "" }],
     receiverCompanyIds: [],
+    projectEmployeeIds: [],
     branchId: "",
     managementId: "",
     actionTakerId: "",
@@ -497,6 +510,16 @@ export default function StepCard({
       enabled: !!projectId,
     });
 
+  const { data: projectEmployees = [], isLoading: isLoadingEmployees } =
+    useQuery({
+      queryKey: ["project-employees", projectId, "step-card-concerned"],
+      queryFn: async () => {
+        const res = await AllProjectsApi.getProjectEmployees(projectId!);
+        return res.data.payload ?? [];
+      },
+      enabled: !!projectId && actionTakerType === "receiver_company",
+    });
+
   const companyOptions = useMemo(
     () =>
       sharedCompanies.map((company) => ({
@@ -505,6 +528,17 @@ export default function StepCard({
       })),
     [sharedCompanies],
   );
+
+  const projectEmployeeOptions = useMemo(() => {
+    const byId = new Map<string, { value: string; label: string }>();
+    for (const row of projectEmployees) {
+      const id = String(row.id ?? "");
+      const name = row.user?.name?.trim();
+      if (!id || !name || byId.has(id)) continue;
+      byId.set(id, { value: id, label: name });
+    }
+    return Array.from(byId.values());
+  }, [projectEmployees]);
 
   const branchSelectOptions = useMemo(
     () =>
@@ -682,7 +716,7 @@ export default function StepCard({
     ) {
       toast({
         title: t("actions.save"),
-        description: ts("validation.selectReceiverCompanies"),
+        description: ts("validation.selectReceiverCompany"),
         variant: "destructive",
       });
       return;
@@ -728,15 +762,21 @@ export default function StepCard({
           }
         : {}),
       ...(data.actionTakerType === "receiver_company"
-        ? { receiver_company_ids: data.receiverCompanyIds }
+        ? {
+            receiver_company_ids: data.receiverCompanyIds.slice(0, 1),
+            project_employee_ids: data.projectEmployeeIds,
+          }
         : {}),
       action_taker_user_ids:
         data.actionTakerType === "specific_user" && data.actionTakerId
           ? [data.actionTakerId]
           : [],
-      concerned_management_hierarchy_ids: data.concernedUserId
-        ? [data.concernedUserId]
-        : [],
+      concerned_management_hierarchy_ids:
+        data.actionTakerType === "receiver_company"
+          ? []
+          : data.concernedUserId
+            ? [data.concernedUserId]
+            : [],
       is_approve: data.orgBase.includes("approve"),
       is_accept: data.orgBase.includes("accept"),
       is_view_only: data.orgBase.includes("view_only"),
@@ -1207,124 +1247,62 @@ export default function StepCard({
         </Box>
 
         {actionTakerType === "receiver_company" && (
-          <Box sx={{ mb: 2.5 }}>
-            <SectionLabel>{ts("receiverCompanies")}</SectionLabel>
-            <Controller
-              name="receiverCompanyIds"
-              control={control}
-              render={({ field }) => {
-                const selectedIds = field.value ?? [];
-                const hasSelection = selectedIds.length > 0;
+          <Box sx={{ mb: 2.5, display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box>
+              <SectionLabel>{ts("receiverCompany")}</SectionLabel>
+              <Controller
+                name="receiverCompanyIds"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={{ width: "100%" }}>
+                    <SearchableSelect
+                      options={companyOptions}
+                      value={field.value?.[0] ?? ""}
+                      onChange={(v) => {
+                        const id = String(v ?? "").trim();
+                        field.onChange(id ? [id] : []);
+                      }}
+                      placeholder={
+                        isLoadingCompanies
+                          ? tc("loading")
+                          : ts("selectReceiverCompany")
+                      }
+                      searchPlaceholder={tc("search")}
+                      noResultsText={tc("noResults")}
+                      disabled={fieldsDisabled || isLoadingCompanies}
+                    />
+                  </Box>
+                )}
+              />
+            </Box>
 
-                return (
-                  <TextField
-                    select
-                    size="small"
-                    fullWidth
-                    disabled={fieldsDisabled || isLoadingCompanies}
-                    value={selectedIds}
-                    onChange={(event) => {
-                      const value = event.target.value;
-                      field.onChange(
-                        typeof value === "string" ? value.split(",") : value,
-                      );
-                    }}
-                    SelectProps={{
-                      multiple: true,
-                      displayEmpty: true,
-                      renderValue: (selected) => {
-                        const ids = selected as string[];
-                        if (!ids.length) {
-                          return (
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              sx={{
-                                color: "text.secondary",
-                                lineHeight: "24px",
-                              }}
-                            >
-                              {isLoadingCompanies
-                                ? tc("loading")
-                                : ts("selectReceiverCompanies")}
-                            </Typography>
-                          );
-                        }
-                        return (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: 0.5,
-                              alignItems: "center",
-                            }}
-                          >
-                            {ids.map((id) => {
-                              const optionLabel =
-                                companyOptions.find(
-                                  (option) =>
-                                    String(option.value) === String(id),
-                                )?.label ?? id;
-                              return (
-                                <Chip
-                                  key={id}
-                                  size="small"
-                                  label={optionLabel}
-                                  sx={{
-                                    maxWidth: 200,
-                                    height: 24,
-                                    "& .MuiChip-label": { px: 1 },
-                                  }}
-                                />
-                              );
-                            })}
-                          </Box>
-                        );
-                      },
-                      MenuProps: {
-                        PaperProps: {
-                          sx: { maxHeight: 280 },
-                        },
-                      },
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        minHeight: 40,
-                        alignItems: hasSelection ? "flex-start" : "center",
-                        borderRadius: "8px",
-                      },
-                      "& .MuiSelect-select": {
-                        py: hasSelection ? 1 : 1.05,
-                        display: "flex",
-                        alignItems: "center",
-                        minHeight: "24px !important",
-                      },
-                    }}
-                  >
-                    {companyOptions.length === 0 ? (
-                      <MenuItem disabled value="__empty__">
-                        {isLoadingCompanies ? tc("loading") : tc("noResults")}
-                      </MenuItem>
-                    ) : (
-                      companyOptions.map((option) => (
-                        <MenuItem
-                          key={option.value}
-                          value={String(option.value)}
-                        >
-                          <Checkbox
-                            size="small"
-                            checked={selectedIds.includes(
-                              String(option.value),
-                            )}
-                          />
-                          {option.label}
-                        </MenuItem>
-                      ))
-                    )}
-                  </TextField>
-                );
-              }}
-            />
+            <Box>
+              <SectionLabel>{ts("concernedUsers")}</SectionLabel>
+              <Controller
+                name="projectEmployeeIds"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={{ width: "100%" }}>
+                    <SearchableSelect
+                      multiple
+                      options={projectEmployeeOptions}
+                      value={field.value ?? []}
+                      onChange={(value) =>
+                        field.onChange(value.map(String))
+                      }
+                      placeholder={
+                        isLoadingEmployees
+                          ? tc("loading")
+                          : ts("selectConcernedUsers")
+                      }
+                      searchPlaceholder={tc("search")}
+                      noResultsText={tc("noResults")}
+                      disabled={fieldsDisabled || isLoadingEmployees}
+                    />
+                  </Box>
+                )}
+              />
+            </Box>
           </Box>
         )}
 
