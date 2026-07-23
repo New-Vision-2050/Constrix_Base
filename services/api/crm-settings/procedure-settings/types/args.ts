@@ -21,6 +21,7 @@ export interface UpdateStageArgs {
   deadline_hours?: number;
   escalation_management_hierarchy_id?: string;
   work_flow_id?: string;
+  project_id?: string;
 }
 
 export interface ActionTakerManagementHierarchyItem {

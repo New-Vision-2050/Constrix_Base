@@ -58,18 +58,8 @@ export const ProcedureSettingsApi = {
   },
   createStage: (args: CreateStageArgs) =>
     baseApi.post<GetStagesResponse>("procedure-settings", args),
-  updateStage: (
-    stageId: string,
-    args: UpdateStageArgs,
-    options?: { projectId?: string },
-  ) =>
-    baseApi.put<GetStagesResponse>(
-      `procedure-settings/${stageId}`,
-      args,
-      options?.projectId
-        ? { params: { project_id: options.projectId } }
-        : undefined,
-    ),
+  updateStage: (stageId: string, args: UpdateStageArgs) =>
+    baseApi.put<GetStagesResponse>(`procedure-settings/${stageId}`, args),
   deleteStage: (stageId: string) =>
     baseApi.delete(`procedure-settings/${stageId}`),
 
@@ -97,4 +87,9 @@ export const ProcedureSettingsApi = {
     args: CreateStepArgs,
   ) =>
     baseApi.post(
-      `procedure-settings/${procedureSettingId}/steps/
+      `procedure-settings/${procedureSettingId}/steps/${stepId}`,
+      args,
+    ),
+  deleteStep: (procedureSettingId: string, stepId: number) =>
+    baseApi.delete(`procedure-settings/${procedureSettingId}/steps/${stepId}`),
+};
