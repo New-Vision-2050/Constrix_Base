@@ -10,10 +10,12 @@ import type {
 } from "./types/response";
 
 export const ProjectSharingDepartmentApi = {
-  list: (projectTypeId: number | string) =>
+  list: (projectTypeId?: number | string) =>
     baseApi.get<ListProjectSharingDepartmentsResponse>(
       "order-permit-departments",
-      { params: { project_type_id: projectTypeId } },
+      projectTypeId != null && projectTypeId !== ""
+        ? { params: { project_type_id: projectTypeId } }
+        : undefined,
     ),
 
   show: (departmentId: number | string) =>

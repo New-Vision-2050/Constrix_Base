@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -8,6 +8,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Grid,
   MenuItem,
@@ -35,10 +36,12 @@ import {
   projectOrderPermitsQueryKey,
   useProjectOrderPermits,
 } from "@/modules/projects/project/query/useProjectOrderPermits";
+import { useUpdateOrderPermit } from "@/modules/projects/project/query/useUpdateOrderPermit";
 
 import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
 
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
+import { PerRowEditablePermitCell, type EditablePermitField } from "./EditablePermitCell";
 
 import type { WorkOrderFilters, WorkOrderRow } from "./types";
 
@@ -140,6 +143,47 @@ const WORK_ORDER_DATE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "consultantColumn155EntryDate",
   "contractorLastProcedureDate",
   "contractorColumn155EntryDate",
+  "startPermitDate",
+  "endPermitDate",
+  "lastDateConsultantStatement",
+]);
+
+const PERMIT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "permitStatus",
+  "startPermitDate",
+  "endPermitDate",
+  "noteFromPermitToDepartments",
+]);
+
+const NON_PERMIT_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "employeeName",
+  "completionPhase",
+  "phaseStatus",
+  "targetDrilling",
+  "achievedDrilling",
+  "targetExtention",
+  "achievedExtention",
+  "descriptionDetails",
+  "consultantStatement",
+  "lastDateConsultantStatement",
+  "officialProjectHours",
+  "numberOfDaysToAchieveColumn155",
+  "percentageTime",
+  "percentageAchieveDrilling",
+  "percentageAchieveExtention",
+]);
+
+const PROJECT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "employeeName",
+  "completionPhase",
+  "phaseStatus",
+  "targetDrilling",
+  "achievedDrilling",
+  "targetExtention",
+  "achievedExtention",
+  "descriptionDetails",
+  "consultantStatement",
+  "lastDateConsultantStatement",
 ]);
 
 function renderWorkOrderCell(
@@ -151,6 +195,18 @@ function renderWorkOrderCell(
 ) {
   if (key === "actions") {
     return null;
+  }
+
+  if (key === "permitStatus") {
+    return <span>{row.permitStatusName || emptyDash}</span>;
+  }
+
+  if (key === "completionPhase") {
+    return <span>{row.completionPhaseName || emptyDash}</span>;
+  }
+
+  if (key === "phaseStatus") {
+    return <span>{row.phaseStatusName || emptyDash}</span>;
   }
 
   if (WORK_ORDER_DATE_COLUMN_KEYS.has(key)) {
@@ -178,7 +234,15 @@ function renderWorkOrderCell(
   return <span>{String(value)}</span>;
 }
 
-export default function WorkOrdersTab() {
+export default function WorkOrdersTab({
+  departmentId,
+  isEditable = false,
+  isProjectEditable = false,
+}: {
+  departmentId?: number;
+  isEditable?: boolean;
+  isProjectEditable?: boolean;
+} = {}) {
   const { projectId } = useProject();
 
   const queryClient = useQueryClient();
@@ -192,6 +256,8 @@ export default function WorkOrdersTab() {
   const tFields = useTranslations("project.workOrdersTab.dialog.fields");
 
   const emptyDash = t("emptyDash");
+  const yesLabel = t("yes");
+  const noLabel = t("no");
 
   const [filters, setFilters] = useState<WorkOrderFilters>(
     EMPTY_WORK_ORDER_FILTERS,
@@ -209,12 +275,32 @@ export default function WorkOrdersTab() {
     initialLimit: 10,
   });
 
-  const workOrdersQuery = useProjectOrderPermits(projectId);
+  const workOrdersQuery = useProjectOrderPermits(projectId, departmentId);
 
   const allRows = useMemo(
     () => workOrdersQuery.data ?? [],
-
     [workOrdersQuery.data],
+  );
+
+  const updatePermitMutation = useUpdateOrderPermit(projectId);
+
+  const handlePermitSave = useCallback(
+    (id: string, body: Record<string, unknown>) => {
+      if (!projectId) return;
+      updatePermitMutation.mutate(
+        { id, body },
+        {
+          onSuccess: (res) => {
+            toast.success(res.data?.message ?? t("importSuccess"));
+          },
+          onError: (err: unknown) => {
+            const error = err as { response?: { data?: { message?: string } } };
+            toast.error(error?.response?.data?.message ?? t("importError"));
+          },
+        },
+      );
+    },
+    [projectId, updatePermitMutation, t],
   );
 
   const workOrderTypeOptions = useMemo(
@@ -315,6 +401,48 @@ export default function WorkOrdersTab() {
       contractorBasket: tFields("contractorBasket"),
 
       consultantPrice: tFields("consultantPrice"),
+
+      permitStatus: tFields("permitStatus"),
+
+      startPermitDate: tFields("startPermitDate"),
+
+      endPermitDate: tFields("endPermitDate"),
+
+      noteFromPermitToDepartments: tFields("noteFromPermitToDepartments"),
+
+      countOfDaysFromAssignedDate: tFields("countOfDaysFromAssignedDate"),
+
+      evaluationPermitStatus: tFields("evaluationPermitStatus"),
+
+      employeeName: tFields("employeeName"),
+
+      completionPhase: tFields("completionPhase"),
+
+      phaseStatus: tFields("phaseStatus"),
+
+      targetDrilling: tFields("targetDrilling"),
+
+      achievedDrilling: tFields("achievedDrilling"),
+
+      targetExtention: tFields("targetExtention"),
+
+      achievedExtention: tFields("achievedExtention"),
+
+      descriptionDetails: tFields("descriptionDetails"),
+
+      consultantStatement: tFields("consultantStatement"),
+
+      lastDateConsultantStatement: tFields("lastDateConsultantStatement"),
+
+      officialProjectHours: tFields("officialProjectHours"),
+
+      numberOfDaysToAchieveColumn155: tFields("numberOfDaysToAchieveColumn155"),
+
+      percentageTime: tFields("percentageTime"),
+
+      percentageAchieveDrilling: tFields("percentageAchieveDrilling"),
+
+      percentageAchieveExtention: tFields("percentageAchieveExtention"),
     }),
 
     [tFields],
@@ -322,7 +450,9 @@ export default function WorkOrdersTab() {
 
   const columns = useMemo(
     () =>
-      WORK_ORDER_COLUMN_KEYS.map((key) => {
+      WORK_ORDER_COLUMN_KEYS.filter(
+        (key) => !(isEditable && NON_PERMIT_COLUMN_KEYS.has(key)),
+      ).map((key) => {
         if (key === "actions") {
           return {
             key,
@@ -359,12 +489,45 @@ export default function WorkOrdersTab() {
 
           sortable: false,
 
-          render: (row: WorkOrderRow) =>
-            renderWorkOrderCell(row, key, emptyDash),
+          render: (row: WorkOrderRow) => {
+            if (isEditable && PERMIT_EDITABLE_COLUMN_KEYS.has(key)) {
+              return (
+                <PerRowEditablePermitCell
+                  row={row}
+                  field={key as EditablePermitField}
+                  emptyDash={emptyDash}
+                  yesLabel={yesLabel}
+                  noLabel={noLabel}
+                  onSave={handlePermitSave}
+                />
+              );
+            }
+
+            if (isProjectEditable && PROJECT_EDITABLE_COLUMN_KEYS.has(key)) {
+              return (
+                <PerRowEditablePermitCell
+                  row={row}
+                  field={key as EditablePermitField}
+                  emptyDash={emptyDash}
+                  yesLabel={yesLabel}
+                  noLabel={noLabel}
+                  onSave={handlePermitSave}
+                />
+              );
+            }
+
+            if (key === "permitStatus") {
+              return (
+                <span>{row.permitStatusName || emptyDash}</span>
+              );
+            }
+
+            return renderWorkOrderCell(row, key, emptyDash);
+          },
         };
       }),
 
-    [columnLabels, tTable, emptyDash],
+    [columnLabels, tTable, emptyDash, isEditable, isProjectEditable, handlePermitSave, yesLabel, noLabel],
   );
 
   const handleExport = () => {
@@ -398,7 +561,7 @@ export default function WorkOrdersTab() {
     if (!projectId) return;
 
     queryClient.invalidateQueries({
-      queryKey: projectOrderPermitsQueryKey(),
+      queryKey: ["project-order-permits", projectId],
     });
   };
 
@@ -441,10 +604,6 @@ export default function WorkOrdersTab() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
-      <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-        {t("title")}
-      </Typography>
-
       {workOrdersQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
           {t("loadError")}

@@ -17,3 +17,17 @@ export interface CreateProjectOrderPermitsArgs {
   project_id: string;
   work_orders: CreateProjectOrderPermitWorkOrderArgs[];
 }
+
+export interface ListProjectOrderPermitsParams {
+  order_permit_department_id?: number;
+}
+
+export interface UpdateProjectOrderPermitArgs {
+  permit_status_id?: number | null;
+  start_permit_date?: string | null;
+  end_permit_date?: string | null;
+  note_from_permit_to_departments?: string | null;
+  is_taked_action?: boolean | number | null;
+  count_of_days_from_assigned_date?: number | string | null;
+  evaluation_permit_status?: string | null;
+}

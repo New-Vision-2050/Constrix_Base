@@ -1,7 +1,8 @@
 import { MessagesGroup, _m } from "../../types";
 
 export const projectWorkOrdersTabMessages = new MessagesGroup({
-  title: _m("Work orders", "أوامر العمل"),
+  title: _m("Work Orders", "أوامر العمل"),
+  title: _m("Permits", "التصاريح"),
   filtersTitle: _m(
     "Advanced search in work orders list",
     "البحث المتقدم في قائمة أوامر العمل",
@@ -95,6 +96,59 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
     ),
     contractorBasket: _m("Contractor basket", "سلة جهة المقاول"),
     consultantPrice: _m("Consultant price", "سعر الاستشاري"),
+    permitStatus: _m("Permit status", "حاله التصريح"),
+    startPermitDate: _m("Permit start date", "تاريخ بدايه التصريح"),
+    endPermitDate: _m("Permit end date", "تاريخ نهاية التصريح"),
+    noteFromPermitToDepartments: _m(
+      "Notes from permit to Projects/Connections dept",
+      "ملاحظات علي التصريح من قسم المشاريع/التوصيلات",
+    ),
+    isTakedAction: _m(
+      "Action taken or warning sent",
+      "هل تم اتخاذ اللازم او ارسال انذار",
+    ),
+    countOfDaysFromAssignedDate: _m(
+      "Days since assignment",
+      "عدد ايام منذ الاسناد",
+    ),
+    evaluationPermitStatus: _m(
+      "Permit evaluation",
+      "تقييم الطلب (التصريح)",
+    ),
+    employeeName: _m("Responsible engineer", "المهندس المسؤول"),
+    completionPhase: _m("Execution phase", "مرحله التنفيذ"),
+    phaseStatus: _m("Phase status", "حاله المرحله"),
+    targetDrilling: _m("Target drilling", "الحفر المستهدف"),
+    achievedDrilling: _m("Achieved drilling", "الحفر المنفذ"),
+    targetExtention: _m("Target extention", "التمديد المستهدف"),
+    achievedExtention: _m("Achieved extention", "التمديد المنفذ"),
+    descriptionDetails: _m(
+      "Work order detailed description",
+      "شرح تفصيل امر العمل",
+    ),
+    consultantStatement: _m("Consultant statement", "افاده الاستشاري"),
+    lastDateConsultantStatement: _m(
+      "Last statement date",
+      "تاريخ اخر افاده",
+    ),
+    consultnatStatementStatus: _m(
+      "Statement status",
+      "حاله الافاده (أقل من 3 أيام → جديدة، من 3 إلى أقل من 6 أيام → إفادة قديمة، من 6 إلى أقل من 10 أيام → إفادة قديمة جدًا، من 10 إلى أقل من 15 يوم → إهمال بالمتابعة، 15 يوم فأكثر → إهمال شديد بالمتابعة)",
+    ),
+    officialProjectHours: _m("Official project duration", "مده المشروع الرسميه"),
+    numberOfDaysToAchieveColumn155: _m(
+      "Days to achieve column 155",
+      "عدد ايام حتي تنفيذ ١٥٥",
+    ),
+    percentageTime: _m("Time percentage", "النسبة الزمنية"),
+    percentageAchieveDrilling: _m(
+      "Drilling achievement percentage",
+      "نسبه انجاز الحفر",
+    ),
+    percentageAchieveExtention: _m(
+      "Extention achievement percentage",
+      "نسبه انجاز التمديد",
+    ),
     actions: _m("Actions", "الإجراءات"),
     action: _m("Action", "اجراء"),
     edit: _m("Edit", "تعديل"),
@@ -178,6 +232,59 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       ),
       contractorBasket: _m("Contractor basket", "سلة جهة المقاول"),
       consultantPrice: _m("Consultant price", "سعر الاستشاري"),
+      permitStatus: _m("Permit status", "حاله التصريح"),
+      startPermitDate: _m("Permit start date", "تاريخ بدايه التصريح"),
+      endPermitDate: _m("Permit end date", "تاريخ نهاية التصريح"),
+      noteFromPermitToDepartments: _m(
+        "Notes from permit to Projects/Connections dept",
+        "ملاحظات علي التصريح من قسم المشاريع/التوصيلات",
+      ),
+      isTakedAction: _m(
+        "Action taken or warning sent",
+        "هل تم اتخاذ اللازم او ارسال انذار",
+      ),
+      countOfDaysFromAssignedDate: _m(
+        "Days since assignment",
+        "عدد ايام منذ الاسناد",
+      ),
+      evaluationPermitStatus: _m(
+        "Permit evaluation",
+        "تقييم الطلب (التصريح)",
+      ),
+      employeeName: _m("Responsible engineer", "المهندس المسؤول"),
+      completionPhase: _m("Execution phase", "مرحله التنفيذ"),
+      phaseStatus: _m("Phase status", "حاله المرحله"),
+      targetDrilling: _m("Target drilling", "الحفر المستهدف"),
+      achievedDrilling: _m("Achieved drilling", "الحفر المنفذ"),
+      targetExtention: _m("Target extention", "التمديد المستهدف"),
+      achievedExtention: _m("Achieved extention", "التمديد المنفذ"),
+      descriptionDetails: _m(
+        "Work order detailed description",
+        "شرح تفصيل امر العمل",
+      ),
+      consultantStatement: _m("Consultant statement", "افاده الاستشاري"),
+      lastDateConsultantStatement: _m(
+        "Last statement date",
+        "تاريخ اخر افاده",
+      ),
+      consultnatStatementStatus: _m(
+        "Statement status",
+        "حاله الافاده (أقل من 3 أيام → جديدة، من 3 إلى أقل من 6 أيام → إفادة قديمة، من 6 إلى أقل من 10 أيام → إفادة قديمة جدًا، من 10 إلى أقل من 15 يوم → إهمال بالمتابعة، 15 يوم فأكثر → إهمال شديد بالمتابعة)",
+      ),
+      officialProjectHours: _m("Official project duration", "مده المشروع الرسميه"),
+      numberOfDaysToAchieveColumn155: _m(
+        "Days to achieve column 155",
+        "عدد ايام حتي تنفيذ ١٥٥",
+      ),
+      percentageTime: _m("Time percentage", "النسبة الزمنية"),
+      percentageAchieveDrilling: _m(
+        "Drilling achievement percentage",
+        "نسبه انجاز الحفر",
+      ),
+      percentageAchieveExtention: _m(
+        "Extention achievement percentage",
+        "نسبه انجاز التمديد",
+      ),
       delete: _m("Remove", "الغاء"),
       selectType: _m("Select type", "اختر النوع"),
       selectContractor: _m("Select contractor", "اختر المقاول"),

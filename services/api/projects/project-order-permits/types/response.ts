@@ -122,6 +122,65 @@ export interface ProjectOrderPermitWorkOrderDto {
   contractor_work_order_status?: string | null;
   contractor_basket?: string | null;
   consultant_price?: number | string | null;
+  permit_status_id?: number | null;
+  permit_status_name?: string | null;
+  start_permit_date?: string | null;
+  end_permit_date?: string | null;
+  note_from_permit_to_departments?: string | null;
+  is_taked_action?: boolean | number | null;
+  count_of_days_from_assigned_date?: number | string | null;
+  evaluation_permit_status?: string | null;
+  employee_id?: string | number | null;
+  employee_name?: string | null;
+  target_drilling?: number | null;
+  achieved_drilling?: number | null;
+  target_extention?: number | null;
+  achieved_extention?: number | null;
+  description_details?: string | null;
+  consultant_statement?: string | null;
+  last_date_consultant_statement?: string | null;
+  consultnat_statement_status?: string | null;
+  official_project_hours?: number | string | null;
+  number_of_days_to_achieve_column_155?: number | string | null;
+  percentage_time?: number | string | null;
+  percentage_achieve_drilling?: number | string | null;
+  percentage_achieve_extention?: number | string | null;
+  completion_phase_id?: number | null;
+  completion_phase_name?: string | null;
+  phase_status_id?: number | null;
+  phase_status_name?: string | null;
+}
+
+export interface CompletionPhaseStatus {
+  id: number;
+  name: string;
+}
+
+export interface CompletionPhase {
+  id: number;
+  name: string;
+  order_permit_department_id: number;
+  department_name: string;
+  statuses: CompletionPhaseStatus[];
+}
+
+export interface CompletionDataDto {
+  order_permit: {
+    id: number;
+    department_id: number;
+    department_name: string;
+  };
+  completion_phases: CompletionPhase[];
+}
+
+export interface CompletionDataResponse {
+  data: CompletionDataDto;
+}
+
+export interface UpdateProjectOrderPermitResponse {
+  code: string;
+  message: string | null;
+  payload?: unknown;
 }
 
 export interface ListProjectOrderPermitsResponse {

@@ -1,5 +1,7 @@
 export interface WorkOrderRow {
   id: string;
+  orderPermitId: number | null;
+  orderPermitDepartmentId: number | null;
   workOrderId: string;
   workOrderType: string;
   consultantWorkOrderType: string;
@@ -28,6 +30,32 @@ export interface WorkOrderRow {
   contractorWorkOrderStatus: string;
   contractorBasket: string;
   consultantPrice: number;
+  permitStatusId: number | null;
+  permitStatusName: string;
+  startPermitDate: string;
+  endPermitDate: string;
+  noteFromPermitToDepartments: string;
+  isTakedAction: string;
+  countOfDaysFromAssignedDate: string;
+  evaluationPermitStatus: string;
+  employeeName: string;
+  completionPhaseId: number | null;
+  completionPhaseName: string;
+  phaseStatusId: number | null;
+  phaseStatusName: string;
+  targetDrilling: string;
+  achievedDrilling: string;
+  targetExtention: string;
+  achievedExtention: string;
+  descriptionDetails: string;
+  consultantStatement: string;
+  lastDateConsultantStatement: string;
+  consultnatStatementStatus: string;
+  officialProjectHours: string;
+  numberOfDaysToAchieveColumn155: string;
+  percentageTime: string;
+  percentageAchieveDrilling: string;
+  percentageAchieveExtention: string;
 }
 
 export interface WorkOrderFilters {
@@ -77,6 +105,27 @@ export type WorkOrderColumnKey =
   | "contractorWorkOrderStatus"
   | "contractorBasket"
   | "consultantPrice"
+  | "permitStatus"
+  | "startPermitDate"
+  | "endPermitDate"
+  | "noteFromPermitToDepartments"
+  | "countOfDaysFromAssignedDate"
+  | "evaluationPermitStatus"
+  | "employeeName"
+  | "completionPhase"
+  | "phaseStatus"
+  | "targetDrilling"
+  | "achievedDrilling"
+  | "targetExtention"
+  | "achievedExtention"
+  | "descriptionDetails"
+  | "consultantStatement"
+  | "lastDateConsultantStatement"
+  | "officialProjectHours"
+  | "numberOfDaysToAchieveColumn155"
+  | "percentageTime"
+  | "percentageAchieveDrilling"
+  | "percentageAchieveExtention"
   | "actions";
 
 /** Column order: right → left (RTL). */
@@ -109,5 +158,26 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "contractorWorkOrderStatus",
   "contractorBasket",
   "consultantPrice",
+  "permitStatus",
+  "startPermitDate",
+  "endPermitDate",
+  "noteFromPermitToDepartments",
+  "countOfDaysFromAssignedDate",
+  "evaluationPermitStatus",
+  "employeeName",
+  "completionPhase",
+  "phaseStatus",
+  "targetDrilling",
+  "achievedDrilling",
+  "targetExtention",
+  "achievedExtention",
+  "descriptionDetails",
+  "consultantStatement",
+  "lastDateConsultantStatement",
+  "officialProjectHours",
+  "numberOfDaysToAchieveColumn155",
+  "percentageTime",
+  "percentageAchieveDrilling",
+  "percentageAchieveExtention",
   "actions",
 ];
