@@ -13,6 +13,37 @@ export type DocumentRequirementStatKey =
   | "inProgress"
   | "certified";
 
+export type RequirementUploadDisabledReason =
+  | "already_submitted"
+  | "outside_repeat_days"
+  | "missing_permission"
+  | "not_assigned"
+  | "invalid_repetition"
+  | string
+  | null;
+
+export interface RequirementSubmissionFilePreview {
+  id: string;
+  name: string;
+  url?: string;
+}
+
+export interface RequirementLatestSubmissionPreview {
+  id: string;
+  submittedAt?: string;
+  files: RequirementSubmissionFilePreview[];
+}
+
+export interface RequirementUploadStatus {
+  canUpload: boolean;
+  disabledReason: RequirementUploadDisabledReason;
+  currentPeriodKey?: string;
+  periodStartsAt?: string;
+  periodEndsAt?: string;
+  nextAvailableAt?: string;
+  latestSubmission: RequirementLatestSubmissionPreview | null;
+}
+
 export interface DocumentRequirementRow {
   id: string;
   requirementCode: string;
@@ -27,6 +58,7 @@ export interface DocumentRequirementRow {
   submissionStatus: DocumentRequirementSubmissionStatus;
   linkedDocument: string;
   completionPercent: number;
+  uploadStatus: RequirementUploadStatus;
 }
 
 export interface DocumentRequirementStat {

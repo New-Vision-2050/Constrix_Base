@@ -960,6 +960,53 @@ export const projectMessages = new MessagesGroup({
     actions: _m("Actions", "الاجراءات"),
     action: _m("Action", "إجراء"),
     view: _m("View", "عرض"),
+    upload: new MessagesGroup({
+      title: _m("Upload requirement files", "رفع ملفات المتطلب"),
+      pickFiles: _m("Choose files", "اختر الملفات"),
+      pickFilesHint: _m(
+        "You can select one or more files",
+        "يمكنك اختيار ملف أو أكثر",
+      ),
+      filesRequired: _m("Please select at least one file", "يرجى اختيار ملف واحد على الأقل"),
+      submit: _m("Upload", "رفع"),
+      success: _m("Files uploaded successfully", "تم رفع الملفات بنجاح"),
+      error: _m("Failed to upload files", "فشل رفع الملفات"),
+      action: _m("Upload files", "رفع ملفات"),
+      availableAgainAt: _m(
+        "Available again at {date}",
+        "متاح مرة أخرى في {date}",
+      ),
+      latestFiles: _m("Latest files", "أحدث الملفات"),
+      disabledReasons: new MessagesGroup({
+        already_submitted: _m(
+          "Already uploaded for this period",
+          "تم الرفع بالفعل لهذه الفترة",
+        ),
+        outside_repeat_days: _m(
+          "Upload is not available today",
+          "الرفع غير متاح اليوم",
+        ),
+        missing_permission: _m(
+          "You do not have permission to upload",
+          "ليس لديك صلاحية للرفع",
+        ),
+        not_assigned: _m(
+          "This requirement is not assigned to your company",
+          "هذا المتطلب غير مسند لشركتك",
+        ),
+        invalid_repetition: _m(
+          "Invalid repetition configuration",
+          "إعداد التكرار غير صالح",
+        ),
+        unknown: _m("Upload is currently unavailable", "الرفع غير متاح حالياً"),
+      }),
+    }),
+    history: new MessagesGroup({
+      title: _m("Submission history", "سجل التقديمات"),
+      action: _m("Submission history", "سجل التقديمات"),
+      empty: _m("No submissions yet", "لا توجد تقديمات بعد"),
+      noFiles: _m("No files in this submission", "لا توجد ملفات في هذا التقديم"),
+    }),
     once: _m("Once", "مرة واحدة"),
     addRequirement: _m("Add requirement", "إضافة متطلب"),
     add: _m("Add", "إضافة"),

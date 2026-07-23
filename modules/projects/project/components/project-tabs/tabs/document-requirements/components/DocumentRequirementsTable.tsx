@@ -6,18 +6,23 @@ import {
   Button,
   CircularProgress,
   InputAdornment,
+  ListItemIcon,
+  ListItemText,
   MenuItem,
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
   ExternalLink,
   EyeIcon,
   Filter,
+  History,
   Plus,
   Search,
+  Upload,
 } from "lucide-react";
 import { alpha } from "@mui/material/styles";
 import { useTranslations } from "next-intl";
@@ -28,8 +33,12 @@ import { useProjectRequirements } from "@/modules/projects/project/query/useProj
 import RequirementStatsCards from "./RequirementStatsCards";
 import SubmissionStatusBadge from "./SubmissionStatusBadge";
 import AddDocumentRequirementDialog from "./AddDocumentRequirementDialog";
+import UploadRequirementFilesDialog from "./UploadRequirementFilesDialog";
+import SubmissionHistoryDialog from "./SubmissionHistoryDialog";
+import LatestSubmissionPreview from "./LatestSubmissionPreview";
 import { DOCUMENT_REQUIREMENT_STATS } from "../constants/mock-data";
 import type { DocumentRequirementRow } from "../types";
+import { getUploadDisabledReasonKey } from "../utils/uploadStatus";
 
 const TableLayout = HeadlessTableLayout<DocumentRequirementRow>(
   "document-requirements-table",
@@ -104,6 +113,10 @@ export default function DocumentRequirementsTable() {
   const [filterPhase, setFilterPhase] = useState("");
   const [filterEntity, setFilterEntity] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [uploadRequirement, setUploadRequirement] =
+    useState<DocumentRequirementRow | null>(null);
+  const [historyRequirement, setHistoryRequirement] =
+    useState<DocumentRequirementRow | null>(null);
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
@@ -135,9 +148,7 @@ export default function DocumentRequirementsTable() {
   const entities = useMemo(
     () =>
       Array.from(
-        new Set(
-          rows.flatMap((r) => [r.sendingEntity, r.reviewingEntity]),
-        ),
+        new Set(rows.flatMap((r) => [r.sendingEntity, r.reviewingEntity])),
       ),
     [rows],
   );
@@ -213,7 +224,10 @@ export default function DocumentRequirementsTable() {
         name: t("documentType"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography component="span" sx={{ color: "#38BDF8", fontWeight: 500 }}>
+          <Typography
+            component="span"
+            sx={{ color: "#38BDF8", fontWeight: 500 }}
+          >
             {row.documentType}
           </Typography>
         ),
@@ -231,7 +245,10 @@ export default function DocumentRequirementsTable() {
         name: t("phase"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography component="span" sx={{ color: "#22C55E", fontWeight: 500 }}>
+          <Typography
+            component="span"
+            sx={{ color: "#22C55E", fontWeight: 500 }}
+          >
             {row.phase}
           </Typography>
         ),
@@ -241,7 +258,10 @@ export default function DocumentRequirementsTable() {
         name: t("sendingEntity"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography component="span" sx={{ color: "#38BDF8", fontWeight: 500 }}>
+          <Typography
+            component="span"
+            sx={{ color: "#38BDF8", fontWeight: 500 }}
+          >
             {row.sendingEntity}
           </Typography>
         ),
@@ -251,7 +271,10 @@ export default function DocumentRequirementsTable() {
         name: t("reviewingEntity"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography component="span" sx={{ color: "#A78BFA", fontWeight: 500 }}>
+          <Typography
+            component="span"
+            sx={{ color: "#A78BFA", fontWeight: 500 }}
+          >
             {row.reviewingEntity}
           </Typography>
         ),
@@ -261,9 +284,7 @@ export default function DocumentRequirementsTable() {
         name: t("frequency"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <span>
-            {row.frequency === "once" ? t("once") : row.frequency}
-          </span>
+          <span>{row.frequency === "once" ? t("once") : row.frequency}</span>
         ),
       },
       {
@@ -279,16 +300,30 @@ export default function DocumentRequirementsTable() {
         name: t("linkedDocument"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.75,
-              color: "text.primary",
-            }}
-          >
-            <span>{row.linkedDocument}</span>
-            <ExternalLink size={14} />
+          <Box sx={{ minWidth: 0, maxWidth: 280 }}>
+            {/* <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.75,
+                color: "text.primary",
+                maxWidth: "100%",
+              }}
+            >
+              <Typography
+                component="span"
+                noWrap
+                sx={{ fontSize: "0.875rem", fontWeight: 500 }}
+              >
+                {row.linkedDocument}
+              </Typography>
+              <ExternalLink size={14} style={{ flexShrink: 0 }} />
+            </Box> */}
+            <LatestSubmissionPreview
+              submission={row.uploadStatus.latestSubmission}
+              nextAvailableAt={row.uploadStatus.nextAvailableAt}
+              canUpload={row.uploadStatus.canUpload}
+            />
           </Box>
         ),
       },
@@ -304,28 +339,121 @@ export default function DocumentRequirementsTable() {
         key: "actions",
         name: t("actions"),
         sortable: false,
-        render: () => (
-          <CustomMenu
-            renderAnchor={({ onClick }) => (
-              <Button
-                size="small"
-                variant="contained"
-                color="primary"
-                onClick={onClick}
-              >
-                {t("action")}
-              </Button>
-            )}
-          >
-            <Button
-              size="small"
-              sx={{ width: "100%", justifyContent: "flex-start", px: 2 }}
+        render: (row: DocumentRequirementRow) => {
+          const canUpload = row.uploadStatus.canUpload;
+          const reasonKey = getUploadDisabledReasonKey(
+            row.uploadStatus.disabledReason,
+          );
+          const disabledReason =
+            !canUpload && reasonKey
+              ? t(`upload.disabledReasons.${reasonKey}`)
+              : undefined;
+
+          return (
+            <CustomMenu
+              renderAnchor={({ onClick }) => (
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={onClick}
+                  sx={{
+                    borderRadius: "10px",
+                    textTransform: "none",
+                    fontWeight: 700,
+                    minWidth: 84,
+                    px: 2,
+                  }}
+                >
+                  {t("action")}
+                </Button>
+              )}
+              menuProps={{
+                anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                transformOrigin: { vertical: "top", horizontal: "right" },
+                PaperProps: {
+                  sx: {
+                    mt: 0.75,
+                    minWidth: 200,
+                    borderRadius: "12px",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    overflow: "hidden",
+                    boxShadow: (theme) =>
+                      `0 10px 30px ${alpha(theme.palette.common.black, 0.35)}`,
+                  },
+                },
+                MenuListProps: {
+                  sx: { py: 0.5 },
+                },
+              }}
             >
-              {t("view")}
-              <EyeIcon className="h-4 w-4 ms-2" />
-            </Button>
-          </CustomMenu>
-        ),
+              <Tooltip
+                title={disabledReason ?? ""}
+                disableHoverListener={canUpload}
+                placement="left"
+              >
+                <span>
+                  <MenuItem
+                    disabled={!canUpload}
+                    onClick={() => setUploadRequirement(row)}
+                    sx={{
+                      py: 1.1,
+                      px: 1.5,
+                      gap: 1,
+                      borderRadius: 1,
+                      mx: 0.5,
+                      "&.Mui-disabled": { opacity: 0.45 },
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 28 }}>
+                      <Upload size={16} />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t("upload.action")}
+                      primaryTypographyProps={{ fontSize: "0.875rem" }}
+                    />
+                  </MenuItem>
+                </span>
+              </Tooltip>
+              <MenuItem
+                onClick={() => setHistoryRequirement(row)}
+                sx={{
+                  py: 1.1,
+                  px: 1.5,
+                  gap: 1,
+                  borderRadius: 1,
+                  mx: 0.5,
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 28 }}>
+                  <History size={16} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={t("history.action")}
+                  primaryTypographyProps={{ fontSize: "0.875rem" }}
+                />
+              </MenuItem>
+              <MenuItem
+                sx={{
+                  py: 1.1,
+                  px: 1.5,
+                  gap: 1,
+                  borderRadius: 1,
+                  mx: 0.5,
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 28 }}>
+                  <EyeIcon size={16} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={t("view")}
+                  primaryTypographyProps={{ fontSize: "0.875rem" }}
+                />
+              </MenuItem>
+            </CustomMenu>
+          );
+        },
       },
     ],
     [t],
@@ -339,7 +467,9 @@ export default function DocumentRequirementsTable() {
     params,
     selectable: true,
     getRowId: (row: DocumentRequirementRow) => row.id,
-    loading: !!projectId && (requirementsQuery.isLoading || requirementsQuery.isFetching),
+    loading:
+      !!projectId &&
+      (requirementsQuery.isLoading || requirementsQuery.isFetching),
     searchable: false,
     onExport: async () => {},
     getRowSx: (_row: DocumentRequirementRow, index: number) => ({
@@ -558,13 +688,27 @@ export default function DocumentRequirementsTable() {
       >
         <TableLayout
           filters={undefined}
-          table={<TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />}
+          table={
+            <TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />
+          }
           pagination={<TableLayout.Pagination state={state} />}
         />
       </Paper>
       <AddDocumentRequirementDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
+      />
+      <UploadRequirementFilesDialog
+        open={!!uploadRequirement}
+        onClose={() => setUploadRequirement(null)}
+        projectId={projectId}
+        requirement={uploadRequirement}
+      />
+      <SubmissionHistoryDialog
+        open={!!historyRequirement}
+        onClose={() => setHistoryRequirement(null)}
+        projectId={projectId}
+        requirement={historyRequirement}
       />
     </Box>
   );

@@ -2,6 +2,7 @@ import type { ProjectRequirementDto } from "@/services/api/projects/project-requ
 import type {
   DocumentRequirementRow,
   DocumentRequirementSubmissionStatus,
+  RequirementUploadStatus,
 } from "@/modules/projects/project/components/project-tabs/tabs/document-requirements/types";
 
 function mapEvaluationStatus(
@@ -47,6 +48,36 @@ function toPercent(value: number | string | null | undefined): number {
   return 0;
 }
 
+function mapUploadStatus(
+  item: ProjectRequirementDto,
+): RequirementUploadStatus {
+  const status = item.upload_status;
+  const latest = status?.latest_submission;
+
+  return {
+    canUpload: Boolean(status?.can_upload),
+    disabledReason: status?.disabled_reason ?? null,
+    currentPeriodKey: status?.current_period_key ?? undefined,
+    periodStartsAt: status?.period_starts_at ?? undefined,
+    periodEndsAt: status?.period_ends_at ?? undefined,
+    nextAvailableAt: status?.next_available_at ?? undefined,
+    latestSubmission: latest
+      ? {
+          id: String(latest.id),
+          submittedAt: latest.submitted_at ?? undefined,
+          files: (latest.files ?? []).map((file) => ({
+            id: String(file.id),
+            name:
+              file.file_name?.trim() ||
+              file.name?.trim() ||
+              String(file.id),
+            url: file.url ?? undefined,
+          })),
+        }
+      : null,
+  };
+}
+
 export function mapProjectRequirementDto(
   item: ProjectRequirementDto,
 ): DocumentRequirementRow {
@@ -64,5 +95,6 @@ export function mapProjectRequirementDto(
     submissionStatus: mapEvaluationStatus(item.evaluation_status),
     linkedDocument: item.resulting_document?.trim() || "—",
     completionPercent: toPercent(item.completion_percentage),
+    uploadStatus: mapUploadStatus(item),
   };
 }

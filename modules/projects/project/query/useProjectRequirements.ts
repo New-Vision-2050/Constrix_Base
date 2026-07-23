@@ -94,3 +94,64 @@ export function useCreateProjectRequirements(projectId: string | undefined) {
     },
   });
 }
+
+export function useCreateRequirementSubmission(projectId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      requirementId,
+      files,
+    }: {
+      requirementId: string;
+      files: File[];
+    }) => {
+      if (!projectId) throw new Error("Missing project ID");
+      return ProjectRequirementsApi.createSubmission(
+        projectId,
+        requirementId,
+        files,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      if (!projectId) return;
+      queryClient.invalidateQueries({
+        queryKey: [PROJECT_REQUIREMENTS_QUERY_KEY, projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          PROJECT_REQUIREMENTS_QUERY_KEY,
+          "submissions",
+          projectId,
+          variables.requirementId,
+        ],
+      });
+    },
+  });
+}
+
+export function useRequirementSubmissions(
+  projectId: string | undefined,
+  requirementId: string | undefined,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: [
+      PROJECT_REQUIREMENTS_QUERY_KEY,
+      "submissions",
+      projectId,
+      requirementId,
+    ],
+    queryFn: async () => {
+      const res = await ProjectRequirementsApi.listSubmissions(
+        projectId!,
+        requirementId!,
+      );
+      const body = res.data;
+      const rows = body.payload ?? body.data ?? [];
+      return Array.isArray(rows) ? rows : [];
+    },
+    enabled: !!projectId && !!requirementId && enabled,
+    retry: false,
+  });
+}
