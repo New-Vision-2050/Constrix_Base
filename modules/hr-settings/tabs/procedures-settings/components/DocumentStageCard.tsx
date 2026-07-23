@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   FormControlLabel,
   MenuItem,
   TextField,
@@ -19,11 +20,17 @@ import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-sett
 import type { ProcedureStep } from "@/services/api/crm-settings/procedure-settings/types/response";
 import type { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/types/args";
 import {
+  formsKindToStepCardUi,
+  parseProcedureStepFormsKind,
+} from "@/services/api/crm-settings/procedure-settings/parse-step-forms";
+import {
   fetchManagementHierarchyOptions,
   type ManagementHierarchyOption,
 } from "@/utils/fetchDropdownOptions";
 import { baseURL } from "@/config/axios-config";
 import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
+import { useProceduresSettings } from "../context/ProceduresSettingsContext";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 
 interface DocumentStageCardProps {
   procedureSettingId: string;
@@ -39,6 +46,7 @@ type DocumentStageForm = {
   actionTakerType: string;
   managementHierarchyType: string;
   isDeputyDirector: boolean;
+  receiverCompanyIds: string[];
   procedureOrder: string;
   orgRule: string;
   orgTemplate: string;
@@ -74,6 +82,7 @@ const defaultValues: DocumentStageForm = {
   actionTakerType: "",
   managementHierarchyType: "",
   isDeputyDirector: false,
+  receiverCompanyIds: [],
   procedureOrder: "1",
   orgRule: "",
   orgTemplate: "",
@@ -110,6 +119,7 @@ export default function DocumentStageCard({
 }: DocumentStageCardProps) {
   const { t, tc, tStepCard: ts } = useProceduresSettingsTranslations();
   const { toast } = useToast();
+  const { projectId } = useProceduresSettings();
   const [isEditing, setIsEditing] = useState(!serverStep);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -131,6 +141,16 @@ export default function DocumentStageCard({
       ),
   });
 
+  const { data: sharedCompanies = [], isLoading: isLoadingCompanies } =
+    useQuery({
+      queryKey: ["shared-companies", projectId, "document-stage"],
+      queryFn: async () => {
+        const res = await ProjectSharingApi.getSharedCompanies(projectId!);
+        return res.data.payload ?? [];
+      },
+      enabled: !!projectId,
+    });
+
   useEffect(() => {
     if (!serverStep) {
       reset({
@@ -148,6 +168,10 @@ export default function DocumentStageCard({
       serverStep.action_taker_management_hierarchy_type ??
       "";
 
+    const formsKind = formsKindToStepCardUi(
+      parseProcedureStepFormsKind(serverStep),
+    );
+
     reset({
       procedureName: serverStep.name ?? "",
       actionTakerType: serverStep.action_taker_type ?? "",
@@ -156,6 +180,7 @@ export default function DocumentStageCard({
       isDeputyDirector:
         Boolean(hierarchyRow?.is_Deputy_Director) ||
         hierarchyType === "deputy_manager",
+      receiverCompanyIds: (serverStep.receiver_company_ids ?? []).map(String),
       procedureOrder: String(stepIndex),
       orgRule: serverStep.is_approve
         ? "approve"
@@ -164,8 +189,8 @@ export default function DocumentStageCard({
           : serverStep.is_return_with_notes
             ? "return_with_notes"
             : "approve",
-      orgTemplate: serverStep.forms || "approve",
-      model: serverStep.forms || "",
+      orgTemplate: formsKind,
+      model: formsKind,
       description: "",
       notifyMobileApp: Boolean(serverStep.notify_by_push),
       notifyWorkAlert: Boolean(serverStep.notify_by_sms),
@@ -194,8 +219,21 @@ export default function DocumentStageCard({
         label: ts("options.actionTakerType.assignedUser"),
       },
       { value: "himself", label: ts("options.actionTakerType.himself") },
+      {
+        value: "receiver_company",
+        label: ts("options.actionTakerType.receiverCompany"),
+      },
     ],
     [ts],
+  );
+
+  const companyOptions = useMemo(
+    () =>
+      sharedCompanies.map((company) => ({
+        value: String(company.id),
+        label: company.name,
+      })),
+    [sharedCompanies],
   );
 
   const managementHierarchyOptions = useMemo(
@@ -250,8 +288,7 @@ export default function DocumentStageCard({
     if (
       procedureNameValue &&
       !base.some(
-        (o) =>
-          o.value === procedureNameValue || o.label === procedureNameValue,
+        (o) => o.value === procedureNameValue || o.label === procedureNameValue,
       )
     ) {
       return [
@@ -284,6 +321,18 @@ export default function DocumentStageCard({
       return;
     }
 
+    if (
+      data.actionTakerType === "receiver_company" &&
+      data.receiverCompanyIds.length === 0
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.selectReceiverCompanies"),
+        variant: "destructive",
+      });
+      return;
+    }
+
     const body: CreateStepArgs = {
       name: data.procedureName.trim(),
       action_taker_type: data.actionTakerType,
@@ -298,10 +347,14 @@ export default function DocumentStageCard({
             ],
           }
         : {}),
+      ...(data.actionTakerType === "receiver_company"
+        ? { receiver_company_ids: data.receiverCompanyIds }
+        : {}),
       action_taker_user_ids: [],
       concerned_management_hierarchy_ids: [],
       is_accept: data.orgTemplate === "accept",
-      is_approve: data.orgRule === "approve" || data.orgRule === "approve_timed",
+      is_approve:
+        data.orgRule === "approve" || data.orgRule === "approve_timed",
       is_view_only: data.orgRule === "view_only",
       is_return_with_notes: data.orgRule === "return_with_notes",
       requires_approval_within_period: data.orgRule === "approve_timed",
@@ -542,6 +595,98 @@ export default function DocumentStageCard({
           )}
         />
       </Box>
+
+      {actionTakerType === "receiver_company" ? (
+        <Controller
+          name="receiverCompanyIds"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              select
+              size="small"
+              fullWidth
+              label={<RequiredLabel label={ts("receiverCompanies")} />}
+              disabled={fieldsDisabled || isLoadingCompanies}
+              value={field.value}
+              onChange={(event) => {
+                const value = event.target.value;
+                field.onChange(
+                  typeof value === "string" ? value.split(",") : value,
+                );
+              }}
+              SelectProps={{
+                multiple: true,
+                displayEmpty: true,
+                renderValue: (selected) => {
+                  const ids = selected as string[];
+                  if (!ids.length) {
+                    return (
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        color="text.secondary"
+                      >
+                        {isLoadingCompanies
+                          ? tc("loading")
+                          : ts("selectReceiverCompanies")}
+                      </Typography>
+                    );
+                  }
+                  return (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 0.5,
+                        py: 0.25,
+                      }}
+                    >
+                      {ids.map((id) => {
+                        const label =
+                          companyOptions.find(
+                            (option) => String(option.value) === String(id),
+                          )?.label ?? id;
+                        return (
+                          <Chip
+                            key={id}
+                            size="small"
+                            label={label}
+                            sx={{ maxWidth: 180 }}
+                          />
+                        );
+                      })}
+                    </Box>
+                  );
+                },
+              }}
+              sx={{
+                ...fieldSx,
+                "& .MuiSelect-select": {
+                  minHeight: 40,
+                  display: "flex",
+                  alignItems: "center",
+                },
+              }}
+            >
+              {companyOptions.length === 0 ? (
+                <MenuItem disabled value="">
+                  {isLoadingCompanies ? tc("loading") : tc("noResults")}
+                </MenuItem>
+              ) : (
+                companyOptions.map((option) => (
+                  <MenuItem key={option.value} value={String(option.value)}>
+                    <Checkbox
+                      size="small"
+                      checked={field.value.includes(String(option.value))}
+                    />
+                    {option.label}
+                  </MenuItem>
+                ))
+              )}
+            </TextField>
+          )}
+        />
+      ) : null}
 
       <Box
         sx={{

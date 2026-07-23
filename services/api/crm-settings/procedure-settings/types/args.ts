@@ -45,6 +45,8 @@ export interface CreateStepArgs {
   management_id?: number;
   action_taker_user_ids: string[];
   concerned_management_hierarchy_ids: string[];
+  /** Required when action_taker_type is receiver_company */
+  receiver_company_ids?: string[];
   is_accept: boolean;
   is_approve: boolean;
   is_view_only: boolean;
