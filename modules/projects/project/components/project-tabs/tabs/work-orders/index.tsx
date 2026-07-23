@@ -145,7 +145,7 @@ const WORK_ORDER_DATE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "contractorColumn155EntryDate",
   "startPermitDate",
   "endPermitDate",
-  "lastDateConsultantStatement",
+  // "lastDateConsultantStatement",
 ]);
 
 const PERMIT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
@@ -156,34 +156,34 @@ const PERMIT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
 ]);
 
 const NON_PERMIT_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
-  "employeeName",
-  "completionPhase",
-  "phaseStatus",
-  "targetDrilling",
-  "achievedDrilling",
-  "targetExtention",
-  "achievedExtention",
-  "descriptionDetails",
-  "consultantStatement",
-  "lastDateConsultantStatement",
-  "officialProjectHours",
-  "numberOfDaysToAchieveColumn155",
-  "percentageTime",
-  "percentageAchieveDrilling",
-  "percentageAchieveExtention",
+  // "employeeName",
+  // "completionPhase",
+  // "phaseStatus",
+  // "targetDrilling",
+  // "achievedDrilling",
+  // "targetExtention",
+  // "achievedExtention",
+  // "descriptionDetails",
+  // "consultantStatement",
+  // "lastDateConsultantStatement",
+  // "officialProjectHours",
+  // "numberOfDaysToAchieveColumn155",
+  // "percentageTime",
+  // "percentageAchieveDrilling",
+  // "percentageAchieveExtention",
 ]);
 
 const PROJECT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
-  "employeeName",
-  "completionPhase",
-  "phaseStatus",
-  "targetDrilling",
-  "achievedDrilling",
-  "targetExtention",
-  "achievedExtention",
-  "descriptionDetails",
-  "consultantStatement",
-  "lastDateConsultantStatement",
+  // "employeeName",
+  // "completionPhase",
+  // "phaseStatus",
+  // "targetDrilling",
+  // "achievedDrilling",
+  // "targetExtention",
+  // "achievedExtention",
+  // "descriptionDetails",
+  // "consultantStatement",
+  // "lastDateConsultantStatement",
 ]);
 
 function renderWorkOrderCell(
@@ -201,13 +201,13 @@ function renderWorkOrderCell(
     return <span>{row.permitStatusName || emptyDash}</span>;
   }
 
-  if (key === "completionPhase") {
-    return <span>{row.completionPhaseName || emptyDash}</span>;
-  }
+  // if (key === "completionPhase") {
+  //   return <span>{row.completionPhaseName || emptyDash}</span>;
+  // }
 
-  if (key === "phaseStatus") {
-    return <span>{row.phaseStatusName || emptyDash}</span>;
-  }
+  // if (key === "phaseStatus") {
+  //   return <span>{row.phaseStatusName || emptyDash}</span>;
+  // }
 
   if (WORK_ORDER_DATE_COLUMN_KEYS.has(key)) {
     const formatted = formatDisplayDate(String(row[key]));
@@ -414,35 +414,21 @@ export default function WorkOrdersTab({
 
       evaluationPermitStatus: tFields("evaluationPermitStatus"),
 
-      employeeName: tFields("employeeName"),
-
-      completionPhase: tFields("completionPhase"),
-
-      phaseStatus: tFields("phaseStatus"),
-
-      targetDrilling: tFields("targetDrilling"),
-
-      achievedDrilling: tFields("achievedDrilling"),
-
-      targetExtention: tFields("targetExtention"),
-
-      achievedExtention: tFields("achievedExtention"),
-
-      descriptionDetails: tFields("descriptionDetails"),
-
-      consultantStatement: tFields("consultantStatement"),
-
-      lastDateConsultantStatement: tFields("lastDateConsultantStatement"),
-
-      officialProjectHours: tFields("officialProjectHours"),
-
-      numberOfDaysToAchieveColumn155: tFields("numberOfDaysToAchieveColumn155"),
-
-      percentageTime: tFields("percentageTime"),
-
-      percentageAchieveDrilling: tFields("percentageAchieveDrilling"),
-
-      percentageAchieveExtention: tFields("percentageAchieveExtention"),
+      // employeeName: tFields("employeeName"),
+      // completionPhase: tFields("completionPhase"),
+      // phaseStatus: tFields("phaseStatus"),
+      // targetDrilling: tFields("targetDrilling"),
+      // achievedDrilling: tFields("achievedDrilling"),
+      // targetExtention: tFields("targetExtention"),
+      // achievedExtention: tFields("achievedExtention"),
+      // descriptionDetails: tFields("descriptionDetails"),
+      // consultantStatement: tFields("consultantStatement"),
+      // lastDateConsultantStatement: tFields("lastDateConsultantStatement"),
+      // officialProjectHours: tFields("officialProjectHours"),
+      // numberOfDaysToAchieveColumn155: tFields("numberOfDaysToAchieveColumn155"),
+      // percentageTime: tFields("percentageTime"),
+      // percentageAchieveDrilling: tFields("percentageAchieveDrilling"),
+      // percentageAchieveExtention: tFields("percentageAchieveExtention"),
     }),
 
     [tFields],
