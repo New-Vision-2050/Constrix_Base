@@ -2,6 +2,7 @@ import { MessagesGroup, _m } from "../../types";
 
 export const projectWorkOrdersTabMessages = new MessagesGroup({
   title: _m("Work Orders", "أوامر العمل"),
+  title: _m("Permits", "التصاريح"),
   filtersTitle: _m(
     "Advanced search in work orders list",
     "البحث المتقدم في قائمة أوامر العمل",
