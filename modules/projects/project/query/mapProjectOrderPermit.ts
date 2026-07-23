@@ -30,6 +30,12 @@ export function mapProjectOrderPermitDto(
 ): WorkOrderRow {
   return {
     id: String(dto.id),
+    orderPermitId:
+      dto.order_permit_id != null ? Number(dto.order_permit_id) : null,
+    orderPermitDepartmentId:
+      dto.order_permit_department_id != null
+        ? Number(dto.order_permit_department_id)
+        : null,
     workOrderId: pickString(dto.name),
     workOrderType: pickString(
       dto.order_permit?.code,
@@ -77,5 +83,57 @@ export function mapProjectOrderPermitDto(
     contractorWorkOrderStatus: pickString(dto.contractor_work_order_status),
     contractorBasket: pickString(dto.contractor_basket),
     consultantPrice: toNumber(dto.consultant_price),
+    permitStatusId:
+      dto.permit_status_id != null ? Number(dto.permit_status_id) : null,
+    permitStatusName: pickString(dto.permit_status_name),
+    startPermitDate: resolveDate(dto.start_permit_date),
+    endPermitDate: resolveDate(dto.end_permit_date),
+    noteFromPermitToDepartments: pickString(dto.note_from_permit_to_departments),
+    isTakedAction:
+      dto.is_taked_action === true || dto.is_taked_action === 1
+        ? "yes"
+        : dto.is_taked_action === false || dto.is_taked_action === 0
+          ? "no"
+          : "",
+    countOfDaysFromAssignedDate:
+      dto.count_of_days_from_assigned_date != null
+        ? String(dto.count_of_days_from_assigned_date)
+        : "",
+    evaluationPermitStatus: pickString(dto.evaluation_permit_status),
+    employeeName: pickString(dto.employee_name),
+    completionPhaseId:
+      dto.completion_phase_id != null ? Number(dto.completion_phase_id) : null,
+    completionPhaseName: pickString(dto.completion_phase_name),
+    phaseStatusId:
+      dto.phase_status_id != null ? Number(dto.phase_status_id) : null,
+    phaseStatusName: pickString(dto.phase_status_name),
+    targetDrilling:
+      dto.target_drilling != null ? String(dto.target_drilling) : "",
+    achievedDrilling:
+      dto.achieved_drilling != null ? String(dto.achieved_drilling) : "",
+    targetExtention:
+      dto.target_extention != null ? String(dto.target_extention) : "",
+    achievedExtention:
+      dto.achieved_extention != null ? String(dto.achieved_extention) : "",
+    descriptionDetails: pickString(dto.description_details),
+    consultantStatement: pickString(dto.consultant_statement),
+    lastDateConsultantStatement: resolveDate(dto.last_date_consultant_statement),
+    consultnatStatementStatus: pickString(dto.consultnat_statement_status),
+    officialProjectHours:
+      dto.official_project_hours != null ? String(dto.official_project_hours) : "",
+    numberOfDaysToAchieveColumn155:
+      dto.number_of_days_to_achieve_column_155 != null
+        ? String(dto.number_of_days_to_achieve_column_155)
+        : "",
+    percentageTime:
+      dto.percentage_time != null ? String(dto.percentage_time) : "",
+    percentageAchieveDrilling:
+      dto.percentage_achieve_drilling != null
+        ? String(dto.percentage_achieve_drilling)
+        : "",
+    percentageAchieveExtention:
+      dto.percentage_achieve_extention != null
+        ? String(dto.percentage_achieve_extention)
+        : "",
   };
 }
