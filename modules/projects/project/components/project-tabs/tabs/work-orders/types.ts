@@ -1,5 +1,6 @@
 export interface WorkOrderRow {
   id: string;
+  orderPermitId: number | null;
   orderPermitDepartmentId: number | null;
   workOrderId: string;
   workOrderType: string;
@@ -29,6 +30,14 @@ export interface WorkOrderRow {
   contractorWorkOrderStatus: string;
   contractorBasket: string;
   consultantPrice: number;
+  permitStatusId: number | null;
+  permitStatusName: string;
+  startPermitDate: string;
+  endPermitDate: string;
+  noteFromPermitToDepartments: string;
+  isTakedAction: string;
+  countOfDaysFromAssignedDate: string;
+  evaluationPermitStatus: string;
 }
 
 export interface WorkOrderFilters {
@@ -78,6 +87,13 @@ export type WorkOrderColumnKey =
   | "contractorWorkOrderStatus"
   | "contractorBasket"
   | "consultantPrice"
+  | "permitStatus"
+  | "startPermitDate"
+  | "endPermitDate"
+  | "noteFromPermitToDepartments"
+  | "isTakedAction"
+  | "countOfDaysFromAssignedDate"
+  | "evaluationPermitStatus"
   | "actions";
 
 /** Column order: right → left (RTL). */
@@ -110,5 +126,12 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "contractorWorkOrderStatus",
   "contractorBasket",
   "consultantPrice",
+  "permitStatus",
+  "startPermitDate",
+  "endPermitDate",
+  "noteFromPermitToDepartments",
+  "isTakedAction",
+  "countOfDaysFromAssignedDate",
+  "evaluationPermitStatus",
   "actions",
 ];

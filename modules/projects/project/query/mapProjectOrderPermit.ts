@@ -30,6 +30,8 @@ export function mapProjectOrderPermitDto(
 ): WorkOrderRow {
   return {
     id: String(dto.id),
+    orderPermitId:
+      dto.order_permit_id != null ? Number(dto.order_permit_id) : null,
     orderPermitDepartmentId:
       dto.order_permit_department_id != null
         ? Number(dto.order_permit_department_id)
@@ -81,5 +83,22 @@ export function mapProjectOrderPermitDto(
     contractorWorkOrderStatus: pickString(dto.contractor_work_order_status),
     contractorBasket: pickString(dto.contractor_basket),
     consultantPrice: toNumber(dto.consultant_price),
+    permitStatusId:
+      dto.permit_status_id != null ? Number(dto.permit_status_id) : null,
+    permitStatusName: pickString(dto.permit_status_name),
+    startPermitDate: resolveDate(dto.start_permit_date),
+    endPermitDate: resolveDate(dto.end_permit_date),
+    noteFromPermitToDepartments: pickString(dto.note_from_permit_to_departments),
+    isTakedAction:
+      dto.is_taked_action === true || dto.is_taked_action === 1
+        ? "yes"
+        : dto.is_taked_action === false || dto.is_taked_action === 0
+          ? "no"
+          : "",
+    countOfDaysFromAssignedDate:
+      dto.count_of_days_from_assigned_date != null
+        ? String(dto.count_of_days_from_assigned_date)
+        : "",
+    evaluationPermitStatus: pickString(dto.evaluation_permit_status),
   };
 }

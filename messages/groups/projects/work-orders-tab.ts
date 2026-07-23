@@ -95,6 +95,25 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
     ),
     contractorBasket: _m("Contractor basket", "سلة جهة المقاول"),
     consultantPrice: _m("Consultant price", "سعر الاستشاري"),
+    permitStatus: _m("Permit status", "حاله التصريح"),
+    startPermitDate: _m("Permit start date", "تاريخ بدايه التصريح"),
+    endPermitDate: _m("Permit end date", "تاريخ نهاية التصريح"),
+    noteFromPermitToDepartments: _m(
+      "Notes from permit to Projects/Connections dept",
+      "ملاحظات علي التصريح من قسم المشاريع/التوصيلات",
+    ),
+    isTakedAction: _m(
+      "Action taken or warning sent",
+      "هل تم اتخاذ اللازم او ارسال انذار",
+    ),
+    countOfDaysFromAssignedDate: _m(
+      "Days since assignment",
+      "عدد ايام منذ الاسناد",
+    ),
+    evaluationPermitStatus: _m(
+      "Permit evaluation",
+      "تقييم الطلب (التصريح)",
+    ),
     actions: _m("Actions", "الإجراءات"),
     action: _m("Action", "اجراء"),
     edit: _m("Edit", "تعديل"),
@@ -178,6 +197,25 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       ),
       contractorBasket: _m("Contractor basket", "سلة جهة المقاول"),
       consultantPrice: _m("Consultant price", "سعر الاستشاري"),
+      permitStatus: _m("Permit status", "حاله التصريح"),
+      startPermitDate: _m("Permit start date", "تاريخ بدايه التصريح"),
+      endPermitDate: _m("Permit end date", "تاريخ نهاية التصريح"),
+      noteFromPermitToDepartments: _m(
+        "Notes from permit to Projects/Connections dept",
+        "ملاحظات علي التصريح من قسم المشاريع/التوصيلات",
+      ),
+      isTakedAction: _m(
+        "Action taken or warning sent",
+        "هل تم اتخاذ اللازم او ارسال انذار",
+      ),
+      countOfDaysFromAssignedDate: _m(
+        "Days since assignment",
+        "عدد ايام منذ الاسناد",
+      ),
+      evaluationPermitStatus: _m(
+        "Permit evaluation",
+        "تقييم الطلب (التصريح)",
+      ),
       delete: _m("Remove", "الغاء"),
       selectType: _m("Select type", "اختر النوع"),
       selectContractor: _m("Select contractor", "اختر المقاول"),

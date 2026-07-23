@@ -2,12 +2,15 @@ import { baseApi } from "@/config/axios/instances/base";
 import type {
   CreateProjectOrderPermitsArgs,
   ListProjectOrderPermitsParams,
+  UpdateProjectOrderPermitArgs,
 } from "./types/params";
 import type {
+  CompletionDataResponse,
   CreateProjectOrderPermitsResponse,
   ImportProjectOrderPermitsResponse,
   ListProjectOrderPermitDepartmentsResponse,
   ListProjectOrderPermitsResponse,
+  UpdateProjectOrderPermitResponse,
 } from "./types/response";
 
 export const ProjectOrderPermitsApi = {
@@ -53,4 +56,19 @@ export const ProjectOrderPermitsApi = {
       },
     );
   },
+
+  update: (
+    projectId: string | number,
+    id: string | number,
+    body: UpdateProjectOrderPermitArgs,
+  ) =>
+    baseApi.put<UpdateProjectOrderPermitResponse>(
+      `projects/${projectId}/order-permits/${id}`,
+      body,
+    ),
+
+  getCompletionData: (projectOrderPermitId: string | number) =>
+    baseApi.get<CompletionDataResponse>("completion-data", {
+      params: { project_order_permit_id: projectOrderPermitId },
+    }),
 };

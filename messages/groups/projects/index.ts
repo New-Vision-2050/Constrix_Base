@@ -37,6 +37,7 @@ export const projectMessages = new MessagesGroup({
     constructions: _m("Constructions", "الانشاءات"),
     departments: _m("Departments", "الاقسام"),
     workOrders: _m("Permits", "التصاريح"),
+    ordersOfWork: _m("Work Orders", "أوامر العمل"),
     managements: _m("Managements", "الإدارات"),
     districts: _m("Districts", "المناطق"),
   }),

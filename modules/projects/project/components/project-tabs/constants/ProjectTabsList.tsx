@@ -15,6 +15,7 @@ import {
   HardHat,
   Building2,
   MapPin,
+  ClipboardList,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -42,6 +43,7 @@ import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
 import ManagementsTab from "../tabs/managements";
 import DistrictsTab from "../tabs/districts";
 import { useConstructionsNestedTabs } from "./useConstructionsNestedTabs";
+import WorkOrdersTab from "../tabs/work-orders";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
@@ -300,6 +302,13 @@ export function useProjectTabsList(): SystemTab[] {
           }
         : null;
 
+    const workOrdersTopTab: SystemTab = {
+      id: "project-tab-work-orders-top",
+      title: tProject("tabs.ordersOfWork"),
+      icon: <ClipboardList className="w-4 h-4" />,
+      content: <WorkOrdersTab />,
+    };
+
     const topLevel: SystemTab[] = [];
     if (
       shouldShowTopLevelTab(
@@ -314,6 +323,8 @@ export function useProjectTabsList(): SystemTab[] {
     }
 
     if (stakeholdersTab) topLevel.push(stakeholdersTab);
+
+    topLevel.push(workOrdersTopTab);
 
     if (constructionsTab) topLevel.push(constructionsTab);
 

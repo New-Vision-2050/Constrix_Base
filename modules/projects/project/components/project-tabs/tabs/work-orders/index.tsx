@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -8,6 +8,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Grid,
   MenuItem,
@@ -35,10 +36,12 @@ import {
   projectOrderPermitsQueryKey,
   useProjectOrderPermits,
 } from "@/modules/projects/project/query/useProjectOrderPermits";
+import { useUpdateOrderPermit } from "@/modules/projects/project/query/useUpdateOrderPermit";
 
 import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
 
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
+import { PerRowEditablePermitCell, type EditablePermitField } from "./EditablePermitCell";
 
 import type { WorkOrderFilters, WorkOrderRow } from "./types";
 
@@ -140,6 +143,16 @@ const WORK_ORDER_DATE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "consultantColumn155EntryDate",
   "contractorLastProcedureDate",
   "contractorColumn155EntryDate",
+  "startPermitDate",
+  "endPermitDate",
+]);
+
+const PERMIT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
+  "permitStatus",
+  "startPermitDate",
+  "endPermitDate",
+  "noteFromPermitToDepartments",
+  "isTakedAction",
 ]);
 
 function renderWorkOrderCell(
@@ -151,6 +164,14 @@ function renderWorkOrderCell(
 ) {
   if (key === "actions") {
     return null;
+  }
+
+  if (key === "permitStatus") {
+    return <span>{row.permitStatusName || emptyDash}</span>;
+  }
+
+  if (key === "isTakedAction") {
+    return <Checkbox checked={row.isTakedAction === "yes"} size="small" sx={{ padding: "4px" }} disabled />;
   }
 
   if (WORK_ORDER_DATE_COLUMN_KEYS.has(key)) {
@@ -180,8 +201,10 @@ function renderWorkOrderCell(
 
 export default function WorkOrdersTab({
   departmentId,
+  isEditable = false,
 }: {
   departmentId?: number;
+  isEditable?: boolean;
 } = {}) {
   const { projectId } = useProject();
 
@@ -196,6 +219,8 @@ export default function WorkOrdersTab({
   const tFields = useTranslations("project.workOrdersTab.dialog.fields");
 
   const emptyDash = t("emptyDash");
+  const yesLabel = t("yes");
+  const noLabel = t("no");
 
   const [filters, setFilters] = useState<WorkOrderFilters>(
     EMPTY_WORK_ORDER_FILTERS,
@@ -218,6 +243,27 @@ export default function WorkOrdersTab({
   const allRows = useMemo(
     () => workOrdersQuery.data ?? [],
     [workOrdersQuery.data],
+  );
+
+  const updatePermitMutation = useUpdateOrderPermit(projectId);
+
+  const handlePermitSave = useCallback(
+    (id: string, body: Record<string, unknown>) => {
+      if (!projectId) return;
+      updatePermitMutation.mutate(
+        { id, body },
+        {
+          onSuccess: (res) => {
+            toast.success(res.data?.message ?? t("importSuccess"));
+          },
+          onError: (err: unknown) => {
+            const error = err as { response?: { data?: { message?: string } } };
+            toast.error(error?.response?.data?.message ?? t("importError"));
+          },
+        },
+      );
+    },
+    [projectId, updatePermitMutation, t],
   );
 
   const workOrderTypeOptions = useMemo(
@@ -318,6 +364,20 @@ export default function WorkOrdersTab({
       contractorBasket: tFields("contractorBasket"),
 
       consultantPrice: tFields("consultantPrice"),
+
+      permitStatus: tFields("permitStatus"),
+
+      startPermitDate: tFields("startPermitDate"),
+
+      endPermitDate: tFields("endPermitDate"),
+
+      noteFromPermitToDepartments: tFields("noteFromPermitToDepartments"),
+
+      isTakedAction: tFields("isTakedAction"),
+
+      countOfDaysFromAssignedDate: tFields("countOfDaysFromAssignedDate"),
+
+      evaluationPermitStatus: tFields("evaluationPermitStatus"),
     }),
 
     [tFields],
@@ -362,12 +422,36 @@ export default function WorkOrdersTab({
 
           sortable: false,
 
-          render: (row: WorkOrderRow) =>
-            renderWorkOrderCell(row, key, emptyDash),
+          render: (row: WorkOrderRow) => {
+            if (isEditable && PERMIT_EDITABLE_COLUMN_KEYS.has(key)) {
+              return (
+                <PerRowEditablePermitCell
+                  row={row}
+                  field={key as EditablePermitField}
+                  emptyDash={emptyDash}
+                  yesLabel={yesLabel}
+                  noLabel={noLabel}
+                  onSave={handlePermitSave}
+                />
+              );
+            }
+
+            if (key === "permitStatus") {
+              return (
+                <span>{row.permitStatusName || emptyDash}</span>
+              );
+            }
+
+            if (key === "isTakedAction") {
+              return <Checkbox checked={row.isTakedAction === "yes"} size="small" sx={{ padding: "4px" }} disabled />;
+            }
+
+            return renderWorkOrderCell(row, key, emptyDash);
+          },
         };
       }),
 
-    [columnLabels, tTable, emptyDash],
+    [columnLabels, tTable, emptyDash, isEditable, handlePermitSave, yesLabel, noLabel],
   );
 
   const handleExport = () => {
