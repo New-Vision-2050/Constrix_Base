@@ -37,6 +37,8 @@ interface DocumentStageCardProps {
 type DocumentStageForm = {
   procedureName: string;
   actionTakerType: string;
+  managementHierarchyType: string;
+  isDeputyDirector: boolean;
   procedureOrder: string;
   orgRule: string;
   orgTemplate: string;
@@ -52,9 +54,26 @@ type DocumentStageForm = {
   escalationEntity: string;
 };
 
+const MANAGEMENT_HIERARCHY_TYPE_OPTIONS = [
+  {
+    value: "project_manager",
+    labelKey: "options.managementHierarchy.projectManager" as const,
+  },
+  {
+    value: "branch_manager",
+    labelKey: "options.managementHierarchy.branchManager" as const,
+  },
+  {
+    value: "management_manager",
+    labelKey: "options.managementHierarchy.managementManager" as const,
+  },
+] as const;
+
 const defaultValues: DocumentStageForm = {
   procedureName: "",
   actionTakerType: "",
+  managementHierarchyType: "",
+  isDeputyDirector: false,
   procedureOrder: "1",
   orgRule: "",
   orgTemplate: "",
@@ -102,6 +121,7 @@ export default function DocumentStageCard({
   });
 
   const fieldsDisabled = !isEditing || isSaving;
+  const actionTakerType = watch("actionTakerType");
 
   const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
     queryKey: ["managements", "hierarchy", "management", "document-stage"],
@@ -122,9 +142,20 @@ export default function DocumentStageCard({
       return;
     }
 
+    const hierarchyRow = serverStep.action_taker_management_hierarchies?.[0];
+    const hierarchyType =
+      hierarchyRow?.action_taker_management_hierarchy_type ??
+      serverStep.action_taker_management_hierarchy_type ??
+      "";
+
     reset({
       procedureName: serverStep.name ?? "",
       actionTakerType: serverStep.action_taker_type ?? "",
+      managementHierarchyType:
+        hierarchyType === "deputy_manager" ? "" : hierarchyType,
+      isDeputyDirector:
+        Boolean(hierarchyRow?.is_Deputy_Director) ||
+        hierarchyType === "deputy_manager",
       procedureOrder: String(stepIndex),
       orgRule: serverStep.is_approve
         ? "approve"
@@ -164,6 +195,15 @@ export default function DocumentStageCard({
       },
       { value: "himself", label: ts("options.actionTakerType.himself") },
     ],
+    [ts],
+  );
+
+  const managementHierarchyOptions = useMemo(
+    () =>
+      MANAGEMENT_HIERARCHY_TYPE_OPTIONS.map((option) => ({
+        value: option.value,
+        label: ts(option.labelKey),
+      })),
     [ts],
   );
 
@@ -232,9 +272,32 @@ export default function DocumentStageCard({
       return;
     }
 
+    if (
+      data.actionTakerType === "management_hierarchy" &&
+      !data.managementHierarchyType
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.selectManagementHierarchy"),
+        variant: "destructive",
+      });
+      return;
+    }
+
     const body: CreateStepArgs = {
       name: data.procedureName.trim(),
       action_taker_type: data.actionTakerType,
+      ...(data.actionTakerType === "management_hierarchy"
+        ? {
+            action_taker_management_hierarchies: [
+              {
+                action_taker_management_hierarchy_type:
+                  data.managementHierarchyType,
+                is_Deputy_Director: data.isDeputyDirector,
+              },
+            ],
+          }
+        : {}),
       action_taker_user_ids: [],
       concerned_management_hierarchy_ids: [],
       is_accept: data.orgTemplate === "accept",
@@ -277,9 +340,25 @@ export default function DocumentStageCard({
       onSaved();
     } catch (error) {
       console.error("Error saving document stage:", error);
+      const apiMessage = (
+        error as {
+          response?: {
+            data?: {
+              message?: string;
+              errors?: Record<string, string[]>;
+            };
+          };
+        }
+      )?.response?.data;
+      const firstFieldError = apiMessage?.errors
+        ? Object.values(apiMessage.errors).flat()[0]
+        : undefined;
       toast({
         title: t("actions.save"),
-        description: t("messages.error"),
+        description:
+          (typeof firstFieldError === "string" && firstFieldError) ||
+          (typeof apiMessage?.message === "string" && apiMessage.message) ||
+          t("messages.error"),
         variant: "destructive",
       });
     } finally {
@@ -396,6 +475,51 @@ export default function DocumentStageCard({
             </TextField>
           )}
         />
+
+        {actionTakerType === "management_hierarchy" ? (
+          <>
+            <Controller
+              name="managementHierarchyType"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  size="small"
+                  label={
+                    <RequiredLabel label={ts("managementHierarchyType")} />
+                  }
+                  disabled={fieldsDisabled}
+                  sx={fieldSx}
+                >
+                  <MenuItem value="">{tc("select")}</MenuItem>
+                  {managementHierarchyOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+            <Controller
+              name="isDeputyDirector"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  sx={{ m: 0, alignSelf: "center" }}
+                  control={
+                    <Checkbox
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={fieldsDisabled}
+                    />
+                  }
+                  label={ts("options.managementHierarchy.deputyManager")}
+                />
+              )}
+            />
+          </>
+        ) : null}
 
         <Controller
           name="procedureOrder"
