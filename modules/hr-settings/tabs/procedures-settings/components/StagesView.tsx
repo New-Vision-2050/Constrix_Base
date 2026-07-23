@@ -400,7 +400,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 sx={{
                   p: 2,
                   borderRadius: "16px",
-                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.6),
+                  bgcolor: (theme) =>
+                    alpha(theme.palette.background.paper, 0.6),
                   backdropFilter: "blur(10px)",
                   border: "1px solid",
                   borderColor: "divider",
@@ -517,7 +518,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 sx={{
                   p: 3,
                   borderRadius: "16px",
-                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.65),
+                  bgcolor: (theme) =>
+                    alpha(theme.palette.background.paper, 0.65),
                   backdropFilter: "blur(12px)",
                   border: "1px solid",
                   borderColor: "divider",

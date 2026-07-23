@@ -600,91 +600,111 @@ export default function DocumentStageCard({
         <Controller
           name="receiverCompanyIds"
           control={control}
-          render={({ field }) => (
-            <TextField
-              select
-              size="small"
-              fullWidth
-              label={<RequiredLabel label={ts("receiverCompanies")} />}
-              disabled={fieldsDisabled || isLoadingCompanies}
-              value={field.value}
-              onChange={(event) => {
-                const value = event.target.value;
-                field.onChange(
-                  typeof value === "string" ? value.split(",") : value,
-                );
-              }}
-              SelectProps={{
-                multiple: true,
-                displayEmpty: true,
-                renderValue: (selected) => {
-                  const ids = selected as string[];
-                  if (!ids.length) {
-                    return (
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        color="text.secondary"
-                      >
-                        {isLoadingCompanies
-                          ? tc("loading")
-                          : ts("selectReceiverCompanies")}
-                      </Typography>
-                    );
-                  }
-                  return (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 0.5,
-                        py: 0.25,
-                      }}
-                    >
-                      {ids.map((id) => {
-                        const label =
-                          companyOptions.find(
-                            (option) => String(option.value) === String(id),
-                          )?.label ?? id;
-                        return (
-                          <Chip
-                            key={id}
-                            size="small"
-                            label={label}
-                            sx={{ maxWidth: 180 }}
-                          />
-                        );
-                      })}
-                    </Box>
+          render={({ field }) => {
+            const selectedIds = field.value ?? [];
+            const hasSelection = selectedIds.length > 0;
+
+            return (
+              <TextField
+                select
+                size="small"
+                fullWidth
+                label={<RequiredLabel label={ts("receiverCompanies")} />}
+                disabled={fieldsDisabled || isLoadingCompanies}
+                value={selectedIds}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  field.onChange(
+                    typeof value === "string" ? value.split(",") : value,
                   );
-                },
-              }}
-              sx={{
-                ...fieldSx,
-                "& .MuiSelect-select": {
-                  minHeight: 40,
-                  display: "flex",
-                  alignItems: "center",
-                },
-              }}
-            >
-              {companyOptions.length === 0 ? (
-                <MenuItem disabled value="">
-                  {isLoadingCompanies ? tc("loading") : tc("noResults")}
-                </MenuItem>
-              ) : (
-                companyOptions.map((option) => (
-                  <MenuItem key={option.value} value={String(option.value)}>
-                    <Checkbox
-                      size="small"
-                      checked={field.value.includes(String(option.value))}
-                    />
-                    {option.label}
+                }}
+                InputLabelProps={{ shrink: true }}
+                SelectProps={{
+                  multiple: true,
+                  displayEmpty: true,
+                  renderValue: (selected) => {
+                    const ids = selected as string[];
+                    if (!ids.length) {
+                      return (
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ color: "text.secondary", lineHeight: "24px" }}
+                        >
+                          {isLoadingCompanies
+                            ? tc("loading")
+                            : ts("selectReceiverCompanies")}
+                        </Typography>
+                      );
+                    }
+                    return (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 0.5,
+                          alignItems: "center",
+                        }}
+                      >
+                        {ids.map((id) => {
+                          const optionLabel =
+                            companyOptions.find(
+                              (option) => String(option.value) === String(id),
+                            )?.label ?? id;
+                          return (
+                            <Chip
+                              key={id}
+                              size="small"
+                              label={optionLabel}
+                              sx={{
+                                maxWidth: 200,
+                                height: 24,
+                                "& .MuiChip-label": { px: 1 },
+                              }}
+                            />
+                          );
+                        })}
+                      </Box>
+                    );
+                  },
+                  MenuProps: {
+                    PaperProps: {
+                      sx: { maxHeight: 280 },
+                    },
+                  },
+                }}
+                sx={{
+                  ...fieldSx,
+                  "& .MuiOutlinedInput-root": {
+                    minHeight: 40,
+                    alignItems: hasSelection ? "flex-start" : "center",
+                  },
+                  "& .MuiSelect-select": {
+                    py: hasSelection ? 1 : 1.05,
+                    display: "flex",
+                    alignItems: "center",
+                    minHeight: "24px !important",
+                  },
+                }}
+              >
+                {companyOptions.length === 0 ? (
+                  <MenuItem disabled value="__empty__">
+                    {isLoadingCompanies ? tc("loading") : tc("noResults")}
                   </MenuItem>
-                ))
-              )}
-            </TextField>
-          )}
+                ) : (
+                  companyOptions.map((option) => (
+                    <MenuItem key={option.value} value={String(option.value)}>
+                      <Checkbox
+                        size="small"
+                        checked={selectedIds.includes(String(option.value))}
+                      />
+                      {option.label}
+                    </MenuItem>
+                  ))
+                )}
+              </TextField>
+            );
+          }}
         />
       ) : null}
 
