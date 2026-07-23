@@ -3,6 +3,7 @@ import { projectInboxMessages } from "./inbox";
 import { projectShareTabMessages } from "./share-tab";
 import { projectContractorsTabMessages } from "./contractors-tab";
 import { projectWorkOrdersTabMessages } from "./work-orders-tab";
+import { projectSafetyTabMessages } from "./safety-tab";
 import { projectManagementsTabMessages } from "./managements-tab";
 import { projectDistrictsTabMessages } from "./districts-tab";
 import { projectSettingsMessages } from "./settings";
@@ -13,6 +14,7 @@ export const projectMessages = new MessagesGroup({
   shareTab: projectShareTabMessages,
   contractorsTab: projectContractorsTabMessages,
   workOrdersTab: projectWorkOrdersTabMessages,
+  safetyTab: projectSafetyTabMessages,
   managementsTab: projectManagementsTabMessages,
   districtsTab: projectDistrictsTabMessages,
   tabs: new MessagesGroup({
@@ -40,6 +42,7 @@ export const projectMessages = new MessagesGroup({
     ordersOfWork: _m("Work Orders", "أوامر العمل"),
     managements: _m("Managements", "الإدارات"),
     districts: _m("Districts", "المناطق"),
+    safety: _m("Safety", "السلامة"),
   }),
   addProject: _m("Add Project", "إضافة مشروع"),
   editProject: _m("Edit Project", "تعديل مشروع"),
