@@ -618,10 +618,6 @@ export default function WorkOrdersTab({
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
-      <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-        {t("title")}
-      </Typography>
-
       {workOrdersQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
           {t("loadError")}
