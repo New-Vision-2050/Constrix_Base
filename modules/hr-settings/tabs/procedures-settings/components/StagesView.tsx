@@ -10,6 +10,7 @@ import {
   Grid,
   IconButton,
   MenuItem,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -129,21 +130,24 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     const [pendingDraftKeys, setPendingDraftKeys] = useState<string[]>([]);
 
     const handleAddStep = () => {
+      if (!selectedProcedureId) return;
       const key = crypto.randomUUID();
-      if (selectedProcedureId) {
-        setDraftStepKeys((prev) => ({
-          ...prev,
-          [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
-        }));
-      } else {
-        setPendingDraftKeys((prev) => [...prev, key]);
-      }
+      setDraftStepKeys((prev) => ({
+        ...prev,
+        [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
+      }));
     };
 
     useImperativeHandle(ref, () => ({
-      openAddProcedureDialog: () => setClassificationDialogOpen(true),
+      openAddProcedureDialog: () => {
+        if (!parentId) return;
+        setClassificationDialogOpen(true);
+      },
       addStage: handleAddStep,
     }));
+
+    const canAddSidebarProcedure = !!parentId;
+    const canAddStage = procedures.length > 0 && !!selectedProcedureId;
 
     useEffect(() => {
       if (!procedures.length) {
@@ -486,26 +490,37 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                   </Box>
                 ))}
 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<AddIcon />}
-                  fullWidth
-                  onClick={() => setAddDialogOpen(true)}
-                  sx={{
-                    justifyContent: "center",
-                    mt: 1,
-                    fontWeight: 700,
-                    px: 1.5,
-                    py: 1,
-                    borderRadius: "12px",
-                    textTransform: "none",
-                    boxShadow: (theme) =>
-                      `0 4px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
-                  }}
+                <Tooltip
+                  title={
+                    canAddSidebarProcedure
+                      ? ""
+                      : t("messages.addSideProcedureRequiresTop")
+                  }
                 >
-                  {t("procedures.addProcedure")}
-                </Button>
+                  <span style={{ display: "block", width: "100%" }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<AddIcon />}
+                      fullWidth
+                      disabled={!canAddSidebarProcedure}
+                      onClick={() => setAddDialogOpen(true)}
+                      sx={{
+                        justifyContent: "center",
+                        mt: 1,
+                        fontWeight: 700,
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: "12px",
+                        textTransform: "none",
+                        boxShadow: (theme) =>
+                          `0 4px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      }}
+                    >
+                      {t("procedures.addProcedure")}
+                    </Button>
+                  </span>
+                </Tooltip>
               </Box>
             </Grid>
 
@@ -605,23 +620,34 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                       {t("steps.modelStagesDescription")}
                     </Typography>
                   </Box>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleAddStep}
-                    sx={{
-                      flexShrink: 0,
-                      whiteSpace: "nowrap",
-                      borderRadius: "12px",
-                      textTransform: "none",
-                      fontWeight: 700,
-                      px: 2,
-                      boxShadow: (theme) =>
-                        `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                    }}
+                  <Tooltip
+                    title={
+                      canAddStage
+                        ? ""
+                        : t("messages.addStageRequiresSideProcedure")
+                    }
                   >
-                    {t("steps.addStage")}
-                  </Button>
+                    <span>
+                      <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={handleAddStep}
+                        disabled={!canAddStage}
+                        sx={{
+                          flexShrink: 0,
+                          whiteSpace: "nowrap",
+                          borderRadius: "12px",
+                          textTransform: "none",
+                          fontWeight: 700,
+                          px: 2,
+                          boxShadow: (theme) =>
+                            `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+                        }}
+                      >
+                        {t("steps.addStage")}
+                      </Button>
+                    </span>
+                  </Tooltip>
                 </Box>
 
                 <Box
