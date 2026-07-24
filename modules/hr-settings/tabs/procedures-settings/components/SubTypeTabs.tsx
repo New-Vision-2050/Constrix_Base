@@ -119,7 +119,10 @@ export default function SubTypeTabs() {
   const activeOuterTab =
     outerTabs.find((tab) => tab.id === selectedOuter) ?? outerTabs[0];
 
-  const currentTabType = activeOuterTab?.type ?? outerTabs[0]?.type ?? "";
+  const currentTabType =
+    activeOuterTab?.type ??
+    outerTabs[0]?.type ??
+    (useDocumentSequenceLayout ? "project_procedure" : "");
 
   useEffect(() => {
     if (useDocumentSequenceLayout && selectedProcedureId) {
@@ -130,6 +133,11 @@ export default function SubTypeTabs() {
         setSelectedOuter(match.id);
         return;
       }
+    }
+
+    if (outerTabs.length === 0) {
+      if (selectedOuter !== 0) setSelectedOuter(0);
+      return;
     }
 
     if (!outerTabs.some((tab) => tab.id === selectedOuter)) {
@@ -674,7 +682,7 @@ export default function SubTypeTabs() {
           }}
         >
           <Tabs
-            value={selectedOuter}
+            value={outerTabs.length > 0 ? selectedOuter : false}
             onChange={(_, val: number) => {
               setSelectedOuter(val);
               setSelectedProcedureId(null);
@@ -777,7 +785,7 @@ export default function SubTypeTabs() {
         )
       )}
 
-      {activeOuterTab && (
+      {(useDocumentSequenceLayout || activeOuterTab) && (
         <>
           {!useDocumentSequenceLayout && (
             <Paper
