@@ -339,6 +339,14 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "Procedure deleted successfully",
       "تم حذف الإجراء بنجاح",
     ),
+    addSideProcedureRequiresTop: _m(
+      "Add a procedure from the top first",
+      "أضف إجراءً من الأعلى أولاً",
+    ),
+    addStageRequiresSideProcedure: _m(
+      "Add a procedure from the side list first",
+      "أضف إجراءً من القائمة الجانبية أولاً",
+    ),
     error: _m("Something went wrong", "حدث خطأ ما"),
   }),
   taskActionDialog: new MessagesGroup({

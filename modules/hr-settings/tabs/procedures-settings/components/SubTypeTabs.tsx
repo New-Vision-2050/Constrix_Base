@@ -293,6 +293,97 @@ export default function SubTypeTabs() {
     [],
   );
 
+  const findProcedureForOuterTab = useCallback(
+    (procedureId?: string) => {
+      if (!procedureId) return null;
+      return (
+        internalProcedures.find((procedure) => procedure.id === procedureId) ??
+        null
+      );
+    },
+    [internalProcedures],
+  );
+
+  const renderOuterTabLabel = useCallback(
+    (tab: { id: number; name: string; type: string; label?: string; procedureId?: string }) => {
+      const procedure = findProcedureForOuterTab(tab.procedureId);
+      const canManage = !!procedure;
+      const canDelete =
+        !!procedure &&
+        !isPrimaryInternalProcedure(procedure, internalProcedures) &&
+        !isLastInternalProcedure(procedure, internalProcedures);
+
+      return (
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.75,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <span>{resolveOuterTabLabel(tab, ts)}</span>
+          {canManage ? (
+            <CustomMenu
+              renderAnchor={({ onClick }) => (
+                <IconButton
+                  size="small"
+                  aria-label={t("stages.editStage")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick(e);
+                  }}
+                  sx={{
+                    p: 0.25,
+                    color: "inherit",
+                    "&:hover": {
+                      bgcolor: "rgba(255, 255, 255, 0.08)",
+                    },
+                  }}
+                >
+                  <Settings sx={{ fontSize: 18 }} />
+                </IconButton>
+              )}
+            >
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditProcedureDialog(procedure);
+                }}
+              >
+                <Edit fontSize="small" sx={{ mr: 1 }} />
+                {t("actions.edit")}
+              </MenuItem>
+              {canDelete ? (
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setProcedureToDelete(procedure);
+                    setDeleteConfirmOpen(true);
+                  }}
+                  sx={{ color: "error.main" }}
+                >
+                  <Delete fontSize="small" sx={{ mr: 1 }} />
+                  {t("actions.delete")}
+                </MenuItem>
+              ) : null}
+            </CustomMenu>
+          ) : (
+            getOuterTabIcon(tab.type)
+          )}
+        </Box>
+      );
+    },
+    [
+      findProcedureForOuterTab,
+      internalProcedures,
+      openEditProcedureDialog,
+      t,
+      ts,
+    ],
+  );
+
   const closeDeleteConfirm = useCallback(() => {
     setDeleteConfirmOpen(false);
     setProcedureToDelete(null);
@@ -383,6 +474,11 @@ export default function SubTypeTabs() {
         await queryClient.invalidateQueries({
           queryKey: ["procedure-settings", "stages", editingProcedure.id],
         });
+        if (useDocumentSequenceLayout) {
+          await queryClient.invalidateQueries({
+            queryKey: [DOCUMENT_SEQUENCE_TABS_QUERY_KEY],
+          });
+        }
 
         toast({
           title: t("actions.edit"),
@@ -405,6 +501,7 @@ export default function SubTypeTabs() {
       projectId,
       refetchInternalProcedures,
       queryClient,
+      useDocumentSequenceLayout,
       t,
       toast,
     ],
@@ -631,24 +728,7 @@ export default function SubTypeTabs() {
               <Tab
                 key={tab.id}
                 value={tab.id}
-                label={
-                  <Box
-                    sx={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 0.75,
-                      position: "relative",
-                      zIndex: 1,
-                      "& svg": {
-                        width: 16,
-                        height: 16,
-                      },
-                    }}
-                  >
-                    {getOuterTabIcon(tab.type)}
-                    <span>{resolveOuterTabLabel(tab, ts)}</span>
-                  </Box>
-                }
+                label={renderOuterTabLabel(tab)}
               />
             ))}
           </Tabs>
