@@ -27,15 +27,3 @@ export function mapInternalProceduresToOuterTabs(
     procedureId: procedure.id,
   }));
 }
-
-/** Fallback when project has no procedures yet — keeps Add UI usable. */
-export function getEmptyDocumentSequenceOuterTab(
-  label: string,
-): ProceduresSettingsOuterTab {
-  return {
-    id: 0,
-    type: DOCUMENT_SEQUENCE_PROCEDURE_TYPE,
-    name: "projectProcedure",
-    label,
-  };
-}
