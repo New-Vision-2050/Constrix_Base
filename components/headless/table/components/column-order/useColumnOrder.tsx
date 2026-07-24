@@ -57,25 +57,6 @@ export function createColumnOrderHook<TRow>(prefix?: string) {
       });
     }, []);
 
-    // Bulk setter for callers (e.g. column grouping) that need to move more
-    // than one item at once — validated the same way moveColumn is: unknown
-    // keys are dropped, and any known key the caller omitted is appended at
-    // the end rather than silently lost.
-    const setValidatedColumnOrder = useCallback(
-      (nextOrder: ColumnOrderState) => {
-        setColumnOrder((prev) => {
-          const validKeys = new Set(columns.map((col) => col.key));
-          const filtered = nextOrder.filter((key) => validKeys.has(key));
-          const filteredSet = new Set(filtered);
-          const missing = prev.filter(
-            (key) => validKeys.has(key) && !filteredSet.has(key),
-          );
-          return [...filtered, ...missing];
-        });
-      },
-      [columns],
-    );
-
     const resetColumnOrder = useCallback(() => {
       setColumnOrder(columns.map((col) => col.key));
     }, [columns]);
@@ -93,7 +74,6 @@ export function createColumnOrderHook<TRow>(prefix?: string) {
       columnOrder,
       orderedColumns: safeOrderedColumns,
       moveColumn,
-      setColumnOrder: setValidatedColumnOrder,
       resetColumnOrder,
     };
   };

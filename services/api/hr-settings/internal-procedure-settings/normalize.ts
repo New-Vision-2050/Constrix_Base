@@ -128,10 +128,6 @@ function extractInternalProcedurePayload(
 export function normalizeInternalProcedure(
   raw: InternalProcedure | Record<string, unknown>,
 ): InternalProcedure {
-  if (!raw || typeof raw !== "object") {
-    throw new Error("Invalid internal procedure payload");
-  }
-
   const data = extractInternalProcedurePayload(raw as Record<string, unknown>);
 
   return {

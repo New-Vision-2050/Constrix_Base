@@ -16,7 +16,6 @@ import {
   Building2,
   MapPin,
   ClipboardList,
-  ShieldPlus,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -45,7 +44,6 @@ import ManagementsTab from "../tabs/managements";
 import DistrictsTab from "../tabs/districts";
 import { useConstructionsNestedTabs } from "./useConstructionsNestedTabs";
 import WorkOrdersTab from "../tabs/work-orders";
-import SafetyTab from "../tabs/safety";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
@@ -311,13 +309,6 @@ export function useProjectTabsList(): SystemTab[] {
       content: <WorkOrdersTab />,
     };
 
-    const safetyTab: SystemTab = {
-      id: "project-tab-safety",
-      title: tProject("tabs.safety"),
-      icon: <ShieldPlus className="w-4 h-4" />,
-      content: <SafetyTab />,
-    };
-
     const topLevel: SystemTab[] = [];
     if (
       shouldShowTopLevelTab(
@@ -336,8 +327,6 @@ export function useProjectTabsList(): SystemTab[] {
     topLevel.push(workOrdersTopTab);
 
     if (constructionsTab) topLevel.push(constructionsTab);
-
-    topLevel.push(safetyTab);
 
     if (documentManagementTab) topLevel.push(documentManagementTab);
 

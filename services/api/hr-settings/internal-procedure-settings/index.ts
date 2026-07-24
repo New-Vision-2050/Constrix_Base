@@ -4,7 +4,6 @@ import {
   FormsConditionApiItem,
   GetFormsConditionsResponse,
   GetInternalProcedureSettingFormsResponse,
-  GetProcedureJobAttributesResponse,
   InternalProcedureSettingFormApiItem,
   InternalProcedureSettingFormOption,
   CreateInternalProcedureResponse,
@@ -14,7 +13,6 @@ import {
   GetInternalProcedureResponse,
   ConditionSettingSchemaApiItem,
   ConditionSettingSchemaOption,
-  ProcedureJobAttribute,
 } from "./types/response";
 import {
   CreateInternalProcedureArgs,
@@ -139,22 +137,6 @@ export const InternalProcedureSettingsApi = {
       .filter((item): item is InternalProcedureSettingFormOption => item != null);
   },
 
-  /** Lists job attributes (سمة الوظيفة) for document classification. */
-  getJobAttributes: async (): Promise<ProcedureJobAttribute[]> => {
-    const response = await baseApi.get<GetProcedureJobAttributesResponse>(
-      "procedure-settings/job-attributes",
-    );
-    const payload = response.data?.payload ?? response.data?.data ?? [];
-    return payload
-      .map((item) => ({
-        id: String(item.id ?? ""),
-        name: String(item.name ?? ""),
-        code: String(item.code ?? ""),
-        is_active: Boolean(item.is_active),
-      }))
-      .filter((item) => item.id && item.name);
-  },
-
   /** Lists form condition definitions for the selected form. */
   getFormsConditions: async (
     formType: string,
@@ -175,49 +157,19 @@ export const InternalProcedureSettingsApi = {
   createInternalProcedure: async (
     args: CreateInternalProcedureArgs,
   ): Promise<InternalProcedure> => {
-    const body: CreateInternalProcedureArgs = { ...args };
-    if (!body.parent_id) {
-      delete body.parent_id;
-    }
-    if (!body.project_id) {
-      delete body.project_id;
-    }
-
     const response = await baseApi.post<CreateInternalProcedureResponse>(
       "procedure-settings/internal-procedures",
-      body,
+      args,
     );
-    const raw =
-      response.data?.payload ??
-      (response.data as { data?: unknown } | undefined)?.data ??
-      response.data;
-
-    if (!raw || typeof raw !== "object") {
-      throw new Error("Invalid create internal procedure response");
-    }
-
-    const record = Array.isArray(raw) ? raw[0] : raw;
-    if (!record || typeof record !== "object") {
-      throw new Error("Invalid create internal procedure response");
-    }
-
-    return normalizeInternalProcedure(
-      record as unknown as Record<string, unknown>,
-    );
+    return normalizeInternalProcedure(response.data.payload);
   },
 
   getInternalProcedures: async (
     type: string,
-    options?: { projectId?: string },
   ): Promise<InternalProcedure[]> => {
-    const params: { type: string; project_id?: string } = { type };
-    if (options?.projectId) {
-      params.project_id = options.projectId;
-    }
-
     const response = await baseApi.get<GetInternalProceduresResponse>(
       "procedure-settings/internal-procedures",
-      { params },
+      { params: { type } },
     );
     return (response.data?.payload ?? []).map((item) =>
       normalizeInternalProcedure(item),

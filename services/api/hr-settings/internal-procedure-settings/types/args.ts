@@ -30,10 +30,7 @@ export interface CreateInternalProcedureArgs {
   name: string;
   type: string;
   form: string;
-  /** Omit when creating a root procedure — null/empty fails UUID validation. */
-  parent_id?: string | null;
-  /** Required for project-scoped procedure types (e.g. document sequence). */
-  project_id?: string;
+  parent_id: string | null;
   conditions: RichInternalProcedureCondition[];
   appears_before_ids: string[];
   appears_after_ids: string[];

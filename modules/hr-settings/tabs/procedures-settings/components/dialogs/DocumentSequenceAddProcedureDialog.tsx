@@ -140,7 +140,7 @@ export default function DocumentSequenceAddProcedureDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", pb: 1 }}>
-        {getProcedureSettingsTabTitle(currentTabType ?? "", tRoot)}
+        {getProcedureSettingsTabTitle(currentTabType, tRoot)}
       </DialogTitle>
 
       <DialogContent>
