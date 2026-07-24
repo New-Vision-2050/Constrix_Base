@@ -4,43 +4,26 @@ import { coerceBoolean } from "@/services/api/hr-settings/internal-procedure-set
 import type { TaskActionFormValues } from "../types";
 import { mapConditionsToApiPayload } from "./conditionFormUtils";
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isValidUuid(value: string | null | undefined): value is string {
-  return typeof value === "string" && UUID_RE.test(value.trim());
-}
-
 function buildInternalProcedurePayload(
   values: TaskActionFormValues,
   options: {
     procedureType: string;
     sortOrder: number;
     parentId?: string | null;
-    projectId?: string | null;
     isActive?: boolean;
   },
 ): CreateInternalProcedureArgs {
-  const payload: CreateInternalProcedureArgs = {
+  return {
     name: values.name.trim(),
     type: options.procedureType,
     form: values.modelId,
+    parent_id: options.parentId ?? null,
     conditions: mapConditionsToApiPayload(values.conditions),
     appears_before_ids: values.appearBeforeIds.filter(Boolean),
     appears_after_ids: values.appearAfterIds.filter(Boolean),
     sort_order: options.sortOrder,
     is_active: coerceBoolean(values.isActive ?? options.isActive, true),
   };
-
-  if (isValidUuid(options.parentId)) {
-    payload.parent_id = options.parentId.trim();
-  }
-
-  if (options.projectId?.trim()) {
-    payload.project_id = options.projectId.trim();
-  }
-
-  return payload;
 }
 
 export function mapTaskActionToCreateInternalProcedure(
@@ -49,7 +32,6 @@ export function mapTaskActionToCreateInternalProcedure(
     procedureType: string;
     sortOrder: number;
     parentId?: string | null;
-    projectId?: string | null;
   },
 ): CreateInternalProcedureArgs {
   return buildInternalProcedurePayload(values, options);
@@ -61,7 +43,6 @@ export function mapTaskActionToUpdateInternalProcedure(
     procedureType: string;
     sortOrder: number;
     parentId?: string | null;
-    projectId?: string | null;
     isActive?: boolean;
   },
 ): CreateInternalProcedureArgs {

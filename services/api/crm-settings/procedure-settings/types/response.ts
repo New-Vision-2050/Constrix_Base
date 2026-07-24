@@ -89,8 +89,6 @@ export interface ProcedureStep {
   action_taker_specific_procedures?: { type: string; id: string }[] | null;
   action_taker_user_ids?: string[];
   concerned_management_hierarchy_ids?: string[];
-  project_employee_ids?: string[] | null;
-  receiver_company_ids?: string[] | null;
   /** API may send boolean or 0/1 */
   is_accept: boolean | number;
   is_approve: boolean | number;
@@ -122,28 +120,4 @@ export interface GetStepsResponse {
   code: string;
   message: string | null;
   payload: ProcedureStep[];
-}
-
-/** Item from GET /procedure-settings/types */
-export interface ProcedureSettingTypeDto {
-  id?: number | string;
-  type?: string;
-  key?: string;
-  slug?: string;
-  name?: string;
-  name_ar?: string;
-  name_en?: string;
-  label?: string;
-  label_ar?: string;
-  label_en?: string;
-  group?: string;
-  category?: string;
-  module?: string;
-}
-
-export interface GetProcedureSettingTypesResponse {
-  code?: string;
-  message?: string | null;
-  payload?: ProcedureSettingTypeDto[];
-  data?: ProcedureSettingTypeDto[];
 }

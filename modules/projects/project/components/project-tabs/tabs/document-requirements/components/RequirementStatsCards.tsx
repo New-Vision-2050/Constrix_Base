@@ -25,33 +25,33 @@ const STAT_VISUAL: Record<
 > = {
   awaitingAcceptance: {
     icon: AlertTriangle,
-    color: "#B45309",
-    gradient: "linear-gradient(135deg, rgba(180,83,9,0.28) 0%, rgba(180,83,9,0.06) 100%)",
-    glow: "rgba(180, 83, 9, 0.35)",
+    color: "#EAB308",
+    gradient: "linear-gradient(135deg, rgba(234,179,8,0.22) 0%, rgba(234,179,8,0.06) 100%)",
+    glow: "rgba(234, 179, 8, 0.35)",
   },
   rejected: {
     icon: XCircle,
-    color: "#A855F7",
-    gradient: "linear-gradient(135deg, rgba(168,85,247,0.28) 0%, rgba(168,85,247,0.06) 100%)",
-    glow: "rgba(168, 85, 247, 0.35)",
+    color: "#EF4444",
+    gradient: "linear-gradient(135deg, rgba(239,68,68,0.22) 0%, rgba(239,68,68,0.06) 100%)",
+    glow: "rgba(239, 68, 68, 0.35)",
   },
   accepted: {
     icon: CheckCircle2,
-    color: "#16A34A",
-    gradient: "linear-gradient(135deg, rgba(22,163,74,0.28) 0%, rgba(22,163,74,0.06) 100%)",
-    glow: "rgba(22, 163, 74, 0.35)",
+    color: "#22C55E",
+    gradient: "linear-gradient(135deg, rgba(34,197,94,0.22) 0%, rgba(34,197,94,0.06) 100%)",
+    glow: "rgba(34, 197, 94, 0.35)",
   },
   inProgress: {
     icon: ClipboardList,
-    color: "#BE123C",
-    gradient: "linear-gradient(135deg, rgba(190,18,60,0.28) 0%, rgba(190,18,60,0.06) 100%)",
-    glow: "rgba(190, 18, 60, 0.35)",
+    color: "#F97316",
+    gradient: "linear-gradient(135deg, rgba(249,115,22,0.22) 0%, rgba(249,115,22,0.06) 100%)",
+    glow: "rgba(249, 115, 22, 0.35)",
   },
   certified: {
     icon: Users,
-    color: "#2563EB",
-    gradient: "linear-gradient(135deg, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0.06) 100%)",
-    glow: "rgba(37, 99, 235, 0.35)",
+    color: "#3B82F6",
+    gradient: "linear-gradient(135deg, rgba(59,130,246,0.22) 0%, rgba(59,130,246,0.06) 100%)",
+    glow: "rgba(59, 130, 246, 0.35)",
   },
 };
 

@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Checkbox,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,23 +24,45 @@ import {
   Typography,
 } from "@mui/material";
 import { Add as AddIcon, DeleteOutline } from "@mui/icons-material";
-import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import SearchableSelect from "@/components/shared/SearchableSelect";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
-import { useCreateProjectRequirements } from "@/modules/projects/project/query/useProjectRequirements";
-import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
-import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
-import { buildCreateRequirementsPayload } from "../buildCreatePayload";
-import type { RequirementEntry, RequirementFrequencyType } from "../types";
+
+export type NewDocumentRequirement = {
+  requirementCode: string;
+  requiredDocumentName: string;
+  document: string;
+  documentType: string;
+  specialization: string;
+  frequency: string;
+};
+
+type FrequencyType = "day" | "week" | "month";
+
+interface RequirementEntry {
+  id: string;
+  requirementCode: string;
+  requiredDocumentName: string;
+  document: string;
+  documentType: string;
+  specialization: string;
+  frequencyType: FrequencyType | "";
+  selectedDays: string[];
+  interval: string;
+}
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  onAdd: (requirements: NewDocumentRequirement[]) => void;
 };
 
-const DOCUMENT_TYPE_PROCEDURE = "project_procedure";
+const DOCUMENT_TYPES = [
+  { value: "Technical Submittal", specialization: "كهرباء" },
+  { value: "Material Submittal", specialization: "كهرباء" },
+  { value: "As-Built", specialization: "ميكانيكا" },
+  { value: "Method Statement", specialization: "مدني" },
+  { value: "Inspection", specialization: "مدني" },
+] as const;
 
 const WEEK_DAYS = [
   "saturday",
@@ -60,9 +81,7 @@ function createEntry(): RequirementEntry {
     requiredDocumentName: "",
     document: "",
     documentType: "",
-    procedureSettingId: "",
     specialization: "",
-    receiverCompanyIds: [],
     frequencyType: "",
     selectedDays: [],
     interval: "",
@@ -74,81 +93,39 @@ function isEntryValid(entry: RequirementEntry): boolean {
     !entry.requirementCode.trim() ||
     !entry.requiredDocumentName.trim() ||
     !entry.document.trim() ||
-    !entry.procedureSettingId ||
+    !entry.documentType ||
     !entry.frequencyType
   ) {
     return false;
   }
-  if (entry.frequencyType === "once") return true;
   if (entry.frequencyType === "day") return entry.selectedDays.length > 0;
   return Number(entry.interval) > 0;
+}
+
+function buildFrequency(
+  entry: RequirementEntry,
+  t: ReturnType<typeof useTranslations>,
+): string {
+  if (entry.frequencyType === "day") {
+    return entry.selectedDays
+      .map((day) => t(`weekDays.${day}` as "weekDays.saturday"))
+      .join("، ");
+  }
+  return t(
+    entry.frequencyType === "week" ? "everyWeeks" : "everyMonths",
+    { count: Number(entry.interval) },
+  );
 }
 
 export default function AddDocumentRequirementDialog({
   open,
   onClose,
+  onAdd,
 }: Props) {
   const t = useTranslations("project.documentRequirements");
   const tValidation = useTranslations("project.documentRequirements.validation");
-  const { projectId } = useProject();
-  const createMutation = useCreateProjectRequirements(projectId);
-
   const [entries, setEntries] = useState<RequirementEntry[]>([createEntry()]);
   const [submitted, setSubmitted] = useState(false);
-
-  const { data: documentTypes = [], isLoading: loadingDocumentTypes } =
-    useQuery({
-      queryKey: ["internal-procedures", DOCUMENT_TYPE_PROCEDURE, projectId],
-      queryFn: async () => {
-        if (!projectId) return [];
-        return InternalProcedureSettingsApi.getInternalProcedures(
-          DOCUMENT_TYPE_PROCEDURE,
-          { projectId },
-        );
-      },
-      enabled: !!projectId && open,
-    });
-
-  const { data: sharedCompanies = [], isLoading: loadingCompanies } = useQuery({
-    queryKey: ["project-shares", projectId, "document-requirements"],
-    queryFn: async () => {
-      if (!projectId) return [];
-      const res = await ProjectSharingApi.listForProject(projectId);
-      const shares = res.data.payload ?? [];
-      const companies = shares
-        .map((share) => share.shared_with_company)
-        .filter(
-          (company): company is NonNullable<typeof company> =>
-            !!company?.id && !!company.name,
-        );
-      const seen = new Set<string>();
-      return companies.filter((company) => {
-        const id = String(company.id);
-        if (seen.has(id)) return false;
-        seen.add(id);
-        return true;
-      });
-    },
-    enabled: !!projectId && open,
-  });
-
-  const documentTypeOptions = useMemo(
-    () =>
-      documentTypes.map((procedure) => ({
-        value: procedure.id,
-        label: procedure.name || procedure.id,
-      })),
-    [documentTypes],
-  );
-
-  const companyOptions = useMemo(
-    () =>
-      sharedCompanies.map((company) => ({
-        value: String(company.id),
-        label: company.name,
-      })),
-    [sharedCompanies],
-  );
 
   const updateEntry = (
     id: string,
@@ -176,26 +153,20 @@ export default function AddDocumentRequirementDialog({
   );
 
   const handleClose = () => {
-    if (createMutation.isPending) return;
     setEntries([createEntry()]);
     setSubmitted(false);
     onClose();
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setSubmitted(true);
-
-    if (!projectId) {
-      toast.error(tValidation("projectRequired"));
-      return;
-    }
 
     const hasFilledAnyRow = entries.some(
       (entry) =>
         entry.requirementCode.trim() ||
         entry.requiredDocumentName.trim() ||
         entry.document.trim() ||
-        entry.procedureSettingId ||
+        entry.documentType ||
         entry.frequencyType,
     );
 
@@ -209,7 +180,7 @@ export default function AddDocumentRequirementDialog({
         entry.requirementCode.trim() ||
         entry.requiredDocumentName.trim() ||
         entry.document.trim() ||
-        entry.procedureSettingId ||
+        entry.documentType ||
         entry.frequencyType;
       if (!hasAny) continue;
 
@@ -225,7 +196,7 @@ export default function AddDocumentRequirementDialog({
         toast.error(tValidation("documentRequired"));
         return;
       }
-      if (!entry.procedureSettingId) {
+      if (!entry.documentType) {
         toast.error(tValidation("documentTypeRequired"));
         return;
       }
@@ -251,37 +222,28 @@ export default function AddDocumentRequirementDialog({
       return;
     }
 
-    try {
-      const res = await createMutation.mutateAsync(
-        buildCreateRequirementsPayload(validEntries),
-      );
-      toast.success(res.data?.message ?? t("submitSuccess"));
-      setEntries([createEntry()]);
-      setSubmitted(false);
-      onClose();
-    } catch (error) {
-      const message =
-        (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message ?? t("submitError");
-      toast.error(message);
-    }
+    onAdd(
+      validEntries.map((entry) => ({
+        requirementCode: entry.requirementCode.trim(),
+        requiredDocumentName: entry.requiredDocumentName.trim(),
+        document: entry.document.trim(),
+        documentType: entry.documentType,
+        specialization: entry.specialization,
+        frequency: buildFrequency(entry, t),
+      })),
+    );
+    handleClose();
   };
 
   const getFieldError = (
     entry: RequirementEntry,
-    field:
-      | "requirementCode"
-      | "requiredDocumentName"
-      | "document"
-      | "documentType"
-      | "frequencyType",
+    field: "requirementCode" | "requiredDocumentName" | "document" | "documentType" | "frequencyType",
   ) => {
     if (!submitted) return false;
     if (field === "requirementCode") return !entry.requirementCode.trim();
-    if (field === "requiredDocumentName")
-      return !entry.requiredDocumentName.trim();
+    if (field === "requiredDocumentName") return !entry.requiredDocumentName.trim();
     if (field === "document") return !entry.document.trim();
-    if (field === "documentType") return !entry.procedureSettingId;
+    if (field === "documentType") return !entry.documentType;
     return !entry.frequencyType;
   };
 
@@ -308,7 +270,7 @@ export default function AddDocumentRequirementDialog({
           </Typography>
           <Paper variant="outlined" sx={{ overflow: "hidden" }}>
             <Box sx={{ overflowX: "auto" }}>
-              <Table size="small" sx={{ minWidth: 1500 }}>
+              <Table size="small" sx={{ minWidth: 1200 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ minWidth: 140, whiteSpace: "nowrap" }}>
@@ -320,14 +282,11 @@ export default function AddDocumentRequirementDialog({
                     <TableCell sx={{ minWidth: 160, whiteSpace: "nowrap" }}>
                       {t("document")} *
                     </TableCell>
-                    <TableCell sx={{ minWidth: 200, whiteSpace: "nowrap" }}>
+                    <TableCell sx={{ minWidth: 160, whiteSpace: "nowrap" }}>
                       {t("documentType")} *
                     </TableCell>
-                    <TableCell sx={{ minWidth: 140, whiteSpace: "nowrap" }}>
+                    <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
                       {t("specialization")}
-                    </TableCell>
-                    <TableCell sx={{ minWidth: 220, whiteSpace: "nowrap" }}>
-                      {t("receiverCompanies")}
                     </TableCell>
                     <TableCell sx={{ minWidth: 120, whiteSpace: "nowrap" }}>
                       {t("frequency")} *
@@ -383,29 +342,23 @@ export default function AddDocumentRequirementDialog({
                       <TableCell>
                         <TextField
                           select
-                          value={entry.procedureSettingId}
+                          value={entry.documentType}
                           onChange={(e) => {
-                            const selected = documentTypeOptions.find(
-                              (option) => option.value === e.target.value,
+                            const selectedType = DOCUMENT_TYPES.find(
+                              (type) => type.value === e.target.value,
                             );
                             updateEntry(entry.id, {
-                              procedureSettingId: e.target.value,
-                              documentType: selected?.label ?? "",
+                              documentType: e.target.value,
+                              specialization: selectedType?.specialization ?? "",
                             });
                           }}
                           size="small"
                           fullWidth
-                          disabled={loadingDocumentTypes}
                           error={getFieldError(entry, "documentType")}
                         >
-                          <MenuItem value="" disabled>
-                            {loadingDocumentTypes
-                              ? t("loading")
-                              : t("selectDocumentType")}
-                          </MenuItem>
-                          {documentTypeOptions.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                              {option.label}
+                          {DOCUMENT_TYPES.map((type) => (
+                            <MenuItem key={type.value} value={type.value}>
+                              {type.value}
                             </MenuItem>
                           ))}
                         </TextField>
@@ -413,38 +366,10 @@ export default function AddDocumentRequirementDialog({
                       <TableCell>
                         <TextField
                           value={entry.specialization}
-                          onChange={(e) =>
-                            updateEntry(entry.id, {
-                              specialization: e.target.value,
-                            })
-                          }
                           size="small"
                           fullWidth
+                          slotProps={{ input: { readOnly: true } }}
                         />
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ minWidth: 200 }}>
-                          <SearchableSelect
-                            multiple
-                            options={companyOptions}
-                            value={entry.receiverCompanyIds}
-                            onChange={(value) =>
-                              updateEntry(entry.id, {
-                                receiverCompanyIds: value.map(String),
-                              })
-                            }
-                            placeholder={
-                              loadingCompanies
-                                ? t("loading")
-                                : t("selectReceiverCompanies")
-                            }
-                            searchPlaceholder={t("search")}
-                            noResultsText={t("noResults")}
-                            disabled={
-                              loadingCompanies || createMutation.isPending
-                            }
-                          />
-                        </Box>
                       </TableCell>
                       <TableCell>
                         <TextField
@@ -452,8 +377,7 @@ export default function AddDocumentRequirementDialog({
                           value={entry.frequencyType}
                           onChange={(e) =>
                             updateEntry(entry.id, {
-                              frequencyType: e.target
-                                .value as RequirementFrequencyType,
+                              frequencyType: e.target.value as FrequencyType,
                               selectedDays: [],
                               interval: "",
                             })
@@ -462,7 +386,6 @@ export default function AddDocumentRequirementDialog({
                           fullWidth
                           error={getFieldError(entry, "frequencyType")}
                         >
-                          <MenuItem value="once">{t("once")}</MenuItem>
                           <MenuItem value="day">{t("frequencyDay")}</MenuItem>
                           <MenuItem value="week">{t("frequencyWeek")}</MenuItem>
                           <MenuItem value="month">{t("frequencyMonth")}</MenuItem>
@@ -521,9 +444,7 @@ export default function AddDocumentRequirementDialog({
                         <IconButton
                           color="secondary"
                           onClick={() => removeEntry(entry.id)}
-                          disabled={
-                            entries.length <= 1 || createMutation.isPending
-                          }
+                          disabled={entries.length <= 1}
                           aria-label={t("delete")}
                         >
                           <DeleteOutline />
@@ -540,7 +461,6 @@ export default function AddDocumentRequirementDialog({
             color="secondary"
             startIcon={<AddIcon />}
             onClick={addEntry}
-            disabled={createMutation.isPending}
             sx={{
               alignSelf: "stretch",
               borderStyle: "dashed",
@@ -552,19 +472,8 @@ export default function AddDocumentRequirementDialog({
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleClose} disabled={createMutation.isPending}>
-          {t("cancel")}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={createMutation.isPending}
-          startIcon={
-            createMutation.isPending ? (
-              <CircularProgress size={16} color="inherit" />
-            ) : undefined
-          }
-        >
+        <Button onClick={handleClose}>{t("cancel")}</Button>
+        <Button variant="contained" onClick={handleSubmit}>
           {t("add")}
         </Button>
       </DialogActions>

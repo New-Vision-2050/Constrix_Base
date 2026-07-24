@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useLocale } from "next-intl";
 import {
   Box,
@@ -9,8 +9,6 @@ import {
   Paper,
   FormLabel,
   FormHelperText,
-  Popper,
-  ClickAwayListener,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -81,7 +79,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const anchorRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedValues = useMemo(
     () => (multiple ? (Array.isArray(value) ? value : []) : []),
@@ -112,7 +110,9 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         .join(isRtl ? "، " : ", ");
     }
 
-    return selectedOption?.label || defaultValueOption?.label || placeholder;
+    return (
+      selectedOption?.label || defaultValueOption?.label || placeholder
+    );
   }, [
     displayTrim,
     multiple,
@@ -139,11 +139,6 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     return valuesMatch(value as string | number, optionValue);
   };
 
-  const closeDropdown = () => {
-    setIsOpen(false);
-    setSearchTerm("");
-  };
-
   const handleOptionClick = (optionValue: string | number) => {
     if (multiple) {
       const currentValues = Array.isArray(value) ? [...value] : [];
@@ -161,198 +156,199 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     }
 
     (onChange as SingleSearchableSelectProps["onChange"])(optionValue);
-    closeDropdown();
+    setIsOpen(false);
+    setSearchTerm("");
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const hasSelection = multiple
     ? selectedValues.length > 0
     : Boolean(displayTrim || selectedOption);
 
-  const anchorWidth = anchorRef.current?.offsetWidth;
-
   return (
-    <ClickAwayListener
-      onClickAway={() => {
-        if (isOpen) closeDropdown();
-      }}
-    >
-      <Box className={className} sx={{ position: "relative" }}>
-        {label && (
-          <FormLabel
-            htmlFor={name}
-            error={!!error}
-            sx={{
-              display: "block",
-              mb: 1,
-              color: error ? "error.main" : "text.primary",
-            }}
-          >
-            {label}{" "}
-            {required && (
-              <span style={{ color: theme.palette.error.main }}>*</span>
-            )}
-          </FormLabel>
-        )}
-
-        <Box
-          ref={anchorRef}
-          onClick={() => !disabled && setIsOpen((open) => !open)}
+    <Box ref={dropdownRef} className={className} sx={{ position: "relative" }}>
+      {label && (
+        <FormLabel
+          htmlFor={name}
+          error={!!error}
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 2,
-            py: 1.5,
+            display: "block",
+            mb: 1,
+            color: error ? "error.main" : "text.primary",
+          }}
+        >
+          {label}{" "}
+          {required && (
+            <span style={{ color: theme.palette.error.main }}>*</span>
+          )}
+        </FormLabel>
+      )}
+
+      <Box
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 2,
+          py: 1.5,
+          bgcolor: "background.paper",
+          border: 1,
+          borderColor: error ? "error.main" : "divider",
+          borderRadius: 1,
+          cursor: disabled ? "not-allowed" : "pointer",
+          opacity: disabled ? 0.7 : 1,
+          minHeight: 44,
+          "&:hover": {
+            borderColor: disabled ? "divider" : "primary.main",
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            flex: 1,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: multiple ? "normal" : "nowrap",
+            display: "-webkit-box",
+            WebkitLineClamp: multiple ? 2 : 1,
+            WebkitBoxOrient: "vertical",
+            color: hasSelection ? "text.primary" : "text.secondary",
+          }}
+        >
+          {mainLabel}
+        </Typography>
+        <KeyboardArrowDownIcon
+          sx={{
+            color: "text.secondary",
+            transition: "transform 0.2s",
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            flexShrink: 0,
+            ml: 1,
+          }}
+        />
+      </Box>
+
+      {isOpen && (
+        <Paper
+          elevation={8}
+          sx={{
+            position: "absolute",
+            zIndex: 9999,
+            width: "100%",
+            mt: 0.5,
             bgcolor: "background.paper",
             border: 1,
-            borderColor: error ? "error.main" : "divider",
+            borderColor: "divider",
             borderRadius: 1,
-            cursor: disabled ? "not-allowed" : "pointer",
-            opacity: disabled ? 0.7 : 1,
-            minHeight: 44,
-            "&:hover": {
-              borderColor: disabled ? "divider" : "primary.main",
-            },
+            maxHeight: 240,
+            overflow: "hidden",
           }}
         >
-          <Typography
-            sx={{
-              flex: 1,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: multiple ? "normal" : "nowrap",
-              display: "-webkit-box",
-              WebkitLineClamp: multiple ? 2 : 1,
-              WebkitBoxOrient: "vertical",
-              color: hasSelection ? "text.primary" : "text.secondary",
-            }}
-          >
-            {mainLabel}
-          </Typography>
-          <KeyboardArrowDownIcon
-            sx={{
-              color: "text.secondary",
-              transition: "transform 0.2s",
-              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-              flexShrink: 0,
-              ml: 1,
-            }}
-          />
-        </Box>
+          {searchable && (
+            <Box sx={{ p: 1.5, borderBottom: 1, borderColor: "divider" }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                autoFocus
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon
+                        sx={{ color: "text.secondary", fontSize: 20 }}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "background.default",
+                  },
+                }}
+              />
+            </Box>
+          )}
 
-        <Popper
-          open={isOpen}
-          anchorEl={anchorRef.current}
-          placement="bottom-start"
-          disablePortal={false}
-          style={{
-            zIndex: theme.zIndex.modal + 2,
-            width: anchorWidth,
-          }}
-        >
-          <Paper
-            elevation={8}
-            sx={{
-              mt: 0.5,
-              bgcolor: "background.paper",
-              border: 1,
-              borderColor: "divider",
-              borderRadius: 1,
-              maxHeight: 240,
-              overflow: "hidden",
-            }}
-          >
-            {searchable && (
-              <Box sx={{ p: 1.5, borderBottom: 1, borderColor: "divider" }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder={searchPlaceholder}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                  autoFocus
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon
-                          sx={{ color: "text.secondary", fontSize: 20 }}
-                        />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "background.default",
-                    },
-                  }}
-                />
+          <Box sx={{ maxHeight: searchable ? 180 : 240, overflowY: "auto" }}>
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => {
+                const selected = isOptionSelected(option.value);
+
+                return (
+                  <Box
+                    key={`${String(option.value)}-${option.label}`}
+                    onClick={() => handleOptionClick(option.value)}
+                    sx={{
+                      px: multiple ? 1 : 2,
+                      py: 1.5,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      bgcolor: !multiple && selected
+                        ? "primary.main"
+                        : "transparent",
+                      color: !multiple && selected
+                        ? "primary.contrastText"
+                        : "text.primary",
+                      "&:hover": {
+                        bgcolor: !multiple && selected
+                          ? "primary.dark"
+                          : "action.hover",
+                      },
+                    }}
+                  >
+                    {multiple && (
+                      <Checkbox
+                        checked={selected}
+                        size="small"
+                        sx={{ p: 0.5 }}
+                        tabIndex={-1}
+                      />
+                    )}
+                    <Typography variant="body2">{option.label}</Typography>
+                  </Box>
+                );
+              })
+            ) : (
+              <Box sx={{ px: 2, py: 1.5 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {noResultsText}
+                </Typography>
               </Box>
             )}
+          </Box>
+        </Paper>
+      )}
 
-            <Box sx={{ maxHeight: searchable ? 180 : 240, overflowY: "auto" }}>
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option) => {
-                  const selected = isOptionSelected(option.value);
-
-                  return (
-                    <Box
-                      key={`${String(option.value)}-${option.label}`}
-                      onClick={() => handleOptionClick(option.value)}
-                      sx={{
-                        px: multiple ? 1 : 2,
-                        py: 1.5,
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        bgcolor:
-                          !multiple && selected ? "primary.main" : "transparent",
-                        color:
-                          !multiple && selected
-                            ? "primary.contrastText"
-                            : "text.primary",
-                        "&:hover": {
-                          bgcolor:
-                            !multiple && selected
-                              ? "primary.dark"
-                              : "action.hover",
-                        },
-                      }}
-                    >
-                      {multiple && (
-                        <Checkbox
-                          checked={selected}
-                          size="small"
-                          sx={{ p: 0.5 }}
-                          tabIndex={-1}
-                        />
-                      )}
-                      <Typography variant="body2">{option.label}</Typography>
-                    </Box>
-                  );
-                })
-              ) : (
-                <Box sx={{ px: 2, py: 1.5 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {noResultsText}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          </Paper>
-        </Popper>
-
-        {error && (
-          <FormHelperText
-            error
-            sx={{ mt: 0.5, textAlign: isRtl ? "right" : "left" }}
-          >
-            {error}
-          </FormHelperText>
-        )}
-      </Box>
-    </ClickAwayListener>
+      {error && (
+        <FormHelperText
+          error
+          sx={{ mt: 0.5, textAlign: isRtl ? "right" : "left" }}
+        >
+          {error}
+        </FormHelperText>
+      )}
+    </Box>
   );
 };
 

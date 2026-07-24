@@ -32,7 +32,6 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
     search: _m("Search...", "البحث..."),
     noResults: _m("No results", "لا توجد نتائج"),
     select: _m("Select", "اختر"),
-    loading: _m("Loading...", "جاري التحميل..."),
     days: _m("Days", "أيام"),
     hours: _m("Hours", "ساعات"),
     hour: _m("Hour", "ساعة"),
@@ -187,7 +186,6 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
         specificProcedures: _m("Specific procedures", "اجراءات محددة"),
         assignedUser: _m("Assigned user", "الموظف المُسند"),
         himself: _m("Himself", "نفسه"),
-        receiverCompany: _m("Receiver company", "الشركة المستلمة"),
       }),
       managementHierarchy: new MessagesGroup({
         projectManager: _m("Project manager", "مدير المشروع"),
@@ -215,14 +213,6 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
       "Select management hierarchy",
       "اختر الهيكل التنظيمي",
     ),
-    receiverCompanies: _m("Receiver companies", "الشركات المستلمة"),
-    receiverCompany: _m("Receiver company", "الشركة المستلمة"),
-    selectReceiverCompanies: _m("Select companies", "اختر الشركات"),
-    selectReceiverCompany: _m("Select company", "اختر الشركة"),
-    selectConcernedUsers: _m(
-      "Select concerned users",
-      "اختر المعنيين",
-    ),
     removeSpecificProcedureRow: _m("Remove", "إزالة"),
     validation: new MessagesGroup({
       selectEmployees: _m("Please select employees", "يرجى اختيار الموظفين"),
@@ -243,14 +233,6 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
         "يرجى اختيار نوع الإجراء",
       ),
       selectValue: _m("Please select a value", "يرجى اختيار القيمة"),
-      selectReceiverCompanies: _m(
-        "Please select at least one company",
-        "يرجى اختيار شركة واحدة على الأقل",
-      ),
-      selectReceiverCompany: _m(
-        "Please select a company",
-        "يرجى اختيار شركة",
-      ),
       enterSkippingPeriod: _m(
         "Please enter skipping period",
         "يرجى إدخال فترة التخطي",

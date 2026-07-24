@@ -1,44 +1,38 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
   CircularProgress,
   InputAdornment,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   Paper,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import {
   ExternalLink,
   EyeIcon,
   Filter,
-  History,
   Plus,
   Search,
-  Upload,
 } from "lucide-react";
 import { alpha } from "@mui/material/styles";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
-import { useProject } from "@/modules/all-project/context/ProjectContext";
-import { useProjectRequirements } from "@/modules/projects/project/query/useProjectRequirements";
 import RequirementStatsCards from "./RequirementStatsCards";
 import SubmissionStatusBadge from "./SubmissionStatusBadge";
-import AddDocumentRequirementDialog from "./AddDocumentRequirementDialog";
-import UploadRequirementFilesDialog from "./UploadRequirementFilesDialog";
-import SubmissionHistoryDialog from "./SubmissionHistoryDialog";
-import LatestSubmissionPreview from "./LatestSubmissionPreview";
+import AddDocumentRequirementDialog, {
+  type NewDocumentRequirement,
+} from "./AddDocumentRequirementDialog";
+import {
+  DOCUMENT_REQUIREMENT_MOCK_ROWS,
+  DOCUMENT_REQUIREMENT_STATS,
+} from "../constants/mock-data";
 import type { DocumentRequirementRow } from "../types";
-import { mapRequirementsSummaryToStats } from "@/modules/projects/project/query/mapRequirementsSummary";
-import { getUploadDisabledReasonKey } from "../utils/uploadStatus";
 
 const TableLayout = HeadlessTableLayout<DocumentRequirementRow>(
   "document-requirements-table",
@@ -106,56 +100,54 @@ function CompletionCell({ percent }: { percent: number }) {
 
 export default function DocumentRequirementsTable() {
   const t = useTranslations("project.documentRequirements");
-  const { projectId } = useProject();
 
   const [filterSpecialization, setFilterSpecialization] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterPhase, setFilterPhase] = useState("");
   const [filterEntity, setFilterEntity] = useState("");
+  const [rows, setRows] = useState<DocumentRequirementRow[]>(
+    DOCUMENT_REQUIREMENT_MOCK_ROWS,
+  );
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [uploadRequirement, setUploadRequirement] =
-    useState<DocumentRequirementRow | null>(null);
-  const [historyRequirement, setHistoryRequirement] =
-    useState<DocumentRequirementRow | null>(null);
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
   });
 
-  const requirementsQuery = useProjectRequirements({
-    projectId,
-    page: params.page,
-    perPage: params.limit,
-  });
-
-  const rows = requirementsQuery.data?.data ?? [];
-  const totalItems = requirementsQuery.data?.totalItems ?? 0;
-  const totalPages = Math.max(1, requirementsQuery.data?.totalPages ?? 1);
-  const stats =
-    requirementsQuery.data?.stats ?? mapRequirementsSummaryToStats(null);
-
   const specializations = useMemo(
-    () => Array.from(new Set(rows.map((r) => r.specialization))),
+    () =>
+      Array.from(
+        new Set(rows.map((r) => r.specialization)),
+      ),
     [rows],
   );
   const documentTypes = useMemo(
-    () => Array.from(new Set(rows.map((r) => r.documentType))),
+    () =>
+      Array.from(
+        new Set(rows.map((r) => r.documentType)),
+      ),
     [rows],
   );
   const phases = useMemo(
-    () => Array.from(new Set(rows.map((r) => r.phase))),
+    () =>
+      Array.from(new Set(rows.map((r) => r.phase))),
     [rows],
   );
   const entities = useMemo(
     () =>
       Array.from(
-        new Set(rows.flatMap((r) => [r.sendingEntity, r.reviewingEntity])),
+        new Set(
+          rows.flatMap((r) => [
+            r.sendingEntity,
+            r.reviewingEntity,
+          ]),
+        ),
       ),
     [rows],
   );
 
-  const data = useMemo(() => {
+  const filteredRows = useMemo(() => {
     const search = params.search.trim().toLowerCase();
     return rows.filter((row) => {
       if (filterSpecialization && row.specialization !== filterSpecialization) {
@@ -188,12 +180,44 @@ export default function DocumentRequirementsTable() {
     rows,
   ]);
 
+  const totalItems = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
+
+  useEffect(() => {
+    if (params.page > totalPages) {
+      params.setPage(totalPages);
+    }
+  }, [params, totalPages]);
+
+  const data = useMemo(() => {
+    const safePage = Math.min(params.page, totalPages);
+    const start = (safePage - 1) * params.limit;
+    return filteredRows.slice(start, start + params.limit);
+  }, [filteredRows, params.page, params.limit, totalPages]);
+
   const clearFilters = () => {
     setFilterSpecialization("");
     setFilterType("");
     setFilterPhase("");
     setFilterEntity("");
     params.setSearch("");
+    params.setPage(1);
+  };
+
+  const addRequirement = (requirements: NewDocumentRequirement[]) => {
+    setRows((currentRows) => [
+      ...requirements.map((requirement, index) => ({
+        id: `requirement-${Date.now()}-${index}`,
+        ...requirement,
+        phase: "—",
+        sendingEntity: "—",
+        reviewingEntity: "—",
+        submissionStatus: "awaiting_acceptance" as const,
+        linkedDocument: "—",
+        completionPercent: 0,
+      })),
+      ...currentRows,
+    ]);
     params.setPage(1);
   };
 
@@ -226,10 +250,7 @@ export default function DocumentRequirementsTable() {
         name: t("documentType"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography
-            component="span"
-            sx={{ color: "#38BDF8", fontWeight: 500 }}
-          >
+          <Typography component="span" sx={{ color: "#38BDF8", fontWeight: 500 }}>
             {row.documentType}
           </Typography>
         ),
@@ -247,10 +268,7 @@ export default function DocumentRequirementsTable() {
         name: t("phase"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography
-            component="span"
-            sx={{ color: "#22C55E", fontWeight: 500 }}
-          >
+          <Typography component="span" sx={{ color: "#22C55E", fontWeight: 500 }}>
             {row.phase}
           </Typography>
         ),
@@ -260,10 +278,7 @@ export default function DocumentRequirementsTable() {
         name: t("sendingEntity"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography
-            component="span"
-            sx={{ color: "#38BDF8", fontWeight: 500 }}
-          >
+          <Typography component="span" sx={{ color: "#38BDF8", fontWeight: 500 }}>
             {row.sendingEntity}
           </Typography>
         ),
@@ -273,10 +288,7 @@ export default function DocumentRequirementsTable() {
         name: t("reviewingEntity"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Typography
-            component="span"
-            sx={{ color: "#A78BFA", fontWeight: 500 }}
-          >
+          <Typography component="span" sx={{ color: "#A78BFA", fontWeight: 500 }}>
             {row.reviewingEntity}
           </Typography>
         ),
@@ -285,9 +297,7 @@ export default function DocumentRequirementsTable() {
         key: "frequency",
         name: t("frequency"),
         sortable: false,
-        render: (row: DocumentRequirementRow) => (
-          <span>{row.frequency === "once" ? t("once") : row.frequency}</span>
-        ),
+        render: (row: DocumentRequirementRow) => <span>{row.frequency}</span>,
       },
       {
         key: "submissionStatus",
@@ -302,30 +312,16 @@ export default function DocumentRequirementsTable() {
         name: t("linkedDocument"),
         sortable: false,
         render: (row: DocumentRequirementRow) => (
-          <Box sx={{ minWidth: 0, maxWidth: 280 }}>
-            {/* <Box
-              sx={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 0.75,
-                color: "text.primary",
-                maxWidth: "100%",
-              }}
-            >
-              <Typography
-                component="span"
-                noWrap
-                sx={{ fontSize: "0.875rem", fontWeight: 500 }}
-              >
-                {row.linkedDocument}
-              </Typography>
-              <ExternalLink size={14} style={{ flexShrink: 0 }} />
-            </Box> */}
-            <LatestSubmissionPreview
-              submission={row.uploadStatus.latestSubmission}
-              nextAvailableAt={row.uploadStatus.nextAvailableAt}
-              canUpload={row.uploadStatus.canUpload}
-            />
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.75,
+              color: "text.primary",
+            }}
+          >
+            <span>{row.linkedDocument}</span>
+            <ExternalLink size={14} />
           </Box>
         ),
       },
@@ -341,121 +337,28 @@ export default function DocumentRequirementsTable() {
         key: "actions",
         name: t("actions"),
         sortable: false,
-        render: (row: DocumentRequirementRow) => {
-          const canUpload = row.uploadStatus.canUpload;
-          const reasonKey = getUploadDisabledReasonKey(
-            row.uploadStatus.disabledReason,
-          );
-          const disabledReason =
-            !canUpload && reasonKey
-              ? t(`upload.disabledReasons.${reasonKey}`)
-              : undefined;
-
-          return (
-            <CustomMenu
-              renderAnchor={({ onClick }) => (
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={onClick}
-                  sx={{
-                    borderRadius: "10px",
-                    textTransform: "none",
-                    fontWeight: 700,
-                    minWidth: 84,
-                    px: 2,
-                  }}
-                >
-                  {t("action")}
-                </Button>
-              )}
-              menuProps={{
-                anchorOrigin: { vertical: "bottom", horizontal: "right" },
-                transformOrigin: { vertical: "top", horizontal: "right" },
-                PaperProps: {
-                  sx: {
-                    mt: 0.75,
-                    minWidth: 200,
-                    borderRadius: "12px",
-                    border: "1px solid",
-                    borderColor: "divider",
-                    overflow: "hidden",
-                    boxShadow: (theme) =>
-                      `0 10px 30px ${alpha(theme.palette.common.black, 0.35)}`,
-                  },
-                },
-                MenuListProps: {
-                  sx: { py: 0.5 },
-                },
-              }}
+        render: () => (
+          <CustomMenu
+            renderAnchor={({ onClick }) => (
+              <Button
+                size="small"
+                variant="contained"
+                color="primary"
+                onClick={onClick}
+              >
+                {t("action")}
+              </Button>
+            )}
+          >
+            <Button
+              size="small"
+              sx={{ width: "100%", justifyContent: "flex-start", px: 2 }}
             >
-              <Tooltip
-                title={disabledReason ?? ""}
-                disableHoverListener={canUpload}
-                placement="left"
-              >
-                <span>
-                  <MenuItem
-                    disabled={!canUpload}
-                    onClick={() => setUploadRequirement(row)}
-                    sx={{
-                      py: 1.1,
-                      px: 1.5,
-                      gap: 1,
-                      borderRadius: 1,
-                      mx: 0.5,
-                      "&.Mui-disabled": { opacity: 0.45 },
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 28 }}>
-                      <Upload size={16} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t("upload.action")}
-                      primaryTypographyProps={{ fontSize: "0.875rem" }}
-                    />
-                  </MenuItem>
-                </span>
-              </Tooltip>
-              <MenuItem
-                onClick={() => setHistoryRequirement(row)}
-                sx={{
-                  py: 1.1,
-                  px: 1.5,
-                  gap: 1,
-                  borderRadius: 1,
-                  mx: 0.5,
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 28 }}>
-                  <History size={16} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={t("history.action")}
-                  primaryTypographyProps={{ fontSize: "0.875rem" }}
-                />
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  py: 1.1,
-                  px: 1.5,
-                  gap: 1,
-                  borderRadius: 1,
-                  mx: 0.5,
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 28 }}>
-                  <EyeIcon size={16} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={t("view")}
-                  primaryTypographyProps={{ fontSize: "0.875rem" }}
-                />
-              </MenuItem>
-            </CustomMenu>
-          );
-        },
+              {t("view")}
+              <EyeIcon className="h-4 w-4 ms-2" />
+            </Button>
+          </CustomMenu>
+        ),
       },
     ],
     [t],
@@ -469,9 +372,7 @@ export default function DocumentRequirementsTable() {
     params,
     selectable: true,
     getRowId: (row: DocumentRequirementRow) => row.id,
-    loading:
-      !!projectId &&
-      (requirementsQuery.isLoading || requirementsQuery.isFetching),
+    loading: false,
     searchable: false,
     onExport: async () => {},
     getRowSx: (_row: DocumentRequirementRow, index: number) => ({
@@ -487,7 +388,7 @@ export default function DocumentRequirementsTable() {
 
   return (
     <Box>
-      <RequirementStatsCards stats={stats} />
+      <RequirementStatsCards stats={DOCUMENT_REQUIREMENT_STATS} />
 
       <Paper
         elevation={0}
@@ -690,27 +591,19 @@ export default function DocumentRequirementsTable() {
       >
         <TableLayout
           filters={undefined}
-          table={
-            <TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />
-          }
+          table={<TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />}
           pagination={<TableLayout.Pagination state={state} />}
         />
       </Paper>
       <AddDocumentRequirementDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
+        onAdd={addRequirement}
       />
-      <UploadRequirementFilesDialog
-        open={!!uploadRequirement}
-        onClose={() => setUploadRequirement(null)}
-        projectId={projectId}
-        requirement={uploadRequirement}
-      />
-      <SubmissionHistoryDialog
-        open={!!historyRequirement}
-        onClose={() => setHistoryRequirement(null)}
-        projectId={projectId}
-        requirement={historyRequirement}
+      <AddDocumentRequirementDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onAdd={addRequirement}
       />
     </Box>
   );
