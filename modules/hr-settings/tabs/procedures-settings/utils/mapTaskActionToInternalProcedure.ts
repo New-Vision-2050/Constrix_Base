@@ -40,6 +40,32 @@ function buildInternalProcedurePayload(
     payload.project_id = options.projectId.trim();
   }
 
+  if (values.attachmentTypeId?.trim()) {
+    payload.attachment_type_id = values.attachmentTypeId.trim();
+  }
+  if (values.attachmentSubTypeId?.trim()) {
+    payload.attachment_sub_type_id = values.attachmentSubTypeId.trim();
+  }
+  if (values.attachmentSubSubTypeId?.trim()) {
+    payload.attachment_sub_sub_type_id = values.attachmentSubSubTypeId.trim();
+  }
+  if (values.jobAttributeId?.trim()) {
+    payload.job_attribute_id = values.jobAttributeId.trim();
+  }
+  if (typeof values.usedInDocumentCycle === "boolean") {
+    payload.used_in_document_cycle = values.usedInDocumentCycle;
+  }
+  if (typeof values.showInAttachmentsLibrary === "boolean") {
+    payload.appears_in_attachments_library = values.showInAttachmentsLibrary;
+  }
+  if (typeof values.showInArchiveAfterApproval === "boolean") {
+    payload.appears_in_archive_after_approval =
+      values.showInArchiveAfterApproval;
+  }
+  if (typeof values.requiresAssetId === "boolean") {
+    payload.requires_asset_id = values.requiresAssetId;
+  }
+
   return payload;
 }
 

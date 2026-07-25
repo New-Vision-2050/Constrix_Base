@@ -51,4 +51,13 @@ export interface TaskActionFormValues {
   appearBeforeIds: string[];
   appearAfterIds: string[];
   isActive: boolean;
+  /** Document classification (project_procedure add/edit form) */
+  attachmentTypeId?: string;
+  attachmentSubTypeId?: string;
+  attachmentSubSubTypeId?: string;
+  jobAttributeId?: string;
+  usedInDocumentCycle?: boolean;
+  showInAttachmentsLibrary?: boolean;
+  showInArchiveAfterApproval?: boolean;
+  requiresAssetId?: boolean;
 }

@@ -336,12 +336,16 @@ export default function SubTypeTabs() {
             <CustomMenu
               renderAnchor={({ onClick }) => (
                 <IconButton
+                  component="span"
                   size="small"
+                  tabIndex={0}
+                  role="button"
                   aria-label={t("stages.editStage")}
                   onClick={(e) => {
                     e.stopPropagation();
                     onClick(e);
                   }}
+                  onMouseDown={(e) => e.stopPropagation()}
                   sx={{
                     p: 0.25,
                     color: "inherit",
@@ -953,72 +957,89 @@ export default function SubTypeTabs() {
 
       {addProcedureVariant === "document-classification" ? (
         <DocumentClassificationAddProcedureDialog
-          open={taskActionDialogOpen}
-          onClose={() => setTaskActionDialogOpen(false)}
-          procedureType={currentTabType}
-          onSave={handleAddTaskAction}
+          open={taskActionDialogOpen || editTaskActionDialogOpen}
+          onClose={() => {
+            setTaskActionDialogOpen(false);
+            setEditTaskActionDialogOpen(false);
+            setEditingProcedure(null);
+          }}
+          procedureType={currentTabType || "project_procedure"}
+          procedure={editTaskActionDialogOpen ? editingProcedure : null}
+          onSave={async (values) => {
+            if (editTaskActionDialogOpen && editingProcedure) {
+              await handleEditTaskAction(values);
+              return;
+            }
+            await handleAddTaskAction(values);
+          }}
         />
       ) : (
-        <AddTaskActionDialog
-          open={taskActionDialogOpen}
-          onClose={() => setTaskActionDialogOpen(false)}
-          procedureType={currentTabType}
-          existingActions={existingActions}
-          excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
-          excludeFromAppearBefore={
-            primaryProcedureId ? [primaryProcedureId] : []
-          }
-          onSave={handleAddTaskAction}
-        />
+        <>
+          <AddTaskActionDialog
+            open={taskActionDialogOpen}
+            onClose={() => setTaskActionDialogOpen(false)}
+            procedureType={currentTabType}
+            existingActions={existingActions}
+            excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
+            excludeFromAppearBefore={
+              primaryProcedureId ? [primaryProcedureId] : []
+            }
+            onSave={handleAddTaskAction}
+          />
+          <EditTaskActionDialog
+            open={editTaskActionDialogOpen}
+            onClose={() => {
+              setEditTaskActionDialogOpen(false);
+              setEditingProcedure(null);
+            }}
+            procedureType={currentTabType}
+            procedure={editingProcedure}
+            lockFormModel={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  ) ||
+                  isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            hideAppearAfter={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  )
+                : false
+            }
+            hideAppearBefore={
+              editingProcedure
+                ? isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            existingActions={existingActions}
+            excludeFromAppearAfter={
+              lastProcedureId && editingProcedure?.id !== lastProcedureId
+                ? [lastProcedureId]
+                : []
+            }
+            excludeFromAppearBefore={
+              primaryProcedureId && editingProcedure?.id !== primaryProcedureId
+                ? [primaryProcedureId]
+                : []
+            }
+            disableIsActiveSwitch={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  ) ||
+                  isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            onSave={handleEditTaskAction}
+          />
+        </>
       )}
-
-      <EditTaskActionDialog
-        open={editTaskActionDialogOpen}
-        onClose={() => {
-          setEditTaskActionDialogOpen(false);
-          setEditingProcedure(null);
-        }}
-        procedureType={currentTabType}
-        procedure={editingProcedure}
-        lockFormModel={
-          editingProcedure
-            ? isPrimaryInternalProcedure(
-                editingProcedure,
-                internalProcedures,
-              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        hideAppearAfter={
-          editingProcedure
-            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        hideAppearBefore={
-          editingProcedure
-            ? isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        existingActions={existingActions}
-        excludeFromAppearAfter={
-          lastProcedureId && editingProcedure?.id !== lastProcedureId
-            ? [lastProcedureId]
-            : []
-        }
-        excludeFromAppearBefore={
-          primaryProcedureId && editingProcedure?.id !== primaryProcedureId
-            ? [primaryProcedureId]
-            : []
-        }
-        disableIsActiveSwitch={
-          editingProcedure
-            ? isPrimaryInternalProcedure(
-                editingProcedure,
-                internalProcedures,
-              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        onSave={handleEditTaskAction}
-      />
     </div>
   );
 }
