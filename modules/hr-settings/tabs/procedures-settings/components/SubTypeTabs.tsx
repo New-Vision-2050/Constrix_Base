@@ -184,9 +184,7 @@ export default function SubTypeTabs() {
 
   const defaultProcedureId = childProcedures[0]?.id ?? null;
   const activeProcedureId =
-    (useDocumentSequenceLayout
-      ? activeOuterTab?.procedureId
-      : null) ??
+    (useDocumentSequenceLayout ? activeOuterTab?.procedureId : null) ??
     selectedProcedureId ??
     defaultProcedureId;
   const stagesParentId = activeProcedureId ?? rootProcedure?.id ?? undefined;
@@ -313,13 +311,31 @@ export default function SubTypeTabs() {
   );
 
   const renderOuterTabLabel = useCallback(
-    (tab: { id: number; name: string; type: string; label?: string; procedureId?: string }) => {
-      const procedure = findProcedureForOuterTab(tab.procedureId);
+    (tab: {
+      id: number;
+      name: string;
+      type: string;
+      label?: string;
+      procedureId?: string;
+    }) => {
+      const loadedProcedure = findProcedureForOuterTab(tab.procedureId);
+      // Tabs render before internal-procedures finish loading; fall back to the
+      // tab data so the gear doesn't swap in after another icon.
+      const procedure: InternalProcedure | null =
+        loadedProcedure ??
+        (tab.procedureId
+          ? {
+              id: tab.procedureId,
+              name: tab.label ?? tab.name,
+              type: tab.type,
+              form: "",
+            }
+          : null);
       const canManage = !!procedure;
       const canDelete =
-        !!procedure &&
-        !isPrimaryInternalProcedure(procedure, internalProcedures) &&
-        !isLastInternalProcedure(procedure, internalProcedures);
+        !!loadedProcedure &&
+        !isPrimaryInternalProcedure(loadedProcedure, internalProcedures) &&
+        !isLastInternalProcedure(loadedProcedure, internalProcedures);
 
       return (
         <Box
@@ -337,9 +353,9 @@ export default function SubTypeTabs() {
               renderAnchor={({ onClick }) => (
                 <IconButton
                   component="span"
-                  size="small"
-                  tabIndex={0}
                   role="button"
+                  tabIndex={0}
+                  size="small"
                   aria-label={t("stages.editStage")}
                   onClick={(e) => {
                     e.stopPropagation();
