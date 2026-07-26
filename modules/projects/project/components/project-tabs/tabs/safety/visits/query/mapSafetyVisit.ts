@@ -1,6 +1,6 @@
-import type { SafetyVisitRow } from "@/modules/projects/project/components/project-tabs/tabs/safety/types";
-import { buildViolationValues } from "@/modules/projects/project/components/project-tabs/tabs/safety/constants/safetyViolations";
-import type { ProjectSafetyRecordDto } from "@/services/api/projects/project-safety/types/response";
+import type { SafetyVisitRow } from "../types";
+import { buildViolationValues } from "../constants/safetyViolations";
+import type { ProjectSafetyRecordDto } from "@/services/api/projects/project-safety/visits/types";
 
 function pickString(...values: Array<string | null | undefined>): string {
   for (const value of values) {
@@ -21,7 +21,7 @@ function resolveDate(value: string | null | undefined): string {
   return raw.length >= 10 ? raw.slice(0, 10) : raw;
 }
 
-export function mapProjectSafetyDto(
+export function mapSafetyVisitDto(
   dto: ProjectSafetyRecordDto,
   contractorNameById?: Map<string, string>,
 ): SafetyVisitRow {

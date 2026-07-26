@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectContractors } from "@/modules/projects/project/query/useProjectContractors";
-import { useProjectSafety } from "@/modules/projects/project/query/useProjectSafety";
+import { useSafetyVisits } from "../query/useSafetyVisits";
 import {
   EMPTY_SAFETY_VISIT_FILTERS,
   type SafetyVisitFilters,
@@ -151,7 +151,7 @@ export default function SafetyVisitsView() {
     initialLimit: 10,
   });
 
-  const safetyQuery = useProjectSafety(projectId);
+  const safetyQuery = useSafetyVisits(projectId);
   const contractorsQuery = useProjectContractors(projectId);
 
   const allRows = useMemo(() => {

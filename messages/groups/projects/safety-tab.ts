@@ -96,6 +96,7 @@ export const projectSafetyTabMessages = new MessagesGroup({
     all: _m("All", "الكل"),
     clearFilters: _m("Clear filter", "مسح التصفية"),
     loadError: _m("Could not load safety indicators", "تعذر تحميل مؤشرات السلامة"),
+    unknownGroup: _m("Unassigned", "غير محدد"),
     noData: _m(
       "No data available for the selected filters.",
       "لا توجد بيانات للفلاتر المحددة.",

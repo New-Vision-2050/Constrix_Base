@@ -1,5 +1,5 @@
-import type { SafetyReportRow } from "@/modules/projects/project/components/project-tabs/tabs/safety/safety-report-types";
-import type { ProjectSafetyReportDto } from "@/services/api/projects/project-safety/types/report-response";
+import type { SafetyReportRow } from "../types";
+import type { ProjectSafetyReportDto } from "@/services/api/projects/project-safety/safety-reports/types";
 
 function pickString(...values: Array<string | null | undefined>): string {
   for (const value of values) {
@@ -51,7 +51,7 @@ function buildReportId(dto: ProjectSafetyReportDto): string {
   return morphableId || morphableType || pickString(dto.morphable_display);
 }
 
-export function mapProjectSafetyReportDto(
+export function mapSafetyReportDto(
   dto: ProjectSafetyReportDto,
 ): SafetyReportRow {
   const statusRaw = pickString(dto.status);
