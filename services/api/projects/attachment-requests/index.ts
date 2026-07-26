@@ -14,6 +14,10 @@ import {
   GetOutgoingAttachmentRequestsResponse,
 } from "./types/response";
 import type { AttachmentRequest } from "./types/response";
+import type {
+  AttachmentRequestChartsFilters,
+  AttachmentRequestChartsResponse,
+} from "./types/charts";
 import { ApiBaseResponse } from "@/types/common/response/base";
 
 export const AttachmentRequestsApi = {
@@ -117,5 +121,13 @@ export const AttachmentRequestsApi = {
   declineRequest: (requestId: string) =>
     baseApi.post<{ code?: string; message?: string | null }>(
       `projects/attachment-requests/${requestId}/decline`,
+    ),
+
+
+  /** GET `projects/attachment-requests/charts` */
+  getCharts: (params: AttachmentRequestChartsFilters) =>
+    baseApi.get<AttachmentRequestChartsResponse>(
+      "projects/attachment-requests/charts",
+      { params },
     ),
 };
