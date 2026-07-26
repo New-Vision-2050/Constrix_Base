@@ -1,26 +1,15 @@
 export interface ProjectSafetyReportDto {
-  id: string;
-  order_number?: string | null;
-  order_permit_num?: string | null;
-  notification_num?: string | null;
-  "order_permit_num/notification_num"?: string | null;
-  order_status?: string | null;
-  status?: string | null;
-  order_status_label?: string | null;
-  status_label?: string | null;
-  safety_visits_count?: number | string | null;
-  visits_count?: number | string | null;
-  observations_count?: number | string | null;
-  notes_count?: number | string | null;
-  site_visit_forms_count?: number | string | null;
-  forms_count?: number | string | null;
+  morphable_type?: string | null;
+  morphable_id?: string | null;
+  morphable_display?: string | null;
+  contractor_id?: string | null;
   contractor_name?: string | null;
-  contractor?: string | null;
-  consultant_name?: string | null;
-  consultant?: string | null;
-  engineer_name?: string | null;
   consultant_engineer?: string | null;
-  engineer?: string | null;
+  consultant?: string | null;
+  total_assignments?: number | string | null;
+  completed_count?: number | string | null;
+  pending_count?: number | string | null;
+  status?: string | null;
 }
 
 export interface ListProjectSafetyReportsResponse {

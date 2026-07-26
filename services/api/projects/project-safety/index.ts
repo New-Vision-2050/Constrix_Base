@@ -8,7 +8,7 @@ export const ProjectSafetyApi = {
 
   listReportsForProject: (projectId: string | number) =>
     baseApi.get<ListProjectSafetyReportsResponse>(
-      `projects/${projectId}/safety-reports`,
+      `projects/${projectId}/safety/report`,
     ),
 };
 
