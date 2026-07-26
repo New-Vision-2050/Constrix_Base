@@ -375,6 +375,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
   }),
   documentAddProcedureDialog: new MessagesGroup({
     title: _m("Add procedure", "اضافة اجراء"),
+    editTitle: _m("Edit procedure", "تعديل اجراء"),
     procedureName: _m("Procedure name", "اسم الاجراء"),
     classificationSection: _m(
       "Classification and linking data",

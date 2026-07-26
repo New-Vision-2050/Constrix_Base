@@ -130,6 +130,15 @@ export interface InternalProcedure {
   appears_after_id?: string | null;
   sort_order?: number;
   is_active?: boolean;
+  /** Document-classification fields (project_procedure) */
+  attachment_type_id?: string | null;
+  attachment_sub_type_id?: string | null;
+  attachment_sub_sub_type_id?: string | null;
+  job_attribute_id?: string | null;
+  used_in_document_cycle?: boolean;
+  appears_in_attachments_library?: boolean;
+  appears_in_archive_after_approval?: boolean;
+  requires_asset_id?: boolean;
 }
 
 export interface CreateInternalProcedureResponse {

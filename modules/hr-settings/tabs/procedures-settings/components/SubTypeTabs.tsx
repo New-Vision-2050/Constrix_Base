@@ -184,9 +184,7 @@ export default function SubTypeTabs() {
 
   const defaultProcedureId = childProcedures[0]?.id ?? null;
   const activeProcedureId =
-    (useDocumentSequenceLayout
-      ? activeOuterTab?.procedureId
-      : null) ??
+    (useDocumentSequenceLayout ? activeOuterTab?.procedureId : null) ??
     selectedProcedureId ??
     defaultProcedureId;
   const stagesParentId = activeProcedureId ?? rootProcedure?.id ?? undefined;
@@ -313,13 +311,31 @@ export default function SubTypeTabs() {
   );
 
   const renderOuterTabLabel = useCallback(
-    (tab: { id: number; name: string; type: string; label?: string; procedureId?: string }) => {
-      const procedure = findProcedureForOuterTab(tab.procedureId);
+    (tab: {
+      id: number;
+      name: string;
+      type: string;
+      label?: string;
+      procedureId?: string;
+    }) => {
+      const loadedProcedure = findProcedureForOuterTab(tab.procedureId);
+      // Tabs render before internal-procedures finish loading; fall back to the
+      // tab data so the gear doesn't swap in after another icon.
+      const procedure: InternalProcedure | null =
+        loadedProcedure ??
+        (tab.procedureId
+          ? {
+              id: tab.procedureId,
+              name: tab.label ?? tab.name,
+              type: tab.type,
+              form: "",
+            }
+          : null);
       const canManage = !!procedure;
       const canDelete =
-        !!procedure &&
-        !isPrimaryInternalProcedure(procedure, internalProcedures) &&
-        !isLastInternalProcedure(procedure, internalProcedures);
+        !!loadedProcedure &&
+        !isPrimaryInternalProcedure(loadedProcedure, internalProcedures) &&
+        !isLastInternalProcedure(loadedProcedure, internalProcedures);
 
       return (
         <Box
@@ -336,12 +352,16 @@ export default function SubTypeTabs() {
             <CustomMenu
               renderAnchor={({ onClick }) => (
                 <IconButton
+                  component="span"
+                  role="button"
+                  tabIndex={0}
                   size="small"
                   aria-label={t("stages.editStage")}
                   onClick={(e) => {
                     e.stopPropagation();
                     onClick(e);
                   }}
+                  onMouseDown={(e) => e.stopPropagation()}
                   sx={{
                     p: 0.25,
                     color: "inherit",
@@ -953,72 +973,89 @@ export default function SubTypeTabs() {
 
       {addProcedureVariant === "document-classification" ? (
         <DocumentClassificationAddProcedureDialog
-          open={taskActionDialogOpen}
-          onClose={() => setTaskActionDialogOpen(false)}
-          procedureType={currentTabType}
-          onSave={handleAddTaskAction}
+          open={taskActionDialogOpen || editTaskActionDialogOpen}
+          onClose={() => {
+            setTaskActionDialogOpen(false);
+            setEditTaskActionDialogOpen(false);
+            setEditingProcedure(null);
+          }}
+          procedureType={currentTabType || "project_procedure"}
+          procedure={editTaskActionDialogOpen ? editingProcedure : null}
+          onSave={async (values) => {
+            if (editTaskActionDialogOpen && editingProcedure) {
+              await handleEditTaskAction(values);
+              return;
+            }
+            await handleAddTaskAction(values);
+          }}
         />
       ) : (
-        <AddTaskActionDialog
-          open={taskActionDialogOpen}
-          onClose={() => setTaskActionDialogOpen(false)}
-          procedureType={currentTabType}
-          existingActions={existingActions}
-          excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
-          excludeFromAppearBefore={
-            primaryProcedureId ? [primaryProcedureId] : []
-          }
-          onSave={handleAddTaskAction}
-        />
+        <>
+          <AddTaskActionDialog
+            open={taskActionDialogOpen}
+            onClose={() => setTaskActionDialogOpen(false)}
+            procedureType={currentTabType}
+            existingActions={existingActions}
+            excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
+            excludeFromAppearBefore={
+              primaryProcedureId ? [primaryProcedureId] : []
+            }
+            onSave={handleAddTaskAction}
+          />
+          <EditTaskActionDialog
+            open={editTaskActionDialogOpen}
+            onClose={() => {
+              setEditTaskActionDialogOpen(false);
+              setEditingProcedure(null);
+            }}
+            procedureType={currentTabType}
+            procedure={editingProcedure}
+            lockFormModel={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  ) ||
+                  isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            hideAppearAfter={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  )
+                : false
+            }
+            hideAppearBefore={
+              editingProcedure
+                ? isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            existingActions={existingActions}
+            excludeFromAppearAfter={
+              lastProcedureId && editingProcedure?.id !== lastProcedureId
+                ? [lastProcedureId]
+                : []
+            }
+            excludeFromAppearBefore={
+              primaryProcedureId && editingProcedure?.id !== primaryProcedureId
+                ? [primaryProcedureId]
+                : []
+            }
+            disableIsActiveSwitch={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  ) ||
+                  isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            onSave={handleEditTaskAction}
+          />
+        </>
       )}
-
-      <EditTaskActionDialog
-        open={editTaskActionDialogOpen}
-        onClose={() => {
-          setEditTaskActionDialogOpen(false);
-          setEditingProcedure(null);
-        }}
-        procedureType={currentTabType}
-        procedure={editingProcedure}
-        lockFormModel={
-          editingProcedure
-            ? isPrimaryInternalProcedure(
-                editingProcedure,
-                internalProcedures,
-              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        hideAppearAfter={
-          editingProcedure
-            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        hideAppearBefore={
-          editingProcedure
-            ? isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        existingActions={existingActions}
-        excludeFromAppearAfter={
-          lastProcedureId && editingProcedure?.id !== lastProcedureId
-            ? [lastProcedureId]
-            : []
-        }
-        excludeFromAppearBefore={
-          primaryProcedureId && editingProcedure?.id !== primaryProcedureId
-            ? [primaryProcedureId]
-            : []
-        }
-        disableIsActiveSwitch={
-          editingProcedure
-            ? isPrimaryInternalProcedure(
-                editingProcedure,
-                internalProcedures,
-              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        onSave={handleEditTaskAction}
-      />
     </div>
   );
 }
