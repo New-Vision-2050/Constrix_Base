@@ -7,7 +7,7 @@ export interface CreateStageArgs {
   percentage: number;
   deadline_days: number;
   deadline_hours: number;
-  escalation_management_hierarchy_id: string;
+  escalation_management_hierarchy_id?: string;
   work_flow_id?: string;
 }
 

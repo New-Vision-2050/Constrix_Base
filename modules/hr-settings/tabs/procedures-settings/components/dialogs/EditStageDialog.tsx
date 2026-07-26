@@ -11,23 +11,18 @@ import {
   Box,
   Switch,
   Typography,
-  FormHelperText,
   InputAdornment,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
-import { useQuery } from "@tanstack/react-query";
-import { baseURL } from "@/config/axios-config";
 import IconPicker from "@/components/shared/icon-picker";
 import { APP_ICONS } from "@/constants/icons";
-import {
-  fetchManagementHierarchyOptions,
-  type ManagementHierarchyOption,
-} from "@/utils/fetchDropdownOptions";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
-import { Stage } from "@/services/api/crm-settings/procedure-settings/types/response";
+import {
+  Stage,
+  ProcedureStep,
+} from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useToast } from "@/modules/table/hooks/use-toast";
-import SearchableSelect from "@/components/shared/SearchableSelect";
 import { getProcedureEditTabTitle } from "../../utils/getProcedureTabTitle";
 import { useProceduresSettings } from "../../context/ProceduresSettingsContext";
 
@@ -54,6 +49,7 @@ interface EditStageDialogProps {
   onSuccess: () => void;
   /** Called after the procedure is deleted (before onSuccess). */
   onDeleted?: (procedureId: string) => void;
+  procedureSteps: ProcedureStep[];
 }
 
 export default function EditStageDialog({
@@ -62,6 +58,7 @@ export default function EditStageDialog({
   procedure,
   onSuccess,
   onDeleted,
+  procedureSteps,
 }: EditStageDialogProps) {
   const { t: tRoot, tStages: t, tc } = useProceduresSettingsTranslations();
   const { toast } = useToast();
@@ -72,22 +69,24 @@ export default function EditStageDialog({
   const [parallelApproval, setParallelApproval] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [durationPercentage, setDurationPercentage] = useState("");
-  const [deadlineHours, setDeadlineHours] = useState("");
-  const [deadlineDays, setDeadlineDays] = useState("");
-  const [escalationUserId, setEscalationUserId] = useState("");
 
-  const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
-    queryKey: ["managements", "hierarchy", "management"],
-    queryFn: () =>
-      fetchManagementHierarchyOptions(
-        `${baseURL}/management_hierarchies/list?type=management`,
-      ),
-  });
   const [errors, setErrors] = useState<{
     name: string;
-    percentage: string;
-    timeLimit: string;
-  }>({ name: "", percentage: "", timeLimit: "" });
+  }>({ name: "" });
+
+  const { totalDays, totalHours } = useMemo(() => {
+    const total = procedureSteps.reduce((sum, step) => {
+      return (
+        sum +
+        (step.approval_within_days || 0) * 24 +
+        (step.approval_within_hours || 0)
+      );
+    }, 0);
+    return {
+      totalDays: Math.floor(total / 24),
+      totalHours: total % 24,
+    };
+  }, [procedureSteps]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -100,14 +99,7 @@ export default function EditStageDialog({
     setDurationPercentage(
       procedure.percentage != null ? String(procedure.percentage) : "",
     );
-    setDeadlineHours(
-      procedure.deadline_hours != null ? String(procedure.deadline_hours) : "",
-    );
-    setDeadlineDays(
-      procedure.deadline_days != null ? String(procedure.deadline_days) : "",
-    );
-    setEscalationUserId(procedure.escalation_management_hierarchy_id || "");
-    setErrors({ name: "", percentage: "", timeLimit: "" });
+    setErrors({ name: "" });
   }, [open, procedure]);
 
   const clearError = (field: keyof typeof errors) =>
@@ -119,12 +111,6 @@ export default function EditStageDialog({
     const percentageValue = parseInt(durationPercentage, 10) || 0;
     const newErrors = {
       name: !name.trim() ? tc("requiredField") : "",
-      percentage:
-        durationPercentage !== "" && percentageValue > 100
-          ? t("percentageMax")
-          : "",
-      timeLimit:
-        !deadlineHours && !deadlineDays ? tc("enterHoursOrDays") : "",
     };
     setErrors(newErrors);
     if (Object.values(newErrors).some(Boolean)) return;
@@ -137,9 +123,8 @@ export default function EditStageDialog({
         icon: selectedIcon || procedure.icon || "approval-icon",
         percentage: percentageValue,
         type: procedure.type,
-        deadline_days: parseInt(deadlineDays, 10) || 0,
-        deadline_hours: parseInt(deadlineHours, 10) || 0,
-        escalation_management_hierarchy_id: escalationUserId || "",
+        deadline_days: totalDays,
+        deadline_hours: totalHours,
         ...(projectId ? { project_id: projectId } : {}),
       });
       toast({
@@ -167,10 +152,7 @@ export default function EditStageDialog({
     setParallelApproval(false);
     setSelectedIcon(null);
     setDurationPercentage("");
-    setDeadlineHours("");
-    setDeadlineDays("");
-    setEscalationUserId("");
-    setErrors({ name: "", percentage: "", timeLimit: "" });
+    setErrors({ name: "" });
     onClose();
   };
 
@@ -319,37 +301,25 @@ export default function EditStageDialog({
             <TextField
               placeholder={t("stageDurationPercentage")}
               value={durationPercentage}
-              onChange={(e) => {
-                setDurationPercentage(e.target.value);
-                clearError("percentage");
-              }}
               fullWidth
               size="small"
               type="number"
               inputProps={{ min: 0, max: 100 }}
-              error={!!errors.percentage}
-              helperText={errors.percentage}
+              disabled
             />
 
             {/* Time limit */}
             <Box>
-              <FormLabel
-                error={!!errors.timeLimit}
-                sx={{ display: "block", mb: 1 }}
-              >
-                {t("timeLimit")} *
+              <FormLabel sx={{ display: "block", mb: 1 }}>
+                {t("timeLimit")}
               </FormLabel>
               <Box sx={{ display: "flex", gap: 1.5 }}>
                 <TextField
-                  value={deadlineHours}
-                  onChange={(e) => {
-                    setDeadlineHours(e.target.value);
-                    clearError("timeLimit");
-                  }}
+                  value={totalHours}
                   size="small"
                   type="number"
                   inputProps={{ min: 0, style: { textAlign: "end" } }}
-                  error={!!errors.timeLimit}
+                  disabled
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -360,15 +330,11 @@ export default function EditStageDialog({
                   sx={{ flex: 1 }}
                 />
                 <TextField
-                  value={deadlineDays}
-                  onChange={(e) => {
-                    setDeadlineDays(e.target.value);
-                    clearError("timeLimit");
-                  }}
+                  value={totalDays}
                   size="small"
                   type="number"
                   inputProps={{ min: 0, style: { textAlign: "end" } }}
-                  error={!!errors.timeLimit}
+                  disabled
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -379,30 +345,6 @@ export default function EditStageDialog({
                   sx={{ flex: 1 }}
                 />
               </Box>
-              {errors.timeLimit && (
-                <FormHelperText error sx={{ textAlign: "end", mt: 0.5 }}>
-                  {errors.timeLimit}
-                </FormHelperText>
-              )}
-            </Box>
-
-            {/* Escalation target */}
-            <Box>
-              <SearchableSelect
-                options={managements.map((m) => ({
-                  value: String(m.id),
-                  label: m.name,
-                }))}
-                value={escalationUserId}
-                onChange={(val) => setEscalationUserId(String(val))}
-                placeholder={t("selectEscalationEntity")}
-                searchPlaceholder={tc("searchManagement")}
-                noResultsText={tc("noResults")}
-                label={t("escalationEntity")}
-              />
-              <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
-                {t("escalationEntityHint")}
-              </FormHelperText>
             </Box>
           </Box>
         </Box>
@@ -420,9 +362,7 @@ export default function EditStageDialog({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={
-            isSubmitting || !name.trim() || (!deadlineHours && !deadlineDays)
-          }
+          disabled={isSubmitting || !name.trim()}
           sx={{ flex: 1 }}
         >
           {tRoot("actions.save")}

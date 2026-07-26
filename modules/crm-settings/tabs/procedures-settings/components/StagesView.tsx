@@ -12,6 +12,7 @@ import EditStageDialog from "./dialogs/EditStageDialog";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { getProcedureSettingsTabTitle } from "../utils/getProcedureTabTitle";
+import { distributePercentages } from "../utils/distributePercentages";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
 import {
   Stage,
@@ -121,7 +122,6 @@ export default function StagesView({
     percentage: number;
     deadline_days: number;
     deadline_hours: number;
-    escalation_management_hierarchy_id: string;
   }) => {
     if (!parentId || !workFlowId) {
       toast({
@@ -137,6 +137,29 @@ export default function StagesView({
         parent_id: parentId,
         work_flow_id: workFlowId,
       });
+
+      const totalCount = procedures.length + 1;
+      const percentages = distributePercentages(totalCount);
+      const updatePromises = procedures.flatMap((procedure, index) => {
+        const percentage = percentages[index + 1];
+        if (percentage == null || percentage === procedure.percentage) {
+          return [];
+        }
+        return [
+          ProcedureSettingsApi.updateStage(procedure.id, {
+            name: procedure.name,
+            execute_type: procedure.execute_type,
+            icon: procedure.icon,
+            type: procedure.type,
+            percentage,
+          }),
+        ];
+      });
+
+      if (updatePromises.length > 0) {
+        await Promise.all(updatePromises);
+      }
+
       await refetch();
       toast({
         title: t("actions.add"),
@@ -400,6 +423,7 @@ export default function StagesView({
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
         currentTabType={currentTabType}
+        existingProcedures={procedures}
         onSuccess={(newStage) => {
           handleCreateProcedure(newStage);
           setAddDialogOpen(false);
@@ -412,6 +436,7 @@ export default function StagesView({
           setProcedureToEdit(null);
         }}
         procedure={procedureToEdit}
+        procedureSteps={serverSteps}
         onDeleted={(procedureId) => {
           setDraftStepKeys((prev) => {
             const next = { ...prev };

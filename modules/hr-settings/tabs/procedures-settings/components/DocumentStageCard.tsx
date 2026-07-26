@@ -945,7 +945,7 @@ export default function DocumentStageCard({
                 searchPlaceholder={tc("searchManagement")}
                 noResultsText={tc("noResults")}
                 label={ts("escalationEntity")}
-                disabled={fieldsDisabled}
+                disabled
               />
             </Box>
           )}

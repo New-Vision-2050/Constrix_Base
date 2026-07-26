@@ -46,6 +46,7 @@ import {
 } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useProceduresSettings } from "../context/ProceduresSettingsContext";
 import { mapTaskActionToCreateInternalProcedure } from "../utils/mapTaskActionToInternalProcedure";
+import { distributePercentages } from "../utils/distributePercentages";
 
 interface StagesViewProps {
   parentId?: string;
@@ -183,7 +184,6 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
       percentage: number;
       deadline_days: number;
       deadline_hours: number;
-      escalation_management_hierarchy_id: string;
     }) => {
       if (!parentId) {
         toast({
@@ -199,6 +199,29 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
           parent_id: parentId,
           ...(workFlowId ? { work_flow_id: workFlowId } : {}),
         });
+
+        const totalCount = procedures.length + 1;
+        const percentages = distributePercentages(totalCount);
+        const updatePromises = procedures.flatMap((procedure, index) => {
+          const percentage = percentages[index + 1];
+          if (percentage == null || percentage === procedure.percentage) {
+            return [];
+          }
+          return [
+            ProcedureSettingsApi.updateStage(procedure.id, {
+              name: procedure.name,
+              execute_type: procedure.execute_type,
+              icon: procedure.icon,
+              type: procedure.type,
+              percentage,
+            }),
+          ];
+        });
+
+        if (updatePromises.length > 0) {
+          await Promise.all(updatePromises);
+        }
+
         await refetch();
         toast({
           title: t("actions.add"),
@@ -333,18 +356,35 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
       currentDraftKeys.length > 0;
 
     const modelTabName = useMemo(() => {
-      if (!currentTabType) return "";
-      const tab = outerTabs.find((item) => item.type === currentTabType);
-      if (tab?.label) return tab.label;
-      if (tab?.name) {
-        try {
-          return ts(tab.name);
-        } catch {
-          return tab.name;
+      const resolveTabLabel = (
+        tab: (typeof outerTabs)[number] | undefined,
+      ) => {
+        if (!tab) return "";
+        if (tab.label) return tab.label;
+        if (tab.name) {
+          try {
+            return ts(tab.name);
+          } catch {
+            return tab.name;
+          }
         }
+        return "";
+      };
+
+      // Project sequence tabs all share type `project_procedure` — match by
+      // procedureId (parentId) so the title tracks the selected model tab.
+      if (parentId) {
+        const byProcedure = outerTabs.find(
+          (item) => item.procedureId === parentId,
+        );
+        const fromProcedure = resolveTabLabel(byProcedure);
+        if (fromProcedure) return fromProcedure;
       }
-      return currentTabType;
-    }, [currentTabType, outerTabs, ts]);
+
+      if (!currentTabType) return "";
+      const byType = outerTabs.find((item) => item.type === currentTabType);
+      return resolveTabLabel(byType) || currentTabType;
+    }, [currentTabType, outerTabs, parentId, ts]);
 
     const documentStagesContent = (
       <>
@@ -735,6 +775,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             open={addDialogOpen}
             onClose={() => setAddDialogOpen(false)}
             currentTabType={currentTabType}
+            existingProcedures={procedures}
             onSuccess={(newStage) => {
               handleCreateProcedure(newStage);
               setAddDialogOpen(false);
@@ -801,6 +842,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
               setProcedureToEdit(null);
             }}
             procedure={procedureToEdit}
+            procedureSteps={serverSteps}
             onDeleted={(procedureId) => {
               setDraftStepKeys((prev) => {
                 const next = { ...prev };
@@ -1023,6 +1065,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
           open={addDialogOpen}
           onClose={() => setAddDialogOpen(false)}
           currentTabType={currentTabType}
+          existingProcedures={procedures}
           onSuccess={(newStage) => {
             handleCreateProcedure(newStage);
             setAddDialogOpen(false);
@@ -1035,6 +1078,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             setProcedureToEdit(null);
           }}
           procedure={procedureToEdit}
+          procedureSteps={serverSteps}
           onDeleted={(procedureId) => {
             setDraftStepKeys((prev) => {
               const next = { ...prev };

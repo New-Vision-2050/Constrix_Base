@@ -35,6 +35,7 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
     loading: _m("Loading...", "جاري التحميل..."),
     days: _m("Days", "أيام"),
     hours: _m("Hours", "ساعات"),
+    minutes: _m("Minutes", "دقائق"),
     hour: _m("Hour", "ساعة"),
     requiredField: _m("This field is required", "هذا الحقل مطلوب"),
     enterHoursOrDays: _m(

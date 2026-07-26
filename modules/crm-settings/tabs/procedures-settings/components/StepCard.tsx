@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -358,6 +359,9 @@ export default function StepCard({
   const [isExpanded, setIsExpanded] = useState(!serverStep);
   const [skippingPeriod, setSkippingPeriod] = useState(
     () => String(serverStep?.skipping_period ?? 0),
+  );
+  const [skippingUnit, setSkippingUnit] = useState<"hours" | "minutes">(
+    "hours",
   );
 
   const { control, handleSubmit, reset, watch } =
@@ -771,6 +775,11 @@ export default function StepCard({
       optionValue: string;
       value: string;
       onChange: (value: string) => void;
+      unit?: {
+        value: string;
+        options: { value: string; label: string }[];
+        onChange: (value: string) => void;
+      };
     };
   }) => (
     <Box
@@ -803,6 +812,26 @@ export default function StepCard({
                     inputProps={{ min: 1, style: { textAlign: "center" } }}
                     onClick={(e) => e.stopPropagation()}
                   />
+                  {inlineInput.unit && (
+                    <TextField
+                      select
+                      size="small"
+                      value={inlineInput.unit.value}
+                      onChange={(e) =>
+                        inlineInput.unit!.onChange(e.target.value)
+                      }
+                      disabled={fieldsDisabled}
+                      sx={{ width: 110 }}
+                      inputProps={{ style: { textAlign: "center" } }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {inlineInput.unit.options.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
                 </Box>
               ) : (
                 opt.label
@@ -1555,8 +1584,27 @@ export default function StepCard({
                 }
                 inlineInput={{
                   optionValue: "approve_timed",
-                  value: skippingPeriod,
-                  onChange: setSkippingPeriod,
+                  value:
+                    skippingUnit === "minutes"
+                      ? String(Math.round((Number(skippingPeriod) || 0) * 60))
+                      : skippingPeriod,
+                  onChange: (value) => {
+                    const num = Number(value) || 0;
+                    setSkippingPeriod(
+                      skippingUnit === "minutes"
+                        ? String(Math.round(num) / 60)
+                        : String(num),
+                    );
+                  },
+                  unit: {
+                    value: skippingUnit,
+                    options: [
+                      { value: "hours", label: tc("hours") },
+                      { value: "minutes", label: tc("minutes") },
+                    ],
+                    onChange: (value) =>
+                      setSkippingUnit(value as "hours" | "minutes"),
+                  },
                 }}
               />
             )}
@@ -1701,7 +1749,7 @@ export default function StepCard({
                       placeholder={ts("selectEscalationEntity")}
                       searchPlaceholder={tc("searchManagement")}
                       noResultsText={tc("noResults")}
-                      disabled={fieldsDisabled}
+                      disabled
                     />
                   </Box>
                   {field.value && (
