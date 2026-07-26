@@ -17,14 +17,20 @@ function toNumber(value: unknown): number {
 
 function normalizeStatus(
   value: string | null | undefined,
-): SafetyReportRow["orderStatus"] {
+): SafetyReportRow["status"] {
   const normalized = value?.trim().toLowerCase() ?? "";
+
   if (
     normalized.includes("complete") ||
     normalized.includes("مكتمل")
   ) {
     return "completed";
   }
+
+  if (normalized.includes("pending") || normalized.includes("انتظار")) {
+    return "pending";
+  }
+
   if (
     normalized.includes("late") ||
     normalized.includes("delay") ||
@@ -32,45 +38,37 @@ function normalizeStatus(
   ) {
     return "late";
   }
+
   return "in_progress";
+}
+
+function buildReportId(dto: ProjectSafetyReportDto): string {
+  const morphableType = pickString(dto.morphable_type);
+  const morphableId = pickString(dto.morphable_id);
+  if (morphableType && morphableId) {
+    return `${morphableType}:${morphableId}`;
+  }
+  return morphableId || morphableType || pickString(dto.morphable_display);
 }
 
 export function mapProjectSafetyReportDto(
   dto: ProjectSafetyReportDto,
 ): SafetyReportRow {
+  const statusRaw = pickString(dto.status);
+
   return {
-    id: String(dto.id),
-    orderNumber: pickString(
-      dto.order_number,
-      dto["order_permit_num/notification_num"],
-      dto.order_permit_num,
-      dto.notification_num,
-    ),
-    orderStatus: normalizeStatus(
-      pickString(dto.order_status, dto.status),
-    ),
-    orderStatusLabel: pickString(dto.order_status_label, dto.status_label) || undefined,
-    safetyVisitsCount: toNumber(
-      dto.safety_visits_count ?? dto.visits_count,
-    ),
-    observationsCount: toNumber(
-      dto.observations_count ?? dto.notes_count,
-    ),
-    siteVisitFormsCount: toNumber(
-      dto.site_visit_forms_count ?? dto.forms_count,
-    ),
-    contractorName: pickString(
-      dto.contractor_name,
-      dto.contractor,
-    ),
-    consultantName: pickString(
-      dto.consultant_name,
-      dto.consultant,
-    ),
-    engineerName: pickString(
-      dto.engineer_name,
-      dto.consultant_engineer,
-      dto.engineer,
-    ),
+    id: buildReportId(dto),
+    morphableType: pickString(dto.morphable_type),
+    morphableId: pickString(dto.morphable_id),
+    morphableDisplay: pickString(dto.morphable_display),
+    contractorId: pickString(dto.contractor_id),
+    contractorName: pickString(dto.contractor_name),
+    consultantEngineer: pickString(dto.consultant_engineer),
+    consultant: pickString(dto.consultant),
+    totalAssignments: toNumber(dto.total_assignments),
+    completedCount: toNumber(dto.completed_count),
+    pendingCount: toNumber(dto.pending_count),
+    status: normalizeStatus(statusRaw),
+    statusLabel: statusRaw || undefined,
   };
 }
