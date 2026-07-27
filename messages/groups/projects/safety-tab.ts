@@ -31,11 +31,15 @@ export const projectSafetyTabMessages = new MessagesGroup({
       "يرجى اختيار ملف Excel صالح (.xls أو .xlsx)",
     ),
     filters: new MessagesGroup({
-      orderNumber: _m("Order number", "رقم الامر"),
+      search: _m(
+        "Notification or work order number",
+        "رقم الاشعار أو رقم امر العمل",
+      ),
       contractor: _m("Contractor", "المقاول"),
       consultant: _m("Consultant", "الاستشاري"),
       engineer: _m("Engineer", "المهندس"),
       date: _m("Date", "التاريخ"),
+      assignedUser: _m("Assigned user", "المستخدم المكلف"),
     }),
     workOrderTypes: new MessagesGroup({
       construction: _m("Construction", "انشاء"),
@@ -96,6 +100,7 @@ export const projectSafetyTabMessages = new MessagesGroup({
     all: _m("All", "الكل"),
     clearFilters: _m("Clear filter", "مسح التصفية"),
     loadError: _m("Could not load safety indicators", "تعذر تحميل مؤشرات السلامة"),
+    unknownGroup: _m("Unassigned", "غير محدد"),
     noData: _m(
       "No data available for the selected filters.",
       "لا توجد بيانات للفلاتر المحددة.",

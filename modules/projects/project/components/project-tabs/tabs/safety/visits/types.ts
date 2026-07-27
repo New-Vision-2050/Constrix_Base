@@ -25,19 +25,19 @@ export type SafetyVisitRow = {
 };
 
 export type SafetyVisitFilters = {
-  orderNumber: string;
-  contractor: string;
-  consultant: string;
-  engineer: string;
   date: string;
+  consultantEngineer: string;
+  consultant: string;
+  contractorId: string;
+  assignedUserId: string;
 };
 
 export const EMPTY_SAFETY_VISIT_FILTERS: SafetyVisitFilters = {
-  orderNumber: "",
-  contractor: "",
-  consultant: "",
-  engineer: "",
   date: "",
+  consultantEngineer: "",
+  consultant: "",
+  contractorId: "",
+  assignedUserId: "",
 };
 
 export const SAFETY_VISIT_BASE_COLUMN_KEYS = [
@@ -55,3 +55,9 @@ export const SAFETY_VISIT_BASE_COLUMN_KEYS = [
 
 export type SafetyVisitBaseColumnKey =
   (typeof SAFETY_VISIT_BASE_COLUMN_KEYS)[number];
+
+export type UseSafetyVisitsParams = {
+  projectId: string | undefined;
+  search?: string;
+  filters?: SafetyVisitFilters;
+};

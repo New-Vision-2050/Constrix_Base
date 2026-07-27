@@ -18,12 +18,12 @@ import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
-import { useProjectSafetyReports } from "@/modules/projects/project/query/useProjectSafetyReports";
+import { useSafetyReports } from "../query/useSafetyReports";
 import {
   EMPTY_SAFETY_REPORT_FILTERS,
   type SafetyReportFilters,
   type SafetyReportRow,
-} from "../safety-report-types";
+} from "../types";
 import SafetyReportStatusBadge from "./SafetyReportStatusBadge";
 
 const SafetyReportsTableLayout = HeadlessTableLayout<SafetyReportRow>(
@@ -98,7 +98,7 @@ export default function SafetyReportsView() {
     initialLimit: 10,
   });
 
-  const reportsQuery = useProjectSafetyReports(projectId);
+  const reportsQuery = useSafetyReports(projectId);
   const allRows = useMemo(
     () => reportsQuery.data ?? [],
     [reportsQuery.data],

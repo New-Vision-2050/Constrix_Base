@@ -20,7 +20,8 @@ import { toast } from "sonner";
 import HeadlessTableLayout from "@/components/headless/table";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectContractors } from "@/modules/projects/project/query/useProjectContractors";
-import { useProjectSafety } from "@/modules/projects/project/query/useProjectSafety";
+import { useProjectEmployees } from "@/modules/projects/project/query/useProjectEmployees";
+import { useSafetyVisits } from "../query/useSafetyVisits";
 import {
   EMPTY_SAFETY_VISIT_FILTERS,
   type SafetyVisitFilters,
@@ -77,63 +78,6 @@ function formatGrade(value: number): string {
   });
 }
 
-function filterSafetyVisits(
-  rows: SafetyVisitRow[],
-  filters: SafetyVisitFilters,
-  search: string,
-): SafetyVisitRow[] {
-  const normalizedSearch = search.trim().toLowerCase();
-
-  return rows.filter((row) => {
-    if (
-      filters.orderNumber &&
-      !row.workOrderNumber
-        .toLowerCase()
-        .includes(filters.orderNumber.trim().toLowerCase())
-    ) {
-      return false;
-    }
-
-    if (filters.contractor && row.contractor !== filters.contractor) {
-      return false;
-    }
-
-    if (filters.consultant && row.consultant !== filters.consultant) {
-      return false;
-    }
-
-    if (
-      filters.engineer &&
-      !row.consultantEngineer
-        .toLowerCase()
-        .includes(filters.engineer.trim().toLowerCase())
-    ) {
-      return false;
-    }
-
-    if (filters.date && row.date !== filters.date) {
-      return false;
-    }
-
-    if (normalizedSearch) {
-      const haystack = [
-        row.workOrderNumber,
-        row.consultantEngineer,
-        row.consultant,
-        row.contractor,
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      if (!haystack.includes(normalizedSearch)) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-}
-
 export default function SafetyVisitsView() {
   const { projectId } = useProject();
   const t = useTranslations("project.safetyTab.visits");
@@ -151,8 +95,13 @@ export default function SafetyVisitsView() {
     initialLimit: 10,
   });
 
-  const safetyQuery = useProjectSafety(projectId);
+  const safetyQuery = useSafetyVisits({
+    projectId,
+    search: params.search || undefined,
+    filters,
+  });
   const contractorsQuery = useProjectContractors(projectId);
+  const employeesQuery = useProjectEmployees(projectId);
 
   const allRows = useMemo(() => {
     const contractorNameById = new Map(
@@ -172,12 +121,6 @@ export default function SafetyVisitsView() {
     }));
   }, [safetyQuery.data, contractorsQuery.data]);
 
-  const contractorOptions = useMemo(
-    () =>
-      [...new Set(allRows.map((row) => row.contractor).filter(Boolean))].sort(),
-    [allRows],
-  );
-
   const consultantOptions = useMemo(
     () =>
       [...new Set(allRows.map((row) => row.consultant).filter(Boolean))].sort(),
@@ -192,18 +135,13 @@ export default function SafetyVisitsView() {
     [allRows],
   );
 
-  const filteredRows = useMemo(
-    () => filterSafetyVisits(allRows, filters, params.search),
-    [allRows, filters, params.search],
-  );
-
-  const totalItems = filteredRows.length;
+  const totalItems = allRows.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
 
   const pageData = useMemo(() => {
     const start = (params.page - 1) * params.limit;
-    return filteredRows.slice(start, start + params.limit);
-  }, [filteredRows, params.page, params.limit]);
+    return allRows.slice(start, start + params.limit);
+  }, [allRows, params.page, params.limit]);
 
   const updateFilter = <K extends keyof SafetyVisitFilters>(
     key: K,
@@ -375,8 +313,8 @@ export default function SafetyVisitsView() {
     params,
     selectable: true,
     getRowId: (row: SafetyVisitRow) => row.id,
-    loading: safetyQuery.isLoading,
-    searchable: true,
+    loading: safetyQuery.isLoading || safetyQuery.isFetching,
+    searchable: false,
   });
 
   if (!projectId) {
@@ -398,9 +336,12 @@ export default function SafetyVisitsView() {
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
             <TextField
-              label={tFilters("orderNumber")}
-              value={filters.orderNumber}
-              onChange={(e) => updateFilter("orderNumber", e.target.value)}
+              label={tFilters("search")}
+              value={params.search}
+              onChange={(e) => {
+                params.setSearch(e.target.value);
+                params.setPage(1);
+              }}
               fullWidth
               size="small"
             />
@@ -410,15 +351,15 @@ export default function SafetyVisitsView() {
             <TextField
               select
               label={tFilters("contractor")}
-              value={filters.contractor}
-              onChange={(e) => updateFilter("contractor", e.target.value)}
+              value={filters.contractorId}
+              onChange={(e) => updateFilter("contractorId", e.target.value)}
               fullWidth
               size="small"
             >
               <MenuItem value="">{t("all")}</MenuItem>
-              {contractorOptions.map((contractor) => (
-                <MenuItem key={contractor} value={contractor}>
-                  {contractor}
+              {(contractorsQuery.data ?? []).map((contractor) => (
+                <MenuItem key={contractor.id} value={String(contractor.id)}>
+                  {contractor.name}
                 </MenuItem>
               ))}
             </TextField>
@@ -446,8 +387,8 @@ export default function SafetyVisitsView() {
             <TextField
               select
               label={tFilters("engineer")}
-              value={filters.engineer}
-              onChange={(e) => updateFilter("engineer", e.target.value)}
+              value={filters.consultantEngineer}
+              onChange={(e) => updateFilter("consultantEngineer", e.target.value)}
               fullWidth
               size="small"
             >
@@ -470,6 +411,24 @@ export default function SafetyVisitsView() {
               size="small"
               InputLabelProps={{ shrink: true }}
             />
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+            <TextField
+              select
+              label={tFilters("assignedUser")}
+              value={filters.assignedUserId}
+              onChange={(e) => updateFilter("assignedUserId", e.target.value)}
+              fullWidth
+              size="small"
+            >
+              <MenuItem value="">{t("all")}</MenuItem>
+              {(employeesQuery.data ?? []).map((employee) => (
+                <MenuItem key={employee.user.id} value={employee.user.id}>
+                  {employee.user.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
       </Paper>
