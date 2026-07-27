@@ -36,7 +36,7 @@ export interface ProjectNotificationContractor {
 export interface ProjectNotificationEmployee {
   user_id: string;
   name: string;
-  status: "available" | "busy" | "no_location" | "offline";
+  status: "available" | "busy" | "no_location" | "offline" | "absent" | "not_connected" | "available_far";
   status_label: string;
   distance_meters: number;
   distance_label: string;
@@ -45,6 +45,8 @@ export interface ProjectNotificationEmployee {
   attendance?: Record<string, unknown> | null;
   branch?: string | null;
   branch_id?: string | number | null;
+  can_clock_in?: boolean;
+  can_clock_in_until?: string | null;
 }
 
 export interface ProjectNotificationAttachment {

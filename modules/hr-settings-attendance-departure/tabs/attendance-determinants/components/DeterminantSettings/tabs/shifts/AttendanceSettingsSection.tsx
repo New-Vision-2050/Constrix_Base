@@ -15,20 +15,44 @@ import type { PatchConstraintRulesParams } from "@/services/api/attendance-const
 import type { ConstraintRules } from "@/services/api/attendance-constraints/types/response";
 import {
   CONSTRAINT_RULE_OPTIONS,
+  CONSTRAINT_RULE_TOGGLE_OPTIONS,
   type ConstraintRuleField,
+  type ConstraintRuleToggleField,
 } from "./timing-constants";
+
 const RULE_FIELDS: ConstraintRuleField[] = [
-  "lateness_minutes",
   "early_clock_in_minutes",
   "max_over_time",
   "out_zone_minutes",
-  "max_working_hours",
+  "extension_hours_shift",
+  "can_clock_in_before",
 ];
 
-function defaultRuleValues(): Record<ConstraintRuleField, number> {
-  return Object.fromEntries(
+const RULE_TOGGLE_FIELDS: ConstraintRuleToggleField[] = [
+  "is_overtime_before_early_clock_in",
+  "is_overtime_after_extension_hours_shift",
+  "is_after_finish_working_hours",
+];
+
+type RuleValues = Record<ConstraintRuleField, number> & {
+  can_clock_in_before_enabled: boolean;
+};
+type RuleToggleValues = Record<ConstraintRuleToggleField, boolean>;
+
+function defaultRuleValues(): RuleValues {
+  const numericDefaults = Object.fromEntries(
     CONSTRAINT_RULE_OPTIONS.map((option) => [option.id, option.amount]),
   ) as Record<ConstraintRuleField, number>;
+  return {
+    ...numericDefaults,
+    can_clock_in_before_enabled: false,
+  };
+}
+
+function defaultToggleValues(): RuleToggleValues {
+  return Object.fromEntries(
+    CONSTRAINT_RULE_TOGGLE_OPTIONS.map((option) => [option.id, false]),
+  ) as RuleToggleValues;
 }
 
 function readRuleNumber(source: Record<string, unknown>, key: string): number | undefined {
@@ -38,6 +62,13 @@ function readRuleNumber(source: Record<string, unknown>, key: string): number | 
     const parsed = Number.parseInt(raw, 10);
     if (Number.isFinite(parsed) && parsed >= 0) return parsed;
   }
+  return undefined;
+}
+
+function readRuleBoolean(source: Record<string, unknown>, key: string): boolean | undefined {
+  const raw = source[key];
+  if (typeof raw === "boolean") return raw;
+  if (typeof raw === "number") return raw !== 0;
   return undefined;
 }
 
@@ -56,17 +87,44 @@ function parseConstraintRules(data: unknown): Partial<ConstraintRules> | null {
     const value = readRuleNumber(source, field);
     if (value != null) parsed[field] = value;
   }
+  if (source.can_clock_in_before === null) {
+    parsed.can_clock_in_before = null;
+  }
+  for (const field of RULE_TOGGLE_FIELDS) {
+    const value = readRuleBoolean(source, field);
+    if (value != null) parsed[field] = value;
+  }
 
   return Object.keys(parsed).length > 0 ? parsed : null;
 }
 
 function mergeRuleValues(
   fromApi: Partial<ConstraintRules> | null | undefined,
-): Record<ConstraintRuleField, number> {
+): RuleValues {
   const defaults = defaultRuleValues();
   if (!fromApi) return defaults;
 
-  return RULE_FIELDS.reduce(
+  const numericValues = RULE_FIELDS.reduce(
+    (acc, field) => {
+      acc[field] = fromApi[field] ?? defaults[field];
+      return acc;
+    },
+    { ...defaults } as RuleValues,
+  );
+
+  numericValues.can_clock_in_before_enabled =
+    fromApi.can_clock_in_before != null && fromApi.can_clock_in_before > 0;
+
+  return numericValues;
+}
+
+function mergeToggleValues(
+  fromApi: Partial<ConstraintRules> | null | undefined,
+): RuleToggleValues {
+  const defaults = defaultToggleValues();
+  if (!fromApi) return defaults;
+
+  return RULE_TOGGLE_FIELDS.reduce(
     (acc, field) => {
       acc[field] = fromApi[field] ?? defaults[field];
       return acc;
@@ -76,14 +134,21 @@ function mergeRuleValues(
 }
 
 function valuesToPatchBody(
-  values: Record<ConstraintRuleField, number>,
+  values: RuleValues,
+  toggles: RuleToggleValues,
 ): PatchConstraintRulesParams {
   return {
-    lateness_minutes: values.lateness_minutes,
     early_clock_in_minutes: values.early_clock_in_minutes,
     max_over_time: values.max_over_time,
     out_zone_minutes: values.out_zone_minutes,
-    max_working_hours: values.max_working_hours,
+    extension_hours_shift: values.extension_hours_shift,
+    can_clock_in_before: values.can_clock_in_before_enabled
+      ? values.can_clock_in_before
+      : null,
+    is_overtime_before_early_clock_in: toggles.is_overtime_before_early_clock_in,
+    is_overtime_after_extension_hours_shift:
+      toggles.is_overtime_after_extension_hours_shift,
+    is_after_finish_working_hours: toggles.is_after_finish_working_hours,
   };
 }
 
@@ -98,9 +163,8 @@ export default function AttendanceSettingsSection({
 
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
-  const [values, setValues] = useState<Record<ConstraintRuleField, number>>(
-    defaultRuleValues,
-  );
+  const [values, setValues] = useState<RuleValues>(defaultRuleValues);
+  const [toggles, setToggles] = useState<RuleToggleValues>(defaultToggleValues);
 
   const rulesQuery = useQuery({
     queryKey: ["constraint-rules", constraintId],
@@ -115,6 +179,7 @@ export default function AttendanceSettingsSection({
   useEffect(() => {
     if (rulesQuery.status !== "success" || isEditing) return;
     setValues(mergeRuleValues(rulesQuery.data));
+    setToggles(mergeToggleValues(rulesQuery.data));
   }, [rulesQuery.data, rulesQuery.status, isEditing]);
 
   const patchRulesMutation = useMutation({
@@ -149,14 +214,23 @@ export default function AttendanceSettingsSection({
     }));
   };
 
+  const handleToggleChange = (id: ConstraintRuleToggleField, checked: boolean) => {
+    setToggles((prev) => ({ ...prev, [id]: checked }));
+  };
+
+  const handleCanClockInBeforeToggle = (enabled: boolean) => {
+    setValues((prev) => ({ ...prev, can_clock_in_before_enabled: enabled }));
+  };
+
   const handleCancel = useCallback(() => {
     setValues(mergeRuleValues(rulesQuery.data));
+    setToggles(mergeToggleValues(rulesQuery.data));
     setIsEditing(false);
   }, [rulesQuery.data]);
 
   const handleSave = useCallback(() => {
-    patchRulesMutation.mutate(valuesToPatchBody(values));
-  }, [patchRulesMutation, values]);
+    patchRulesMutation.mutate(valuesToPatchBody(values, toggles));
+  }, [patchRulesMutation, values, toggles]);
 
   const isBusy = rulesQuery.isLoading || patchRulesMutation.isPending;
 
@@ -207,33 +281,85 @@ export default function AttendanceSettingsSection({
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {displayOptions.map((option) => (
+        {displayOptions.map((option) => {
+          const isCanClockInBefore = option.id === "can_clock_in_before";
+          const isEnabled = !isCanClockInBefore || values.can_clock_in_before_enabled;
+
+          return (
+            <div
+              key={option.id}
+              className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center"
+            >
+              {isEditing && isCanClockInBefore ? (
+                <div className="flex items-center justify-between mb-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={values.can_clock_in_before_enabled}
+                      disabled={isBusy}
+                      onChange={(e) => handleCanClockInBeforeToggle(e.target.checked)}
+                      className="h-4 w-4 rounded border-border"
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {t("can_clock_in_before_enabled")}
+                    </span>
+                  </label>
+                </div>
+              ) : null}
+              {isEditing ? (
+                <div className={`flex items-center gap-2 justify-start ${!isEnabled ? "opacity-40" : ""}`}>
+                  <input
+                    type="number"
+                    min={0}
+                    value={option.amount}
+                    disabled={isBusy || !isEnabled}
+                    onChange={(e) =>
+                      handleAmountChange(option.id, e.target.value)
+                    }
+                    className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-right outline-none focus:border-primary disabled:opacity-50"
+                  />
+                  <span className="text-lg font-semibold text-primary">
+                    {t(`${option.id}_unit`)}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-3xl font-semibold text-primary leading-none">
+                  {rulesQuery.isLoading
+                    ? "—"
+                    : isCanClockInBefore && !values.can_clock_in_before_enabled
+                      ? t("not_set")
+                      : `${option.amount} ${t(`${option.id}_unit`)}`}
+                </p>
+              )}
+              <p className="text-sm text-muted-foreground mt-3">{t(`${option.id}_label`)}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 space-y-3">
+        {CONSTRAINT_RULE_TOGGLE_OPTIONS.map((option) => (
           <div
             key={option.id}
-            className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center"
+            className="bg-background border border-border rounded-lg px-4 py-3 flex items-center justify-between"
           >
+            <p className="text-sm text-muted-foreground">{t(`${option.id}_label`)}</p>
             {isEditing ? (
-              <div className="flex items-center gap-2 justify-start">
+              <label className="relative inline-flex items-center cursor-pointer">
                 <input
-                  type="number"
-                  min={0}
-                  value={option.amount}
+                  type="checkbox"
+                  checked={toggles[option.id]}
                   disabled={isBusy}
-                  onChange={(e) =>
-                    handleAmountChange(option.id, e.target.value)
-                  }
-                  className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-right outline-none focus:border-primary disabled:opacity-50"
+                  onChange={(e) => handleToggleChange(option.id, e.target.checked)}
+                  className="sr-only peer"
                 />
-                <span className="text-lg font-semibold text-primary">
-                  {t(`${option.id}_unit`)}
-                </span>
-              </div>
+                <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-primary peer-focus:ring-2 peer-focus:ring-primary/20 transition-colors after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
+              </label>
             ) : (
-              <p className="text-3xl font-semibold text-primary leading-none">
-                {rulesQuery.isLoading ? "—" : `${option.amount} ${t(`${option.id}_unit`)}`}
-              </p>
+              <span className={`text-sm font-medium ${toggles[option.id] ? "text-primary" : "text-muted-foreground"}`}>
+                {toggles[option.id] ? t("enabled") : t("disabled")}
+              </span>
             )}
-            <p className="text-sm text-muted-foreground mt-3">{t(`${option.id}_label`)}</p>
           </div>
         ))}
       </div>

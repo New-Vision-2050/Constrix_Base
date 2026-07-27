@@ -106,11 +106,14 @@ export type ConstraintLocationsListApiResponse = {
 
 /** Rules payload for GET/PATCH `/attendance/constraints/:constraintId/rules` */
 export type ConstraintRules = {
-  lateness_minutes: number;
   early_clock_in_minutes: number;
   max_over_time: number;
   out_zone_minutes: number;
-  max_working_hours: number;
+  extension_hours_shift: number;
+  can_clock_in_before: number | null;
+  is_overtime_before_early_clock_in: boolean;
+  is_overtime_after_extension_hours_shift: boolean;
+  is_after_finish_working_hours: boolean;
 };
 
 export type ConstraintRulesApiResponse = {

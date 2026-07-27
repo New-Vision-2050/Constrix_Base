@@ -3,22 +3,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Paper, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import type { SxProps, Theme } from "@mui/material/styles";
 import { useSearchParams } from "@i18n/navigation";
 import type { SystemTab } from "@/modules/settings/types/SystemTab";
 
-const pillIndicatorSx = {
+const pillIndicatorSx: SxProps<Theme> = {
   height: "100%",
   borderRadius: "12px",
-  backgroundColor: (theme: ReturnType<typeof useTheme>) =>
-    alpha(theme.palette.primary.main, 0.14),
+  backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.14),
   border: "1px solid",
   borderColor: "primary.main",
-  boxShadow: (theme: ReturnType<typeof useTheme>) =>
-    `0 0 20px ${alpha(theme.palette.primary.main, 0.35)}`,
+  boxShadow: (theme) => `0 0 20px ${alpha(theme.palette.primary.main, 0.35)}`,
   top: 0,
   bottom: 0,
   zIndex: 0,
-} as const;
+};
 
 type ProjectTabsLayoutProps = {
   tabsList: SystemTab[];
