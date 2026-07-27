@@ -1,4 +1,4 @@
-export type SafetyVisitsListParams = {
+export type ListProjectSafetyVisitsParams = {
   search?: string;
   date?: string;
   consultantEngineer?: string;
@@ -7,8 +7,8 @@ export type SafetyVisitsListParams = {
   assignedUserId?: string;
 };
 
-export function buildSafetyVisitsListParams(
-  params: SafetyVisitsListParams,
+export function buildListProjectSafetyVisitsParams(
+  params: ListProjectSafetyVisitsParams,
 ): Record<string, string> | undefined {
   const query: Record<string, string> = {};
 
@@ -29,3 +29,9 @@ export function buildSafetyVisitsListParams(
 
   return Object.keys(query).length > 0 ? query : undefined;
 }
+
+/** @deprecated Use ListProjectSafetyVisitsParams */
+export type SafetyVisitsListParams = ListProjectSafetyVisitsParams;
+
+/** @deprecated Use buildListProjectSafetyVisitsParams */
+export const buildSafetyVisitsListParams = buildListProjectSafetyVisitsParams;

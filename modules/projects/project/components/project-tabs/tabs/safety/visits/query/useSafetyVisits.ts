@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { ProjectSafetyVisitsApi } from "@/services/api/projects/project-safety/visits/api";
-import { extractProjectSafetyRecords } from "@/services/api/projects/project-safety/visits/types";
+import { ProjectSafetyApi } from "@/services/api/projects/project-safety";
+import { extractProjectSafetyRecords } from "@/services/api/projects/project-safety/types/response";
 import type {
   SafetyVisitFilters,
   SafetyVisitRow,
@@ -32,7 +32,7 @@ export function useSafetyVisits({
   return useQuery({
     queryKey: safetyVisitsQueryKey({ projectId, search, filters }),
     queryFn: async (): Promise<SafetyVisitRow[]> => {
-      const res = await ProjectSafetyVisitsApi.listForProject(projectId!, {
+      const res = await ProjectSafetyApi.listVisitsForProject(projectId!, {
         search: search?.trim() || undefined,
         date: filters?.date || undefined,
         consultantEngineer: filters?.consultantEngineer || undefined,

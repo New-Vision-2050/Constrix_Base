@@ -1,9 +1,9 @@
 import { useQueries } from "@tanstack/react-query";
-import { ProjectSafetyIndicatorsApi } from "@/services/api/projects/project-safety/indicators/api";
+import { ProjectSafetyApi } from "@/services/api/projects/project-safety";
 import {
   extractListPayload,
   extractSinglePayload,
-} from "@/services/api/projects/project-safety/indicators/types";
+} from "@/services/api/projects/project-safety/types/response";
 import {
   mapSafetyAnalyticsCompliant,
   mapSafetyAnalyticsContractorConsultant,
@@ -31,7 +31,7 @@ export function useSafetyAnalytics(projectId: string | undefined) {
       {
         queryKey: analyticsQueryKey(projectId!, "overall"),
         queryFn: async (): Promise<SafetyAnalyticsOverall> => {
-          const res = await ProjectSafetyIndicatorsApi.getOverall(projectId!);
+          const res = await ProjectSafetyApi.getAnalyticsOverall(projectId!);
           return mapSafetyAnalyticsOverall(extractSinglePayload(res.data));
         },
         enabled,
@@ -40,7 +40,7 @@ export function useSafetyAnalytics(projectId: string | undefined) {
       {
         queryKey: analyticsQueryKey(projectId!, "compliant"),
         queryFn: async (): Promise<SafetyAnalyticsCompliant> => {
-          const res = await ProjectSafetyIndicatorsApi.getCompliant(projectId!);
+          const res = await ProjectSafetyApi.getAnalyticsCompliant(projectId!);
           return mapSafetyAnalyticsCompliant(extractSinglePayload(res.data));
         },
         enabled,
@@ -49,7 +49,7 @@ export function useSafetyAnalytics(projectId: string | undefined) {
       {
         queryKey: analyticsQueryKey(projectId!, "frequent-violations"),
         queryFn: async (): Promise<SafetyAnalyticsViolationItem[]> => {
-          const res = await ProjectSafetyIndicatorsApi.getFrequentViolations(
+          const res = await ProjectSafetyApi.getAnalyticsFrequentViolations(
             projectId!,
           );
           return extractListPayload(res.data).map(mapSafetyAnalyticsViolationItem);
@@ -60,7 +60,7 @@ export function useSafetyAnalytics(projectId: string | undefined) {
       {
         queryKey: analyticsQueryKey(projectId!, "violation-performance"),
         queryFn: async (): Promise<SafetyAnalyticsPerformanceItem[]> => {
-          const res = await ProjectSafetyIndicatorsApi.getViolationPerformance(
+          const res = await ProjectSafetyApi.getAnalyticsViolationPerformance(
             projectId!,
           );
           return extractListPayload(res.data).map(
@@ -74,7 +74,7 @@ export function useSafetyAnalytics(projectId: string | undefined) {
         queryKey: analyticsQueryKey(projectId!, "by-contractor-consultant"),
         queryFn: async (): Promise<SafetyAnalyticsContractorConsultantItem[]> => {
           const res =
-            await ProjectSafetyIndicatorsApi.getByContractorConsultant(
+            await ProjectSafetyApi.getAnalyticsByContractorConsultant(
               projectId!,
             );
           return extractListPayload(res.data).map(
@@ -87,7 +87,7 @@ export function useSafetyAnalytics(projectId: string | undefined) {
       {
         queryKey: analyticsQueryKey(projectId!, "top-violations"),
         queryFn: async (): Promise<SafetyAnalyticsViolationItem[]> => {
-          const res = await ProjectSafetyIndicatorsApi.getTopViolations(
+          const res = await ProjectSafetyApi.getAnalyticsTopViolations(
             projectId!,
           );
           return extractListPayload(res.data).map(mapSafetyAnalyticsViolationItem);

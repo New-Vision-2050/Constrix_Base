@@ -1,35 +1,91 @@
-import { ProjectSafetyVisitsApi } from "./visits/api";
-import { ProjectSafetyReportsApi } from "./safety-reports/api";
-import { ProjectSafetyIndicatorsApi } from "./indicators/api";
+import { baseApi } from "@/config/axios/instances/base";
+import {
+  buildListProjectSafetyVisitsParams,
+  type ListProjectSafetyVisitsParams,
+} from "./types/params";
+import type {
+  ListProjectSafetyReportsResponse,
+  ListProjectSafetyReportsTabResponse,
+  ListProjectSafetyVisitsResponse,
+  SafetyAnalyticsByContractorConsultantResponse,
+  SafetyAnalyticsCompliantResponse,
+  SafetyAnalyticsFrequentViolationsResponse,
+  SafetyAnalyticsOverallResponse,
+  SafetyAnalyticsTopViolationsResponse,
+  SafetyAnalyticsViolationPerformanceResponse,
+} from "./types/response";
 
-export { ProjectSafetyVisitsApi } from "./visits/api";
-export { ProjectSafetyReportsApi } from "./safety-reports/api";
-export { ProjectSafetyIndicatorsApi } from "./indicators/api";
-export { ProjectSafetyReportsTabApi } from "./reports/api";
-
-export type {
-  ProjectSafetyRecordDto,
-  ProjectSafetyViolationDto,
-} from "./visits/types";
-export type { ProjectSafetyReportDto } from "./safety-reports/types";
-export type {
-  SafetyAnalyticsOverallDto,
-  SafetyAnalyticsCompliantDto,
-  SafetyAnalyticsViolationItemDto,
-  SafetyAnalyticsViolationPerformanceDto,
-  SafetyAnalyticsContractorConsultantDto,
-} from "./indicators/types";
-
-/** @deprecated Prefer tab-specific APIs (ProjectSafetyVisitsApi, etc.). */
 export const ProjectSafetyApi = {
-  listForProject: ProjectSafetyVisitsApi.listForProject,
-  listReportsForProject: ProjectSafetyReportsApi.listForProject,
-  getAnalyticsOverall: ProjectSafetyIndicatorsApi.getOverall,
-  getAnalyticsCompliant: ProjectSafetyIndicatorsApi.getCompliant,
-  getAnalyticsFrequentViolations: ProjectSafetyIndicatorsApi.getFrequentViolations,
-  getAnalyticsViolationPerformance:
-    ProjectSafetyIndicatorsApi.getViolationPerformance,
-  getAnalyticsByContractorConsultant:
-    ProjectSafetyIndicatorsApi.getByContractorConsultant,
-  getAnalyticsTopViolations: ProjectSafetyIndicatorsApi.getTopViolations,
+  listVisitsForProject: (
+    projectId: string | number,
+    params?: ListProjectSafetyVisitsParams,
+  ) =>
+    baseApi.get<ListProjectSafetyVisitsResponse>(
+      `projects/${projectId}/safety`,
+      {
+        params: buildListProjectSafetyVisitsParams(params ?? {}),
+      },
+    ),
+
+  listReportsForProject: (projectId: string | number) =>
+    baseApi.get<ListProjectSafetyReportsResponse>(
+      `projects/${projectId}/safety/report`,
+    ),
+
+  getAnalyticsOverall: (projectId: string | number) =>
+    baseApi.get<SafetyAnalyticsOverallResponse>(
+      `projects/${projectId}/safety/analytics/overall`,
+    ),
+
+  getAnalyticsCompliant: (projectId: string | number) =>
+    baseApi.get<SafetyAnalyticsCompliantResponse>(
+      `projects/${projectId}/safety/analytics/compliant`,
+    ),
+
+  getAnalyticsFrequentViolations: (projectId: string | number) =>
+    baseApi.get<SafetyAnalyticsFrequentViolationsResponse>(
+      `projects/${projectId}/safety/analytics/frequent-violations`,
+    ),
+
+  getAnalyticsViolationPerformance: (projectId: string | number) =>
+    baseApi.get<SafetyAnalyticsViolationPerformanceResponse>(
+      `projects/${projectId}/safety/analytics/violation-performance`,
+    ),
+
+  getAnalyticsByContractorConsultant: (projectId: string | number) =>
+    baseApi.get<SafetyAnalyticsByContractorConsultantResponse>(
+      `projects/${projectId}/safety/analytics/by-contractor-consultant`,
+    ),
+
+  getAnalyticsTopViolations: () =>
+    baseApi.get<SafetyAnalyticsTopViolationsResponse>(
+      `projects/safety/analytics/top-violations`,
+    ),
+
+  /** Placeholder — replace path when the التقارير tab API is defined. */
+  // listReportsTabForProject: (_projectId: string | number) =>
+  //   baseApi.get<ListProjectSafetyReportsTabResponse>(
+  //     "projects/_placeholder/safety/reports",
+  //   ),
 };
+
+export const ProjectSafetyVisitsApi = {
+  listForProject: ProjectSafetyApi.listVisitsForProject,
+};
+
+export const ProjectSafetyReportsApi = {
+  listForProject: ProjectSafetyApi.listReportsForProject,
+};
+
+export const ProjectSafetyIndicatorsApi = {
+  getOverall: ProjectSafetyApi.getAnalyticsOverall,
+  getCompliant: ProjectSafetyApi.getAnalyticsCompliant,
+  getFrequentViolations: ProjectSafetyApi.getAnalyticsFrequentViolations,
+  getViolationPerformance: ProjectSafetyApi.getAnalyticsViolationPerformance,
+  getByContractorConsultant: ProjectSafetyApi.getAnalyticsByContractorConsultant,
+  getTopViolations: ProjectSafetyApi.getAnalyticsTopViolations,
+};
+
+// export const ProjectSafetyReportsTabApi = {
+//   listForProject: ProjectSafetyApi.listReportsTabForProject,
+// };

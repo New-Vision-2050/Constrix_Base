@@ -1,6 +1,6 @@
 import type { SafetyVisitRow } from "../types";
 import { buildViolationValues } from "../constants/safetyViolations";
-import type { ProjectSafetyRecordDto } from "@/services/api/projects/project-safety/visits/types";
+import type { ProjectSafetyRecordDto } from "@/services/api/projects/project-safety/types/response";
 
 function pickString(...values: Array<string | null | undefined>): string {
   for (const value of values) {

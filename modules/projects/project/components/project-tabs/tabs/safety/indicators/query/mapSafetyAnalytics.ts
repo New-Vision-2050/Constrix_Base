@@ -5,7 +5,7 @@ import type {
   SafetyAnalyticsOverallDto,
   SafetyAnalyticsViolationItemDto,
   SafetyAnalyticsViolationPerformanceDto,
-} from "@/services/api/projects/project-safety/indicators/types";
+} from "@/services/api/projects/project-safety/types/response";
 
 function toNumber(value: unknown): number {
   if (value === null || value === undefined || value === "") return 0;

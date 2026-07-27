@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { ProjectSafetyReportsApi } from "@/services/api/projects/project-safety/safety-reports/api";
-import { extractProjectSafetyReports } from "@/services/api/projects/project-safety/safety-reports/types";
+import { ProjectSafetyApi } from "@/services/api/projects/project-safety";
+import { extractProjectSafetyReports } from "@/services/api/projects/project-safety/types/response";
 import type { SafetyReportRow } from "../types";
 import { mapSafetyReportDto } from "./mapSafetyReport";
 
@@ -13,7 +13,7 @@ export function useSafetyReports(projectId: string | undefined) {
   return useQuery({
     queryKey: safetyReportsQueryKey(projectId),
     queryFn: async (): Promise<SafetyReportRow[]> => {
-      const res = await ProjectSafetyReportsApi.listForProject(projectId!);
+      const res = await ProjectSafetyApi.listReportsForProject(projectId!);
       const records = extractProjectSafetyReports(res.data);
       return records.map((item) => mapSafetyReportDto(item));
     },

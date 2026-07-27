@@ -1,5 +1,5 @@
 import type { SafetyReportRow } from "../types";
-import type { ProjectSafetyReportDto } from "@/services/api/projects/project-safety/safety-reports/types";
+import type { ProjectSafetyReportDto } from "@/services/api/projects/project-safety/types/response";
 
 function pickString(...values: Array<string | null | undefined>): string {
   for (const value of values) {
