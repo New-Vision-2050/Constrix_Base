@@ -620,7 +620,10 @@ export default function StepCard({
         const res = await ProjectSharingApi.listForProject(projectId!);
         const shares = res.data.payload ?? [];
         const companies = shares
-          .map((share) => share.shared_with_company)
+          .flatMap((share) => [
+            share.shared_with_company,
+            share.owner_company,
+          ])
           .filter(
             (company): company is NonNullable<typeof company> =>
               !!company?.id && !!company.name,

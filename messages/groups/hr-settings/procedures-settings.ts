@@ -188,7 +188,7 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
         specificProcedures: _m("Specific procedures", "اجراءات محددة"),
         assignedUser: _m("Assigned user", "الموظف المُسند"),
         himself: _m("Himself", "نفسه"),
-        receiverCompany: _m("Receiver company", "الشركة المستلمة"),
+        receiverCompany: _m("Participating entities", "الجهات المشاركة"),
       }),
       managementHierarchy: new MessagesGroup({
         projectManager: _m("Project manager", "مدير المشروع"),
@@ -216,10 +216,10 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
       "Select management hierarchy",
       "اختر الهيكل التنظيمي",
     ),
-    receiverCompanies: _m("Receiver companies", "الشركات المستلمة"),
-    receiverCompany: _m("Receiver company", "الشركة المستلمة"),
-    selectReceiverCompanies: _m("Select companies", "اختر الشركات"),
-    selectReceiverCompany: _m("Select company", "اختر الشركة"),
+    receiverCompanies: _m("Participating entities", "الجهات المشاركة"),
+    receiverCompany: _m("Participating entities", "الجهات المشاركة"),
+    selectReceiverCompanies: _m("Select participating entities", "اختر الجهات المشاركة"),
+    selectReceiverCompany: _m("Select participating entity", "اختر الجهة المشاركة"),
     selectConcernedUsers: _m(
       "Select concerned users",
       "اختر المعنيين",
@@ -245,12 +245,12 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
       ),
       selectValue: _m("Please select a value", "يرجى اختيار القيمة"),
       selectReceiverCompanies: _m(
-        "Please select at least one company",
-        "يرجى اختيار شركة واحدة على الأقل",
+        "Please select at least one participating entity",
+        "يرجى اختيار جهة مشاركة واحدة على الأقل",
       ),
       selectReceiverCompany: _m(
-        "Please select a company",
-        "يرجى اختيار شركة",
+        "Please select a participating entity",
+        "يرجى اختيار جهة مشاركة",
       ),
       enterSkippingPeriod: _m(
         "Please enter skipping period",
