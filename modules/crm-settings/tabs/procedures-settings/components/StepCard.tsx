@@ -343,6 +343,113 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
   };
 };
 
+// ── layout helpers (module scope — must not be redefined per render) ─────────
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+      {children}
+    </Typography>
+  );
+}
+
+function CheckRow({
+  options,
+  selected,
+  onToggle,
+  inlineInput,
+  fieldsDisabled,
+}: {
+  options: readonly { value: string; label: string; disabled?: boolean }[];
+  selected: string[];
+  onToggle: (val: string) => void;
+  inlineInput?: {
+    optionValue: string;
+    value: string;
+    onChange: (value: string) => void;
+    unit?: {
+      value: string;
+      options: { value: string; label: string }[];
+      onChange: (value: string) => void;
+    };
+  };
+  fieldsDisabled: boolean;
+}) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 0.5,
+      }}
+    >
+      {options.map((opt) => {
+        const showInlineInput =
+          inlineInput?.optionValue === opt.value &&
+          selected.includes(opt.value);
+
+        return (
+          <Box
+            key={opt.value}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              ...(opt.disabled
+                ? { opacity: 0.6, cursor: "not-allowed" }
+                : {}),
+            }}
+          >
+            <FormControlLabel
+              labelPlacement="end"
+              label={opt.label}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={selected.includes(opt.value)}
+                  onChange={() => onToggle(opt.value)}
+                  disabled={fieldsDisabled || opt.disabled}
+                />
+              }
+            />
+            {showInlineInput && (
+              <>
+                <TextField
+                  type="number"
+                  size="small"
+                  value={inlineInput.value}
+                  onChange={(e) => inlineInput.onChange(e.target.value)}
+                  disabled={fieldsDisabled}
+                  sx={{ width: 80 }}
+                  inputProps={{ min: 1, style: { textAlign: "center" } }}
+                />
+                {inlineInput.unit && (
+                  <TextField
+                    select
+                    size="small"
+                    value={inlineInput.unit.value}
+                    onChange={(e) =>
+                      inlineInput.unit!.onChange(e.target.value)
+                    }
+                    disabled={fieldsDisabled}
+                    sx={{ width: 110 }}
+                    inputProps={{ style: { textAlign: "center" } }}
+                  >
+                    {inlineInput.unit.options.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              </>
+            )}
+          </Box>
+        );
+      })}
+    </Box>
+  );
+}
+
 export default function StepCard({
   procedureSettingId,
   serverStep,
@@ -357,8 +464,8 @@ export default function StepCard({
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(!serverStep);
   const [isExpanded, setIsExpanded] = useState(!serverStep);
-  const [skippingPeriod, setSkippingPeriod] = useState(
-    () => String(serverStep?.skipping_period ?? 0),
+  const [skippingDisplayValue, setSkippingDisplayValue] = useState(
+    () => String(serverStep?.skipping_period ?? "0"),
   );
   const [skippingUnit, setSkippingUnit] = useState<"hours" | "minutes">(
     "hours",
@@ -381,7 +488,8 @@ export default function StepCard({
 
   const syncFromServer = useCallback(() => {
     reset(getDefaultValues(serverStep));
-    setSkippingPeriod(String(serverStep?.skipping_period ?? 0));
+    setSkippingDisplayValue(String(serverStep?.skipping_period ?? "0"));
+    setSkippingUnit("hours");
   }, [serverStep, reset]);
 
   useEffect(() => {
@@ -649,9 +757,13 @@ export default function StepCard({
         return;
       }
     }
+    const skippingHours =
+      skippingUnit === "minutes"
+        ? Number(skippingDisplayValue) / 60
+        : Number(skippingDisplayValue);
     if (
       data.orgBase.includes("approve_timed") &&
-      (!skippingPeriod.trim() || Number(skippingPeriod) <= 0)
+      (!skippingDisplayValue.trim() || skippingHours <= 0)
     ) {
       toast({
         title: t("actions.save"),
@@ -717,7 +829,7 @@ export default function StepCard({
       approval_within_days: Number(data.deadlineDays) || 0,
       approval_within_hours: Number(data.deadlineHours) || 0,
       ...(data.orgBase.includes("approve_timed")
-        ? { skipping_period: Number(skippingPeriod) || 0 }
+        ? { skipping_period: skippingHours }
         : {}),
     };
 
@@ -756,105 +868,6 @@ export default function StepCard({
   };
 
   // ── layout helpers ──────────────────────────────────────────────────────────
-  const SectionLabel = ({ children }: { children: string }) => (
-    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
-      {children}
-    </Typography>
-  );
-
-  const CheckRow = ({
-    options,
-    selected,
-    onToggle,
-    inlineInput,
-  }: {
-    options: readonly { value: string; label: string; disabled?: boolean }[];
-    selected: string[];
-    onToggle: (val: string) => void;
-    inlineInput?: {
-      optionValue: string;
-      value: string;
-      onChange: (value: string) => void;
-      unit?: {
-        value: string;
-        options: { value: string; label: string }[];
-        onChange: (value: string) => void;
-      };
-    };
-  }) => (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 0.5,
-      }}
-    >
-      {options.map((opt) => {
-        const showInlineInput =
-          inlineInput?.optionValue === opt.value &&
-          selected.includes(opt.value);
-
-        return (
-          <FormControlLabel
-            key={opt.value}
-            labelPlacement="end"
-            label={
-              showInlineInput ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <span>{opt.label}</span>
-                  <TextField
-                    type="number"
-                    size="small"
-                    value={inlineInput.value}
-                    onChange={(e) => inlineInput.onChange(e.target.value)}
-                    disabled={fieldsDisabled}
-                    sx={{ width: 80 }}
-                    inputProps={{ min: 1, style: { textAlign: "center" } }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  {inlineInput.unit && (
-                    <TextField
-                      select
-                      size="small"
-                      value={inlineInput.unit.value}
-                      onChange={(e) =>
-                        inlineInput.unit!.onChange(e.target.value)
-                      }
-                      disabled={fieldsDisabled}
-                      sx={{ width: 110 }}
-                      inputProps={{ style: { textAlign: "center" } }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {inlineInput.unit.options.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                </Box>
-              ) : (
-                opt.label
-              )
-            }
-            control={
-              <Checkbox
-                size="small"
-                checked={selected.includes(opt.value)}
-                onChange={() => onToggle(opt.value)}
-                disabled={fieldsDisabled || opt.disabled}
-              />
-            }
-            sx={
-              opt.disabled
-                ? { opacity: 0.6, cursor: "not-allowed" }
-                : undefined
-            }
-          />
-        );
-      })}
-    </Box>
-  );
 
   return (
     <Accordion
@@ -1579,31 +1592,30 @@ export default function StepCard({
               <CheckRow
                 options={orgBaseOptions}
                 selected={field.value}
+                fieldsDisabled={fieldsDisabled}
                 onToggle={(v) =>
                   field.onChange(toggleArrayValue(field.value, v))
                 }
                 inlineInput={{
                   optionValue: "approve_timed",
-                  value:
-                    skippingUnit === "minutes"
-                      ? String(Math.round((Number(skippingPeriod) || 0) * 60))
-                      : skippingPeriod,
-                  onChange: (value) => {
-                    const num = Number(value) || 0;
-                    setSkippingPeriod(
-                      skippingUnit === "minutes"
-                        ? String(Math.round(num) / 60)
-                        : String(num),
-                    );
-                  },
+                  value: skippingDisplayValue,
+                  onChange: (value) => setSkippingDisplayValue(value),
                   unit: {
                     value: skippingUnit,
                     options: [
                       { value: "hours", label: tc("hours") },
                       { value: "minutes", label: tc("minutes") },
                     ],
-                    onChange: (value) =>
-                      setSkippingUnit(value as "hours" | "minutes"),
+                    onChange: (value) => {
+                      const newUnit = value as "hours" | "minutes";
+                      const num = Number(skippingDisplayValue) || 0;
+                      const converted =
+                        newUnit === "minutes"
+                          ? num * 60
+                          : Math.round((num / 60) * 100) / 100;
+                      setSkippingDisplayValue(String(converted));
+                      setSkippingUnit(newUnit);
+                    },
                   },
                 }}
               />
@@ -1664,6 +1676,7 @@ export default function StepCard({
               <CheckRow
                 options={notificationOptions}
                 selected={field.value}
+                fieldsDisabled={fieldsDisabled}
                 onToggle={(v) =>
                   field.onChange(toggleArrayValue(field.value, v))
                 }

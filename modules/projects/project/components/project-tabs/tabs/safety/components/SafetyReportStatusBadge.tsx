@@ -7,12 +7,13 @@ import type { SafetyReportStatus } from "../safety-report-types";
 const STATUS_CONFIG: Record<
   SafetyReportStatus,
   {
-    labelKey: "inProgress" | "completed" | "late";
-    color: "warning" | "success" | "error";
+    labelKey: "inProgress" | "completed" | "pending" | "late";
+    color: "warning" | "success" | "info" | "error";
   }
 > = {
   in_progress: { labelKey: "inProgress", color: "warning" },
   completed: { labelKey: "completed", color: "success" },
+  pending: { labelKey: "pending", color: "info" },
   late: { labelKey: "late", color: "error" },
 };
 

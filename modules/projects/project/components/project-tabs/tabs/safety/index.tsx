@@ -5,6 +5,7 @@ import { Alert, Box, Tab, Tabs } from "@mui/material";
 import { useTranslations } from "next-intl";
 import SafetyVisitsView from "./components/SafetyVisitsView";
 import SafetyReportsView from "./components/SafetyReportsView";
+import SafetyIndicatorsView from "./components/SafetyIndicatorsView";
 
 const TABS = [
   { id: "safetyReports", labelKey: "safetyReports" },
@@ -31,7 +32,8 @@ export default function SafetyTab() {
 
       {activeTab === "safetyReports" && <SafetyReportsView />}
       {activeTab === "visits" && <SafetyVisitsView />}
-      {(activeTab === "reports" || activeTab === "indicators") && (
+      {activeTab === "indicators" && <SafetyIndicatorsView />}
+      {activeTab === "reports" && (
         <Box sx={{ p: 4, textAlign: "center" }}>
           <Alert severity="info">{t("comingSoon")}</Alert>
         </Box>

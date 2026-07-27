@@ -39,31 +39,25 @@ function filterSafetyReports(
 
   return rows.filter((row) => {
     if (
-      filters.orderNumber &&
-      !row.orderNumber
+      filters.reference &&
+      !row.morphableDisplay
         .toLowerCase()
-        .includes(filters.orderNumber.trim().toLowerCase())
+        .includes(filters.reference.trim().toLowerCase())
     ) {
       return false;
     }
 
-    if (
-      filters.contractor &&
-      row.contractorName !== filters.contractor
-    ) {
+    if (filters.contractor && row.contractorName !== filters.contractor) {
       return false;
     }
 
-    if (
-      filters.consultant &&
-      row.consultantName !== filters.consultant
-    ) {
+    if (filters.consultant && row.consultant !== filters.consultant) {
       return false;
     }
 
     if (
       filters.engineer &&
-      !row.engineerName
+      !row.consultantEngineer
         .toLowerCase()
         .includes(filters.engineer.trim().toLowerCase())
     ) {
@@ -72,10 +66,10 @@ function filterSafetyReports(
 
     if (normalizedSearch) {
       const haystack = [
-        row.orderNumber,
+        row.morphableDisplay,
         row.contractorName,
-        row.consultantName,
-        row.engineerName,
+        row.consultant,
+        row.consultantEngineer,
       ]
         .join(" ")
         .toLowerCase();
@@ -105,7 +99,10 @@ export default function SafetyReportsView() {
   });
 
   const reportsQuery = useProjectSafetyReports(projectId);
-  const allRows = reportsQuery.data ?? [];
+  const allRows = useMemo(
+    () => reportsQuery.data ?? [],
+    [reportsQuery.data],
+  );
 
   const contractorOptions = useMemo(
     () =>
@@ -115,13 +112,13 @@ export default function SafetyReportsView() {
 
   const consultantOptions = useMemo(
     () =>
-      [...new Set(allRows.map((row) => row.consultantName).filter(Boolean))].sort(),
+      [...new Set(allRows.map((row) => row.consultant).filter(Boolean))].sort(),
     [allRows],
   );
 
   const engineerOptions = useMemo(
     () =>
-      [...new Set(allRows.map((row) => row.engineerName).filter(Boolean))].sort(),
+      [...new Set(allRows.map((row) => row.consultantEngineer).filter(Boolean))].sort(),
     [allRows],
   );
 
@@ -159,51 +156,49 @@ export default function SafetyReportsView() {
   const columns = useMemo(
     () => [
       {
-        key: "orderNumber",
-        name: tTable("orderNumber"),
+        key: "morphableDisplay",
+        name: tTable("reference"),
         sortable: false,
-        minWidth: 140,
+        minWidth: 160,
         render: (row: SafetyReportRow) => (
-          <span className="font-medium">{row.orderNumber}</span>
+          <span className="font-medium">{row.morphableDisplay || "—"}</span>
         ),
       },
       {
-        key: "orderStatus",
-        name: tTable("orderStatus"),
+        key: "status",
+        name: tTable("status"),
         sortable: false,
         minWidth: 140,
         render: (row: SafetyReportRow) => (
           <SafetyReportStatusBadge
-            status={row.orderStatus}
-            statusLabel={row.orderStatusLabel}
+            status={row.status}
+            statusLabel={row.statusLabel}
           />
         ),
       },
       {
-        key: "safetyVisitsCount",
-        name: tTable("safetyVisitsCount"),
+        key: "totalAssignments",
+        name: tTable("totalAssignments"),
         sortable: false,
         align: "center" as const,
         minWidth: 120,
-        render: (row: SafetyReportRow) => <span>{row.safetyVisitsCount}</span>,
+        render: (row: SafetyReportRow) => <span>{row.totalAssignments}</span>,
       },
       {
-        key: "observationsCount",
-        name: tTable("observationsCount"),
+        key: "completedCount",
+        name: tTable("completedCount"),
         sortable: false,
         align: "center" as const,
         minWidth: 120,
-        render: (row: SafetyReportRow) => <span>{row.observationsCount}</span>,
+        render: (row: SafetyReportRow) => <span>{row.completedCount}</span>,
       },
       {
-        key: "siteVisitFormsCount",
-        name: tTable("siteVisitFormsCount"),
+        key: "pendingCount",
+        name: tTable("pendingCount"),
         sortable: false,
         align: "center" as const,
-        minWidth: 140,
-        render: (row: SafetyReportRow) => (
-          <span>{row.siteVisitFormsCount}</span>
-        ),
+        minWidth: 120,
+        render: (row: SafetyReportRow) => <span>{row.pendingCount}</span>,
       },
       {
         key: "contractorName",
@@ -213,11 +208,18 @@ export default function SafetyReportsView() {
         render: (row: SafetyReportRow) => <span>{row.contractorName}</span>,
       },
       {
-        key: "consultantName",
-        name: tTable("consultantName"),
+        key: "consultant",
+        name: tTable("consultant"),
         sortable: false,
         minWidth: 160,
-        render: (row: SafetyReportRow) => <span>{row.consultantName}</span>,
+        render: (row: SafetyReportRow) => <span>{row.consultant}</span>,
+      },
+      {
+        key: "consultantEngineer",
+        name: tTable("consultantEngineer"),
+        sortable: false,
+        minWidth: 160,
+        render: (row: SafetyReportRow) => <span>{row.consultantEngineer}</span>,
       },
       {
         key: "actions",
@@ -279,9 +281,9 @@ export default function SafetyReportsView() {
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
-              label={tFilters("orderNumber")}
-              value={filters.orderNumber}
-              onChange={(e) => updateFilter("orderNumber", e.target.value)}
+              label={tFilters("reference")}
+              value={filters.reference}
+              onChange={(e) => updateFilter("reference", e.target.value)}
               fullWidth
               size="small"
             />
