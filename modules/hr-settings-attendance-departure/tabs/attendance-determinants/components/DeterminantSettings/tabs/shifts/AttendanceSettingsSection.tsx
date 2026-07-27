@@ -353,7 +353,7 @@ export default function AttendanceSettingsSection({
                   onChange={(e) => handleToggleChange(option.id, e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-primary peer-focus:ring-2 peer-focus:ring-primary/20 transition-colors after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
+                <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-primary peer-focus:ring-2 peer-focus:ring-primary/20 transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
               </label>
             ) : (
               <span className={`text-sm font-medium ${toggles[option.id] ? "text-primary" : "text-muted-foreground"}`}>

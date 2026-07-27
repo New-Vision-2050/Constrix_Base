@@ -867,9 +867,12 @@ function Step4Form({
       label: t("allStatuses", { defaultValue: "All statuses" }),
     },
     { value: "available", label: t("available", { defaultValue: "Available" }) },
+    { value: "available_far", label: t("availableFar", { defaultValue: "Available (Far)" }) },
     { value: "busy", label: t("busy", { defaultValue: "Busy" }) },
     { value: "no_location", label: t("noLocation", { defaultValue: "No Location" }) },
+    { value: "not_connected", label: t("notConnected", { defaultValue: "Not Connected" }) },
     { value: "offline", label: t("offline", { defaultValue: "Offline" }) },
+    { value: "absent", label: t("absent", { defaultValue: "Absent" }) },
   ];
 
   const branchOptions = useMemo(() => {
@@ -934,6 +937,10 @@ function Step4Form({
         return "#f97316";
       case "no_location":
         return "#ef4444";
+      case "absent":
+        return "#dc3545";
+      case "not_connected":
+        return "#9CA3AF";
       default:
         return "#6b7280";
     }

@@ -109,10 +109,19 @@ export const attendancePresenceMessages = new MessagesGroup({
     "Attendance registration is not available right now",
     "تسجيل الحضور غير متاح حالياً",
   ),
-  earlyClockInBlocked: _m(
-    "You can clock in up to {minutes} minutes before shift start",
-    "يمكنك تسجيل الحضور قبل بداية الفترة بـ {minutes} دقيقة فقط",
+  clockInTooEarly: _m(
+    "You cannot clock in yet — the clock-in window has not opened",
+    "لا يمكن تسجيل الحضور الآن — نافذة الحضور لم تبدأ بعد",
   ),
+  clockInDeadlinePassed: _m(
+    "The clock-in deadline has passed — you are marked absent for this period",
+    "انتهى وقت تسجيل الحضور — تم تسجيلك كغائب لهذه الفترة",
+  ),
+  clockInWindowClosed: _m(
+    "The clock-in window for this shift has closed",
+    "انتهت نافذة تسجيل الحضور لهذه الفترة",
+  ),
+  expectedClockOut: _m("Expected clock-out", "الانصراف المتوقع"),
 
   // Work log
   workLog: _m("Work Log", "سجل الدوام"),
