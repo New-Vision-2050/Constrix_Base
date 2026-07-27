@@ -29,54 +29,12 @@ import {
   constraintBasicInfoQueryKey,
   useConstraintBasicInfo,
 } from "../../../../hooks/useConstraintBasicInfo";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { fetchManagementHierarchyOptions } from "@/utils/fetchDropdownOptions";
 import {
   SectionBorderActions,
 } from "../../components/SectionBorderActions";
 import { SectionEditPinButton } from "../../components/SectionEditPinButton";
-
-type ConstraintTypeOption = { code: string; name: string };
-
-function mapConstraintTypeRow(row: unknown): ConstraintTypeOption | null {
-  if (!row || typeof row !== "object") return null;
-  const rec = row as Record<string, unknown>;
-  const code = String(rec.code ?? rec.slug ?? rec.key ?? rec.id ?? "").trim();
-  const name = String(
-    rec.name ?? rec.label_ar ?? rec.title ?? rec.code ?? "",
-  ).trim();
-  if (!code) return null;
-  return { code, name: name || code };
-}
-
-/** API returns a single constraint type in `payload` (array of one or one object). */
-function parseConstraintTypeOption(payload: unknown): ConstraintTypeOption | null {
-  if (payload == null) return null;
-  if (Array.isArray(payload)) {
-    for (const row of payload) {
-      const mapped = mapConstraintTypeRow(row);
-      if (mapped) return mapped;
-    }
-    return null;
-  }
-  if (typeof payload === "object") {
-    const obj = payload as Record<string, unknown>;
-    const direct = mapConstraintTypeRow(obj);
-    if (direct) return direct;
-    const nested = obj.objects ?? obj.data ?? obj.items;
-    if (nested != null) return parseConstraintTypeOption(nested);
-  }
-  return null;
-}
-
-async function fetchConstraintTypeOption(): Promise<ConstraintTypeOption | null> {
-  const res = await apiClient.get<{ payload?: unknown }>(
-    "attendance/constraints/types",
-    { params: { page: 1, per_page: 10 } },
-  );
-  const body = res.data as Record<string, unknown>;
-  return parseConstraintTypeOption(body.payload ?? body.data ?? body);
-}
 
 function mergeConstraintFromBasicInfo(
   constraint: Constraint,
@@ -231,14 +189,6 @@ export default function DeterminantDetailsTab({
     [mergedConstraint],
   );
 
-  const constraintTypeQuery = useQuery({
-    queryKey: ["attendance-constraint-type"],
-    queryFn: fetchConstraintTypeOption,
-    staleTime: 5 * 60_000,
-  });
-
-  const constraintTypeOption = constraintTypeQuery.data ?? null;
-
   const branchesLookupQuery = useQuery({
     queryKey: ["management-hierarchies-branches", "determinant-details"],
     queryFn: () =>
@@ -258,44 +208,17 @@ export default function DeterminantDetailsTab({
     [mergedConstraint, basicInfo, branchesLookupQuery.data],
   );
 
-  const resolvedTypeCode = useMemo(() => {
-    if (constraintTypeOption?.code) return constraintTypeOption.code;
-    return (
-      mergedConstraint.constraint_type?.trim() ||
-      mergedConstraint.constraint_code?.trim() ||
-      ""
-    );
-  }, [
-    constraintTypeOption,
-    mergedConstraint.constraint_code,
-    mergedConstraint.constraint_type,
-  ]);
-
-  const typeDisplayName = useMemo(() => {
-    if (constraintTypeOption) return constraintTypeOption.name;
-    return resolvedTypeCode || "—";
-  }, [constraintTypeOption, resolvedTypeCode]);
-
-  const viewTypeSelectValue = resolvedTypeCode || "__none";
-
   const queryClient = useQueryClient();
 
   const [editingBasics, setEditingBasics] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
-  const [typeDraft, setTypeDraft] = useState("");
   const [branchIdsDraft, setBranchIdsDraft] = useState<string[]>([]);
   const showSkeletonRows = isLoading && !basicInfo;
 
   useEffect(() => {
     if (editingBasics) return;
-    setTypeDraft(resolvedTypeCode);
     setBranchIdsDraft(resolvedBranchIds);
-  }, [editingBasics, resolvedTypeCode, resolvedBranchIds]);
-
-  useEffect(() => {
-    if (!editingBasics || !constraintTypeOption?.code) return;
-    setTypeDraft(constraintTypeOption.code);
-  }, [editingBasics, constraintTypeOption]);
+  }, [editingBasics, resolvedBranchIds]);
 
   useEffect(() => {
     if (!editingBasics || resolvedBranchIds.length === 0) return;
@@ -327,25 +250,21 @@ export default function DeterminantDetailsTab({
 
   const beginEditBasics = useCallback(() => {
     setNameDraft(displayName !== "—" ? displayName : "");
-    setTypeDraft(resolvedTypeCode);
     setBranchIdsDraft(resolvedBranchIds);
     setEditingBasics(true);
   }, [
     displayName,
-    resolvedTypeCode,
     resolvedBranchIds,
   ]);
 
   const saveBasics = useCallback(() => {
     const trimmed = nameDraft.trim();
-    const typeTrim = typeDraft.trim();
     patchBasicInfoMutation.mutate({
       constraint_name: trimmed || undefined,
       ...(trimmed ? { name: trimmed } : {}),
-      constraint_type: typeTrim || undefined,
       ...(branchIdsDraft.length > 0 ? { branch_ids: [...branchIdsDraft] } : {}),
     });
-  }, [nameDraft, typeDraft, branchIdsDraft, patchBasicInfoMutation]);
+  }, [nameDraft, branchIdsDraft, patchBasicInfoMutation]);
 
   const isSavingBasicInfo = patchBasicInfoMutation.isPending;
 
@@ -369,7 +288,6 @@ export default function DeterminantDetailsTab({
           disabled={
             isSavingBasicInfo ||
             !nameDraft.trim() ||
-            !typeDraft.trim() ||
             branchIdsDraft.length === 0
           }
           onClick={saveBasics}
@@ -396,7 +314,6 @@ export default function DeterminantDetailsTab({
         >
           {showSkeletonRows ? (
             <>
-              <Skeleton className="h-[76px] w-full" />
               <Skeleton className="h-[76px] w-full" />
               <Skeleton className="h-[76px] w-full md:col-span-2" />
             </>
@@ -426,52 +343,6 @@ export default function DeterminantDetailsTab({
                     },
                   }}
                 />
-              </div>
-              <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2">
-                <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  {t("determinantSystem")}
-                </label>
-                {editingBasics ? (
-                  constraintTypeQuery.isPending ? (
-                    <Skeleton className="h-12 w-full rounded-md" />
-                  ) : (
-                    <Select
-                      value={typeDraft || constraintTypeOption?.code || ""}
-                      onValueChange={setTypeDraft}
-                      disabled={Boolean(constraintTypeOption)}
-                    >
-                      <SelectTrigger
-
-                        className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
-                      >
-                        <SelectValue placeholder={t("selectSystem")} />
-                      </SelectTrigger>
-                      <SelectContent >
-                        {constraintTypeOption ? (
-                          <SelectItem value={constraintTypeOption.code}>
-                            {constraintTypeOption.name}
-                          </SelectItem>
-                        ) : typeDraft ? (
-                          <SelectItem value={typeDraft}>{typeDraft}</SelectItem>
-                        ) : null}
-                      </SelectContent>
-                    </Select>
-                  )
-                ) : (
-                  <Select value={viewTypeSelectValue} disabled>
-                    <SelectTrigger
-
-                      className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
-                    >
-                      <SelectValue placeholder={typeDisplayName} />
-                    </SelectTrigger>
-                    <SelectContent >
-                      <SelectItem value={viewTypeSelectValue}>
-                        {typeDisplayName}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
               </div>
               <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2 md:col-span-2">
                 <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
