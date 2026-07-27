@@ -97,4 +97,5 @@ export const breadcrumbsMessages = new MessagesGroup({
   "cms_themes": _m("Themes Settings", "اعدادات المظاهر"),
   "cms_communication-settings": _m("Communication Settings", "اعدادات التواصل"),
   "cms_about-setting": _m("About Us Settings", "اعدادات النبذة عنا"),
+  "change-password": _m("Change Password", "تغيير كلمة المرور"),
 });

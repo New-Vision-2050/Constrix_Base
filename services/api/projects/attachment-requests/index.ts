@@ -14,6 +14,10 @@ import {
   GetOutgoingAttachmentRequestsResponse,
 } from "./types/response";
 import type { AttachmentRequest } from "./types/response";
+import type {
+  AttachmentRequestChartsFilters,
+  AttachmentRequestChartsResponse,
+} from "./types/charts";
 import { ApiBaseResponse } from "@/types/common/response/base";
 
 export const AttachmentRequestsApi = {
@@ -57,11 +61,12 @@ export const AttachmentRequestsApi = {
     formData.append("name", data.name);
     formData.append("date", data.date);
     formData.append("project_id", data.project_id);
-    formData.append("receiver_company_id", data.receiver_company_id);
+    if (data.receiver_company_id)
+      formData.append("receiver_company_id", data.receiver_company_id);
     if (data.serial_number)
       formData.append("serial_number", data.serial_number);
-    if (data.attachment_type_id)
-      formData.append("attachment_type_id", data.attachment_type_id);
+    if (data.procedure_setting_id)
+      formData.append("procedure_setting_id", data.procedure_setting_id);
     if (data.attachment_sub_type_id)
       formData.append("attachment_sub_type_id", data.attachment_sub_type_id);
     if (data.attachment_sub_sub_type_id)
@@ -116,5 +121,13 @@ export const AttachmentRequestsApi = {
   declineRequest: (requestId: string) =>
     baseApi.post<{ code?: string; message?: string | null }>(
       `projects/attachment-requests/${requestId}/decline`,
+    ),
+
+
+  /** GET `projects/attachment-requests/charts` */
+  getCharts: (params: AttachmentRequestChartsFilters) =>
+    baseApi.get<AttachmentRequestChartsResponse>(
+      "projects/attachment-requests/charts",
+      { params },
     ),
 };

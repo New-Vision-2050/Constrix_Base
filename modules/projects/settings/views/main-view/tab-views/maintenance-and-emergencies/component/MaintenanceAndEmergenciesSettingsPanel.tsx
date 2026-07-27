@@ -7,6 +7,7 @@ import HorizontalSwitch from "@/modules/projects/settings/components/horizontal-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { UpdateMaintenanceAndEmergenciesSettingsArgs } from "@/services/api/projects/project-types/types/args";
+import SiteStatusTypesTab from "@/modules/projects/project/components/project-tabs/tabs/maintenance-emergency/components/site-status-types";
 
 interface MaintenanceAndEmergenciesSettingsPanelProps {
   projectTypeId: number | null;
@@ -77,6 +78,19 @@ function MaintenanceAndEmergenciesSettingsPanel({
           disabled={updateMutation.isPending}
         />
       </div>
+
+      <Box className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <Typography variant="h6" fontWeight="bold" className="mb-4">
+          {t("siteStatusTypes")}
+        </Typography>
+        {projectTypeId ? (
+          <SiteStatusTypesTab projectTypeId={projectTypeId} />
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            {t("selectProjectType")}
+          </Typography>
+        )}
+      </Box>
     </div>
   );
 }

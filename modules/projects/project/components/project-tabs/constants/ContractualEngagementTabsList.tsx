@@ -12,6 +12,7 @@ import {
   Wrench,
   HardHat,
   Building2,
+  ShieldPlus,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import AttachmentsTab from "../tabs/attachments";
@@ -22,7 +23,8 @@ import DocumentCycleTab from "../tabs/document-cycle";
 import DocumentRequirementsTab from "../tabs/document-requirements";
 import SequenceOfProceduresTab from "../tabs/sequence-of-procedures";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
-import WorkOrdersTab from "../tabs/work-orders";
+import SafetyTab from "../tabs/safety";
+import { useConstructionsNestedTabs } from "./useConstructionsNestedTabs";
 
 const STAKEHOLDERS_GROUP_ID = "engagement-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "engagement-tab-document-management";
@@ -30,6 +32,7 @@ const CONSTRUCTIONS_GROUP_ID = "engagement-tab-constructions";
 
 export function useContractualEngagementTabsList(): SystemTab[] {
   const tProject = useTranslations("project");
+  const constructionsNestedTabs = useConstructionsNestedTabs("engagement");
 
   return useMemo(() => {
     const attachmentsTab: SystemTab = {
@@ -98,13 +101,7 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       title: tProject("tabs.constructions"),
       icon: <Building2 className="w-4 h-4" />,
       content: <></>,
-      nestedTabs: [
-        {
-          id: "engagement-tab-work-orders",
-          title: tProject("tabs.workOrders"),
-          content: <WorkOrdersTab />,
-        },
-      ],
+      nestedTabs: constructionsNestedTabs,
     };
 
     const maintenanceTab: SystemTab = {
@@ -114,12 +111,20 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       content: <MaintenanceEmergencyTab />,
     };
 
+    const safetyTab: SystemTab = {
+      id: "engagement-tab-safety",
+      title: tProject("tabs.safety"),
+      icon: <ShieldPlus className="w-4 h-4" />,
+      content: <SafetyTab />,
+    };
+
     return [
       attachmentsTab,
       stakeholdersTab,
       constructionsTab,
+      safetyTab,
       documentManagementTab,
       maintenanceTab,
     ];
-  }, [tProject]);
+  }, [tProject, constructionsNestedTabs]);
 }

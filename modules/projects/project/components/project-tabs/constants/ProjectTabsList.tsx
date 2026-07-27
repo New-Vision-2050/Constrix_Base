@@ -14,6 +14,9 @@ import {
   Wrench,
   HardHat,
   Building2,
+  MapPin,
+  ClipboardList,
+  ShieldPlus,
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
@@ -38,7 +41,11 @@ import {
 import ShareTab from "../tabs/share";
 import ContractorsTab from "../tabs/contractors";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
+import ManagementsTab from "../tabs/managements";
+import DistrictsTab from "../tabs/districts";
+import { useConstructionsNestedTabs } from "./useConstructionsNestedTabs";
 import WorkOrdersTab from "../tabs/work-orders";
+import SafetyTab from "../tabs/safety";
 
 const STAKEHOLDERS_GROUP_ID = "project-tab-stakeholders";
 const DOCUMENT_MANAGEMENT_GROUP_ID = "project-tab-document-management";
@@ -83,6 +90,18 @@ function createStakeholderSubTabs(
       icon: <Share2 className="w-4 h-4" />,
       content: <ShareTab />,
     },
+    {
+      id: "project-tab-managements",
+      title: tProject("tabs.managements"),
+      icon: <Building2 className="w-4 h-4" />,
+      content: <ManagementsTab />,
+    },
+    {
+      id: "project-tab-districts",
+      title: tProject("tabs.districts"),
+      icon: <MapPin className="w-4 h-4" />,
+      content: <DistrictsTab />,
+    },
   ];
 }
 
@@ -109,20 +128,6 @@ function createDocumentManagementSubTabs(
     },
   ];
 }
-
-/** Sub-sections under «الانشاءات». */
-function createConstructionsSubTabs(
-  tProject: ReturnType<typeof useTranslations<"project">>,
-): SystemTab[] {
-  return [
-    {
-      id: "project-tab-work-orders",
-      title: tProject("tabs.workOrders"),
-      content: <WorkOrdersTab />,
-    },
-  ];
-}
-
 
 function passesProjectTypeVisibility(
   tabId: string,
@@ -205,6 +210,7 @@ export function useProjectTabsList(): SystemTab[] {
   const { projectData, projectId } = useProject();
   const { data: authCompanyData } = useCurrentAuthCompany();
   const permissions = projectData?.permissions;
+  const constructionsNestedTabs = useConstructionsNestedTabs("project");
 
   const { data: flatPerms, isFetched: flatPermissionsFetched } =
     useProjectMyPermissionsFlat(projectId);
@@ -223,7 +229,6 @@ export function useProjectTabsList(): SystemTab[] {
       content: <MaintenanceEmergencyTab />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
-    const constructionsSubTabs = createConstructionsSubTabs(tProject);
     const documentManagementSubTabs =
       createDocumentManagementSubTabs(tProject);
 
@@ -278,7 +283,7 @@ export function useProjectTabsList(): SystemTab[] {
           }
         : null;
 
-    const visibleConstructionsSubs = constructionsSubTabs.filter((tab) =>
+    const visibleConstructionsSubs = constructionsNestedTabs.filter((tab) =>
       shouldShowTopLevelTab(
         tab.id,
         permissions,
@@ -299,6 +304,20 @@ export function useProjectTabsList(): SystemTab[] {
           }
         : null;
 
+    const workOrdersTopTab: SystemTab = {
+      id: "project-tab-work-orders-top",
+      title: tProject("tabs.ordersOfWork"),
+      icon: <ClipboardList className="w-4 h-4" />,
+      content: <WorkOrdersTab />,
+    };
+
+    const safetyTab: SystemTab = {
+      id: "project-tab-safety",
+      title: tProject("tabs.safety"),
+      icon: <ShieldPlus className="w-4 h-4" />,
+      content: <SafetyTab />,
+    };
+
     const topLevel: SystemTab[] = [];
     if (
       shouldShowTopLevelTab(
@@ -314,7 +333,11 @@ export function useProjectTabsList(): SystemTab[] {
 
     if (stakeholdersTab) topLevel.push(stakeholdersTab);
 
+    topLevel.push(workOrdersTopTab);
+
     if (constructionsTab) topLevel.push(constructionsTab);
+
+    topLevel.push(safetyTab);
 
     if (documentManagementTab) topLevel.push(documentManagementTab);
 
@@ -339,5 +362,6 @@ export function useProjectTabsList(): SystemTab[] {
     flatPermissionsFetched,
     flatPerms,
     tProject,
+    constructionsNestedTabs,
   ]);
 }

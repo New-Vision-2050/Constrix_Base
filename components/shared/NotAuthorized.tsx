@@ -4,6 +4,7 @@ import Link from "@i18n/link";
 import { ShieldX, Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 interface NotAuthorizedProps {
   title?: string;
@@ -24,6 +25,7 @@ export function NotAuthorized({
   className = "",
 }: NotAuthorizedProps) {
   const t = useTranslations("Errors.Authorization");
+  const { isCentralCompany } = usePermissions();
 
   const handleBack = () => {
     if (typeof window !== "undefined") {
@@ -68,7 +70,7 @@ export function NotAuthorized({
 
           {showHomeLink && (
             <Button asChild className="flex items-center gap-2">
-              <Link href="/user-profile">
+              <Link href={isCentralCompany ? "/user-profile" : "/attendance-presence"}>
                 <Home className="w-4 h-4" />
                 {t("GoHome")}
               </Link>

@@ -31,13 +31,12 @@ import { toast } from "sonner";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectContractors } from "@/modules/projects/project/query/useProjectContractors";
 import {
-  getOrderPermitDepartmentLabel,
   getOrderPermitLabel,
-  useOrderPermitDepartments,
   useOrderPermits,
 } from "@/modules/projects/project/query/useOrderPermitOptions";
+import { useProjectManagements } from "@/modules/projects/project/query/useProjectManagements";
+import { useProjectDistricts } from "@/modules/projects/project/query/useProjectDistricts";
 import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
-import { useStatesList } from "@/modules/projects/project/query/useStatesList";
 import { buildCreateWorkOrdersPayload } from "./buildCreatePayload";
 
 const STEP_KEYS = ["workOrderData", "review"] as const;
@@ -105,35 +104,27 @@ function isValidWorkOrderEntry(entry: WorkOrderEntry): boolean {
   );
 }
 
-function OrderPermitDepartmentSelect({
-  orderPermitId,
+function ManagementSelect({
+  projectId,
   value,
   onChange,
   readOnly,
   emptyDash,
 }: {
-  orderPermitId: string;
+  projectId: string | undefined;
   value: string;
   onChange?: (value: string) => void;
   readOnly?: boolean;
   emptyDash: string;
 }) {
   const tFields = useTranslations("project.workOrdersTab.dialog.fields");
-  const parsedOrderPermitId = orderPermitId ? Number(orderPermitId) : undefined;
-  const orderPermitDepartmentsQuery = useOrderPermitDepartments(
-    Number.isFinite(parsedOrderPermitId) ? parsedOrderPermitId : undefined,
-  );
+  const managementsQuery = useProjectManagements(projectId);
 
   if (readOnly) {
-    const selectedDepartment = (orderPermitDepartmentsQuery.data ?? []).find(
+    const selected = (managementsQuery.data ?? []).find(
       (item) => String(item.id) === value,
     );
-    return displayValue(
-      selectedDepartment
-        ? getOrderPermitDepartmentLabel(selectedDepartment)
-        : value,
-      emptyDash,
-    );
+    return displayValue(selected?.name ?? value, emptyDash);
   }
 
   return (
@@ -143,14 +134,14 @@ function OrderPermitDepartmentSelect({
       onChange={(e) => onChange?.(e.target.value)}
       size="small"
       fullWidth
-      disabled={!orderPermitId || orderPermitDepartmentsQuery.isLoading}
+      disabled={managementsQuery.isLoading}
     >
       <MenuItem value="">
         <em>{tFields("selectManagement")}</em>
       </MenuItem>
-      {(orderPermitDepartmentsQuery.data ?? []).map((item) => (
+      {(managementsQuery.data ?? []).map((item) => (
         <MenuItem key={item.id} value={String(item.id)}>
-          {getOrderPermitDepartmentLabel(item)}
+          {item.name}
         </MenuItem>
       ))}
     </TextField>
@@ -183,7 +174,7 @@ export default function AddWorkOrderDialog({
 
   const contractorsQuery = useProjectContractors(open ? projectId : undefined);
   const orderPermitsQuery = useOrderPermits(open);
-  const statesQuery = useStatesList({ enabled: open });
+  const districtsQuery = useProjectDistricts(open ? projectId : undefined);
 
   const contractorOptions = useMemo(
     () =>
@@ -209,13 +200,13 @@ export default function AddWorkOrderDialog({
     return map;
   }, [orderPermitsQuery.data]);
 
-  const stateLabelMap = useMemo(() => {
+  const districtLabelMap = useMemo(() => {
     const map = new Map<string, string>();
-    for (const state of statesQuery.data ?? []) {
-      map.set(state.id, state.name);
+    for (const district of districtsQuery.data ?? []) {
+      map.set(String(district.id), district.name);
     }
     return map;
-  }, [statesQuery.data]);
+  }, [districtsQuery.data]);
 
   useEffect(() => {
     if (!open) {
@@ -448,7 +439,6 @@ export default function AddWorkOrderDialog({
                       onChange={(e) =>
                         updateEntry(entry.id, {
                           workOrderType: e.target.value,
-                          management: "",
                         })
                       }
                       size="small"
@@ -515,8 +505,8 @@ export default function AddWorkOrderDialog({
                   )}
                 </TableCell>
                 <TableCell>
-                  <OrderPermitDepartmentSelect
-                    orderPermitId={entry.workOrderType}
+                  <ManagementSelect
+                    projectId={projectId}
                     value={entry.management}
                     onChange={(management) =>
                       updateEntry(entry.id, { management })
@@ -528,7 +518,7 @@ export default function AddWorkOrderDialog({
                 <TableCell>
                   {readOnly ? (
                     displayValue(
-                      stateLabelMap.get(entry.location) ?? entry.location,
+                      districtLabelMap.get(entry.location) ?? entry.location,
                       emptyDash,
                     )
                   ) : (
@@ -540,14 +530,14 @@ export default function AddWorkOrderDialog({
                       }
                       size="small"
                       fullWidth
-                      disabled={statesQuery.isLoading}
+                      disabled={districtsQuery.isLoading}
                     >
                       <MenuItem value="">
                         <em>{tFields("selectLocation")}</em>
                       </MenuItem>
-                      {(statesQuery.data ?? []).map((state) => (
-                        <MenuItem key={state.id} value={state.id}>
-                          {state.name}
+                      {(districtsQuery.data ?? []).map((district) => (
+                        <MenuItem key={district.id} value={String(district.id)}>
+                          {district.name}
                         </MenuItem>
                       ))}
                     </TextField>

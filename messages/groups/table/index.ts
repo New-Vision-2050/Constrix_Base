@@ -48,4 +48,38 @@ export const tableMessages = new MessagesGroup({
   HideAll: _m("Hide All", "إخفاء الكل"),
   Reset: _m("Reset", "إعادة تعيين"),
   Close: _m("Close", "إغلاق"),
+
+  // Column Pinning translations
+  PinColumn: _m("Pin column", "تثبيت العمود"),
+  UnpinColumn: _m("Unpin column", "إلغاء تثبيت العمود"),
+  PinnedColumnsDescription: _m(
+    "Fixed columns: {pinned}/{max}",
+    "الأعمدة الثابتة: {pinned}/{max}",
+  ),
+  MaxPinnedReached: _m(
+    "You can fix up to {max} columns",
+    "يمكنك تثبيت حتى {max} أعمدة",
+  ),
+  PinColumnDisabledHidden: _m(
+    "Show this column before fixing it",
+    "أظهر هذا العمود قبل تثبيته",
+  ),
+
+  // Column Order translations
+  DragToReorder: _m("Drag to reorder column", "اسحب لإعادة ترتيب العمود"),
+
+  // Column Grouping translations
+  NewGroup: _m("New Group", "مجموعة جديدة"),
+  AddGroup: _m("Add Group", "إضافة مجموعة"),
+  GroupName: _m("Group name", "اسم المجموعة"),
+  UngroupColumns: _m("Delete group", "حذف المجموعة"),
+  DragToReorderGroup: _m("Drag to reorder group", "اسحب لإعادة ترتيب المجموعة"),
+  GroupBackgroundColor: _m("Background color", "لون الخلفية"),
+  GroupTextColor: _m("Text color", "لون النص"),
+  MoveToGroup: _m("Move to…", "نقل إلى…"),
+  Ungrouped: _m("Ungrouped", "بدون مجموعة"),
+  EmptyGroupDropHint: _m(
+    "Drag columns here",
+    "اسحب الأعمدة هنا",
+  ),
 });

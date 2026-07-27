@@ -25,12 +25,20 @@ export interface ProjectNotificationLocation {
   source?: string | null;
 }
 
+export interface ContractorRepresentative {
+  id: string;
+  name: string;
+  mobile?: string | null;
+  nationality?: string | null;
+}
+
 export interface ProjectNotificationContractor {
   id: string;
   name: string;
   number: string;
   mobile?: string | null;
   notes?: string | null;
+  representatives?: ContractorRepresentative[];
 }
 
 export interface ProjectNotificationEmployee {
@@ -107,8 +115,8 @@ export interface ProjectNotification {
   work_description: string;
   contractor_id?: string | null;
   contractor_name: string;
-  contractor_technical_name?: string | null;
-  contractor_technical_number?: string | null;
+  contractor_representative_id?: string | null;
+  contractor_representative_name?: string | null;
   contractor_category?: string | null;
   contractor_notes?: string | null;
   permit_source?: string | null;
@@ -144,6 +152,12 @@ export interface ProjectNotification {
   created_by?: ProjectNotificationUser | null;
   created_at: string;
   updated_at: string;
+
+  /** Site status type linked to the notification. */
+  site_status_type_id?: string | null;
+  site_status_type?: SiteStatusTypeRef | null;
+  /** Values stored for each key of the linked site status type. */
+  site_status_values?: SiteStatusNotificationValue[] | null;
 }
 
 export interface ProjectNotificationNotesData {
@@ -306,6 +320,78 @@ export interface ProjectNotificationAvailableActionsResponse extends ApiBaseResp
   ProjectNotificationAvailableAction[]
 > {}
 
+/* ── Site Status Types ── */
+
+export type SiteStatusTypeKeyFieldType =
+  | "text"
+  | "number"
+  | "date"
+  | "select";
+
+export interface SiteStatusTypeKey {
+  id: string;
+  site_status_type_id: string;
+  name_ar: string;
+  name_en: string;
+  key: string;
+  field_type: SiteStatusTypeKeyFieldType;
+  options: string[] | null;
+  show_in_site_status_updates: boolean;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SiteStatusTypeNotificationTypeRef {
+  id: string;
+  name_ar: string;
+  name_en: string;
+}
+
+export interface SiteStatusType {
+  id: string;
+  project_type_id: string | number;
+  name_ar: string;
+  name_en: string;
+  sort_order: number;
+  is_active: boolean;
+  notification_types?: SiteStatusTypeNotificationTypeRef[] | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SiteStatusTypeRef {
+  id: string;
+  name_ar: string;
+  name_en: string;
+}
+
+export interface SiteStatusNotificationValue {
+  id: string;
+  key_id: string;
+  key: string;
+  name_ar: string;
+  name_en: string;
+  field_type: SiteStatusTypeKeyFieldType;
+  options: string[] | null;
+  show_in_site_status_updates?: boolean;
+  value: string;
+}
+
+export interface SiteStatusTypeWithKeys extends SiteStatusType {
+  keys: SiteStatusTypeKey[];
+}
+
+export interface SiteStatusTypesResponse
+  extends ApiBaseResponse<SiteStatusTypeWithKeys[]> {}
+
+export interface SiteStatusTypeSingleResponse
+  extends ApiBaseResponse<SiteStatusTypeWithKeys> {}
+
+export interface SiteStatusTypeKeysResponse
+  extends ApiBaseResponse<SiteStatusTypeKey[]> {}
+
 /* ── Site Status Updates ── */
 
 export interface SiteStatusUpdateAttachment {
@@ -358,6 +444,8 @@ export interface SiteStatusUpdateSummary {
 export interface SiteStatusUpdatesData {
   items: SiteStatusUpdate[];
   summary: SiteStatusUpdateSummary;
+  site_status_type?: SiteStatusTypeRef | null;
+  notification_values?: SiteStatusNotificationValue[] | null;
 }
 
 export interface SiteStatusUpdatesResponse {

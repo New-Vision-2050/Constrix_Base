@@ -12,12 +12,13 @@ export interface WizardFormData {
   task_date: string;
   duration_hours: number;
   notes: string;
+  site_status_type_id: string;
+  site_status_values: Record<string, string>;
 
   // Step 2
   contractor_id: string;
   contractor_name: string;
-  contractor_technical_name: string;
-  contractor_technical_number: string;
+  contractor_representative_id: string;
   contractor_category: string;
   contractor_notes: string;
   permit_source: string;
@@ -50,11 +51,12 @@ export const EMPTY_FORM: WizardFormData = {
   task_date: new Date().toISOString().split("T")[0],
   duration_hours: 4,
   notes: "",
+  site_status_type_id: "",
+  site_status_values: {},
 
   contractor_id: "",
   contractor_name: "",
-  contractor_technical_name: "",
-  contractor_technical_number: "",
+  contractor_representative_id: "",
   contractor_category: "",
   contractor_notes: "",
   permit_source: "",

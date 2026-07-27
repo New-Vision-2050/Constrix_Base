@@ -6,6 +6,8 @@ export interface CreateProjectOrderPermitWorkOrderArgs {
   price: number;
   order_permit_id?: number;
   order_permit_department_id?: number;
+  project_management_id?: number;
+  projects_district_id?: number;
   state_id?: string;
   lat?: number;
   long?: number;
@@ -14,4 +16,18 @@ export interface CreateProjectOrderPermitWorkOrderArgs {
 export interface CreateProjectOrderPermitsArgs {
   project_id: string;
   work_orders: CreateProjectOrderPermitWorkOrderArgs[];
+}
+
+export interface ListProjectOrderPermitsParams {
+  order_permit_department_id?: number;
+}
+
+export interface UpdateProjectOrderPermitArgs {
+  permit_status_id?: number | null;
+  start_permit_date?: string | null;
+  end_permit_date?: string | null;
+  note_from_permit_to_departments?: string | null;
+  is_taked_action?: boolean | number | null;
+  count_of_days_from_assigned_date?: number | string | null;
+  evaluation_permit_status?: string | null;
 }

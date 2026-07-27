@@ -1,11 +1,13 @@
 import React from "react";
 import { TableState } from "../..";
+import type { ColumnGroupDef } from "../column-grouping";
 
 export type ColumnDef<TRow> = {
   key: string; // Unique identifier for the column (used for sorting)
   name: string; // Display name for the column header
   sortable?: boolean; // Whether this column can be sorted
   align?: "left" | "center" | "right" | "justify"; // Alignment for header and body cells
+  minWidth?: number; // Minimum column width in px (default: DEFAULT_COLUMN_MIN_WIDTH)
   render: (
     row: TRow,
     index: number,
@@ -40,6 +42,9 @@ export type TablePropsWithoutState<TRow> = {
   loading?: boolean;
   loadingOptions?: LoadingOptions;
   selectable?: SelectionConfig<TRow>;
+  pinnedColumnCount?: number;
+  columnGroups?: ColumnGroupDef[];
+  columnGroupMap?: Record<string, string>;
   state?: never;
 };
 

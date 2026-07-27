@@ -344,68 +344,8 @@ export default function AddContractorDialog({
         toast.error(tValidation("nameRequired"));
         return false;
       }
-      if (!isValidEmail(form.email)) {
-        toast.error(tValidation("emailInvalid"));
-        return false;
-      }
       if (!form.country?.id) {
         toast.error(tValidation("countryRequired"));
-        return false;
-      }
-      return true;
-    }
-    if (step === 1) {
-      if (!form.managerName.trim()) {
-        toast.error(tValidation("managerNameRequired"));
-        return false;
-      }
-      if (!form.managerMobile.trim()) {
-        toast.error(tValidation("mobileRequired"));
-        return false;
-      }
-      if (!isValidEmail(form.managerEmail)) {
-        toast.error(tValidation("emailInvalid"));
-        return false;
-      }
-      if (!form.managerNationality?.name?.trim()) {
-        toast.error(tValidation("managerNationalityRequired"));
-        return false;
-      }
-      return true;
-    }
-    if (step === 2) {
-      const validReps = form.representatives.filter(
-        (rep) =>
-          rep.name.trim() &&
-          rep.mobile.trim() &&
-          rep.nationality != null,
-      );
-      if (validReps.length === 0) {
-        toast.error(tValidation("representativesRequired"));
-        return false;
-      }
-      for (const rep of form.representatives) {
-        const hasAny =
-          rep.name.trim() || rep.mobile.trim() || rep.nationality != null;
-        if (!hasAny) continue;
-        if (!rep.name.trim()) {
-          toast.error(tValidation("representativeNameRequired"));
-          return false;
-        }
-        if (!rep.mobile.trim()) {
-          toast.error(tValidation("mobileRequired"));
-          return false;
-        }
-        if (!rep.nationality) {
-          toast.error(tValidation("representativeNationalityRequired"));
-          return false;
-        }
-      }
-      return true;
-    }
-    if (step === 3) {
-      if (!form.confirmedReview) {
-        toast.error(tValidation("confirmRequired"));
         return false;
       }
       return true;
@@ -442,12 +382,7 @@ export default function AddContractorDialog({
 
   const validRepresentatives = useMemo(
     () =>
-      form.representatives.filter(
-        (rep) =>
-          rep.name.trim() &&
-          rep.mobile.trim() &&
-          rep.nationality != null,
-      ),
+      form.representatives.filter((rep) => rep.name.trim()),
     [form.representatives],
   );
 
@@ -610,7 +545,6 @@ export default function AddContractorDialog({
               value={form.managerName}
               onChange={(e) => updateField("managerName", e.target.value)}
               fullWidth
-              required
             />
 
             <Grid container spacing={2}>
@@ -620,7 +554,6 @@ export default function AddContractorDialog({
                   value={form.managerMobile}
                   onChange={(e) => updateField("managerMobile", e.target.value)}
                   fullWidth
-                  required
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
@@ -658,9 +591,9 @@ export default function AddContractorDialog({
                   <TableHead>
                     <TableRow>
                       <TableCell width={48}>{tReview("indexColumn")}</TableCell>
-                      <TableCell>{tFields("representativeName")} *</TableCell>
-                      <TableCell>{tFields("representativeMobile")} *</TableCell>
-                      <TableCell>{tFields("representativeNationality")} *</TableCell>
+                      <TableCell>{tFields("representativeName")}</TableCell>
+                      <TableCell>{tFields("representativeMobile")}</TableCell>
+                      <TableCell>{tFields("representativeNationality")}</TableCell>
                       <TableCell width={56} />
                     </TableRow>
                   </TableHead>
@@ -678,7 +611,6 @@ export default function AddContractorDialog({
                             }
                             fullWidth
                             size="small"
-                            required
                           />
                         </TableCell>
                         <TableCell>
@@ -691,7 +623,6 @@ export default function AddContractorDialog({
                             }
                             fullWidth
                             size="small"
-                            required
                           />
                         </TableCell>
                         <TableCell>
@@ -703,7 +634,6 @@ export default function AddContractorDialog({
                             countries={countries}
                             loading={loadingCountries}
                             placeholder={tFields("selectNationality")}
-                            required
                             size="small"
                           />
                         </TableCell>
@@ -933,7 +863,7 @@ export default function AddContractorDialog({
                 variant="contained"
                 color="secondary"
                 onClick={handleNext}
-                disabled={submitting || loadingContractor || (isLastStep && !form.confirmedReview)}
+                disabled={submitting || loadingContractor}
               >
                   {isLastStep ? t("next") : t("next")}
                 </Button>

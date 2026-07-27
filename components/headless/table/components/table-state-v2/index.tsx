@@ -1,15 +1,33 @@
 import { useState, useMemo, useCallback } from "react";
 import { TableStateV2, TableStateV2Options } from "./types";
 import { createColumnVisibilityHook } from "../column-visibility";
+import { createColumnPinningHook } from "../column-pinning";
+import { createColumnOrderHook } from "../column-order";
+import { createColumnGroupingHook } from "../column-grouping";
 
 // ============================================================================
 // Table State Hook V2 (After Query)
 // ============================================================================
 
 export function createTableStateV2Hook<TRow>(prefix?: string) {
+  // Create column order hook if prefix is provided, otherwise create a no-op hook
+  const useColumnOrderHook = prefix
+    ? createColumnOrderHook<TRow>(prefix)
+    : () => null;
+
   // Create column visibility hook if prefix is provided, otherwise create a no-op hook
   const useColumnVisibilityHook = prefix
     ? createColumnVisibilityHook<TRow>(prefix)
+    : () => null;
+
+  // Create column pinning hook if prefix is provided, otherwise create a no-op hook
+  const useColumnPinningHook = prefix
+    ? createColumnPinningHook<TRow>(prefix)
+    : () => null;
+
+  // Create column grouping hook if prefix is provided, otherwise create a no-op hook
+  const useColumnGroupingHook = prefix
+    ? createColumnGroupingHook<TRow>(prefix)
     : () => null;
 
   return function useTableState(
@@ -30,16 +48,60 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
       onExport,
       onDelete,
       columnVisibility: externalColumnVisibility,
+      columnPinning: externalColumnPinning,
+      columnOrder: externalColumnOrder,
+      columnGrouping: externalColumnGrouping,
     } = options;
+
+    // Automatically create column order if prefix exists and not provided externally
+    // Hook is always called unconditionally (returns null if no prefix)
+    const internalColumnOrder = useColumnOrderHook(columns);
+    const columnOrder = externalColumnOrder ?? internalColumnOrder ?? undefined;
+
+    // Custom order (if any) becomes the base list visibility/pinning operate on,
+    // so drag order is the single source of truth for everything downstream.
+    const orderedColumns = columnOrder?.orderedColumns ?? columns;
+
+    // Automatically create column grouping if prefix exists and not provided
+    // externally. Independent of visibility/pinning — grouping is purely an
+    // annotation read by the dialog and the live table's header renderer, it
+    // never filters/reorders `activeColumns` itself.
+    const internalColumnGrouping = useColumnGroupingHook(
+      orderedColumns,
+      columnOrder,
+    );
+    const columnGrouping =
+      externalColumnGrouping ?? internalColumnGrouping ?? undefined;
 
     // Automatically create column visibility if prefix exists and not provided externally
     // Hook is always called unconditionally (returns null if no prefix)
-    const internalColumnVisibility = useColumnVisibilityHook(columns);
+    const internalColumnVisibility = useColumnVisibilityHook(orderedColumns);
     const columnVisibility =
       externalColumnVisibility ?? internalColumnVisibility ?? undefined;
 
+    // Automatically create column pinning if prefix exists and not provided externally
+    // Hook is always called unconditionally (returns null if no prefix)
+    const internalColumnPinning = useColumnPinningHook(orderedColumns);
+    const columnPinning =
+      externalColumnPinning ?? internalColumnPinning ?? undefined;
+
     // Use visible columns if column visibility is enabled, otherwise use all columns
-    const activeColumns = columnVisibility?.visibleColumns ?? columns;
+    const visibleColumns = columnVisibility?.visibleColumns ?? orderedColumns;
+
+    // Pinned columns move to the front, keeping their relative order from
+    // `visibleColumns` (i.e. the dragged/custom order), not pin-click order.
+    const pinnedKeySet = new Set(columnPinning?.pinnedKeys ?? []);
+    const pinnedVisibleColumns = visibleColumns.filter((col) =>
+      pinnedKeySet.has(col.key),
+    );
+    const unpinnedVisibleColumns = visibleColumns.filter(
+      (col) => !pinnedKeySet.has(col.key),
+    );
+    const activeColumns =
+      pinnedVisibleColumns.length > 0
+        ? [...pinnedVisibleColumns, ...unpinnedVisibleColumns]
+        : visibleColumns;
+    const pinnedColumnCount = pinnedVisibleColumns.length;
 
     // Selection state
     const [selectedRows, setSelectedRows] = useState<TRow[]>([]);
@@ -163,8 +225,12 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
         selectable,
         searchable,
         getRowSx,
+        pinnedColumnCount,
       },
       columnVisibility,
+      columnPinning,
+      columnOrder,
+      columnGrouping,
       pagination: {
         page: params.page,
         limit: params.limit,

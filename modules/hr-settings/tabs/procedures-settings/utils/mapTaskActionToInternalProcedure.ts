@@ -4,26 +4,69 @@ import { coerceBoolean } from "@/services/api/hr-settings/internal-procedure-set
 import type { TaskActionFormValues } from "../types";
 import { mapConditionsToApiPayload } from "./conditionFormUtils";
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidUuid(value: string | null | undefined): value is string {
+  return typeof value === "string" && UUID_RE.test(value.trim());
+}
+
 function buildInternalProcedurePayload(
   values: TaskActionFormValues,
   options: {
     procedureType: string;
     sortOrder: number;
     parentId?: string | null;
+    projectId?: string | null;
     isActive?: boolean;
   },
 ): CreateInternalProcedureArgs {
-  return {
+  const payload: CreateInternalProcedureArgs = {
     name: values.name.trim(),
     type: options.procedureType,
     form: values.modelId,
-    parent_id: options.parentId ?? null,
     conditions: mapConditionsToApiPayload(values.conditions),
     appears_before_ids: values.appearBeforeIds.filter(Boolean),
     appears_after_ids: values.appearAfterIds.filter(Boolean),
     sort_order: options.sortOrder,
     is_active: coerceBoolean(values.isActive ?? options.isActive, true),
   };
+
+  if (isValidUuid(options.parentId)) {
+    payload.parent_id = options.parentId.trim();
+  }
+
+  if (options.projectId?.trim()) {
+    payload.project_id = options.projectId.trim();
+  }
+
+  if (values.attachmentTypeId?.trim()) {
+    payload.attachment_type_id = values.attachmentTypeId.trim();
+  }
+  if (values.attachmentSubTypeId?.trim()) {
+    payload.attachment_sub_type_id = values.attachmentSubTypeId.trim();
+  }
+  if (values.attachmentSubSubTypeId?.trim()) {
+    payload.attachment_sub_sub_type_id = values.attachmentSubSubTypeId.trim();
+  }
+  if (values.jobAttributeId?.trim()) {
+    payload.job_attribute_id = values.jobAttributeId.trim();
+  }
+  if (typeof values.usedInDocumentCycle === "boolean") {
+    payload.used_in_document_cycle = values.usedInDocumentCycle;
+  }
+  if (typeof values.showInAttachmentsLibrary === "boolean") {
+    payload.appears_in_attachments_library = values.showInAttachmentsLibrary;
+  }
+  if (typeof values.showInArchiveAfterApproval === "boolean") {
+    payload.appears_in_archive_after_approval =
+      values.showInArchiveAfterApproval;
+  }
+  if (typeof values.requiresAssetId === "boolean") {
+    payload.requires_asset_id = values.requiresAssetId;
+  }
+
+  return payload;
 }
 
 export function mapTaskActionToCreateInternalProcedure(
@@ -32,6 +75,7 @@ export function mapTaskActionToCreateInternalProcedure(
     procedureType: string;
     sortOrder: number;
     parentId?: string | null;
+    projectId?: string | null;
   },
 ): CreateInternalProcedureArgs {
   return buildInternalProcedurePayload(values, options);
@@ -43,6 +87,7 @@ export function mapTaskActionToUpdateInternalProcedure(
     procedureType: string;
     sortOrder: number;
     parentId?: string | null;
+    projectId?: string | null;
     isActive?: boolean;
   },
 ): CreateInternalProcedureArgs {

@@ -10,6 +10,7 @@ import {
   Grid,
   IconButton,
   MenuItem,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -33,10 +34,10 @@ import AddStageDialog from "./dialogs/AddStageDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
 import DocumentSequenceAddProcedureDialog from "./dialogs/DocumentSequenceAddProcedureDialog";
 import EditStageDialog from "./dialogs/EditStageDialog";
-import DocumentStageCard from "./DocumentStageCard";
 import StepCard from "./StepCard";
 import { APP_ICONS } from "@/constants/icons";
 import { ProcedureSettingsApi } from "@/services/api/crm-settings/procedure-settings";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import {
   Stage,
   GetStagesResponse,
@@ -44,6 +45,8 @@ import {
   GetStepsResponse,
 } from "@/services/api/crm-settings/procedure-settings/types/response";
 import { useProceduresSettings } from "../context/ProceduresSettingsContext";
+import { mapTaskActionToCreateInternalProcedure } from "../utils/mapTaskActionToInternalProcedure";
+import { distributePercentages } from "../utils/distributePercentages";
 
 interface StagesViewProps {
   parentId?: string;
@@ -63,7 +66,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     ref,
   ) {
     const { t, ts } = useProceduresSettingsTranslations();
-    const { addProcedureVariant } = useProceduresSettings();
+    const { addProcedureVariant, outerTabs, projectId } =
+      useProceduresSettings();
     const useDocumentAddDialog =
       addProcedureVariant === "document-classification";
     const tConfirm = useTranslations("common.deleteConfirmation");
@@ -127,21 +131,24 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
     const [pendingDraftKeys, setPendingDraftKeys] = useState<string[]>([]);
 
     const handleAddStep = () => {
+      if (!selectedProcedureId) return;
       const key = crypto.randomUUID();
-      if (selectedProcedureId) {
-        setDraftStepKeys((prev) => ({
-          ...prev,
-          [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
-        }));
-      } else {
-        setPendingDraftKeys((prev) => [...prev, key]);
-      }
+      setDraftStepKeys((prev) => ({
+        ...prev,
+        [selectedProcedureId]: [...(prev[selectedProcedureId] ?? []), key],
+      }));
     };
 
     useImperativeHandle(ref, () => ({
-      openAddProcedureDialog: () => setClassificationDialogOpen(true),
+      openAddProcedureDialog: () => {
+        if (!parentId) return;
+        setClassificationDialogOpen(true);
+      },
       addStage: handleAddStep,
     }));
+
+    const canAddSidebarProcedure = !!parentId;
+    const canAddStage = procedures.length > 0 && !!selectedProcedureId;
 
     useEffect(() => {
       if (!procedures.length) {
@@ -177,9 +184,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
       percentage: number;
       deadline_days: number;
       deadline_hours: number;
-      escalation_management_hierarchy_id: string;
     }) => {
-      if (!parentId || !workFlowId) {
+      if (!parentId) {
         toast({
           title: t("actions.add"),
           description: t("messages.error"),
@@ -191,8 +197,31 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
         await ProcedureSettingsApi.createStage({
           ...payload,
           parent_id: parentId,
-          work_flow_id: workFlowId,
+          ...(workFlowId ? { work_flow_id: workFlowId } : {}),
         });
+
+        const totalCount = procedures.length + 1;
+        const percentages = distributePercentages(totalCount);
+        const updatePromises = procedures.flatMap((procedure, index) => {
+          const percentage = percentages[index + 1];
+          if (percentage == null || percentage === procedure.percentage) {
+            return [];
+          }
+          return [
+            ProcedureSettingsApi.updateStage(procedure.id, {
+              name: procedure.name,
+              execute_type: procedure.execute_type,
+              icon: procedure.icon,
+              type: procedure.type,
+              percentage,
+            }),
+          ];
+        });
+
+        if (updatePromises.length > 0) {
+          await Promise.all(updatePromises);
+        }
+
         await refetch();
         toast({
           title: t("actions.add"),
@@ -201,9 +230,15 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
         });
       } catch (error) {
         console.error("Error creating procedure:", error);
+        const apiMessage = (
+          error as { response?: { data?: { message?: string } } }
+        )?.response?.data?.message;
         toast({
           title: t("actions.add"),
-          description: t("messages.error"),
+          description:
+            typeof apiMessage === "string" && apiMessage.trim()
+              ? apiMessage
+              : t("messages.error"),
           variant: "destructive",
         });
       }
@@ -321,23 +356,40 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
       currentDraftKeys.length > 0;
 
     const modelTabName = useMemo(() => {
-      if (!currentTabType) return "";
-      try {
-        if (currentTabType === "correspondence") return ts("correspondence");
-        if (currentTabType === "technical_submittal")
-          return ts("technicalSubmittal");
-        if (currentTabType === "ncr") return ts("ncr");
-        if (currentTabType === "vo") return ts("vo");
-      } catch {
-        /* fallback below */
+      const resolveTabLabel = (
+        tab: (typeof outerTabs)[number] | undefined,
+      ) => {
+        if (!tab) return "";
+        if (tab.label) return tab.label;
+        if (tab.name) {
+          try {
+            return ts(tab.name);
+          } catch {
+            return tab.name;
+          }
+        }
+        return "";
+      };
+
+      // Project sequence tabs all share type `project_procedure` — match by
+      // procedureId (parentId) so the title tracks the selected model tab.
+      if (parentId) {
+        const byProcedure = outerTabs.find(
+          (item) => item.procedureId === parentId,
+        );
+        const fromProcedure = resolveTabLabel(byProcedure);
+        if (fromProcedure) return fromProcedure;
       }
-      return currentTabType;
-    }, [currentTabType, ts]);
+
+      if (!currentTabType) return "";
+      const byType = outerTabs.find((item) => item.type === currentTabType);
+      return resolveTabLabel(byType) || currentTabType;
+    }, [currentTabType, outerTabs, parentId, ts]);
 
     const documentStagesContent = (
       <>
         {pendingDraftKeys.map((draftKey, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`pending-${draftKey}`}
             procedureSettingId={selectedProcedureId ?? ""}
             serverStep={null}
@@ -352,11 +404,10 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onDelete={() =>
               setPendingDraftKeys((prev) => prev.filter((k) => k !== draftKey))
             }
-            onCopy={handleAddStep}
           />
         ))}
         {serverSteps.map((step, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`server-${step.id}`}
             procedureSettingId={selectedProcedureId!}
             serverStep={step}
@@ -365,18 +416,16 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onDelete={() =>
               handleDeleteServerStep(selectedProcedureId!, step.id)
             }
-            onCopy={handleAddStep}
           />
         ))}
         {currentDraftKeys.map((draftKey, index) => (
-          <DocumentStageCard
+          <StepCard
             key={`draft-${draftKey}`}
             procedureSettingId={selectedProcedureId!}
             serverStep={null}
             stepIndex={pendingDraftKeys.length + serverSteps.length + index + 1}
             onSaved={() => handleStepSaved(selectedProcedureId!, draftKey)}
             onDelete={() => removeDraftStep(selectedProcedureId!, draftKey)}
-            onCopy={handleAddStep}
           />
         ))}
       </>
@@ -391,7 +440,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 sx={{
                   p: 2,
                   borderRadius: "16px",
-                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.6),
+                  bgcolor: (theme) =>
+                    alpha(theme.palette.background.paper, 0.6),
                   backdropFilter: "blur(10px)",
                   border: "1px solid",
                   borderColor: "divider",
@@ -480,26 +530,37 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                   </Box>
                 ))}
 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<AddIcon />}
-                  fullWidth
-                  onClick={() => setAddDialogOpen(true)}
-                  sx={{
-                    justifyContent: "center",
-                    mt: 1,
-                    fontWeight: 700,
-                    px: 1.5,
-                    py: 1,
-                    borderRadius: "12px",
-                    textTransform: "none",
-                    boxShadow: (theme) =>
-                      `0 4px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
-                  }}
+                <Tooltip
+                  title={
+                    canAddSidebarProcedure
+                      ? ""
+                      : t("messages.addSideProcedureRequiresTop")
+                  }
                 >
-                  {t("procedures.addProcedure")}
-                </Button>
+                  <span style={{ display: "block", width: "100%" }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<AddIcon />}
+                      fullWidth
+                      disabled={!canAddSidebarProcedure}
+                      onClick={() => setAddDialogOpen(true)}
+                      sx={{
+                        justifyContent: "center",
+                        mt: 1,
+                        fontWeight: 700,
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: "12px",
+                        textTransform: "none",
+                        boxShadow: (theme) =>
+                          `0 4px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      }}
+                    >
+                      {t("procedures.addProcedure")}
+                    </Button>
+                  </span>
+                </Tooltip>
               </Box>
             </Grid>
 
@@ -508,7 +569,8 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                 sx={{
                   p: 3,
                   borderRadius: "16px",
-                  bgcolor: (theme) => alpha(theme.palette.background.paper, 0.65),
+                  bgcolor: (theme) =>
+                    alpha(theme.palette.background.paper, 0.65),
                   backdropFilter: "blur(12px)",
                   border: "1px solid",
                   borderColor: "divider",
@@ -598,23 +660,34 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
                       {t("steps.modelStagesDescription")}
                     </Typography>
                   </Box>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleAddStep}
-                    sx={{
-                      flexShrink: 0,
-                      whiteSpace: "nowrap",
-                      borderRadius: "12px",
-                      textTransform: "none",
-                      fontWeight: 700,
-                      px: 2,
-                      boxShadow: (theme) =>
-                        `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                    }}
+                  <Tooltip
+                    title={
+                      canAddStage
+                        ? ""
+                        : t("messages.addStageRequiresSideProcedure")
+                    }
                   >
-                    {t("steps.addStage")}
-                  </Button>
+                    <span>
+                      <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={handleAddStep}
+                        disabled={!canAddStage}
+                        sx={{
+                          flexShrink: 0,
+                          whiteSpace: "nowrap",
+                          borderRadius: "12px",
+                          textTransform: "none",
+                          fontWeight: 700,
+                          px: 2,
+                          boxShadow: (theme) =>
+                            `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+                        }}
+                      >
+                        {t("steps.addStage")}
+                      </Button>
+                    </span>
+                  </Tooltip>
                 </Box>
 
                 <Box
@@ -702,6 +775,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             open={addDialogOpen}
             onClose={() => setAddDialogOpen(false)}
             currentTabType={currentTabType}
+            existingProcedures={procedures}
             onSuccess={(newStage) => {
               handleCreateProcedure(newStage);
               setAddDialogOpen(false);
@@ -712,16 +786,53 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             onClose={() => setClassificationDialogOpen(false)}
             procedureType={currentTabType ?? ""}
             onSave={async (values) => {
-              await handleCreateProcedure({
-                name: values.name,
-                type: currentTabType ?? "",
-                execute_type: "sequence",
-                icon: "settings",
-                percentage: 0,
-                deadline_days: 1,
-                deadline_hours: 0,
-                escalation_management_hierarchy_id: "",
-              });
+              if (!currentTabType) {
+                toast({
+                  title: t("actions.add"),
+                  description: t("messages.error"),
+                  variant: "destructive",
+                });
+                throw new Error("Missing procedure type");
+              }
+
+              try {
+                // Same API as CRM إعداد إجراءات الطلبات
+                await InternalProcedureSettingsApi.createInternalProcedure(
+                  mapTaskActionToCreateInternalProcedure(values, {
+                    procedureType: currentTabType,
+                    sortOrder: 1,
+                    parentId: parentId ?? null,
+                    projectId,
+                  }),
+                );
+
+                await queryClient.invalidateQueries({
+                  queryKey: ["internal-procedures", currentTabType],
+                });
+                await queryClient.invalidateQueries({
+                  queryKey: ["procedure-settings", "stages", parentId],
+                });
+
+                toast({
+                  title: t("actions.add"),
+                  description: t("messages.procedureAdded"),
+                  variant: "default",
+                });
+              } catch (error) {
+                console.error("Error creating internal procedure:", error);
+                const apiMessage = (
+                  error as { response?: { data?: { message?: string } } }
+                )?.response?.data?.message;
+                toast({
+                  title: t("actions.add"),
+                  description:
+                    typeof apiMessage === "string" && apiMessage.trim()
+                      ? apiMessage
+                      : t("messages.error"),
+                  variant: "destructive",
+                });
+                throw error;
+              }
             }}
           />
           <EditStageDialog
@@ -731,6 +842,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
               setProcedureToEdit(null);
             }}
             procedure={procedureToEdit}
+            procedureSteps={serverSteps}
             onDeleted={(procedureId) => {
               setDraftStepKeys((prev) => {
                 const next = { ...prev };
@@ -953,6 +1065,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
           open={addDialogOpen}
           onClose={() => setAddDialogOpen(false)}
           currentTabType={currentTabType}
+          existingProcedures={procedures}
           onSuccess={(newStage) => {
             handleCreateProcedure(newStage);
             setAddDialogOpen(false);
@@ -965,6 +1078,7 @@ const StagesView = forwardRef<StagesViewRef, StagesViewProps>(
             setProcedureToEdit(null);
           }}
           procedure={procedureToEdit}
+          procedureSteps={serverSteps}
           onDeleted={(procedureId) => {
             setDraftStepKeys((prev) => {
               const next = { ...prev };

@@ -15,72 +15,125 @@ function toNumber(value: unknown): number {
   return Number.isNaN(num) ? 0 : num;
 }
 
-function resolveActive(dto: ProjectOrderPermitWorkOrderDto): boolean {
-  const raw = dto.active ?? dto.is_active;
-  if (raw === true || raw === 1 || raw === "1") return true;
-  if (raw === false || raw === 0 || raw === "0") return false;
-  return true;
+function resolveDate(value: string | null | undefined): string {
+  const raw = value?.trim() ?? "";
+  return raw.length >= 10 ? raw.slice(0, 10) : raw;
 }
 
-function resolveDate(dto: ProjectOrderPermitWorkOrderDto): string {
-  const raw = pickString(dto.updated_at, dto.assigned_date);
-  return raw.length >= 10 ? raw.slice(0, 10) : raw;
+function resolveCoordinate(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "";
+  return String(value);
 }
 
 export function mapProjectOrderPermitDto(
   dto: ProjectOrderPermitWorkOrderDto,
-  serial: number,
 ): WorkOrderRow {
   return {
     id: String(dto.id),
-    serial,
-    contractCode: pickString(dto.contract_code, dto.name),
-    clientCode: pickString(dto.client_code),
-    stationCode: pickString(dto.station_code),
-    stationName: pickString(dto.station_name, dto.state?.name, dto.name),
-    governorate: pickString(dto.governorate, dto.state?.name),
-    contractingParty: pickString(
-      dto.contracting_party,
+    orderPermitId:
+      dto.order_permit_id != null ? Number(dto.order_permit_id) : null,
+    orderPermitDepartmentId:
+      dto.order_permit_department_id != null
+        ? Number(dto.order_permit_department_id)
+        : null,
+    workOrderId: pickString(dto.name),
+    workOrderType: pickString(
+      dto.order_permit?.code,
+      dto.order_permit?.description,
+      dto.order_permit?.type,
+      dto.type,
+    ),
+    consultantWorkOrderType: pickString(dto.order_permit?.type),
+    departmentName: pickString(dto.order_permit?.department_name),
+    orderPermitDescription: pickString(dto.order_permit?.description),
+    orderPermitTypeName: pickString(dto.order_permit?.order_permit_type_name),
+    udsPeriod: pickString(dto.order_permit?.uds_period),
+    assignmentDate: resolveDate(dto.assigned_date),
+    contractor: pickString(
+      dto.contractor_name,
       dto.contractor?.name,
       dto.contractor?.contractor_name,
     ),
-    type: pickString(
-      dto.type,
-      dto.order_permit?.type,
-      dto.order_permit?.description,
-      dto.order_permit?.code,
+    management: pickString(
+      dto.project_management_name,
+      dto.order_permit_department?.description,
+      dto.order_permit_department?.code,
     ),
+    location: pickString(
+      dto.projects_district_name,
+      dto.state_name,
+      dto.state?.name,
+    ),
+    latitude: resolveCoordinate(dto.lat),
+    longitude: resolveCoordinate(dto.long),
     price: toNumber(dto.price),
-    indebtedness: toNumber(dto.indebtedness),
-    representative: pickString(dto.representative),
-    supervisor: pickString(dto.supervisor),
-    guidanceAndRegions: pickString(dto.guidance_and_regions),
-    route: pickString(dto.route),
-    defaultValue: toNumber(dto.default_value),
-    availableBalance: toNumber(dto.available_balance),
-    cashBalance: toNumber(dto.cash_balance),
-    posMachinesCount: toNumber(dto.pos_machines_count),
-    pcMachinesCount: toNumber(dto.pc_machines_count),
-    totalMachinesCount: toNumber(dto.total_machines_count),
-    cashier: pickString(dto.cashier),
-    simLinesCount: toNumber(dto.sim_lines_count),
-    pcSimLinesCount: toNumber(dto.pc_sim_lines_count),
-    totalLinesCount: toNumber(dto.total_lines_count),
-    bank: pickString(dto.bank),
-    bankAccountNumber: pickString(dto.bank_account_number),
-    bankClientCode: pickString(dto.bank_client_code),
-    bankAccountName: pickString(dto.bank_account_name),
-    collectionParty: pickString(dto.collection_party),
-    paymentType: pickString(dto.payment_type),
-    paymentMethod: pickString(dto.payment_method),
-    value:
-      dto.value != null && dto.value !== ""
-        ? toNumber(dto.value)
-        : toNumber(dto.price),
-    paymentStatus: pickString(dto.payment_status),
-    active: resolveActive(dto),
-    block: pickString(dto.block),
-    dataUpdatedAt: resolveDate(dto),
-    updatedByUser: pickString(dto.updated_by_user, dto.updated_by),
+    executingEntity: pickString(dto.executing_entity),
+    office: pickString(dto.office),
+    consultantCurrentBasket: pickString(dto.consultant_current_basket),
+    consultantAssignmentDate: resolveDate(dto.consultant_assignment_date),
+    consultantLastProcedureCode: pickString(dto.consultant_last_procedure_code),
+    consultantLastProcedureDate: resolveDate(dto.consultant_last_procedure_date),
+    consultantColumn155EntryDate: resolveDate(dto.consultant_column_155_entry_date),
+    contractorLastProcedureCode: pickString(dto.contractor_last_procedure_code),
+    contractorLastProcedureDate: resolveDate(dto.contractor_last_procedure_date),
+    contractorColumn155EntryDate: resolveDate(dto.contractor_column_155_entry_date),
+    materialBalanceElecContractor: resolveCoordinate(
+      dto.material_balance_elec_contractor,
+    ),
+    contractorWorkOrderStatus: pickString(dto.contractor_work_order_status),
+    contractorBasket: pickString(dto.contractor_basket),
+    consultantPrice: toNumber(dto.consultant_price),
+    permitStatusId:
+      dto.permit_status_id != null ? Number(dto.permit_status_id) : null,
+    permitStatusName: pickString(dto.permit_status_name),
+    startPermitDate: resolveDate(dto.start_permit_date),
+    endPermitDate: resolveDate(dto.end_permit_date),
+    noteFromPermitToDepartments: pickString(dto.note_from_permit_to_departments),
+    isTakedAction:
+      dto.is_taked_action === true || dto.is_taked_action === 1
+        ? "yes"
+        : dto.is_taked_action === false || dto.is_taked_action === 0
+          ? "no"
+          : "",
+    countOfDaysFromAssignedDate:
+      dto.count_of_days_from_assigned_date != null
+        ? String(dto.count_of_days_from_assigned_date)
+        : "",
+    evaluationPermitStatus: pickString(dto.evaluation_permit_status),
+    employeeName: pickString(dto.employee_name),
+    completionPhaseId:
+      dto.completion_phase_id != null ? Number(dto.completion_phase_id) : null,
+    completionPhaseName: pickString(dto.completion_phase_name),
+    phaseStatusId:
+      dto.phase_status_id != null ? Number(dto.phase_status_id) : null,
+    phaseStatusName: pickString(dto.phase_status_name),
+    targetDrilling:
+      dto.target_drilling != null ? String(dto.target_drilling) : "",
+    achievedDrilling:
+      dto.achieved_drilling != null ? String(dto.achieved_drilling) : "",
+    targetExtention:
+      dto.target_extention != null ? String(dto.target_extention) : "",
+    achievedExtention:
+      dto.achieved_extention != null ? String(dto.achieved_extention) : "",
+    descriptionDetails: pickString(dto.description_details),
+    consultantStatement: pickString(dto.consultant_statement),
+    lastDateConsultantStatement: resolveDate(dto.last_date_consultant_statement),
+    consultnatStatementStatus: pickString(dto.consultnat_statement_status),
+    officialProjectHours:
+      dto.official_project_hours != null ? String(dto.official_project_hours) : "",
+    numberOfDaysToAchieveColumn155:
+      dto.number_of_days_to_achieve_column_155 != null
+        ? String(dto.number_of_days_to_achieve_column_155)
+        : "",
+    percentageTime:
+      dto.percentage_time != null ? String(dto.percentage_time) : "",
+    percentageAchieveDrilling:
+      dto.percentage_achieve_drilling != null
+        ? String(dto.percentage_achieve_drilling)
+        : "",
+    percentageAchieveExtention:
+      dto.percentage_achieve_extention != null
+        ? String(dto.percentage_achieve_extention)
+        : "",
   };
 }

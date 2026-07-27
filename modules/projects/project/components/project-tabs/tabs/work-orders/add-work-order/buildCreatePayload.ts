@@ -46,12 +46,12 @@ export function buildCreateWorkOrdersPayload(
       }
 
       if (entry.management) {
-        workOrder.order_permit_department_id = Number(entry.management);
+        workOrder.project_management_id = Number(entry.management);
       }
 
-      const stateId = entry.location.trim();
-      if (stateId) {
-        workOrder.state_id = stateId;
+      const districtId = entry.location.trim();
+      if (districtId) {
+        workOrder.projects_district_id = Number(districtId);
       }
 
       const lat = parseCoordinate(entry.lat);

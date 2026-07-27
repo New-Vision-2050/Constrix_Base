@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Chip, LinearProgress, Typography } from "@mui/material";
+import { Box, Chip, LinearProgress, Tooltip, Typography } from "@mui/material";
 
 export type ProjectColumnTranslator = (key: string) => string;
 
@@ -67,6 +67,29 @@ function StatusChip({
   );
 }
 
+function TruncatedProjectName({ name }: { name: string }) {
+  return (
+    <Tooltip title={name} arrow placement="top">
+      <Box
+        component="span"
+        sx={{
+          fontSize: "0.8125rem",
+          fontWeight: 500,
+          display: "inline-block",
+          maxWidth: 180,
+          minWidth: 0,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          verticalAlign: "bottom",
+        }}
+      >
+        {name}
+      </Box>
+    </Tooltip>
+  );
+}
+
 function ProgressBar({ value, color }: { value?: number; color: string }) {
   const v = value ?? 0;
   return (
@@ -106,9 +129,8 @@ export const getProjectsColumns = (t: ProjectColumnTranslator) => [
     key: "name",
     name: t("projectName"),
     sortable: false,
-    render: (row: ProjectRow) => (
-      <span className="font-medium">{row.name}</span>
-    ),
+    minWidth: 120,
+    render: (row: ProjectRow) => <TruncatedProjectName name={row.name} />,
   },
   {
     key: "client",

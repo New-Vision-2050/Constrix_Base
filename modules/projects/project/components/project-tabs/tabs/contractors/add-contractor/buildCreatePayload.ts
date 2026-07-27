@@ -6,14 +6,11 @@ export function buildCreateProjectContractorPayload(
   form: AddContractorFormData,
 ): CreateProjectContractorArgs {
   const representatives = form.representatives
-    .filter(
-      (rep) =>
-        rep.name.trim() && rep.mobile.trim() && rep.nationality?.name?.trim(),
-    )
+    .filter((rep) => rep.name.trim())
     .map((rep) => ({
       name: rep.name.trim(),
       mobile: rep.mobile.trim(),
-      nationality: rep.nationality!.name.trim(),
+      nationality: rep.nationality?.name?.trim() ?? "",
     }));
 
   return {

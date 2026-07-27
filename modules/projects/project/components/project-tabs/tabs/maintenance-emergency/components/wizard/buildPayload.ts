@@ -10,21 +10,23 @@ function wizardDataToNotificationFields(data: WizardFormData) {
   return {
     notification_number: data.notification_number || null,
     notification_type: data.notification_type,
-    feeder_number: data.feeder_number || null,
-    machine_number: data.machine_number || null,
     work_description: data.work_description || null,
     task_date: data.task_date || null,
     duration_hours: data.duration_hours || null,
     notes: data.notes || null,
+    site_status_type_id: data.site_status_type_id || null,
+    site_status_type_values: Object.entries(data.site_status_values).map(
+      ([key_id, value]) => ({
+        key_id,
+        value: value === "" || value === undefined || value === null ? null : String(value),
+      }),
+    ),
 
     contractor_id: data.contractor_id || null,
     contractor_name: data.contractor_name || null,
-    contractor_technical_name: data.contractor_technical_name || null,
-    contractor_technical_number: data.contractor_technical_number || null,
+    contractor_representative_id: data.contractor_representative_id || null,
     contractor_category: data.contractor_category || null,
     contractor_notes: data.contractor_notes || null,
-    permit_source: data.permit_source || null,
-    permit_recipient: data.permit_recipient || null,
 
     task_latitude: data.task_latitude ?? 0,
     task_longitude: data.task_longitude ?? 0,

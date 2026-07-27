@@ -1,142 +1,183 @@
 export interface WorkOrderRow {
   id: string;
-  serial: number;
-  contractCode: string;
-  clientCode: string;
-  stationCode: string;
-  stationName: string;
-  governorate: string;
-  contractingParty: string;
-  type: string;
+  orderPermitId: number | null;
+  orderPermitDepartmentId: number | null;
+  workOrderId: string;
+  workOrderType: string;
+  consultantWorkOrderType: string;
+  departmentName: string;
+  orderPermitDescription: string;
+  orderPermitTypeName: string;
+  udsPeriod: string;
+  assignmentDate: string;
+  contractor: string;
+  management: string;
+  location: string;
+  latitude: string;
+  longitude: string;
   price: number;
-  indebtedness: number;
-  representative: string;
-  supervisor: string;
-  guidanceAndRegions: string;
-  route: string;
-  defaultValue: number;
-  availableBalance: number;
-  cashBalance: number;
-  posMachinesCount: number;
-  pcMachinesCount: number;
-  totalMachinesCount: number;
-  cashier: string;
-  simLinesCount: number;
-  pcSimLinesCount: number;
-  totalLinesCount: number;
-  bank: string;
-  bankAccountNumber: string;
-  bankClientCode: string;
-  bankAccountName: string;
-  collectionParty: string;
-  paymentType: string;
-  paymentMethod: string;
-  value: number;
-  paymentStatus: string;
-  active: boolean;
-  block: string;
-  dataUpdatedAt: string;
-  updatedByUser: string;
+  executingEntity: string;
+  office: string;
+  consultantCurrentBasket: string;
+  consultantAssignmentDate: string;
+  consultantLastProcedureCode: string;
+  consultantLastProcedureDate: string;
+  consultantColumn155EntryDate: string;
+  contractorLastProcedureCode: string;
+  contractorLastProcedureDate: string;
+  contractorColumn155EntryDate: string;
+  materialBalanceElecContractor: string;
+  contractorWorkOrderStatus: string;
+  contractorBasket: string;
+  consultantPrice: number;
+  permitStatusId: number | null;
+  permitStatusName: string;
+  startPermitDate: string;
+  endPermitDate: string;
+  noteFromPermitToDepartments: string;
+  isTakedAction: string;
+  countOfDaysFromAssignedDate: string;
+  evaluationPermitStatus: string;
+  employeeName: string;
+  completionPhaseId: number | null;
+  completionPhaseName: string;
+  phaseStatusId: number | null;
+  phaseStatusName: string;
+  targetDrilling: string;
+  achievedDrilling: string;
+  targetExtention: string;
+  achievedExtention: string;
+  descriptionDetails: string;
+  consultantStatement: string;
+  lastDateConsultantStatement: string;
+  consultnatStatementStatus: string;
+  officialProjectHours: string;
+  numberOfDaysToAchieveColumn155: string;
+  percentageTime: string;
+  percentageAchieveDrilling: string;
+  percentageAchieveExtention: string;
 }
 
 export interface WorkOrderFilters {
-  contractCode: string;
-  type: string;
-  stationName: string;
-  projectStartDate: string;
-  projectEndDate: string;
-  contractingParty: string;
-  paymentStatus: string;
+  workOrderId: string;
+  workOrderType: string;
+  location: string;
+  assignmentStartDate: string;
+  assignmentEndDate: string;
+  contractor: string;
 }
 
 export const EMPTY_WORK_ORDER_FILTERS: WorkOrderFilters = {
-  contractCode: "",
-  type: "",
-  stationName: "",
-  projectStartDate: "",
-  projectEndDate: "",
-  contractingParty: "",
-  paymentStatus: "",
+  workOrderId: "",
+  workOrderType: "",
+  location: "",
+  assignmentStartDate: "",
+  assignmentEndDate: "",
+  contractor: "",
 };
 
 export type WorkOrderColumnKey =
-  | "serial"
-  | "contractCode"
-  | "clientCode"
-  | "stationCode"
-  | "stationName"
-  | "governorate"
-  | "contractingParty"
-  | "type"
+  | "workOrderId"
+  | "workOrderType"
+  | "consultantWorkOrderType"
+  | "departmentName"
+  | "orderPermitDescription"
+  | "orderPermitTypeName"
+  | "udsPeriod"
+  | "assignmentDate"
+  | "contractor"
+  | "management"
+  | "location"
+  | "latitude"
+  | "longitude"
   | "price"
-  | "indebtedness"
-  | "representative"
-  | "supervisor"
-  | "guidanceAndRegions"
-  | "route"
-  | "defaultValue"
-  | "availableBalance"
-  | "cashBalance"
-  | "posMachinesCount"
-  | "pcMachinesCount"
-  | "totalMachinesCount"
-  | "cashier"
-  | "simLinesCount"
-  | "pcSimLinesCount"
-  | "totalLinesCount"
-  | "bank"
-  | "bankAccountNumber"
-  | "bankClientCode"
-  | "bankAccountName"
-  | "collectionParty"
-  | "paymentType"
-  | "paymentMethod"
-  | "value"
-  | "paymentStatus"
-  | "active"
-  | "block"
-  | "dataUpdatedAt"
-  | "updatedByUser"
+  | "executingEntity"
+  | "office"
+  | "consultantCurrentBasket"
+  | "consultantAssignmentDate"
+  | "consultantLastProcedureCode"
+  | "consultantLastProcedureDate"
+  | "consultantColumn155EntryDate"
+  | "contractorLastProcedureCode"
+  | "contractorLastProcedureDate"
+  | "contractorColumn155EntryDate"
+  | "materialBalanceElecContractor"
+  | "contractorWorkOrderStatus"
+  | "contractorBasket"
+  | "consultantPrice"
+  | "permitStatus"
+  | "startPermitDate"
+  | "endPermitDate"
+  | "noteFromPermitToDepartments"
+  | "countOfDaysFromAssignedDate"
+  | "evaluationPermitStatus"
+  | "employeeName"
+  | "completionPhase"
+  | "phaseStatus"
+  | "targetDrilling"
+  | "achievedDrilling"
+  | "targetExtention"
+  | "achievedExtention"
+  | "descriptionDetails"
+  | "consultantStatement"
+  | "lastDateConsultantStatement"
+  | "officialProjectHours"
+  | "numberOfDaysToAchieveColumn155"
+  | "percentageTime"
+  | "percentageAchieveDrilling"
+  | "percentageAchieveExtention"
   | "actions";
 
 /** Column order: right → left (RTL). */
 export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
-  "serial",
-  "contractCode",
-  "clientCode",
-  "stationCode",
-  "stationName",
-  "governorate",
-  "contractingParty",
-  "type",
+  "workOrderId",
+  "workOrderType",
+  "consultantWorkOrderType",
+  "departmentName",
+  "orderPermitDescription",
+  "orderPermitTypeName",
+  "udsPeriod",
+  "assignmentDate",
+  "contractor",
+  "management",
+  "location",
+  "latitude",
+  "longitude",
   "price",
-  "indebtedness",
-  "representative",
-  "supervisor",
-  "guidanceAndRegions",
-  "route",
-  "defaultValue",
-  "availableBalance",
-  "cashBalance",
-  "posMachinesCount",
-  "pcMachinesCount",
-  "totalMachinesCount",
-  "cashier",
-  "simLinesCount",
-  "pcSimLinesCount",
-  "totalLinesCount",
-  "bank",
-  "bankAccountNumber",
-  "bankClientCode",
-  "bankAccountName",
-  "collectionParty",
-  "paymentType",
-  "paymentMethod",
-  "value",
-  "paymentStatus",
-  "active",
-  "block",
-  "dataUpdatedAt",
-  "updatedByUser",
+  "executingEntity",
+  "office",
+  "consultantCurrentBasket",
+  "consultantAssignmentDate",
+  "consultantLastProcedureCode",
+  "consultantLastProcedureDate",
+  "consultantColumn155EntryDate",
+  "contractorLastProcedureCode",
+  "contractorLastProcedureDate",
+  "contractorColumn155EntryDate",
+  "materialBalanceElecContractor",
+  "contractorWorkOrderStatus",
+  "contractorBasket",
+  "consultantPrice",
+  "permitStatus",
+  "startPermitDate",
+  "endPermitDate",
+  "noteFromPermitToDepartments",
+  "countOfDaysFromAssignedDate",
+  "evaluationPermitStatus",
+  // "employeeName",
+  // "completionPhase",
+  // "phaseStatus",
+  // "targetDrilling",
+  // "achievedDrilling",
+  // "targetExtention",
+  // "achievedExtention",
+  // "descriptionDetails",
+  // "consultantStatement",
+  // "lastDateConsultantStatement",
+  // "officialProjectHours",
+  // "numberOfDaysToAchieveColumn155",
+  // "percentageTime",
+  // "percentageAchieveDrilling",
+  // "percentageAchieveExtention",
   "actions",
 ];

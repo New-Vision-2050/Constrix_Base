@@ -35,6 +35,7 @@ import {
 import { Close } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
 import {
   useCreateProjectNotificationMutation,
@@ -45,7 +46,13 @@ import {
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
-import type { ProjectNotificationEmployee, ProjectNotificationType } from "@/services/api/projects/notifications/types/response";
+import { useSiteStatusTypes } from "@/modules/projects/project/query/useSiteStatusTypes";
+import type {
+  ProjectNotification,
+  ProjectNotificationEmployee,
+  ProjectNotificationType,
+  SiteStatusTypeWithKeys,
+} from "@/services/api/projects/notifications/types/response";
 import { useGoogleRouteDistances } from "./useGoogleRouteDistances";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
 import {
@@ -107,6 +114,23 @@ export default function CreateNotificationWizard({
     createMutation.isPending || updateMutation.isPending;
   const notificationTypesQuery = useProjectNotificationTypes();
   const notificationTypes = notificationTypesQuery.data ?? [];
+
+  const project = useOptionalProject();
+  const projectTypeId = project?.projectData?.sub_sub_project_type_id;
+
+  const selectedNotificationTypeId = useMemo(() => {
+    const match = notificationTypes.find(
+      (nt) => nt.value === data.notification_type,
+    );
+    return match?.id;
+  }, [notificationTypes, data.notification_type]);
+
+  const siteStatusTypesQuery = useSiteStatusTypes({
+    projectTypeId,
+    projectId,
+    notificationTypeId: selectedNotificationTypeId,
+  });
+  const siteStatusTypes = siteStatusTypesQuery.data ?? [];
 
   const employeeQuery = useProjectNotificationEmployees({
     projectId,
@@ -394,10 +418,23 @@ export default function CreateNotificationWizard({
             </Stepper>
 
             {step === 1 && (
-              <Step1Form data={data} errors={errors} onChange={updateField} t={t} notificationTypes={notificationTypes} />
+              <Step1Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                notificationTypes={notificationTypes}
+                siteStatusTypes={siteStatusTypes}
+              />
             )}
             {step === 2 && (
-              <Step2Form data={data} errors={errors} onChange={updateField} t={t} />
+              <Step2Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                projectId={projectId}
+              />
             )}
             {step === 3 && (
               <Step3Form
@@ -424,9 +461,12 @@ export default function CreateNotificationWizard({
               <Step5Form
                 data={data}
                 employees={employees}
+                siteStatusTypes={siteStatusTypes}
                 confirmed={confirmed}
                 onChangeConfirmed={(value) => setConfirmed(value)}
                 t={t}
+                projectId={projectId}
+                existingNotification={existingNotification}
               />
             )}
           </>
@@ -478,12 +518,14 @@ function Step1Form({
   onChange,
   t,
   notificationTypes,
+  siteStatusTypes,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: ReturnType<typeof useTranslations>;
   notificationTypes: ProjectNotificationType[];
+  siteStatusTypes: SiteStatusTypeWithKeys[];
 }) {
   return (
     <Grid container spacing={2}>
@@ -506,7 +548,11 @@ function Step1Form({
           size="small"
           label={t("notificationType", { defaultValue: "نوع الاشعار" })}
           value={data.notification_type}
-          onChange={(e) => onChange("notification_type", e.target.value)}
+          onChange={(e) => {
+            onChange("notification_type", e.target.value);
+            onChange("site_status_type_id", "");
+            onChange("site_status_values", {});
+          }}
           error={Boolean(errors.notification_type)}
           helperText={errors.notification_type}
         >
@@ -516,28 +562,6 @@ function Step1Form({
             </MenuItem>
           ))}
         </TextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("feeder_number", { defaultValue: "رقم المغذي" })}
-          value={data.feeder_number}
-          onChange={(e) => onChange("feeder_number", e.target.value)}
-          error={Boolean(errors.feeder_number)}
-          helperText={errors.feeder_number}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("machineNumber", { defaultValue: "رقم المعدة" })}
-          value={data.machine_number}
-          onChange={(e) => onChange("machine_number", e.target.value)}
-        />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -589,8 +613,154 @@ function Step1Form({
           onChange={(e) => onChange("notes", e.target.value)}
         />
       </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
+          value={data.site_status_type_id}
+          onChange={(e) => {
+            const selectedId = e.target.value;
+            onChange("site_status_type_id", selectedId);
+            const selectedType = siteStatusTypes.find((type) => type.id === selectedId);
+            const initialValues: Record<string, string> = {};
+            (selectedType?.keys ?? []).forEach((key) => {
+              initialValues[key.id] = "";
+            });
+            onChange("site_status_values", initialValues);
+          }}
+          disabled={siteStatusTypes.length === 0}
+        >
+          <MenuItem value="">
+            {t("selectSiteStatusType", { defaultValue: "اختر صيغة الإشعار" })}
+          </MenuItem>
+          {siteStatusTypes.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name_ar || type.name_en}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      {data.site_status_type_id && (
+        <SiteStatusValueInputs
+          siteStatusTypeId={data.site_status_type_id}
+          siteStatusTypes={siteStatusTypes}
+          values={data.site_status_values}
+          onChange={(values) => onChange("site_status_values", values)}
+          t={t}
+        />
+      )}
     </Grid>
   );
+}
+
+function SiteStatusSummaryCard({
+  siteStatusTypeId,
+  siteStatusTypes,
+  values,
+  t,
+}: {
+  siteStatusTypeId: string;
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+  values: Record<string, string>;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const selectedType = siteStatusTypes.find((type) => type.id === siteStatusTypeId);
+  const rows = (selectedType?.keys ?? [])
+    .filter((key) => values[key.id] !== undefined && values[key.id] !== "")
+    .map((key) => ({
+      label: key.name_ar || key.name_en || key.key,
+      value: values[key.id],
+    }));
+
+  return (
+    <SummaryCard
+      title={t("summarySiteStatus", { defaultValue: "حالة الموقع" })}
+      rows={[
+        {
+          label: t("siteStatusType", { defaultValue: "صيغة الإشعار" }),
+          value: selectedType?.name_ar || selectedType?.name_en || "—",
+        },
+        ...rows,
+      ]}
+    />
+  );
+}
+
+function SiteStatusValueInputs({
+  siteStatusTypeId,
+  siteStatusTypes,
+  values,
+  onChange,
+  t,
+}: {
+  siteStatusTypeId: string;
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+  values: Record<string, string>;
+  onChange: (values: Record<string, string>) => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const selectedType = siteStatusTypes.find((type) => type.id === siteStatusTypeId);
+  const keys = selectedType?.keys ?? [];
+
+  function updateValue(keyId: string, value: string) {
+    onChange({ ...values, [keyId]: value });
+  }
+
+  if (!keys.length) {
+    return (
+      <Grid size={{ xs: 12 }}>
+        <Typography variant="body2" color="text.secondary">
+          {t("noKeys", { defaultValue: "لا توجد مفاتيح محددة" })}
+        </Typography>
+      </Grid>
+    );
+  }
+
+  return keys.map((key) => {
+    const label = key.name_ar || key.name_en || key.key;
+    const value = values[key.id] ?? "";
+
+    if (key.field_type === "select" && (key.options ?? []).length > 0) {
+      return (
+        <Grid size={{ xs: 12, md: 6 }} key={key.id}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={label}
+            value={value}
+            onChange={(e) => updateValue(key.id, e.target.value)}
+          >
+            {(key.options ?? []).map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+      );
+    }
+
+    const inputType = key.field_type === "number" ? "number" : key.field_type === "date" ? "date" : "text";
+
+    return (
+      <Grid size={{ xs: 12, md: 6 }} key={key.id}>
+        <TextField
+          fullWidth
+          size="small"
+          type={inputType}
+          label={label}
+          value={value}
+          onChange={(e) => updateValue(key.id, e.target.value)}
+          InputLabelProps={inputType === "date" ? { shrink: true } : undefined}
+        />
+      </Grid>
+    );
+  });
 }
 
 // ============================================================================
@@ -602,20 +772,26 @@ function Step2Form({
   errors,
   onChange,
   t,
+  projectId,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: ReturnType<typeof useTranslations>;
+  projectId: string | undefined;
 }) {
-  const contractorsQuery = useProjectNotificationContractors();
+  const contractorsQuery = useProjectNotificationContractors(projectId);
   const contractors = contractorsQuery.data ?? [];
 
   function handleContractorChange(contractorId: string) {
     const selected = contractors.find((c) => c.id === contractorId);
     onChange("contractor_id", contractorId);
     onChange("contractor_name", selected?.name ?? "");
+    onChange("contractor_representative_id", "");
   }
+
+  const selectedContractor = contractors.find((c) => c.id === data.contractor_id);
+  const representatives = selectedContractor?.representatives ?? [];
 
   return (
     <Grid container spacing={2}>
@@ -629,6 +805,11 @@ function Step2Form({
           isOptionEqualToValue={(option, value) => option.id === value?.id}
           value={contractors.find((c) => c.id === data.contractor_id) ?? null}
           onChange={(_e, value) => handleContractorChange(value?.id ?? "")}
+          renderOption={(props, option) => (
+            <li {...props} key={option.id}>
+              {option.name}
+            </li>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -643,42 +824,23 @@ function Step2Form({
 
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
+          select
           fullWidth
           size="small"
-          label={t("contractorTechnicalName", { defaultValue: "Contractor technical name" })}
-          value={data.contractor_technical_name}
-          onChange={(e) => onChange("contractor_technical_name", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("contractorTechnicalNumber")}
-          value={data.contractor_technical_number}
-          onChange={(e) => onChange("contractor_technical_number", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("permitSource", { defaultValue: "Permit Source" })}
-          value={data.permit_source}
-          onChange={(e) => onChange("permit_source", e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          label={t("permitRecipient", { defaultValue: "Permit Recipient" })}
-          value={data.permit_recipient}
-          onChange={(e) => onChange("permit_recipient", e.target.value)}
-        />
+          label={t("contractorRepresentative", { defaultValue: "Contractor Representative" })}
+          value={data.contractor_representative_id}
+          onChange={(e) => onChange("contractor_representative_id", e.target.value)}
+          disabled={!data.contractor_id || representatives.length === 0}
+        >
+          <MenuItem value="">
+            {t("chooseRepresentative", { defaultValue: "Choose representative" })}
+          </MenuItem>
+          {representatives.map((rep) => (
+            <MenuItem key={rep.id} value={rep.id}>
+              {rep.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -1173,16 +1335,26 @@ function Step4Form({
 function Step5Form({
   data,
   employees,
+  siteStatusTypes,
   confirmed,
   onChangeConfirmed,
   t,
+  projectId,
+  existingNotification,
 }: {
   data: WizardFormData;
   employees: ProjectNotificationEmployee[];
+  siteStatusTypes: SiteStatusTypeWithKeys[];
   confirmed: { dataReviewed: boolean; readyToSend: boolean };
   onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
   t: ReturnType<typeof useTranslations>;
+  projectId: string | undefined;
+  existingNotification: ProjectNotification | null | undefined;
 }) {
+  const contractorsQuery = useProjectNotificationContractors(projectId);
+  const contractors = contractorsQuery.data ?? [];
+  const selectedContractor = contractors.find((c) => c.id === data.contractor_id);
+  const representatives = selectedContractor?.representatives ?? [];
   const selectedEmployees = useMemo(
     () => employees.filter((e) => data.assigned_user_ids.includes(e.user_id)),
     [employees, data.assigned_user_ids],
@@ -1200,20 +1372,30 @@ function Step5Form({
         rows={[
           { label: t("notification_number", { defaultValue: "رقم الإشعار" }), value: data.notification_number },
           { label: t("notificationType", { defaultValue: "نوع الاشعار" }), value: data.notification_type },
-          { label: t("feeder_number", { defaultValue: "رقم المغذي" }), value: data.feeder_number },
-          { label: t("machineNumber", { defaultValue: "رقم المعدة" }), value: data.machine_number },
           { label: t("description"), value: data.work_description },
         ]}
       />
+
+      {data.site_status_type_id && (
+        <SiteStatusSummaryCard
+          siteStatusTypeId={data.site_status_type_id}
+          siteStatusTypes={siteStatusTypes}
+          values={data.site_status_values}
+          t={t}
+        />
+      )}
 
       <SummaryCard
         title={t("summaryContractor")}
         rows={[
           { label: t("contractor"), value: data.contractor_name },
-          { label: t("contractorTechnicalName", { defaultValue: "Contractor technical name" }), value: data.contractor_technical_name },
-          { label: t("contractorTechnicalNumber"), value: data.contractor_technical_number },
-          { label: t("permitSource", { defaultValue: "Permit Source" }), value: data.permit_source },
-          { label: t("permitRecipient", { defaultValue: "Permit Recipient" }), value: data.permit_recipient },
+          {
+            label: t("contractorRepresentative", { defaultValue: "Contractor Representative" }),
+            value:
+              representatives.find((r) => r.id === data.contractor_representative_id)?.name ??
+              existingNotification?.contractor_representative_name ??
+              "-",
+          },
         ]}
       />
 

@@ -11,7 +11,7 @@ export const orderPermitDepartmentsQueryKey = (orderPermitId: number | string) =
   ["order-permit-departments", orderPermitId] as const;
 
 export function getOrderPermitLabel(item: ProjectOrderPermitTypeDto): string {
-  return item.type?.trim() || item.description?.trim() || item.code;
+  return item.code?.trim() || item.description?.trim() || item.type;
 }
 
 export function getOrderPermitDepartmentLabel(

@@ -31,7 +31,8 @@ export function createTopActionsComponent<TRow>(
     searchComponent,
     children,
   }: TopActionsProps<TRow>) => {
-    const { actions, columnVisibility } = state;
+    const { actions, columnVisibility, columnPinning, columnOrder, columnGrouping } =
+      state;
     const t = useTranslations("Table");
     const [columnDialogOpen, setColumnDialogOpen] = useState(false);
 
@@ -110,6 +111,20 @@ export function createTopActionsComponent<TRow>(
             showAllColumns={columnVisibility.showAllColumns}
             hideAllColumns={columnVisibility.hideAllColumns}
             resetColumnVisibility={columnVisibility.resetColumnVisibility}
+            pinnedKeys={columnPinning?.pinnedKeys}
+            isPinned={columnPinning?.isPinned}
+            togglePin={columnPinning?.togglePin}
+            canPinMore={columnPinning?.canPinMore}
+            maxPinned={columnPinning?.maxPinned}
+            onReorder={columnOrder?.moveColumn}
+            groups={columnGrouping?.groups}
+            groupIdForColumn={columnGrouping?.groupIdForColumn}
+            createGroup={columnGrouping?.createGroup}
+            renameGroup={columnGrouping?.renameGroup}
+            setGroupColors={columnGrouping?.setGroupColors}
+            deleteGroup={columnGrouping?.deleteGroup}
+            moveColumnToGroup={columnGrouping?.moveColumnToGroup}
+            moveGroupBlock={columnGrouping?.moveGroupBlock}
           />
         )}
       </Stack>

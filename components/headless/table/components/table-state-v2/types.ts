@@ -2,6 +2,62 @@ import type { SxProps } from "@mui/material/styles";
 import { ColumnDef } from "../table-component/types";
 import { TableParams } from "../table-params/types";
 import { ColumnVisibilityState } from "../column-visibility";
+import { ColumnPinningState } from "../column-pinning";
+import { ColumnOrderState } from "../column-order";
+import { ColumnGroupDef, ColumnGroupingState } from "../column-grouping";
+
+export type ColumnOrderBag<TRow> = {
+  columnOrder: ColumnOrderState;
+  orderedColumns: ColumnDef<TRow>[];
+  moveColumn: (activeKey: string, overKey: string) => void;
+  setColumnOrder: (order: ColumnOrderState) => void;
+  resetColumnOrder: () => void;
+};
+
+export type ColumnVisibilityBag<TRow> = {
+  columnVisibility: ColumnVisibilityState;
+  toggleColumn: (columnKey: string) => void;
+  showAllColumns: () => void;
+  hideAllColumns: () => void;
+  resetColumnVisibility: () => void;
+  visibleColumns: ColumnDef<TRow>[];
+  allColumns: ColumnDef<TRow>[];
+  visibleCount: number;
+  totalCount: number;
+  hasHiddenColumns: boolean;
+};
+
+export type ColumnPinningBag<TRow> = {
+  pinnedKeys: ColumnPinningState;
+  isPinned: (columnKey: string) => boolean;
+  togglePin: (columnKey: string) => void;
+  clearPinnedColumns: () => void;
+  pinnedColumns: ColumnDef<TRow>[];
+  canPinMore: boolean;
+  maxPinned: number;
+};
+
+// Not parameterized by TRow: grouping is keyed purely by column key/id, not
+// by row shape, unlike the other (per-column-def) bags above.
+export type ColumnGroupingBag = {
+  groups: ColumnGroupDef[];
+  columnGroupMap: ColumnGroupingState["columnGroupMap"];
+  groupIdForColumn: (columnKey: string) => string | undefined;
+  createGroup: (
+    name: string,
+    backgroundColor?: string,
+    textColor?: string,
+  ) => string;
+  renameGroup: (id: string, name: string) => void;
+  setGroupColors: (id: string, backgroundColor: string, textColor: string) => void;
+  deleteGroup: (id: string) => void;
+  moveColumnToGroup: (
+    columnKey: string,
+    targetGroupId: string | null,
+    beforeKey?: string,
+  ) => void;
+  moveGroupBlock: (groupId: string, beforeKey: string | null) => void;
+};
 
 // ============================================================================
 // Table State Types (After Query)
@@ -30,18 +86,16 @@ export type TableStateV2Options<TRow> = {
   searchable?: boolean;
 
   // Column Visibility
-  columnVisibility?: {
-    columnVisibility: ColumnVisibilityState;
-    toggleColumn: (columnKey: string) => void;
-    showAllColumns: () => void;
-    hideAllColumns: () => void;
-    resetColumnVisibility: () => void;
-    visibleColumns: ColumnDef<TRow>[];
-    allColumns: ColumnDef<TRow>[];
-    visibleCount: number;
-    totalCount: number;
-    hasHiddenColumns: boolean;
-  };
+  columnVisibility?: ColumnVisibilityBag<TRow>;
+
+  // Column Pinning
+  columnPinning?: ColumnPinningBag<TRow>;
+
+  // Column Order
+  columnOrder?: ColumnOrderBag<TRow>;
+
+  // Column Grouping
+  columnGrouping?: ColumnGroupingBag;
 
   // Loading & Filtering
   loading?: boolean;
@@ -65,21 +119,21 @@ export type TableStateV2<TRow> = {
     selectable: boolean;
     searchable: boolean;
     getRowSx?: (row: TRow, index: number) => SxProps | undefined;
+    // Number of leading columns (in `columns`) that are pinned/fixed
+    pinnedColumnCount: number;
   };
 
   // Column Visibility state (optional, only if prefix provided)
-  columnVisibility?: {
-    columnVisibility: ColumnVisibilityState;
-    toggleColumn: (columnKey: string) => void;
-    showAllColumns: () => void;
-    hideAllColumns: () => void;
-    resetColumnVisibility: () => void;
-    visibleColumns: ColumnDef<TRow>[];
-    allColumns: ColumnDef<TRow>[];
-    visibleCount: number;
-    totalCount: number;
-    hasHiddenColumns: boolean;
-  };
+  columnVisibility?: ColumnVisibilityBag<TRow>;
+
+  // Column Pinning state (optional, only if prefix provided)
+  columnPinning?: ColumnPinningBag<TRow>;
+
+  // Column Order state (optional, only if prefix provided)
+  columnOrder?: ColumnOrderBag<TRow>;
+
+  // Column Grouping state (optional, only if prefix provided)
+  columnGrouping?: ColumnGroupingBag;
 
   // Pagination state
   pagination: {
