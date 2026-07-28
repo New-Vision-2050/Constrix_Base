@@ -30,12 +30,23 @@ export interface CreateInternalProcedureArgs {
   name: string;
   type: string;
   form: string;
-  parent_id: string | null;
+  /** Omit when creating a root procedure — null/empty fails UUID validation. */
+  parent_id?: string | null;
+  /** Required for project-scoped procedure types (e.g. document sequence). */
+  project_id?: string;
   conditions: RichInternalProcedureCondition[];
   appears_before_ids: string[];
   appears_after_ids: string[];
   sort_order: number;
   is_active: boolean;
+  attachment_type_id?: string | null;
+  attachment_sub_type_id?: string | null;
+  attachment_sub_sub_type_id?: string | null;
+  job_attribute_id?: string | null;
+  used_in_document_cycle?: boolean;
+  appears_in_attachments_library?: boolean;
+  appears_in_archive_after_approval?: boolean;
+  requires_asset_id?: boolean;
 }
 
 export type UpdateInternalProcedureArgs = CreateInternalProcedureArgs;

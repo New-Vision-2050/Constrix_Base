@@ -27,7 +27,7 @@ import {
   FileEdit,
   Layers,
 } from "lucide-react";
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CustomMenu from "@/components/headless/custom-menu";
@@ -59,6 +59,9 @@ import AddTaskActionDialog from "./dialogs/AddTaskActionDialog";
 import EditTaskActionDialog from "./dialogs/EditTaskActionDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
 
+/** Keep in sync with useDocumentSequenceOuterTabs query key. */
+const DOCUMENT_SEQUENCE_TABS_QUERY_KEY =
+  "document-sequence-internal-procedures" as const;
 const WORK_PLAN_TAB = "work_plan";
 
 const OUTER_TAB_ICONS: Record<string, typeof Mail> = {
@@ -73,9 +76,21 @@ function getOuterTabIcon(type: string) {
   return <Icon size={16} strokeWidth={2} />;
 }
 
+function resolveOuterTabLabel(
+  tab: { name: string; type: string; label?: string },
+  ts: (key: string) => string,
+): string {
+  if (tab.label) return tab.label;
+  try {
+    return ts(tab.name);
+  } catch {
+    return tab.name || tab.type;
+  }
+}
+
 export default function SubTypeTabs() {
   const { t, ts } = useProceduresSettingsTranslations();
-  const { outerTabs, hideWorkPlanTabs, addProcedureVariant } =
+  const { outerTabs, hideWorkPlanTabs, addProcedureVariant, projectId } =
     useProceduresSettings();
   const useDocumentSequenceLayout =
     hideWorkPlanTabs && addProcedureVariant === "document-classification";
@@ -104,17 +119,57 @@ export default function SubTypeTabs() {
   const activeOuterTab =
     outerTabs.find((tab) => tab.id === selectedOuter) ?? outerTabs[0];
 
-  const currentTabType = activeOuterTab?.type ?? outerTabs[0]?.type ?? "";
+  const currentTabType =
+    activeOuterTab?.type ??
+    outerTabs[0]?.type ??
+    (useDocumentSequenceLayout ? "project_procedure" : "");
+
+  useEffect(() => {
+    if (useDocumentSequenceLayout && selectedProcedureId) {
+      const match = outerTabs.find(
+        (tab) => tab.procedureId === selectedProcedureId,
+      );
+      if (match && match.id !== selectedOuter) {
+        setSelectedOuter(match.id);
+        return;
+      }
+    }
+
+    if (outerTabs.length === 0) {
+      if (selectedOuter !== 0) setSelectedOuter(0);
+      return;
+    }
+
+    if (!outerTabs.some((tab) => tab.id === selectedOuter)) {
+      setSelectedOuter(outerTabs[0]?.id ?? 0);
+    }
+  }, [
+    useDocumentSequenceLayout,
+    outerTabs,
+    selectedOuter,
+    selectedProcedureId,
+  ]);
 
   const {
     data: internalProcedures = [],
     isLoading: isLoadingInternalProcedures,
     refetch: refetchInternalProcedures,
   } = useQuery({
-    queryKey: ["internal-procedures", currentTabType],
-    queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedures(currentTabType),
+    queryKey: ["internal-procedures", currentTabType, projectId],
+    queryFn: async () => {
+      try {
+        return await InternalProcedureSettingsApi.getInternalProcedures(
+          currentTabType,
+          projectId ? { projectId } : undefined,
+        );
+      } catch {
+        // Backend may not have registered document types yet (422).
+        // Keep CRM flow; allow empty list so user can create the first procedure.
+        return [];
+      }
+    },
     enabled: !!currentTabType,
+    retry: false,
   });
 
   const rootProcedure = useMemo(
@@ -128,7 +183,10 @@ export default function SubTypeTabs() {
   );
 
   const defaultProcedureId = childProcedures[0]?.id ?? null;
-  const activeProcedureId = selectedProcedureId ?? defaultProcedureId;
+  const activeProcedureId =
+    (useDocumentSequenceLayout ? activeOuterTab?.procedureId : null) ??
+    selectedProcedureId ??
+    defaultProcedureId;
   const stagesParentId = activeProcedureId ?? rootProcedure?.id ?? undefined;
 
   const existingActions = useMemo(
@@ -241,6 +299,119 @@ export default function SubTypeTabs() {
     [],
   );
 
+  const findProcedureForOuterTab = useCallback(
+    (procedureId?: string) => {
+      if (!procedureId) return null;
+      return (
+        internalProcedures.find((procedure) => procedure.id === procedureId) ??
+        null
+      );
+    },
+    [internalProcedures],
+  );
+
+  const renderOuterTabLabel = useCallback(
+    (tab: {
+      id: number;
+      name: string;
+      type: string;
+      label?: string;
+      procedureId?: string;
+    }) => {
+      const loadedProcedure = findProcedureForOuterTab(tab.procedureId);
+      // Tabs render before internal-procedures finish loading; fall back to the
+      // tab data so the gear doesn't swap in after another icon.
+      const procedure: InternalProcedure | null =
+        loadedProcedure ??
+        (tab.procedureId
+          ? {
+              id: tab.procedureId,
+              name: tab.label ?? tab.name,
+              type: tab.type,
+              form: "",
+            }
+          : null);
+      const canManage = !!procedure;
+      const canDelete =
+        !!loadedProcedure &&
+        !isPrimaryInternalProcedure(loadedProcedure, internalProcedures) &&
+        !isLastInternalProcedure(loadedProcedure, internalProcedures);
+
+      return (
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.75,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <span>{resolveOuterTabLabel(tab, ts)}</span>
+          {canManage ? (
+            <CustomMenu
+              renderAnchor={({ onClick }) => (
+                <IconButton
+                  component="span"
+                  role="button"
+                  tabIndex={0}
+                  size="small"
+                  aria-label={t("stages.editStage")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick(e);
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  sx={{
+                    p: 0.25,
+                    color: "inherit",
+                    "&:hover": {
+                      bgcolor: "rgba(255, 255, 255, 0.08)",
+                    },
+                  }}
+                >
+                  <Settings sx={{ fontSize: 18 }} />
+                </IconButton>
+              )}
+            >
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditProcedureDialog(procedure);
+                }}
+              >
+                <Edit fontSize="small" sx={{ mr: 1 }} />
+                {t("actions.edit")}
+              </MenuItem>
+              {canDelete ? (
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setProcedureToDelete(procedure);
+                    setDeleteConfirmOpen(true);
+                  }}
+                  sx={{ color: "error.main" }}
+                >
+                  <Delete fontSize="small" sx={{ mr: 1 }} />
+                  {t("actions.delete")}
+                </MenuItem>
+              ) : null}
+            </CustomMenu>
+          ) : (
+            getOuterTabIcon(tab.type)
+          )}
+        </Box>
+      );
+    },
+    [
+      findProcedureForOuterTab,
+      internalProcedures,
+      openEditProcedureDialog,
+      t,
+      ts,
+    ],
+  );
+
   const closeDeleteConfirm = useCallback(() => {
     setDeleteConfirmOpen(false);
     setProcedureToDelete(null);
@@ -264,6 +435,11 @@ export default function SubTypeTabs() {
         await queryClient.invalidateQueries({
           queryKey: ["procedure-settings", "stages", procedure.id],
         });
+        if (useDocumentSequenceLayout) {
+          await queryClient.invalidateQueries({
+            queryKey: [DOCUMENT_SEQUENCE_TABS_QUERY_KEY],
+          });
+        }
 
         if (selectedProcedureId === procedure.id) {
           setSelectedProcedureId(null);
@@ -292,6 +468,7 @@ export default function SubTypeTabs() {
       queryClient,
       selectedProcedureId,
       internalProcedures,
+      useDocumentSequenceLayout,
       closeDeleteConfirm,
       t,
       toast,
@@ -317,6 +494,7 @@ export default function SubTypeTabs() {
             procedureType: currentTabType,
             sortOrder: editingProcedure.sort_order ?? 1,
             parentId: editingProcedure.parent_id ?? null,
+            projectId,
           }),
         );
 
@@ -324,6 +502,11 @@ export default function SubTypeTabs() {
         await queryClient.invalidateQueries({
           queryKey: ["procedure-settings", "stages", editingProcedure.id],
         });
+        if (useDocumentSequenceLayout) {
+          await queryClient.invalidateQueries({
+            queryKey: [DOCUMENT_SEQUENCE_TABS_QUERY_KEY],
+          });
+        }
 
         toast({
           title: t("actions.edit"),
@@ -343,8 +526,10 @@ export default function SubTypeTabs() {
     [
       editingProcedure,
       currentTabType,
+      projectId,
       refetchInternalProcedures,
       queryClient,
+      useDocumentSequenceLayout,
       t,
       toast,
     ],
@@ -360,6 +545,7 @@ export default function SubTypeTabs() {
               procedureType: currentTabType,
               sortOrder,
               parentId: rootProcedure?.id ?? null,
+              projectId,
             }),
           );
 
@@ -370,6 +556,11 @@ export default function SubTypeTabs() {
         await queryClient.invalidateQueries({
           queryKey: ["procedure-settings", "stages", created.id],
         });
+        if (useDocumentSequenceLayout) {
+          await queryClient.invalidateQueries({
+            queryKey: [DOCUMENT_SEQUENCE_TABS_QUERY_KEY],
+          });
+        }
 
         toast({
           title: t("actions.add"),
@@ -378,9 +569,15 @@ export default function SubTypeTabs() {
         });
       } catch (error) {
         console.error("Error creating internal procedure:", error);
+        const apiMessage = (
+          error as { response?: { data?: { message?: string } } }
+        )?.response?.data?.message;
         toast({
           title: t("actions.add"),
-          description: t("messages.error"),
+          description:
+            typeof apiMessage === "string" && apiMessage.trim()
+              ? apiMessage
+              : t("messages.error"),
           variant: "destructive",
         });
         throw error;
@@ -390,8 +587,10 @@ export default function SubTypeTabs() {
       childProcedures.length,
       currentTabType,
       rootProcedure?.id,
+      projectId,
       refetchInternalProcedures,
       queryClient,
+      useDocumentSequenceLayout,
       t,
       toast,
     ],
@@ -503,7 +702,7 @@ export default function SubTypeTabs() {
           }}
         >
           <Tabs
-            value={selectedOuter}
+            value={outerTabs.length > 0 ? selectedOuter : false}
             onChange={(_, val: number) => {
               setSelectedOuter(val);
               setSelectedProcedureId(null);
@@ -557,24 +756,7 @@ export default function SubTypeTabs() {
               <Tab
                 key={tab.id}
                 value={tab.id}
-                label={
-                  <Box
-                    sx={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 0.75,
-                      position: "relative",
-                      zIndex: 1,
-                      "& svg": {
-                        width: 16,
-                        height: 16,
-                      },
-                    }}
-                  >
-                    {getOuterTabIcon(tab.type)}
-                    <span>{ts(tab.name)}</span>
-                  </Box>
-                }
+                label={renderOuterTabLabel(tab)}
               />
             ))}
           </Tabs>
@@ -583,7 +765,7 @@ export default function SubTypeTabs() {
             variant="contained"
             size="small"
             startIcon={<PlusIcon className="h-4 w-4" />}
-            onClick={() => stagesViewRef.current?.openAddProcedureDialog()}
+            onClick={openAddTaskDialog}
             aria-label={t("procedures.addProcedure")}
             sx={{
               borderRadius: "12px",
@@ -612,14 +794,18 @@ export default function SubTypeTabs() {
               scrollButtons="auto"
             >
               {outerTabs.map((tab) => (
-                <Tab key={tab.id} value={tab.id} label={ts(tab.name)} />
+                <Tab
+                  key={tab.id}
+                  value={tab.id}
+                  label={resolveOuterTabLabel(tab, ts)}
+                />
               ))}
             </Tabs>
           </Paper>
         )
       )}
 
-      {activeOuterTab && (
+      {(useDocumentSequenceLayout || activeOuterTab) && (
         <>
           {!useDocumentSequenceLayout && (
             <Paper
@@ -715,11 +901,7 @@ export default function SubTypeTabs() {
           {showStagesView ? (
             <StagesView
               ref={stagesViewRef}
-              parentId={
-                useDocumentSequenceLayout
-                  ? (rootProcedure?.id ?? stagesParentId)
-                  : stagesParentId
-              }
+              parentId={stagesParentId}
               workFlowId={
                 hideWorkPlanTabs || selectedInner === WORK_PLAN_TAB
                   ? workFlowId
@@ -791,72 +973,89 @@ export default function SubTypeTabs() {
 
       {addProcedureVariant === "document-classification" ? (
         <DocumentClassificationAddProcedureDialog
-          open={taskActionDialogOpen}
-          onClose={() => setTaskActionDialogOpen(false)}
-          procedureType={currentTabType}
-          onSave={handleAddTaskAction}
+          open={taskActionDialogOpen || editTaskActionDialogOpen}
+          onClose={() => {
+            setTaskActionDialogOpen(false);
+            setEditTaskActionDialogOpen(false);
+            setEditingProcedure(null);
+          }}
+          procedureType={currentTabType || "project_procedure"}
+          procedure={editTaskActionDialogOpen ? editingProcedure : null}
+          onSave={async (values) => {
+            if (editTaskActionDialogOpen && editingProcedure) {
+              await handleEditTaskAction(values);
+              return;
+            }
+            await handleAddTaskAction(values);
+          }}
         />
       ) : (
-        <AddTaskActionDialog
-          open={taskActionDialogOpen}
-          onClose={() => setTaskActionDialogOpen(false)}
-          procedureType={currentTabType}
-          existingActions={existingActions}
-          excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
-          excludeFromAppearBefore={
-            primaryProcedureId ? [primaryProcedureId] : []
-          }
-          onSave={handleAddTaskAction}
-        />
+        <>
+          <AddTaskActionDialog
+            open={taskActionDialogOpen}
+            onClose={() => setTaskActionDialogOpen(false)}
+            procedureType={currentTabType}
+            existingActions={existingActions}
+            excludeFromAppearAfter={lastProcedureId ? [lastProcedureId] : []}
+            excludeFromAppearBefore={
+              primaryProcedureId ? [primaryProcedureId] : []
+            }
+            onSave={handleAddTaskAction}
+          />
+          <EditTaskActionDialog
+            open={editTaskActionDialogOpen}
+            onClose={() => {
+              setEditTaskActionDialogOpen(false);
+              setEditingProcedure(null);
+            }}
+            procedureType={currentTabType}
+            procedure={editingProcedure}
+            lockFormModel={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  ) ||
+                  isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            hideAppearAfter={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  )
+                : false
+            }
+            hideAppearBefore={
+              editingProcedure
+                ? isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            existingActions={existingActions}
+            excludeFromAppearAfter={
+              lastProcedureId && editingProcedure?.id !== lastProcedureId
+                ? [lastProcedureId]
+                : []
+            }
+            excludeFromAppearBefore={
+              primaryProcedureId && editingProcedure?.id !== primaryProcedureId
+                ? [primaryProcedureId]
+                : []
+            }
+            disableIsActiveSwitch={
+              editingProcedure
+                ? isPrimaryInternalProcedure(
+                    editingProcedure,
+                    internalProcedures,
+                  ) ||
+                  isLastInternalProcedure(editingProcedure, internalProcedures)
+                : false
+            }
+            onSave={handleEditTaskAction}
+          />
+        </>
       )}
-
-      <EditTaskActionDialog
-        open={editTaskActionDialogOpen}
-        onClose={() => {
-          setEditTaskActionDialogOpen(false);
-          setEditingProcedure(null);
-        }}
-        procedureType={currentTabType}
-        procedure={editingProcedure}
-        lockFormModel={
-          editingProcedure
-            ? isPrimaryInternalProcedure(
-                editingProcedure,
-                internalProcedures,
-              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        hideAppearAfter={
-          editingProcedure
-            ? isPrimaryInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        hideAppearBefore={
-          editingProcedure
-            ? isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        existingActions={existingActions}
-        excludeFromAppearAfter={
-          lastProcedureId && editingProcedure?.id !== lastProcedureId
-            ? [lastProcedureId]
-            : []
-        }
-        excludeFromAppearBefore={
-          primaryProcedureId && editingProcedure?.id !== primaryProcedureId
-            ? [primaryProcedureId]
-            : []
-        }
-        disableIsActiveSwitch={
-          editingProcedure
-            ? isPrimaryInternalProcedure(
-                editingProcedure,
-                internalProcedures,
-              ) || isLastInternalProcedure(editingProcedure, internalProcedures)
-            : false
-        }
-        onSave={handleEditTaskAction}
-      />
     </div>
   );
 }

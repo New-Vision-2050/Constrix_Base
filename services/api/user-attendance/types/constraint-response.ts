@@ -6,12 +6,12 @@ export interface AttendanceRecord {
   clock_in_time: string | null;
   clock_out_time: string | null;
   total_hours_present: number;
-}
-
-export interface EarlyClockInRules {
-  prevent_early_clock_in: boolean;
-  early_period: number;
-  early_unit: "minute" | "hour" | string;
+  total_work_hours?: string;
+  overtime_hours?: string;
+  pre_shift_hours?: string;
+  in_shift_hours?: string;
+  post_shift_hours?: string;
+  outside_window_hours?: string;
 }
 
 export interface WorkPeriodConstraint {
@@ -26,7 +26,13 @@ export interface WorkPeriodConstraint {
   total_hours_present: number;
   can_clock_in: boolean;
   can_clock_out: boolean;
-  early_clock_in_rules?: EarlyClockInRules;
+  can_clock_in_from?: string | null;
+  can_clock_in_until?: string | null;
+  can_clock_out_until?: string | null;
+  expected_clock_out_time?: string | null;
+  absent_at?: string | null;
+  required_work_minutes?: number;
+  is_absent?: boolean;
   attendance: AttendanceRecord[];
 }
 
@@ -35,6 +41,9 @@ export interface LocationWork {
   latitude: number;
   longitude: number;
   radius: number;
+  source?: string;
+  expires_at?: string | null;
+  reference_id?: string | null;
 }
 
 export interface UserConstraintWorkRules {

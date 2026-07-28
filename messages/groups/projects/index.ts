@@ -3,6 +3,7 @@ import { projectInboxMessages } from "./inbox";
 import { projectShareTabMessages } from "./share-tab";
 import { projectContractorsTabMessages } from "./contractors-tab";
 import { projectWorkOrdersTabMessages } from "./work-orders-tab";
+import { projectSafetyTabMessages } from "./safety-tab";
 import { projectManagementsTabMessages } from "./managements-tab";
 import { projectDistrictsTabMessages } from "./districts-tab";
 import { projectSettingsMessages } from "./settings";
@@ -13,6 +14,7 @@ export const projectMessages = new MessagesGroup({
   shareTab: projectShareTabMessages,
   contractorsTab: projectContractorsTabMessages,
   workOrdersTab: projectWorkOrdersTabMessages,
+  safetyTab: projectSafetyTabMessages,
   managementsTab: projectManagementsTabMessages,
   districtsTab: projectDistrictsTabMessages,
   tabs: new MessagesGroup({
@@ -40,6 +42,7 @@ export const projectMessages = new MessagesGroup({
     ordersOfWork: _m("Work Orders", "أوامر العمل"),
     managements: _m("Managements", "الإدارات"),
     districts: _m("Districts", "المناطق"),
+    safety: _m("Safety", "السلامة"),
   }),
   addProject: _m("Add Project", "إضافة مشروع"),
   editProject: _m("Edit Project", "تعديل مشروع"),
@@ -114,7 +117,11 @@ export const projectMessages = new MessagesGroup({
     requestDirectionFilter: _m("Direction", "الاتجاه"),
     addFile: _m("Add File", "اضافة ملف"),
     documentName: _m("Document Name", "اسم المستند"),
-    documentType: _m("Document Type", "نوع المستند"),
+    documentType: _m("Document Type", "نوع الوثيقة"),
+    documentTypeRequired: _m(
+      "Please select a document type",
+      "يرجى اختيار نوع الوثيقة",
+    ),
     type: _m("Type", "النوع"),
     endDate: _m("End Date", "تاريخ النهاية"),
     fileSize: _m("File Size", "حجم الملف"),
@@ -221,6 +228,84 @@ export const projectMessages = new MessagesGroup({
       "حول WebViewer Server",
     ),
     openInNewTab: _m("Open in new tab", "فتح في تبويب جديد"),
+
+    tabs: new MessagesGroup({
+      requests: _m("Requests", "الطلبات"),
+      indicators: _m("Indicators", "المؤشرات"),
+    }),
+    charts: new MessagesGroup({
+      title: _m("Indicators", "المؤشرات"),
+      attachmentRequestsSection: _m("Attachment Requests", "طلبات المرفقات"),
+      requirementSubmissionsSection: _m(
+        "Requirement Submissions",
+        "تسليمات المتطلبات",
+      ),
+      statusDistribution: _m("Status Distribution", "توزيع الحالات"),
+      directionDistribution: _m("Direction", "الاتجاه"),
+      procedureDistribution: _m("Procedure", "الإجراء"),
+      attachmentTypeDistribution: _m("Attachment Type", "نوع المرفق"),
+      itemStatusDistribution: _m("Item Status", "حالة العناصر"),
+      fileTypeDistribution: _m("File Type", "نوع الملف"),
+      projectDistribution: _m("Project Distribution", "توزيع المشاريع"),
+      requirementDistribution: _m("Requirement", "المتطلب"),
+      trendDistribution: _m("Monthly Trend", "الاتجاه الشهري"),
+      totalRequests: _m("Total Requests", "إجمالي الطلبات"),
+      totalItems: _m("Total Items", "إجمالي العناصر"),
+      pendingRequests: _m("Pending", "قيد الانتظار"),
+      semiApprovedRequests: _m("Semi Approved", "معتمد جزئي"),
+      approvedRequests: _m("Approved", "معتمد"),
+      declinedRequests: _m("Declined", "مرفوض"),
+      outgoingRequests: _m("Outgoing", "صادر"),
+      incomingRequests: _m("Incoming", "وارد"),
+      totalSubmissions: _m("Total Submissions", "إجمالي التسليمات"),
+      pendingSubmissions: _m("Pending", "قيد الانتظار"),
+      approvedSubmissions: _m("Approved", "معتمد"),
+      declinedSubmissions: _m("Declined", "مرفوض"),
+      filter: _m("Filter", "تصفية"),
+      clearFilters: _m("Clear filters", "مسح التصفية"),
+      search: _m("Search", "بحث"),
+      searchPlaceholder: _m("Search by serial number", "بحث برقم التسلسل"),
+      fromDate: _m("From date", "من تاريخ"),
+      toDate: _m("To date", "إلى تاريخ"),
+      filterStatus: _m("Status", "الحالة"),
+      filterDirection: _m("Direction", "الاتجاه"),
+      filterProcedure: _m("Procedure", "الإجراء"),
+      filterAttachmentType: _m("Attachment Type", "نوع المرفق"),
+      filterItemStatus: _m("Item Status", "حالة العنصر"),
+      filterFileType: _m("File Type", "نوع الملف"),
+      filterRequirement: _m("Requirement", "المتطلب"),
+      noData: _m(
+        "No data available for the selected filters.",
+        "لا توجد بيانات للفلاتر المحددة.",
+      ),
+      noSections: _m("No chart data available.", "لا توجد بيانات للمخططات."),
+      fullscreen: _m("Fullscreen", "ملء الشاشة"),
+      exitFullscreen: _m("Exit Fullscreen", "إنهاء ملء الشاشة"),
+      errorBadRequest: _m(
+        "The chart request could not be processed. Please check your filters and try again.",
+        "تعذر معالجة طلب المخططات. يرجى مراجعة الفلاتر والمحاولة مرة أخرى.",
+      ),
+      errorUnauthorized: _m(
+        "Your session has expired. Please sign in again.",
+        "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
+      ),
+      errorForbidden: _m(
+        "You do not have permission to view these charts.",
+        "ليس لديك صلاحية لعرض هذه المخططات.",
+      ),
+      errorNotFound: _m(
+        "The requested project or chart data was not found.",
+        "لم يتم العثور على المشروع أو بيانات المخططات المطلوبة.",
+      ),
+      errorValidation: _m(
+        "Some filters are invalid. Please review the highlighted fields.",
+        "بعض الفلاتر غير صالحة. يرجى مراجعة الحقول المحددة.",
+      ),
+      errorGeneric: _m(
+        "Something went wrong while loading the dashboard. Please try again later.",
+        "حدث خطأ أثناء تحميل لوحة المؤشرات. يرجى المحاولة لاحقاً.",
+      ),
+    }),
   }),
   staff: new MessagesGroup({
     title: _m("Staff", "الكادر"),
@@ -947,7 +1032,15 @@ export const projectMessages = new MessagesGroup({
     requiredDocumentName: _m("Required document name", "اسم المستند المطلوب"),
     document: _m("Document", "الوثيقة"),
     documentType: _m("Document type", "نوع الوثيقة"),
+    selectDocumentType: _m("Select document type", "اختر نوع الوثيقة"),
     specialization: _m("Specialization", "التخصص"),
+    receiverCompanies: _m("Receiver companies", "الشركات المستلمة"),
+    selectReceiverCompanies: _m(
+      "Select receiver companies",
+      "اختر الشركات المستلمة",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+    noResults: _m("No results", "لا توجد نتائج"),
     phase: _m("Phase", "المرحلة"),
     sendingEntity: _m("Sending entity", "جهة الارسال"),
     reviewingEntity: _m("Reviewing entity", "جهة المراجعة"),
@@ -958,6 +1051,53 @@ export const projectMessages = new MessagesGroup({
     actions: _m("Actions", "الاجراءات"),
     action: _m("Action", "إجراء"),
     view: _m("View", "عرض"),
+    upload: new MessagesGroup({
+      title: _m("Upload requirement files", "رفع ملفات المتطلب"),
+      pickFiles: _m("Choose files", "اختر الملفات"),
+      pickFilesHint: _m(
+        "You can select one or more files",
+        "يمكنك اختيار ملف أو أكثر",
+      ),
+      filesRequired: _m("Please select at least one file", "يرجى اختيار ملف واحد على الأقل"),
+      submit: _m("Upload", "رفع"),
+      success: _m("Files uploaded successfully", "تم رفع الملفات بنجاح"),
+      error: _m("Failed to upload files", "فشل رفع الملفات"),
+      action: _m("Upload files", "رفع ملفات"),
+      availableAgainAt: _m(
+        "Available again at {date}",
+        "متاح مرة أخرى في {date}",
+      ),
+      latestFiles: _m("Latest files", "أحدث الملفات"),
+      disabledReasons: new MessagesGroup({
+        already_submitted: _m(
+          "Already uploaded for this period",
+          "تم الرفع بالفعل لهذه الفترة",
+        ),
+        outside_repeat_days: _m(
+          "Upload is not available today",
+          "الرفع غير متاح اليوم",
+        ),
+        missing_permission: _m(
+          "You do not have permission to upload",
+          "ليس لديك صلاحية للرفع",
+        ),
+        not_assigned: _m(
+          "This requirement is not assigned to your company",
+          "هذا المتطلب غير مسند لشركتك",
+        ),
+        invalid_repetition: _m(
+          "Invalid repetition configuration",
+          "إعداد التكرار غير صالح",
+        ),
+        unknown: _m("Upload is currently unavailable", "الرفع غير متاح حالياً"),
+      }),
+    }),
+    history: new MessagesGroup({
+      title: _m("Submission history", "سجل التقديمات"),
+      action: _m("Submission history", "سجل التقديمات"),
+      empty: _m("No submissions yet", "لا توجد تقديمات بعد"),
+      noFiles: _m("No files in this submission", "لا توجد ملفات في هذا التقديم"),
+    }),
     once: _m("Once", "مرة واحدة"),
     addRequirement: _m("Add requirement", "إضافة متطلب"),
     add: _m("Add", "إضافة"),
@@ -972,6 +1112,18 @@ export const projectMessages = new MessagesGroup({
     monthInterval: _m("Repeat every (months)", "التكرار كل (عدد الشهور)"),
     everyWeeks: _m("Every {count} week(s)", "كل {count} أسبوع"),
     everyMonths: _m("Every {count} month(s)", "كل {count} شهر"),
+    submitSuccess: _m(
+      "Requirements created successfully",
+      "تم إنشاء المتطلبات بنجاح",
+    ),
+    submitError: _m(
+      "Failed to create requirements",
+      "فشل إنشاء المتطلبات",
+    ),
+    loadError: _m(
+      "Failed to load document requirements",
+      "فشل تحميل متطلبات الوثائق",
+    ),
     validation: new MessagesGroup({
       rowsRequired: _m("Add at least one requirement", "أضف متطلباً واحداً على الأقل"),
       requirementCodeRequired: _m("Requirement code is required", "كود المتطلب مطلوب"),
@@ -981,6 +1133,7 @@ export const projectMessages = new MessagesGroup({
       frequencyRequired: _m("Frequency is required", "التكرار مطلوب"),
       intervalRequired: _m("Interval is required", "الفاصل الزمني مطلوب"),
       daysRequired: _m("Select at least one day", "اختر يوماً واحداً على الأقل"),
+      projectRequired: _m("Project is required", "المشروع مطلوب"),
     }),
     weekDays: new MessagesGroup({
       saturday: _m("Saturday", "السبت"),

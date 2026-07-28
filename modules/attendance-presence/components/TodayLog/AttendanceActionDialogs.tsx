@@ -17,9 +17,7 @@ import {
 } from "../../hooks/useAttendanceActions";
 import { useCurrentDateTime } from "../../hooks/useCurrentDateTime";
 import {
-  getEarlyClockInMinutes,
   getLateMinutes,
-  isBeforeEarlyClockInWindow,
   useFormattedNow,
 } from "../../utils/attendance";
 import {
@@ -59,19 +57,40 @@ type DialogStep =
 interface AttendanceActionDialogsProps {
   workPeriod: WorkPeriodConstraint;
   locationWork: LocationWork;
+  additionalLocations?: LocationWork[];
   disabled?: boolean;
 }
 
-function getApiErrorMessage(error: unknown) {
+const CLOCK_IN_ERROR_TYPE_KEYS: Record<string, string> = {
+  clock_in_too_early: "clockInTooEarly",
+  clock_in_deadline_passed: "clockInDeadlinePassed",
+  clock_in_window_closed: "clockInWindowClosed",
+};
+
+function getApiErrorMessage(error: unknown, t: (key: string) => string) {
   if (
     typeof error === "object" &&
     error !== null &&
-    "response" in error &&
-    typeof (error as { response?: { data?: { message?: string } } }).response
-      ?.data?.message === "string"
+    "response" in error
   ) {
-    return (error as { response: { data: { message: string } } }).response.data
-      .message;
+    const response = (error as { response?: { data?: { message?: string; errors?: { type?: string }[]; error?: { type?: string } } } }).response;
+    const data = response?.data;
+
+    if (data?.errors && Array.isArray(data.errors)) {
+      for (const err of data.errors) {
+        if (err?.type && CLOCK_IN_ERROR_TYPE_KEYS[err.type]) {
+          return t(CLOCK_IN_ERROR_TYPE_KEYS[err.type]);
+        }
+      }
+    }
+
+    if (data?.error?.type && CLOCK_IN_ERROR_TYPE_KEYS[data.error.type]) {
+      return t(CLOCK_IN_ERROR_TYPE_KEYS[data.error.type]);
+    }
+
+    if (typeof data?.message === "string") {
+      return data.message;
+    }
   }
 
   return undefined;
@@ -80,6 +99,7 @@ function getApiErrorMessage(error: unknown) {
 export default function AttendanceActionDialogs({
   workPeriod,
   locationWork,
+  additionalLocations = [],
   disabled = false,
 }: AttendanceActionDialogsProps) {
   const t = useTranslations("AttendancePresence");
@@ -114,15 +134,18 @@ export default function AttendanceActionDialogs({
     async (latitude: number, longitude: number) => {
       setUserCoords({ latitude, longitude });
 
-      const withinRadius = isWithinRadius(
-        latitude,
-        longitude,
-        locationWork.latitude,
-        locationWork.longitude,
-        locationWork.radius,
+      const allLocations = [locationWork, ...additionalLocations];
+      const withinAny = allLocations.some((loc) =>
+        isWithinRadius(
+          latitude,
+          longitude,
+          loc.latitude,
+          loc.longitude,
+          loc.radius,
+        ),
       );
 
-      if (!withinRadius) {
+      if (!withinAny) {
         setDistanceKm(
           getDistanceKilometers(
             latitude,
@@ -143,20 +166,11 @@ export default function AttendanceActionDialogs({
       setLateMinutes(getLateMinutes(now, startTime));
       setStep("clock-in-confirm");
     },
-    [isClockOut, locationWork, now, startTime],
+    [isClockOut, locationWork, additionalLocations, now, startTime],
   );
 
   const startAttendanceFlow = useCallback(async () => {
     if (disabled) return;
-
-    if (!isClockOut && isBeforeEarlyClockInWindow(now, workPeriod)) {
-      toast.error(
-        t("earlyClockInBlocked", {
-          minutes: getEarlyClockInMinutes(workPeriod.early_clock_in_rules),
-        }),
-      );
-      return;
-    }
 
     setIsFetchingLocation(true);
     try {
@@ -194,7 +208,7 @@ export default function AttendanceActionDialogs({
       });
       setStep("clock-in-success");
     } catch (error) {
-      toast.error(getApiErrorMessage(error) ?? t("attendanceActionError"));
+      toast.error(getApiErrorMessage(error, t) ?? t("attendanceActionError"));
     }
   };
 

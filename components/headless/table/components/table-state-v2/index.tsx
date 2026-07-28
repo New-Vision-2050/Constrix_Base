@@ -3,6 +3,7 @@ import { TableStateV2, TableStateV2Options } from "./types";
 import { createColumnVisibilityHook } from "../column-visibility";
 import { createColumnPinningHook } from "../column-pinning";
 import { createColumnOrderHook } from "../column-order";
+import { createColumnGroupingHook } from "../column-grouping";
 
 // ============================================================================
 // Table State Hook V2 (After Query)
@@ -22,6 +23,11 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
   // Create column pinning hook if prefix is provided, otherwise create a no-op hook
   const useColumnPinningHook = prefix
     ? createColumnPinningHook<TRow>(prefix)
+    : () => null;
+
+  // Create column grouping hook if prefix is provided, otherwise create a no-op hook
+  const useColumnGroupingHook = prefix
+    ? createColumnGroupingHook<TRow>(prefix)
     : () => null;
 
   return function useTableState(
@@ -44,6 +50,7 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
       columnVisibility: externalColumnVisibility,
       columnPinning: externalColumnPinning,
       columnOrder: externalColumnOrder,
+      columnGrouping: externalColumnGrouping,
     } = options;
 
     // Automatically create column order if prefix exists and not provided externally
@@ -54,6 +61,17 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
     // Custom order (if any) becomes the base list visibility/pinning operate on,
     // so drag order is the single source of truth for everything downstream.
     const orderedColumns = columnOrder?.orderedColumns ?? columns;
+
+    // Automatically create column grouping if prefix exists and not provided
+    // externally. Independent of visibility/pinning — grouping is purely an
+    // annotation read by the dialog and the live table's header renderer, it
+    // never filters/reorders `activeColumns` itself.
+    const internalColumnGrouping = useColumnGroupingHook(
+      orderedColumns,
+      columnOrder,
+    );
+    const columnGrouping =
+      externalColumnGrouping ?? internalColumnGrouping ?? undefined;
 
     // Automatically create column visibility if prefix exists and not provided externally
     // Hook is always called unconditionally (returns null if no prefix)
@@ -212,6 +230,7 @@ export function createTableStateV2Hook<TRow>(prefix?: string) {
       columnVisibility,
       columnPinning,
       columnOrder,
+      columnGrouping,
       pagination: {
         page: params.page,
         limit: params.limit,

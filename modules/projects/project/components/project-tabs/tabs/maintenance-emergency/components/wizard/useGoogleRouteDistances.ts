@@ -33,7 +33,7 @@ function cacheKey(
   return `${origin.lat.toFixed(6)},${origin.lng.toFixed(6)}|${dest.lat.toFixed(6)},${dest.lng.toFixed(6)}`;
 }
 
-const DEBOUNCE_MS = 600;
+const DEBOUNCE_MS = 1200;
 
 export function useGoogleRouteDistances(
   employees: ProjectNotificationEmployee[],

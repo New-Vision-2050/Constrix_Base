@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -9,7 +8,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormHelperText,
   FormLabel,
   InputAdornment,
   Switch,
@@ -17,15 +15,10 @@ import {
   Typography,
 } from "@mui/material";
 import IconPicker from "@/components/shared/icon-picker";
-import SearchableSelect from "@/components/shared/SearchableSelect";
 import { APP_ICONS } from "@/constants/icons";
-import { baseURL } from "@/config/axios-config";
-import {
-  fetchManagementHierarchyOptions,
-  type ManagementHierarchyOption,
-} from "@/utils/fetchDropdownOptions";
 import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
 import { getProcedureSettingsTabTitle } from "../../utils/getProcedureTabTitle";
+import { distributePercentages } from "../../utils/distributePercentages";
 
 const DIALOG_ICON_IDS = [
   "person-outline",
@@ -49,7 +42,6 @@ export type DocumentSequenceProcedurePayload = {
   percentage: number;
   deadline_days: number;
   deadline_hours: number;
-  escalation_management_hierarchy_id: string;
 };
 
 type Props = {
@@ -57,6 +49,7 @@ type Props = {
   onClose: () => void;
   onSuccess: (procedure: DocumentSequenceProcedurePayload) => void;
   currentTabType?: string;
+  existingProcedures: { id: string; percentage: number }[];
 };
 
 /**
@@ -68,28 +61,25 @@ export default function DocumentSequenceAddProcedureDialog({
   onClose,
   onSuccess,
   currentTabType,
+  existingProcedures,
 }: Props) {
   const { t: tRoot, tStages: t, tc } = useProceduresSettingsTranslations();
   const [name, setName] = useState("");
   const [sequentialApproval, setSequentialApproval] = useState(true);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [durationPercentage, setDurationPercentage] = useState("");
-  const [deadlineHours, setDeadlineHours] = useState("");
-  const [deadlineDays, setDeadlineDays] = useState("");
-  const [escalationUserId, setEscalationUserId] = useState("");
+  const [deadlineHours] = useState("0");
+  const [deadlineDays] = useState("0");
   const [errors, setErrors] = useState({
     name: "",
-    percentage: "",
-    timeLimit: "",
   });
 
-  const { data: managements = [] } = useQuery<ManagementHierarchyOption[]>({
-    queryKey: ["managements", "hierarchy", "management"],
-    queryFn: () =>
-      fetchManagementHierarchyOptions(
-        `${baseURL}/management_hierarchies/list?type=management`,
-      ),
-  });
+  useEffect(() => {
+    if (!open) return;
+    const total = existingProcedures.length + 1;
+    const percentages = distributePercentages(total);
+    setDurationPercentage(String(percentages[0] ?? 100));
+  }, [open, existingProcedures]);
 
   const clearError = (field: keyof typeof errors) =>
     setErrors((current) => ({ ...current, [field]: "" }));
@@ -99,10 +89,7 @@ export default function DocumentSequenceAddProcedureDialog({
     setSequentialApproval(true);
     setSelectedIcon(null);
     setDurationPercentage("");
-    setDeadlineHours("");
-    setDeadlineDays("");
-    setEscalationUserId("");
-    setErrors({ name: "", percentage: "", timeLimit: "" });
+    setErrors({ name: "" });
   };
 
   const handleClose = () => {
@@ -114,12 +101,6 @@ export default function DocumentSequenceAddProcedureDialog({
     const percentage = Number.parseInt(durationPercentage, 10) || 0;
     const nextErrors = {
       name: !name.trim() ? tc("requiredField") : "",
-      percentage:
-        durationPercentage !== "" && percentage > 100
-          ? t("percentageMax")
-          : "",
-      timeLimit:
-        !deadlineHours && !deadlineDays ? tc("enterHoursOrDays") : "",
     };
     setErrors(nextErrors);
     if (Object.values(nextErrors).some(Boolean)) return;
@@ -132,7 +113,6 @@ export default function DocumentSequenceAddProcedureDialog({
       percentage,
       deadline_days: Number.parseInt(deadlineDays, 10) || 0,
       deadline_hours: Number.parseInt(deadlineHours, 10) || 0,
-      escalation_management_hierarchy_id: escalationUserId,
     });
     handleClose();
   };
@@ -140,7 +120,7 @@ export default function DocumentSequenceAddProcedureDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ textAlign: "start", pb: 1 }}>
-        {getProcedureSettingsTabTitle(currentTabType, tRoot)}
+        {getProcedureSettingsTabTitle(currentTabType ?? "", tRoot)}
       </DialogTitle>
 
       <DialogContent>
@@ -229,35 +209,23 @@ export default function DocumentSequenceAddProcedureDialog({
             <TextField
               placeholder={t("stageDurationPercentage")}
               value={durationPercentage}
-              onChange={(event) => {
-                setDurationPercentage(event.target.value);
-                clearError("percentage");
-              }}
               fullWidth
               size="small"
               type="number"
               slotProps={{ htmlInput: { min: 0, max: 100 } }}
-              error={!!errors.percentage}
-              helperText={errors.percentage}
+              disabled
             />
 
             <Box>
-              <FormLabel
-                error={!!errors.timeLimit}
-                sx={{ display: "block", mb: 1 }}
-              >
-                {t("timeLimit")} *
+              <FormLabel sx={{ display: "block", mb: 1 }}>
+                {t("timeLimit")}
               </FormLabel>
               <Box sx={{ display: "flex", gap: 1.5 }}>
                 <TextField
                   value={deadlineHours}
-                  onChange={(event) => {
-                    setDeadlineHours(event.target.value);
-                    clearError("timeLimit");
-                  }}
                   size="small"
                   type="number"
-                  error={!!errors.timeLimit}
+                  disabled
                   slotProps={{
                     htmlInput: { min: 0 },
                     input: {
@@ -274,13 +242,9 @@ export default function DocumentSequenceAddProcedureDialog({
                 />
                 <TextField
                   value={deadlineDays}
-                  onChange={(event) => {
-                    setDeadlineDays(event.target.value);
-                    clearError("timeLimit");
-                  }}
                   size="small"
                   type="number"
-                  error={!!errors.timeLimit}
+                  disabled
                   slotProps={{
                     htmlInput: { min: 0 },
                     input: {
@@ -296,29 +260,6 @@ export default function DocumentSequenceAddProcedureDialog({
                   sx={{ flex: 1 }}
                 />
               </Box>
-              {errors.timeLimit ? (
-                <FormHelperText error sx={{ textAlign: "end", mt: 0.5 }}>
-                  {errors.timeLimit}
-                </FormHelperText>
-              ) : null}
-            </Box>
-
-            <Box>
-              <SearchableSelect
-                options={managements.map((management) => ({
-                  value: String(management.id),
-                  label: management.name,
-                }))}
-                value={escalationUserId}
-                onChange={(value) => setEscalationUserId(String(value))}
-                placeholder={t("selectEscalationEntity")}
-                searchPlaceholder={tc("searchManagement")}
-                noResultsText={tc("noResults")}
-                label={t("escalationEntity")}
-              />
-              <FormHelperText sx={{ textAlign: "end", mt: 0.5 }}>
-                {t("escalationEntityHint")}
-              </FormHelperText>
             </Box>
           </Box>
         </Box>
@@ -331,7 +272,7 @@ export default function DocumentSequenceAddProcedureDialog({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!name.trim() || (!deadlineHours && !deadlineDays)}
+          disabled={!name.trim()}
           sx={{ flex: 1 }}
         >
           {tRoot("actions.save")}

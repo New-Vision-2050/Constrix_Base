@@ -6,10 +6,12 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
+  Chip,
   Divider,
   FormControlLabel,
   Grid,
   IconButton,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -17,6 +19,7 @@ import { Add, Delete, Edit, KeyboardArrowDown } from "@mui/icons-material";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useProceduresSettingsTranslations } from "../hooks/useProceduresSettingsTranslations";
+import { useProceduresSettings } from "../context/ProceduresSettingsContext";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useAllEmployees } from "@/modules/hr-settings/tabs/procedures-settings/hooks/useAllEmployees";
@@ -33,6 +36,8 @@ import { CreateStepArgs } from "@/services/api/crm-settings/procedure-settings/t
 import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { withEmptyOption } from "@/modules/hr-settings/tabs/procedures-settings/utils/selectOptions";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
+import { AllProjectsApi } from "@/services/api/projects/all-projects";
 
 // ─── Option value constants (labels from i18n inside component) ───────────────
 const ORG_BASE_OPTION_DEFS = [
@@ -70,6 +75,10 @@ const ACTION_TAKER_TYPE_OPTION_DEFS = [
   },
   { value: "assigned_user", labelKey: "actionTakerType.assignedUser" as const },
   { value: "himself", labelKey: "actionTakerType.himself" as const },
+  {
+    value: "receiver_company",
+    labelKey: "actionTakerType.receiverCompany" as const,
+  },
 ] as const;
 
 const MANAGEMENT_HIERARCHY_TYPE_OPTION_DEFS = [
@@ -132,6 +141,8 @@ interface StepFormData {
   actionTakerType: string;
   actionTakerManagementHierarchyRows: ManagementHierarchyRow[];
   actionTakerSpecificProcedureRows: SpecificProcedureRow[];
+  receiverCompanyIds: string[];
+  projectEmployeeIds: string[];
   branchId: string;
   managementId: string;
   actionTakerId: string;
@@ -142,6 +153,13 @@ interface StepFormData {
   deadlineDays: string;
   deadlineHours: string;
   escalationUserId: string;
+}
+
+function projectEmployeeIdsFromStep(step: ProcedureStep): string[] {
+  if (step.project_employee_ids?.length) {
+    return step.project_employee_ids.map(String);
+  }
+  return [];
 }
 
 function toStringArray(val: string | string[] | null | undefined): string[] {
@@ -309,6 +327,10 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
       actionTakerManagementHierarchyRows:
         normalizeManagementHierarchyRows(serverStep),
       actionTakerSpecificProcedureRows: normalizeSpecificProcedureRows(serverStep),
+      receiverCompanyIds: serverStep.receiver_company_ids?.[0]
+        ? [String(serverStep.receiver_company_ids[0])]
+        : [],
+      projectEmployeeIds: projectEmployeeIdsFromStep(serverStep),
       branchId: serverStep.branch_id ? String(serverStep.branch_id) : "",
       managementId: serverStep.management_id
         ? String(serverStep.management_id)
@@ -329,6 +351,8 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
     actionTakerType: "specific_user",
     actionTakerManagementHierarchyRows: [{ type: "", isDeputyDirector: false }],
     actionTakerSpecificProcedureRows: [{ type: "", id: "" }],
+    receiverCompanyIds: [],
+    projectEmployeeIds: [],
     branchId: "",
     managementId: "",
     actionTakerId: "",
@@ -342,6 +366,113 @@ const getDefaultValues = (serverStep: ProcedureStep | null): StepFormData => {
   };
 };
 
+// ── layout helpers (module scope — must not be redefined per render) ─────────
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+      {children}
+    </Typography>
+  );
+}
+
+function CheckRow({
+  options,
+  selected,
+  onToggle,
+  inlineInput,
+  fieldsDisabled,
+}: {
+  options: readonly { value: string; label: string; disabled?: boolean }[];
+  selected: string[];
+  onToggle: (val: string) => void;
+  inlineInput?: {
+    optionValue: string;
+    value: string;
+    onChange: (value: string) => void;
+    unit?: {
+      value: string;
+      options: { value: string; label: string }[];
+      onChange: (value: string) => void;
+    };
+  };
+  fieldsDisabled: boolean;
+}) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 0.5,
+      }}
+    >
+      {options.map((opt) => {
+        const showInlineInput =
+          inlineInput?.optionValue === opt.value &&
+          selected.includes(opt.value);
+
+        return (
+          <Box
+            key={opt.value}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              ...(opt.disabled
+                ? { opacity: 0.6, cursor: "not-allowed" }
+                : {}),
+            }}
+          >
+            <FormControlLabel
+              labelPlacement="end"
+              label={opt.label}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={selected.includes(opt.value)}
+                  onChange={() => onToggle(opt.value)}
+                  disabled={fieldsDisabled || opt.disabled}
+                />
+              }
+            />
+            {showInlineInput && (
+              <>
+                <TextField
+                  type="number"
+                  size="small"
+                  value={inlineInput.value}
+                  onChange={(e) => inlineInput.onChange(e.target.value)}
+                  disabled={fieldsDisabled}
+                  sx={{ width: 80 }}
+                  inputProps={{ min: 1, style: { textAlign: "center" } }}
+                />
+                {inlineInput.unit && (
+                  <TextField
+                    select
+                    size="small"
+                    value={inlineInput.unit.value}
+                    onChange={(e) =>
+                      inlineInput.unit!.onChange(e.target.value)
+                    }
+                    disabled={fieldsDisabled}
+                    sx={{ width: 110 }}
+                    inputProps={{ style: { textAlign: "center" } }}
+                  >
+                    {inlineInput.unit.options.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              </>
+            )}
+          </Box>
+        );
+      })}
+    </Box>
+  );
+}
+
 export default function StepCard({
   procedureSettingId,
   serverStep,
@@ -350,15 +481,19 @@ export default function StepCard({
   onDelete,
 }: StepCardProps) {
   const { t, tStepCard: ts, tc } = useProceduresSettingsTranslations();
+  const { projectId } = useProceduresSettings();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(!serverStep);
   const [isExpanded, setIsExpanded] = useState(!serverStep);
-  const [skippingPeriod, setSkippingPeriod] = useState(
-    () => String(serverStep?.skipping_period ?? 0),
+  const [skippingDisplayValue, setSkippingDisplayValue] = useState(
+    () => String(serverStep?.skipping_period ?? "0"),
+  );
+  const [skippingUnit, setSkippingUnit] = useState<"hours" | "minutes">(
+    "hours",
   );
 
-  const { control, handleSubmit, reset, watch } =
+  const { control, handleSubmit, reset, watch, setValue } =
     useForm<StepFormData>({
       defaultValues: getDefaultValues(serverStep),
     });
@@ -371,11 +506,14 @@ export default function StepCard({
   const branchId = watch("branchId");
   const actionTakerIdW = watch("actionTakerId");
   const concernedUserIdW = watch("concernedUserId");
+  const receiverCompanyIdsW = watch("receiverCompanyIds");
+  const selectedReceiverCompanyId = receiverCompanyIdsW?.[0] ?? "";
   const fieldsDisabled = !!serverStep && !isEditing;
 
   const syncFromServer = useCallback(() => {
     reset(getDefaultValues(serverStep));
-    setSkippingPeriod(String(serverStep?.skipping_period ?? 0));
+    setSkippingDisplayValue(String(serverStep?.skipping_period ?? "0"));
+    setSkippingUnit("hours");
   }, [serverStep, reset]);
 
   useEffect(() => {
@@ -466,12 +604,86 @@ export default function StepCard({
 
   const actionTakerTypeOptions = useMemo(
     () =>
-      ACTION_TAKER_TYPE_OPTION_DEFS.map((o) => ({
+      ACTION_TAKER_TYPE_OPTION_DEFS.filter(
+        (option) => option.value !== "receiver_company" || !!projectId,
+      ).map((o) => ({
         value: o.value,
         label: ts(`options.${o.labelKey}`),
       })),
-    [ts],
+    [projectId, ts],
   );
+
+  const { data: sharedCompanies = [], isLoading: isLoadingCompanies } =
+    useQuery({
+      queryKey: ["project-shares", projectId, "step-card"],
+      queryFn: async () => {
+        const res = await ProjectSharingApi.listForProject(projectId!);
+        const shares = res.data.payload ?? [];
+        const companies = shares
+          .flatMap((share) => [
+            share.shared_with_company,
+            share.owner_company,
+          ])
+          .filter(
+            (company): company is NonNullable<typeof company> =>
+              !!company?.id && !!company.name,
+          );
+        const seen = new Set<string>();
+        return companies.filter((company) => {
+          const id = String(company.id);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
+      },
+      enabled: !!projectId,
+    });
+
+  const { data: projectEmployees = [], isLoading: isLoadingEmployees } =
+    useQuery({
+      queryKey: [
+        "project-employees",
+        projectId,
+        selectedReceiverCompanyId,
+        "step-card-concerned",
+      ],
+      queryFn: async () => {
+        const res = await AllProjectsApi.getProjectEmployees(projectId!, {
+          ...(selectedReceiverCompanyId
+            ? { company_id: selectedReceiverCompanyId }
+            : {}),
+        });
+        return res.data.payload ?? [];
+      },
+      enabled:
+        !!projectId &&
+        actionTakerType === "receiver_company" &&
+        !!selectedReceiverCompanyId,
+    });
+
+  const companyOptions = useMemo(
+    () =>
+      sharedCompanies.map((company) => ({
+        value: String(company.id),
+        label: company.name,
+      })),
+    [sharedCompanies],
+  );
+
+  const projectEmployeeOptions = useMemo(() => {
+    const byId = new Map<string, { value: string; label: string }>();
+    for (const row of projectEmployees) {
+      // Keep only employees belonging to this project assignment list
+      if (projectId && row.project_id && String(row.project_id) !== projectId) {
+        continue;
+      }
+      const id = String(row.id ?? "");
+      const name = row.user?.name?.trim();
+      if (!id || !name || byId.has(id)) continue;
+      byId.set(id, { value: id, label: name });
+    }
+    return Array.from(byId.values());
+  }, [projectEmployees, projectId]);
 
   const branchSelectOptions = useMemo(
     () =>
@@ -644,8 +856,23 @@ export default function StepCard({
       }
     }
     if (
+      data.actionTakerType === "receiver_company" &&
+      data.receiverCompanyIds.length === 0
+    ) {
+      toast({
+        title: t("actions.save"),
+        description: ts("validation.selectReceiverCompany"),
+        variant: "destructive",
+      });
+      return;
+    }
+    const skippingHours =
+      skippingUnit === "minutes"
+        ? Number(skippingDisplayValue) / 60
+        : Number(skippingDisplayValue);
+    if (
       data.orgBase.includes("approve_timed") &&
-      (!skippingPeriod.trim() || Number(skippingPeriod) <= 0)
+      (!skippingDisplayValue.trim() || skippingHours <= 0)
     ) {
       toast({
         title: t("actions.save"),
@@ -683,13 +910,23 @@ export default function StepCard({
             action_taker_specific_procedure_id: validSpecificRows.map((r) => r.id),
           }
         : {}),
+      ...(data.actionTakerType === "receiver_company"
+        ? {
+            receiver_company_ids: data.receiverCompanyIds.slice(0, 1),
+            project_employee_ids: data.projectEmployeeIds,
+            ...(projectId ? { project_id: projectId } : {}),
+          }
+        : {}),
       action_taker_user_ids:
         data.actionTakerType === "specific_user" && data.actionTakerId
           ? [data.actionTakerId]
           : [],
-      concerned_management_hierarchy_ids: data.concernedUserId
-        ? [data.concernedUserId]
-        : [],
+      concerned_management_hierarchy_ids:
+        data.actionTakerType === "receiver_company"
+          ? []
+          : data.concernedUserId
+            ? [data.concernedUserId]
+            : [],
       is_approve: data.orgBase.includes("approve"),
       is_accept: data.orgBase.includes("accept"),
       is_view_only: data.orgBase.includes("view_only"),
@@ -711,7 +948,7 @@ export default function StepCard({
       approval_within_days: Number(data.deadlineDays) || 0,
       approval_within_hours: Number(data.deadlineHours) || 0,
       ...(data.orgBase.includes("approve_timed")
-        ? { skipping_period: Number(skippingPeriod) || 0 }
+        ? { skipping_period: skippingHours }
         : {}),
     };
 
@@ -750,80 +987,6 @@ export default function StepCard({
   };
 
   // ── layout helpers ──────────────────────────────────────────────────────────
-  const SectionLabel = ({ children }: { children: string }) => (
-    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
-      {children}
-    </Typography>
-  );
-
-  const CheckRow = ({
-    options,
-    selected,
-    onToggle,
-    inlineInput,
-  }: {
-    options: readonly { value: string; label: string; disabled?: boolean }[];
-    selected: string[];
-    onToggle: (val: string) => void;
-    inlineInput?: {
-      optionValue: string;
-      value: string;
-      onChange: (value: string) => void;
-    };
-  }) => (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 0.5,
-      }}
-    >
-      {options.map((opt) => {
-        const showInlineInput =
-          inlineInput?.optionValue === opt.value &&
-          selected.includes(opt.value);
-
-        return (
-          <FormControlLabel
-            key={opt.value}
-            labelPlacement="end"
-            label={
-              showInlineInput ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <span>{opt.label}</span>
-                  <TextField
-                    type="number"
-                    size="small"
-                    value={inlineInput.value}
-                    onChange={(e) => inlineInput.onChange(e.target.value)}
-                    disabled={fieldsDisabled}
-                    sx={{ width: 80 }}
-                    inputProps={{ min: 1, style: { textAlign: "center" } }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </Box>
-              ) : (
-                opt.label
-              )
-            }
-            control={
-              <Checkbox
-                size="small"
-                checked={selected.includes(opt.value)}
-                onChange={() => onToggle(opt.value)}
-                disabled={fieldsDisabled || opt.disabled}
-              />
-            }
-            sx={
-              opt.disabled
-                ? { opacity: 0.6, cursor: "not-allowed" }
-                : undefined
-            }
-          />
-        );
-      })}
-    </Box>
-  );
 
   return (
     <Accordion
@@ -1158,6 +1321,73 @@ export default function StepCard({
             )}
           />
         </Box>
+
+        {actionTakerType === "receiver_company" && (
+          <Box sx={{ mb: 2.5, display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box>
+              <SectionLabel>{ts("receiverCompany")}</SectionLabel>
+              <Controller
+                name="receiverCompanyIds"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={{ width: "100%" }}>
+                    <SearchableSelect
+                      options={companyOptions}
+                      value={field.value?.[0] ?? ""}
+                      onChange={(v) => {
+                        const id = String(v ?? "").trim();
+                        field.onChange(id ? [id] : []);
+                        setValue("projectEmployeeIds", []);
+                      }}
+                      placeholder={
+                        isLoadingCompanies
+                          ? tc("loading")
+                          : ts("selectReceiverCompany")
+                      }
+                      searchPlaceholder={tc("search")}
+                      noResultsText={tc("noResults")}
+                      disabled={fieldsDisabled || isLoadingCompanies}
+                    />
+                  </Box>
+                )}
+              />
+            </Box>
+
+            <Box>
+              <SectionLabel>{ts("concernedUsers")}</SectionLabel>
+              <Controller
+                name="projectEmployeeIds"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={{ width: "100%" }}>
+                    <SearchableSelect
+                      multiple
+                      options={projectEmployeeOptions}
+                      value={field.value ?? []}
+                      onChange={(value) =>
+                        field.onChange(value.map(String))
+                      }
+                      placeholder={
+                        !selectedReceiverCompanyId
+                          ? ts("selectReceiverCompany")
+                          : isLoadingEmployees
+                            ? tc("loading")
+                            : ts("selectConcernedUsers")
+                      }
+                      searchPlaceholder={tc("search")}
+                      noResultsText={tc("noResults")}
+                      disabled={
+                        fieldsDisabled ||
+                        isLoadingEmployees ||
+                        !selectedReceiverCompanyId
+                      }
+                    />
+                  </Box>
+                )}
+              />
+            </Box>
+          </Box>
+        )}
 
         {/* ── نوع الهيكل التنظيمي (conditional) ── */}
         {actionTakerType === "management_hierarchy" && (
@@ -1548,13 +1778,31 @@ export default function StepCard({
               <CheckRow
                 options={orgBaseOptions}
                 selected={field.value}
+                fieldsDisabled={fieldsDisabled}
                 onToggle={(v) =>
                   field.onChange(toggleArrayValue(field.value, v))
                 }
                 inlineInput={{
                   optionValue: "approve_timed",
-                  value: skippingPeriod,
-                  onChange: setSkippingPeriod,
+                  value: skippingDisplayValue,
+                  onChange: (value) => setSkippingDisplayValue(value),
+                  unit: {
+                    value: skippingUnit,
+                    options: [
+                      { value: "hours", label: tc("hours") },
+                      { value: "minutes", label: tc("minutes") },
+                    ],
+                    onChange: (value) => {
+                      const newUnit = value as "hours" | "minutes";
+                      const num = Number(skippingDisplayValue) || 0;
+                      const converted =
+                        newUnit === "minutes"
+                          ? num * 60
+                          : Math.round((num / 60) * 100) / 100;
+                      setSkippingDisplayValue(String(converted));
+                      setSkippingUnit(newUnit);
+                    },
+                  },
                 }}
               />
             )}
@@ -1614,6 +1862,7 @@ export default function StepCard({
               <CheckRow
                 options={notificationOptions}
                 selected={field.value}
+                fieldsDisabled={fieldsDisabled}
                 onToggle={(v) =>
                   field.onChange(toggleArrayValue(field.value, v))
                 }
@@ -1699,7 +1948,7 @@ export default function StepCard({
                       placeholder={ts("selectEscalationEntity")}
                       searchPlaceholder={tc("searchManagement")}
                       noResultsText={tc("noResults")}
-                      disabled={fieldsDisabled}
+                      disabled
                     />
                   </Box>
                   {field.value && (

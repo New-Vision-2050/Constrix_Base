@@ -17,6 +17,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
     technicalSubmittal: _m("Technical Submittal", "Technical Submittal"),
     ncr: _m("NCR", "NCR"),
     vo: _m("VO", "VO"),
+    projectProcedure: _m("Project procedures", "إجراءات المشروع"),
   }),
   tabTitles: new MessagesGroup({
     contract: _m("Contract procedures settings", "اعداد إجراءات العقود"),
@@ -46,14 +47,20 @@ export const proceduresSettingsMessages = new MessagesGroup({
     search: _m("Search...", "البحث..."),
     noResults: _m("No results", "لا توجد نتائج"),
     select: _m("Select", "اختر"),
+    loading: _m("Loading...", "جاري التحميل..."),
     days: _m("Days", "أيام"),
     hours: _m("Hours", "ساعات"),
+    minutes: _m("Minutes", "دقائق"),
     requiredField: _m("This field is required", "هذا الحقل مطلوب"),
     enterHoursOrDays: _m(
       "Enter hours or days",
       "يجب إدخال ساعات أو أيام",
     ),
     searchManagement: _m("Search for department...", "البحث عن اداره..."),
+    loadError: _m(
+      "Failed to load procedure types",
+      "فشل تحميل أنواع الإجراءات",
+    ),
   }),
   stages: new MessagesGroup({
     title: _m("Stages", "المراحل"),
@@ -238,6 +245,7 @@ export const proceduresSettingsMessages = new MessagesGroup({
         specificProcedures: _m("Specific procedures", "اجراءات محددة"),
         assignedUser: _m("Assigned user", "الموظف المُسند"),
         himself: _m("Himself", "نفسه"),
+        receiverCompany: _m("Participating entities", "الجهات المشاركة"),
       }),
       managementHierarchy: new MessagesGroup({
         projectManager: _m("Project manager", "مدير المشروع"),
@@ -265,6 +273,17 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "Select management hierarchy",
       "اختر الهيكل التنظيمي",
     ),
+    receiverCompanies: _m("Participating entities", "الجهات المشاركة"),
+    receiverCompany: _m("Participating entities", "الجهات المشاركة"),
+    selectReceiverCompanies: _m(
+      "Select participating entities",
+      "اختر الجهات المشاركة",
+    ),
+    selectReceiverCompany: _m("Select participating entity", "اختر الجهة المشاركة"),
+    selectConcernedUsers: _m(
+      "Select concerned users",
+      "اختر المعنيين",
+    ),
     removeSpecificProcedureRow: _m("Remove", "إزالة"),
     validation: new MessagesGroup({
       selectPrimaryHierarchy: _m(
@@ -284,6 +303,14 @@ export const proceduresSettingsMessages = new MessagesGroup({
         "يرجى اختيار نوع الإجراء",
       ),
       selectValue: _m("Please select a value", "يرجى اختيار القيمة"),
+      selectReceiverCompanies: _m(
+        "Please select at least one participating entity",
+        "يرجى اختيار جهة مشاركة واحدة على الأقل",
+      ),
+      selectReceiverCompany: _m(
+        "Please select a participating entity",
+        "يرجى اختيار جهة مشاركة",
+      ),
       enterSkippingPeriod: _m(
         "Please enter skipping period",
         "يرجى إدخال فترة التخطي",
@@ -313,6 +340,14 @@ export const proceduresSettingsMessages = new MessagesGroup({
       "Procedure deleted successfully",
       "تم حذف الإجراء بنجاح",
     ),
+    addSideProcedureRequiresTop: _m(
+      "Add a procedure from the top first",
+      "أضف إجراءً من الأعلى أولاً",
+    ),
+    addStageRequiresSideProcedure: _m(
+      "Add a procedure from the side list first",
+      "أضف إجراءً من القائمة الجانبية أولاً",
+    ),
     error: _m("Something went wrong", "حدث خطأ ما"),
   }),
   taskActionDialog: new MessagesGroup({
@@ -341,15 +376,18 @@ export const proceduresSettingsMessages = new MessagesGroup({
   }),
   documentAddProcedureDialog: new MessagesGroup({
     title: _m("Add procedure", "اضافة اجراء"),
+    editTitle: _m("Edit procedure", "تعديل اجراء"),
     procedureName: _m("Procedure name", "اسم الاجراء"),
     classificationSection: _m(
       "Classification and linking data",
       "بيانات التصنيف والربط",
     ),
-    classificationName: _m("Classification name", "اسم التصنيف"),
-    linkedFolderName: _m("Linked folder name", "اسم المجلد المرتبط"),
-    classificationCode: _m("Classification code", "كود التصنيف"),
-    documentNature: _m("Document nature", "طبيعة المستند"),
+    mainClassification: _m("Main Classification", "تصنيف رئيسي"),
+    subClassification: _m("Sub Classification", "تصنيف فرعي"),
+    subSubClassification: _m(
+      "Sub Sub Classification",
+      "تصنيف فرعي فرعي",
+    ),
     jobAttribute: _m("Job attribute", "سمة الوظيفة"),
     usedInDocumentCycle: _m(
       "Used in document cycle",

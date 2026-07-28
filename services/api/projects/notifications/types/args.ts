@@ -43,6 +43,8 @@ export type ProjectNotificationsMapTasksArgs = ProjectNotificationScopeArgs & {
 export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScopeArgs & {
   latitude: number;
   longitude: number;
+  include_unavailable?: boolean;
+  statuses?: string[];
 };
 
 export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {

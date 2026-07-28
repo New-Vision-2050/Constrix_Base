@@ -128,6 +128,10 @@ function extractInternalProcedurePayload(
 export function normalizeInternalProcedure(
   raw: InternalProcedure | Record<string, unknown>,
 ): InternalProcedure {
+  if (!raw || typeof raw !== "object") {
+    throw new Error("Invalid internal procedure payload");
+  }
+
   const data = extractInternalProcedurePayload(raw as Record<string, unknown>);
 
   return {
@@ -154,5 +158,27 @@ export function normalizeInternalProcedure(
     sort_order:
       typeof data.sort_order === "number" ? data.sort_order : undefined,
     is_active: coerceBoolean(data.is_active, true),
+    attachment_type_id: resolveOptionalId(
+      data.attachment_type_id ?? data.attachment_type,
+    ),
+    attachment_sub_type_id: resolveOptionalId(
+      data.attachment_sub_type_id ?? data.attachment_sub_type,
+    ),
+    attachment_sub_sub_type_id: resolveOptionalId(
+      data.attachment_sub_sub_type_id ?? data.attachment_sub_sub_type,
+    ),
+    job_attribute_id: resolveOptionalId(
+      data.job_attribute_id ?? data.job_attribute,
+    ),
+    used_in_document_cycle: coerceBoolean(data.used_in_document_cycle, false),
+    appears_in_attachments_library: coerceBoolean(
+      data.appears_in_attachments_library,
+      false,
+    ),
+    appears_in_archive_after_approval: coerceBoolean(
+      data.appears_in_archive_after_approval,
+      false,
+    ),
+    requires_asset_id: coerceBoolean(data.requires_asset_id, false),
   };
 }

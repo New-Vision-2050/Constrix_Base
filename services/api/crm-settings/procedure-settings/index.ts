@@ -1,8 +1,30 @@
 import { baseApi } from "@/config/axios/instances/base";
 import { CreateStageArgs, UpdateStageArgs, CreateStepArgs } from "./types/args";
-import { GetStagesResponse, GetStepsResponse } from "./types/response";
+import type {
+  GetProcedureSettingTypesResponse,
+  GetStagesResponse,
+  GetStepsResponse,
+  ProcedureSettingTypeDto,
+} from "./types/response";
+
+export type GetProcedureSettingTypesParams = {
+  /** Optional backend filter (e.g. document / crm). */
+  group?: string;
+  category?: string;
+  module?: string;
+};
 
 export const ProcedureSettingsApi = {
+  /** Lists available procedure-setting type tabs (domains). */
+  getTypes: async (
+    params?: GetProcedureSettingTypesParams,
+  ): Promise<ProcedureSettingTypeDto[]> => {
+    const response = await baseApi.get<GetProcedureSettingTypesResponse>(
+      "procedure-settings/types",
+      { params },
+    );
+    return response.data?.payload ?? response.data?.data ?? [];
+  },
   getStages: (
     typeOrOptions:
       | string

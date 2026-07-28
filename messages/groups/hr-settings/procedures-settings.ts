@@ -32,8 +32,10 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
     search: _m("Search...", "البحث..."),
     noResults: _m("No results", "لا توجد نتائج"),
     select: _m("Select", "اختر"),
+    loading: _m("Loading...", "جاري التحميل..."),
     days: _m("Days", "أيام"),
     hours: _m("Hours", "ساعات"),
+    minutes: _m("Minutes", "دقائق"),
     hour: _m("Hour", "ساعة"),
     requiredField: _m("This field is required", "هذا الحقل مطلوب"),
     enterHoursOrDays: _m(
@@ -186,6 +188,7 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
         specificProcedures: _m("Specific procedures", "اجراءات محددة"),
         assignedUser: _m("Assigned user", "الموظف المُسند"),
         himself: _m("Himself", "نفسه"),
+        receiverCompany: _m("Participating entities", "الجهات المشاركة"),
       }),
       managementHierarchy: new MessagesGroup({
         projectManager: _m("Project manager", "مدير المشروع"),
@@ -213,6 +216,14 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
       "Select management hierarchy",
       "اختر الهيكل التنظيمي",
     ),
+    receiverCompanies: _m("Participating entities", "الجهات المشاركة"),
+    receiverCompany: _m("Participating entities", "الجهات المشاركة"),
+    selectReceiverCompanies: _m("Select participating entities", "اختر الجهات المشاركة"),
+    selectReceiverCompany: _m("Select participating entity", "اختر الجهة المشاركة"),
+    selectConcernedUsers: _m(
+      "Select concerned users",
+      "اختر المعنيين",
+    ),
     removeSpecificProcedureRow: _m("Remove", "إزالة"),
     validation: new MessagesGroup({
       selectEmployees: _m("Please select employees", "يرجى اختيار الموظفين"),
@@ -233,6 +244,14 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
         "يرجى اختيار نوع الإجراء",
       ),
       selectValue: _m("Please select a value", "يرجى اختيار القيمة"),
+      selectReceiverCompanies: _m(
+        "Please select at least one participating entity",
+        "يرجى اختيار جهة مشاركة واحدة على الأقل",
+      ),
+      selectReceiverCompany: _m(
+        "Please select a participating entity",
+        "يرجى اختيار جهة مشاركة",
+      ),
       enterSkippingPeriod: _m(
         "Please enter skipping period",
         "يرجى إدخال فترة التخطي",
@@ -261,6 +280,14 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
     procedureDeleted: _m(
       "Procedure deleted successfully",
       "تم حذف الإجراء بنجاح",
+    ),
+    addSideProcedureRequiresTop: _m(
+      "Add a procedure from the top first",
+      "أضف إجراءً من الأعلى أولاً",
+    ),
+    addStageRequiresSideProcedure: _m(
+      "Add a procedure from the side list first",
+      "أضف إجراءً من القائمة الجانبية أولاً",
     ),
     error: _m("Something went wrong", "حدث خطأ ما"),
   }),
