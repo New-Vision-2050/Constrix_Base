@@ -71,11 +71,21 @@ export function buildNotificationsEmployeesLocationsArgs(
   scope: NotificationScope,
   latitude: number,
   longitude: number,
+  options?: {
+    include_unavailable?: boolean;
+    statuses?: string[];
+  },
 ): ProjectNotificationsEmployeesLocationsArgs {
   return {
     ...buildNotificationScopeParams(scope),
     latitude,
     longitude,
+    ...(options?.include_unavailable != null
+      ? { include_unavailable: options.include_unavailable }
+      : {}),
+    ...(options?.statuses?.length
+      ? { statuses: options.statuses }
+      : {}),
   } as ProjectNotificationsEmployeesLocationsArgs;
 }
 

@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, Check, ChevronsUpDown } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Select,
@@ -29,318 +29,12 @@ import {
   constraintBasicInfoQueryKey,
   useConstraintBasicInfo,
 } from "../../../../hooks/useConstraintBasicInfo";
-import { apiClient, baseURL } from "@/config/axios-config";
-import { cn } from "@/lib/utils";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/modules/table/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/modules/table/components/ui/command";
+import { baseURL } from "@/config/axios-config";
 import { fetchManagementHierarchyOptions } from "@/utils/fetchDropdownOptions";
 import {
   SectionBorderActions,
 } from "../../components/SectionBorderActions";
 import { SectionEditPinButton } from "../../components/SectionEditPinButton";
-
-type LookupOption = { value: string; label: string };
-
-type ConstraintTypeOption = { code: string; name: string };
-
-function mapConstraintTypeRow(row: unknown): ConstraintTypeOption | null {
-  if (!row || typeof row !== "object") return null;
-  const rec = row as Record<string, unknown>;
-  const code = String(rec.code ?? rec.slug ?? rec.key ?? rec.id ?? "").trim();
-  const name = String(
-    rec.name ?? rec.label_ar ?? rec.title ?? rec.code ?? "",
-  ).trim();
-  if (!code) return null;
-  return { code, name: name || code };
-}
-
-/** API returns a single constraint type in `payload` (array of one or one object). */
-function parseConstraintTypeOption(payload: unknown): ConstraintTypeOption | null {
-  if (payload == null) return null;
-  if (Array.isArray(payload)) {
-    for (const row of payload) {
-      const mapped = mapConstraintTypeRow(row);
-      if (mapped) return mapped;
-    }
-    return null;
-  }
-  if (typeof payload === "object") {
-    const obj = payload as Record<string, unknown>;
-    const direct = mapConstraintTypeRow(obj);
-    if (direct) return direct;
-    const nested = obj.objects ?? obj.data ?? obj.items;
-    if (nested != null) return parseConstraintTypeOption(nested);
-  }
-  return null;
-}
-
-async function fetchConstraintTypeOption(): Promise<ConstraintTypeOption | null> {
-  const res = await apiClient.get<{ payload?: unknown }>(
-    "attendance/constraints/types",
-    { params: { page: 1, per_page: 10 } },
-  );
-  const body = res.data as Record<string, unknown>;
-  return parseConstraintTypeOption(body.payload ?? body.data ?? body);
-}
-
-type CountryOption = { id: string; name: string };
-type TimeZoneOption = { id: string; label: string };
-
-function parseApiList(payload: unknown): Record<string, unknown>[] {
-  if (Array.isArray(payload)) return payload as Record<string, unknown>[];
-  if (payload && typeof payload === "object") {
-    const obj = payload as Record<string, unknown>;
-    for (const key of ["objects", "data", "items"]) {
-      if (Array.isArray(obj[key])) return obj[key] as Record<string, unknown>[];
-    }
-  }
-  return [];
-}
-
-async function fetchCountriesOptions(): Promise<CountryOption[]> {
-  const perPage = 250;
-  let page = 1;
-  const merged: CountryOption[] = [];
-  const seen = new Set<string>();
-
-  while (page <= 200) {
-    const res = await apiClient.get<{
-      payload?: unknown;
-      pagination?: { last_page?: number };
-    }>("/countries", {
-      params: { page, per_page: perPage },
-    });
-
-    const body = res.data;
-    const rows = parseApiList(
-      (body as Record<string, unknown>).payload ??
-        (body as Record<string, unknown>).data ??
-        body,
-    );
-
-    if (!rows.length) break;
-
-    for (const row of rows) {
-      const id = String(row.id ?? "").trim();
-      const name = String(row.name ?? "").trim();
-      if (id.length > 0 && name.length > 0 && !seen.has(id)) {
-        seen.add(id);
-        merged.push({ id, name });
-      }
-    }
-
-    const lastPage = body.pagination?.last_page;
-    if (typeof lastPage === "number") {
-      if (page >= lastPage) break;
-    }
-
-    page += 1;
-  }
-
-  return merged.sort((a, b) => a.name.localeCompare(b.name, "ar"));
-}
-
-async function fetchTimeZonesByCountry(
-  countryId: string,
-): Promise<TimeZoneOption[]> {
-  const res = await apiClient.get<{ payload?: unknown }>("/time_zones", {
-    params: { country_id: countryId, page: 1, per_page: 500 },
-  });
-  const body = res.data as Record<string, unknown>;
-  return parseApiList(body.payload ?? body.data ?? body)
-    .map((row) => {
-      const id = String(row.id ?? row.zone_name ?? row.zoneName ?? "").trim();
-      const label = String(
-        row.zone_name ?? row.zoneName ?? row.tzName ?? row.name ?? id,
-      ).trim();
-      return { id, label };
-    })
-    .filter((t) => t.id.length > 0 && t.label.length > 0);
-}
-
-function readBasicCountryId(basic: ConstraintBasicInfo | undefined): string {
-  const raw = (basic as Record<string, unknown> | undefined)?.country_id;
-  return raw != null ? String(raw).trim() : "";
-}
-
-function resolveCountryId(
-  basic: ConstraintBasicInfo | undefined,
-  countries: CountryOption[],
-): string {
-  if (!countries.length) return readBasicCountryId(basic);
-
-  const fromId = readBasicCountryId(basic);
-  if (fromId && countries.some((c) => c.id === fromId)) return fromId;
-
-  const name = basic?.country?.trim();
-  if (name) {
-    const match = countries.find((c) => c.name.trim() === name);
-    if (match) return match.id;
-  }
-
-  const code = basic?.country_code?.trim().toLowerCase();
-  if (code === "sa") {
-    const sa = countries.find(
-      (c) =>
-        c.name.includes("السعود") ||
-        c.name.toLowerCase().includes("saudi"),
-    );
-    if (sa) return sa.id;
-  }
-
-  return fromId;
-}
-
-function resolveCountryLabel(
-  basic: ConstraintBasicInfo | undefined,
-  countryId: string,
-  countries: CountryOption[],
-): string {
-  if (!countryId) return "";
-  const match = countries.find((c) => c.id === countryId);
-  if (match) return match.name;
-  return basic?.country?.trim() || "";
-}
-
-function toLookupOptions(
-  items: { value: string; label: string }[],
-  selectedValue: string,
-  selectedLabel: string,
-): LookupOption[] {
-  if (
-    selectedValue &&
-    selectedLabel &&
-    !items.some((item) => item.value === selectedValue)
-  ) {
-    return [{ value: selectedValue, label: selectedLabel }, ...items];
-  }
-  return items;
-}
-
-function LookupSearchSelect({
-  options,
-  value,
-  onChange,
-  placeholder,
-  searchPlaceholder,
-  emptyText,
-  disabled = false,
-}: {
-  options: LookupOption[];
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-  searchPlaceholder: string;
-  emptyText: string;
-  disabled?: boolean;
-}) {
-  const [open, setOpen] = useState(false);
-  const selected = options.find((opt) => opt.value === value);
-
-  return (
-    <Popover
-      open={disabled ? false : open}
-      onOpenChange={disabled ? undefined : setOpen}
-    >
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          disabled={disabled}
-          className={cn(
-            "h-12 w-full justify-between border-border bg-background/80 px-3 font-normal",
-            !selected && "text-muted-foreground",
-          )}
-        >
-          <span className="truncate">{selected?.label ?? placeholder}</span>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
-        align="start"
-        sideOffset={4}
-      >
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
-          <CommandList>
-            <CommandEmpty>{emptyText}</CommandEmpty>
-            <CommandGroup>
-              {options.map((opt) => (
-                <CommandItem
-                  key={opt.value}
-                  value={opt.label}
-                  onSelect={() => {
-                    onChange(opt.value);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "ml-2 h-4 w-4",
-                      value === opt.value ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  {opt.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-function resolveTimeZoneId(
-  basic: ConstraintBasicInfo | undefined,
-  timeZones: TimeZoneOption[],
-): string {
-  const rawTzId = (basic as Record<string, unknown> | undefined)?.time_zone_id;
-  if (rawTzId != null) {
-    const id = String(rawTzId).trim();
-    if (timeZones.some((t) => t.id === id)) return id;
-  }
-
-  const tz = basic?.timezone?.trim() ?? "";
-  if (!tz) return "";
-
-  const byId = timeZones.find((t) => t.id === tz);
-  if (byId) return byId.id;
-
-  const lower = tz.toLowerCase();
-  const byLabel = timeZones.find((t) => t.label.toLowerCase() === lower);
-  if (byLabel) return byLabel.id;
-
-  return tz;
-}
-
-function resolveTimeZoneLabel(
-  basic: ConstraintBasicInfo | undefined,
-  timeZoneId: string,
-  timeZones: TimeZoneOption[],
-): string {
-  const match = timeZones.find((t) => t.id === timeZoneId);
-  if (match) return match.label;
-
-  const tz = basic?.timezone?.trim();
-  if (tz && !/^\d+$/.test(tz)) return tz;
-
-  return timeZoneId || "";
-}
 
 function mergeConstraintFromBasicInfo(
   constraint: Constraint,
@@ -495,14 +189,6 @@ export default function DeterminantDetailsTab({
     [mergedConstraint],
   );
 
-  const constraintTypeQuery = useQuery({
-    queryKey: ["attendance-constraint-type"],
-    queryFn: fetchConstraintTypeOption,
-    staleTime: 5 * 60_000,
-  });
-
-  const constraintTypeOption = constraintTypeQuery.data ?? null;
-
   const branchesLookupQuery = useQuery({
     queryKey: ["management-hierarchies-branches", "determinant-details"],
     queryFn: () =>
@@ -522,143 +208,17 @@ export default function DeterminantDetailsTab({
     [mergedConstraint, basicInfo, branchesLookupQuery.data],
   );
 
-  const resolvedTypeCode = useMemo(() => {
-    if (constraintTypeOption?.code) return constraintTypeOption.code;
-    return (
-      mergedConstraint.constraint_type?.trim() ||
-      mergedConstraint.constraint_code?.trim() ||
-      ""
-    );
-  }, [
-    constraintTypeOption,
-    mergedConstraint.constraint_code,
-    mergedConstraint.constraint_type,
-  ]);
-
-  const typeDisplayName = useMemo(() => {
-    if (constraintTypeOption) return constraintTypeOption.name;
-    return resolvedTypeCode || "—";
-  }, [constraintTypeOption, resolvedTypeCode]);
-
-  const viewTypeSelectValue = resolvedTypeCode || "__none";
-
   const queryClient = useQueryClient();
 
   const [editingBasics, setEditingBasics] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
-  const [typeDraft, setTypeDraft] = useState("");
   const [branchIdsDraft, setBranchIdsDraft] = useState<string[]>([]);
-  const [editingCountry, setEditingCountry] = useState(false);
-  const [countryIdDraft, setCountryIdDraft] = useState("");
-  const [timeZoneIdDraft, setTimeZoneIdDraft] = useState("");
-
-  const countriesQuery = useQuery({
-    queryKey: ["determinant-countries"],
-    queryFn: fetchCountriesOptions,
-    staleTime: 5 * 60_000,
-  });
-
-  const resolvedCountryId = useMemo(
-    () => resolveCountryId(basicInfo, countriesQuery.data ?? []),
-    [basicInfo, countriesQuery.data],
-  );
-
-  const countryIdForTimeZones = editingCountry
-    ? countryIdDraft
-    : resolvedCountryId;
-
-  const timeZonesQuery = useQuery({
-    queryKey: ["determinant-time-zones", countryIdForTimeZones],
-    queryFn: () => fetchTimeZonesByCountry(countryIdForTimeZones),
-    enabled: Boolean(countryIdForTimeZones),
-    staleTime: 5 * 60_000,
-  });
-
-  const resolvedTimeZoneId = useMemo(
-    () => resolveTimeZoneId(basicInfo, timeZonesQuery.data ?? []),
-    [basicInfo, timeZonesQuery.data],
-  );
-
-  const countryDisplayName = useMemo(
-    () =>
-      resolveCountryLabel(basicInfo, resolvedCountryId, countriesQuery.data ?? []),
-    [basicInfo, resolvedCountryId, countriesQuery.data],
-  );
-
-  const timeZoneDisplayName = useMemo(
-    () =>
-      resolveTimeZoneLabel(
-        basicInfo,
-        resolvedTimeZoneId,
-        timeZonesQuery.data ?? [],
-      ),
-    [basicInfo, resolvedTimeZoneId, timeZonesQuery.data],
-  );
-
-  const activeCountryId = editingCountry ? countryIdDraft : resolvedCountryId;
-  const activeTimeZoneId = editingCountry ? timeZoneIdDraft : resolvedTimeZoneId;
-
-  const countryOptions = useMemo(
-    (): LookupOption[] =>
-      toLookupOptions(
-        (countriesQuery.data ?? []).map((c) => ({
-          value: c.id,
-          label: c.name,
-        })),
-        activeCountryId,
-        countryDisplayName,
-      ),
-    [activeCountryId, countriesQuery.data, countryDisplayName],
-  );
-
-  const timeZoneOptions = useMemo(
-    (): LookupOption[] =>
-      toLookupOptions(
-        (timeZonesQuery.data ?? []).map((t) => ({
-          value: t.id,
-          label: t.label,
-        })),
-        activeTimeZoneId,
-        timeZoneDisplayName,
-      ),
-    [activeTimeZoneId, timeZoneDisplayName, timeZonesQuery.data],
-  );
-
   const showSkeletonRows = isLoading && !basicInfo;
 
   useEffect(() => {
-    if (editingCountry) return;
-    setCountryIdDraft(resolvedCountryId);
-    setTimeZoneIdDraft(resolvedTimeZoneId);
-  }, [editingCountry, resolvedCountryId, resolvedTimeZoneId]);
-
-  useEffect(() => {
-    if (!editingCountry || !countryIdDraft) {
-      return;
-    }
-    if (!timeZonesQuery.data?.length) {
-      return;
-    }
-    setTimeZoneIdDraft((prev) => {
-      if (prev && timeZonesQuery.data.some((t) => t.id === prev)) return prev;
-      return timeZonesQuery.data[0]?.id ?? "";
-    });
-  }, [
-    countryIdDraft,
-    editingCountry,
-    timeZonesQuery.data,
-  ]);
-
-  useEffect(() => {
     if (editingBasics) return;
-    setTypeDraft(resolvedTypeCode);
     setBranchIdsDraft(resolvedBranchIds);
-  }, [editingBasics, resolvedTypeCode, resolvedBranchIds]);
-
-  useEffect(() => {
-    if (!editingBasics || !constraintTypeOption?.code) return;
-    setTypeDraft(constraintTypeOption.code);
-  }, [editingBasics, constraintTypeOption]);
+  }, [editingBasics, resolvedBranchIds]);
 
   useEffect(() => {
     if (!editingBasics || resolvedBranchIds.length === 0) return;
@@ -685,60 +245,26 @@ export default function DeterminantDetailsTab({
         queryKey: constraintBasicInfoQueryKey(constraint.id),
       });
       setEditingBasics(false);
-      setEditingCountry(false);
     },
   });
 
   const beginEditBasics = useCallback(() => {
-    setEditingCountry(false);
     setNameDraft(displayName !== "—" ? displayName : "");
-    setTypeDraft(resolvedTypeCode);
     setBranchIdsDraft(resolvedBranchIds);
     setEditingBasics(true);
   }, [
     displayName,
-    resolvedTypeCode,
     resolvedBranchIds,
   ]);
 
-  const beginEditCountry = useCallback(() => {
-    setEditingBasics(false);
-    setCountryIdDraft(resolvedCountryId);
-    setTimeZoneIdDraft(resolvedTimeZoneId);
-    setEditingCountry(true);
-  }, [resolvedCountryId, resolvedTimeZoneId]);
-
-  const saveCountry = useCallback(() => {
-    const selectedCountry = (countriesQuery.data ?? []).find(
-      (c) => c.id === countryIdDraft,
-    );
-    const selectedTimeZone = (timeZonesQuery.data ?? []).find(
-      (t) => t.id === timeZoneIdDraft,
-    );
-    patchBasicInfoMutation.mutate({
-      country_id: countryIdDraft || undefined,
-      country: selectedCountry?.name,
-      timezone: timeZoneIdDraft || undefined,
-      time_zone_id: timeZoneIdDraft || undefined,
-      reference_time: selectedTimeZone?.label,
-    } as PatchConstraintBasicInfoParams);
-  }, [
-    countriesQuery.data,
-    countryIdDraft,
-    patchBasicInfoMutation,
-    timeZoneIdDraft,
-    timeZonesQuery.data,
-  ]);
   const saveBasics = useCallback(() => {
     const trimmed = nameDraft.trim();
-    const typeTrim = typeDraft.trim();
     patchBasicInfoMutation.mutate({
       constraint_name: trimmed || undefined,
       ...(trimmed ? { name: trimmed } : {}),
-      constraint_type: typeTrim || undefined,
       ...(branchIdsDraft.length > 0 ? { branch_ids: [...branchIdsDraft] } : {}),
     });
-  }, [nameDraft, typeDraft, branchIdsDraft, patchBasicInfoMutation]);
+  }, [nameDraft, branchIdsDraft, patchBasicInfoMutation]);
 
   const isSavingBasicInfo = patchBasicInfoMutation.isPending;
 
@@ -762,7 +288,6 @@ export default function DeterminantDetailsTab({
           disabled={
             isSavingBasicInfo ||
             !nameDraft.trim() ||
-            !typeDraft.trim() ||
             branchIdsDraft.length === 0
           }
           onClick={saveBasics}
@@ -780,41 +305,6 @@ export default function DeterminantDetailsTab({
         />
     );
 
-  const countryToolbar =
-    showSkeletonRows || isError ? undefined : editingCountry ? (
-      <>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-9 shrink-0"
-          disabled={isSavingBasicInfo}
-          onClick={() => setEditingCountry(false)}
-        >
-          {t("cancel")}
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          className="h-9 shrink-0 gap-2"
-          disabled={
-            isSavingBasicInfo || !countryIdDraft.trim() || !timeZoneIdDraft.trim()
-          }
-          onClick={saveCountry}
-        >
-          {isSavingBasicInfo ? (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-          ) : null}
-          {t("save")}
-        </Button>
-      </>
-    ) : (
-        <SectionEditPinButton
-          onClick={beginEditCountry}
-          disabled={isSavingBasicInfo}
-        />
-    );
-
   return (
     <div className="flex w-full min-w-0 flex-col gap-8">
       <DetailsSection title={t("sectionBasics")} actions={basicsToolbar}>
@@ -824,7 +314,6 @@ export default function DeterminantDetailsTab({
         >
           {showSkeletonRows ? (
             <>
-              <Skeleton className="h-[76px] w-full" />
               <Skeleton className="h-[76px] w-full" />
               <Skeleton className="h-[76px] w-full md:col-span-2" />
             </>
@@ -854,52 +343,6 @@ export default function DeterminantDetailsTab({
                     },
                   }}
                 />
-              </div>
-              <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2">
-                <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  {t("determinantSystem")}
-                </label>
-                {editingBasics ? (
-                  constraintTypeQuery.isPending ? (
-                    <Skeleton className="h-12 w-full rounded-md" />
-                  ) : (
-                    <Select
-                      value={typeDraft || constraintTypeOption?.code || ""}
-                      onValueChange={setTypeDraft}
-                      disabled={Boolean(constraintTypeOption)}
-                    >
-                      <SelectTrigger
-
-                        className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
-                      >
-                        <SelectValue placeholder={t("selectSystem")} />
-                      </SelectTrigger>
-                      <SelectContent >
-                        {constraintTypeOption ? (
-                          <SelectItem value={constraintTypeOption.code}>
-                            {constraintTypeOption.name}
-                          </SelectItem>
-                        ) : typeDraft ? (
-                          <SelectItem value={typeDraft}>{typeDraft}</SelectItem>
-                        ) : null}
-                      </SelectContent>
-                    </Select>
-                  )
-                ) : (
-                  <Select value={viewTypeSelectValue} disabled>
-                    <SelectTrigger
-
-                      className="h-12 w-full min-w-0 rounded-md border-border bg-background/80"
-                    >
-                      <SelectValue placeholder={typeDisplayName} />
-                    </SelectTrigger>
-                    <SelectContent >
-                      <SelectItem value={viewTypeSelectValue}>
-                        {typeDisplayName}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
               </div>
               <div className="flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2 md:col-span-2">
                 <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
@@ -954,74 +397,6 @@ export default function DeterminantDetailsTab({
                       <SelectItem value={branchText}>{branchText}</SelectItem>
                     </SelectContent>
                   </Select>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </DetailsSection>
-
-      <DetailsSection title={t("sectionCountry")} actions={countryToolbar}>
-        <div
-
-          className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 md:items-start"
-        >
-          {showSkeletonRows ? (
-            <>
-              <Skeleton className="h-[76px] w-full" />
-              <Skeleton className="h-[76px] w-full" />
-            </>
-          ) : (
-            <>
-              <div className="relative flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2 sm:col-span-1">
-                <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  {t("countryName")}
-                </label>
-                {countriesQuery.isPending ? (
-                  <Skeleton className="h-12 w-full rounded-md" />
-                ) : countriesQuery.isError ? (
-                  <div className="flex h-12 items-center rounded-md border border-destructive/40 bg-background/80 px-3 text-sm text-destructive">
-                    {t("loadCountriesError")}
-                  </div>
-                ) : (
-                  <LookupSearchSelect
-                    options={countryOptions}
-                    value={activeCountryId}
-                    onChange={(nextId) => {
-                      setCountryIdDraft(nextId);
-                      setTimeZoneIdDraft("");
-                    }}
-                    placeholder={t("selectCountry")}
-                    searchPlaceholder={t("searchCountry")}
-                    emptyText={t("noResults")}
-                    disabled={showSkeletonRows || !editingCountry}
-                  />
-                )}
-              </div>
-              <div className="relative flex min-h-0 min-w-0 w-full flex-col items-stretch gap-2 sm:col-span-1">
-                <label className="block text-start text-xs font-medium leading-none text-muted-foreground">
-                  {t("timezone")}
-                </label>
-                {!activeCountryId ? (
-                  <div className="flex h-12 items-center rounded-md border border-border bg-background/80 px-3 text-sm text-muted-foreground">
-                    {t("selectCountryFirst")}
-                  </div>
-                ) : timeZonesQuery.isPending ? (
-                  <Skeleton className="h-12 w-full rounded-md" />
-                ) : timeZonesQuery.isError ? (
-                  <div className="flex h-12 items-center rounded-md border border-destructive/40 bg-background/80 px-3 text-sm text-destructive">
-                    {t("loadTimezonesError")}
-                  </div>
-                ) : (
-                  <LookupSearchSelect
-                    options={timeZoneOptions}
-                    value={activeTimeZoneId}
-                    onChange={setTimeZoneIdDraft}
-                    placeholder={t("selectTimezone")}
-                    searchPlaceholder={t("searchTimezone")}
-                    emptyText={t("noResults")}
-                    disabled={showSkeletonRows || !editingCountry}
-                  />
                 )}
               </div>
             </>

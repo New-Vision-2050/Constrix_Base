@@ -9,9 +9,15 @@ import {
 } from "./time";
 
 export function formatApiTime(time: string, locale: string) {
-  const [hours, minutes] = time.split(":").map(Number);
-  const date = new Date();
-  date.setHours(hours, minutes, 0, 0);
+  let date: Date;
+
+  if (time.includes("T") || time.includes("-")) {
+    date = new Date(time);
+  } else {
+    const [hours, minutes] = time.split(":").map(Number);
+    date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+  }
 
   const parts = formatCurrentTimeParts(date, locale);
   const localizedTime = localizeWesternDigits(parts.time, locale);
@@ -102,32 +108,6 @@ export function getAttendanceActionState(period?: WorkPeriodConstraint) {
     isClockOut: period.can_clock_out,
     canPerform: period.can_clock_in || period.can_clock_out,
   };
-}
-
-export function getEarlyClockInMinutes(
-  rules?: WorkPeriodConstraint["early_clock_in_rules"],
-) {
-  if (!rules?.prevent_early_clock_in) return 0;
-
-  if (rules.early_unit === "hour") {
-    return rules.early_period * 60;
-  }
-
-  return rules.early_period;
-}
-
-export function isBeforeEarlyClockInWindow(
-  now: Date,
-  period: WorkPeriodConstraint,
-) {
-  const earlyMinutes = getEarlyClockInMinutes(period.early_clock_in_rules);
-  if (!earlyMinutes) return false;
-
-  const [hours, minutes] = period.start_time.split(":").map(Number);
-  const earliestClockIn = new Date(now);
-  earliestClockIn.setHours(hours, minutes - earlyMinutes, 0, 0);
-
-  return now < earliestClockIn;
 }
 
 export function getLatestAttendanceRecord(period?: WorkPeriodConstraint) {

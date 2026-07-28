@@ -382,11 +382,21 @@ export default function TodayLogPanel() {
             </div>
           </div>
 
+          {selectedApiPeriod?.expected_clock_out_time ? (
+            <div className="relative z-10 mb-4 text-center text-sm text-muted-foreground">
+              {t("expectedClockOut")}:{" "}
+              <span className="font-medium text-foreground" dir="ltr">
+                {formatApiTime(selectedApiPeriod.expected_clock_out_time, locale).display}
+              </span>
+            </div>
+          ) : null}
+
           <div className="relative z-10 space-y-2.5">
             {showButton && actionPeriod && workRules?.location_work ? (
               <AttendanceActionDialogs
                 workPeriod={actionPeriod}
                 locationWork={workRules.location_work}
+                additionalLocations={workRules.additional_locations}
                 disabled={!canPerform}
               />
             ) : showButton ? (

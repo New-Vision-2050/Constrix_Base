@@ -11,6 +11,8 @@ export interface UseProjectNotificationEmployeesParams extends NotificationScope
   latitude: number | undefined;
   longitude: number | undefined;
   enabled?: boolean;
+  includeUnavailable?: boolean;
+  statusesFilter?: string[];
 }
 
 export const PROJECT_NOTIFICATION_EMPLOYEES_QUERY_KEY =
@@ -25,6 +27,8 @@ export function projectNotificationEmployeesQueryKey(
     params.contractualEngagementKey,
     params.latitude,
     params.longitude,
+    params.includeUnavailable,
+    params.statusesFilter,
   ] as const;
 }
 
@@ -37,6 +41,8 @@ export function useProjectNotificationEmployees(
     latitude,
     longitude,
     enabled = true,
+    includeUnavailable,
+    statusesFilter,
   } = params;
 
   return useQuery({
@@ -54,6 +60,10 @@ export function useProjectNotificationEmployees(
           { projectId, contractualEngagementKey },
           latitude,
           longitude,
+          {
+            include_unavailable: includeUnavailable,
+            statuses: statusesFilter?.length ? statusesFilter : undefined,
+          },
         ),
       );
       return res.data.payload ?? [];

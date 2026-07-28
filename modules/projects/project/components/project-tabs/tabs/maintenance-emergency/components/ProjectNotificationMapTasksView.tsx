@@ -57,6 +57,8 @@ const EMPLOYEE_STATUS_COLOR_MAP: Record<string, string> = {
   offline: "#6b7280",
   no_location: "#ef4444",
   available_far: "#eab308",
+  absent: "#dc3545",
+  not_connected: "#9CA3AF",
 };
 
 const TASK_CIRCLE_COLORS = [
@@ -224,9 +226,12 @@ export default function ProjectNotificationMapTasksView({
     () => [
       { value: "", label: t("allStatuses", { defaultValue: "All statuses" }) },
       { value: "available", label: t("available", { defaultValue: "Available" }) },
+      { value: "available_far", label: t("availableFar", { defaultValue: "Available (Far)" }) },
       { value: "busy", label: t("busy", { defaultValue: "Busy" }) },
       { value: "no_location", label: t("noLocation", { defaultValue: "No Location" }) },
+      { value: "not_connected", label: t("notConnected", { defaultValue: "Not Connected" }) },
       { value: "offline", label: t("offline", { defaultValue: "Offline" }) },
+      { value: "absent", label: t("absent", { defaultValue: "Absent" }) },
     ],
     [t],
   );

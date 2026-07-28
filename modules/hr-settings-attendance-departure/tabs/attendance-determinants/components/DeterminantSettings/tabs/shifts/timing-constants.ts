@@ -9,11 +9,16 @@ export const WEEK_DAYS = [
 ];
 
 export type ConstraintRuleField =
-  | "max_working_hours"
   | "early_clock_in_minutes"
   | "out_zone_minutes"
-  | "lateness_minutes"
-  | "max_over_time";
+  | "max_over_time"
+  | "extension_hours_shift"
+  | "can_clock_in_before";
+
+export type ConstraintRuleToggleField =
+  | "is_overtime_before_early_clock_in"
+  | "is_overtime_after_extension_hours_shift"
+  | "is_after_finish_working_hours";
 
 export type ConstraintRuleOption = {
   id: ConstraintRuleField;
@@ -22,13 +27,12 @@ export type ConstraintRuleOption = {
   label: string;
 };
 
+export type ConstraintRuleToggleOption = {
+  id: ConstraintRuleToggleField;
+  label: string;
+};
+
 export const CONSTRAINT_RULE_OPTIONS: ConstraintRuleOption[] = [
-  {
-    id: "max_working_hours",
-    amount: 9,
-    unit: "س",
-    label: "عدد ساعات العمل",
-  },
   {
     id: "early_clock_in_minutes",
     amount: 30,
@@ -42,15 +46,36 @@ export const CONSTRAINT_RULE_OPTIONS: ConstraintRuleOption[] = [
     label: "خارج نطاق الموقع",
   },
   {
-    id: "lateness_minutes",
-    amount: 15,
-    unit: "د",
-    label: "فترة السماح",
-  },
-  {
     id: "max_over_time",
     amount: 4,
     unit: "س",
     label: "الحد الاقصى للساعات الإضافية",
+  },
+  {
+    id: "extension_hours_shift",
+    amount: 2,
+    unit: "س",
+    label: "ساعات الامتداد بعد نهاية الدوام",
+  },
+  {
+    id: "can_clock_in_before",
+    amount: 60,
+    unit: "د",
+    label: "الحد الأقصى لتسجيل الحضور بعد بدء الدوام",
+  },
+];
+
+export const CONSTRAINT_RULE_TOGGLE_OPTIONS: ConstraintRuleToggleOption[] = [
+  {
+    id: "is_overtime_before_early_clock_in",
+    label: "احتساب وقت إضافي قبل فترة الحضور المبكر",
+  },
+  {
+    id: "is_overtime_after_extension_hours_shift",
+    label: "احتساب وقت إضافي بعد ساعات الامتداد",
+  },
+  {
+    id: "is_after_finish_working_hours",
+    label: "احتساب وقت إضافي بعد اكتمال ساعات العمل",
   },
 ];

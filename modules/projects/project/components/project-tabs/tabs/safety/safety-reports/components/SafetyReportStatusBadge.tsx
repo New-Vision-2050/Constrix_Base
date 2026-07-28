@@ -2,7 +2,7 @@
 
 import { Chip } from "@mui/material";
 import { useTranslations } from "next-intl";
-import type { SafetyReportStatus } from "../safety-report-types";
+import type { SafetyReportStatus } from "../types";
 
 const STATUS_CONFIG: Record<
   SafetyReportStatus,

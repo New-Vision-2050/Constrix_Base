@@ -35,15 +35,18 @@ import {
   YAxis,
 } from "recharts";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
-import { useProjectSafety } from "@/modules/projects/project/query/useProjectSafety";
+import {
+  buildContractorConsultantLabel,
+  toChartSlices,
+} from "../query/mapSafetyAnalytics";
+import { useSafetyAnalytics } from "../query/useSafetyAnalytics";
 import {
   EMPTY_SAFETY_INDICATOR_FILTERS,
-  computeSafetyIndicators,
-  filterVisitsForIndicators,
+  filterContractorConsultantRows,
   getRatingBand,
   getRatingColor,
   type SafetyIndicatorFilters,
-} from "../utils/computeSafetyIndicators";
+} from "../utils/safetyIndicatorUtils";
 
 const CHART_COLORS = [
   "#14B8A6",
@@ -279,30 +282,51 @@ export default function SafetyIndicatorsView() {
     EMPTY_SAFETY_INDICATOR_FILTERS,
   );
 
-  const safetyQuery = useProjectSafety(projectId);
-  const allRows = safetyQuery.data ?? [];
+  const analyticsQuery = useSafetyAnalytics(projectId);
+
+  const contractorConsultantRows = useMemo(
+    () =>
+      filterContractorConsultantRows(
+        analyticsQuery.contractorConsultant,
+        filters,
+      ),
+    [analyticsQuery.contractorConsultant, filters],
+  );
 
   const contractorOptions = useMemo(
     () =>
-      [...new Set(allRows.map((row) => row.contractor).filter(Boolean))].sort(),
-    [allRows],
+      [
+        ...new Set(
+          analyticsQuery.contractorConsultant
+            .map((row) => row.contractorName)
+            .filter(Boolean),
+        ),
+      ].sort(),
+    [analyticsQuery.contractorConsultant],
   );
 
   const consultantOptions = useMemo(
     () =>
-      [...new Set(allRows.map((row) => row.consultant).filter(Boolean))].sort(),
-    [allRows],
+      [
+        ...new Set(
+          analyticsQuery.contractorConsultant
+            .map((row) => row.consultant)
+            .filter(Boolean),
+        ),
+      ].sort(),
+    [analyticsQuery.contractorConsultant],
   );
 
-  const filteredRows = useMemo(
-    () => filterVisitsForIndicators(allRows, filters),
-    [allRows, filters],
+  const overallRating = analyticsQuery.overall?.averagePercentage ?? 0;
+  const committedSites = analyticsQuery.compliant?.compliantLocations ?? 0;
+  const highRiskObservations = useMemo(
+    () =>
+      analyticsQuery.frequentViolations
+        .filter((item) => item.category.toUpperCase() === "A")
+        .reduce((sum, item) => sum + item.count, 0),
+    [analyticsQuery.frequentViolations],
   );
-
-  const indicators = useMemo(
-    () => computeSafetyIndicators(filteredRows, locale),
-    [filteredRows, locale],
-  );
+  const repeatedViolations = analyticsQuery.frequentViolations.length;
 
   const updateFilter = <K extends keyof SafetyIndicatorFilters>(
     key: K,
@@ -311,7 +335,7 @@ export default function SafetyIndicatorsView() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const overallBand = getRatingBand(indicators.overallRating);
+  const overallBand = getRatingBand(overallRating);
   const overallColor = getRatingColor(overallBand);
   const overallStatusKey =
     overallBand === "critical"
@@ -320,17 +344,22 @@ export default function SafetyIndicatorsView() {
         ? "attention"
         : "good";
 
-  const committedStatusKey = indicators.committedSites > 0 ? "good" : "attention";
-  const highRiskStatusKey =
-    indicators.highRiskObservations === 0
+  const committedStatusKey =
+    committedSites > 0 && analyticsQuery.compliant?.isProjectCompliant
       ? "good"
-      : indicators.highRiskObservations <= 2
+      : committedSites > 0
+        ? "good"
+        : "attention";
+  const highRiskStatusKey =
+    highRiskObservations === 0
+      ? "good"
+      : highRiskObservations <= 2
         ? "attention"
         : "critical";
   const repeatedStatusKey =
-    indicators.repeatedViolations === 0
+    repeatedViolations === 0
       ? "good"
-      : indicators.repeatedViolations <= 3
+      : repeatedViolations <= 3
         ? "attention"
         : "critical";
 
@@ -340,21 +369,40 @@ export default function SafetyIndicatorsView() {
     critical: getRatingColor("critical"),
   };
 
-  const assessmentChartData = indicators.monthlyAssessment.map((item) => ({
-    name: item.label,
-    percentage: item.percentage,
+  const assessmentChartData = analyticsQuery.violationPerformance.map((item) => ({
+    name: item.description,
+    percentage: Math.round(item.complianceRate),
     fill: getRatingColor(item.band),
   }));
 
-  const contractorPieData = indicators.contractorConsultantErrors.map((item, index) => ({
+  const contractorPieData = toChartSlices(
+    contractorConsultantRows.map((item) => ({
+      label: buildContractorConsultantLabel(item, t("unknownGroup")),
+      value: item.violationCount,
+      code: item.contractorId || item.consultant,
+    })),
+  ).map((item, index) => ({
     ...item,
     fill: CHART_COLORS[index % CHART_COLORS.length],
   }));
 
-  const violationsPieData = indicators.topViolations.map((item, index) => ({
+  const violationsPieData = toChartSlices(
+    analyticsQuery.topViolations.map((item) => ({
+      label: item.description,
+      value: item.count,
+      code: item.code,
+    })),
+  ).map((item, index) => ({
     ...item,
     fill: CHART_COLORS[index % CHART_COLORS.length],
   }));
+
+  const overallSparkline = useMemo(() => {
+    const completed = analyticsQuery.overall?.completedEvaluations ?? 0;
+    const pending = analyticsQuery.overall?.pendingEvaluations ?? 0;
+    if (completed + pending <= 0) return [];
+    return [{ value: pending }, { value: completed }];
+  }, [analyticsQuery.overall]);
 
   const assessmentBarCount = assessmentChartData.length;
   const assessmentChartMargins = { top: 8, bottom: 24, left: 8, right: 0 };
@@ -365,6 +413,7 @@ export default function SafetyIndicatorsView() {
     assessmentChartMargins.bottom;
   const assessmentBandSize =
     assessmentBarCount > 0 ? assessmentPlotHeight / assessmentBarCount : 0;
+  const assessmentLabelWidth = 240;
 
   if (!projectId) {
     return null;
@@ -372,7 +421,7 @@ export default function SafetyIndicatorsView() {
 
   return (
     <Box>
-      {safetyQuery.isError ? (
+      {analyticsQuery.isError ? (
         <Alert severity="error" sx={{ mb: 2 }}>
           {t("loadError")}
         </Alert>
@@ -443,7 +492,7 @@ export default function SafetyIndicatorsView() {
         </Grid>
       </Paper>
 
-      {safetyQuery.isLoading ? (
+      {analyticsQuery.isLoading ? (
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {[1, 2, 3, 4].map((key) => (
             <Grid key={key} size={{ xs: 12, sm: 6, md: 3 }}>
@@ -456,10 +505,10 @@ export default function SafetyIndicatorsView() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorKpiCard
               title={t("kpis.overallRating")}
-              value={`${indicators.overallRating}%`}
+              value={`${overallRating}%`}
               statusLabel={t(`status.${overallStatusKey}`)}
               statusColor={overallColor}
-              sparklineData={indicators.ratingSparkline}
+              sparklineData={overallSparkline}
               sparklineColor={overallColor}
               icon={<CheckCircleOutline fontSize="small" />}
             />
@@ -467,10 +516,10 @@ export default function SafetyIndicatorsView() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorKpiCard
               title={t("kpis.committedSites")}
-              value={indicators.committedSites}
+              value={committedSites}
               statusLabel={t(`status.${committedStatusKey}`)}
               statusColor={statusColors[committedStatusKey]}
-              sparklineData={indicators.committedSparkline}
+              sparklineData={[]}
               sparklineColor={statusColors[committedStatusKey]}
               icon={<CheckCircleOutline fontSize="small" />}
             />
@@ -478,10 +527,10 @@ export default function SafetyIndicatorsView() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorKpiCard
               title={t("kpis.highRiskObservations")}
-              value={indicators.highRiskObservations}
+              value={highRiskObservations}
               statusLabel={t(`status.${highRiskStatusKey}`)}
               statusColor={statusColors[highRiskStatusKey]}
-              sparklineData={indicators.highRiskSparkline}
+              sparklineData={[]}
               sparklineColor={statusColors[highRiskStatusKey]}
               icon={<ErrorOutline fontSize="small" />}
             />
@@ -489,10 +538,10 @@ export default function SafetyIndicatorsView() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorKpiCard
               title={t("kpis.repeatedViolations")}
-              value={indicators.repeatedViolations}
+              value={repeatedViolations}
               statusLabel={t(`status.${repeatedStatusKey}`)}
               statusColor={statusColors[repeatedStatusKey]}
-              sparklineData={indicators.repeatedSparkline}
+              sparklineData={[]}
               sparklineColor={statusColors[repeatedStatusKey]}
               icon={<WarningAmberOutlined fontSize="small" />}
             />
@@ -506,7 +555,7 @@ export default function SafetyIndicatorsView() {
         </Typography>
         <AssessmentLegend t={t} />
 
-        {safetyQuery.isLoading ? (
+        {analyticsQuery.isLoading ? (
           <Skeleton variant="rounded" height={280} />
         ) : assessmentChartData.length ? (
           <Box
@@ -516,8 +565,8 @@ export default function SafetyIndicatorsView() {
               direction: "rtl",
               gap: 0.75,
               gridTemplateColumns: isRtl
-                ? "minmax(0, 1fr) auto"
-                : "auto minmax(0, 1fr)",
+                ? `minmax(0, 1fr) ${assessmentLabelWidth}px`
+                : `${assessmentLabelWidth}px minmax(0, 1fr)`,
               gridTemplateAreas: isRtl ? '"chart labels"' : '"labels chart"',
             }}
           >
@@ -577,13 +626,13 @@ export default function SafetyIndicatorsView() {
               sx={{
                 gridArea: "labels",
                 position: "relative",
-                width: 96,
+                width: assessmentLabelWidth,
                 height: assessmentChartHeight,
               }}
             >
               {assessmentChartData.map((item, index) => (
                 <Typography
-                  key={item.name}
+                  key={`${item.name}-${index}`}
                   variant="caption"
                   sx={{
                     position: "absolute",
@@ -598,6 +647,10 @@ export default function SafetyIndicatorsView() {
                     fontSize: 11,
                     color: "text.secondary",
                     lineHeight: 1.2,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
                   }}
                 >
                   {item.name}
@@ -617,7 +670,7 @@ export default function SafetyIndicatorsView() {
               {t("charts.topViolations")}
             </Typography>
 
-            {safetyQuery.isLoading ? (
+            {analyticsQuery.isLoading ? (
               <Skeleton variant="rounded" height={280} />
             ) : violationsPieData.length ? (
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
@@ -676,7 +729,7 @@ export default function SafetyIndicatorsView() {
               {t("charts.contractorConsultantErrors")}
             </Typography>
 
-            {safetyQuery.isLoading ? (
+            {analyticsQuery.isLoading ? (
               <Skeleton variant="rounded" height={280} />
             ) : contractorPieData.length ? (
               <Box sx={{ width: "100%", height: 280 }}>
