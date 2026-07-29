@@ -47,6 +47,7 @@ import { useTranslations } from "next-intl";
 import { ColumnDef } from "../table-component/types";
 import { ColumnVisibilityState } from "./useColumnVisibility";
 import { ColumnGroupDef, computeColumnRuns } from "../column-grouping";
+import { AddGroupDialog } from "./AddGroupDialog";
 
 export type ColumnVisibilityDialogProps<TRow> = {
   open: boolean;
@@ -65,7 +66,11 @@ export type ColumnVisibilityDialogProps<TRow> = {
   onReorder?: (activeKey: string, overKey: string) => void;
   groups?: ColumnGroupDef[];
   groupIdForColumn?: (columnKey: string) => string | undefined;
-  createGroup?: (name: string) => string;
+  createGroup?: (
+    name: string,
+    backgroundColor?: string,
+    textColor?: string,
+  ) => string;
   renameGroup?: (id: string, name: string) => void;
   setGroupColors?: (id: string, backgroundColor: string, textColor: string) => void;
   deleteGroup?: (id: string) => void;
@@ -490,6 +495,7 @@ export function ColumnVisibilityDialog<TRow>({
   const [activeType, setActiveType] = useState<"column" | "group" | null>(
     null,
   );
+  const [addGroupDialogOpen, setAddGroupDialogOpen] = useState(false);
 
   const visibleCount = columns.filter(
     (col) => columnVisibility[col.key] !== false,
@@ -628,6 +634,7 @@ export function ColumnVisibilityDialog<TRow>({
       : undefined;
 
   return (
+    <>
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{t("ColumnVisibility")}</DialogTitle>
       <DialogContent>
@@ -677,7 +684,7 @@ export function ColumnVisibilityDialog<TRow>({
               size="small"
               variant="outlined"
               startIcon={<Add fontSize="small" />}
-              onClick={() => createGroup?.(t("NewGroup"))}
+              onClick={() => setAddGroupDialogOpen(true)}
             >
               {t("AddGroup")}
             </Button>
@@ -749,5 +756,15 @@ export function ColumnVisibilityDialog<TRow>({
         <Button onClick={onClose}>{t("Close")}</Button>
       </DialogActions>
     </Dialog>
+    {groupingEnabled && (
+      <AddGroupDialog
+        open={addGroupDialogOpen}
+        onClose={() => setAddGroupDialogOpen(false)}
+        onCreate={(name, backgroundColor, textColor) =>
+          createGroup?.(name, backgroundColor, textColor)
+        }
+      />
+    )}
+    </>
   );
 }

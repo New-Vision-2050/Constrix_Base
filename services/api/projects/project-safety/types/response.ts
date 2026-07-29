@@ -7,8 +7,21 @@ export interface ProjectSafetyViolationDto {
   weight?: number | null;
 }
 
+export interface ProjectSafetyMorphableDto {
+  display?: string | null;
+  type?: string | null;
+}
+
+export interface ProjectSafetyAssignedUserDto {
+  id?: string | null;
+  name?: string | null;
+  consultant?: string | null;
+}
+
 export interface ProjectSafetyRecordDto {
   id: string;
+  morphable?: ProjectSafetyMorphableDto | null;
+  assigned_user?: ProjectSafetyAssignedUserDto | null;
   order_permit_num?: string | null;
   notification_num?: string | null;
   /** Some API responses use a combined field name. */
@@ -24,7 +37,16 @@ export interface ProjectSafetyRecordDto {
   contractor_id?: string | null;
   contractor_name?: string | null;
   contractor?: string | null;
+  status?: string | null;
+  project_id?: string | null;
   all_violations?: ProjectSafetyViolationDto[] | null;
+}
+
+export interface ProjectSafetyVisitsListPagination {
+  page: number;
+  next_page: number | null;
+  last_page: number;
+  result_count: number;
 }
 
 export interface ListProjectSafetyVisitsResponse {
@@ -32,6 +54,9 @@ export interface ListProjectSafetyVisitsResponse {
   message?: string | null;
   data?: ProjectSafetyRecordDto[] | ProjectSafetyRecordDto | null;
   payload?: ProjectSafetyRecordDto[] | ProjectSafetyRecordDto | null;
+  pagination?: ProjectSafetyVisitsListPagination;
+  last_page?: number;
+  total?: number;
 }
 
 export function extractProjectSafetyRecords(
