@@ -2,7 +2,6 @@ import { MessagesGroup, _m } from "../../types";
 
 export const projectWorkOrdersTabMessages = new MessagesGroup({
   title: _m("Work Orders", "أوامر العمل"),
-  title: _m("Permits", "التصاريح"),
   filtersTitle: _m(
     "Advanced search in work orders list",
     "البحث المتقدم في قائمة أوامر العمل",
@@ -101,7 +100,11 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
     endPermitDate: _m("Permit end date", "تاريخ نهاية التصريح"),
     noteFromPermitToDepartments: _m(
       "Notes from permit to Projects/Connections dept",
-      "ملاحظات علي التصريح من قسم المشاريع/التوصيلات",
+      "ملاحظات من التصاريح الي قسم المشاريع/التوصيلات",
+    ),
+    noteFromDepartmentsToPermit: _m(
+      "Notes from Projects/Connections dept to permit",
+      "ملاحظات من قسم المشاريع/التوصيلات الي التصاريح",
     ),
     isTakedAction: _m(
       "Action taken or warning sent",
@@ -237,7 +240,11 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       endPermitDate: _m("Permit end date", "تاريخ نهاية التصريح"),
       noteFromPermitToDepartments: _m(
         "Notes from permit to Projects/Connections dept",
-        "ملاحظات علي التصريح من قسم المشاريع/التوصيلات",
+        "ملاحظات من التصاريح الي قسم المشاريع/التوصيلات",
+      ),
+      noteFromDepartmentsToPermit: _m(
+        "Notes from Projects/Connections dept to permit",
+        "ملاحظات من قسم المشاريع/التوصيلات الي التصاريح",
       ),
       isTakedAction: _m(
         "Action taken or warning sent",

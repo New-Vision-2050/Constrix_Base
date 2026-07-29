@@ -89,6 +89,7 @@ export function mapProjectOrderPermitDto(
     startPermitDate: resolveDate(dto.start_permit_date),
     endPermitDate: resolveDate(dto.end_permit_date),
     noteFromPermitToDepartments: pickString(dto.note_from_permit_to_departments),
+    noteFromDepartmentsToPermit: pickString(dto.note_from_departments_to_permit),
     isTakedAction:
       dto.is_taked_action === true || dto.is_taked_action === 1
         ? "yes"
@@ -100,6 +101,7 @@ export function mapProjectOrderPermitDto(
         ? String(dto.count_of_days_from_assigned_date)
         : "",
     evaluationPermitStatus: pickString(dto.evaluation_permit_status),
+    employeeId: dto.employee_id != null ? String(dto.employee_id) : "",
     employeeName: pickString(dto.employee_name),
     completionPhaseId:
       dto.completion_phase_id != null ? Number(dto.completion_phase_id) : null,

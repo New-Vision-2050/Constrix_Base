@@ -127,6 +127,7 @@ export interface ProjectOrderPermitWorkOrderDto {
   start_permit_date?: string | null;
   end_permit_date?: string | null;
   note_from_permit_to_departments?: string | null;
+  note_from_departments_to_permit?: string | null;
   is_taked_action?: boolean | number | null;
   count_of_days_from_assigned_date?: number | string | null;
   evaluation_permit_status?: string | null;
@@ -199,4 +200,22 @@ export interface ImportProjectOrderPermitsResponse {
   code: string;
   message: string | null;
   payload?: unknown;
+}
+
+export interface NoteLog {
+  id: number;
+  project_order_permit_id: number;
+  user_id: number;
+  user_name: string | null;
+  created_by_name: string | null;
+  note: string | null;
+  type: string | null;
+  timezone: string | null;
+  created_at: string | null;
+  created_at_date: string | null;
+  created_at_time: string | null;
+}
+
+export interface NoteLogsResponse {
+  data: NoteLog[];
 }

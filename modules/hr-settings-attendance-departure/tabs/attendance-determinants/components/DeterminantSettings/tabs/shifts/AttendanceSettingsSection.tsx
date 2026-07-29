@@ -34,9 +34,7 @@ const RULE_TOGGLE_FIELDS: ConstraintRuleToggleField[] = [
   "is_after_finish_working_hours",
 ];
 
-type RuleValues = Record<ConstraintRuleField, number> & {
-  can_clock_in_before_enabled: boolean;
-};
+type RuleValues = Record<ConstraintRuleField, number>;
 type RuleToggleValues = Record<ConstraintRuleToggleField, boolean>;
 
 function defaultRuleValues(): RuleValues {
@@ -45,7 +43,6 @@ function defaultRuleValues(): RuleValues {
   ) as Record<ConstraintRuleField, number>;
   return {
     ...numericDefaults,
-    can_clock_in_before_enabled: false,
   };
 }
 
@@ -87,9 +84,6 @@ function parseConstraintRules(data: unknown): Partial<ConstraintRules> | null {
     const value = readRuleNumber(source, field);
     if (value != null) parsed[field] = value;
   }
-  if (source.can_clock_in_before === null) {
-    parsed.can_clock_in_before = null;
-  }
   for (const field of RULE_TOGGLE_FIELDS) {
     const value = readRuleBoolean(source, field);
     if (value != null) parsed[field] = value;
@@ -111,9 +105,6 @@ function mergeRuleValues(
     },
     { ...defaults } as RuleValues,
   );
-
-  numericValues.can_clock_in_before_enabled =
-    fromApi.can_clock_in_before != null && fromApi.can_clock_in_before > 0;
 
   return numericValues;
 }
@@ -142,9 +133,7 @@ function valuesToPatchBody(
     max_over_time: values.max_over_time,
     out_zone_minutes: values.out_zone_minutes,
     extension_hours_shift: values.extension_hours_shift,
-    can_clock_in_before: values.can_clock_in_before_enabled
-      ? values.can_clock_in_before
-      : null,
+    can_clock_in_before: values.can_clock_in_before,
     is_overtime_before_early_clock_in: toggles.is_overtime_before_early_clock_in,
     is_overtime_after_extension_hours_shift:
       toggles.is_overtime_after_extension_hours_shift,
@@ -218,10 +207,6 @@ export default function AttendanceSettingsSection({
     setToggles((prev) => ({ ...prev, [id]: checked }));
   };
 
-  const handleCanClockInBeforeToggle = (enabled: boolean) => {
-    setValues((prev) => ({ ...prev, can_clock_in_before_enabled: enabled }));
-  };
-
   const handleCancel = useCallback(() => {
     setValues(mergeRuleValues(rulesQuery.data));
     setToggles(mergeToggleValues(rulesQuery.data));
@@ -282,37 +267,18 @@ export default function AttendanceSettingsSection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {displayOptions.map((option) => {
-          const isCanClockInBefore = option.id === "can_clock_in_before";
-          const isEnabled = !isCanClockInBefore || values.can_clock_in_before_enabled;
-
           return (
             <div
               key={option.id}
               className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center"
             >
-              {isEditing && isCanClockInBefore ? (
-                <div className="flex items-center justify-between mb-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={values.can_clock_in_before_enabled}
-                      disabled={isBusy}
-                      onChange={(e) => handleCanClockInBeforeToggle(e.target.checked)}
-                      className="h-4 w-4 rounded border-border"
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {t("can_clock_in_before_enabled")}
-                    </span>
-                  </label>
-                </div>
-              ) : null}
               {isEditing ? (
-                <div className={`flex items-center gap-2 justify-start ${!isEnabled ? "opacity-40" : ""}`}>
+                <div className="flex items-center gap-2 justify-start">
                   <input
                     type="number"
                     min={0}
                     value={option.amount}
-                    disabled={isBusy || !isEnabled}
+                    disabled={isBusy}
                     onChange={(e) =>
                       handleAmountChange(option.id, e.target.value)
                     }
@@ -326,9 +292,7 @@ export default function AttendanceSettingsSection({
                 <p className="text-3xl font-semibold text-primary leading-none">
                   {rulesQuery.isLoading
                     ? "—"
-                    : isCanClockInBefore && !values.can_clock_in_before_enabled
-                      ? t("not_set")
-                      : `${option.amount} ${t(`${option.id}_unit`)}`}
+                    : `${option.amount} ${t(`${option.id}_unit`)}`}
                 </p>
               )}
               <p className="text-sm text-muted-foreground mt-3">{t(`${option.id}_label`)}</p>
