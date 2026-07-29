@@ -38,23 +38,44 @@ function resolvePagination(
     total?: number;
   },
   rowCount: number,
+  page: number,
+  perPage: number,
+  needsClientSlice: boolean,
 ): SafetyVisitsQueryResult["pagination"] {
+  const totalItems =
+    body.pagination?.result_count ?? body.total ?? rowCount;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+
+  if (needsClientSlice) {
+    return {
+      page,
+      next_page: page < totalPages ? page + 1 : null,
+      last_page: totalPages,
+      result_count: totalItems,
+    };
+  }
+
   const pagination = body.pagination;
   if (pagination) {
     return {
-      page: pagination.page ?? 1,
+      page: pagination.page ?? page,
       next_page: pagination.next_page ?? null,
-      last_page: pagination.last_page ?? 1,
-      result_count: pagination.result_count ?? rowCount,
+      last_page: pagination.last_page ?? totalPages,
+      result_count: pagination.result_count ?? totalItems,
     };
   }
 
   return {
-    page: 1,
-    next_page: null,
-    last_page: body.last_page ?? 1,
-    result_count: body.total ?? rowCount,
+    page,
+    next_page: page < totalPages ? page + 1 : null,
+    last_page: body.last_page ?? totalPages,
+    result_count: totalItems,
   };
+}
+
+function paginateRows<T>(rows: T[], page: number, perPage: number): T[] {
+  const start = (page - 1) * perPage;
+  return rows.slice(start, start + perPage);
 }
 
 export function useSafetyVisits({
@@ -79,15 +100,24 @@ export function useSafetyVisits({
       });
       const body = res.data;
       const records = extractProjectSafetyRecords(body);
-      const data = records.map((item) => mapSafetyVisitDto(item));
+      const allRows = records.map((item) => mapSafetyVisitDto(item));
+      const needsClientSlice = allRows.length > perPage;
+      const data = needsClientSlice
+        ? paginateRows(allRows, page, perPage)
+        : allRows;
 
       return {
         data,
-        pagination: resolvePagination(body, data.length),
+        pagination: resolvePagination(
+          body,
+          allRows.length,
+          page,
+          perPage,
+          needsClientSlice,
+        ),
       };
     },
     enabled: !!projectId,
     retry: false,
-    placeholderData: (prev) => prev,
   });
 }
