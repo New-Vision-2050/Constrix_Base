@@ -1,4 +1,6 @@
 export type ListProjectSafetyVisitsParams = {
+  page?: number;
+  per_page?: number;
   search?: string;
   date?: string;
   consultantEngineer?: string;
@@ -9,8 +11,11 @@ export type ListProjectSafetyVisitsParams = {
 
 export function buildListProjectSafetyVisitsParams(
   params: ListProjectSafetyVisitsParams,
-): Record<string, string> | undefined {
+): Record<string, string> {
   const query: Record<string, string> = {};
+
+  if (params.page != null) query.page = String(params.page);
+  if (params.per_page != null) query.per_page = String(params.per_page);
 
   const search = params.search?.trim();
   if (search) query.search = search;
@@ -27,7 +32,7 @@ export function buildListProjectSafetyVisitsParams(
 
   if (params.assignedUserId) query.assignedUserId = params.assignedUserId;
 
-  return Object.keys(query).length > 0 ? query : undefined;
+  return query;
 }
 
 /** @deprecated Use ListProjectSafetyVisitsParams */

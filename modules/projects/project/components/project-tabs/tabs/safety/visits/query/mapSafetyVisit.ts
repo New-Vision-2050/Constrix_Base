@@ -48,11 +48,12 @@ export function mapSafetyVisitDto(
   return {
     id: String(dto.id),
     workOrderNumber: pickString(
+      dto.morphable?.display,
       dto["order_permit_num/notification_num"],
       dto.order_permit_num,
       dto.notification_num,
     ),
-    workOrderType: pickString(dto.order_type),
+    workOrderType: pickString(dto.morphable?.type, dto.order_type),
     date: resolveDate(dto.date),
     time: pickString(dto.time),
     requiredGrade: toNumber(dto.required_score),
@@ -61,6 +62,7 @@ export function mapSafetyVisitDto(
     consultantEngineer: pickString(dto.consultant_engineer),
     consultant: pickString(dto.consultant),
     contractorId,
+    contractorName: pickString(dto.contractor_name),
     contractor,
     violations,
     violationValues: buildViolationValues(violations),

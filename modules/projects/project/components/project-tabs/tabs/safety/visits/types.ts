@@ -19,6 +19,7 @@ export type SafetyVisitRow = {
   consultantEngineer: string;
   consultant: string;
   contractorId: string;
+  contractorName: string;
   contractor: string;
   violations: SafetyViolation[];
   violationValues: Record<string, string>;
@@ -58,6 +59,18 @@ export type SafetyVisitBaseColumnKey =
 
 export type UseSafetyVisitsParams = {
   projectId: string | undefined;
+  page?: number;
+  perPage?: number;
   search?: string;
   filters?: SafetyVisitFilters;
+};
+
+export type SafetyVisitsQueryResult = {
+  data: SafetyVisitRow[];
+  pagination: {
+    page: number;
+    next_page: number | null;
+    last_page: number;
+    result_count: number;
+  };
 };
