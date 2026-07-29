@@ -97,51 +97,31 @@ export default function SafetyVisitsView() {
 
   const safetyQuery = useSafetyVisits({
     projectId,
+    page: params.page,
+    perPage: params.limit,
     search: params.search || undefined,
     filters,
   });
   const contractorsQuery = useProjectContractors(projectId);
   const employeesQuery = useProjectEmployees(projectId);
 
-  const allRows = useMemo(() => {
-    const contractorNameById = new Map(
-      (contractorsQuery.data ?? []).map((contractor) => [
-        String(contractor.id),
-        contractor.name,
-      ]),
-    );
-
-    return (safetyQuery.data ?? []).map((row) => ({
-      ...row,
-      contractor:
-        row.contractor ||
-        contractorNameById.get(row.contractorId) ||
-        row.contractorId ||
-        "",
-    }));
-  }, [safetyQuery.data, contractorsQuery.data]);
+  const rows = useMemo(() => safetyQuery.data?.data ?? [], [safetyQuery.data]);
+  const totalPages = safetyQuery.data?.pagination.last_page ?? 1;
+  const totalItems = safetyQuery.data?.pagination.result_count ?? rows.length;
 
   const consultantOptions = useMemo(
     () =>
-      [...new Set(allRows.map((row) => row.consultant).filter(Boolean))].sort(),
-    [allRows],
+      [...new Set(rows.map((row) => row.consultant).filter(Boolean))].sort(),
+    [rows],
   );
 
   const engineerOptions = useMemo(
     () =>
       [
-        ...new Set(allRows.map((row) => row.consultantEngineer).filter(Boolean)),
+        ...new Set(rows.map((row) => row.consultantEngineer).filter(Boolean)),
       ].sort(),
-    [allRows],
+    [rows],
   );
-
-  const totalItems = allRows.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
-
-  const pageData = useMemo(() => {
-    const start = (params.page - 1) * params.limit;
-    return allRows.slice(start, start + params.limit);
-  }, [allRows, params.page, params.limit]);
 
   const updateFilter = <K extends keyof SafetyVisitFilters>(
     key: K,
@@ -270,11 +250,13 @@ export default function SafetyVisitsView() {
         render: (row: SafetyVisitRow) => <span>{row.consultant}</span>,
       },
       {
-        key: "contractor",
+        key: "contractorName",
         name: tTable("contractor"),
         sortable: false,
         minWidth: 160,
-        render: (row: SafetyVisitRow) => <span>{row.contractor}</span>,
+        render: (row: SafetyVisitRow) => (
+          <span>{row.contractorName || "—"}</span>
+        ),
       },
     ];
 
@@ -306,7 +288,7 @@ export default function SafetyVisitsView() {
   }, [tTable]);
 
   const state = SafetyVisitsTableLayout.useTableState({
-    data: pageData,
+    data: rows,
     columns,
     totalPages,
     totalItems,
