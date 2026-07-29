@@ -81,7 +81,7 @@ export interface PatchConstraintRulesParams {
   max_over_time: number;
   out_zone_minutes: number;
   extension_hours_shift: number;
-  can_clock_in_before: number | null;
+  can_clock_in_before: number;
   is_overtime_before_early_clock_in: boolean;
   is_overtime_after_extension_hours_shift: boolean;
   is_after_finish_working_hours: boolean;

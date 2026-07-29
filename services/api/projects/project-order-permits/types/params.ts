@@ -27,7 +27,9 @@ export interface UpdateProjectOrderPermitArgs {
   start_permit_date?: string | null;
   end_permit_date?: string | null;
   note_from_permit_to_departments?: string | null;
+  note_from_departments_to_permit?: string | null;
   is_taked_action?: boolean | number | null;
   count_of_days_from_assigned_date?: number | string | null;
   evaluation_permit_status?: string | null;
+  employee_id?: string | number | null;
 }

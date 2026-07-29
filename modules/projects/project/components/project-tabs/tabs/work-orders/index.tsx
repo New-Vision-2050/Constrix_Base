@@ -42,6 +42,7 @@ import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-pe
 
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
 import { PerRowEditablePermitCell, type EditablePermitField } from "./EditablePermitCell";
+import NoteLogsEye from "./NoteLogsEye";
 
 import type { WorkOrderFilters, WorkOrderRow } from "./types";
 
@@ -50,8 +51,6 @@ import {
   WORK_ORDER_COLUMN_KEYS,
   type WorkOrderColumnKey,
 } from "./types";
-
-const WorkOrdersTableLayout = HeadlessTableLayout<WorkOrderRow>("work-orders");
 
 const EXCEL_FILE_ACCEPT =
   ".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -166,6 +165,7 @@ const NON_PERMIT_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "descriptionDetails",
   "consultantStatement",
   "lastDateConsultantStatement",
+  "noteFromDepartmentsToPermit",
   "officialProjectHours",
   "numberOfDaysToAchieveColumn155",
   "percentageTime",
@@ -184,6 +184,7 @@ const PROJECT_EDITABLE_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "descriptionDetails",
   "consultantStatement",
   "lastDateConsultantStatement",
+  "noteFromDepartmentsToPermit",
 ]);
 
 function renderWorkOrderCell(
@@ -246,6 +247,16 @@ export default function WorkOrdersTab({
   const { projectId } = useProject();
 
   const queryClient = useQueryClient();
+
+  const WorkOrdersTableLayout = useMemo(
+    () =>
+      HeadlessTableLayout<WorkOrderRow>(
+        departmentId != null
+          ? `work-orders-dept-${departmentId}`
+          : "work-orders",
+      ),
+    [departmentId],
+  );
 
   const t = useTranslations("project.workOrdersTab");
 
@@ -410,6 +421,8 @@ export default function WorkOrdersTab({
 
       noteFromPermitToDepartments: tFields("noteFromPermitToDepartments"),
 
+      noteFromDepartmentsToPermit: tFields("noteFromDepartmentsToPermit"),
+
       countOfDaysFromAssignedDate: tFields("countOfDaysFromAssignedDate"),
 
       evaluationPermitStatus: tFields("evaluationPermitStatus"),
@@ -490,6 +503,46 @@ export default function WorkOrdersTab({
           sortable: false,
 
           render: (row: WorkOrderRow) => {
+            if (key === "noteFromPermitToDepartments") {
+              return (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  {isEditable ? (
+                    <PerRowEditablePermitCell
+                      row={row}
+                      field={key as EditablePermitField}
+                      emptyDash={emptyDash}
+                      yesLabel={yesLabel}
+                      noLabel={noLabel}
+                      onSave={handlePermitSave}
+                    />
+                  ) : (
+                    <span>{row.noteFromPermitToDepartments || emptyDash}</span>
+                  )}
+                  <NoteLogsEye projectId={projectId} orderPermitId={row.id} emptyDash={emptyDash} noteType="permit_to_departments" />
+                </Box>
+              );
+            }
+
+            if (key === "noteFromDepartmentsToPermit") {
+              return (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  {isProjectEditable ? (
+                    <PerRowEditablePermitCell
+                      row={row}
+                      field={key as EditablePermitField}
+                      emptyDash={emptyDash}
+                      yesLabel={yesLabel}
+                      noLabel={noLabel}
+                      onSave={handlePermitSave}
+                    />
+                  ) : (
+                    <span>{row.noteFromDepartmentsToPermit || emptyDash}</span>
+                  )}
+                  <NoteLogsEye projectId={projectId} orderPermitId={row.id} emptyDash={emptyDash} noteType="departments_to_permit" />
+                </Box>
+              );
+            }
+
             if (isEditable && PERMIT_EDITABLE_COLUMN_KEYS.has(key)) {
               return (
                 <PerRowEditablePermitCell

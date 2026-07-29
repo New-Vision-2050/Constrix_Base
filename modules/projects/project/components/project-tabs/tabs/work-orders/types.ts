@@ -35,9 +35,11 @@ export interface WorkOrderRow {
   startPermitDate: string;
   endPermitDate: string;
   noteFromPermitToDepartments: string;
+  noteFromDepartmentsToPermit: string;
   isTakedAction: string;
   countOfDaysFromAssignedDate: string;
   evaluationPermitStatus: string;
+  employeeId: string;
   employeeName: string;
   completionPhaseId: number | null;
   completionPhaseName: string;
@@ -109,6 +111,7 @@ export type WorkOrderColumnKey =
   | "startPermitDate"
   | "endPermitDate"
   | "noteFromPermitToDepartments"
+  | "noteFromDepartmentsToPermit"
   | "countOfDaysFromAssignedDate"
   | "evaluationPermitStatus"
   | "employeeName"
@@ -162,6 +165,7 @@ export const WORK_ORDER_COLUMN_KEYS: WorkOrderColumnKey[] = [
   "startPermitDate",
   "endPermitDate",
   "noteFromPermitToDepartments",
+  "noteFromDepartmentsToPermit",
   "countOfDaysFromAssignedDate",
   "evaluationPermitStatus",
   "employeeName",
