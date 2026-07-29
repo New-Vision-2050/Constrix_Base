@@ -21,6 +21,7 @@ import {
   Chip,
 } from "@mui/material";
 import { InboxOutlined, SearchOff } from "@mui/icons-material";
+import { darken, lighten } from "@mui/material/styles";
 import type { SxProps, Theme } from "@mui/material/styles";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -69,6 +70,35 @@ function opaqueTintSx(tintColor: string) {
   };
 }
 
+// Row hover is driven by JS state (see DataRow's onMouseEnter/onMouseLeave)
+// rather than CSS :hover, so every cell — including sticky ones, which sit
+// outside the <tr> box and can't be reached by a plain CSS :hover rule —
+// reacts the same way from one shared boolean, no marker class needed.
+// Plain cells get a brighter wash of their resting color; cells belonging to
+// a group get a darker wash of the group's own color instead, so grouped
+// cells stay visually distinct from plain ones even while hovered.
+function hoverTintSx(baseColor: string, brighten: boolean) {
+  return {
+    backgroundColor: "background.paper",
+    backgroundImage: (theme: Theme) => {
+      const resolved = resolveSxColor(theme, baseColor);
+      const shifted = brighten ? lighten(resolved, 0.06) : darken(resolved, 0.12);
+      return `linear-gradient(${shifted}, ${shifted})`;
+    },
+  };
+}
+
+// Cell content is arbitrary (column.render can nest Chips, icons, or other
+// elements with their own explicit colors), so forcing legible text on hover
+// means overriding every descendant, not just the cell's own color.
+function forcedTextSx(textColor: string) {
+  return {
+    "& *": {
+      color: (theme: Theme) => `${resolveSxColor(theme, textColor)} !important`,
+    },
+  };
+}
+
 type DataRowProps<TRow> = {
   row: TRow;
   index: number;
@@ -88,12 +118,6 @@ type DataRowProps<TRow> = {
   onToggleSelect: () => void;
 };
 
-// MUI's `hover`/`:hover` styling only recolors the <tr> itself, never
-// reaching our custom sticky <td> children — the row's own "&:hover" rule
-// below targets this marker class explicitly so sticky cells pick up the
-// same tint via pure CSS, with no React state or extra re-renders needed.
-const STICKY_CELL_CLASS = "htbl-sticky-cell";
-
 function DataRow<TRow>({
   row,
   index,
@@ -109,6 +133,7 @@ function DataRow<TRow>({
   rowSx,
   onToggleSelect,
 }: DataRowProps<TRow>) {
+  const [isHovered, setIsHovered] = useState(false);
   const stripeColor = currentTheme === "green-light" ? "#F7FDF9" : "#14573A";
   const restingBackgroundColor = selected
     ? "action.selected"
@@ -118,22 +143,21 @@ function DataRow<TRow>({
         ? stripeColor
         : "background.paper";
   // Selected/cross-page-sticky rows already have their own resting tint;
-  // only plain rows should swap to the hover tint via CSS.
+  // only plain rows should swap to the hover tint.
   const showsHoverTint = !selected && !isCrossPageSticky;
+  const applyHover = isHovered && showsHoverTint;
 
   return (
     <TableRow
-      hover={showsHoverTint}
       selected={selected}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       sx={{
         "&:last-child td, &:last-child th": { border: 0 },
         ...opaqueTintSx(restingBackgroundColor),
         ...(isCrossPageSticky && {
           borderLeft: "3px solid",
           borderLeftColor: "primary.main",
-        }),
-        ...(showsHoverTint && {
-          [`&:hover .${STICKY_CELL_CLASS}`]: opaqueTintSx("action.hover"),
         }),
         ...rowSx,
       }}
@@ -144,8 +168,10 @@ function DataRow<TRow>({
           return (
             <TableCell
               padding="checkbox"
-              className={stickySx ? STICKY_CELL_CLASS : undefined}
-              sx={stickySx}
+              sx={{
+                ...stickySx,
+                ...(applyHover && hoverTintSx(restingBackgroundColor, true)),
+              }}
             >
               <Checkbox checked={selected} onChange={onToggleSelect} />
             </TableCell>
@@ -167,12 +193,14 @@ function DataRow<TRow>({
           <TableCell
             key={column.key}
             align={column.align || "left"}
-            className={stickySx ? STICKY_CELL_CLASS : undefined}
             sx={{
               ...getColumnSizingSx(column),
               ...(stickySx ??
                 (group ? { backgroundColor: group.backgroundColor } : {})),
               ...(group && { color: group.textColor }),
+              ...(applyHover && hoverTintSx(tintColor, !group)),
+              ...(applyHover &&
+                forcedTextSx(group ? group.textColor : "text.primary")),
             }}
           >
             {column.render(row, index, column)}
