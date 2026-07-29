@@ -250,7 +250,7 @@ export default function SafetyVisitsView() {
         render: (row: SafetyVisitRow) => <span>{row.consultant}</span>,
       },
       {
-        key: "contractor",
+        key: "contractorName",
         name: tTable("contractor"),
         sortable: false,
         minWidth: 160,

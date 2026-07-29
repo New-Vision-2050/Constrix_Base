@@ -20,7 +20,6 @@ export type SafetyVisitRow = {
   consultant: string;
   contractorId: string;
   contractorName: string;
-  contractor: string;
   violations: SafetyViolation[];
   violationValues: Record<string, string>;
 };
@@ -51,7 +50,7 @@ export const SAFETY_VISIT_BASE_COLUMN_KEYS = [
   "percentage",
   "consultantEngineer",
   "consultant",
-  "contractor",
+  "contractorName",
 ] as const;
 
 export type SafetyVisitBaseColumnKey =

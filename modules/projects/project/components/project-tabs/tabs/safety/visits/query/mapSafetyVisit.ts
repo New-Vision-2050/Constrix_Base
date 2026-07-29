@@ -23,14 +23,7 @@ function resolveDate(value: string | null | undefined): string {
 
 export function mapSafetyVisitDto(
   dto: ProjectSafetyRecordDto,
-  contractorNameById?: Map<string, string>,
 ): SafetyVisitRow {
-  const contractorId = pickString(dto.contractor_id);
-  const contractor =
-    pickString(dto.contractor_name, dto.contractor) ||
-    (contractorId ? contractorNameById?.get(contractorId) : "") ||
-    "";
-
   const violations = Array.isArray(dto.all_violations)
     ? dto.all_violations.map((violation) => ({
         id: String(violation.id),
@@ -61,9 +54,8 @@ export function mapSafetyVisitDto(
     percentage: toNumber(dto.percentage),
     consultantEngineer: pickString(dto.consultant_engineer),
     consultant: pickString(dto.consultant),
-    contractorId,
+    contractorId: pickString(dto.contractor_id),
     contractorName: pickString(dto.contractor_name),
-    contractor,
     violations,
     violationValues: buildViolationValues(violations),
   };
