@@ -434,19 +434,6 @@ export default function MapSettingsSection({
         ),
       },
       {
-        key: "location",
-        name: t("columnLocation"),
-        sortable: false,
-        align: "left",
-        render: (row: MapLocationRow) => (
-          <div className={`flex ${
-            isRTL
-              ? "text-right"
-              : "text-left"
-          } p-2 text-sm`}>{row.location}</div>
-        ),
-      },
-      {
         key: "actions",
         name: t("columnActions"),
         sortable: false,
