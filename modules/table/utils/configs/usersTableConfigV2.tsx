@@ -20,6 +20,9 @@ import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSe
 import useUserData from "@/hooks/use-user-data";
 import { useRouter } from "@i18n/navigation";
 import SubEntityStatusSwitch from "@/modules/users/components/SubEntityStatusSwitch";
+import SubEntityAttendanceBadge, {
+  type AttendanceListStatus,
+} from "@/modules/users/components/SubEntityAttendanceBadge";
 // Define types for the company data
 interface CompanyData {
   id: string;
@@ -46,6 +49,7 @@ export interface UserTableRow {
   companies: CompanyData[];
   user_id: string;
   identity_entry?: string | null;
+  attendance?: AttendanceListStatus;
   [key: string]: any; // For any other properties
 }
 
@@ -66,6 +70,8 @@ export const UsersConfigV2 = (options?: {
   const tSubTable = useTranslations("Companies.SubEntitiesTable");
   const tEditSubEntity = useTranslations("EditSubEntityMessages");
   const tUsers = useTranslations("Users");
+  const isEmployeeView =
+    options?.registrationFormSlug === ModelsTypes.EMPLOYEE;
   // define final form config for EDIT mode
   // Note: This config is used when clicking "Edit" button in the table
   const finalFormConfig = useMemo(() => {
@@ -487,6 +493,17 @@ export const UsersConfigV2 = (options?: {
       { key: "contract_start_date", label: tSubTable("ContractStartDate") },
       { key: "notice_period", label: tSubTable("NoticePeriod") },
       { key: "salary", label: tSubTable("Salary") },
+      ...(isEmployeeView
+        ? [
+            {
+              key: "attendance",
+              label: tSubTable("AttendanceStatus"),
+              render: (_: unknown, row: UserTableRow) => (
+                <SubEntityAttendanceBadge attendance={row.attendance} />
+              ),
+            },
+          ]
+        : []),
       {
         key: "status",
         label: "الحالة",
@@ -541,6 +558,19 @@ export const UsersConfigV2 = (options?: {
           placeholder: tSubTable("EmailOrPhone"),
         },
       },
+      ...(isEmployeeView
+        ? [
+            {
+              key: "start_date",
+              name: "start_date",
+              label: tSubTable("AttendanceDate"),
+              searchType: {
+                type: "date" as const,
+                placeholder: tSubTable("AttendanceDate"),
+              },
+            },
+          ]
+        : []),
     ],
     availableColumnKeys: [
       "name",
@@ -556,8 +586,12 @@ export const UsersConfigV2 = (options?: {
       "broker",
       "number_of_projects",
       "end_date",
+      ...(isEmployeeView ? ["attendance"] : []),
     ],
-    alwaysVisibleColumnKeys: ["status"],
+    alwaysVisibleColumnKeys: [
+      "status",
+      ...(isEmployeeView ? ["attendance"] : []),
+    ],
     defaultVisibleColumnKeys: [
       "name",
       "email",
@@ -565,6 +599,7 @@ export const UsersConfigV2 = (options?: {
       "companies",
       "user-type",
       "data_status",
+      ...(isEmployeeView ? ["attendance"] : []),
     ],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,

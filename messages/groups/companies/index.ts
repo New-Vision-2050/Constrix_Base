@@ -71,6 +71,8 @@ export const companiesMessages = new MessagesGroup({
     JobType: _m("Job Type", "نوع الوظيفة"),
     JobCode: _m("Job Code", "كود الوظيفة"),
     AttendanceConstraint: _m("Attendance Constraint", "محددات الحضور"),
+    AttendanceStatus: _m("Attendance Status", "حالة الحضور"),
+    AttendanceDate: _m("Attendance Date", "تاريخ الحضور"),
     Identity: _m("National ID", "رقم الهوية"),
     Passport: _m("Passport", "جواز السفر"),
     BorderNumber: _m("Border Number", "رقم الحدود"),
