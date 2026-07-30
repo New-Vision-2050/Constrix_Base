@@ -35,6 +35,7 @@ export const PublicDocsTable = () => {
     setOpenDirWithPassword,
     setVisitedDirs,
     setDocToView,
+    setSearchData,
   } = usePublicDocsCxt();
   const docsLibrary = useOptionalDocsLibraryCxt();
   const t = useTranslations("docs-library.publicDocs.table");
@@ -79,6 +80,7 @@ export const PublicDocsTable = () => {
       } else {
         setDocToView(row.document);
       }
+      setSearchData((prev) => ({ ...prev, search: "" }));
     },
     [
       projectId,
@@ -87,6 +89,7 @@ export const PublicDocsTable = () => {
       setOpenDirWithPassword,
       setVisitedDirs,
       setDocToView,
+      setSearchData,
       docsLibrary,
     ],
   );
