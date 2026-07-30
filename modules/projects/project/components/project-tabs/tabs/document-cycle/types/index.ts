@@ -76,4 +76,5 @@ export interface DocumentRow {
   /** From API `history` on attachment requests (chronological). */
   history?: DocumentHistoryEntry[];
   comments?: DocumentComment[];
+  canTakeAction?: boolean;
 }

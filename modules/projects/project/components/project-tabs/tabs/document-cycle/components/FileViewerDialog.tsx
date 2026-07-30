@@ -490,8 +490,7 @@ export default function FileViewerDialog({
 
   if (!document || !activeFile) return null;
 
-  const showWorkflow =
-    isIncoming && !isApprovedStatus(document.approvalStatus);
+  const showWorkflow = !!document.canTakeAction;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -610,7 +609,7 @@ export default function FileViewerDialog({
                 ))}
               </Box>
 
-              {isIncoming && (
+              {showWorkflow && (
                 <Box>
                   <Typography
                     variant="subtitle1"
