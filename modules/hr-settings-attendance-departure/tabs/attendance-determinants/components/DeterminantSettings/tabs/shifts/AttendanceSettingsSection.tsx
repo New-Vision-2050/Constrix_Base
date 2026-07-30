@@ -81,8 +81,12 @@ function parseConstraintRules(data: unknown): Partial<ConstraintRules> | null {
 
   const parsed: Partial<ConstraintRules> = {};
   for (const field of RULE_FIELDS) {
-    const value = readRuleNumber(source, field);
-    if (value != null) parsed[field] = value;
+    if (source[field] === null) {
+      (parsed as Record<string, unknown>)[field] = null;
+    } else {
+      const value = readRuleNumber(source, field);
+      if (value != null) parsed[field] = value;
+    }
   }
   for (const field of RULE_TOGGLE_FIELDS) {
     const value = readRuleBoolean(source, field);
@@ -100,7 +104,8 @@ function mergeRuleValues(
 
   const numericValues = RULE_FIELDS.reduce(
     (acc, field) => {
-      acc[field] = fromApi[field] ?? defaults[field];
+      const apiValue = fromApi[field];
+      acc[field] = apiValue !== undefined ? apiValue ?? 0 : defaults[field];
       return acc;
     },
     { ...defaults } as RuleValues,

@@ -15,6 +15,7 @@ import { AlertCircle, Navigation, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type NationalAddressMapPayload = {
+  name: string;
   longitude: string;
   latitude: string;
   radius: string;
@@ -44,6 +45,7 @@ export default function NationalAddressMapDialog({
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.maps",
   );
 
+  const [name, setName] = useState("");
   const [longitude, setLongitude] = useState(DEFAULT_COORD);
   const [latitude, setLatitude] = useState(DEFAULT_COORD);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
@@ -55,6 +57,7 @@ export default function NationalAddressMapDialog({
 
   useEffect(() => {
     if (!open) return;
+    setName(initialValues?.name ?? "");
     setLongitude(initialValues?.longitude ?? DEFAULT_COORD);
     setLatitude(initialValues?.latitude ?? DEFAULT_COORD);
     setRadius(initialValues?.radius ?? DEFAULT_RADIUS);
@@ -130,6 +133,7 @@ export default function NationalAddressMapDialog({
     try {
       await Promise.resolve(
         onSave({
+          name,
           longitude,
           latitude,
           radius,
@@ -174,6 +178,15 @@ export default function NationalAddressMapDialog({
         </div>
 
         <div className="space-y-4 px-4 pb-4 pt-4 sm:px-0">
+          <div>
+            <label className="text-sm">{t("nameLabel")}</label>
+            <Input
+              variant="secondary"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t("nameLabel")}
+            />
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="text-sm">{t("longitudeLabel")}</label>
