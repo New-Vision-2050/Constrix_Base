@@ -40,6 +40,7 @@ import type {
 
 export type MapLocationRow = {
   id: string;
+  name: string;
   longitude: string;
   latitude: string;
   location: string;
@@ -153,8 +154,10 @@ function mapPayloadToRow(
   const rad =
     radiusStr(payload.radius) ?? radiusStr(payload.radius_meters);
   const id = str(payload.id) || `constraint-location-${index}`;
+  const name = str(payload.name) || location;
   return {
     id,
+    name,
     longitude: lng,
     latitude: lat,
     location,
@@ -187,7 +190,7 @@ function mapPayloadToLocationCreateItem(
     throw new Error("يرجى إدخال إحداثيات صالحة.");
   const radius =
     Number.isFinite(radiusParsed) && radiusParsed > 0 ? radiusParsed : 1000;
-  const name = str(p.location) || "—";
+  const name = str(p.name) || str(p.location) || "—";
   return { name, latitude: lat, longitude: lng, radius };
 }
 
@@ -320,6 +323,7 @@ export default function MapSettingsSection({
     const row = rows.find((r) => r.id === editingRowId);
     if (!row) return undefined;
     return {
+      name: row.name,
       longitude: row.longitude,
       latitude: row.latitude,
       location: row.location,
@@ -390,6 +394,19 @@ export default function MapSettingsSection({
 
   const columns = useMemo(
     () => [
+      {
+        key: "name",
+        name: t("columnName"),
+        sortable: false,
+        align: "left",
+        render: (row: MapLocationRow) => (
+          <div className={`flex ${
+            isRTL
+              ? "text-right"
+              : "text-left"
+          } p-2 text-sm`}>{row.name}</div>
+        ),
+      },
       {
         key: "longitude",
         name: t("columnLongitude"),
