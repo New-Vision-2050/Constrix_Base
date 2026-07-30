@@ -84,6 +84,7 @@ export interface AttachmentRequest {
   attachments_preview?: AttachmentRequestItem[];
   statistics?: AttachmentRequestStatistics | null;
   history?: AttachmentRequestHistoryEntry[];
+  can_take_action?: number;
 }
 
 export interface AttachmentFolder {
