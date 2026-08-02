@@ -20,9 +20,7 @@ import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSe
 import useUserData from "@/hooks/use-user-data";
 import { useRouter } from "@i18n/navigation";
 import SubEntityStatusSwitch from "@/modules/users/components/SubEntityStatusSwitch";
-import SubEntityAttendanceBadge, {
-  type AttendanceListStatus,
-} from "@/modules/users/components/SubEntityAttendanceBadge";
+import SubEntityAttendanceBadge from "@/modules/users/components/SubEntityAttendanceBadge";
 // Define types for the company data
 interface CompanyData {
   id: string;
@@ -49,7 +47,10 @@ export interface UserTableRow {
   companies: CompanyData[];
   user_id: string;
   identity_entry?: string | null;
-  attendance?: AttendanceListStatus;
+  attendance_id?: string | null;
+  attendance_work_date?: string | null;
+  attendance_status_code?: string | null;
+  attendance_status_label?: string | null;
   [key: string]: any; // For any other properties
 }
 
@@ -499,7 +500,14 @@ export const UsersConfigV2 = (options?: {
               key: "attendance",
               label: tSubTable("AttendanceStatus"),
               render: (_: unknown, row: UserTableRow) => (
-                <SubEntityAttendanceBadge attendance={row.attendance} />
+                <SubEntityAttendanceBadge
+                  companyUserId={row.id}
+                  attendanceStatusCode={row.attendance_status_code}
+                  attendanceStatusLabel={row.attendance_status_label}
+                  attendanceId={row.attendance_id}
+                  attendanceWorkDate={row.attendance_work_date}
+                  tableId={options?.tableId}
+                />
               ),
             },
           ]
