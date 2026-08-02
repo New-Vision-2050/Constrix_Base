@@ -215,13 +215,6 @@ export default function SafetyReportsView() {
         render: (row: SafetyReportRow) => <span>{row.consultant}</span>,
       },
       {
-        key: "consultantEngineer",
-        name: tTable("consultantEngineer"),
-        sortable: false,
-        minWidth: 160,
-        render: (row: SafetyReportRow) => <span>{row.consultantEngineer}</span>,
-      },
-      {
         key: "actions",
         name: tTable("actions"),
         sortable: false,

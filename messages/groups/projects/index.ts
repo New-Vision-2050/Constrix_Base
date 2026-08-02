@@ -744,6 +744,8 @@ export const projectMessages = new MessagesGroup({
       ),
       branch: _m("Branch", "الفرع"),
       availableFar: _m("Available - Far", "متاح - بعيد"),
+      notConnected: _m("Not Connected", "غير متصل"),
+      absent: _m("Absent", "غائب"),
       contractorTechnicalNumber: _m(
         "Contractor Technical Number",
         "رقم فني المقاول",
