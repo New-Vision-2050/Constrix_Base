@@ -836,6 +836,13 @@ export const projectMessages = new MessagesGroup({
       ),
       siteStatusOriginal: _m("Original", "أصلي"),
       siteStatusCopied: _m("Copied", "منسوخ"),
+      downloadImage: _m("Download", "تحميل"),
+      downloadAllImages: _m("Download all (ZIP)", "تحميل الكل (ZIP)"),
+      downloadFailed: _m("Could not download", "تعذر التحميل"),
+      downloadingImages: _m("Preparing ZIP…", "جاري تجهيز ملف ZIP…"),
+      imagesSection: _m("Images", "الصور"),
+      showImages: _m("Show images", "عرض الصور"),
+      hideImages: _m("Hide images", "إخفاء الصور"),
       // Notes
       noNotes: _m("No notes yet", "لا توجد ملاحظات بعد"),
       writeNote: _m("Write a note…", "اكتب ملاحظة…"),
