@@ -44,7 +44,6 @@ export const SAFETY_VISIT_BASE_COLUMN_KEYS = [
   "workOrderNumber",
   "workOrderType",
   "date",
-  "time",
   "requiredGrade",
   "earnedGrade",
   "percentage",

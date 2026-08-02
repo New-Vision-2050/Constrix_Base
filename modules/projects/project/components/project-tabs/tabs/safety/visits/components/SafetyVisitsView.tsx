@@ -59,18 +59,6 @@ function formatDisplayDate(isoDate: string): string {
   return `${day}/${month}/${year}`;
 }
 
-function formatDisplayTime(time: string, locale: string): string {
-  const [hours, minutes] = time.split(":").map(Number);
-  if (Number.isNaN(hours) || Number.isNaN(minutes)) return time;
-  const date = new Date();
-  date.setHours(hours, minutes, 0, 0);
-  return date.toLocaleTimeString(locale, {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-}
-
 function formatGrade(value: number): string {
   return value.toLocaleString("en-US", {
     minimumFractionDigits: 4,
@@ -197,15 +185,6 @@ export default function SafetyVisitsView() {
         minWidth: 110,
         render: (row: SafetyVisitRow) => (
           <span>{formatDisplayDate(row.date)}</span>
-        ),
-      },
-      {
-        key: "time",
-        name: tTable("time"),
-        sortable: false,
-        minWidth: 100,
-        render: (row: SafetyVisitRow) => (
-          <span>{formatDisplayTime(row.time, "ar-SA")}</span>
         ),
       },
       {

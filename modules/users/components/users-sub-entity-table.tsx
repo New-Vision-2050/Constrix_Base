@@ -145,7 +145,9 @@ const UsersSubEntityTable = ({
     .filter((field) =>
       field.key === "email_or_phone"
         ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
-        : optionalAttr?.includes(field.name || field.key),
+        : field.key === "start_date"
+          ? registrationFormSlug === ModelsTypes.EMPLOYEE
+          : optionalAttr?.includes(field.name || field.key),
     )
     .filter(
       (field) =>
@@ -163,11 +165,26 @@ const UsersSubEntityTable = ({
         ? UsersRole.Broker
         : UsersRole.Employee;
 
+  const isEmployeeView = registrationFormSlug === ModelsTypes.EMPLOYEE;
+
   const tableConfig: TableConfig = {
     ...usersConfig,
     url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
-    defaultVisibleColumnKeys: defaultAttr,
-    availableColumnKeys: [...new Set([...(defaultAttr ?? []), ...(optionalAttr ?? [])])],
+    defaultVisibleColumnKeys: [
+      ...(defaultAttr ?? []),
+      ...(isEmployeeView ? ["attendance"] : []),
+    ],
+    availableColumnKeys: [
+      ...new Set([
+        ...(defaultAttr ?? []),
+        ...(optionalAttr ?? []),
+        ...(isEmployeeView ? ["attendance"] : []),
+      ]),
+    ],
+    alwaysVisibleColumnKeys: [
+      ...(usersConfig.alwaysVisibleColumnKeys ?? []),
+      ...(isEmployeeView ? ["attendance"] : []),
+    ],
     tableId: TABLE_ID,
     allSearchedFields,
     enableExport: can(entityPermissions.export),

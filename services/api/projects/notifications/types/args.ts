@@ -24,14 +24,20 @@ export type ProjectNotificationsMobileListArgs = Omit<
 };
 
 export type ProjectNotificationsExportArgs = ProjectNotificationScopeArgs & {
+  format?: "xlsx" | "csv";
   status?: string;
-  severity?: string;
   notification_type?: string;
   work_type?: string;
-  from_date?: string;
-  to_date?: string;
+  contractor_name?: string;
+  contractor_id?: string;
   assigned_user_id?: string;
+  task_date?: string;
+  date_from?: string;
+  date_to?: string;
   search?: string;
+  created_by_user_id?: string;
+  sort?: string;
+  ids?: string[];
 };
 
 export type ProjectNotificationsMapTasksArgs = ProjectNotificationScopeArgs & {

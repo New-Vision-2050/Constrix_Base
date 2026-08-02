@@ -21,6 +21,16 @@ function resolveDate(value: string | null | undefined): string {
   return raw.length >= 10 ? raw.slice(0, 10) : raw;
 }
 
+function resolveWorkOrderType(value: string | null | undefined): string {
+  const raw = value?.trim() ?? "";
+  if (!raw) return "";
+  const normalized = raw.toLowerCase();
+  if (normalized.includes("notification")) {
+    return "اشعار طوارئ";
+  }
+  return raw;
+}
+
 export function mapSafetyVisitDto(
   dto: ProjectSafetyRecordDto,
 ): SafetyVisitRow {
@@ -46,7 +56,9 @@ export function mapSafetyVisitDto(
       dto.order_permit_num,
       dto.notification_num,
     ),
-    workOrderType: pickString(dto.morphable?.type, dto.order_type),
+    workOrderType: resolveWorkOrderType(
+      pickString(dto.morphable?.type, dto.order_type),
+    ),
     date: resolveDate(dto.date),
     time: pickString(dto.time),
     requiredGrade: toNumber(dto.required_score),
