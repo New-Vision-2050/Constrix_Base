@@ -64,7 +64,10 @@ export function mapSafetyVisitDto(
     requiredGrade: toNumber(dto.required_score),
     earnedGrade: toNumber(dto.earned_score),
     percentage: toNumber(dto.percentage),
-    consultantEngineer: pickString(dto.consultant_engineer),
+    consultantEngineer: pickString(
+      dto.assigned_user?.name,
+      dto.consultant_engineer,
+    ),
     consultant: pickString(dto.consultant),
     contractorId: pickString(dto.contractor_id),
     contractorName: pickString(dto.contractor_name),
