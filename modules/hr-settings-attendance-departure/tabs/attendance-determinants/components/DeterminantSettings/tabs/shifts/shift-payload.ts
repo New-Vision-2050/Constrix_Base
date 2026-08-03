@@ -331,3 +331,44 @@ export function hydratedShiftStateFromApiEnvelope(
     dayPeriodRows,
   };
 }
+
+function hmToMinutes(hm: string): number {
+  const [h, m = "0"] = hm.trim().split(":");
+  return Number.parseInt(h, 10) * 60 + Number.parseInt(String(m), 10);
+}
+
+export function dayPeriodRowDurationMinutes(row: DayPeriodRow): number {
+  const start = to24HourHm(row.from, row.fromMeridiem);
+  const end = to24HourHm(row.to, row.toMeridiem);
+  let startMin = hmToMinutes(start);
+  let endMin = hmToMinutes(end);
+  if (endMin <= startMin) endMin += 24 * 60;
+  return endMin - startMin;
+}
+
+export function calculateWeeklyWorkHours(
+  weeklyDays: string[],
+  weeklyPeriodRows: DayPeriodRow[],
+  dayPeriodRows: Record<string, DayPeriodRow[]>,
+): number {
+  const dailyDays = Object.keys(dayPeriodRows).filter(
+    (day) => (dayPeriodRows[day] ?? []).length > 0,
+  );
+
+  if (dailyDays.length > 0) {
+    let totalMinutes = 0;
+    for (const day of dailyDays) {
+      for (const row of dayPeriodRows[day]) {
+        totalMinutes += dayPeriodRowDurationMinutes(row);
+      }
+    }
+    return totalMinutes / 60;
+  }
+
+  if (weeklyDays.length === 0 || weeklyPeriodRows.length === 0) return 0;
+  let perDayMinutes = 0;
+  for (const row of weeklyPeriodRows) {
+    perDayMinutes += dayPeriodRowDurationMinutes(row);
+  }
+  return (perDayMinutes * weeklyDays.length) / 60;
+}

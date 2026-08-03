@@ -19,12 +19,16 @@ import {
   type ConstraintRuleField,
   type ConstraintRuleToggleField,
 } from "./timing-constants";
+import {
+  calculateWeeklyWorkHours,
+  hydratedShiftStateFromApiEnvelope,
+} from "./shift-payload";
 
 const RULE_FIELDS: ConstraintRuleField[] = [
   "early_clock_in_minutes",
   "max_over_time",
   "out_zone_minutes",
-  "extension_hours_shift",
+  "extension_minutes",
   "can_clock_in_before",
 ];
 
@@ -34,9 +38,7 @@ const RULE_TOGGLE_FIELDS: ConstraintRuleToggleField[] = [
   "is_after_finish_working_hours",
 ];
 
-type RuleValues = Record<ConstraintRuleField, number> & {
-  can_clock_in_before_enabled: boolean;
-};
+type RuleValues = Record<ConstraintRuleField, number>;
 type RuleToggleValues = Record<ConstraintRuleToggleField, boolean>;
 
 function defaultRuleValues(): RuleValues {
@@ -45,7 +47,6 @@ function defaultRuleValues(): RuleValues {
   ) as Record<ConstraintRuleField, number>;
   return {
     ...numericDefaults,
-    can_clock_in_before_enabled: false,
   };
 }
 
@@ -85,7 +86,12 @@ function parseConstraintRules(data: unknown): Partial<ConstraintRules> | null {
   const parsed: Partial<ConstraintRules> = {};
   for (const field of RULE_FIELDS) {
     const value = readRuleNumber(source, field);
-    if (value != null) parsed[field] = value;
+    if (value != null) {
+      parsed[field] = value;
+    } else if (field === "extension_minutes") {
+      const alias = readRuleNumber(source, "extension_hours_shift");
+      if (alias != null) parsed[field] = alias;
+    }
   }
   if (source.can_clock_in_before === null) {
     parsed.can_clock_in_before = null;
@@ -111,9 +117,6 @@ function mergeRuleValues(
     },
     { ...defaults } as RuleValues,
   );
-
-  numericValues.can_clock_in_before_enabled =
-    fromApi.can_clock_in_before != null && fromApi.can_clock_in_before > 0;
 
   return numericValues;
 }
@@ -141,10 +144,8 @@ function valuesToPatchBody(
     early_clock_in_minutes: values.early_clock_in_minutes,
     max_over_time: values.max_over_time,
     out_zone_minutes: values.out_zone_minutes,
-    extension_hours_shift: values.extension_hours_shift,
-    can_clock_in_before: values.can_clock_in_before_enabled
-      ? values.can_clock_in_before
-      : null,
+    extension_minutes: values.extension_minutes,
+    can_clock_in_before: values.can_clock_in_before,
     is_overtime_before_early_clock_in: toggles.is_overtime_before_early_clock_in,
     is_overtime_after_extension_hours_shift:
       toggles.is_overtime_after_extension_hours_shift,
@@ -175,6 +176,26 @@ export default function AttendanceSettingsSection({
     enabled: Boolean(constraintId),
     refetchOnWindowFocus: false,
   });
+
+  const shiftsQuery = useQuery({
+    queryKey: ["constraint-shifts", constraintId],
+    queryFn: async () =>
+      (
+        await AttendanceConstraints.getShifts(constraintId)
+      ).data as unknown,
+    enabled: Boolean(constraintId),
+    refetchOnWindowFocus: false,
+  });
+
+  const weeklyWorkHours = useMemo(() => {
+    const state = hydratedShiftStateFromApiEnvelope(shiftsQuery.data);
+    if (!state) return 0;
+    return calculateWeeklyWorkHours(
+      state.weeklyDays,
+      state.weeklyPeriodRows,
+      state.dayPeriodRows,
+    );
+  }, [shiftsQuery.data]);
 
   useEffect(() => {
     if (rulesQuery.status !== "success" || isEditing) return;
@@ -216,10 +237,6 @@ export default function AttendanceSettingsSection({
 
   const handleToggleChange = (id: ConstraintRuleToggleField, checked: boolean) => {
     setToggles((prev) => ({ ...prev, [id]: checked }));
-  };
-
-  const handleCanClockInBeforeToggle = (enabled: boolean) => {
-    setValues((prev) => ({ ...prev, can_clock_in_before_enabled: enabled }));
   };
 
   const handleCancel = useCallback(() => {
@@ -281,38 +298,27 @@ export default function AttendanceSettingsSection({
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center">
+          <p className="text-3xl font-semibold text-primary leading-none">
+            {shiftsQuery.isLoading
+              ? "—"
+              : `${weeklyWorkHours} ${t("weekly_work_hours_unit")}`}
+          </p>
+          <p className="text-sm text-muted-foreground mt-3">{t("weekly_work_hours_label")}</p>
+        </div>
         {displayOptions.map((option) => {
-          const isCanClockInBefore = option.id === "can_clock_in_before";
-          const isEnabled = !isCanClockInBefore || values.can_clock_in_before_enabled;
-
           return (
             <div
               key={option.id}
               className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center"
             >
-              {isEditing && isCanClockInBefore ? (
-                <div className="flex items-center justify-between mb-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={values.can_clock_in_before_enabled}
-                      disabled={isBusy}
-                      onChange={(e) => handleCanClockInBeforeToggle(e.target.checked)}
-                      className="h-4 w-4 rounded border-border"
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {t("can_clock_in_before_enabled")}
-                    </span>
-                  </label>
-                </div>
-              ) : null}
               {isEditing ? (
-                <div className={`flex items-center gap-2 justify-start ${!isEnabled ? "opacity-40" : ""}`}>
+                <div className="flex items-center gap-2 justify-start">
                   <input
                     type="number"
                     min={0}
                     value={option.amount}
-                    disabled={isBusy || !isEnabled}
+                    disabled={isBusy}
                     onChange={(e) =>
                       handleAmountChange(option.id, e.target.value)
                     }
@@ -326,9 +332,7 @@ export default function AttendanceSettingsSection({
                 <p className="text-3xl font-semibold text-primary leading-none">
                   {rulesQuery.isLoading
                     ? "—"
-                    : isCanClockInBefore && !values.can_clock_in_before_enabled
-                      ? t("not_set")
-                      : `${option.amount} ${t(`${option.id}_unit`)}`}
+                    : `${option.amount} ${t(`${option.id}_unit`)}`}
                 </p>
               )}
               <p className="text-sm text-muted-foreground mt-3">{t(`${option.id}_label`)}</p>
