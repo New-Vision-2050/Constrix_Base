@@ -3,8 +3,10 @@
 import { useMemo } from "react";
 import {
   Box,
+  Button,
   Chip,
   CircularProgress,
+  Collapse,
   Grid,
   IconButton,
   Paper,
@@ -14,11 +16,12 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Copy, FileText, Check } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Copy, Download, FileText, ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import Link from "next/link";
+import JSZip from "jszip";
 import {
   useCopiedSiteStatusUpdates,
   useCopySiteStatusUpdateMutation,
@@ -82,6 +85,88 @@ function isImageAttachment(att: SiteStatusUpdateAttachment): boolean {
     return ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext ?? "");
   }
   return false;
+}
+
+function attachmentFileName(
+  att: SiteStatusUpdateAttachment,
+  index: number,
+): string {
+  if (att.name?.trim()) return att.name.trim();
+  try {
+    const path = new URL(normalizeUrl(att.url)).pathname;
+    const fromUrl = path.split("/").pop();
+    if (fromUrl) return decodeURIComponent(fromUrl);
+  } catch {
+    /* ignore */
+  }
+  return `image-${index + 1}.jpg`;
+}
+
+async function fetchAttachmentBlob(
+  att: SiteStatusUpdateAttachment,
+): Promise<Blob> {
+  const absoluteUrl = normalizeUrl(att.url);
+  const proxyUrl = `/api/download?url=${encodeURIComponent(absoluteUrl)}`;
+  const res = await fetch(proxyUrl);
+  if (!res.ok) {
+    throw new Error(`Failed to download (${res.status})`);
+  }
+  return res.blob();
+}
+
+function triggerBlobDownload(blob: Blob, fileName: string): void {
+  const objectUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = objectUrl;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(objectUrl);
+}
+
+async function downloadAttachment(
+  att: SiteStatusUpdateAttachment,
+  index: number,
+): Promise<void> {
+  const blob = await fetchAttachmentBlob(att);
+  triggerBlobDownload(blob, attachmentFileName(att, index));
+}
+
+function uniqueZipEntryName(fileName: string, usedNames: Set<string>): string {
+  if (!usedNames.has(fileName)) {
+    usedNames.add(fileName);
+    return fileName;
+  }
+  const dot = fileName.lastIndexOf(".");
+  const base = dot > 0 ? fileName.slice(0, dot) : fileName;
+  const ext = dot > 0 ? fileName.slice(dot) : "";
+  let i = 2;
+  let candidate = `${base} (${i})${ext}`;
+  while (usedNames.has(candidate)) {
+    i += 1;
+    candidate = `${base} (${i})${ext}`;
+  }
+  usedNames.add(candidate);
+  return candidate;
+}
+
+async function downloadAttachmentsAsZip(
+  attachments: SiteStatusUpdateAttachment[],
+  zipName: string,
+): Promise<void> {
+  const zip = new JSZip();
+  const usedNames = new Set<string>();
+
+  for (let i = 0; i < attachments.length; i++) {
+    const att = attachments[i];
+    const blob = await fetchAttachmentBlob(att);
+    const entryName = uniqueZipEntryName(attachmentFileName(att, i), usedNames);
+    zip.file(entryName, blob);
+  }
+
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+  triggerBlobDownload(zipBlob, zipName.endsWith(".zip") ? zipName : `${zipName}.zip`);
 }
 
 function buildCopyText(
@@ -281,6 +366,9 @@ function SiteStatusCard({
   showCopiedBadge?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const [imagesExpanded, setImagesExpanded] = useState(false);
+  const [downloadingAll, setDownloadingAll] = useState(false);
+  const [downloadingIndex, setDownloadingIndex] = useState<number | null>(null);
   const copyMutation = useCopySiteStatusUpdateMutation(notificationId);
 
   const handleCopy = async () => {
@@ -301,6 +389,33 @@ function SiteStatusCard({
   const timeLabel = formatArabicTime(update.created_at);
   const imageAttachments = update.attachments.filter(isImageAttachment);
   const otherAttachments = update.attachments.filter((a) => !isImageAttachment(a));
+
+  const handleDownloadImage = async (
+    att: SiteStatusUpdateAttachment,
+    index: number,
+  ) => {
+    setDownloadingIndex(index);
+    try {
+      await downloadAttachment(att, index);
+    } catch {
+      toast.error(t("downloadFailed"));
+    } finally {
+      setDownloadingIndex(null);
+    }
+  };
+
+  const handleDownloadAllImages = async () => {
+    if (!imageAttachments.length || downloadingAll) return;
+    setDownloadingAll(true);
+    try {
+      const zipName = `site-status-${notification.notification_number ?? notificationId}-${dateLabel.replace(/\//g, "-")}.zip`;
+      await downloadAttachmentsAsZip(imageAttachments, zipName);
+    } catch {
+      toast.error(t("downloadFailed"));
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
 
   return (
     <Paper
@@ -450,49 +565,174 @@ function SiteStatusCard({
           </Grid>
         </Grid>
 
-        {/* Image attachments */}
+        {/* Image attachments — collapsed by default so large images aren't fetched until opened */}
         {imageAttachments.length > 0 && (
           <Box
             sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "repeat(2, minmax(0, 1fr))",
-                sm: "repeat(3, minmax(0, 1fr))",
-              },
-              gap: 1,
+              borderRadius: 2,
+              border: 1,
+              borderColor: "divider",
+              overflow: "hidden",
             }}
           >
-            {imageAttachments.map((att, idx) => (
-              <Box
-                key={att.id ?? idx}
-                component={Link}
-                href={normalizeUrl(att.url)}
-                target="_blank"
-                rel="noopener noreferrer"
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 1,
+                px: 1.5,
+                py: 1,
+                bgcolor: "action.hover",
+              }}
+            >
+              <Button
+                size="small"
+                color="inherit"
+                onClick={() => setImagesExpanded((v) => !v)}
+                startIcon={<ImageIcon className="w-4 h-4" />}
+                endIcon={
+                  imagesExpanded ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )
+                }
                 sx={{
-                  display: "block",
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  aspectRatio: "1",
-                  border: 1,
-                  borderColor: "divider",
-                  cursor: "pointer",
-                  "&:hover": { opacity: 0.85 },
+                  textTransform: "none",
+                  fontWeight: 600,
+                  color: "text.primary",
+                  justifyContent: "flex-start",
+                  px: 0.5,
                 }}
               >
-                <Box
-                  component="img"
-                  src={normalizeUrl(att.url)}
-                  alt={att.name ?? `image-${idx}`}
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
+                {t("imagesSection")}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ ms: 1, fontWeight: 600 }}
+                >
+                  ({imageAttachments.length})
+                </Typography>
+              </Button>
+
+              <Stack direction="row" spacing={1} alignItems="center">
+                {imagesExpanded ? (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={
+                      downloadingAll ? (
+                        <CircularProgress size={14} thickness={4} />
+                      ) : (
+                        <Download className="w-4 h-4" />
+                      )
+                    }
+                    onClick={handleDownloadAllImages}
+                    disabled={downloadingAll}
+                  >
+                    {downloadingAll ? t("downloadingImages") : t("downloadAllImages")}
+                  </Button>
+                ) : null}
+                <Tooltip title={imagesExpanded ? t("hideImages") : t("showImages")}>
+                  <IconButton
+                    size="small"
+                    onClick={() => setImagesExpanded((v) => !v)}
+                    aria-expanded={imagesExpanded}
+                    aria-label={imagesExpanded ? t("hideImages") : t("showImages")}
+                  >
+                    {imagesExpanded ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Box>
+
+            <Collapse in={imagesExpanded} timeout="auto" unmountOnExit>
+              <Box
+                sx={{
+                  p: 1.5,
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "repeat(2, minmax(0, 1fr))",
+                    sm: "repeat(3, minmax(0, 1fr))",
+                  },
+                  gap: 1,
+                }}
+              >
+                {imageAttachments.map((att, idx) => (
+                  <Box
+                    key={att.id ?? idx}
+                    sx={{
+                      position: "relative",
+                      borderRadius: 2,
+                      overflow: "hidden",
+                      aspectRatio: "1",
+                      border: 1,
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Tooltip title={t("downloadImage")}>
+                      <IconButton
+                        size="small"
+                        aria-label={t("downloadImage")}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          void handleDownloadImage(att, idx);
+                        }}
+                        disabled={downloadingAll || downloadingIndex === idx}
+                        sx={{
+                          position: "absolute",
+                          top: 6,
+                          left: 6,
+                          zIndex: 1,
+                          bgcolor: "rgba(255,255,255,0.92)",
+                          boxShadow: 1,
+                          "&:hover": { bgcolor: "common.white" },
+                        }}
+                      >
+                        {downloadingIndex === idx ? (
+                          <CircularProgress size={14} thickness={4} />
+                        ) : (
+                          <Download className="w-4 h-4" />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+                    <Box
+                      component={Link}
+                      href={normalizeUrl(att.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        display: "block",
+                        width: "100%",
+                        height: "100%",
+                        cursor: "pointer",
+                        "&:hover": { opacity: 0.9 },
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={normalizeUrl(att.url)}
+                        alt={att.name ?? `image-${idx}`}
+                        loading="lazy"
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                ))}
               </Box>
-            ))}
+            </Collapse>
           </Box>
         )}
 

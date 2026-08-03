@@ -26,8 +26,8 @@ export type ColumnGroupingState = {
   columnGroupMap: Record<string, string>;
 };
 
-const DEFAULT_GROUP_BACKGROUND = "#E3F2FD";
-const DEFAULT_GROUP_TEXT_COLOR = "#0D47A1";
+export const DEFAULT_GROUP_BACKGROUND = "#E3F2FD";
+export const DEFAULT_GROUP_TEXT_COLOR = "#0D47A1";
 
 function generateGroupId(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {

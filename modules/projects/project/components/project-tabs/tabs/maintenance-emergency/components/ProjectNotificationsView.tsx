@@ -234,7 +234,7 @@ export default function ProjectNotificationsView() {
       hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_DELETE),
     [isEngagement, flatPerms],
   );
-  const canExport = useMemo(
+  const canExport = useMemo( 
     () =>
       isEngagement ||
       hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_EXPORT),
@@ -341,33 +341,6 @@ export default function ProjectNotificationsView() {
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
       toast.error(error?.response?.data?.message ?? t("notifyByVoiceError"));
-    },
-  });
-
-  const exportMutation = useMutation({
-    mutationFn: async () => {
-      const res = await ProjectNotificationsApi.export(
-        buildNotificationsExportArgs(notificationScope, {
-          status: filterStatus || undefined,
-          severity: filterSeverity || undefined,
-          notification_type: filterType || undefined,
-          from_date: filterFromDate || undefined,
-          to_date: filterToDate || undefined,
-          assigned_user_id: filterAssignedUser || undefined,
-          search: params.search || undefined,
-        }),
-      );
-      const url = window.URL.createObjectURL(res.data);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = notificationScopeExportFilename(notificationScope);
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    },
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(error?.response?.data?.message ?? tCommon("states.error"));
     },
   });
 
@@ -659,6 +632,34 @@ export default function ProjectNotificationsView() {
     searchable: true,
   });
 
+  const exportMutation = useMutation({
+    mutationFn: async (ids?: string[]) => {
+      const res = await ProjectNotificationsApi.export(
+        buildNotificationsExportArgs(notificationScope, {
+          format: "xlsx",
+          status: filterStatus || undefined,
+          notification_type: filterType || undefined,
+          date_from: filterFromDate || undefined,
+          date_to: filterToDate || undefined,
+          assigned_user_id: filterAssignedUser || undefined,
+          search: params.search || undefined,
+          ...(ids?.length ? { ids } : {}),
+        }),
+      );
+      const url = window.URL.createObjectURL(res.data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = notificationScopeExportFilename(notificationScope);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? tCommon("states.error"));
+    },
+  });
+
   if (!hasScope) {
     return null;
   }
@@ -789,11 +790,15 @@ export default function ProjectNotificationsView() {
                         {t("addNotification")}
                       </Button>
                     ) : null}
-                    {canExport ? (
+                    {canView ? (
                       <Button
                         variant="outlined"
                         startIcon={<FileDown />}
-                        onClick={() => exportMutation.mutate()}
+                        onClick={() =>
+                          exportMutation.mutate(
+                            state.selection.selectedRows.map((row) => row.id),
+                          )
+                        }
                         disabled={exportMutation.isPending}
                       >
                         {t("export")}

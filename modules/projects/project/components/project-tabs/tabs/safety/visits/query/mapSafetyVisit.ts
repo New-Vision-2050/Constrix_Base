@@ -21,16 +21,19 @@ function resolveDate(value: string | null | undefined): string {
   return raw.length >= 10 ? raw.slice(0, 10) : raw;
 }
 
+function resolveWorkOrderType(value: string | null | undefined): string {
+  const raw = value?.trim() ?? "";
+  if (!raw) return "";
+  const normalized = raw.toLowerCase();
+  if (normalized.includes("notification")) {
+    return "اشعار طوارئ";
+  }
+  return raw;
+}
+
 export function mapSafetyVisitDto(
   dto: ProjectSafetyRecordDto,
-  contractorNameById?: Map<string, string>,
 ): SafetyVisitRow {
-  const contractorId = pickString(dto.contractor_id);
-  const contractor =
-    pickString(dto.contractor_name, dto.contractor) ||
-    (contractorId ? contractorNameById?.get(contractorId) : "") ||
-    "";
-
   const violations = Array.isArray(dto.all_violations)
     ? dto.all_violations.map((violation) => ({
         id: String(violation.id),
@@ -48,20 +51,26 @@ export function mapSafetyVisitDto(
   return {
     id: String(dto.id),
     workOrderNumber: pickString(
+      dto.morphable?.display,
       dto["order_permit_num/notification_num"],
       dto.order_permit_num,
       dto.notification_num,
     ),
-    workOrderType: pickString(dto.order_type),
+    workOrderType: resolveWorkOrderType(
+      pickString(dto.morphable?.type, dto.order_type),
+    ),
     date: resolveDate(dto.date),
     time: pickString(dto.time),
     requiredGrade: toNumber(dto.required_score),
     earnedGrade: toNumber(dto.earned_score),
     percentage: toNumber(dto.percentage),
-    consultantEngineer: pickString(dto.consultant_engineer),
+    consultantEngineer: pickString(
+      dto.assigned_user?.name,
+      dto.consultant_engineer,
+    ),
     consultant: pickString(dto.consultant),
-    contractorId,
-    contractor,
+    contractorId: pickString(dto.contractor_id),
+    contractorName: pickString(dto.contractor_name),
     violations,
     violationValues: buildViolationValues(violations),
   };

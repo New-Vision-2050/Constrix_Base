@@ -47,8 +47,8 @@ export const projectSafetyTabMessages = new MessagesGroup({
     }),
     table: new MessagesGroup({
       workOrderNumber: _m(
-        "Notification number",
-        "رقم الاشعار",
+        "Work order / notification number",
+        "رقم أمر العمل / الإشعار",
       ),
       workOrderType: _m("Work order type", "نوع أمر العمل"),
       date: _m("Date", "التاريخ"),

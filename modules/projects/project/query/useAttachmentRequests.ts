@@ -89,6 +89,7 @@ function mapToDocumentRow(item: AttachmentRequestWithFlow): DocumentRow {
     description: item.notes?.trim() ? item.notes : undefined,
     attachments,
     history: mapAttachmentRequestHistory(item),
+    canTakeAction: item.can_take_action === 1,
   };
 }
 

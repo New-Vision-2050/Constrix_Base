@@ -10,6 +10,7 @@ import type {
   ImportProjectOrderPermitsResponse,
   ListProjectOrderPermitDepartmentsResponse,
   ListProjectOrderPermitsResponse,
+  NoteLogsResponse,
   UpdateProjectOrderPermitResponse,
 } from "./types/response";
 
@@ -71,4 +72,12 @@ export const ProjectOrderPermitsApi = {
     baseApi.get<CompletionDataResponse>("completion-data", {
       params: { project_order_permit_id: projectOrderPermitId },
     }),
+
+  getNoteLogs: (
+    projectId: string | number,
+    orderPermitId: string | number,
+  ) =>
+    baseApi.get<NoteLogsResponse>(
+      `projects/${projectId}/order-permits/${orderPermitId}/note-logs`,
+    ),
 };

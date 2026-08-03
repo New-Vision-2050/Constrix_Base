@@ -11,12 +11,15 @@ import {
   getCompletionPhases,
   getAllCompletionStatuses,
 } from "@/modules/projects/project/query/useCompletionData";
+import { useProjectEmployees } from "@/modules/projects/project/query/useProjectEmployees";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
 
 export type EditablePermitField =
   | "permitStatus"
   | "startPermitDate"
   | "endPermitDate"
   | "noteFromPermitToDepartments"
+  | "noteFromDepartmentsToPermit"
   | "isTakedAction"
   | "countOfDaysFromAssignedDate"
   | "evaluationPermitStatus"
@@ -40,6 +43,7 @@ interface EditablePermitCellProps {
   permitStatusOptions: CompletionPhaseStatus[];
   completionPhases: CompletionPhase[];
   completionStatuses: CompletionPhaseStatus[];
+  employeeOptions: { id: string; name: string }[];
   onSave: (id: string, body: Record<string, unknown>) => void;
 }
 
@@ -53,6 +57,8 @@ function getRowValue(row: WorkOrderRow, field: EditablePermitField): string {
       return row.endPermitDate;
     case "noteFromPermitToDepartments":
       return row.noteFromPermitToDepartments;
+    case "noteFromDepartmentsToPermit":
+      return row.noteFromDepartmentsToPermit;
     case "isTakedAction":
       return row.isTakedAction;
     case "countOfDaysFromAssignedDate":
@@ -60,7 +66,7 @@ function getRowValue(row: WorkOrderRow, field: EditablePermitField): string {
     case "evaluationPermitStatus":
       return row.evaluationPermitStatus;
     case "employeeName":
-      return row.employeeName;
+      return row.employeeId;
     case "completionPhase":
       return row.completionPhaseId != null ? String(row.completionPhaseId) : "";
     case "phaseStatus":
@@ -95,6 +101,8 @@ function buildBody(
       return { end_permit_date: value || null };
     case "noteFromPermitToDepartments":
       return { note_from_permit_to_departments: value || null };
+    case "noteFromDepartmentsToPermit":
+      return { note_from_departments_to_permit: value || null };
     case "isTakedAction":
       return {
         is_taked_action:
@@ -107,7 +115,7 @@ function buildBody(
     case "evaluationPermitStatus":
       return { evaluation_permit_status: value || null };
     case "employeeName":
-      return { employee_name: value || null };
+      return { employee_id: value || null };
     case "completionPhase":
       return { completion_phase_id: value ? Number(value) : null };
     case "phaseStatus":
@@ -136,7 +144,8 @@ export function PerRowEditablePermitCell({
   yesLabel,
   noLabel,
   onSave,
-}: Omit<EditablePermitCellProps, "permitStatusOptions" | "completionPhases" | "completionStatuses">) {
+}: Omit<EditablePermitCellProps, "permitStatusOptions" | "completionPhases" | "completionStatuses" | "employeeOptions">) {
+  const { projectId } = useProject();
   const completionDataQuery = useCompletionData(Number(row.id));
   const permitStatusOptions = useMemo(
     () => flattenCompletionStatuses(completionDataQuery.data),
@@ -150,6 +159,15 @@ export function PerRowEditablePermitCell({
     () => getAllCompletionStatuses(completionDataQuery.data),
     [completionDataQuery.data],
   );
+  const employeesQuery = useProjectEmployees(projectId);
+  const employeeOptions = useMemo(
+    () =>
+      (employeesQuery.data ?? []).map((e) => ({
+        id: e.user.id,
+        name: e.user.name,
+      })),
+    [employeesQuery.data],
+  );
   return (
     <EditablePermitCell
       row={row}
@@ -160,6 +178,7 @@ export function PerRowEditablePermitCell({
       permitStatusOptions={permitStatusOptions}
       completionPhases={completionPhases}
       completionStatuses={completionStatuses}
+      employeeOptions={employeeOptions}
       onSave={onSave}
     />
   );
@@ -174,6 +193,7 @@ export default function EditablePermitCell({
   permitStatusOptions,
   completionPhases,
   completionStatuses,
+  employeeOptions,
   onSave,
 }: EditablePermitCellProps) {
   const [editing, setEditing] = useState(false);
@@ -245,6 +265,11 @@ export default function EditablePermitCell({
       display =
         phaseStatuses.find((s) => s.id === row.phaseStatusId)?.name ??
         row.phaseStatusName ??
+        "";
+    } else if (field === "employeeName") {
+      display =
+        employeeOptions.find((e) => e.id === row.employeeId)?.name ??
+        row.employeeName ??
         "";
     } else {
       display = currentValue;
@@ -346,8 +371,8 @@ export default function EditablePermitCell({
       )}
 
       {(field === "noteFromPermitToDepartments" ||
+        field === "noteFromDepartmentsToPermit" ||
         field === "evaluationPermitStatus" ||
-        field === "employeeName" ||
         field === "descriptionDetails" ||
         field === "consultantStatement") && (
         <TextField
@@ -357,6 +382,32 @@ export default function EditablePermitCell({
           sx={commonSx}
           autoFocus
         />
+      )}
+
+      {field === "employeeName" && (
+        <Select
+          size="small"
+          value={value || ""}
+          onChange={(e) => {
+            setValue(e.target.value);
+            if (e.target.value !== currentValue) {
+              onSave(row.id, buildBody(field, e.target.value));
+            }
+            setEditing(false);
+          }}
+          onClose={() => setEditing(false)}
+          sx={commonSx}
+          autoFocus
+        >
+          <MenuItem value="">
+            <em>{emptyDash}</em>
+          </MenuItem>
+          {employeeOptions.map((opt) => (
+            <MenuItem key={opt.id} value={opt.id}>
+              {opt.name}
+            </MenuItem>
+          ))}
+        </Select>
       )}
 
       {field === "completionPhase" && (

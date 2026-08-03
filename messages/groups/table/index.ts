@@ -82,4 +82,6 @@ export const tableMessages = new MessagesGroup({
     "Drag columns here",
     "اسحب الأعمدة هنا",
   ),
+  Cancel: _m("Cancel", "إلغاء"),
+  Create: _m("Create", "إنشاء"),
 });

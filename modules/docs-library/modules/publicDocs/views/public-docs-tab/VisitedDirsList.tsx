@@ -8,7 +8,7 @@ import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-l
 export default function VisitedDirsList() {
   const lang = useLocale();
   const isRtl = lang === "ar";
-  const { visitedDirs, setParentId, setVisitedDirs, projectId } =
+  const { visitedDirs, setParentId, setVisitedDirs, projectId, setSearchData } =
     usePublicDocsCxt();
   const docsLibrary = useOptionalDocsLibraryCxt();
 
@@ -27,6 +27,7 @@ export default function VisitedDirsList() {
       }
       setVisitedDirs((prev) => prev.slice(0, targetIndex + 1));
     }
+    setSearchData((prev) => ({ ...prev, search: "" }));
   };
 
   console.log("visitedDirs", visitedDirs);

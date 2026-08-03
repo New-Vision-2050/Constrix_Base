@@ -118,9 +118,12 @@ export const useTableInitialization = ({
       // Filter columns based on availableColumnKeys if provided
       let filteredColumns = [...columnsWithActions];
       if (availableColumnKeys && availableColumnKeys.length > 0) {
-        filteredColumns = filteredColumns.filter(col =>
-          availableColumnKeys.includes(col.key) ||
-          (col.key === "id" && shouldAddActionColumn) // Always include action column if it should be added
+        const alwaysVisible = alwaysVisibleColumnKeys ?? [];
+        filteredColumns = filteredColumns.filter(
+          (col) =>
+            availableColumnKeys.includes(col.key) ||
+            (col.key === "id" && shouldAddActionColumn) ||
+            alwaysVisible.includes(col.key),
         );
       }
       

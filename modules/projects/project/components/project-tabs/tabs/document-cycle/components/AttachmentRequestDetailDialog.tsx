@@ -417,8 +417,7 @@ function DetailMain({
         justifyContent="flex-start"
         sx={{ pt: 1, gap: 1 }}
       >
-        {variant === "incoming" &&
-        !isTerminalApprovalStatus(document.approvalStatus) ? (
+        {document.canTakeAction ? (
           <>
             <Button
               variant="contained"

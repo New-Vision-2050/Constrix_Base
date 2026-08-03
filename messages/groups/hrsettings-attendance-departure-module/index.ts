@@ -275,6 +275,7 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
       }),
       maps: new MessagesGroup({
         addButton: _m("Add", "اضافة"),
+        columnName: _m("Name", "الاسم"),
         columnLongitude: _m("Longitude Lines", "خطوط الطول"),
         columnLatitude: _m("Latitude Lines", "خطوط العرض"),
         columnLocation: _m("Location", "الموقع"),
@@ -297,6 +298,7 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
         mapDialogTitle: _m("Show National Address Location Coordinates", "اظهار احداثيات موقع العنوان الوطني"),
         mapDialogDescription: _m("Set longitude, latitude and radius on the map", "تحديد خط الطول وخط العرض ونصف القطر على الخريطة"),
         mapDialogClose: _m("Close", "إغلاق"),
+        nameLabel: _m("Name", "الاسم"),
         longitudeLabel: _m("Longitude", "خط الطول"),
         latitudeLabel: _m("Latitude", "خط العرض"),
         radiusLabel: _m("Radius", "نصف القطر"),

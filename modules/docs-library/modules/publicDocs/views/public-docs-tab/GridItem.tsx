@@ -52,6 +52,7 @@ export default function GridItem({
     setOpenFileDialog,
     refetchDocs,
     setDocToView,
+    setSearchData,
   } = usePublicDocsCxt();
   const { can } = usePermissions();
   const docsLibrary = useOptionalDocsLibraryCxt();
@@ -119,6 +120,7 @@ export default function GridItem({
         }
       }
       setVisitedDirs((prev) => [...prev, document]);
+      setSearchData((prev) => ({ ...prev, search: "" }));
     }
   };
 
@@ -192,7 +194,10 @@ export default function GridItem({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <SquareMenu
-                    onClick={() => setDocToView(document)}
+                    onClick={() => {
+                      setDocToView(document);
+                      setSearchData((prev) => ({ ...prev, search: "" }));
+                    }}
                     className="w-5 h-5 text-primary hover:text-primary/80 cursor-pointer transition-colors"
                   />
                 </TooltipTrigger>
