@@ -29,7 +29,7 @@ export default function StatisticsCardsSection() {
       const start = new Date(startDate);
       if (!isNaN(start.getTime())) {
         const durationNum = Number(employmentContract.contract_duration);
-        if (durationNum > 0) {
+        if (durationNum > 0 && isFinite(durationNum)) {
           const end = new Date(start);
           const unitName = (employmentContract.contract_duration_unit?.name ?? "").toLowerCase();
           if (unitName.includes("شهر") || unitName.includes("month")) {
@@ -41,7 +41,9 @@ export default function StatisticsCardsSection() {
           } else {
             end.setDate(end.getDate() + durationNum);
           }
-          endDate = end.toISOString().split("T")[0];
+          if (!isNaN(end.getTime())) {
+            endDate = end.toISOString().split("T")[0];
+          }
         }
       }
     }
