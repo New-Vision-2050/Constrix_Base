@@ -70,7 +70,7 @@ export default function StatisticsCardsSection() {
       <ContractStatusCard contractData={contractWidgetData} />
       <WorkingTimeCard />
       <FinancialReportCard />
-      <TasksStatisticCard />
+      <TasksStatisticCard tasksData={widgetData?.tasks} />
 
       {/* 
       <EmptyStatisticsCard
