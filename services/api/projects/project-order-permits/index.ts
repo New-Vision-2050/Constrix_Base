@@ -45,6 +45,16 @@ export const ProjectOrderPermitsApi = {
       body,
     ),
 
+  updateFromUds: (
+    projectId: string | number,
+    name: string,
+    orderPermitId: number | string,
+  ) =>
+    baseApi.get<UpdateProjectOrderPermitResponse>(
+      `projects/${projectId}/order-permits/${encodeURIComponent(name)}/update-from-uds`,
+      { params: { order_permit_id: orderPermitId } },
+    ),
+
   import: (projectId: string | number, file: File) => {
     const formData = new FormData();
     formData.append("file", file);

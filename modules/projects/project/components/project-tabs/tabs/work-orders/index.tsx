@@ -596,10 +596,10 @@ export default function WorkOrdersTab({
     loading: workOrdersQuery.isLoading,
   });
 
-  const handleWorkOrdersCreated = () => {
+  const handleWorkOrdersCreated = async () => {
     if (!projectId) return;
 
-    queryClient.invalidateQueries({
+    await queryClient.invalidateQueries({
       queryKey: ["project-order-permits", projectId],
     });
   };
