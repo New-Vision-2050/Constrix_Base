@@ -60,6 +60,7 @@ export default function NotificationsSettingsSection({
   const queryClient = useQueryClient();
   const notificationsQuery = useConstraintNotifications(constraintId);
   const [values, setValues] = useState<ConstraintNotifications>(DEFAULT_VALUES);
+  const [savingKey, setSavingKey] = useState<NotificationKey | null>(null);
 
   useEffect(() => {
     if (notificationsQuery.status !== "success") return;
@@ -87,15 +88,19 @@ export default function NotificationsSettingsSection({
     const previous = values;
     const next = { ...values, [key]: checked };
     setValues(next);
+    setSavingKey(key);
     patchNotificationsMutation.mutate(next, {
+      onSuccess: () => {
+        setSavingKey(null);
+      },
       onError: () => {
         setValues(previous);
+        setSavingKey(null);
       },
     });
   };
 
   const isLoading = notificationsQuery.isLoading;
-  const isSaving = patchNotificationsMutation.isPending;
 
   return (
     <div className="w-full">
@@ -146,7 +151,7 @@ export default function NotificationsSettingsSection({
                   </div>
                   <Switch
                     checked={enabled}
-                    disabled={isSaving}
+                    disabled={savingKey === key}
                     onCheckedChange={(checked) => handleToggle(key, checked)}
                     className="shrink-0 data-[state=checked]:bg-primary"
                     aria-label={label}
