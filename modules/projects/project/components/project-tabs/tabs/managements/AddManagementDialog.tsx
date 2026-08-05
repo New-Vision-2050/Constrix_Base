@@ -105,8 +105,8 @@ export default function AddManagementDialog({
           />
         </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} disabled={submitting}>
+      <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+        <Button onClick={handleClose} disabled={submitting} variant="outlined" sx={{ minWidth: 80 }}>
           {t("cancel")}
         </Button>
         <Button
@@ -114,6 +114,7 @@ export default function AddManagementDialog({
           color="primary"
           onClick={handleSubmit}
           disabled={submitting}
+          sx={{ minWidth: 80 }}
         >
           {t("submit")}
         </Button>
