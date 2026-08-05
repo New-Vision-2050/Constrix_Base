@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ban, Clock3, DoorOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -32,6 +33,7 @@ export default function NotificationsSettingsSection({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.notifications",
   );
+  const isRtl = useIsRtl();
 
   const ROWS = useMemo(
     () => [
@@ -98,9 +100,9 @@ export default function NotificationsSettingsSection({
   const isSaving = patchNotificationsMutation.isPending;
 
   return (
-    <div className="w-full">
+    <div dir={isRtl ? "rtl" : "ltr"} className="w-full">
       <section className="rounded-xl border border-primary/90 px-4 pb-5 pt-9 shadow-sm backdrop-blur-[2px]">
-        <h2 className="px-3 pb-5 text-sm font-semibold tracking-tight text-foreground">
+        <h2 className="px-3 pb-5 text-sm font-semibold tracking-tight text-foreground text-start">
           {t("sectionTitle")}
         </h2>
 
@@ -135,7 +137,7 @@ export default function NotificationsSettingsSection({
                     >
                       <Icon className="h-5 w-5" aria-hidden />
                     </div>
-                    <div className="min-w-0 flex-1 space-y-1 text-right">
+                    <div className="min-w-0 flex-1 space-y-1 text-start">
                       <p className="text-sm font-medium leading-snug text-foreground">
                         {label}
                       </p>
