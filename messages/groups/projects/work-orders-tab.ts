@@ -167,6 +167,10 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
     addNewRow: _m("Add new work order", "اضافة امر عمل جديد"),
     submitSuccess: _m("Work orders added successfully", "تمت إضافة أوامر العمل بنجاح"),
     submitError: _m("Could not add work orders", "تعذر إضافة أوامر العمل"),
+    udsUpdateError: _m(
+      "Work orders were added, but UDS data could not be refreshed for some entries",
+      "تمت إضافة أوامر العمل، لكن تعذر تحديث بيانات UDS لبعض الإدخالات",
+    ),
     emptyDash: _m("—", "—"),
     steps: new MessagesGroup({
       workOrderData: _m("Work order data", "بيانات امر العمل"),

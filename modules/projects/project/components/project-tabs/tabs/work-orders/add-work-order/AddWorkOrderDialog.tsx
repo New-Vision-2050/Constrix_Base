@@ -151,7 +151,7 @@ function ManagementSelect({
 export interface AddWorkOrderDialogProps {
   open: boolean;
   onClose: () => void;
-  onCreated?: () => void;
+  onCreated?: () => void | Promise<void>;
 }
 
 export default function AddWorkOrderDialog({
@@ -349,7 +349,29 @@ export default function AddWorkOrderDialog({
         );
         const res = await ProjectOrderPermitsApi.create(projectId, payload);
         toast.success(res.data?.message ?? t("submitSuccess"));
-        onCreated?.();
+
+        const udsEntries = validEntries.filter(
+          (entry) => entry.workOrderId.trim() && entry.workOrderType,
+        );
+        if (udsEntries.length > 0) {
+          const udsResults = await Promise.allSettled(
+            udsEntries.map((entry) =>
+              ProjectOrderPermitsApi.updateFromUds(
+                projectId,
+                entry.workOrderId.trim(),
+                entry.workOrderType,
+              ),
+            ),
+          );
+          const udsFailed = udsResults.filter(
+            (result) => result.status === "rejected",
+          ).length;
+          if (udsFailed > 0) {
+            toast.error(t("udsUpdateError"));
+          }
+        }
+
+        await onCreated?.();
         onClose();
       } catch (error: { response?: { data?: { message?: string } } }) {
         toast.error(error?.response?.data?.message ?? t("submitError"));
