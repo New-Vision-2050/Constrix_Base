@@ -63,7 +63,15 @@ export default function GridItem({
   const docsLibrary = useOptionalDocsLibraryCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
-  const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
+  
+  // Manual date formatting to avoid hydration issues
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+  const formattedDate = formatDate(date);
   // calc file size
   const fileSize = isDir ? document?.size : document?.file?.size;
   const fileSizeInMB = (fileSize || 0) / 1024 / 1024;
@@ -155,7 +163,7 @@ export default function GridItem({
   };
 
   const updatedDate = document?.updated_at
-    ? new Date(document.updated_at).toLocaleDateString("en-GB").replace(/\//g, "-")
+    ? formatDate(new Date(document.updated_at))
     : null;
 
   return (
