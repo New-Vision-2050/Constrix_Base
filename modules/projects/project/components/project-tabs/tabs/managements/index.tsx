@@ -77,12 +77,14 @@ export default function ManagementsTab() {
 
   const allRows = useMemo<ManagementRow[]>(() => {
     const data = managementsQuery.data ?? [];
-    return data.map((item) => ({
-      id: item.id,
-      name: item.name ?? "",
-      createdAt: item.created_at ?? "",
-      updatedAt: item.updated_at ?? "",
-    }));
+    return data
+      .map((item) => ({
+        id: item.id,
+        name: item.name ?? "",
+        createdAt: item.created_at ?? "",
+        updatedAt: item.updated_at ?? "",
+      }))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [managementsQuery.data]);
 
   const totalItems = allRows.length;
