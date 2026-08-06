@@ -26,6 +26,7 @@ import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
@@ -37,6 +38,7 @@ const PasswordPhase = ({
   handleSetStep: (step: LoginPhase) => void;
 }) => {
   const t = useTranslations();
+  const isRtl = useIsRtl();
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -137,12 +139,12 @@ const PasswordPhase = ({
     <>
       <Box position="relative">
         <IconButton
-          sx={{ position: "absolute", top: 0, left: 0 }}
+          sx={{ position: "absolute", top: 0, insetInlineStart: 0 }}
           onClick={() => handleStepBack()}
           type="button"
           aria-label="go-back"
         >
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ transform: isRtl ? "scaleX(-1)" : "none" }} />
         </IconButton>
         <Typography variant="h5" textAlign="center" mb={2}>
           {t("Login.EnterPassword")}
