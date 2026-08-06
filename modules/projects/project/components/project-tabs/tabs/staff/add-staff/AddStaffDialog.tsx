@@ -34,6 +34,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
 import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
@@ -55,6 +56,7 @@ const STEP_KEYS = [
 
 export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
   const t = useTranslations("project");
+  const isRtl = useIsRtl();
   const { projectId } = useProject();
   const queryClient = useQueryClient();
 
@@ -558,7 +560,7 @@ export default function AddStaffDialog({ open, setOpen }: AddStaffDialogProps) {
                   pending ? (
                     <CircularProgress size={18} color="inherit" />
                   ) : (
-                    <SendIcon sx={{ fontSize: 20 }} />
+                    <SendIcon sx={{ fontSize: 20, transform: isRtl ? "scaleX(-1)" : "none" }} />
                   )
                 }
               >
