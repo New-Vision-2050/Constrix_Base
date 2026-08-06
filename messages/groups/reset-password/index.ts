@@ -9,4 +9,6 @@ export const resetPasswordMessages = new MessagesGroup({
   Confirm: _m("Confirm", "تأكيد"),
   GenericError: _m("An error occurred, please try again", "حدث خطأ، حاول مرة أخرى"),
   Success: _m("Password changed successfully", "تم تغيير كلمة المرور بنجاح"),
+  WrongCurrentPassword: _m("Current password is incorrect", "كلمة المرور الحالية غير صحيحة"),
+  PasswordMismatch: _m("Passwords do not match", "كلمتا المرور غير متطابقتين"),
 });

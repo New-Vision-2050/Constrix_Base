@@ -31,10 +31,16 @@ import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { createPasswordValidation, getMessage } from "@/utils/zodTranslations";
 
-const changePasswordSchema = z.object({
-  old_password: z.string().min(1, getMessage("passwordRequired") as string),
-  newPassword: createPasswordValidation(),
-});
+const changePasswordSchema = z
+  .object({
+    old_password: z.string().min(1, getMessage("passwordRequired") as string),
+    newPassword: createPasswordValidation(),
+    confirmNewPassword: z.string().min(1, getMessage("passwordRequired") as string),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    path: ["confirmNewPassword"],
+    message: getMessage("passwordMatch") as string,
+  });
 
 type ChangePasswordFormType = z.infer<typeof changePasswordSchema>;
 
@@ -57,6 +63,7 @@ const ChangePasswordFlow = () => {
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -64,6 +71,7 @@ const ChangePasswordFlow = () => {
     formState: { errors },
     trigger,
     reset,
+    setError,
   } = useForm<ChangePasswordFormType>({
     resolver: zodResolver(changePasswordSchema),
   });
@@ -111,11 +119,12 @@ const ChangePasswordFlow = () => {
                   }
                 );
               },
-              onError: (error: any) => {
-                toast.error(
-                  error?.response?.data?.message ||
-                    t("ResetPassword.GenericError")
-                );
+              onError: () => {
+                setError("old_password", {
+                  type: "manual",
+                  message: t("ResetPassword.WrongCurrentPassword"),
+                });
+                toast.error(t("ResetPassword.WrongCurrentPassword"));
               },
             }
           );
@@ -191,6 +200,30 @@ const ChangePasswordFlow = () => {
                     aria-label="toggle password visibility"
                   >
                     {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            type={showConfirmPassword ? "text" : "password"}
+            label={t("ResetPassword.ConfirmNewPassword")}
+            {...register("confirmNewPassword", {
+              onChange: () => trigger("confirmNewPassword"),
+            })}
+            error={!!errors.confirmNewPassword}
+            helperText={errors.confirmNewPassword?.message}
+            fullWidth
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    edge="end"
+                    aria-label="toggle confirm password visibility"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
