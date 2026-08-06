@@ -24,9 +24,12 @@ import { useProjectEmployees } from "@/modules/projects/project/query/useProject
 import { useSafetyVisits } from "../query/useSafetyVisits";
 import {
   EMPTY_SAFETY_VISIT_FILTERS,
+  type SafetyViolation,
   type SafetyVisitFilters,
   type SafetyVisitRow,
 } from "../types";
+import SafetyViolationEvidenceDialog from "./SafetyViolationEvidenceDialog";
+import ViolationCell from "./ViolationCell";
 import {
   SAFETY_VIOLATIONS_CATALOG,
   SAFETY_VIOLATION_EMPTY_VALUE,
@@ -76,6 +79,10 @@ export default function SafetyVisitsView() {
     EMPTY_SAFETY_VISIT_FILTERS,
   );
   const [isImporting, setIsImporting] = useState(false);
+  const [evidenceDialog, setEvidenceDialog] = useState<{
+    violation: SafetyViolation;
+    workOrderNumber: string;
+  } | null>(null);
   const importFileInputRef = useRef<HTMLInputElement>(null);
 
   const params = SafetyVisitsTableLayout.useTableParams({
@@ -246,19 +253,23 @@ export default function SafetyVisitsView() {
       align: "center" as const,
       minWidth: 220,
       render: (row: SafetyVisitRow) => {
+        const violation = row.violations.find(
+          (item) => item.code === definition.code,
+        );
         const value =
           row.violationValues[definition.code] ?? SAFETY_VIOLATION_EMPTY_VALUE;
-        const isEmpty = value === SAFETY_VIOLATION_EMPTY_VALUE;
 
         return (
-          <span
-            style={{
-              opacity: isEmpty ? 0.45 : 1,
-              fontWeight: isEmpty ? 400 : 600,
-            }}
-          >
-            {value}
-          </span>
+          <ViolationCell
+            value={value}
+            violation={violation}
+            onOpenEvidence={(selectedViolation) =>
+              setEvidenceDialog({
+                violation: selectedViolation,
+                workOrderNumber: row.workOrderNumber,
+              })
+            }
+          />
         );
       },
     }));
@@ -457,6 +468,13 @@ export default function SafetyVisitsView() {
           </Box>
         }
         pagination={<SafetyVisitsTableLayout.Pagination state={state} />}
+      />
+
+      <SafetyViolationEvidenceDialog
+        open={evidenceDialog !== null}
+        onClose={() => setEvidenceDialog(null)}
+        violation={evidenceDialog?.violation ?? null}
+        workOrderNumber={evidenceDialog?.workOrderNumber}
       />
     </Box>
   );
