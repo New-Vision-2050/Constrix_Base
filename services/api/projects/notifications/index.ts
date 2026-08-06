@@ -11,11 +11,14 @@ import type {
   ProjectNotificationsListArgs,
   ProjectNotificationsMapTasksArgs,
   ProjectNotificationsMobileListArgs,
+  ConfirmLocationArgs,
+  EndTaskArgs,
   ProjectNotificationMobileActionArgs,
   ProjectNotificationReadStatusArgs,
   ProjectNotificationReassignArgs,
   ProjectNotificationRejectArgs,
   ProjectNotificationScopeArgs,
+  RequestSiteStatusUpdateArgs,
   UpdateProjectNotificationArgs,
   UpdateSiteStatusTypeArgs,
   UpdateSiteStatusTypeKeyArgs,
@@ -174,11 +177,71 @@ export const ProjectNotificationsApi = {
       args,
     ),
 
-  endTask: (id: string, args: ProjectNotificationMobileActionArgs) =>
-    baseApi.post<ProjectNotificationSingleResponse>(
+  confirmLocation: (id: string, args: ConfirmLocationArgs) => {
+    const formData = new FormData();
+    formData.append("latitude", String(args.latitude));
+    formData.append("longitude", String(args.longitude));
+    formData.append("distance_meters", String(args.distance_meters));
+    formData.append("is_inside_location", String(args.is_inside_location));
+    return baseApi.post<ProjectNotificationSingleResponse>(
+      `projects/notifications/${encodeURIComponent(id)}/confirm-location`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
+
+  endTask: (id: string, args: EndTaskArgs) => {
+    const formData = new FormData();
+    formData.append("latitude", String(args.latitude));
+    formData.append("longitude", String(args.longitude));
+    if (args.notes) {
+      formData.append("notes", args.notes);
+    }
+    if (args.internal_procedure_setting_id) {
+      formData.append(
+        "internal_procedure_setting_id",
+        args.internal_procedure_setting_id,
+      );
+    }
+    args.files?.forEach((file) => formData.append("files[]", file));
+    return baseApi.post<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}/end`,
-      args,
-    ),
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
+
+  requestSiteStatusUpdate: (id: string, args: RequestSiteStatusUpdateArgs) => {
+    const formData = new FormData();
+    formData.append("description", args.description);
+    if (args.internal_procedure_setting_id) {
+      formData.append(
+        "internal_procedure_setting_id",
+        args.internal_procedure_setting_id,
+      );
+    }
+    args.files?.forEach((file) => formData.append("files[]", file));
+    if (args.current_latitude != null) {
+      formData.append("current_latitude", String(args.current_latitude));
+    }
+    if (args.current_longitude != null) {
+      formData.append("current_longitude", String(args.current_longitude));
+    }
+    if (args.update_date) {
+      formData.append("update_date", args.update_date);
+    }
+    if (args.update_time) {
+      formData.append("update_time", args.update_time);
+    }
+    if (args.current_site_status_id) {
+      formData.append("current_site_status_id", args.current_site_status_id);
+    }
+    return baseApi.post<ProjectNotificationSingleResponse>(
+      `projects/notifications/${encodeURIComponent(id)}/request-site-status-update`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
 
   myTasks: (args?: ProjectNotificationsMobileListArgs) =>
     baseApi.get<ProjectNotificationMyTasksResponse>(
