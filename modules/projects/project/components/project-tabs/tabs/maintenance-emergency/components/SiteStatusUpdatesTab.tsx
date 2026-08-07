@@ -200,11 +200,13 @@ function buildCopyText(
 interface SiteStatusUpdatesTabProps {
   notification: ProjectNotification;
   notificationId: string;
+  readOnly?: boolean;
 }
 
 export default function SiteStatusUpdatesTab({
   notification,
   notificationId,
+  readOnly = false,
 }: SiteStatusUpdatesTabProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const [activeTab, setActiveTab] = useState(0);
@@ -343,6 +345,7 @@ export default function SiteStatusUpdatesTab({
                 notificationId={notificationId}
                 t={t}
                 showCopiedBadge={!isCopiedTab}
+                readOnly={readOnly}
               />
             ))}
           </Box>
@@ -358,12 +361,14 @@ function SiteStatusCard({
   notificationId,
   t,
   showCopiedBadge = false,
+  readOnly = false,
 }: {
   update: SiteStatusUpdate;
   notification: ProjectNotification;
   notificationId: string;
   t: ReturnType<typeof useTranslations>;
   showCopiedBadge?: boolean;
+  readOnly?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const [imagesExpanded, setImagesExpanded] = useState(false);
@@ -468,25 +473,27 @@ function SiteStatusCard({
             />
           )}
         </Stack>
-        <Tooltip title={t("copyReport")}>
-          <IconButton
-            size="small"
-            onClick={handleCopy}
-            disabled={copyMutation.isPending}
-            sx={{
-              color: copied ? "success.main" : "text.secondary",
-              "&:hover": { color: "primary.main" },
-            }}
-          >
-            {copyMutation.isPending ? (
-              <CircularProgress size={16} thickness={4} />
-            ) : copied ? (
-              <Check className="w-4 h-4" />
-            ) : (
-              <Copy className="w-4 h-4" />
-            )}
-          </IconButton>
-        </Tooltip>
+        {!readOnly && (
+          <Tooltip title={t("copyReport")}>
+            <IconButton
+              size="small"
+              onClick={handleCopy}
+              disabled={copyMutation.isPending}
+              sx={{
+                color: copied ? "success.main" : "text.secondary",
+                "&:hover": { color: "primary.main" },
+              }}
+            >
+              {copyMutation.isPending ? (
+                <CircularProgress size={16} thickness={4} />
+              ) : copied ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
 
       {/* Card body — full report */}

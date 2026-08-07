@@ -10,7 +10,7 @@ import AttendanceWorkLogContent, {
   PlaceholderContent,
 } from "./AttendanceWorkLogContent";
 import AttendanceReportsContent from "./Reports/AttendanceReportsContent";
-import AttachmentsContent from "./Attachments/AttachmentsContent";
+import AssignedTasksTable from "./AssignedTasks/AssignedTasksTable";
 
 const tabsRowSx = (indicatorColor: string) =>
   ({
@@ -41,9 +41,9 @@ export default function AttendancePresenceTabs() {
     () => [
       {
         id: "attendance-presence-assigned-tasks",
-        title: t("assignedTasks"),
+        title: t("assignedTasks.title"),
         icon: ATTENDANCE_PRESENCE_MAIN_TAB_ICONS.assignedTasks,
-        content: <PlaceholderContent messageKey="underDevelopment" />,
+        content: <AssignedTasksTable />,
       },
       {
         id: "attendance-presence-attendance-log",

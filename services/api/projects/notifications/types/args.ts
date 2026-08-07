@@ -107,6 +107,32 @@ export interface ProjectNotificationMobileActionArgs {
   notes?: string;
 }
 
+export interface ConfirmLocationArgs {
+  latitude: number;
+  longitude: number;
+  distance_meters: number;
+  is_inside_location: 0 | 1;
+}
+
+export interface EndTaskArgs {
+  latitude: number;
+  longitude: number;
+  notes?: string;
+  internal_procedure_setting_id?: string;
+  files?: File[];
+}
+
+export interface RequestSiteStatusUpdateArgs {
+  description: string;
+  internal_procedure_setting_id?: string;
+  files?: File[];
+  current_latitude?: number;
+  current_longitude?: number;
+  update_date?: string;
+  update_time?: string;
+  current_site_status_id?: string;
+}
+
 export interface ProjectNotificationReassignArgs {
   assigned_user_ids: string[];
 }
