@@ -16,6 +16,7 @@ import { useResetPassword } from "../../store/mutations";
 import { useTranslations } from "next-intl";
 import LoadingBackdrop from "@/components/shared/loading-backdrop";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
 
 const ResetPasswordPhase = ({
@@ -26,6 +27,7 @@ const ResetPasswordPhase = ({
   handleStepBack: () => void;
 }) => {
   const t = useTranslations();
+  const isRtl = useIsRtl();
   const { mutate, isPending } = useResetPassword();
   const {
     formState: { errors },
@@ -79,12 +81,12 @@ const ResetPasswordPhase = ({
       <LoadingBackdrop open={isPending} />
       <Box position="relative">
         <IconButton
-          sx={{ position: "absolute", top: 0, left: 0 }}
+          sx={{ position: "absolute", top: 0, insetInlineStart: 0 }}
           onClick={() => handleStepBack()}
           type="button"
           aria-label="go-back"
         >
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ transform: isRtl ? "scaleX(-1)" : "none" }} />
         </IconButton>
         <Stack spacing={2.5}>
           <Typography variant="h5" textAlign="center">

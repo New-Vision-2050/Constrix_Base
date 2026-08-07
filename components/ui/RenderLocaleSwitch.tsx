@@ -2,28 +2,24 @@
 
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { Globe } from "lucide-react";
 
 const RenderLocaleSwitch = () => {
   const pathname = usePathname();
   const locale = useLocale();
-  console.log(locale);
+
+  const targetLocale = locale === "en" ? "ar" : "en";
+  const targetLabel = locale === "en" ? "ع" : "EN";
 
   return (
-    <div>
-      {locale == "en" ? (
-        <Link href={`/${pathname}`} locale="ar" className="text-lg p-2">
-          <div className="flex justify-between items-center gap-2 text-white">
-            English
-          </div>
-        </Link>
-      ) : (
-        <Link href={`/${pathname}`} locale="en" className="text-lg p-2">
-          <div className="flex justify-between items-center gap-2 text-white">
-            Arabic
-          </div>
-        </Link>
-      )}
-    </div>
+    <Link
+      href={`/${pathname}`}
+      locale={targetLocale}
+      className="flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+    >
+      <Globe className="h-4 w-4 shrink-0" />
+      <span>{targetLabel}</span>
+    </Link>
   );
 };
 

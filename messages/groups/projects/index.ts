@@ -308,8 +308,8 @@ export const projectMessages = new MessagesGroup({
     }),
   }),
   staff: new MessagesGroup({
-    title: _m("Staff", "الكادر"),
-    addStaff: _m("Add new staff", "إضافة كادر جديد"),
+    title: _m("cadre", "الكادر"),
+    addStaff: _m("Add new cadre", "إضافة كادر جديد"),
     add: _m("Add", "اضافة"),
     name: _m("Name", "الاسم"),
     phone: _m("Phone", "الهاتف"),

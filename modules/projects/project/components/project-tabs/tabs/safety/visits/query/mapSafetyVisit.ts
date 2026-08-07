@@ -1,6 +1,9 @@
 import type { SafetyVisitRow } from "../types";
 import { buildViolationValues } from "../constants/safetyViolations";
-import type { ProjectSafetyRecordDto } from "@/services/api/projects/project-safety/types/response";
+import type {
+  ProjectSafetyRecordDto,
+  ProjectSafetyViolationEvidenceDto,
+} from "@/services/api/projects/project-safety/types/response";
 
 function pickString(...values: Array<string | null | undefined>): string {
   for (const value of values) {
@@ -31,6 +34,17 @@ function resolveWorkOrderType(value: string | null | undefined): string {
   return raw;
 }
 
+function mapEvidence(dto: ProjectSafetyViolationEvidenceDto) {
+  return {
+    id: dto.id,
+    name: pickString(dto.name),
+    fileName: pickString(dto.file_name),
+    mimeType: pickString(dto.mime_type),
+    size: toNumber(dto.size),
+    url: pickString(dto.url),
+  };
+}
+
 export function mapSafetyVisitDto(
   dto: ProjectSafetyRecordDto,
 ): SafetyVisitRow {
@@ -44,7 +58,15 @@ export function mapSafetyVisitDto(
         weight:
           violation.weight === null || violation.weight === undefined
             ? null
-            : toNumber(violation.weight),
+            : String(violation.weight),
+        action: violation.action ?? null,
+        evidence: Array.isArray(violation.evidence)
+          ? violation.evidence.map(mapEvidence)
+          : [],
+        status:
+          violation.status === null || violation.status === undefined
+            ? null
+            : toNumber(violation.status),
       }))
     : [];
 

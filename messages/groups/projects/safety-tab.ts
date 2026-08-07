@@ -60,6 +60,12 @@ export const projectSafetyTabMessages = new MessagesGroup({
       consultant: _m("Consultant", "الاستشاري"),
       contractor: _m("Contractor", "المقاول"),
     }),
+    evidenceDialog: new MessagesGroup({
+      title: _m("Violation evidence", "أدلة المخالفة"),
+      empty: _m("No images available", "لا توجد صور"),
+      openFullSize: _m("Open full size", "فتح بالحجم الكامل"),
+      close: _m("Close", "إغلاق"),
+    }),
   }),
   reports: new MessagesGroup({
     filtersTitle: _m("Search filter", "فلتر البحث"),

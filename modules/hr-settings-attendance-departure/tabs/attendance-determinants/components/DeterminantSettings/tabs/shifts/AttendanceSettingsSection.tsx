@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -161,6 +162,7 @@ export default function AttendanceSettingsSection({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.workPeriods",
   );
+  const isRtl = useIsRtl();
 
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -293,12 +295,12 @@ export default function AttendanceSettingsSection({
         <SectionBorderActions>{sectionToolbar}</SectionBorderActions>
       ) : null}
 
-      <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground" dir="rtl">
+      <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground" dir={isRtl ? "rtl" : "ltr"}>
         {t("attendanceSettingsTitle")}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center">
+        <div className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-end flex flex-col justify-center">
           <p className="text-3xl font-semibold text-primary leading-none">
             {shiftsQuery.isLoading
               ? "—"
@@ -310,7 +312,7 @@ export default function AttendanceSettingsSection({
           return (
             <div
               key={option.id}
-              className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center"
+              className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-end flex flex-col justify-center"
             >
               {isEditing ? (
                 <div className="flex items-center gap-2 justify-start">
@@ -322,7 +324,7 @@ export default function AttendanceSettingsSection({
                     onChange={(e) =>
                       handleAmountChange(option.id, e.target.value)
                     }
-                    className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-right outline-none focus:border-primary disabled:opacity-50"
+                    className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-end outline-none focus:border-primary disabled:opacity-50"
                   />
                   <span className="text-lg font-semibold text-primary">
                     {t(`${option.id}_unit`)}

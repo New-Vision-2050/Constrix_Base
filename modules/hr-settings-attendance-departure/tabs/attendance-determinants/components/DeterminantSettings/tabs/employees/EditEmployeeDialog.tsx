@@ -353,7 +353,10 @@ export default function EditEmployeeDialog({
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-sm text-muted-foreground opacity-80 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 absolute top-4 left-4"
+            className={cn(
+              "shrink-0 rounded-sm text-muted-foreground opacity-80 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 absolute top-4",
+              isRtl ? "left-4" : "right-4",
+            )}
             aria-label={t("close")}
           >
             <CloseOutlined className="h-5 w-5 cursor-pointer" />

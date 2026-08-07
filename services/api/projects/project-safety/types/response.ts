@@ -1,10 +1,22 @@
+export interface ProjectSafetyViolationEvidenceDto {
+  id: number;
+  name: string;
+  file_name: string;
+  mime_type: string;
+  size: number;
+  url: string;
+}
+
 export interface ProjectSafetyViolationDto {
   id: string;
   code?: string | null;
   description?: string | null;
   category?: string | null;
   is_attached?: boolean | null;
-  weight?: number | null;
+  weight?: string | number | null;
+  action?: string | null;
+  evidence?: ProjectSafetyViolationEvidenceDto[] | null;
+  status?: number | null;
 }
 
 export interface ProjectSafetyMorphableDto {
