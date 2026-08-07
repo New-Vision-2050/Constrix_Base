@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AttendanceConstraints } from "@/services/api/attendance-constraints";
@@ -251,9 +252,11 @@ export default function TimingSettingsSection({
     setPeriodsDialog(null);
   };
 
+  const isRtl = useIsRtl();
+
   return (
     <>
-      <Tabs defaultValue="weekly" dir="rtl" className="gap-4">
+      <Tabs defaultValue="weekly" dir={isRtl ? "rtl" : "ltr"} className="gap-4">
         <div className="flex items-center justify-center mb-4">
         <TabsList className="h-auto rounded-full p-1 bg-transparent border border-border rounded-xl mx-auto justify-center gap-2">
           <TabsTrigger

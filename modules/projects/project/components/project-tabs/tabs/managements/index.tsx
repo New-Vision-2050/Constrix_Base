@@ -77,21 +77,29 @@ export default function ManagementsTab() {
 
   const allRows = useMemo<ManagementRow[]>(() => {
     const data = managementsQuery.data ?? [];
-    return data.map((item) => ({
-      id: item.id,
-      name: item.name ?? "",
-      createdAt: item.created_at ?? "",
-      updatedAt: item.updated_at ?? "",
-    }));
+    return data
+      .map((item) => ({
+        id: item.id,
+        name: item.name ?? "",
+        createdAt: item.created_at ?? "",
+        updatedAt: item.updated_at ?? "",
+      }))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [managementsQuery.data]);
 
-  const totalItems = allRows.length;
+  const filteredRows = useMemo(() => {
+    const q = params.search?.trim().toLowerCase();
+    if (!q) return allRows;
+    return allRows.filter((row) => row.name.toLowerCase().includes(q));
+  }, [allRows, params.search]);
+
+  const totalItems = filteredRows.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
 
   const pageData = useMemo(() => {
     const start = (params.page - 1) * params.limit;
-    return allRows.slice(start, start + params.limit);
-  }, [allRows, params.page, params.limit]);
+    return filteredRows.slice(start, start + params.limit);
+  }, [filteredRows, params.page, params.limit]);
 
   const columns = useMemo(
     () => [

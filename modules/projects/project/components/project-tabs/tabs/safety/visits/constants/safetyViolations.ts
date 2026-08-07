@@ -1,3 +1,7 @@
+import {
+  getSafetyViolationWeightLabel,
+} from "../types";
+
 export type SafetyViolationDefinition = {
   code: string;
   description: string;
@@ -214,22 +218,11 @@ export const SAFETY_VIOLATIONS_CATALOG: SafetyViolationDefinition[] = [
 
 export const SAFETY_VIOLATION_EMPTY_VALUE = "_";
 
-export function formatViolationWeight(value: number): string {
-  if (Number.isInteger(value)) {
-    return String(value);
-  }
-  return value.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-}
-
-/** Attached violations show API weight (may be negative); others show "_". */
+/** Violations from all_violations show a weight-based label; missing entries show "_". */
 export function buildViolationValues(
   apiViolations: Array<{
     code: string;
-    isAttached: boolean;
-    weight: number | null;
+    weight: string | null;
   }>,
 ): Record<string, string> {
   const byCode = new Map(
@@ -242,11 +235,13 @@ export function buildViolationValues(
   return SAFETY_VIOLATIONS_CATALOG.reduce<Record<string, string>>(
     (acc, definition) => {
       const received = byCode.get(definition.code);
-      if (received?.isAttached && received.weight !== null) {
-        acc[definition.code] = formatViolationWeight(received.weight);
-      } else {
+      if (!received) {
         acc[definition.code] = SAFETY_VIOLATION_EMPTY_VALUE;
+        return acc;
       }
+
+      const label = getSafetyViolationWeightLabel(received.weight);
+      acc[definition.code] = label ?? SAFETY_VIOLATION_EMPTY_VALUE;
       return acc;
     },
     {},

@@ -32,6 +32,7 @@ import ErrorDialog from "@/components/shared/error-dialog";
 import { getErrorMessage } from "@/utils/errorHandler";
 import LoadingBackdrop from "@/components/shared/loading-backdrop";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 
 const ValidatePhonePhase = ({
   handleSetStep,
@@ -42,6 +43,7 @@ const ValidatePhonePhase = ({
 }) => {
   const t = useTranslations("Login.PhoneVerification");
   const loginT = useTranslations("Login");
+  const isRtl = useIsRtl();
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -114,16 +116,16 @@ const ValidatePhonePhase = ({
       <LoadingBackdrop open={isPending} />
       <Box position="relative">
         <IconButton
-          sx={{ position: "absolute", top: 0, left: 0 }}
+          sx={{ position: "absolute", top: 0, insetInlineStart: 0 }}
           onClick={() => handleStepBack()}
           type="button"
           aria-label="go-back"
         >
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ transform: isRtl ? "scaleX(-1)" : "none" }} />
         </IconButton>
         <Stack spacing={2}>
           <Stack spacing={1}>
-            <Typography variant="h5" textAlign="left">
+            <Typography variant="h5" textAlign="start">
               {t("Title")}
             </Typography>
             <Typography component="p">

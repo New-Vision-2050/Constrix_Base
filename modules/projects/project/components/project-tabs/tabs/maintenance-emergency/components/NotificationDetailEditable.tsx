@@ -50,6 +50,7 @@ import NotificationSeverityBadge from "./NotificationSeverityBadge";
 
 interface NotificationDetailEditableProps {
   notification: ProjectNotification;
+  readOnly?: boolean;
 }
 
 function formatDateOnly(value: string | null | undefined): string {
@@ -92,6 +93,7 @@ function FieldBlock({ caption, value }: { caption: string; value: string }) {
 
 export default function NotificationDetailEditable({
   notification,
+  readOnly = false,
 }: NotificationDetailEditableProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const theme = useTheme();
@@ -724,6 +726,7 @@ export default function NotificationDetailEditable({
   // Description section (read-only)
   // ===========================================================================
   const description = notification.work_description?.trim() || "";
+  const canEdit = !readOnly && hasScope;
 
   return (
     <Stack spacing={2.5}>
@@ -748,6 +751,7 @@ export default function NotificationDetailEditable({
       <EditableSection
         title={t("summaryNotification")}
         isRTL={isRTL}
+        canEdit={canEdit}
         isSaving={savingSection === "notification"}
         onSave={() => saveSection("notification", {})}
         editChildren={notificationEditFields}
@@ -765,6 +769,7 @@ export default function NotificationDetailEditable({
       <EditableSection
         title={t("summaryContractor")}
         isRTL={isRTL}
+        canEdit={canEdit}
         isSaving={savingSection === "contractor"}
         onSave={() => saveSection("contractor", {})}
         editChildren={contractorEditFields}
@@ -782,6 +787,7 @@ export default function NotificationDetailEditable({
       <EditableSection
         title={t("summaryLocation")}
         isRTL={isRTL}
+        canEdit={canEdit}
         isSaving={savingSection === "location"}
         onSave={() => saveSection("location", {})}
         editChildren={locationEditFields}
@@ -793,6 +799,7 @@ export default function NotificationDetailEditable({
       <EditableSection
         title={t("summaryAssignment")}
         isRTL={isRTL}
+        canEdit={canEdit}
         isSaving={savingSection === "employee"}
         onSave={() => saveSection("employee", {})}
         editChildren={employeeEditFields}
