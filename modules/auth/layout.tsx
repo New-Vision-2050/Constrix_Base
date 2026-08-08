@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { useTheme } from "next-themes";
+import RenderLocaleSwitch from "@/components/ui/RenderLocaleSwitch";
 
 export default function AuthLayout({
   children,
@@ -29,9 +30,9 @@ export default function AuthLayout({
   return (
     <main className="min-h-screen flex flex-col relative overflow-hidden bg-background">
       {/* Language switcher */}
-      {/* <div className="fixed top-4 end-4 z-50">
+      <div className="fixed top-4 end-4 z-50">
         <RenderLocaleSwitch />
-      </div> */}
+      </div>
 
       {/* Background particles */}
       <SparklesCore
@@ -64,26 +65,28 @@ export default function AuthLayout({
           <h1 className="order-2 md:order-2 text-xl md:text-4xl text-center">
             {t("Login.Control_panel")}
           </h1>
-          <div className="order-1 md:order-3 mb-2 md:mb-0 rounded-full overflow-hidden w-[70px] h-[70px]">
-            {mainLogo ? (
-              <Image
-                src={mainLogo}
-                alt="logo"
-                width={70}
-                height={70}
-                priority
-                className="w-[70px] h-[70px] rounded-full object-cover overflow-hidden"
-              />
-            ) : (
-              <Image
-                src={LogoPlaceholder}
-                alt={"logo placeholder"}
-                width={70}
-                height={70}
-                priority
-                className="w-[80px] h-[80px] rounded-full object-cover overflow-hidden"
-              />
-            )}
+          <div className="order-1 md:order-3 mb-2 md:mb-0">
+            <div className="rounded-full overflow-hidden w-[70px] h-[70px] shrink-0">
+              {mainLogo ? (
+                <Image
+                  src={mainLogo}
+                  alt="logo"
+                  width={70}
+                  height={70}
+                  priority
+                  className="w-[70px] h-[70px] rounded-full object-cover overflow-hidden"
+                />
+              ) : (
+                <Image
+                  src={LogoPlaceholder}
+                  alt={"logo placeholder"}
+                  width={70}
+                  height={70}
+                  priority
+                  className="w-[80px] h-[80px] rounded-full object-cover overflow-hidden"
+                />
+              )}
+            </div>
           </div>
         </div>
       </header>

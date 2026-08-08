@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,12 +20,16 @@ import {
   type ConstraintRuleField,
   type ConstraintRuleToggleField,
 } from "./timing-constants";
+import {
+  calculateWeeklyWorkHours,
+  hydratedShiftStateFromApiEnvelope,
+} from "./shift-payload";
 
 const RULE_FIELDS: ConstraintRuleField[] = [
   "early_clock_in_minutes",
   "max_over_time",
   "out_zone_minutes",
-  "extension_hours_shift",
+  "extension_minutes",
   "can_clock_in_before",
 ];
 
@@ -81,12 +86,16 @@ function parseConstraintRules(data: unknown): Partial<ConstraintRules> | null {
 
   const parsed: Partial<ConstraintRules> = {};
   for (const field of RULE_FIELDS) {
-    if (source[field] === null) {
-      (parsed as Record<string, unknown>)[field] = null;
-    } else {
-      const value = readRuleNumber(source, field);
-      if (value != null) parsed[field] = value;
+    const value = readRuleNumber(source, field);
+    if (value != null) {
+      parsed[field] = value;
+    } else if (field === "extension_minutes") {
+      const alias = readRuleNumber(source, "extension_hours_shift");
+      if (alias != null) parsed[field] = alias;
     }
+  }
+  if (source.can_clock_in_before === null) {
+    parsed.can_clock_in_before = null;
   }
   for (const field of RULE_TOGGLE_FIELDS) {
     const value = readRuleBoolean(source, field);
@@ -104,8 +113,7 @@ function mergeRuleValues(
 
   const numericValues = RULE_FIELDS.reduce(
     (acc, field) => {
-      const apiValue = fromApi[field];
-      acc[field] = apiValue !== undefined ? apiValue ?? 0 : defaults[field];
+      acc[field] = fromApi[field] ?? defaults[field];
       return acc;
     },
     { ...defaults } as RuleValues,
@@ -137,7 +145,7 @@ function valuesToPatchBody(
     early_clock_in_minutes: values.early_clock_in_minutes,
     max_over_time: values.max_over_time,
     out_zone_minutes: values.out_zone_minutes,
-    extension_hours_shift: values.extension_hours_shift,
+    extension_minutes: values.extension_minutes,
     can_clock_in_before: values.can_clock_in_before,
     is_overtime_before_early_clock_in: toggles.is_overtime_before_early_clock_in,
     is_overtime_after_extension_hours_shift:
@@ -154,6 +162,7 @@ export default function AttendanceSettingsSection({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.workPeriods",
   );
+  const isRtl = useIsRtl();
 
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -169,6 +178,26 @@ export default function AttendanceSettingsSection({
     enabled: Boolean(constraintId),
     refetchOnWindowFocus: false,
   });
+
+  const shiftsQuery = useQuery({
+    queryKey: ["constraint-shifts", constraintId],
+    queryFn: async () =>
+      (
+        await AttendanceConstraints.getShifts(constraintId)
+      ).data as unknown,
+    enabled: Boolean(constraintId),
+    refetchOnWindowFocus: false,
+  });
+
+  const weeklyWorkHours = useMemo(() => {
+    const state = hydratedShiftStateFromApiEnvelope(shiftsQuery.data);
+    if (!state) return 0;
+    return calculateWeeklyWorkHours(
+      state.weeklyDays,
+      state.weeklyPeriodRows,
+      state.dayPeriodRows,
+    );
+  }, [shiftsQuery.data]);
 
   useEffect(() => {
     if (rulesQuery.status !== "success" || isEditing) return;
@@ -266,16 +295,24 @@ export default function AttendanceSettingsSection({
         <SectionBorderActions>{sectionToolbar}</SectionBorderActions>
       ) : null}
 
-      <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground" dir="rtl">
+      <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground" dir={isRtl ? "rtl" : "ltr"}>
         {t("attendanceSettingsTitle")}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-end flex flex-col justify-center">
+          <p className="text-3xl font-semibold text-primary leading-none">
+            {shiftsQuery.isLoading
+              ? "—"
+              : `${weeklyWorkHours} ${t("weekly_work_hours_unit")}`}
+          </p>
+          <p className="text-sm text-muted-foreground mt-3">{t("weekly_work_hours_label")}</p>
+        </div>
         {displayOptions.map((option) => {
           return (
             <div
               key={option.id}
-              className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-right flex flex-col justify-center"
+              className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-end flex flex-col justify-center"
             >
               {isEditing ? (
                 <div className="flex items-center gap-2 justify-start">
@@ -287,7 +324,7 @@ export default function AttendanceSettingsSection({
                     onChange={(e) =>
                       handleAmountChange(option.id, e.target.value)
                     }
-                    className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-right outline-none focus:border-primary disabled:opacity-50"
+                    className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-end outline-none focus:border-primary disabled:opacity-50"
                   />
                   <span className="text-lg font-semibold text-primary">
                     {t(`${option.id}_unit`)}

@@ -184,13 +184,29 @@ export function useSiteStatusUpdates(notificationId: string | undefined) {
   return useQuery<SiteStatusUpdatesData>({
     queryKey: [SITE_STATUS_UPDATES_QUERY_KEY, notificationId],
     queryFn: async (): Promise<SiteStatusUpdatesData> => {
-      if (!notificationId) return { items: [], summary: { total: 0, approved: 0, pending: 0 } };
+      if (!notificationId) {
+        return {
+          items: [],
+          summary: { total: 0, approved: 0, pending: 0 },
+          site_status_type: null,
+          notification_values: null,
+        };
+      }
       const res = await ProjectNotificationsApi.getSiteStatusUpdates(notificationId);
-      const body = res.data as any;
-      const data = body?.data ?? body?.payload ?? body;
+      const body = res.data as Record<string, unknown>;
+      const data = (body?.data ?? body?.payload ?? body) as SiteStatusUpdatesData;
       const items = data?.items ?? [];
-      const summary = data?.summary ?? { total: items.length, approved: 0, pending: 0 };
-      return { items, summary };
+      const summary = data?.summary ?? {
+        total: items.length,
+        approved: 0,
+        pending: 0,
+      };
+      return {
+        items,
+        summary,
+        site_status_type: data?.site_status_type ?? null,
+        notification_values: data?.notification_values ?? null,
+      };
     },
     enabled: Boolean(notificationId),
   });

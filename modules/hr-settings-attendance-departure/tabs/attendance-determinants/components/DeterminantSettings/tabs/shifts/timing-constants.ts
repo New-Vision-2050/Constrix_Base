@@ -12,7 +12,7 @@ export type ConstraintRuleField =
   | "early_clock_in_minutes"
   | "out_zone_minutes"
   | "max_over_time"
-  | "extension_hours_shift"
+  | "extension_minutes"
   | "can_clock_in_before";
 
 export type ConstraintRuleToggleField =
@@ -47,15 +47,15 @@ export const CONSTRAINT_RULE_OPTIONS: ConstraintRuleOption[] = [
   },
   {
     id: "max_over_time",
-    amount: 4,
-    unit: "س",
-    label: "الحد الاقصى للساعات الإضافية",
+    amount: 240,
+    unit: "د",
+    label: "الحد الاقصى للوقت الإضافي",
   },
   {
-    id: "extension_hours_shift",
-    amount: 2,
-    unit: "س",
-    label: "ساعات الامتداد بعد نهاية الدوام",
+    id: "extension_minutes",
+    amount: 120,
+    unit: "د",
+    label: "وقت الامتداد بعد نهاية الدوام",
   },
   {
     id: "can_clock_in_before",

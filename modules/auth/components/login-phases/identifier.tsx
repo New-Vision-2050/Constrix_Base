@@ -102,6 +102,14 @@ const IdentifierPhase = ({
           error={!!errors?.identifier?.message}
           helperText={errors?.identifier?.message}
           fullWidth
+          sx={{
+            "& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active":
+              {
+                WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
+                WebkitTextFillColor: "inherit !important",
+                transition: "background-color 5000s ease-in-out 0s",
+              },
+          }}
         />
 
         <Button

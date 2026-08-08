@@ -42,11 +42,13 @@ function formatDateTime(value: string | null | undefined): string {
 interface NotificationNotesTabProps {
   notificationId: string;
   scope: NotificationScope;
+  readOnly?: boolean;
 }
 
 export default function NotificationNotesTab({
   notificationId,
   scope,
+  readOnly = false,
 }: NotificationNotesTabProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const [newNote, setNewNote] = useState("");
@@ -119,46 +121,50 @@ export default function NotificationNotesTab({
         </Box>
       )}
 
-      <Divider />
+      {!readOnly && (
+        <>
+          <Divider />
 
-      <Paper
-        component="form"
-        onSubmit={handleSubmit}
-        variant="outlined"
-        sx={{ p: 2, borderRadius: 2 }}
-      >
-        <TextField
-          fullWidth
-          multiline
-          rows={3}
-          value={newNote}
-          onChange={(e) => setNewNote(e.target.value)}
-          placeholder={t("writeNote")}
-          disabled={addNoteMutation.isPending}
-          inputProps={{ maxLength: MAX_NOTE_LENGTH }}
-        />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mt: 2,
-            flexWrap: "wrap",
-            gap: 1,
-          }}
-        >
-          <Typography variant="caption" color="text.secondary">
-            {newNote.length}/{MAX_NOTE_LENGTH}
-          </Typography>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!newNote.trim() || addNoteMutation.isPending}
+          <Paper
+            component="form"
+            onSubmit={handleSubmit}
+            variant="outlined"
+            sx={{ p: 2, borderRadius: 2 }}
           >
-            {addNoteMutation.isPending ? t("addingNote") : t("addNote")}
-          </Button>
-        </Box>
-      </Paper>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              placeholder={t("writeNote")}
+              disabled={addNoteMutation.isPending}
+              inputProps={{ maxLength: MAX_NOTE_LENGTH }}
+            />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 2,
+                flexWrap: "wrap",
+                gap: 1,
+              }}
+            >
+              <Typography variant="caption" color="text.secondary">
+                {newNote.length}/{MAX_NOTE_LENGTH}
+              </Typography>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!newNote.trim() || addNoteMutation.isPending}
+              >
+                {addNoteMutation.isPending ? t("addingNote") : t("addNote")}
+              </Button>
+            </Box>
+          </Paper>
+        </>
+      )}
     </Stack>
   );
 }

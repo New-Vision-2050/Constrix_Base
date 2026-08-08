@@ -109,7 +109,8 @@ export type ConstraintRules = {
   early_clock_in_minutes: number;
   max_over_time: number;
   out_zone_minutes: number;
-  extension_hours_shift: number;
+  extension_minutes: number;
+  extension_hours_shift?: number;
   can_clock_in_before: number | null;
   is_overtime_before_early_clock_in: boolean;
   is_overtime_after_extension_hours_shift: boolean;

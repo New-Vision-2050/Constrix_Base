@@ -35,6 +35,8 @@ export const ROUTER = {
   PERMISSIONS: "/permissions",
   AttendanceDeparture: "/attendance-departure",
   AttendancePresence: "/attendance-presence",
+  ATTENDANCE_PRESENCE_ASSIGNED_TASK_DETAILS: (id: string) =>
+    `/attendance-presence/assigned-task/${id}`,
   Powers: "/powers",
   Programs: "/programs",
   Bouquet: "/bouquet",

@@ -48,6 +48,7 @@ interface NotificationDetailViewProps {
   projectId?: string;
   contractualEngagementKey?: string;
   notificationId: string;
+  readOnly?: boolean;
 }
 
 function getInitials(name?: string | null): string {
@@ -209,6 +210,7 @@ export default function NotificationDetailView({
   projectId,
   contractualEngagementKey,
   notificationId,
+  readOnly = false,
 }: NotificationDetailViewProps) {
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const tCommon = useTranslations("common");
@@ -224,9 +226,10 @@ export default function NotificationDetailView({
 
   const canReassign = useMemo(
     () =>
-      isEngagement ||
-      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_UPDATE),
-    [isEngagement, flatPerms],
+      !readOnly &&
+      (isEngagement ||
+        hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_UPDATE)),
+    [readOnly, isEngagement, flatPerms],
   );
 
   const readStatusMutation = useProjectNotificationReadStatusMutation(notificationScope);
@@ -257,7 +260,11 @@ export default function NotificationDetailView({
       );
       return;
     }
-    router.push(`/projects/${projectId}?tab=project-tab-maintenance`);
+    if (projectId) {
+      router.push(`/projects/${projectId}?tab=project-tab-maintenance`);
+      return;
+    }
+    router.push(ROUTER.AttendancePresence);
   };
 
   const taskAttachments = notification?.attachments ?? notification?.employee_task?.attachments ?? [];
@@ -489,7 +496,7 @@ export default function NotificationDetailView({
 
       {/* Details tab — editable sections */}
       {activeTab === 0 && (
-        <NotificationDetailEditable notification={notification} />
+        <NotificationDetailEditable notification={notification} readOnly={readOnly} />
       )}
 
       {/* Attachments tab */}
@@ -580,6 +587,7 @@ export default function NotificationDetailView({
         <SiteStatusUpdatesTab
           notification={notification}
           notificationId={notificationId}
+          readOnly={readOnly}
         />
       )}
 
@@ -588,15 +596,18 @@ export default function NotificationDetailView({
         <NotificationNotesTab
           notificationId={notificationId}
           scope={notificationScope}
+          readOnly={readOnly}
         />
       )}
 
-      <ReassignTaskModal
-        notification={notification}
-        scope={notificationScope}
-        open={reassignOpen}
-        onClose={() => setReassignOpen(false)}
-      />
+      {!readOnly && (
+        <ReassignTaskModal
+          notification={notification}
+          scope={notificationScope}
+          open={reassignOpen}
+          onClose={() => setReassignOpen(false)}
+        />
+      )}
     </Box>
   );
 }

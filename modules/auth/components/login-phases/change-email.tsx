@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 
 const ChangeEmailPhase = ({
   handleSetStep,
@@ -23,6 +24,7 @@ const ChangeEmailPhase = ({
   handleStepBack: () => void;
 }) => {
   const t = useTranslations();
+  const isRtl = useIsRtl();
   const {
     register,
     formState: { errors },
@@ -43,12 +45,12 @@ const ChangeEmailPhase = ({
   return (
     <Box position="relative">
       <IconButton
-        sx={{ position: "absolute", top: 0, left: 0 }}
+        sx={{ position: "absolute", top: 0, insetInlineStart: 0 }}
         onClick={() => handleStepBack()}
         type="button"
         aria-label="go-back"
       >
-        <ArrowBackIcon />
+        <ArrowBackIcon sx={{ transform: isRtl ? "scaleX(-1)" : "none" }} />
       </IconButton>
       <Stack spacing={2}>
         <Typography variant="h5" textAlign="center">
