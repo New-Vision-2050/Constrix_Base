@@ -506,6 +506,8 @@ export const UsersConfigV2 = (options?: {
                   attendanceStatusLabel={row.attendance_status_label}
                   attendanceId={row.attendance_id}
                   attendanceWorkDate={row.attendance_work_date}
+                  attendanceDateFrom={row.attendance_date_from}
+                  attendanceDateTo={row.attendance_date_to}
                   tableId={options?.tableId}
                 />
               ),
