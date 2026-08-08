@@ -13,11 +13,13 @@ import {
   createFilterOptions,
   Box,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { Controller, Control, FieldErrors } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useMemo } from "react";
+import { useMemo, useCallback, useRef } from "react";
+import React from "react";
 import { CreateProjectFormValues } from "../validation/projectForm.schema";
 import {
   ProjectEditSelections,
@@ -54,6 +56,16 @@ interface ProjectFormFieldsProps {
   contractTypesData?: OptionItem[];
   editSelections?: ProjectEditSelections | null;
   onSearchChange?: (fieldName: string, searchValue: string) => void;
+  entityClientsPagination?: {
+    hasNextPage: boolean;
+    fetchNextPage: () => void;
+    isFetchingNextPage: boolean;
+  };
+  individualClientsPagination?: {
+    hasNextPage: boolean;
+    fetchNextPage: () => void;
+    isFetchingNextPage: boolean;
+  };
 }
 
 export function ProjectFormFields({
@@ -75,6 +87,8 @@ export function ProjectFormFields({
   contractTypesData,
   editSelections,
   onSearchChange,
+  entityClientsPagination,
+  individualClientsPagination,
 }: ProjectFormFieldsProps) {
   const t = useTranslations();
   const router = useRouter();
@@ -155,6 +169,82 @@ export function ProjectFormFields({
   const handleCreateClient = () => {
     router.push("/create-client/clients?action=create");
   };
+
+  const entityObserverRef = useRef<IntersectionObserver | null>(null);
+  const entityPaginationRef = useRef(entityClientsPagination);
+  entityPaginationRef.current = entityClientsPagination;
+
+  const attachEntityLastOption = useCallback(
+    (node: HTMLLIElement | null) => {
+      if (entityObserverRef.current) {
+        entityObserverRef.current.disconnect();
+        entityObserverRef.current = null;
+      }
+      const pag = entityPaginationRef.current;
+      if (!node || !pag?.hasNextPage) return;
+      entityObserverRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting && pag?.hasNextPage && !pag?.isFetchingNextPage) {
+            pag?.fetchNextPage();
+          }
+        },
+        { root: node.parentElement, threshold: 0.1 },
+      );
+      entityObserverRef.current.observe(node);
+    },
+    [],
+  );
+
+  const handleEntityListboxScroll = useCallback(
+    (event: React.UIEvent<HTMLElement>) => {
+      const target = event.currentTarget;
+      const nearBottom =
+        target.scrollTop + target.clientHeight >= target.scrollHeight - 40;
+      const pag = entityPaginationRef.current;
+      if (nearBottom && pag?.hasNextPage && !pag?.isFetchingNextPage) {
+        pag?.fetchNextPage();
+      }
+    },
+    [],
+  );
+
+  const individualObserverRef = useRef<IntersectionObserver | null>(null);
+  const individualPaginationRef = useRef(individualClientsPagination);
+  individualPaginationRef.current = individualClientsPagination;
+
+  const attachIndividualLastOption = useCallback(
+    (node: HTMLLIElement | null) => {
+      if (individualObserverRef.current) {
+        individualObserverRef.current.disconnect();
+        individualObserverRef.current = null;
+      }
+      const pag = individualPaginationRef.current;
+      if (!node || !pag?.hasNextPage) return;
+      individualObserverRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting && pag?.hasNextPage && !pag?.isFetchingNextPage) {
+            pag?.fetchNextPage();
+          }
+        },
+        { root: node.parentElement, threshold: 0.1 },
+      );
+      individualObserverRef.current.observe(node);
+    },
+    [],
+  );
+
+  const handleIndividualListboxScroll = useCallback(
+    (event: React.UIEvent<HTMLElement>) => {
+      const target = event.currentTarget;
+      const nearBottom =
+        target.scrollTop + target.clientHeight >= target.scrollHeight - 40;
+      const pag = individualPaginationRef.current;
+      if (nearBottom && pag?.hasNextPage && !pag?.isFetchingNextPage) {
+        pag?.fetchNextPage();
+      }
+    },
+    [],
+  );
 
   // Filter clients based on client type
   const filteredClients = useMemo(() => {
@@ -439,8 +529,13 @@ export function ProjectFormFields({
                 onInputChange={(_, value) => onSearchChange?.("entity_clients", value)}
                 size="small"
                 noOptionsText="لا يوجد عملاء"
-                renderOption={(props, option) => {
+                ListboxProps={{
+                  style: { maxHeight: 150, overflow: 'auto' },
+                  onScroll: handleEntityListboxScroll,
+                }}
+                renderOption={(props, option, state) => {
                   const { key, ...restProps } = props;
+                  const isLast = state.index === entityClientsOptions.length - 1;
                   if (option.isCreateButton) {
                     return (
                       <Box component="li" key={key} {...restProps}>
@@ -459,16 +554,22 @@ export function ProjectFormFields({
                       </Box>
                     );
                   }
-                  return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                  return (
+                    <Box
+                      component="li"
+                      key={key}
+                      {...restProps}
+                      ref={isLast ? attachEntityLastOption : undefined}
+                    >
+                      {option.name}
+                    </Box>
+                  );
                 }}
                 filterOptions={(options, params) => {
-                  const filtered = options.filter((option) =>
-                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
-                  );
-                  if (params.inputValue !== '' && filtered.length === 0) {
+                  if (params.inputValue !== '' && options.length === 0) {
                     return [{ id: -1, name: 'إنشاء عميل جديد', isCreateButton: true }];
                   }
-                  return filtered;
+                  return options;
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -476,6 +577,17 @@ export function ProjectFormFields({
                     label={t("project.selectClient")}
                     error={!!errors.project_owner_id}
                     helperText={errors.project_owner_id && t("project.clientRequired")}
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {entityClientsPagination?.isFetchingNextPage ? (
+                            <CircularProgress color="inherit" size={16} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
                   />
                 )}
               />
@@ -505,8 +617,13 @@ export function ProjectFormFields({
                 onInputChange={(_, value) => onSearchChange?.("individual_clients", value)}
                 size="small"
                 noOptionsText="لا يوجد عملاء"
-                renderOption={(props, option) => {
+                ListboxProps={{
+                  style: { maxHeight: 150, overflow: 'auto' },
+                  onScroll: handleIndividualListboxScroll,
+                }}
+                renderOption={(props, option, state) => {
                   const { key, ...restProps } = props;
+                  const isLast = state.index === individualClientsOptions.length - 1;
                   if (option.isCreateButton) {
                     return (
                       <Box component="li" key={key} {...restProps}>
@@ -525,16 +642,22 @@ export function ProjectFormFields({
                       </Box>
                     );
                   }
-                  return <Box component="li" key={key} {...restProps}>{option.name}</Box>;
+                  return (
+                    <Box
+                      component="li"
+                      key={key}
+                      {...restProps}
+                      ref={isLast ? attachIndividualLastOption : undefined}
+                    >
+                      {option.name}
+                    </Box>
+                  );
                 }}
                 filterOptions={(options, params) => {
-                  const filtered = options.filter((option) =>
-                    option.name.toLowerCase().includes(params.inputValue.toLowerCase())
-                  );
-                  if (params.inputValue !== '' && filtered.length === 0) {
+                  if (params.inputValue !== '' && options.length === 0) {
                     return [{ id: -1, name: 'إنشاء عميل جديد', isCreateButton: true }];
                   }
-                  return filtered;
+                  return options;
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -542,6 +665,17 @@ export function ProjectFormFields({
                     label={t("project.selectClient")}
                     error={!!errors.project_owner_id}
                     helperText={errors.project_owner_id && t("project.clientRequired")}
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {individualClientsPagination?.isFetchingNextPage ? (
+                            <CircularProgress color="inherit" size={16} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
                   />
                 )}
               />
