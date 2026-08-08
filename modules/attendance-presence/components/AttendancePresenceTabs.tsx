@@ -11,6 +11,7 @@ import AttendanceWorkLogContent, {
 } from "./AttendanceWorkLogContent";
 import AttendanceReportsContent from "./Reports/AttendanceReportsContent";
 import AssignedTasksTable from "./AssignedTasks/AssignedTasksTable";
+import AttachmentsContent from "./Attachments/AttachmentsContent";
 
 const tabsRowSx = (indicatorColor: string) =>
   ({
