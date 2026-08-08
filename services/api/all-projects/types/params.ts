@@ -27,4 +27,6 @@ export interface UpdateProjectData extends Partial<CreateProjectData> {}
 
 export interface ClientParams {
   name?: string;
+  page?: number;
+  per_page?: number;
 }

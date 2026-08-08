@@ -1,7 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { AllProjectsApi } from "@/services/api/projects/all-projects";
 import { useState, useCallback, useRef, useMemo } from "react";
 import { useLocale } from "next-intl";
+
+const CLIENTS_PER_PAGE = 20;
 
 export function useProjectFormData(
   watchProjectTypeId?: string,
@@ -76,35 +78,93 @@ export function useProjectFormData(
     },
   });
 
-  const { data: entityClientsData } = useQuery({
+  const entityClientsQuery = useInfiniteQuery({
     queryKey: ["entity-clients", watchOwnerType, searchParams.entity_clients],
-    queryFn: async () => {
-      const response = await AllProjectsApi.getEntityClients(
-        searchParams.entity_clients
-          ? { name: searchParams.entity_clients }
-          : {},
-      );
-      return response.data.payload ?? [];
+    queryFn: async ({ pageParam }) => {
+      const params: { name?: string; page: number; per_page: number } = {
+        page: pageParam,
+        per_page: CLIENTS_PER_PAGE,
+      };
+      if (searchParams.entity_clients) {
+        params.name = searchParams.entity_clients;
+      }
+      const response = await AllProjectsApi.getEntityClients(params);
+      return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      const pagination = lastPage.pagination;
+      if (pagination && lastPageParam < pagination.last_page) {
+        return lastPageParam + 1;
+      }
+      const itemCount = lastPage.payload?.length ?? 0;
+      if (itemCount >= CLIENTS_PER_PAGE) {
+        return lastPageParam + 1;
+      }
+      return undefined;
     },
     enabled: watchOwnerType === "company",
   });
 
-  const { data: individualClientsData } = useQuery({
+  const entityClientsData = useMemo(() => {
+    const merged: NonNullable<typeof entityClientsQuery.data>["pages"][0]["payload"] = [];
+    const seen = new Set<string>();
+    for (const page of entityClientsQuery.data?.pages ?? []) {
+      for (const item of page.payload ?? []) {
+        if (!seen.has(String(item.id))) {
+          seen.add(String(item.id));
+          merged.push(item);
+        }
+      }
+    }
+    return merged;
+  }, [entityClientsQuery.data]);
+
+  const individualClientsQuery = useInfiniteQuery({
     queryKey: [
       "individual-clients",
       watchOwnerType,
       searchParams.individual_clients,
     ],
-    queryFn: async () => {
-      const response = await AllProjectsApi.getIndividualClients(
-        searchParams.individual_clients
-          ? { name: searchParams.individual_clients }
-          : {},
-      );
-      return response.data.payload ?? [];
+    queryFn: async ({ pageParam }) => {
+      const params: { name?: string; page: number; per_page: number } = {
+        page: pageParam,
+        per_page: CLIENTS_PER_PAGE,
+      };
+      if (searchParams.individual_clients) {
+        params.name = searchParams.individual_clients;
+      }
+      const response = await AllProjectsApi.getIndividualClients(params);
+      return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      const pagination = lastPage.pagination;
+      if (pagination && lastPageParam < pagination.last_page) {
+        return lastPageParam + 1;
+      }
+      const itemCount = lastPage.payload?.length ?? 0;
+      if (itemCount >= CLIENTS_PER_PAGE) {
+        return lastPageParam + 1;
+      }
+      return undefined;
     },
     enabled: watchOwnerType === "individual",
   });
+
+  const individualClientsData = useMemo(() => {
+    const merged: NonNullable<typeof individualClientsQuery.data>["pages"][0]["payload"] = [];
+    const seen = new Set<string>();
+    for (const page of individualClientsQuery.data?.pages ?? []) {
+      for (const item of page.payload ?? []) {
+        if (!seen.has(String(item.id))) {
+          seen.add(String(item.id));
+          merged.push(item);
+        }
+      }
+    }
+    return merged;
+  }, [individualClientsQuery.data]);
 
   const { data: contractualEngagementsRaw } = useQuery({
     queryKey: ["contractual-engagements"],
@@ -162,5 +222,15 @@ export function useProjectFormData(
     contractTypesData,
     // projectClassificationsData,
     onSearchChange: handleSearchChange,
+    entityClientsPagination: {
+      hasNextPage: entityClientsQuery.hasNextPage ?? false,
+      fetchNextPage: entityClientsQuery.fetchNextPage,
+      isFetchingNextPage: entityClientsQuery.isFetchingNextPage,
+    },
+    individualClientsPagination: {
+      hasNextPage: individualClientsQuery.hasNextPage ?? false,
+      fetchNextPage: individualClientsQuery.fetchNextPage,
+      isFetchingNextPage: individualClientsQuery.isFetchingNextPage,
+    },
   };
 }
