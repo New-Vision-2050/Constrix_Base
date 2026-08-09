@@ -92,7 +92,6 @@ export default function SafetyReportsView() {
   const [filters, setFilters] = useState<SafetyReportFilters>(
     EMPTY_SAFETY_REPORT_FILTERS,
   );
-
   const params = SafetyReportsTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,

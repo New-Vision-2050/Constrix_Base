@@ -59,6 +59,16 @@ export const projectSafetyTabMessages = new MessagesGroup({
       consultantEngineer: _m("Consultant engineer", "مهندس الاستشاري"),
       consultant: _m("Consultant", "الاستشاري"),
       contractor: _m("Contractor", "المقاول"),
+      actions: _m("Actions", "الإجراءات"),
+      downloadReport: _m("Download Report", "تحميل التقرير"),
+      downloadReportDisabledTooltip: _m(
+        "The report can only be downloaded after the violation is completed.",
+        "لا يمكن تحميل التقرير إلا بعد اكتمال المخالفة.",
+      ),
+      downloadReportError: _m(
+        "Failed to download the report. Please try again.",
+        "فشل تحميل التقرير. يرجى المحاولة مرة أخرى.",
+      ),
     }),
     evidenceDialog: new MessagesGroup({
       title: _m("Violation evidence", "أدلة المخالفة"),
@@ -99,6 +109,15 @@ export const projectSafetyTabMessages = new MessagesGroup({
       actions: _m("Actions", "الإجراءات"),
       action: _m("Action", "إجراء"),
       view: _m("View", "عرض"),
+      downloadReport: _m("Download Report", "تحميل التقرير"),
+      downloadReportDisabledTooltip: _m(
+        "The report can only be downloaded after the violation is completed.",
+        "لا يمكن تحميل التقرير إلا بعد اكتمال المخالفة.",
+      ),
+      downloadReportError: _m(
+        "Failed to download the report. Please try again.",
+        "فشل تحميل التقرير. يرجى المحاولة مرة أخرى.",
+      ),
     }),
   }),
   indicators: new MessagesGroup({
