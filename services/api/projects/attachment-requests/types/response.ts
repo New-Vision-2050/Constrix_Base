@@ -52,7 +52,7 @@ export interface AttachmentRequestHistoryEntry {
   id: string;
   action: string;
   description: string;
-  user?: AttachmentRequestActor | null;
+  user?: AttachmentRequestActor[] | null;
   timestamp: string;
   metadata?: Record<string, unknown> | null;
 }

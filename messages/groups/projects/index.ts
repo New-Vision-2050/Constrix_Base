@@ -208,6 +208,14 @@ export const projectMessages = new MessagesGroup({
     ),
     historyActionRequestDeclined: _m("Request declined", "تم رفض الطلب"),
     historyActionRequestUpdate: _m("Request updated", "تم تحديث الطلب"),
+    historyActionWorkflowStepPending: _m(
+      "Workflow step pending",
+      "خطوة الاعتماد قيد الانتظار",
+    ),
+    historyActionWorkflowStepApproved: _m(
+      "Workflow step approved",
+      "تمت الموافقة على خطوة الاعتماد",
+    ),
     itemRespondSuccess: _m("Response submitted", "تم إرسال الرد"),
     itemRespondError: _m("Could not submit response", "تعذر إرسال الرد"),
     requestApproveSuccess: _m("Request approved", "تم اعتماد الطلب"),

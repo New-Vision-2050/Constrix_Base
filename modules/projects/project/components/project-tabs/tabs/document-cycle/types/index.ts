@@ -14,13 +14,22 @@ export interface DocumentAttachment {
   size: string;
 }
 
+export type ApprovalStepStatus = "created" | "pending" | "approved";
+
+export interface ApprovalStepUser {
+  id: string;
+  name: string;
+  email?: string;
+}
+
 export interface ApprovalStep {
   id: string;
-  title: string;
-  user: string;
+  /** Raw action from the API `history` entry, e.g. "request_created", "workflow_step_pending". */
+  action: string;
+  /** Normalized status driving the step's icon/color. */
+  status: ApprovalStepStatus;
+  user: ApprovalStepUser[] | null;
   date: string;
-  status: "pending" | "completed" | "current";
-  icon?: "submit" | "review" | "technical" | "commercial";
 }
 
 export interface DocumentComment {
@@ -29,15 +38,6 @@ export interface DocumentComment {
   avatar?: string;
   date: string;
   content: string;
-}
-
-/** Normalized attachment-request `history` entries for UI steppers. */
-export interface DocumentHistoryEntry {
-  id: string;
-  action: string;
-  description: string;
-  userName: string;
-  timestamp: string;
 }
 
 export interface DocumentRowProject {
@@ -73,8 +73,6 @@ export interface DocumentRow {
   description?: string;
   attachments?: DocumentAttachment[];
   approvalPath?: ApprovalStep[];
-  /** From API `history` on attachment requests (chronological). */
-  history?: DocumentHistoryEntry[];
   comments?: DocumentComment[];
   canTakeAction?: boolean;
 }
