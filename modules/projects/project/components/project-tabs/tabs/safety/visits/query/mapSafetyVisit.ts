@@ -95,5 +95,6 @@ export function mapSafetyVisitDto(
     contractorName: pickString(dto.contractor_name),
     violations,
     violationValues: buildViolationValues(violations),
+    status: pickString(dto.status),
   };
 }

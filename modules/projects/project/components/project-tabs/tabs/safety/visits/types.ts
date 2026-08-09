@@ -77,6 +77,7 @@ export type SafetyVisitRow = {
   contractorName: string;
   violations: SafetyViolation[];
   violationValues: Record<string, string>;
+  status: string;
 };
 
 export type SafetyVisitFilters = {
