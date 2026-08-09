@@ -1,5 +1,6 @@
 import {
-  getSafetyViolationWeightLabel,
+  getSafetyViolationDisplayLabel,
+  type SafetyViolationStatus,
 } from "../types";
 
 export type SafetyViolationDefinition = {
@@ -223,6 +224,7 @@ export function buildViolationValues(
   apiViolations: Array<{
     code: string;
     weight: string | null;
+    status: SafetyViolationStatus;
   }>,
 ): Record<string, string> {
   const byCode = new Map(
@@ -240,8 +242,10 @@ export function buildViolationValues(
         return acc;
       }
 
-      const label = getSafetyViolationWeightLabel(received.weight);
-      acc[definition.code] = label ?? SAFETY_VIOLATION_EMPTY_VALUE;
+      acc[definition.code] = getSafetyViolationDisplayLabel(
+        received.status,
+        received.weight,
+      );
       return acc;
     },
     {},

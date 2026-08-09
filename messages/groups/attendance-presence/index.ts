@@ -10,6 +10,10 @@ export const attendancePresenceMessages = new MessagesGroup({
   // Main tabs
   assignedTasks: new MessagesGroup({
     title: _m("Assigned Tasks", "المهام المسندة"),
+    notificationsAndEmergencies: _m(
+      "Notifications & Emergencies",
+      "الإشعارات والطوارئ",
+    ),
     notificationNumber: _m("Notification Number", "رقم الإشعار"),
     notificationStatus: _m("Notification Status", "حالة الإشعار"),
     notificationType: _m("Notification Type", "نوع الإشعار"),

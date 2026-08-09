@@ -5,7 +5,12 @@ import {
   isImageEvidence,
   type SafetyViolation,
 } from "../types";
-import { SAFETY_VIOLATION_EMPTY_VALUE } from "../constants/safetyViolations";
+import {
+  SAFETY_VIOLATION_PENDING_VALUE,
+} from "../types";
+import {
+  SAFETY_VIOLATION_EMPTY_VALUE,
+} from "../constants/safetyViolations";
 
 type ViolationCellProps = {
   value: string;
@@ -18,7 +23,9 @@ export default function ViolationCell({
   violation,
   onOpenEvidence,
 }: ViolationCellProps) {
-  const isEmpty = value === SAFETY_VIOLATION_EMPTY_VALUE;
+  const isEmpty =
+    value === SAFETY_VIOLATION_EMPTY_VALUE ||
+    value === SAFETY_VIOLATION_PENDING_VALUE;
   const hasImageEvidence =
     (violation?.evidence.filter(isImageEvidence).length ?? 0) > 0;
 

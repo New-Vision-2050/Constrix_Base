@@ -49,6 +49,19 @@ export function getSafetyViolationWeightLabel(
   return null;
 }
 
+export const SAFETY_VIOLATION_PENDING_VALUE = "-";
+
+export function getSafetyViolationDisplayLabel(
+  status: SafetyViolationStatus,
+  weight: string | null,
+): string {
+  if (status === null || status === undefined) {
+    return SAFETY_VIOLATION_PENDING_VALUE;
+  }
+
+  return getSafetyViolationWeightLabel(weight) ?? "_";
+}
+
 export type SafetyVisitRow = {
   id: string;
   workOrderNumber: string;
