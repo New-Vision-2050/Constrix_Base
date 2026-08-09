@@ -227,15 +227,13 @@ export default function SelectedEmployees({
         key: "phone",
         name: t("columnPhone"),
         sortable: false,
-        render: (row: ConstraintSelectedEmployeePayload) => (
-          <span>
-            {row.phone ??
-              row.mobile ??
-              row.user?.phone ??
-              row.user?.mobile ??
-              "—"}
-          </span>
-        ),
+        render: (row: ConstraintSelectedEmployeePayload) => {
+          const phone =
+            row.phone ?? row.mobile ?? row.user?.phone ?? row.user?.mobile ?? "";
+          if (!phone) return "—";
+          const formatted = phone.replace(/^\+/, "") + "+";
+          return <span>{formatted}</span>;
+        },
       },
       {
         key: "projects",
