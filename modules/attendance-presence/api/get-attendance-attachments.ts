@@ -105,3 +105,16 @@ export async function deleteAttendanceAttachmentFile(
 ): Promise<void> {
   await apiClient.delete(`/media/${fileId}`);
 }
+
+/**
+ * entry_number (Iqama) and work_permit documents are owned by the
+ * identity-data resource (edited from User Profile > Iqama Data), not by the
+ * generic /hr/attendance/attachments endpoint. Use this to update them.
+ */
+export async function updateIdentityDataAttachment(
+  formData: FormData
+): Promise<void> {
+  await apiClient.post("/company-users/identity-data", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+}

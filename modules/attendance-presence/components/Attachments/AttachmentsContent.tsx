@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   getAttendanceAttachments,
   updateAttendanceAttachment,
+  updateIdentityDataAttachment,
   AttachmentMedia,
   AttendanceAttachmentsPayload,
   AttendanceDocuments,
@@ -42,6 +43,12 @@ type DocCardConfig = {
   showImagePreview?: boolean;
   /** icon shown as placeholder when no image is uploaded */
   PlaceholderIcon?: React.ElementType;
+  /**
+   * entry_number & work_permit are owned by the identity-data resource
+   * (User Profile > Iqama Data), so they must be saved through
+   * /company-users/identity-data instead of /hr/attendance/attachments.
+   */
+  useIdentityDataEndpoint?: boolean;
 };
 
 // ─── Card configs (matches real API field names) ───────────────────────────────
@@ -86,6 +93,7 @@ const DOC_CARDS: DocCardConfig[] = [
     titleKey: "entryNumber",
     showImagePreview: true,
     PlaceholderIcon: ShieldCheck,
+    useIdentityDataEndpoint: true,
   },
   {
     docKey: "work_permit",
@@ -96,6 +104,7 @@ const DOC_CARDS: DocCardConfig[] = [
     titleKey: "workPermit",
     showImagePreview: true,
     PlaceholderIcon: BriefcaseBusiness,
+    useIdentityDataEndpoint: true,
   },
   {
     docKey: "industrial_safety",
@@ -155,10 +164,12 @@ function DocumentCard({
   config,
   documents,
   onUpdated,
+  onRefetch,
 }: {
   config: DocCardConfig;
   documents: AttendanceDocuments;
   onUpdated: (docs: AttendanceDocuments) => void;
+  onRefetch: () => void;
 }) {
   const t = useTranslations("AttendancePresence.attachmentsTab");
   const tUpload = useTranslations("UserProfile.header.uploadPhoto");
@@ -216,21 +227,46 @@ function DocumentCard({
   }, [documents, config, editing]);
 
   const mutation = useMutation({
-    mutationFn: (fd: FormData) => updateAttendanceAttachment(fd),
+    mutationFn: (fd: FormData) =>
+      config.useIdentityDataEndpoint
+        ? updateIdentityDataAttachment(fd).then(() => null)
+        : updateAttendanceAttachment(fd),
     onSuccess: (res) => {
       toast.success(t("saveSuccess"));
       setEditing(false);
       setNewFile(null);
-      if (res?.documents) onUpdated(res.documents);
+      if (res?.documents) {
+        onUpdated(res.documents);
+      } else {
+        onRefetch();
+      }
     },
-    onError: () => {
-      toast.error(t("saveError"));
+    onError: (error: unknown) => {
+      console.error(`[${config.docKey}] save failed:`, error);
+      const err = error as {
+        response?: {
+          data?: {
+            message?: string | { description?: string };
+            errors?: Record<string, string[]>;
+          };
+        };
+      };
+      const apiData = err?.response?.data;
+      const firstFieldError = apiData?.errors
+        ? Object.values(apiData.errors).flat()[0]
+        : undefined;
+      const rawMessage = apiData?.message;
+      const backendMessage =
+        typeof rawMessage === "string" ? rawMessage : rawMessage?.description;
+      toast.error(firstFieldError || backendMessage || t("saveError"));
     },
   });
 
   const handleSave = () => {
     const fd = new FormData();
-    fd.append("key", config.docKey);
+    if (!config.useIdentityDataEndpoint) {
+      fd.append("key", config.docKey);
+    }
     fd.append(config.docKey, numVal);
     fd.append(config.startDateKey as string, startVal);
     fd.append(config.endDateKey as string, endVal);
@@ -658,6 +694,7 @@ export default function AttachmentsContent() {
           config={config}
           documents={localData.documents}
           onUpdated={handleDocumentsUpdated}
+          onRefetch={refetch}
         />
       ))}
     </div>
