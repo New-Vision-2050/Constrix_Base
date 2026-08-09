@@ -21,6 +21,7 @@ export interface CreateProjectData {
   status: number;
   project_owner_type?: "company" | "individual";
   contractual_engagement_id?: string;
+  project_classification_id?: number;
 }
 
 export interface UpdateProjectData extends Partial<CreateProjectData> {}

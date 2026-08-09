@@ -14,6 +14,7 @@ import {
   GetEmployeesNotInProjectResponse,
   GetProjectEmployeesResponse,
   GetContractualEngagementsResponse,
+  GetProjectClassificationsResponse,
   GetProjectTypesResponse,
   ListProjectsResponse,
   ShowProjectResponse,
@@ -40,6 +41,11 @@ export const AllProjectsApi = {
     baseApi.get<GetContractualEngagementsResponse>(
       "projects/contractual-engagements",
     ),
+
+  getProjectClassifications: (params?: { page?: number; per_page?: number }) =>
+    baseApi.get<GetProjectClassificationsResponse>("projects/project-tags", {
+      params,
+    }),
 
   getProjectTypes: () =>
     baseApi.get<GetProjectTypesResponse>("project-types/roots"),

@@ -10,6 +10,7 @@ export type ProjectEditSelections = {
   manager?: { id: string; name: string } | null;
   projectOwner?: { id: string; name: string; type?: string } | null;
   contractType?: { id: string; name: string } | null;
+  projectClassification?: { id: number; name: string } | null;
 };
 
 function toIdString(value: unknown): string | undefined {
@@ -59,6 +60,7 @@ export function mapProjectToEditSelections(
     management: project.management,
     manager: project.manager,
     projectOwner: project.project_owner,
+    projectClassification: project.project_classification,
     contractType: project.contractual_engagement
       ? {
           id: project.contractual_engagement.id,

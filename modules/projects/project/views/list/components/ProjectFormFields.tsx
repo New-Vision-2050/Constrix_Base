@@ -54,6 +54,7 @@ interface ProjectFormFieldsProps {
   entityClientsData?: OptionItem[];
   individualClientsData?: OptionItem[];
   contractTypesData?: OptionItem[];
+  projectClassificationsData?: OptionItem[];
   editSelections?: ProjectEditSelections | null;
   onSearchChange?: (fieldName: string, searchValue: string) => void;
   entityClientsPagination?: {
@@ -85,6 +86,7 @@ export function ProjectFormFields({
   entityClientsData,
   individualClientsData,
   contractTypesData,
+  projectClassificationsData,
   editSelections,
   onSearchChange,
   entityClientsPagination,
@@ -159,6 +161,15 @@ export function ProjectFormFields({
     () =>
       withSelectedOption(contractTypesData, editSelections?.contractType ?? null),
     [contractTypesData, editSelections?.contractType],
+  );
+
+  const projectClassificationOptions = useMemo(
+    () =>
+      withSelectedOption(
+        projectClassificationsData,
+        editSelections?.projectClassification ?? null,
+      ),
+    [projectClassificationsData, editSelections?.projectClassification],
   );
 
   const filterOptions = createFilterOptions({
@@ -712,24 +723,16 @@ export function ProjectFormFields({
 
       <Controller
         name="project_classification_id"
-        disabled
         control={control}
         render={({ field }) => (
           <FormControl fullWidth error={!!errors.project_classification_id}>
             <InputLabel>وسم المشروع</InputLabel>
-            <Select {...field} label="وسم المشروع">
-              <MenuItem key="1" value="1">
-                مشروع جديد
-              </MenuItem>
-              <MenuItem key="2" value="2">
-                مشروع قديم
-              </MenuItem>
-              <MenuItem key="3" value="3">
-                مشروع متكامل
-              </MenuItem>
-              <MenuItem key="4" value="4">
-                مشروع متكامل
-              </MenuItem>
+            <Select {...field} value={field.value ?? ""} label="وسم المشروع">
+              {projectClassificationOptions.map((item) => (
+                <MenuItem key={item.id} value={String(item.id)}>
+                  {item.name}
+                </MenuItem>
+              ))}
             </Select>
             {errors.project_classification_id && (
               <Typography variant="caption" color="error">
