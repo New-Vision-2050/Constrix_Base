@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Pencil, X, Upload, Eye, RefreshCw, UserCircle2, ChevronDown, ChevronUp, Camera, ImagePlus, IdCard, BriefcaseBusiness, ShieldCheck, MapPinned, HardHat } from "lucide-react";
+import { Pencil, X, Upload, Eye, RefreshCw, UserCircle2, ChevronDown, ChevronUp, Camera, ImagePlus, IdCard, BriefcaseBusiness, ShieldCheck, MapPinned, HardHat, Copy } from "lucide-react";
 import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
 import validateProfileImage from "@/modules/dashboard/api/validate-image";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
@@ -161,6 +161,7 @@ function DocumentCard({
   onUpdated: (docs: AttendanceDocuments) => void;
 }) {
   const t = useTranslations("AttendancePresence.attachmentsTab");
+  const tUpload = useTranslations("UserProfile.header.uploadPhoto");
 
   const docNumber = documents[config.docKey] as string | null;
   const startDate = documents[config.startDateKey] as string | null;
@@ -174,16 +175,24 @@ function DocumentCard({
   const [endVal, setEndVal] = useState(endDate ?? "");
   const [newFile, setNewFile] = useState<File | null>(null);
   const [newFilePreviewUrl, setNewFilePreviewUrl] = useState<string | null>(null);
-  const fileRef = React.useRef<HTMLInputElement>(null);
-  const bgFileRef = React.useRef<HTMLInputElement>(null);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
-  const handleBgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageDialogValidate = async (file: File) => {
+    const isImage = ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type);
+    return [
+      {
+        sentence: "Only image files (JPG, JPEG, PNG, WEBP) are allowed.",
+        status: isImage ? 1 : 0,
+        sub_title: "",
+      },
+    ];
+  };
+
+  const handleImageDialogUpload = async (file: File) => {
     setNewFile(file);
     if (!expanded) setExpanded(true);
     if (!editing) setEditing(true);
-    e.target.value = "";
+    return { image_url: URL.createObjectURL(file) };
   };
 
   React.useEffect(() => {
@@ -237,6 +246,12 @@ function DocumentCard({
     setEditing(false);
   };
 
+  const handleCopyDocNumber = () => {
+    if (!docNumber) return;
+    navigator.clipboard.writeText(docNumber);
+    toast.success(t("copySuccess"));
+  };
+
   return (
     <Card className="bg-sidebar border-sidebar-border">
       <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
@@ -246,25 +261,16 @@ function DocumentCard({
         <div className="flex items-center gap-1">
           {/* Camera button — always visible for showImagePreview cards */}
           {config.showImagePreview && (
-            <>
-              <input
-                ref={bgFileRef}
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleBgImageChange}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                onClick={() => bgFileRef.current?.click()}
-                disabled={mutation.isPending}
-                title={t("uploadFile")}
-              >
-                <Camera className="h-3.5 w-3.5" />
-              </Button>
-            </>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+              onClick={() => setImageDialogOpen(true)}
+              disabled={mutation.isPending}
+              title={t("uploadFile")}
+            >
+              <Camera className="h-3.5 w-3.5" />
+            </Button>
           )}
           {/* Toggle expand/collapse */}
           <Button
@@ -313,7 +319,7 @@ function DocumentCard({
               ) : (
                 <button
                   type="button"
-                  onClick={() => bgFileRef.current?.click()}
+                  onClick={() => setImageDialogOpen(true)}
                   className="flex flex-col items-center gap-3 text-muted-foreground hover:text-primary transition-colors cursor-pointer w-full h-full"
                 >
                   {config.PlaceholderIcon
@@ -341,9 +347,23 @@ function DocumentCard({
                   disabled={mutation.isPending}
                 />
               ) : (
-                <p className="text-sm text-sidebar-foreground font-medium">
-                  {docNumber || <span className="text-muted-foreground">—</span>}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm text-sidebar-foreground font-medium">
+                    {docNumber || <span className="text-muted-foreground">—</span>}
+                  </p>
+                  {docNumber && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                      onClick={handleCopyDocNumber}
+                      title={t("copyDocumentNumber")}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -400,14 +420,6 @@ function DocumentCard({
             {/* File picker — only in edit mode */}
             {editing && (
               <div className="space-y-1 pt-1">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  className="hidden"
-                  accept="image/*,.pdf,.doc,.docx"
-                  onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
-                  disabled={mutation.isPending}
-                />
                 {newFile ? (
                   <div className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-md text-sm">
                     <span className="flex-1 truncate text-sidebar-foreground">{newFile.name}</span>
@@ -428,7 +440,7 @@ function DocumentCard({
                     variant="outline"
                     size="sm"
                     className="w-full border-primary border text-primary hover:bg-primary/10 hover:text-primary"
-                    onClick={() => fileRef.current?.click()}
+                    onClick={() => setImageDialogOpen(true)}
                     disabled={mutation.isPending}
                   >
                     {files.length > 0 ? (
@@ -466,6 +478,18 @@ function DocumentCard({
           </>
         )}
       </CardContent>
+
+      {/* Reuse the existing profile image dialog (crop + validation) */}
+      {config.showImagePreview && (
+        <UploadProfileImageDialog
+          title={tUpload("title")}
+          open={imageDialogOpen}
+          setOpen={setImageDialogOpen}
+          validateImageFn={handleImageDialogValidate}
+          uploadImageFn={handleImageDialogUpload}
+          onSuccess={() => setImageDialogOpen(false)}
+        />
+      )}
     </Card>
   );
 }

@@ -101,10 +101,12 @@ export const IdentityDataFormConfig = () => {
             placeholder: t("attachment"),
             fileConfig: {
               allowedFileTypes: [
-                "application/pdf", // pdf
-                "image/jpeg", // jpeg & jpg
-                "image/png", // png
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/webp",
               ],
+              useImageDialog: true,
             },
           },
         ],

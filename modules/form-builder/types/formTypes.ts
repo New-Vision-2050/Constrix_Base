@@ -160,6 +160,7 @@ export interface FieldConfig {
     uploadUrl?: string; // URL to upload the file to
     uploadHeaders?: Record<string, string>; // Custom headers for the upload request
     showThumbnails?: boolean; // Whether to show thumbnails for files
+    useImageDialog?: boolean; // Open image-upload-with-crop dialog instead of native file picker
   };
   label: string;
   placeholder?: string;
