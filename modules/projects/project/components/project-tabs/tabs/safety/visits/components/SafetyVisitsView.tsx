@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -11,6 +11,7 @@ import {
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { FileDownloadOutlined, FileUploadOutlined } from "@mui/icons-material";
@@ -22,6 +23,7 @@ import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectContractors } from "@/modules/projects/project/query/useProjectContractors";
 import { useProjectEmployees } from "@/modules/projects/project/query/useProjectEmployees";
 import { useSafetyVisits } from "../query/useSafetyVisits";
+import { ProjectSafetyApi } from "@/services/api/projects/project-safety";
 import {
   EMPTY_SAFETY_VISIT_FILTERS,
   type SafetyViolation,
@@ -84,6 +86,38 @@ export default function SafetyVisitsView() {
     workOrderNumber: string;
   } | null>(null);
   const importFileInputRef = useRef<HTMLInputElement>(null);
+  const downloadingRef = useRef<Set<string>>(new Set());
+  const [downloadingIds, setDownloadingIds] = useState<Set<string>>(new Set());
+
+  const handleDownloadReport = useCallback(async (row: SafetyVisitRow) => {
+    if (!projectId || downloadingRef.current.has(row.id)) return;
+    downloadingRef.current.add(row.id);
+    setDownloadingIds((prev) => new Set(prev).add(row.id));
+    try {
+      const response = await ProjectSafetyApi.getViolationReport(projectId, row.id);
+      const blob = new Blob([response.data as unknown as BlobPart], {
+        type: response.headers["content-type"] ?? "application/octet-stream",
+      });
+      const url = URL.createObjectURL(blob);
+      const disposition = response.headers["content-disposition"] ?? "";
+      const fileNameMatch = disposition.match(/filename[^;=\n]*=(['"]?)([^'"\n]+)\1/);
+      const fileName = fileNameMatch?.[2]?.trim() || `violation-report-${row.id}.pdf`;
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = fileName;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error(tTable("downloadReportError"));
+    } finally {
+      downloadingRef.current.delete(row.id);
+      setDownloadingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(row.id);
+        return next;
+      });
+    }
+  }, [projectId, tTable]);
 
   const params = SafetyVisitsTableLayout.useTableParams({
     initialPage: 1,
@@ -274,8 +308,47 @@ export default function SafetyVisitsView() {
       },
     }));
 
-    return [...baseColumns, ...violationColumns];
-  }, [tTable]);
+    const actionsColumn = {
+      key: "actions",
+      name: tTable("actions"),
+      sortable: false,
+      minWidth: 160,
+      render: (row: SafetyVisitRow) => {
+        const isCompleted =
+          row.status?.toLowerCase().includes("complet") ||
+          row.status?.toLowerCase().includes("مكتمل");
+        const isDownloading = downloadingIds.has(row.id);
+        return (
+          <Tooltip
+            title={isCompleted ? "" : tTable("downloadReportDisabledTooltip")}
+            disableHoverListener={isCompleted}
+            arrow
+          >
+            <span>
+              <Button
+                size="small"
+                variant="contained"
+                color="primary"
+                disabled={!isCompleted || isDownloading}
+                onClick={() => handleDownloadReport(row)}
+                startIcon={
+                  isDownloading ? (
+                    <CircularProgress size={14} color="inherit" />
+                  ) : (
+                    <FileDownloadOutlined fontSize="small" />
+                  )
+                }
+              >
+                {tTable("downloadReport")}
+              </Button>
+            </span>
+          </Tooltip>
+        );
+      },
+    };
+
+    return [...baseColumns, ...violationColumns, actionsColumn];
+  }, [tTable, downloadingIds, handleDownloadReport]);
 
   const state = SafetyVisitsTableLayout.useTableState({
     data: rows,
