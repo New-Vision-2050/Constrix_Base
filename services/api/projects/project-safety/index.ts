@@ -16,6 +16,15 @@ import type {
 } from "./types/response";
 
 export const ProjectSafetyApi = {
+  getViolationReport: (
+    projectId: string | number,
+    safetyId: string | number,
+  ) =>
+    baseApi.get<Blob>(
+      `projects/${projectId}/safety/${safetyId}/violation-report`,
+      { responseType: "blob" },
+    ),
+
   listVisitsForProject: (
     projectId: string | number,
     params?: ListProjectSafetyVisitsParams,
