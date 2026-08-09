@@ -44,7 +44,14 @@ export default function AttendancePresenceTabs() {
         id: "attendance-presence-assigned-tasks",
         title: t("assignedTasks.title"),
         icon: ATTENDANCE_PRESENCE_MAIN_TAB_ICONS.assignedTasks,
-        content: <AssignedTasksTable />,
+        content: null,
+        nestedTabs: [
+          {
+            id: "attendance-presence-assigned-tasks-notifications",
+            title: t("assignedTasks.notificationsAndEmergencies"),
+            content: <AssignedTasksTable />,
+          },
+        ],
       },
       {
         id: "attendance-presence-attendance-log",
@@ -105,7 +112,7 @@ export default function AttendancePresenceTabs() {
     return activeMainTab?.content ?? null;
   }, [activeMainTab, nestedTabs, activeNestedTab]);
 
-  const showNestedTabsRow = Boolean(nestedTabs && nestedTabs.length > 1);
+  const showNestedTabsRow = Boolean(nestedTabs && nestedTabs.length > 0);
 
   return (
     <div className="space-y-0" dir={tabDirection}>

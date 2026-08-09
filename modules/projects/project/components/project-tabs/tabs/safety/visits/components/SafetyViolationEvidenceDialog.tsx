@@ -12,7 +12,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslations } from "next-intl";
 import {
-  getSafetyViolationWeightLabel,
+  getSafetyViolationDisplayLabel,
   isImageEvidence,
   type SafetyViolation,
 } from "../types";
@@ -34,7 +34,7 @@ export default function SafetyViolationEvidenceDialog({
 
   const images = violation?.evidence.filter(isImageEvidence) ?? [];
   const statusLabel = violation
-    ? getSafetyViolationWeightLabel(violation.weight)
+    ? getSafetyViolationDisplayLabel(violation.status, violation.weight)
     : null;
 
   return (
