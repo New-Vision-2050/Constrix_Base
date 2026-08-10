@@ -226,9 +226,16 @@ export const InternalProcedureSettingsApi = {
 
   getInternalProcedure: async (
     procedureSettingId: string,
+    options?: { projectId?: string },
   ): Promise<InternalProcedure> => {
+    const params: { project_id?: string } = {};
+    if (options?.projectId?.trim()) {
+      params.project_id = options.projectId.trim();
+    }
+
     const response = await baseApi.get<GetInternalProcedureResponse>(
       `procedure-settings/${procedureSettingId}`,
+      Object.keys(params).length > 0 ? { params } : undefined,
     );
     const payload = response.data?.payload;
     if (!payload || typeof payload !== "object") {

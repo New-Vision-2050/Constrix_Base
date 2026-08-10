@@ -231,6 +231,14 @@ export default function AttachmentRequestsTable() {
         render: (row: DocumentRow) => <span>{row.name}</span>,
       },
       {
+        key: "documentType",
+        name: t("documentType"),
+        sortable: false,
+        render: (row: DocumentRow) => (
+          <span>{row.documentType?.trim() || "—"}</span>
+        ),
+      },
+      {
         key: "fileSize",
         name: t("fileSize"),
         sortable: false,

@@ -1,12 +1,20 @@
 "use client";
 
-import { Box, Paper, Tab, Tabs, IconButton } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  LinearProgress,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { alpha } from "@mui/material/styles";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
-import LinearProgress from "@mui/material/LinearProgress";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddProjectTypeDialog from "../../../../components/dialogs/add-project-type";
 import EditProjectTypeDialog from "../../../../components/dialogs/edit-project-type";
@@ -15,6 +23,7 @@ import SchemaLevelTabs from "./schema-level-tabs";
 import { Settings } from "@mui/icons-material";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import OverflowTabBar from "@/components/shared/OverflowTabBar";
 
 interface SecondLevelTabsProps {
   parentId: number;
@@ -40,13 +49,14 @@ function EditProjectTypeDialogTrigger({
         }}
         render={({ onOpen }) => (
           <IconButton
-            component="div"
+            component="span"
             onClick={(e) => {
               e.stopPropagation();
               onOpen();
             }}
             color="primary"
-            sx={{ cursor: "pointer" }}
+            size="small"
+            sx={{ cursor: "pointer", p: 0.25 }}
           >
             <Settings
               sx={{ fontSize: 20 }}
@@ -60,9 +70,11 @@ function EditProjectTypeDialogTrigger({
 }
 
 export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
+  const t = useTranslations("Projects.Settings.projectTypes");
   const [selectedItem, setSelectedItem] = useState<PRJ_ProjectType | null>(
     null,
   );
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["project-types", "children", parentId],
@@ -80,76 +92,109 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
     }
   }, [items, selectedItem]);
 
+  useEffect(() => {
+    if (
+      selectedItem &&
+      items.length > 0 &&
+      !items.some((item) => item.id === selectedItem.id)
+    ) {
+      setSelectedItem(items[0]);
+    }
+  }, [items, selectedItem]);
+
+  const renderTabLabel = (item: PRJ_ProjectType) => {
+    const appIcon = APP_ICONS.find((i) => i.id === item.icon);
+    const IconComponent = appIcon?.component;
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+        }}
+      >
+        {IconComponent ? <IconComponent size={16} /> : null}
+        <span>{item.name}</span>
+        <EditProjectTypeDialogTrigger
+          item={item}
+          parentId={parentId}
+          onSuccess={() => refetch()}
+        />
+      </Box>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {(isLoading || isFetching) && <LinearProgress />}
       {!isLoading && (
         <>
-          <Paper>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Tabs
-                value={selectedItem?.id ?? false}
-                onChange={(_, value: number) => {
-                  const item = items.find((i) => i.id === value);
-                  if (item) setSelectedItem(item);
-                }}
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{ flex: 1, minWidth: 0 }}
-              >
-                {items.map((item) => {
-                  const appIcon = APP_ICONS.find((i) => i.id === item.icon);
-                  const IconComponent = appIcon?.component;
-                  return (
-                    <Tab
-                      key={item.id}
-                      value={item.id}
-                      label={
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: 2,
-                          }}
-                        >
-                          {IconComponent && <IconComponent size={16} />}
-                          {item.name}
-                          <Can check={[PERMISSIONS.projectType.update]}>
-                            <EditProjectTypeDialogTrigger
-                              item={item}
-                              parentId={parentId}
-                              onSuccess={() => refetch()}
-                            />
-                          </Can>
-                        </Box>
-                      }
-                    />
-                  );
-                })}
-              </Tabs>
-              <Box sx={{ flexShrink: 0 }}>
-                <Can check={[PERMISSIONS.projectType.create]}>
-                  <DialogTrigger
-                    component={AddProjectTypeDialog}
-                    dialogProps={{
-                      parentId,
-                      onSuccess: () => refetch(),
+          <OverflowTabBar
+            tabs={items}
+            value={selectedItem?.id ?? items[0]?.id ?? 0}
+            onChange={(id) => {
+              const item = items.find((i) => i.id === id);
+              if (item) setSelectedItem(item);
+            }}
+            renderLabel={(item) => renderTabLabel(item)}
+            addLabel={t("add")}
+            addActionWidth={52}
+            overflowTriggerAriaLabel={t("add")}
+            renderAddAction={(context) => (
+              <Can check={[PERMISSIONS.projectType.create]}>
+                {context === "menu" ? (
+                  <MenuItem
+                    onClick={() => setAddDialogOpen(true)}
+                    sx={{
+                      borderRadius: "10px",
+                      mx: 0.75,
+                      my: 0.25,
+                      py: 1.25,
+                      bgcolor: (theme) =>
+                        alpha(theme.palette.primary.main, 0.08),
+                      "&:hover": {
+                        bgcolor: (theme) =>
+                          alpha(theme.palette.primary.main, 0.14),
+                      },
                     }}
-                    render={({ onOpen }) => (
-                      <IconButton
-                        onClick={onOpen}
-                        sx={{ mr: 1 }}
-                        color="primary"
-                      >
-                        <AddIcon />
-                      </IconButton>
-                    )}
-                  />
-                </Can>
-              </Box>
-            </div>
-          </Paper>
+                  >
+                    <ListItemIcon sx={{ minWidth: 36, color: "primary.main" }}>
+                      <AddIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t("add")}
+                      primaryTypographyProps={{
+                        fontWeight: 700,
+                        color: "primary.main",
+                        fontSize: "0.875rem",
+                      }}
+                    />
+                  </MenuItem>
+                ) : (
+                  <IconButton
+                    onClick={() => setAddDialogOpen(true)}
+                    color="primary"
+                    aria-label={t("add")}
+                    sx={{ flexShrink: 0 }}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                )}
+              </Can>
+            )}
+          />
+
+          <AddProjectTypeDialog
+            open={addDialogOpen}
+            onClose={() => setAddDialogOpen(false)}
+            parentId={parentId}
+            onSuccess={() => {
+              void refetch();
+              setAddDialogOpen(false);
+            }}
+          />
+
           {selectedItem && (
             <Can check={[PERMISSIONS.projectType.view]}>
               <SchemaLevelTabs

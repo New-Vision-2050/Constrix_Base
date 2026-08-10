@@ -20,10 +20,12 @@ import { Close, List } from "@mui/icons-material";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import SearchableSelect from "@/components/shared/SearchableSelect";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import type { InternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/types/response";
 import { normalizeInternalProcedure } from "@/services/api/hr-settings/internal-procedure-settings/normalize";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
+import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
 import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { useProceduresSettingsTranslations } from "../../hooks/useProceduresSettingsTranslations";
 import type { TaskActionFormValues } from "../../types";
@@ -34,6 +36,8 @@ interface DocumentClassificationAddProcedureDialogProps {
   procedureType: string;
   /** When set, dialog opens in edit mode with the add form. */
   procedure?: InternalProcedure | null;
+  /** Existing project procedures for the optional "Copy steps from" selector. */
+  existingProcedures?: InternalProcedure[];
   onSave: (values: TaskActionFormValues) => void | Promise<void>;
 }
 
@@ -48,6 +52,8 @@ type ClassificationForm = {
   showInAttachmentsLibrary: boolean;
   showInArchiveAfterApproval: boolean;
   requiresAssetId: boolean;
+  receiverCompanyIds: string[];
+  sourceProcedureSettingId: string;
 };
 
 const defaultForm: ClassificationForm = {
@@ -61,7 +67,16 @@ const defaultForm: ClassificationForm = {
   showInAttachmentsLibrary: false,
   showInArchiveAfterApproval: false,
   requiresAssetId: false,
+  receiverCompanyIds: [],
+  sourceProcedureSettingId: "",
 };
+
+function sameIdSet(left: string[], right: string[]): boolean {
+  if (left.length !== right.length) return false;
+  const sortedLeft = [...left].map(String).sort();
+  const sortedRight = [...right].map(String).sort();
+  return sortedLeft.every((value, index) => value === sortedRight[index]);
+}
 
 function formFromProcedure(procedure: InternalProcedure): ClassificationForm {
   return {
@@ -83,7 +98,25 @@ function formFromProcedure(procedure: InternalProcedure): ClassificationForm {
     showInAttachmentsLibrary: !!procedure.appears_in_attachments_library,
     showInArchiveAfterApproval: !!procedure.appears_in_archive_after_approval,
     requiresAssetId: !!procedure.requires_asset_id,
+    receiverCompanyIds: (procedure.receiver_company_ids ?? []).map(String),
+    sourceProcedureSettingId: "",
   };
+}
+
+function extractApiFieldErrors(error: unknown): Record<string, string[]> {
+  const response = (error as { response?: { data?: { errors?: unknown } } })
+    ?.response?.data?.errors;
+  if (!response || typeof response !== "object") return {};
+  return Object.fromEntries(
+    Object.entries(response as Record<string, unknown>).map(([key, value]) => [
+      key,
+      Array.isArray(value)
+        ? value.map(String)
+        : value != null
+          ? [String(value)]
+          : [],
+    ]),
+  );
 }
 
 export default function DocumentClassificationAddProcedureDialog({
@@ -91,6 +124,7 @@ export default function DocumentClassificationAddProcedureDialog({
   onClose,
   procedureType,
   procedure = null,
+  existingProcedures = [],
   onSave,
 }: DocumentClassificationAddProcedureDialogProps) {
   const { tc } = useProceduresSettingsTranslations();
@@ -105,18 +139,35 @@ export default function DocumentClassificationAddProcedureDialog({
   const isEditMode = !!procedure;
 
   const [form, setForm] = useState<ClassificationForm>(defaultForm);
+  const [initialReceiverCompanyIds, setInitialReceiverCompanyIds] = useState<
+    string[]
+  >([]);
   const [nameError, setNameError] = useState("");
+  const [receiverCompaniesError, setReceiverCompaniesError] = useState("");
+  const [sourceProcedureError, setSourceProcedureError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const procedureId = procedure?.id;
 
   const { data: fetchedProcedure, isLoading: loadingProcedure } = useQuery({
-    queryKey: ["internal-procedure", procedureId, "document-classification"],
+    queryKey: ["internal-procedure", procedureId, "document-classification", projectId],
     queryFn: () =>
-      InternalProcedureSettingsApi.getInternalProcedure(procedureId!),
+      InternalProcedureSettingsApi.getInternalProcedure(procedureId!, {
+        projectId,
+      }),
     enabled: open && !!procedureId,
     placeholderData: procedure ?? undefined,
   });
+
+  const { data: sharedCompanies = [], isLoading: loadingSharedCompanies } =
+    useQuery({
+      queryKey: ["shared-companies", projectId, "procedure-dialog"],
+      queryFn: async () => {
+        const res = await ProjectSharingApi.getSharedCompanies(projectId!);
+        return res.data.payload ?? [];
+      },
+      enabled: open && !!projectId,
+    });
 
   const { data: forms = [] } = useQuery({
     queryKey: ["internal_procedure_setting_forms", procedureType, locale],
@@ -181,21 +232,49 @@ export default function DocumentClassificationAddProcedureDialog({
   useEffect(() => {
     if (!open) {
       setForm(defaultForm);
+      setInitialReceiverCompanyIds([]);
       setNameError("");
+      setReceiverCompaniesError("");
+      setSourceProcedureError("");
       return;
     }
 
     if (!procedure) {
       setForm(defaultForm);
+      setInitialReceiverCompanyIds([]);
       setNameError("");
+      setReceiverCompaniesError("");
+      setSourceProcedureError("");
       return;
     }
 
     const source =
       fetchedProcedure ?? normalizeInternalProcedure(procedure);
-    setForm(formFromProcedure(source));
+    const nextForm = formFromProcedure(source);
+    setForm(nextForm);
+    setInitialReceiverCompanyIds(nextForm.receiverCompanyIds);
     setNameError("");
+    setReceiverCompaniesError("");
+    setSourceProcedureError("");
   }, [open, procedure, fetchedProcedure]);
+
+  const sharedCompanyOptions = useMemo(
+    () =>
+      sharedCompanies.map((company) => ({
+        value: String(company.id),
+        label: company.name,
+      })),
+    [sharedCompanies],
+  );
+
+  const sourceProcedureOptions = useMemo(
+    () =>
+      existingProcedures.map((item) => ({
+        value: String(item.id),
+        label: item.name || String(item.id),
+      })),
+    [existingProcedures],
+  );
 
   const checkboxFields = useMemo(
     () =>
@@ -227,6 +306,8 @@ export default function DocumentClassificationAddProcedureDialog({
     }
 
     setIsSaving(true);
+    setReceiverCompaniesError("");
+    setSourceProcedureError("");
     try {
       await onSave({
         name: form.name.trim(),
@@ -244,8 +325,25 @@ export default function DocumentClassificationAddProcedureDialog({
         showInAttachmentsLibrary: form.showInAttachmentsLibrary,
         showInArchiveAfterApproval: form.showInArchiveAfterApproval,
         requiresAssetId: form.requiresAssetId,
+        receiverCompanyIds: form.receiverCompanyIds,
+        receiverCompanyIdsChanged: isEditMode
+          ? !sameIdSet(form.receiverCompanyIds, initialReceiverCompanyIds)
+          : undefined,
+        sourceProcedureSettingId:
+          !isEditMode && form.sourceProcedureSettingId
+            ? form.sourceProcedureSettingId
+            : undefined,
       });
       onClose();
+    } catch (error) {
+      const fieldErrors = extractApiFieldErrors(error);
+      if (fieldErrors.receiver_company_ids?.length) {
+        setReceiverCompaniesError(t("validationReceiverCompanies"));
+      }
+      if (fieldErrors.source_procedure_setting_id?.length) {
+        setSourceProcedureError(t("validationSourceProcedure"));
+      }
+      throw error;
     } finally {
       setIsSaving(false);
     }
@@ -494,6 +592,78 @@ export default function DocumentClassificationAddProcedureDialog({
                 ))}
               </Box>
             </Box>
+
+            {projectId ? (
+              <Box>
+                <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 0.5 }}>
+                  {t("concernedCompanies")}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 1 }}
+                >
+                  {t("concernedCompaniesHint")}
+                </Typography>
+                <SearchableSelect
+                  multiple
+                  options={sharedCompanyOptions}
+                  value={form.receiverCompanyIds}
+                  onChange={(value) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      receiverCompanyIds: value.map(String),
+                    }));
+                    if (receiverCompaniesError) setReceiverCompaniesError("");
+                  }}
+                  placeholder={
+                    loadingSharedCompanies ? tc("loading") : t("select")
+                  }
+                  searchPlaceholder={t("searchCompanies")}
+                  noResultsText={t("noCompanies")}
+                  disabled={isSaving || loadingSharedCompanies}
+                  error={receiverCompaniesError}
+                />
+              </Box>
+            ) : null}
+
+            {!isEditMode && existingProcedures.length > 0 ? (
+              <Box>
+                <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 0.5 }}>
+                  {t("copyStepsFrom")}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 1 }}
+                >
+                  {t("copyStepsFromHint")}
+                </Typography>
+                <TextField
+                  select
+                  size="small"
+                  fullWidth
+                  value={form.sourceProcedureSettingId}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      sourceProcedureSettingId: e.target.value,
+                    }));
+                    if (sourceProcedureError) setSourceProcedureError("");
+                  }}
+                  disabled={isSaving}
+                  error={!!sourceProcedureError}
+                  helperText={sourceProcedureError}
+                >
+                  <MenuItem value="">{t("select")}</MenuItem>
+                  {sourceProcedureOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+            ) : null}
 
             <Alert severity="warning" variant="outlined">
               {t("notice")}

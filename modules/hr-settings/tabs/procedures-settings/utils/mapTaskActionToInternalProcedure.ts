@@ -66,6 +66,15 @@ function buildInternalProcedurePayload(
     payload.requires_asset_id = values.requiresAssetId;
   }
 
+  if (values.receiverCompanyIds !== undefined) {
+    payload.receiver_company_ids = values.receiverCompanyIds.filter(Boolean);
+  }
+
+  if (values.sourceProcedureSettingId?.trim()) {
+    payload.source_procedure_setting_id =
+      values.sourceProcedureSettingId.trim();
+  }
+
   return payload;
 }
 
@@ -78,7 +87,17 @@ export function mapTaskActionToCreateInternalProcedure(
     projectId?: string | null;
   },
 ): CreateInternalProcedureArgs {
-  return buildInternalProcedurePayload(values, options);
+  const payload = buildInternalProcedurePayload(values, options);
+
+  if (!payload.receiver_company_ids?.length) {
+    delete payload.receiver_company_ids;
+  }
+
+  if (!payload.source_procedure_setting_id) {
+    delete payload.source_procedure_setting_id;
+  }
+
+  return payload;
 }
 
 export function mapTaskActionToUpdateInternalProcedure(
@@ -91,7 +110,14 @@ export function mapTaskActionToUpdateInternalProcedure(
     isActive?: boolean;
   },
 ): CreateInternalProcedureArgs {
-  return buildInternalProcedurePayload(values, options);
+  const payload = buildInternalProcedurePayload(values, options);
+  delete payload.source_procedure_setting_id;
+
+  if (!values.receiverCompanyIdsChanged) {
+    delete payload.receiver_company_ids;
+  }
+
+  return payload;
 }
 
 export function resolveProcedureSettingId(

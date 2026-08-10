@@ -69,6 +69,7 @@ function mapToDocumentRow(item: AttachmentRequestWithFlow): DocumentRow {
     id: item.id,
     serialNumber: item.serial_number,
     name: item.name,
+    documentType: item.procedure_setting?.name?.trim() || undefined,
     fileSize: firstFile?.file_size_formatted ?? "—",
     documentCount: docCount,
     lastActivityUser: item.created_by?.name ?? "—",
