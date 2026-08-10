@@ -63,14 +63,14 @@ export function getWorkPanelProject({
         url: makkahUrl,
         icon: FolderClosed,
         isActive: fullPath.startsWith(makkahUrl),
-        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
+        show: !isCentralCompany && can(PERMISSIONS.projectType.list),
       },
       {
         name: t("Sidebar.UnifiedContractJeddah"),
         url: jeddahUrl,
         icon: FolderClosed,
         isActive: fullPath.startsWith(jeddahUrl),
-        show: !isCentralCompany && can(PERMISSIONS.projectManagement.list),
+        show: !isCentralCompany && can(PERMISSIONS.projectType.list),
       },
       {
         name: t("Sidebar.Inbox"),

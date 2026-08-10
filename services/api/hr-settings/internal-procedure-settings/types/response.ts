@@ -139,6 +139,20 @@ export interface InternalProcedure {
   appears_in_attachments_library?: boolean;
   appears_in_archive_after_approval?: boolean;
   requires_asset_id?: boolean;
+  /** Project procedure visibility (type = project_procedure) */
+  receiver_company_ids?: string[] | null;
+  receiver_companies?: ProcedureReceiverCompany[] | null;
+  project_procedure_setting_id?: string | null;
+  project_id?: string | null;
+}
+
+export interface ProcedureReceiverCompany {
+  id: string;
+  name: string;
+  serial_no?: string | null;
+  serial_number?: string | null;
+  email?: string | null;
+  phone?: string | null;
 }
 
 export interface CreateInternalProcedureResponse {

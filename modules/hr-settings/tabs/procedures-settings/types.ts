@@ -60,4 +60,10 @@ export interface TaskActionFormValues {
   showInAttachmentsLibrary?: boolean;
   showInArchiveAfterApproval?: boolean;
   requiresAssetId?: boolean;
+  /** Accepted shared companies that can see this project procedure. */
+  receiverCompanyIds?: string[];
+  /** When true on update, include receiver_company_ids in the payload. */
+  receiverCompanyIdsChanged?: boolean;
+  /** Create-only: copy steps from an existing project procedure. */
+  sourceProcedureSettingId?: string;
 }
