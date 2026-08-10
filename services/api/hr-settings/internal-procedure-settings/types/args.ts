@@ -47,6 +47,10 @@ export interface CreateInternalProcedureArgs {
   appears_in_attachments_library?: boolean;
   appears_in_archive_after_approval?: boolean;
   requires_asset_id?: boolean;
+  /** Accepted shared companies that can see this project procedure. Omit or empty = all. */
+  receiver_company_ids?: string[];
+  /** Create-only: copy steps from an existing project procedure. */
+  source_procedure_setting_id?: string;
 }
 
 export type UpdateInternalProcedureArgs = CreateInternalProcedureArgs;

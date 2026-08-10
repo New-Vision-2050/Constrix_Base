@@ -1,4 +1,4 @@
-import type { InternalProcedure } from "./types/response";
+import type { InternalProcedure, ProcedureReceiverCompany } from "./types/response";
 import type { RichInternalProcedureCondition } from "./types/args";
 
 export function coerceBoolean(value: unknown, fallback = false): boolean {
@@ -103,6 +103,33 @@ function resolveFormId(raw: Record<string, unknown>): string {
   return "";
 }
 
+function normalizeReceiverCompanies(value: unknown): ProcedureReceiverCompany[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const companies: ProcedureReceiverCompany[] = [];
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const record = item as Record<string, unknown>;
+    const id = resolveOptionalId(record.id);
+    const name = typeof record.name === "string" ? record.name.trim() : "";
+    if (!id || !name) continue;
+    companies.push({
+      id,
+      name,
+      serial_no:
+        typeof record.serial_no === "string" ? record.serial_no : null,
+      serial_number:
+        typeof record.serial_number === "string"
+          ? record.serial_number
+          : null,
+      email: typeof record.email === "string" ? record.email : null,
+      phone: typeof record.phone === "string" ? record.phone : null,
+    });
+  }
+
+  return companies.length > 0 ? companies : undefined;
+}
+
 function extractInternalProcedurePayload(
   payload: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -180,5 +207,11 @@ export function normalizeInternalProcedure(
       false,
     ),
     requires_asset_id: coerceBoolean(data.requires_asset_id, false),
+    receiver_company_ids: resolveOptionalIdArray(data.receiver_company_ids),
+    receiver_companies: normalizeReceiverCompanies(data.receiver_companies),
+    project_procedure_setting_id: resolveOptionalId(
+      data.project_procedure_setting_id,
+    ),
+    project_id: resolveOptionalId(data.project_id),
   };
 }

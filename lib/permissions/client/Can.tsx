@@ -57,7 +57,7 @@ export const Can = ({ check, children, fallback = null, strict }: CanProps) => {
   // Handle the different check formats to match the can function signature
   const hasPermission = strict ? strictCan(...check) : can(...check);
 
-  return hasPermission ? <>{children}</> : <>{fallback}</>;
+  return hasPermission ? children : fallback;
 };
 
 export default Can;

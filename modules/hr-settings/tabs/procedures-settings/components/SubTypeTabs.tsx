@@ -17,7 +17,6 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import { Delete, Edit, Settings } from "@mui/icons-material";
 import {
   PlusIcon,
@@ -58,6 +57,7 @@ import StagesView, { type StagesViewRef } from "./StagesView";
 import AddTaskActionDialog from "./dialogs/AddTaskActionDialog";
 import EditTaskActionDialog from "./dialogs/EditTaskActionDialog";
 import DocumentClassificationAddProcedureDialog from "./dialogs/DocumentClassificationAddProcedureDialog";
+import OverflowTabBar from "@/components/shared/OverflowTabBar";
 
 /** Keep in sync with useDocumentSequenceOuterTabs query key. */
 const DOCUMENT_SEQUENCE_TABS_QUERY_KEY =
@@ -678,108 +678,18 @@ export default function SubTypeTabs() {
   return (
     <div className="space-y-4">
       {useDocumentSequenceLayout ? (
-        <Paper
-          elevation={0}
-          sx={{
-            px: 1.5,
-            py: 1.5,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            borderRadius: "16px",
-            border: "1px solid",
-            borderColor: "divider",
-            bgcolor: (theme) => alpha(theme.palette.background.paper, 0.7),
-            backdropFilter: "blur(12px)",
-            backgroundImage: (theme) =>
-              `linear-gradient(180deg, ${alpha(
-                theme.palette.primary.main,
-                0.05,
-              )} 0%, transparent 100%)`,
-            boxShadow: (theme) =>
-              `0 4px 24px ${alpha(theme.palette.common.black, 0.25)}`,
+        <OverflowTabBar
+          tabs={outerTabs}
+          value={selectedOuter}
+          onChange={(val) => {
+            setSelectedOuter(val);
+            setSelectedProcedureId(null);
+            setSelectedInner(WORK_PLAN_TAB);
           }}
-        >
-          <Tabs
-            value={outerTabs.length > 0 ? selectedOuter : false}
-            onChange={(_, val: number) => {
-              setSelectedOuter(val);
-              setSelectedProcedureId(null);
-              setSelectedInner(WORK_PLAN_TAB);
-            }}
-            variant="scrollable"
-            scrollButtons="auto"
-            TabIndicatorProps={{
-              sx: {
-                height: "100%",
-                borderRadius: "12px",
-                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.14),
-                border: "1px solid",
-                borderColor: "primary.main",
-                boxShadow: (theme) =>
-                  `0 0 20px ${alpha(theme.palette.primary.main, 0.35)}`,
-                top: 0,
-                bottom: 0,
-                zIndex: 0,
-              },
-            }}
-            sx={{
-              flex: 1,
-              minWidth: 0,
-              "& .MuiTabs-flexContainer": {
-                gap: 0.5,
-              },
-              "& .MuiTab-root": {
-                textTransform: "none",
-                minHeight: 44,
-                px: 2,
-                py: 1,
-                borderRadius: "12px",
-                color: "text.secondary",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                transition: "all 0.2s ease",
-                zIndex: 1,
-                "&:hover": {
-                  color: "text.primary",
-                  bgcolor: "rgba(255, 255, 255, 0.03)",
-                },
-                "&.Mui-selected": {
-                  color: "primary.main",
-                  fontWeight: 700,
-                },
-              },
-            }}
-          >
-            {outerTabs.map((tab) => (
-              <Tab
-                key={tab.id}
-                value={tab.id}
-                label={renderOuterTabLabel(tab)}
-              />
-            ))}
-          </Tabs>
-
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<PlusIcon className="h-4 w-4" />}
-            onClick={openAddTaskDialog}
-            aria-label={t("procedures.addProcedure")}
-            sx={{
-              borderRadius: "12px",
-              textTransform: "none",
-              fontWeight: 700,
-              px: 2,
-              boxShadow: (theme) =>
-                `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-              flexShrink: 0,
-            }}
-          >
-            {t("procedures.addProcedure")}
-          </Button>
-        </Paper>
+          renderLabel={(tab) => renderOuterTabLabel(tab)}
+          onAdd={openAddTaskDialog}
+          addLabel={t("procedures.addProcedure")}
+        />
       ) : (
         !(hideWorkPlanTabs && outerTabs.length <= 1) && (
           <Paper>
@@ -981,6 +891,9 @@ export default function SubTypeTabs() {
           }}
           procedureType={currentTabType || "project_procedure"}
           procedure={editTaskActionDialogOpen ? editingProcedure : null}
+          existingProcedures={
+            useDocumentSequenceLayout ? internalProcedures : childProcedures
+          }
           onSave={async (values) => {
             if (editTaskActionDialogOpen && editingProcedure) {
               await handleEditTaskAction(values);

@@ -409,5 +409,25 @@ export const proceduresSettingsMessages = new MessagesGroup({
     save: _m("Save", "حفظ"),
     cancel: _m("Cancel", "تراجع"),
     select: _m("Select", "اختر"),
+    concernedCompanies: _m("Concerned companies", "الشركات المعنية"),
+    concernedCompaniesHint: _m(
+      "Leave empty to make the procedure visible to all accepted shared companies.",
+      "اتركه فارغاً ليكون الإجراء مرئياً لجميع الشركات المشاركة المقبولة.",
+    ),
+    copyStepsFrom: _m("Copy steps from", "نسخ الخطوات من"),
+    copyStepsFromHint: _m(
+      "Optional. Copies steps from an existing procedure into the new one.",
+      "اختياري. ينسخ خطوات إجراء موجود إلى الإجراء الجديد.",
+    ),
+    searchCompanies: _m("Search companies", "بحث عن الشركات"),
+    noCompanies: _m("No companies found", "لا توجد شركات"),
+    validationReceiverCompanies: _m(
+      "Selected companies must be accepted shared companies for this project.",
+      "يجب أن تكون الشركات المحددة شركات مشاركة مقبولة لهذا المشروع.",
+    ),
+    validationSourceProcedure: _m(
+      "The selected source procedure is not valid for this project.",
+      "الإجراء المصدر المحدد غير صالح لهذا المشروع.",
+    ),
   }),
 });
