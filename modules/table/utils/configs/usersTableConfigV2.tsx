@@ -163,20 +163,11 @@ export const UsersConfigV2 = (options?: {
         key: "phone",
         label: tSubTable("Phone"),
         render: (_: unknown, row: UserTableRow) => {
-          // const companies = row.companies || [];
+          const phone = row.phone || "";
+          const formatted = phone.replace(/^\+/, "") + "+";
           return (
             <div className="line-clamp-3 flex flex-col items-start justify-start">
-              {/* {companies.map((company) => (
-                <p
-                  key={company.id}
-                  className="line-clamp-1 h-5"
-                  dir={"ltr"}
-                  style={{ width: "fit-content" }}
-                >
-                  {company?.phone || ""}
-                </p>
-              ))} */}
-              <p>{row.phone || ""}</p>
+              <p>{formatted}</p>
             </div>
           );
         },
