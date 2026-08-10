@@ -111,15 +111,65 @@ export const attendancePresenceMessages = new MessagesGroup({
       submitting: _m("Submitting...", "جاري الإرسال..."),
     }),
     endTask: new MessagesGroup({
-      title: _m("End Task", "إنهاء المهمة"),
+      title: _m("Close Notification", "إغلاق الإشعار"),
       subtitle: _m(
         "Complete the task and submit closure details",
         "إنهاء المهمة وإرسال بيانات الإغلاق",
       ),
-      closureInfoSection: _m("Closure information", "معلومات الإغلاق"),
-      locationLabel: _m("Current location", "الموقع الحالي"),
-      latitudeLabel: _m("Latitude", "خط العرض"),
-      longitudeLabel: _m("Longitude", "خط الطول"),
+      taskStatus: _m("Task status", "حالة المهمة"),
+      startTime: _m("Start time", "وقت البدء"),
+      attachClosingStatementsSection: _m(
+        "Attach closing statements",
+        "إرفاق إفادات الإغلاق",
+      ),
+      attachClosingStatementsHint: _m(
+        "Attach screenshots that were sent to the groups",
+        "إرفاق لقطات الشاشة التي تم إرسالها على الجروبات",
+      ),
+      endTaskStatusLabel: _m("Task completion status", "حالة إنهاء المهمة"),
+      selectEndTaskStatus: _m(
+        "Select task completion status",
+        "اختر حالة إنهاء المهمة",
+      ),
+      statusRequired: _m(
+        "Task completion status is required",
+        "حالة إنهاء المهمة مطلوبة",
+      ),
+      statusesLoadError: _m(
+        "Failed to load task completion statuses",
+        "فشل تحميل حالات إنهاء المهمة",
+      ),
+      loadingStatuses: _m("Loading...", "جاري التحميل..."),
+      photosLabel: _m("Screenshots", "لقطات الشاشة"),
+      addPhotos: _m("Add photos", "إضافة صور"),
+      screenshotTooLarge: _m(
+        "Each screenshot must be 5MB or less",
+        "يجب ألا يتجاوز حجم كل لقطة شاشة 5MB",
+      ),
+      screenshotsRequired: _m(
+        "At least one screenshot is required",
+        "لقطة شاشة واحدة على الأقل مطلوبة",
+      ),
+      statementsSentToGroups: _m(
+        "Statements have been sent to the groups",
+        "تم إرسال الإفادات على الجروبات",
+      ),
+      attachmentsReviewed: _m(
+        "All attachments have been reviewed",
+        "تمت مراجعة جميع المرفقات",
+      ),
+      confirmationsRequired: _m(
+        "Please confirm both checkboxes before closing",
+        "يرجى تأكيد خانتي الاختيار قبل الإغلاق",
+      ),
+      screenshotsMandatoryInfo: _m(
+        "Screenshots are mandatory to complete the final closing of the notification.",
+        "لقطات الشاشة إلزامية لإتمام الإغلاق النهائي للإشعار.",
+      ),
+      preview: _m("Preview", "معاينة"),
+      previewTitle: _m("Closure preview", "معاينة الإغلاق"),
+      screenshotsCount: _m("Screenshots", "لقطات الشاشة"),
+      closeNotification: _m("Close notification", "إغلاق الإشعار"),
       fetchingLocation: _m("Getting location...", "جاري تحديد الموقع..."),
       locationPermissionDenied: _m(
         "Location permission was denied",
@@ -131,24 +181,74 @@ export const attendancePresenceMessages = new MessagesGroup({
       ),
       notesLabel: _m("Closing notes", "ملاحظات الإغلاق"),
       notesPlaceholder: _m(
-        "Add final notes about the task closure",
-        "أضف ملاحظات نهائية عن إغلاق المهمة",
+        "Write closing notes here...",
+        "اكتب ملاحظات الإغلاق هنا...",
       ),
-      photosLabel: _m(
-        "Site photos (optional)",
-        "صور من الموقع (اختياري)",
-      ),
-      addPhotos: _m("Add photos", "إضافة صور"),
-      submitEndTask: _m("End task", "إنهاء المهمة"),
       submitSuccess: _m(
-        "Task ended successfully",
-        "تم إنهاء المهمة بنجاح",
+        "Notification closed successfully",
+        "تم إغلاق الإشعار بنجاح",
       ),
       submitError: _m(
-        "Failed to end task",
-        "فشل إنهاء المهمة",
+        "Failed to close notification",
+        "فشل إغلاق الإشعار",
       ),
       submitting: _m("Submitting...", "جاري الإرسال..."),
+    }),
+    safetyViolationForm: new MessagesGroup({
+      title: _m("Safety Report", "تقرير السلامة"),
+      subtitle: _m(
+        "Safety checklist form",
+        "نموذج قائمة فحص سلامة",
+      ),
+      progressSummary: _m(
+        "Required: {total}, Completed: {completed}, Remaining: {remaining}",
+        "المطلوب: {total} ، مكتمل: {completed} ، المتبقي: {remaining}",
+      ),
+      hasViolation: _m("Violation exists", "يوجد مخالفة"),
+      noViolation: _m("No violation", "لا يوجد مخالفة"),
+      notApplicable: _m("Not applicable", "لا ينطبق"),
+      actionLabel: _m("Required action", "الإجراء المطلوب"),
+      selectAction: _m("Select action", "اختر الإجراء"),
+      photosRequired: _m(
+        "Photo attachment required (up to {max})",
+        "إرفاق صور إلزامي (حتى {max})",
+      ),
+      photosRequiredHint: _m(
+        "At least one photo is required when selecting violation exists.",
+        "يجب إرفاق صورة واحدة على الأقل عند اختيار يوجد مخالفة.",
+      ),
+      addPhotos: _m("Add photos", "إضافة صور"),
+      completePreviousItem: _m(
+        "Complete the previous item first to activate this point.",
+        "أكمل العنصر السابق أولاً لتفعيل هذا البند.",
+      ),
+      submitReport: _m("Submit report", "إرسال التقرير"),
+      loadError: _m(
+        "Failed to load safety violations",
+        "فشل تحميل بنود السلامة",
+      ),
+      emptyCatalog: _m(
+        "No safety violations available",
+        "لا توجد بنود سلامة متاحة",
+      ),
+      submitSuccess: _m(
+        "Safety report submitted successfully",
+        "تم إرسال تقرير السلامة بنجاح",
+      ),
+      submitError: _m(
+        "Failed to submit safety report",
+        "فشل إرسال تقرير السلامة",
+      ),
+      submitting: _m("Submitting...", "جاري الإرسال..."),
+      fetchingLocation: _m("Getting location...", "جاري تحديد الموقع..."),
+      locationPermissionDenied: _m(
+        "Location permission was denied",
+        "تم رفض صلاحية الموقع",
+      ),
+      locationUnavailable: _m(
+        "Unable to get current location",
+        "تعذر الحصول على الموقع الحالي",
+      ),
     }),
     confirmLocation: new MessagesGroup({
       title: _m("Confirm Site Presence", "تأكيد التواجد في الموقع"),

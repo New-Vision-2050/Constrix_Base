@@ -13,9 +13,11 @@ import AssignedTaskNotificationLink from "./AssignedTaskNotificationLink";
 import SiteStatusUpdateFormDialog from "./SiteStatusUpdateFormDialog";
 import EndTaskFormDialog from "./EndTaskFormDialog";
 import ConfirmLocationDialog from "./ConfirmLocationDialog";
+import SafetyViolationFormDialog from "./SafetyViolationFormDialog";
 import {
   CONFIRM_LOCATION_FORM_KEY,
   END_TASK_FORM_KEY,
+  SAFETY_VIOLATION_FORM_KEY,
   SITE_STATUS_UPDATE_FORM_KEY,
 } from "./assignedTaskFormKeys";
 
@@ -41,6 +43,10 @@ export default function AssignedTasksTable() {
     notification: ProjectNotification;
     action: ProjectNotificationAvailableAction;
   } | null>(null);
+  const [safetyViolationContext, setSafetyViolationContext] = useState<{
+    notification: ProjectNotification;
+    action: ProjectNotificationAvailableAction;
+  } | null>(null);
 
   const handleSelectAction = (
     action: ProjectNotificationAvailableAction,
@@ -60,6 +66,11 @@ export default function AssignedTasksTable() {
 
     if (action.form.key === CONFIRM_LOCATION_FORM_KEY) {
       setConfirmLocationContext({ notification, action });
+      return;
+    }
+
+    if (action.form.key === SAFETY_VIOLATION_FORM_KEY) {
+      setSafetyViolationContext({ notification, action });
     }
   };
 
@@ -178,6 +189,12 @@ export default function AssignedTasksTable() {
         notification={confirmLocationContext?.notification ?? null}
         action={confirmLocationContext?.action ?? null}
         onClose={() => setConfirmLocationContext(null)}
+      />
+
+      <SafetyViolationFormDialog
+        notification={safetyViolationContext?.notification ?? null}
+        action={safetyViolationContext?.action ?? null}
+        onClose={() => setSafetyViolationContext(null)}
       />
     </Box>
   );

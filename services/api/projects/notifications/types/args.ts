@@ -115,6 +115,7 @@ export interface ConfirmLocationArgs {
 }
 
 export interface EndTaskArgs {
+  status_id: string;
   latitude: number;
   longitude: number;
   notes?: string;
@@ -131,6 +132,24 @@ export interface RequestSiteStatusUpdateArgs {
   update_date?: string;
   update_time?: string;
   current_site_status_id?: string;
+}
+
+export type SafetyViolationSubmissionStatus =
+  | "violation_found"
+  | "no_violation"
+  | "not_applicable";
+
+export type SafetyViolationSubmissionItem = {
+  violation_id: string;
+  status: SafetyViolationSubmissionStatus;
+  images?: File[];
+};
+
+export interface RequestSafetyViolationArgs {
+  internal_procedure_setting_id: string;
+  current_latitude?: number;
+  current_longitude?: number;
+  violations: SafetyViolationSubmissionItem[];
 }
 
 export interface ProjectNotificationReassignArgs {
