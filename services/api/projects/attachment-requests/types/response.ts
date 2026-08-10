@@ -40,6 +40,15 @@ export interface AttachmentRequestProject {
   serial_number: string;
 }
 
+export interface AttachmentRequestProcedureSetting {
+  id: string;
+  name: string;
+  type?: string;
+  execute_type?: string;
+  is_active?: boolean;
+  attachment_type?: { id?: string; name?: string } | null;
+}
+
 export interface AttachmentRequestStatistics {
   total_items: number;
   approved_items: number;
@@ -85,6 +94,7 @@ export interface AttachmentRequest {
   statistics?: AttachmentRequestStatistics | null;
   history?: AttachmentRequestHistoryEntry[];
   can_take_action?: number;
+  procedure_setting?: AttachmentRequestProcedureSetting | null;
 }
 
 export interface AttachmentFolder {
