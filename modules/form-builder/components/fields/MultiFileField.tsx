@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { FileObject } from './FileField'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
 
 interface MultiFileFieldProps {
   field: FieldConfig;
@@ -139,6 +140,9 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
 
   // State for file info
   const [filesInfo, setFilesInfo] = useState<FileInfo[]>([]);
+
+  // State for image dialog (useImageDialog mode)
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   // Get the current locale to determine text direction
 
@@ -548,10 +552,12 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
 
   // Handle clicking the upload button
   const handleUploadClick = useCallback(() => {
-    if (fileInputRef.current) {
+    if (field.fileConfig?.useImageDialog) {
+      setImageDialogOpen(true);
+    } else if (fileInputRef.current) {
       fileInputRef.current.click();
     }
-  }, []);
+  }, [field.fileConfig?.useImageDialog]);
 
   return (
     <div className="relative">
@@ -716,6 +722,26 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
           <div className="text-destructive text-sm mt-1 whitespace-pre-line">
             {error || storeErrors[field.name]}
           </div>
+        )}
+
+        {/* Image upload dialog (useImageDialog mode) */}
+        {field.fileConfig?.useImageDialog && (
+          <UploadProfileImageDialog
+            open={imageDialogOpen}
+            setOpen={setImageDialogOpen}
+            validateImageFn={async (file) => [
+              {
+                sentence: "Only image files (JPG, JPEG, PNG, WEBP) are allowed.",
+                status: file.type.startsWith("image/") ? 1 : 0,
+                sub_title: "",
+              },
+            ]}
+            uploadImageFn={async (file) => {
+              const existingFiles = Array.isArray(value) ? value : value ? [value] : [];
+              onChange([...existingFiles, file]);
+              return { image_url: URL.createObjectURL(file) };
+            }}
+          />
         )}
       </div>
     </div>

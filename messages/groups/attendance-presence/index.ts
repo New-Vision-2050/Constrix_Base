@@ -330,6 +330,8 @@ export const attendancePresenceMessages = new MessagesGroup({
     workPermit: _m("Work Permit", "تصريح العمل"),
     industrialSafety: _m("Industrial Safety", "الأمن الصناعي"),
     documentNumber: _m("Document Number", "رقم الوثيقة"),
+    copyDocumentNumber: _m("Copy number", "نسخ الرقم"),
+    copySuccess: _m("Copied to clipboard", "تم النسخ"),
     startDate: _m("Start Date", "تاريخ البداية"),
     endDate: _m("End Date", "تاريخ الانتهاء"),
     uploadFile: _m("Upload File", "رفع ملف"),

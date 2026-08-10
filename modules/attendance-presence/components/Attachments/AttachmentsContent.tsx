@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Pencil, X, Upload, Eye, RefreshCw, UserCircle2, ChevronDown, ChevronUp, Camera, ImagePlus, IdCard, BriefcaseBusiness, ShieldCheck, MapPinned, HardHat } from "lucide-react";
+import { Pencil, X, Upload, Eye, RefreshCw, UserCircle2, ChevronDown, ChevronUp, Camera, ImagePlus, IdCard, BriefcaseBusiness, ShieldCheck, MapPinned, HardHat, Copy } from "lucide-react";
 import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
 import validateProfileImage from "@/modules/dashboard/api/validate-image";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   getAttendanceAttachments,
   updateAttendanceAttachment,
+  updateIdentityDataAttachment,
   AttachmentMedia,
   AttendanceAttachmentsPayload,
   AttendanceDocuments,
@@ -42,6 +43,12 @@ type DocCardConfig = {
   showImagePreview?: boolean;
   /** icon shown as placeholder when no image is uploaded */
   PlaceholderIcon?: React.ElementType;
+  /**
+   * entry_number & work_permit are owned by the identity-data resource
+   * (User Profile > Iqama Data), so they must be saved through
+   * /company-users/identity-data instead of /hr/attendance/attachments.
+   */
+  useIdentityDataEndpoint?: boolean;
 };
 
 // ─── Card configs (matches real API field names) ───────────────────────────────
@@ -86,6 +93,7 @@ const DOC_CARDS: DocCardConfig[] = [
     titleKey: "entryNumber",
     showImagePreview: true,
     PlaceholderIcon: ShieldCheck,
+    useIdentityDataEndpoint: true,
   },
   {
     docKey: "work_permit",
@@ -96,6 +104,7 @@ const DOC_CARDS: DocCardConfig[] = [
     titleKey: "workPermit",
     showImagePreview: true,
     PlaceholderIcon: BriefcaseBusiness,
+    useIdentityDataEndpoint: true,
   },
   {
     docKey: "industrial_safety",
@@ -155,12 +164,15 @@ function DocumentCard({
   config,
   documents,
   onUpdated,
+  onRefetch,
 }: {
   config: DocCardConfig;
   documents: AttendanceDocuments;
   onUpdated: (docs: AttendanceDocuments) => void;
+  onRefetch: () => void;
 }) {
   const t = useTranslations("AttendancePresence.attachmentsTab");
+  const tUpload = useTranslations("UserProfile.header.uploadPhoto");
 
   const docNumber = documents[config.docKey] as string | null;
   const startDate = documents[config.startDateKey] as string | null;
@@ -174,16 +186,24 @@ function DocumentCard({
   const [endVal, setEndVal] = useState(endDate ?? "");
   const [newFile, setNewFile] = useState<File | null>(null);
   const [newFilePreviewUrl, setNewFilePreviewUrl] = useState<string | null>(null);
-  const fileRef = React.useRef<HTMLInputElement>(null);
-  const bgFileRef = React.useRef<HTMLInputElement>(null);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
-  const handleBgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageDialogValidate = async (file: File) => {
+    const isImage = ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type);
+    return [
+      {
+        sentence: "Only image files (JPG, JPEG, PNG, WEBP) are allowed.",
+        status: isImage ? 1 : 0,
+        sub_title: "",
+      },
+    ];
+  };
+
+  const handleImageDialogUpload = async (file: File) => {
     setNewFile(file);
     if (!expanded) setExpanded(true);
     if (!editing) setEditing(true);
-    e.target.value = "";
+    return { image_url: URL.createObjectURL(file) };
   };
 
   React.useEffect(() => {
@@ -207,21 +227,46 @@ function DocumentCard({
   }, [documents, config, editing]);
 
   const mutation = useMutation({
-    mutationFn: (fd: FormData) => updateAttendanceAttachment(fd),
+    mutationFn: (fd: FormData) =>
+      config.useIdentityDataEndpoint
+        ? updateIdentityDataAttachment(fd).then(() => null)
+        : updateAttendanceAttachment(fd),
     onSuccess: (res) => {
       toast.success(t("saveSuccess"));
       setEditing(false);
       setNewFile(null);
-      if (res?.documents) onUpdated(res.documents);
+      if (res?.documents) {
+        onUpdated(res.documents);
+      } else {
+        onRefetch();
+      }
     },
-    onError: () => {
-      toast.error(t("saveError"));
+    onError: (error: unknown) => {
+      console.error(`[${config.docKey}] save failed:`, error);
+      const err = error as {
+        response?: {
+          data?: {
+            message?: string | { description?: string };
+            errors?: Record<string, string[]>;
+          };
+        };
+      };
+      const apiData = err?.response?.data;
+      const firstFieldError = apiData?.errors
+        ? Object.values(apiData.errors).flat()[0]
+        : undefined;
+      const rawMessage = apiData?.message;
+      const backendMessage =
+        typeof rawMessage === "string" ? rawMessage : rawMessage?.description;
+      toast.error(firstFieldError || backendMessage || t("saveError"));
     },
   });
 
   const handleSave = () => {
     const fd = new FormData();
-    fd.append("key", config.docKey);
+    if (!config.useIdentityDataEndpoint) {
+      fd.append("key", config.docKey);
+    }
     fd.append(config.docKey, numVal);
     fd.append(config.startDateKey as string, startVal);
     fd.append(config.endDateKey as string, endVal);
@@ -237,6 +282,12 @@ function DocumentCard({
     setEditing(false);
   };
 
+  const handleCopyDocNumber = () => {
+    if (!docNumber) return;
+    navigator.clipboard.writeText(docNumber);
+    toast.success(t("copySuccess"));
+  };
+
   return (
     <Card className="bg-sidebar border-sidebar-border">
       <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
@@ -246,25 +297,16 @@ function DocumentCard({
         <div className="flex items-center gap-1">
           {/* Camera button — always visible for showImagePreview cards */}
           {config.showImagePreview && (
-            <>
-              <input
-                ref={bgFileRef}
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleBgImageChange}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                onClick={() => bgFileRef.current?.click()}
-                disabled={mutation.isPending}
-                title={t("uploadFile")}
-              >
-                <Camera className="h-3.5 w-3.5" />
-              </Button>
-            </>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+              onClick={() => setImageDialogOpen(true)}
+              disabled={mutation.isPending}
+              title={t("uploadFile")}
+            >
+              <Camera className="h-3.5 w-3.5" />
+            </Button>
           )}
           {/* Toggle expand/collapse */}
           <Button
@@ -313,7 +355,7 @@ function DocumentCard({
               ) : (
                 <button
                   type="button"
-                  onClick={() => bgFileRef.current?.click()}
+                  onClick={() => setImageDialogOpen(true)}
                   className="flex flex-col items-center gap-3 text-muted-foreground hover:text-primary transition-colors cursor-pointer w-full h-full"
                 >
                   {config.PlaceholderIcon
@@ -341,9 +383,23 @@ function DocumentCard({
                   disabled={mutation.isPending}
                 />
               ) : (
-                <p className="text-sm text-sidebar-foreground font-medium">
-                  {docNumber || <span className="text-muted-foreground">—</span>}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm text-sidebar-foreground font-medium">
+                    {docNumber || <span className="text-muted-foreground">—</span>}
+                  </p>
+                  {docNumber && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                      onClick={handleCopyDocNumber}
+                      title={t("copyDocumentNumber")}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -400,14 +456,6 @@ function DocumentCard({
             {/* File picker — only in edit mode */}
             {editing && (
               <div className="space-y-1 pt-1">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  className="hidden"
-                  accept="image/*,.pdf,.doc,.docx"
-                  onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
-                  disabled={mutation.isPending}
-                />
                 {newFile ? (
                   <div className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-md text-sm">
                     <span className="flex-1 truncate text-sidebar-foreground">{newFile.name}</span>
@@ -428,7 +476,7 @@ function DocumentCard({
                     variant="outline"
                     size="sm"
                     className="w-full border-primary border text-primary hover:bg-primary/10 hover:text-primary"
-                    onClick={() => fileRef.current?.click()}
+                    onClick={() => setImageDialogOpen(true)}
                     disabled={mutation.isPending}
                   >
                     {files.length > 0 ? (
@@ -466,6 +514,18 @@ function DocumentCard({
           </>
         )}
       </CardContent>
+
+      {/* Reuse the existing profile image dialog (crop + validation) */}
+      {config.showImagePreview && (
+        <UploadProfileImageDialog
+          title={tUpload("title")}
+          open={imageDialogOpen}
+          setOpen={setImageDialogOpen}
+          validateImageFn={handleImageDialogValidate}
+          uploadImageFn={handleImageDialogUpload}
+          onSuccess={() => setImageDialogOpen(false)}
+        />
+      )}
     </Card>
   );
 }
@@ -634,6 +694,7 @@ export default function AttachmentsContent() {
           config={config}
           documents={localData.documents}
           onUpdated={handleDocumentsUpdated}
+          onRefetch={refetch}
         />
       ))}
     </div>
