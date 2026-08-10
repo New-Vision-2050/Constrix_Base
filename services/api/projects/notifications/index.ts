@@ -18,6 +18,7 @@ import type {
   ProjectNotificationReassignArgs,
   ProjectNotificationRejectArgs,
   ProjectNotificationScopeArgs,
+  RequestSafetyViolationArgs,
   RequestSiteStatusUpdateArgs,
   UpdateProjectNotificationArgs,
   UpdateSiteStatusTypeArgs,
@@ -42,6 +43,7 @@ import type {
   SiteStatusTypeKeysResponse,
   SiteStatusTypeSingleResponse,
   SiteStatusTypesResponse,
+  EndTaskStatusesResponse,
   SiteStatusUpdatesResponse,
 } from "./types/response";
 
@@ -190,8 +192,14 @@ export const ProjectNotificationsApi = {
     );
   },
 
+  getEndTaskStatuses: () =>
+    baseApi.get<EndTaskStatusesResponse>(
+      "projects/notifications/end-task-statuses",
+    ),
+
   endTask: (id: string, args: EndTaskArgs) => {
     const formData = new FormData();
+    formData.append("status_id", args.status_id);
     formData.append("latitude", String(args.latitude));
     formData.append("longitude", String(args.longitude));
     if (args.notes) {
@@ -238,6 +246,38 @@ export const ProjectNotificationsApi = {
     }
     return baseApi.post<ProjectNotificationSingleResponse>(
       `projects/notifications/${encodeURIComponent(id)}/request-site-status-update`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
+
+  requestSafetyViolation: (id: string, args: RequestSafetyViolationArgs) => {
+    const formData = new FormData();
+    formData.append(
+      "internal_procedure_setting_id",
+      args.internal_procedure_setting_id,
+    );
+
+    if (args.current_latitude != null) {
+      formData.append("current_latitude", String(args.current_latitude));
+    }
+    if (args.current_longitude != null) {
+      formData.append("current_longitude", String(args.current_longitude));
+    }
+
+    args.violations.forEach((violation, index) => {
+      formData.append(
+        `violations[${index}][violation_id]`,
+        violation.violation_id,
+      );
+      formData.append(`violations[${index}][status]`, violation.status);
+      violation.images?.forEach((file, imageIndex) => {
+        formData.append(`violations[${index}][images][${imageIndex}]`, file);
+      });
+    });
+
+    return baseApi.post<ProjectNotificationSingleResponse>(
+      `projects/notifications/${encodeURIComponent(id)}/request-safety-violation`,
       formData,
       { headers: { "Content-Type": "multipart/form-data" } },
     );

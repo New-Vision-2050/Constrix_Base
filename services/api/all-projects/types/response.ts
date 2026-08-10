@@ -217,6 +217,7 @@ export type GetBranchesResponse = ApiResponse<Branch[]>;
 export type GetManagementsResponse = ApiResponse<Management[]>;
 export type GetCompanyUsersResponse = ApiResponse<Manager[]>;
 export type GetClientsResponse = ApiResponse<Client[]>;
+export type GetProjectClassificationsResponse = ApiResponse<ProjectClassification[]>;
 
 export interface ProjectEmployeeUser {
   id: string;

@@ -185,13 +185,16 @@ export function useProjectFormData(
     [contractualEngagementsRaw, locale],
   );
 
-  // const { data: projectClassificationsData } = useQuery({
-  //   queryKey: ["project-classifications"],
-  //   queryFn: async () => {
-  //     const response = await AllProjectsApi.getProjectClassifications();
-  //     return response.data.payload ?? [];
-  //   },
-  // });
+  const { data: projectClassificationsData } = useQuery({
+    queryKey: ["project-classifications"],
+    queryFn: async () => {
+      const response = await AllProjectsApi.getProjectClassifications({
+        page: 1,
+        per_page: 100,
+      });
+      return response.data.payload ?? [];
+    },
+  });
 
   const timeoutRefs = useRef<Record<string, NodeJS.Timeout>>({});
 
@@ -220,7 +223,7 @@ export function useProjectFormData(
     entityClientsData,
     individualClientsData,
     contractTypesData,
-    // projectClassificationsData,
+    projectClassificationsData,
     onSearchChange: handleSearchChange,
     entityClientsPagination: {
       hasNextPage: entityClientsQuery.hasNextPage ?? false,

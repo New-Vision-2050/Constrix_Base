@@ -320,6 +320,23 @@ export interface ProjectNotificationAvailableActionsResponse extends ApiBaseResp
   ProjectNotificationAvailableAction[]
 > {}
 
+export interface EndTaskStatus {
+  id: string;
+  key: string;
+  name_ar: string;
+  name_en: string;
+  sort_order: number;
+}
+
+export interface EndTaskStatusesResponse extends ApiBaseResponse<EndTaskStatus[]> {}
+
+export function extractEndTaskStatuses(
+  response: EndTaskStatusesResponse | undefined,
+): EndTaskStatus[] {
+  if (!response?.payload || !Array.isArray(response.payload)) return [];
+  return [...response.payload].sort((a, b) => a.sort_order - b.sort_order);
+}
+
 /* ── Site Status Types ── */
 
 export type SiteStatusTypeKeyFieldType =

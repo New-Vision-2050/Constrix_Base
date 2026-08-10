@@ -9,7 +9,7 @@ import type {
   DocumentStatus,
 } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/types";
 import { mapAttachmentRequestFilesToDocumentAttachments } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapAttachmentFiles";
-import { mapAttachmentRequestHistory } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapRequestHistory";
+import { mapApprovalSteps } from "@/modules/projects/project/components/project-tabs/tabs/document-cycle/mapApprovalSteps";
 
 export const ATTACHMENT_REQUESTS_QUERY_KEY = "attachment-requests" as const;
 
@@ -88,7 +88,7 @@ function mapToDocumentRow(item: AttachmentRequestWithFlow): DocumentRow {
       : undefined,
     description: item.notes?.trim() ? item.notes : undefined,
     attachments,
-    history: mapAttachmentRequestHistory(item),
+    approvalPath: mapApprovalSteps(item),
     canTakeAction: item.can_take_action === 1,
   };
 }

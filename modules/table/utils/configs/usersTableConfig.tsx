@@ -72,16 +72,20 @@ export const UsersConfig = () => {
           const companies = row.companies || [];
           return (
             <div className="line-clamp-3">
-              {companies.map((company) => (
-                <p
-                  key={company.id}
-                  className="line-clamp-1 h-5"
-                  dir={"ltr"}
-                  style={{ width: "fit-content" }}
-                >
-                  {company?.phone || ""}
-                </p>
-              ))}
+              {companies.map((company) => {
+                const phone = company?.phone || "";
+                const formatted = phone.replace(/^\+/, "") + "+";
+                return (
+                  <p
+                    key={company.id}
+                    className="line-clamp-1 h-5"
+                    dir={"ltr"}
+                    style={{ width: "fit-content" }}
+                  >
+                    {formatted}
+                  </p>
+                );
+              })}
             </div>
           );
         },

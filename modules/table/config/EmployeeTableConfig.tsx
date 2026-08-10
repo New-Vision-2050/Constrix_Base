@@ -72,6 +72,11 @@ export const EmployeeTableConfig = ({
       {
         key: "phone",
         label: "رقم الجوال",
+        render: (value: string) => {
+          if (!value) return "";
+          const formatted = value.replace(/^\+/, "");
+          return formatted + "+";
+        },
       },
       {
         key: "branch.name",

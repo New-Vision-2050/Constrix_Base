@@ -7,7 +7,6 @@ import { isAxiosError } from "axios";
 import {
   Box,
   Button,
-  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -19,16 +18,13 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { Settings, Download, FileText, Check } from "lucide-react";
+import { Settings, Download, FileText } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import CustomMenu from "@/components/headless/custom-menu";
-import {
-  DocumentRow,
-  DocumentAttachment,
-  DocumentHistoryEntry,
-} from "../types";
+import { DocumentRow, DocumentAttachment } from "../types";
 import { downloadAttachmentFile } from "../attachmentActions";
 import FileViewerDialog from "./FileViewerDialog";
+import ApprovalTimeline from "./ApprovalTimeline";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
 import { ATTACHMENT_REQUESTS_QUERY_KEY } from "@/modules/projects/project/query/useAttachmentRequests";
 
@@ -47,199 +43,6 @@ function formatDisplayDate(value?: string): string {
   const d = new Date(s);
   if (Number.isNaN(d.getTime())) return s;
   return d.toLocaleDateString();
-}
-
-function normalizeHistoryAction(action: string): string {
-  const norm = action.trim().toLowerCase().replace(/-/g, "_");
-  if (
-    norm === "attachment request created" ||
-    norm === "attachment_request_created"
-  ) {
-    return "request_created";
-  }
-  if (norm.includes("request fully approved")) {
-    return "request_fully_approved";
-  }
-  if (
-    norm.includes("attachment approved") ||
-    norm.includes("attachment_approved")
-  ) {
-    return "attachment_approved";
-  }
-  return norm;
-}
-
-function historyActionLabel(
-  action: string,
-  t: (key: string) => string,
-): string {
-  switch (normalizeHistoryAction(action)) {
-    case "request_created":
-      return t("historyActionRequestCreated");
-    case "request_approved":
-    case "request_fully_approved":
-    case "attachment_approved":
-      return t("historyActionRequestApproved");
-    case "request_declined":
-      return t("historyActionRequestDeclined");
-    case "request_update":
-      return t("historyActionRequestUpdate");
-    default:
-      return action.trim() || "—";
-  }
-}
-
-function historyActionChipColor(
-  action: string,
-): "primary" | "success" | "error" | "warning" | "default" {
-  switch (normalizeHistoryAction(action)) {
-    case "request_approved":
-    case "request_fully_approved":
-    case "attachment_approved":
-      return "success";
-    case "request_declined":
-      return "error";
-    case "request_created":
-      return "primary";
-    case "request_update":
-      return "warning";
-    default:
-      return "default";
-  }
-}
-
-function historyDescriptionLabel(
-  description: string,
-  t: (key: string) => string,
-): string {
-  const norm = normalizeHistoryAction(description);
-  switch (norm) {
-    case "request_created":
-      return t("historyActionRequestCreated");
-    case "request_approved":
-      return t("historyActionRequestApproved");
-    case "request_fully_approved":
-      return t("historyActionRequestFullyApproved");
-    case "attachment_approved":
-      return t("historyActionAttachmentApproved");
-    case "request_declined":
-      return t("historyActionRequestDeclined");
-    case "request_update":
-      return t("historyActionRequestUpdate");
-    default:
-      return description;
-  }
-}
-
-function historyStepIconPaletteKey(
-  action: string,
-):
-  | "primary.main"
-  | "success.main"
-  | "error.main"
-  | "warning.main"
-  | "grey.500" {
-  switch (normalizeHistoryAction(action)) {
-    case "request_approved":
-    case "request_fully_approved":
-    case "attachment_approved":
-      return "success.main";
-    case "request_declined":
-      return "error.main";
-    case "request_created":
-      return "primary.main";
-    case "request_update":
-      return "warning.main";
-    default:
-      return "grey.500";
-  }
-}
-
-function HistoryApprovalStepper({
-  history,
-  t,
-}: {
-  history: DocumentHistoryEntry[];
-  t: (key: string) => string;
-}) {
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
-      {history.map((entry, index) => {
-        const bg = historyStepIconPaletteKey(entry.action);
-        return (
-          <Box
-            key={entry.id}
-            sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                flexShrink: 0,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: "50%",
-                  bgcolor: bg,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "common.white",
-                }}
-              >
-                <Check className="w-4 h-4" strokeWidth={2.5} />
-              </Box>
-              {index < history.length - 1 ? (
-                <Box
-                  sx={{
-                    width: 2,
-                    flex: 1,
-                    minHeight: 28,
-                    bgcolor: "divider",
-                    my: 0.5,
-                  }}
-                />
-              ) : null}
-            </Box>
-            <Box
-              sx={{
-                pb: index < history.length - 1 ? 1.5 : 0,
-                minWidth: 0,
-                flex: 1,
-                textAlign: "start",
-              }}
-            >
-              <Typography variant="body2" fontWeight={600} color="text.primary">
-                {historyDescriptionLabel(entry.description, t)}
-              </Typography>
-              <Typography variant="body2" fontWeight={600} color="text.primary">
-                {formatDisplayDate(entry.timestamp)}
-              </Typography>
-              <Chip
-                size="small"
-                label={historyActionLabel(entry.action, t)}
-                color={historyActionChipColor(entry.action)}
-                variant="outlined"
-                sx={{ mt: 0.75, fontWeight: 600 }}
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 0.75 }}
-              >
-                {entry.userName?.trim() ? entry.userName : "—"}
-              </Typography>
-            </Box>
-          </Box>
-        );
-      })}
-    </Box>
-  );
 }
 
 /** After approve/decline the list refetches; hide action buttons for finished states. */
@@ -461,27 +264,27 @@ function DetailSidebar({
   document: DocumentRow;
   t: (key: string) => string;
 }) {
-  const hasHistory = document.history && document.history.length > 0;
-  const historyKey =
-    document.history?.map((h) => h.id).join("-") ?? `${document.id}-history`;
+  const steps = document.approvalPath ?? [];
 
   return (
     <Stack spacing={3} sx={{ height: "100%" }}>
       <Box>
         <Paper
-          key={historyKey}
+          key={document.id}
           variant="outlined"
           sx={{ ...cardSx, p: 2 }}
         >
-          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-            {t("approvalPath")}
-          </Typography>
-          {hasHistory ? (
-            <HistoryApprovalStepper history={document.history!} t={t} />
+          {steps.length > 0 ? (
+            <ApprovalTimeline steps={steps} />
           ) : (
-            <Typography variant="body2" color="text.secondary">
-              —
-            </Typography>
+            <>
+              <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                {t("approvalPath")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                —
+              </Typography>
+            </>
           )}
         </Paper>
       </Box>

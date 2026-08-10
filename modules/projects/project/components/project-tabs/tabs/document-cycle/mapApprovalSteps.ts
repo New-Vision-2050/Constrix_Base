@@ -1,0 +1,36 @@
+import type { AttachmentRequest } from "@/services/api/projects/attachment-requests/types/response";
+import type { ApprovalStep, ApprovalStepStatus } from "./types";
+
+function normalizeApprovalAction(action: string): string {
+  return action.trim().toLowerCase().replace(/-/g, "_");
+}
+
+function approvalStepStatus(action: string): ApprovalStepStatus {
+  switch (normalizeApprovalAction(action)) {
+    case "request_created":
+      return "created";
+    case "workflow_step_approved":
+    case "request_approved":
+      return "approved";
+    case "workflow_step_pending":
+    default:
+      return "pending";
+  }
+}
+
+export function mapApprovalSteps(
+  item: AttachmentRequest,
+): ApprovalStep[] | undefined {
+  const raw = item.history;
+  if (!Array.isArray(raw) || raw.length === 0) return undefined;
+  const sorted = [...raw].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+  );
+  return sorted.map((h) => ({
+    id: h.id,
+    action: h.action,
+    status: approvalStepStatus(h.action),
+    user: Array.isArray(h.user) ? h.user : null,
+    date: h.timestamp ?? "",
+  }));
+}

@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   CheckCircle2,
   ClipboardList,
+  ClipboardCheck,
   FileText,
   Gavel,
   MapPin,
@@ -21,6 +22,7 @@ const ACTION_ICON_BY_FORM_KEY: Record<string, LucideIcon> = {
   projectNotificationWorkResumption: CheckCircle2,
   projectNotificationTaskPostponement: PauseCircle,
   endProjectNotificationTask: CheckCircle2,
+  projectNotificationSafetyViolation: ClipboardCheck,
 };
 
 export function getActionIcon(formKey: string): LucideIcon {

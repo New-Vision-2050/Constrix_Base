@@ -151,9 +151,12 @@ export default function StaffTab() {
         key: "phone",
         name: t("staff.mobileNumber"),
         sortable: false,
-        render: (row: Employee) => (
-          <span>{row.user.phone.trim() ? row.user.phone : "—"}</span>
-        ),
+        render: (row: Employee) => {
+          const phone = row.user.phone.trim();
+          if (!phone) return "—";
+          const formatted = phone.replace(/^\+/, "") + "+";
+          return <span>{formatted}</span>;
+        },
       },
       {
         key: "email",

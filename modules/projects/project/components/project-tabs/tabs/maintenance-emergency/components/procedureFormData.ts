@@ -46,6 +46,10 @@ export const FORM_DISPLAY_NAMES: Record<string, { en: string; ar: string }> = {
   projectNotificationWorkResumption: { en: "Work Resumption", ar: "استئناف الأعمال" },
   projectNotificationTaskPostponement: { en: "Task Postponement", ar: "تأجيل المهمة" },
   endProjectNotificationTask: { en: "End Task", ar: "إنهاء المهمة" },
+  projectNotificationSafetyViolation: {
+    en: "Security Violations Assessment",
+    ar: "تقييم المخالفات الأمنية",
+  },
 };
 
 export function getFormDataLabel(key: string, isRTL: boolean): string {
