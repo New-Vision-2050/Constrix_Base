@@ -122,7 +122,9 @@ export default function ApprovalTimeline({ steps }: ApprovalTimelineProps) {
                   {approvalActionLabel(step.action, t)}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {stepUserLabel(step)} — {formatStepDate(step.date)}
+                  {step.status === "pending"
+                    ? stepUserLabel(step)
+                    : `${stepUserLabel(step)} — ${formatStepDate(step.date)}`}
                 </Typography>
               </Box>
             </Box>
