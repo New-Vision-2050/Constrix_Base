@@ -161,10 +161,26 @@ export default function DocumentClassificationAddProcedureDialog({
 
   const { data: sharedCompanies = [], isLoading: loadingSharedCompanies } =
     useQuery({
-      queryKey: ["shared-companies", projectId, "procedure-dialog"],
+      queryKey: ["project-shares", projectId, "procedure-dialog"],
       queryFn: async () => {
-        const res = await ProjectSharingApi.getSharedCompanies(projectId!);
-        return res.data.payload ?? [];
+        const res = await ProjectSharingApi.listForProject(projectId!);
+        const shares = res.data.payload ?? [];
+        const companies = shares
+          .flatMap((share) => [
+            share.shared_with_company,
+            share.owner_company,
+          ])
+          .filter(
+            (company): company is NonNullable<typeof company> =>
+              !!company?.id && !!company.name,
+          );
+        const seen = new Set<string>();
+        return companies.filter((company) => {
+          const id = String(company.id);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
       },
       enabled: open && !!projectId,
     });

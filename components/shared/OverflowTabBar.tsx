@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import { alpha, type SxProps, type Theme } from "@mui/material/styles";
 import { PlusIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useLocale } from "next-intl";
 import CustomMenu from "@/components/headless/custom-menu";
 
@@ -412,7 +413,7 @@ export default function OverflowTabBar<T extends { id: number }>({
           },
         }}
       >
-        <PlusIcon className="h-5 w-5" strokeWidth={2.5} />
+        <ChevronDown className="h-5 w-5" strokeWidth={2.5} />
       </IconButton>
     </Badge>
   );
