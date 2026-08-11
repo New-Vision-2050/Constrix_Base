@@ -216,6 +216,11 @@ export const projectMessages = new MessagesGroup({
       "Workflow step approved",
       "تمت الموافقة على خطوة الاعتماد",
     ),
+    historyActionWorkflowStepRejected: _m(
+      "Workflow step rejected",
+      "تم رفض خطوة الاعتماد",
+    ),
+    historyActionMediaReplaced: _m("Media replaced", "تم استبدال الملف"),
     itemRespondSuccess: _m("Response submitted", "تم إرسال الرد"),
     itemRespondError: _m("Could not submit response", "تعذر إرسال الرد"),
     requestApproveSuccess: _m("Request approved", "تم اعتماد الطلب"),

@@ -24,8 +24,20 @@ function approvalActionLabel(
       return t("historyActionWorkflowStepPending");
     case "workflow_step_approved":
       return t("historyActionWorkflowStepApproved");
+    case "workflow_step_rejected":
+      return t("historyActionWorkflowStepRejected");
     case "request_approved":
       return t("historyActionRequestApproved");
+    case "request_fully_approved":
+      return t("historyActionRequestFullyApproved");
+    case "attachment_approved":
+      return t("historyActionAttachmentApproved");
+    case "request_declined":
+      return t("historyActionRequestDeclined");
+    case "request_update":
+      return t("historyActionRequestUpdate");
+    case "media_replaced":
+      return t("historyActionMediaReplaced");
     default:
       return action.trim() || "—";
   }
