@@ -11,6 +11,8 @@ function approvalStepStatus(action: string): ApprovalStepStatus {
       return "created";
     case "workflow_step_approved":
     case "request_approved":
+    case "request_fully_approved":
+    case "attachment_approved":
       return "approved";
     case "workflow_step_pending":
     default:
