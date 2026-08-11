@@ -208,22 +208,22 @@ export function extractListPayload<T>(
 export interface ProjectSafetyWeeklyReportDto {
   id?: string | number | null;
   serial_number?: string | number | null;
-  title?: string | null;
+  project_id?: string | null;
+  company_id?: string | null;
   name?: string | null;
-  type?: string | null;
-  report_type?: string | null;
-  report_types?: string | string[] | null;
+  title?: string | null;
   from_date?: string | null;
   to_date?: string | null;
-  week_start?: string | null;
-  week_end?: string | null;
-  created_at?: string | null;
-  generated_at?: string | null;
-  updated_at?: string | null;
   status?: string | null;
+  file_size?: number | string | null;
+  generated_at?: string | null;
+  created_by?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  download_url?: string | null;
+  has_file?: boolean | null;
   file_url?: string | null;
   url?: string | null;
-  download_url?: string | null;
   report_url?: string | null;
 }
 
@@ -239,7 +239,7 @@ export function extractProjectSafetyWeeklyReports(
 ): ProjectSafetyWeeklyReportDto[] {
   if (!response) return [];
 
-  const raw = response.data ?? response.payload;
+  const raw = response.payload ?? response.data;
   if (Array.isArray(raw)) return raw;
   if (raw && typeof raw === "object") return [raw];
 

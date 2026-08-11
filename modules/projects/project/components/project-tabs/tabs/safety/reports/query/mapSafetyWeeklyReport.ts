@@ -10,13 +10,10 @@ function pickString(...values: Array<string | number | null | undefined>): strin
   return "";
 }
 
-function formatReportTypes(
-  value: ProjectSafetyWeeklyReportDto["report_types"],
-): string {
-  if (Array.isArray(value)) {
-    return value.map((item) => String(item).trim()).filter(Boolean).join(", ");
-  }
-  return pickString(value);
+function toNumber(value: unknown): number {
+  if (value === null || value === undefined || value === "") return 0;
+  const num = Number(value);
+  return Number.isNaN(num) ? 0 : num;
 }
 
 function normalizeStatus(
@@ -63,33 +60,30 @@ export function mapSafetyWeeklyReportDto(
   dto: ProjectSafetyWeeklyReportDto,
   index: number,
 ): SafetyWeeklyReportRow {
-  const fromDate = pickString(dto.from_date, dto.week_start);
-  const toDate = pickString(dto.to_date, dto.week_end);
-  const createdAt = pickString(dto.created_at, dto.generated_at, dto.updated_at);
+  const fromDate = pickString(dto.from_date);
+  const toDate = pickString(dto.to_date);
   const statusRaw = pickString(dto.status);
-  const title =
-    pickString(dto.title, dto.name) ||
-    (fromDate && toDate ? `${fromDate} → ${toDate}` : `Report ${index + 1}`);
-  const reportTypes =
-    formatReportTypes(dto.report_types) ||
-    pickString(dto.report_type, dto.type) ||
-    title;
+  const downloadUrl = pickString(
+    dto.download_url,
+    dto.file_url,
+    dto.report_url,
+    dto.url,
+  );
 
   return {
     id: pickString(dto.id) || `weekly-report-${index}`,
-    serialNumber: pickString(dto.serial_number, dto.id) || String(index + 1),
-    title,
-    reportTypes,
+    serialNumber: pickString(dto.serial_number) || String(index + 1),
+    name:
+      pickString(dto.name, dto.title) ||
+      (fromDate && toDate ? `${fromDate} → ${toDate}` : `Report ${index + 1}`),
     fromDate,
     toDate,
-    createdAt,
     status: normalizeStatus(statusRaw),
     statusLabel: statusRaw || undefined,
-    downloadUrl: pickString(
-      dto.download_url,
-      dto.file_url,
-      dto.report_url,
-      dto.url,
-    ),
+    createdAt: pickString(dto.created_at),
+    generatedAt: pickString(dto.generated_at, dto.created_at),
+    downloadUrl,
+    hasFile: Boolean(dto.has_file ?? downloadUrl),
+    fileSize: toNumber(dto.file_size),
   };
 }

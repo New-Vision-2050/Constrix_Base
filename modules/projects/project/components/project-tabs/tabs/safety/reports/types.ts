@@ -7,14 +7,16 @@ export type SafetyWeeklyReportStatus =
 export type SafetyWeeklyReportRow = {
   id: string;
   serialNumber: string;
-  title: string;
-  reportTypes: string;
+  name: string;
   fromDate: string;
   toDate: string;
-  createdAt: string;
   status: SafetyWeeklyReportStatus;
   statusLabel?: string;
+  createdAt: string;
+  generatedAt: string;
   downloadUrl: string;
+  hasFile: boolean;
+  fileSize: number;
 };
 
 export type SafetyWeeklyReportFilters = {

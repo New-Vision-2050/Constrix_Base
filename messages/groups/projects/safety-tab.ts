@@ -152,6 +152,19 @@ export const projectSafetyTabMessages = new MessagesGroup({
       create: _m("Create", "إنشاء"),
       creating: _m("Creating…", "جاري الإنشاء…"),
     }),
+    fileDialog: new MessagesGroup({
+      title: _m("Report file", "ملف التقرير"),
+      unavailable: _m(
+        "No file is available for this report.",
+        "لا يوجد ملف متاح لهذا التقرير.",
+      ),
+      previewUnsupported: _m(
+        "Preview is not available for this file type. Open it in a new tab instead.",
+        "المعاينة غير متاحة لهذا النوع من الملفات. افتحه في تبويب جديد.",
+      ),
+      openInNewTab: _m("Open in new tab", "فتح في تبويب جديد"),
+      close: _m("Close", "إغلاق"),
+    }),
     statuses: new MessagesGroup({
       ready: _m("Ready", "جاهز"),
       processing: _m("Processing", "قيد المعالجة"),
@@ -160,10 +173,13 @@ export const projectSafetyTabMessages = new MessagesGroup({
     }),
     table: new MessagesGroup({
       serialNumber: _m("Serial number", "الرقم التسلسلي"),
+      name: _m("Report name", "اسم التقرير"),
+      fromDate: _m("From date", "من تاريخ"),
+      toDate: _m("To date", "إلى تاريخ"),
+      status: _m("Status", "الحالة"),
       createdAt: _m("Created", "تاريخ الإنشاء"),
-      reportTypes: _m("Report types", "أنواع التقرير"),
       actions: _m("Actions", "إجراءات"),
-      download: _m("Download", "تحميل"),
+      show: _m("Show", "عرض"),
     }),
   }),
   indicators: new MessagesGroup({

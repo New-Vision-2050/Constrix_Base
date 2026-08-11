@@ -5,13 +5,12 @@ import {
   Alert,
   Box,
   Button,
-  Link,
   Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { FileDownloadOutlined } from "@mui/icons-material";
+import { VisibilityOutlined } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormatter, useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -26,6 +25,8 @@ import {
   type SafetyWeeklyReportRow,
 } from "../types";
 import CreateSafetyWeeklyReportDialog from "./CreateSafetyWeeklyReportDialog";
+import SafetyWeeklyReportFileDialog from "./SafetyWeeklyReportFileDialog";
+import SafetyWeeklyReportStatusBadge from "./SafetyWeeklyReportStatusBadge";
 
 const SafetyWeeklyReportsTableLayout = HeadlessTableLayout<SafetyWeeklyReportRow>(
   "safety-weekly-reports",
@@ -52,6 +53,8 @@ export default function SafetyWeeklyReportsView() {
   );
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [previewReport, setPreviewReport] =
+    useState<SafetyWeeklyReportRow | null>(null);
 
   const params = SafetyWeeklyReportsTableLayout.useTableParams({
     initialPage: 1,
@@ -64,35 +67,14 @@ export default function SafetyWeeklyReportsView() {
     [reportsQuery.data],
   );
 
-  const filteredRows = useMemo(() => {
-    const search = params.search.trim().toLowerCase();
-    if (!search) return allRows;
-
-    return allRows.filter((row) => {
-      const haystack = [
-        row.serialNumber,
-        row.title,
-        row.reportTypes,
-        row.fromDate,
-        row.toDate,
-        row.createdAt,
-        row.statusLabel,
-        row.status,
-      ]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(search);
-    });
-  }, [allRows, params.search]);
-
-  const totalItems = filteredRows.length;
+  const totalItems = allRows.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / params.limit));
   const hasDateFilter = Boolean(filters.fromDate || filters.toDate);
 
   const pageData = useMemo(() => {
     const start = (params.page - 1) * params.limit;
-    return filteredRows.slice(start, start + params.limit);
-  }, [filteredRows, params.page, params.limit]);
+    return allRows.slice(start, start + params.limit);
+  }, [allRows, params.page, params.limit]);
 
   const updateFilter = <K extends keyof SafetyWeeklyReportFilters>(
     key: K,
@@ -150,9 +132,48 @@ export default function SafetyWeeklyReportsView() {
         key: "serialNumber",
         name: tTable("serialNumber"),
         sortable: false,
-        minWidth: 120,
+        minWidth: 130,
         render: (row: SafetyWeeklyReportRow) => (
           <span className="font-medium">{row.serialNumber || "—"}</span>
+        ),
+      },
+      {
+        key: "name",
+        name: tTable("name"),
+        sortable: false,
+        minWidth: 240,
+        render: (row: SafetyWeeklyReportRow) => (
+          <span>{row.name || "—"}</span>
+        ),
+      },
+      {
+        key: "fromDate",
+        name: tTable("fromDate"),
+        sortable: false,
+        minWidth: 110,
+        render: (row: SafetyWeeklyReportRow) => (
+          <span>{formatDisplayDate(row.fromDate)}</span>
+        ),
+      },
+      {
+        key: "toDate",
+        name: tTable("toDate"),
+        sortable: false,
+        minWidth: 110,
+        render: (row: SafetyWeeklyReportRow) => (
+          <span>{formatDisplayDate(row.toDate)}</span>
+        ),
+      },
+      {
+        key: "status",
+        name: tTable("status"),
+        sortable: false,
+        minWidth: 120,
+        render: (row: SafetyWeeklyReportRow) => (
+          <SafetyWeeklyReportStatusBadge
+            status={row.status}
+            statusLabel={row.statusLabel}
+          />
         ),
       },
       {
@@ -161,36 +182,24 @@ export default function SafetyWeeklyReportsView() {
         sortable: false,
         minWidth: 160,
         render: (row: SafetyWeeklyReportRow) => (
-          <span>{formatCreatedAt(row.createdAt)}</span>
-        ),
-      },
-      {
-        key: "reportTypes",
-        name: tTable("reportTypes"),
-        sortable: false,
-        minWidth: 180,
-        render: (row: SafetyWeeklyReportRow) => (
-          <span>{row.reportTypes || "—"}</span>
+          <span>{formatCreatedAt(row.createdAt || row.generatedAt)}</span>
         ),
       },
       {
         key: "actions",
         name: tTable("actions"),
         sortable: false,
-        minWidth: 140,
+        minWidth: 120,
         render: (row: SafetyWeeklyReportRow) =>
-          row.downloadUrl ? (
+          row.hasFile && row.downloadUrl ? (
             <Button
-              component={Link}
-              href={row.downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
               size="small"
               variant="contained"
               color="primary"
-              startIcon={<FileDownloadOutlined />}
+              startIcon={<VisibilityOutlined />}
+              onClick={() => setPreviewReport(row)}
             >
-              {tTable("download")}
+              {tTable("show")}
             </Button>
           ) : (
             <Typography variant="body2" color="text.secondary">
@@ -319,6 +328,12 @@ export default function SafetyWeeklyReportsView() {
         loading={creating}
         onClose={() => setCreateOpen(false)}
         onSubmit={handleCreateReport}
+      />
+
+      <SafetyWeeklyReportFileDialog
+        open={Boolean(previewReport)}
+        report={previewReport}
+        onClose={() => setPreviewReport(null)}
       />
     </Box>
   );

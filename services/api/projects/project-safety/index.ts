@@ -73,25 +73,28 @@ export const ProjectSafetyApi = {
       `projects/safety/analytics/top-violations`,
     ),
 
+  /** List generated weekly reports. */
   listWeeklyReportsForProject: (
     projectId: string | number,
     params?: ListProjectSafetyWeeklyReportsParams,
   ) =>
     baseApi.get<ListProjectSafetyWeeklyReportsResponse>(
-      `projects/${projectId}/safety/weekly-report`,
+      `projects/${projectId}/safety/weekly-reports`,
       {
         params: buildListProjectSafetyWeeklyReportsParams(params ?? {}),
       },
     ),
 
+  /** Generate a weekly report for a date range. */
   createWeeklyReportForProject: (
     projectId: string | number,
     params: Required<ListProjectSafetyWeeklyReportsParams>,
   ) =>
-    baseApi.get<ListProjectSafetyWeeklyReportsResponse>(
+    baseApi.post<ListProjectSafetyWeeklyReportsResponse>(
       `projects/${projectId}/safety/weekly-report`,
       {
-        params: buildListProjectSafetyWeeklyReportsParams(params),
+        from_date: params.from_date,
+        to_date: params.to_date,
       },
     ),
 };
