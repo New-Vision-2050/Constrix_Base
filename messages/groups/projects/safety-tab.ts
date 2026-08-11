@@ -120,6 +120,52 @@ export const projectSafetyTabMessages = new MessagesGroup({
       ),
     }),
   }),
+  weeklyReports: new MessagesGroup({
+    createdReportsTitle: _m("Generated reports", "التقارير المُنشأة"),
+    createReport: _m("Create report", "إنشاء تقرير"),
+    resetFilters: _m("Reset", "إعادة تعيين"),
+    emptyReports: _m(
+      "No reports yet. Create one using the button above.",
+      "لا توجد تقارير بعد. أنشئ تقريراً باستخدام الزر أعلاه.",
+    ),
+    loadError: _m(
+      "Could not load weekly reports",
+      "تعذر تحميل التقارير الأسبوعية",
+    ),
+    createSuccess: _m(
+      "Report created successfully",
+      "تم إنشاء التقرير بنجاح",
+    ),
+    createError: _m(
+      "Could not create the report. Please try again.",
+      "تعذر إنشاء التقرير. يُرجى المحاولة مرة أخرى.",
+    ),
+    filters: new MessagesGroup({
+      fromDate: _m("From", "من"),
+      toDate: _m("To", "إلى"),
+    }),
+    createDialog: new MessagesGroup({
+      title: _m("Create report", "إنشاء تقرير"),
+      startDate: _m("Start date", "تاريخ البداية"),
+      endDate: _m("End date", "تاريخ النهاية"),
+      cancel: _m("Cancel", "إلغاء"),
+      create: _m("Create", "إنشاء"),
+      creating: _m("Creating…", "جاري الإنشاء…"),
+    }),
+    statuses: new MessagesGroup({
+      ready: _m("Ready", "جاهز"),
+      processing: _m("Processing", "قيد المعالجة"),
+      failed: _m("Failed", "فشل"),
+      pending: _m("Pending", "قيد الانتظار"),
+    }),
+    table: new MessagesGroup({
+      serialNumber: _m("Serial number", "الرقم التسلسلي"),
+      createdAt: _m("Created", "تاريخ الإنشاء"),
+      reportTypes: _m("Report types", "أنواع التقرير"),
+      actions: _m("Actions", "إجراءات"),
+      download: _m("Download", "تحميل"),
+    }),
+  }),
   indicators: new MessagesGroup({
     filtersTitle: _m("Filter", "فلتر"),
     all: _m("All", "الكل"),
