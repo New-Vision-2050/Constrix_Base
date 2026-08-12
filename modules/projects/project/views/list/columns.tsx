@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Chip, LinearProgress, Tooltip, Typography } from "@mui/material";
+import { Link } from "@/i18n/navigation";
+import { ROUTER } from "@/router";
 
 export type ProjectColumnTranslator = (key: string) => string;
 
@@ -115,13 +117,20 @@ export const getProjectsColumns = (t: ProjectColumnTranslator) => [
     name: t("columnRefNumber"),
     sortable: false,
     render: (row: ProjectRow) => {
+      const serial =
+        row.serial_number ?? row.ref_number ?? row.id ?? t("emptyCell");
       return (
-        <span>
-          {row.serial_number ??
-            row.ref_number ??
-            row.id ??
-            t("emptyCell")}
-        </span>
+        <Link
+          href={ROUTER.PROJECT_DETAILS(String(row.id))}
+          style={{
+            color: "inherit",
+            textDecoration: "none",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          {serial}
+        </Link>
       );
     },
   },

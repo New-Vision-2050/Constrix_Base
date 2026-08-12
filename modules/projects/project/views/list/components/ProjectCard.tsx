@@ -41,18 +41,21 @@ export function ProjectCard({
       labelKey: "columnRefNumber",
       value:
         project.serial_number ?? project.ref_number ?? project.id ?? emptyCell,
+      isLink: true,
     },
     {
       labelKey: "columnClientName",
       value: project.project_owner_name ?? emptyCell,
+      isLink: false,
     },
     {
       labelKey: "columnResponsibleEngineer",
       value: project.responsible_employee_name ?? emptyCell,
+      isLink: false,
     },
-    { labelKey: "management", value: project.management_name ?? emptyCell },
-    { labelKey: "columnProjectStart", value: project.start_date ?? emptyCell },
-    { labelKey: "columnProjectEnd", value: project.end_date ?? emptyCell },
+    { labelKey: "management", value: project.management_name ?? emptyCell, isLink: false },
+    { labelKey: "columnProjectStart", value: project.start_date ?? emptyCell, isLink: false },
+    { labelKey: "columnProjectEnd", value: project.end_date ?? emptyCell, isLink: false },
   ];
 
   return (
@@ -117,7 +120,7 @@ export function ProjectCard({
       </Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
-        {fields.map(({ labelKey, value }) => (
+        {fields.map(({ labelKey, value, isLink }) => (
           <Box key={labelKey}>
             <Typography
               variant="caption"
@@ -126,9 +129,25 @@ export function ProjectCard({
             >
               {tProject(labelKey)}
             </Typography>
-            <Typography variant="body2" fontWeight="medium">
-              {String(value)}
-            </Typography>
+            {isLink ? (
+              <Link
+                href={ROUTER.PROJECT_DETAILS(String(project.id))}
+                style={{
+                  color: "inherit",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                <Typography variant="body2" fontWeight="medium" component="span">
+                  {String(value)}
+                </Typography>
+              </Link>
+            ) : (
+              <Typography variant="body2" fontWeight="medium">
+                {String(value)}
+              </Typography>
+            )}
           </Box>
         ))}
       </Box>
