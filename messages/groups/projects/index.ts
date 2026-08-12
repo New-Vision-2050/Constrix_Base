@@ -208,6 +208,10 @@ export const projectMessages = new MessagesGroup({
       "تم اعتماد المرفق",
     ),
     historyActionRequestDeclined: _m("Request declined", "تم رفض الطلب"),
+    historyActionAttachmentDeclined: _m(
+      "Attachment declined",
+      "تم رفض المرفق",
+    ),
     historyActionRequestUpdate: _m("Request updated", "تم تحديث الطلب"),
     historyActionWorkflowStepPending: _m(
       "Workflow step pending",
