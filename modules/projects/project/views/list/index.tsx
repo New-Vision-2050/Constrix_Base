@@ -7,10 +7,6 @@ import {
   LinearProgress,
   MenuItem,
   Typography,
-  Paper,
-  FormControl,
-  InputLabel,
-  Select,
 } from "@mui/material";
 import { LayoutGrid, List, EditIcon, Trash2, Eye } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -26,6 +22,8 @@ import { AllProjectsApi } from "@/services/api/projects/all-projects";
 import { ProjectRow, getProjectsColumns } from "./columns";
 import { ProjectCard } from "./components/ProjectCard";
 import { ProjectFormDrawer } from "./components/ProjectFormDrawer";
+import { ProjectFilters } from "./components/ProjectFilters";
+import { useProjectFilters } from "./hooks/useProjectFilters";
 import { ROUTER } from "@/router";
 import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 import { statisticsConfig } from "./components/statistics-config";
@@ -48,16 +46,9 @@ function ProjectsList() {
     null,
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>("");
-  const [filterProjectTypeId, setFilterProjectTypeId] = useState<string>("");
   const [statisticsRefreshKey, setStatisticsRefreshKey] = useState(0);
 
-  const { data: projectTypesData } = useQuery({
-    queryKey: ["all-projects-types-filter"],
-    queryFn: () => AllProjectsApi.getProjectTypes(),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
+  const filterManager = useProjectFilters();
 
   const params = ProjectsTableLayout.useTableParams({
     initialPage: 1,
@@ -96,20 +87,33 @@ function ProjectsList() {
       params.search,
       params.sortBy,
       params.sortOrder,
-      filterStatus,
-      filterProjectTypeId,
+      filterManager.filters,
     ],
     queryFn: async () => {
+      const f = filterManager.filters;
       const response = await AllProjectsApi.list({
         page: params.page,
         per_page: params.limit,
         ...(params.search ? { name: params.search } : {}),
         ...(params.sortBy ? { sort_by: params.sortBy } : {}),
         ...(params.sortOrder ? { sort_order: params.sortOrder } : {}),
-        ...(filterStatus !== "" ? { status: filterStatus } : {}),
-        ...(filterProjectTypeId
-          ? { project_type_id: filterProjectTypeId }
+        ...(f.status !== "" ? { status: f.status } : {}),
+        ...(f.project_type_id ? { project_type_id: f.project_type_id } : {}),
+        ...(f.sub_project_type_id
+          ? { sub_project_type_id: f.sub_project_type_id }
           : {}),
+        ...(f.sub_sub_project_type_id
+          ? { sub_sub_project_type_id: f.sub_sub_project_type_id }
+          : {}),
+        ...(f.manager_id ? { manager_id: f.manager_id } : {}),
+        ...(f.branch_id ? { branch_id: f.branch_id } : {}),
+        ...(f.project_owner_type
+          ? { project_owner_type: f.project_owner_type as "company" | "individual" }
+          : {}),
+        ...(f.project_owner_id
+          ? { project_owner_id: f.project_owner_id }
+          : {}),
+        ...(f.management_id ? { management_id: f.management_id } : {}),
       });
 
       const payload = response.data.payload ?? [];
@@ -233,59 +237,7 @@ function ProjectsList() {
         refreshKey={statisticsRefreshKey}
       />
 
-      <Paper
-        elevation={0}
-        sx={{
-          mb: 3,
-          p: 2.5,
-          borderRadius: 2,
-          border: 1,
-          borderColor: "divider",
-        }}
-      >
-        <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
-          {t("project.filterSearch")}
-        </Typography>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 2,
-          }}
-        >
-          <FormControl size="small" fullWidth>
-            <InputLabel>{t("project.projectClassification")}</InputLabel>
-            <Select
-              value={filterProjectTypeId}
-              label={t("project.projectClassification")}
-              onChange={(e) => setFilterProjectTypeId(e.target.value)}
-            >
-              <MenuItem value="">{t("project.all")}</MenuItem>
-              {(projectTypesData?.data?.payload ?? []).map(
-                (type: { id: number; name: string }) => (
-                  <MenuItem key={type.id} value={String(type.id)}>
-                    {type.name}
-                  </MenuItem>
-                ),
-              )}
-            </Select>
-          </FormControl>
-          <FormControl size="small" fullWidth>
-            <InputLabel>{t("project.projectStatus")}</InputLabel>
-            <Select
-              value={filterStatus}
-              label={t("project.projectStatus")}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <MenuItem value="">{t("project.all")}</MenuItem>
-              <MenuItem value="1">{t("project.statusOngoing")}</MenuItem>
-              <MenuItem value="0">{t("project.statusInProgress")}</MenuItem>
-              <MenuItem value="-1">{t("project.statusStopped")}</MenuItem>
-              <MenuItem value="2">{t("project.statusCompleted")}</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-      </Paper>
+      <ProjectFilters filterManager={filterManager} />
 
       {viewMode === "table" ? (
         <ProjectsTableLayout
