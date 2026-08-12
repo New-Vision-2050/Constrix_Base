@@ -204,12 +204,51 @@ export function extractListPayload<T>(
   return Array.isArray(raw) ? raw : [];
 }
 
-/** Placeholder types for the التقارير tab — wire when API is available. */
-export type ProjectSafetyReportsTabDto = Record<string, never>;
+/** Generated weekly safety report row (التقارير tab). */
+export interface ProjectSafetyWeeklyReportDto {
+  id?: string | number | null;
+  serial_number?: string | number | null;
+  project_id?: string | null;
+  company_id?: string | null;
+  name?: string | null;
+  title?: string | null;
+  from_date?: string | null;
+  to_date?: string | null;
+  status?: string | null;
+  file_size?: number | string | null;
+  generated_at?: string | null;
+  created_by?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  download_url?: string | null;
+  has_file?: boolean | null;
+  file_url?: string | null;
+  url?: string | null;
+  report_url?: string | null;
+}
 
-export type ListProjectSafetyReportsTabResponse = {
+export type ListProjectSafetyWeeklyReportsResponse = {
   code?: string;
   message?: string | null;
-  data?: ProjectSafetyReportsTabDto[] | null;
-  payload?: ProjectSafetyReportsTabDto[] | null;
+  data?: ProjectSafetyWeeklyReportDto[] | ProjectSafetyWeeklyReportDto | null;
+  payload?: ProjectSafetyWeeklyReportDto[] | ProjectSafetyWeeklyReportDto | null;
 };
+
+export function extractProjectSafetyWeeklyReports(
+  response: ListProjectSafetyWeeklyReportsResponse | undefined,
+): ProjectSafetyWeeklyReportDto[] {
+  if (!response) return [];
+
+  const raw = response.payload ?? response.data;
+  if (Array.isArray(raw)) return raw;
+  if (raw && typeof raw === "object") return [raw];
+
+  return [];
+}
+
+/** @deprecated Use ProjectSafetyWeeklyReportDto */
+export type ProjectSafetyReportsTabDto = ProjectSafetyWeeklyReportDto;
+
+/** @deprecated Use ListProjectSafetyWeeklyReportsResponse */
+export type ListProjectSafetyReportsTabResponse =
+  ListProjectSafetyWeeklyReportsResponse;

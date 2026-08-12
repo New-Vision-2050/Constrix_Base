@@ -120,6 +120,68 @@ export const projectSafetyTabMessages = new MessagesGroup({
       ),
     }),
   }),
+  weeklyReports: new MessagesGroup({
+    createdReportsTitle: _m("Generated reports", "التقارير المُنشأة"),
+    createReport: _m("Create report", "إنشاء تقرير"),
+    resetFilters: _m("Reset", "إعادة تعيين"),
+    emptyReports: _m(
+      "No reports yet. Create one using the button above.",
+      "لا توجد تقارير بعد. أنشئ تقريراً باستخدام الزر أعلاه.",
+    ),
+    loadError: _m(
+      "Could not load weekly reports",
+      "تعذر تحميل التقارير الأسبوعية",
+    ),
+    createSuccess: _m(
+      "Report created successfully",
+      "تم إنشاء التقرير بنجاح",
+    ),
+    createError: _m(
+      "Could not create the report. Please try again.",
+      "تعذر إنشاء التقرير. يُرجى المحاولة مرة أخرى.",
+    ),
+    filters: new MessagesGroup({
+      fromDate: _m("From", "من"),
+      toDate: _m("To", "إلى"),
+    }),
+    createDialog: new MessagesGroup({
+      title: _m("Create report", "إنشاء تقرير"),
+      startDate: _m("Start date", "تاريخ البداية"),
+      endDate: _m("End date", "تاريخ النهاية"),
+      cancel: _m("Cancel", "إلغاء"),
+      create: _m("Create", "إنشاء"),
+      creating: _m("Creating…", "جاري الإنشاء…"),
+    }),
+    fileDialog: new MessagesGroup({
+      title: _m("Report file", "ملف التقرير"),
+      unavailable: _m(
+        "No file is available for this report.",
+        "لا يوجد ملف متاح لهذا التقرير.",
+      ),
+      previewUnsupported: _m(
+        "Preview is not available for this file type. Open it in a new tab instead.",
+        "المعاينة غير متاحة لهذا النوع من الملفات. افتحه في تبويب جديد.",
+      ),
+      openInNewTab: _m("Open in new tab", "فتح في تبويب جديد"),
+      close: _m("Close", "إغلاق"),
+    }),
+    statuses: new MessagesGroup({
+      ready: _m("Ready", "جاهز"),
+      processing: _m("Processing", "قيد المعالجة"),
+      failed: _m("Failed", "فشل"),
+      pending: _m("Pending", "قيد الانتظار"),
+    }),
+    table: new MessagesGroup({
+      serialNumber: _m("Serial number", "الرقم التسلسلي"),
+      name: _m("Report name", "اسم التقرير"),
+      fromDate: _m("From date", "من تاريخ"),
+      toDate: _m("To date", "إلى تاريخ"),
+      status: _m("Status", "الحالة"),
+      createdAt: _m("Created", "تاريخ الإنشاء"),
+      actions: _m("Actions", "إجراءات"),
+      show: _m("Show", "عرض"),
+    }),
+  }),
   indicators: new MessagesGroup({
     filtersTitle: _m("Filter", "فلتر"),
     all: _m("All", "الكل"),
