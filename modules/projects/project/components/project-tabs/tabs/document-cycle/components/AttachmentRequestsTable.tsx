@@ -217,14 +217,6 @@ export default function AttachmentRequestsTable() {
         ),
       },
       {
-        key: "receiver",
-        name: t("counterpartyColumn"),
-        sortable: false,
-        render: (row: DocumentRow) => (
-          <span>{row.receiverName?.trim() || "—"}</span>
-        ),
-      },
-      {
         key: "name",
         name: t("documentName"),
         sortable: false,
