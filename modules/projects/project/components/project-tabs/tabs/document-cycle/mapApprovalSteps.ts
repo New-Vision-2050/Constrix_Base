@@ -14,6 +14,10 @@ function approvalStepStatus(action: string): ApprovalStepStatus {
     case "request_fully_approved":
     case "attachment_approved":
       return "approved";
+    case "workflow_step_rejected":
+    case "request_declined":
+    case "attachment_declined":
+      return "declined";
     case "workflow_step_pending":
     default:
       return "pending";
@@ -25,10 +29,7 @@ export function mapApprovalSteps(
 ): ApprovalStep[] | undefined {
   const raw = item.history;
   if (!Array.isArray(raw) || raw.length === 0) return undefined;
-  const sorted = [...raw].sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-  );
-  return sorted.map((h) => ({
+  return raw.map((h) => ({
     id: h.id,
     action: h.action,
     status: approvalStepStatus(h.action),
