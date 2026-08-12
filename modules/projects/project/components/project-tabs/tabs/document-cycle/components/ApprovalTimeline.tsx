@@ -34,6 +34,8 @@ function approvalActionLabel(
       return t("historyActionAttachmentApproved");
     case "request_declined":
       return t("historyActionRequestDeclined");
+    case "attachment_declined":
+      return t("historyActionAttachmentDeclined");
     case "request_update":
       return t("historyActionRequestUpdate");
     case "media_replaced":
@@ -47,6 +49,7 @@ const STEP_STATUS_COLOR: Record<ApprovalStepStatus, string> = {
   created: "primary.main",
   pending: "warning.main",
   approved: "success.main",
+  declined: "error.main",
 };
 
 function stepUserLabel(step: ApprovalStep): string {
@@ -112,7 +115,11 @@ export default function ApprovalTimeline({ steps }: ApprovalTimelineProps) {
                       width: 2,
                       height: 32,
                       bgcolor:
-                        step.status === "approved" ? "success.main" : "grey.600",
+                        step.status === "approved"
+                          ? "success.main"
+                          : step.status === "declined"
+                            ? "error.main"
+                            : "grey.600",
                     }}
                   />
                 )}

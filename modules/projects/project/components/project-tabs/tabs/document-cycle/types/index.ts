@@ -14,7 +14,11 @@ export interface DocumentAttachment {
   size: string;
 }
 
-export type ApprovalStepStatus = "created" | "pending" | "approved";
+export type ApprovalStepStatus =
+  | "created"
+  | "pending"
+  | "approved"
+  | "declined";
 
 export interface ApprovalStepUser {
   id: string;
