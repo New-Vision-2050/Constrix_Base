@@ -4,6 +4,13 @@ export interface ProjectParams {
   name?: string;
   status?: string;
   project_type_id?: string;
+  sub_project_type_id?: string;
+  sub_sub_project_type_id?: string;
+  manager_id?: string;
+  branch_id?: string;
+  project_owner_type?: "company" | "individual";
+  project_owner_id?: string;
+  management_id?: string;
   sort_by?: string;
   sort_order?: "asc" | "desc";
 }
