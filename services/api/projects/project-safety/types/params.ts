@@ -40,3 +40,19 @@ export type SafetyVisitsListParams = ListProjectSafetyVisitsParams;
 
 /** @deprecated Use buildListProjectSafetyVisitsParams */
 export const buildSafetyVisitsListParams = buildListProjectSafetyVisitsParams;
+
+export type ListProjectSafetyWeeklyReportsParams = {
+  from_date?: string;
+  to_date?: string;
+};
+
+export function buildListProjectSafetyWeeklyReportsParams(
+  params: ListProjectSafetyWeeklyReportsParams,
+): Record<string, string> {
+  const query: Record<string, string> = {};
+
+  if (params.from_date) query.from_date = params.from_date;
+  if (params.to_date) query.to_date = params.to_date;
+
+  return query;
+}

@@ -1,9 +1,30 @@
-/** Placeholder types for the التقارير tab — extend when API is available. */
+export type SafetyWeeklyReportStatus =
+  | "ready"
+  | "processing"
+  | "failed"
+  | "pending";
 
-export type SafetyReportsTabFilters = {
-  search: string;
+export type SafetyWeeklyReportRow = {
+  id: string;
+  serialNumber: string;
+  name: string;
+  fromDate: string;
+  toDate: string;
+  status: SafetyWeeklyReportStatus;
+  statusLabel?: string;
+  createdAt: string;
+  generatedAt: string;
+  downloadUrl: string;
+  hasFile: boolean;
+  fileSize: number;
 };
 
-export const EMPTY_SAFETY_REPORTS_TAB_FILTERS: SafetyReportsTabFilters = {
-  search: "",
+export type SafetyWeeklyReportFilters = {
+  fromDate: string;
+  toDate: string;
+};
+
+export const EMPTY_SAFETY_WEEKLY_REPORT_FILTERS: SafetyWeeklyReportFilters = {
+  fromDate: "",
+  toDate: "",
 };

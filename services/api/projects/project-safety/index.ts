@@ -1,12 +1,14 @@
 import { baseApi } from "@/config/axios/instances/base";
 import {
   buildListProjectSafetyVisitsParams,
+  buildListProjectSafetyWeeklyReportsParams,
   type ListProjectSafetyVisitsParams,
+  type ListProjectSafetyWeeklyReportsParams,
 } from "./types/params";
 import type {
   ListProjectSafetyReportsResponse,
-  ListProjectSafetyReportsTabResponse,
   ListProjectSafetyVisitsResponse,
+  ListProjectSafetyWeeklyReportsResponse,
   SafetyAnalyticsByContractorConsultantResponse,
   SafetyAnalyticsCompliantResponse,
   SafetyAnalyticsFrequentViolationsResponse,
@@ -71,11 +73,30 @@ export const ProjectSafetyApi = {
       `projects/safety/analytics/top-violations`,
     ),
 
-  /** Placeholder — replace path when the التقارير tab API is defined. */
-  // listReportsTabForProject: (_projectId: string | number) =>
-  //   baseApi.get<ListProjectSafetyReportsTabResponse>(
-  //     "projects/_placeholder/safety/reports",
-  //   ),
+  /** List generated weekly reports. */
+  listWeeklyReportsForProject: (
+    projectId: string | number,
+    params?: ListProjectSafetyWeeklyReportsParams,
+  ) =>
+    baseApi.get<ListProjectSafetyWeeklyReportsResponse>(
+      `projects/${projectId}/safety/weekly-reports`,
+      {
+        params: buildListProjectSafetyWeeklyReportsParams(params ?? {}),
+      },
+    ),
+
+  /** Generate a weekly report for a date range. */
+  createWeeklyReportForProject: (
+    projectId: string | number,
+    params: Required<ListProjectSafetyWeeklyReportsParams>,
+  ) =>
+    baseApi.post<ListProjectSafetyWeeklyReportsResponse>(
+      `projects/${projectId}/safety/weekly-report`,
+      {
+        from_date: params.from_date,
+        to_date: params.to_date,
+      },
+    ),
 };
 
 export const ProjectSafetyVisitsApi = {
@@ -95,6 +116,7 @@ export const ProjectSafetyIndicatorsApi = {
   getTopViolations: ProjectSafetyApi.getAnalyticsTopViolations,
 };
 
-// export const ProjectSafetyReportsTabApi = {
-//   listForProject: ProjectSafetyApi.listReportsTabForProject,
-// };
+export const ProjectSafetyWeeklyReportsApi = {
+  listForProject: ProjectSafetyApi.listWeeklyReportsForProject,
+  createForProject: ProjectSafetyApi.createWeeklyReportForProject,
+};
