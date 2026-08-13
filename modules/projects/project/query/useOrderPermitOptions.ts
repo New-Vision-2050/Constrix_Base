@@ -5,7 +5,10 @@ import type {
   ProjectOrderPermitTypeDto,
 } from "@/services/api/projects/project-order-permits/types/response";
 
-export const orderPermitsQueryKey = () => ["order-permits", "options"] as const;
+export const orderPermitsQueryKey = (name?: string) =>
+  name?.trim()
+    ? (["order-permits", "options", name.trim()] as const)
+    : (["order-permits", "options"] as const);
 
 export const orderPermitDepartmentsQueryKey = (orderPermitId: number | string) =>
   ["order-permit-departments", orderPermitId] as const;
@@ -29,6 +32,24 @@ export function useOrderPermits(enabled = false) {
     },
     enabled,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useOrderPermitsByName(
+  name: string | undefined,
+  enabled = true,
+) {
+  const trimmedName = name?.trim() ?? "";
+
+  return useQuery({
+    queryKey: orderPermitsQueryKey(trimmedName),
+    queryFn: async () => {
+      const res = await ProjectOrderPermitsApi.list({ name: trimmedName });
+      return (res.data.payload ?? []) as ProjectOrderPermitTypeDto[];
+    },
+    enabled: enabled && trimmedName.length >= 2,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 }
 

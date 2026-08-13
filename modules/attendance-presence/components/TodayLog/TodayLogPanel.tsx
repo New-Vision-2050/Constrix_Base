@@ -130,6 +130,7 @@ export default function TodayLogPanel() {
 
   const workRules = constraintData?.work_rules;
   const isHoliday = Boolean(workRules?.is_holiday);
+  const isFlexible = workRules?.attendance_type === "flexible";
   const apiPeriods = workRules?.all_work_periods ?? [];
   const activeApiPeriod = getActiveWorkPeriod(apiPeriods);
 
@@ -175,12 +176,28 @@ export default function TodayLogPanel() {
     ? Math.round(selectedApiPeriod.total_hours_present * 60)
     : 0;
   const goalHours = selectedApiPeriod?.total_work_hours ?? 9;
-  const elapsedMinutes = shiftProgress?.elapsedMinutes ?? 0;
-  const progress = shiftProgress?.progress ?? 0;
+  const requiredWorkMinutes =
+    selectedApiPeriod?.required_work_minutes ??
+    workRules?.flexible_required_work_minutes ??
+    Math.round(goalHours * 60);
+
+  const elapsedMinutes = isFlexible
+    ? workedMinutes
+    : shiftProgress?.elapsedMinutes ?? 0;
+  const progress = isFlexible
+    ? requiredWorkMinutes > 0
+      ? Math.min(1, workedMinutes / requiredWorkMinutes)
+      : 0
+    : shiftProgress?.progress ?? 0;
+  const remainingMinutes = isFlexible
+    ? Math.max(0, requiredWorkMinutes - workedMinutes)
+    : shiftProgress?.remainingMinutes ?? 0;
+
   const workedHoursLabel = formatDurationHoursMinutes(workedMinutes);
   const scheduledHoursLabel = formatDurationHoursMinutes(
     Math.round(goalHours * 60),
   );
+  const remainingHoursLabel = formatDurationHoursMinutes(remainingMinutes);
 
   const clockInDisplay = activeAttendance?.clock_in_time
     ? formatApiTime(activeAttendance.clock_in_time, locale).display
@@ -216,26 +233,50 @@ export default function TodayLogPanel() {
     }
   };
 
-  const statItems = [
-    {
-      key: "check-in",
-      icon: <CheckInStatIcon />,
-      label: t("checkIn"),
-      value: startTimeDisplay,
-    },
-    {
-      key: "check-out",
-      icon: <CheckOutStatIcon />,
-      label: t("checkOut"),
-      value: endTimeDisplay,
-    },
-    {
-      key: "work-hours",
-      icon: <WorkHoursStatIcon />,
-      label: t("workHours"),
-      value: scheduledHoursLabel,
-    },
-  ];
+  const statItems = isFlexible
+    ? [
+        {
+          key: "worked",
+          icon: <WorkHoursStatIcon />,
+          label: t("workedHours"),
+          value: workedHoursLabel,
+        },
+        {
+          key: "remaining",
+          icon: <CheckInStatIcon />,
+          label: t("remainingWorkHours", {
+            hours: Math.floor(remainingMinutes / 60),
+            minutes: remainingMinutes % 60,
+          }),
+          value: remainingHoursLabel,
+        },
+        {
+          key: "required",
+          icon: <CheckOutStatIcon />,
+          label: t("workHours"),
+          value: scheduledHoursLabel,
+        },
+      ]
+    : [
+        {
+          key: "check-in",
+          icon: <CheckInStatIcon />,
+          label: t("checkIn"),
+          value: startTimeDisplay,
+        },
+        {
+          key: "check-out",
+          icon: <CheckOutStatIcon />,
+          label: t("checkOut"),
+          value: endTimeDisplay,
+        },
+        {
+          key: "work-hours",
+          icon: <WorkHoursStatIcon />,
+          label: t("workHours"),
+          value: scheduledHoursLabel,
+        },
+      ];
 
   const tableColumns = [
     { key: "date", label: t("date") },
@@ -382,11 +423,16 @@ export default function TodayLogPanel() {
             </div>
           </div>
 
-          {selectedApiPeriod?.expected_clock_out_time ? (
+          {selectedApiPeriod?.expected_clock_out_time ||
+          selectedApiPeriod?.expected_clock_out_at ? (
             <div className="relative z-10 mb-4 text-center text-sm text-muted-foreground">
               {t("expectedClockOut")}:{" "}
               <span className="font-medium text-foreground" dir="ltr">
-                {formatApiTime(selectedApiPeriod.expected_clock_out_time, locale).display}
+                {formatApiTime(
+                  selectedApiPeriod.expected_clock_out_at ??
+                    selectedApiPeriod.expected_clock_out_time!,
+                  locale,
+                ).display}
               </span>
             </div>
           ) : null}
@@ -398,6 +444,7 @@ export default function TodayLogPanel() {
                 locationWork={workRules.location_work}
                 additionalLocations={workRules.additional_locations}
                 disabled={!canPerform}
+                isFlexible={isFlexible}
               />
             ) : showButton ? (
               <Button

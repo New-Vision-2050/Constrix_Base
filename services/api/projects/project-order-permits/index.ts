@@ -1,7 +1,9 @@
 import { baseApi } from "@/config/axios/instances/base";
 import type {
   CreateProjectOrderPermitsArgs,
+  ListOrderPermitTypesParams,
   ListProjectOrderPermitsParams,
+  ListUdsWorkOrdersParams,
   UpdateProjectOrderPermitArgs,
 } from "./types/params";
 import type {
@@ -9,14 +11,21 @@ import type {
   CreateProjectOrderPermitsResponse,
   ImportProjectOrderPermitsResponse,
   ListProjectOrderPermitDepartmentsResponse,
+  ListProjectOrderPermitTypesResponse,
   ListProjectOrderPermitsResponse,
   NoteLogsResponse,
+  UdsWorkOrderResponse,
   UpdateProjectOrderPermitResponse,
 } from "./types/response";
 
 export const ProjectOrderPermitsApi = {
-  list: () =>
-    baseApi.get<ListProjectOrderPermitsResponse>("order-permits"),
+  list: (params?: ListOrderPermitTypesParams) =>
+    baseApi.get<ListProjectOrderPermitTypesResponse>(
+      "order-permits",
+      params?.name?.trim()
+        ? { params: { name: params.name.trim() } }
+        : undefined,
+    ),
 
   listForProject: (
     projectId: string | number,
@@ -37,6 +46,20 @@ export const ProjectOrderPermitsApi = {
     baseApi.get<ListProjectOrderPermitDepartmentsResponse>(
       "order-permit-departments",
       { params: { order_permit_id: orderPermitId } },
+    ),
+
+  listUdsWorkOrders: (
+    projectId: string | number,
+    params: ListUdsWorkOrdersParams,
+  ) =>
+    baseApi.get<UdsWorkOrderResponse>(
+      `projects/${projectId}/order-permits/uds-work-orders`,
+      {
+        params: {
+          name: params.name.trim(),
+          order_permit_id: params.order_permit_id,
+        },
+      },
     ),
 
   create: (projectId: string, body: CreateProjectOrderPermitsArgs) =>

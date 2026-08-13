@@ -212,6 +212,16 @@ export const JobFormConfig = () => {
             ],
           },
           {
+            name: "attendance_type",
+            label: tJobData("attendanceType"),
+            type: "radio",
+            required: false,
+            options: [
+              { value: "regular", label: tJobData("regular") },
+              { value: "flexible", label: tJobData("flexible") },
+            ],
+          },
+          {
             name: "additional_constraint_ids",
             label: tJobData("additionalAttendanceConstraints"),
             type: "select",
@@ -274,6 +284,7 @@ export const JobFormConfig = () => {
       job_title_id: professionalData?.job_title?.id,
       job_code: professionalData?.job_code,
       attendance_constraint_id: mainConstraintId,
+      attendance_type: professionalData?.attendance_type ?? "regular",
       additional_constraint_ids: additionalConstraintIds,
       roles: professionalData?.roles,
     },

@@ -22,6 +22,15 @@ export interface ListProjectOrderPermitsParams {
   order_permit_department_id?: number;
 }
 
+export interface ListOrderPermitTypesParams {
+  name?: string;
+}
+
+export interface ListUdsWorkOrdersParams {
+  name: string;
+  order_permit_id: number | string;
+}
+
 export interface UpdateProjectOrderPermitArgs {
   permit_status_id?: number | null;
   start_permit_date?: string | null;

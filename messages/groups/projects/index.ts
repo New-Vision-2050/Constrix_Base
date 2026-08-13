@@ -212,6 +212,14 @@ export const projectMessages = new MessagesGroup({
       "Attachment declined",
       "تم رفض المرفق",
     ),
+    historyActionAttachmentDeclinedPartial: _m(
+      "Attachment declined (partial decline)",
+      "تم رفض المرفق ( رفض جزئي )",
+    ),
+    historyActionAttachmentDeclinedFull: _m(
+      "Attachment declined (full decline)",
+      "تم رفض المرفق ( رفض كلي )",
+    ),
     historyActionRequestUpdate: _m("Request updated", "تم تحديث الطلب"),
     historyActionWorkflowStepPending: _m(
       "Workflow step pending",

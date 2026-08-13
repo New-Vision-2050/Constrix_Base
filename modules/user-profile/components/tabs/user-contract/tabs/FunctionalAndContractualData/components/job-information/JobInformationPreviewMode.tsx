@@ -73,6 +73,18 @@ export default function JobInformationPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
+          label={tJobData("attendanceType")}
+          value={
+            professionalData?.attendance_type === "flexible"
+              ? tJobData("flexible")
+              : tJobData("regular")
+          }
+          valid={Boolean(professionalData?.attendance_type)}
+        />
+      </div>
+
+      <div className="p-2">
+        <PreviewTextField
           label={tJobData("additionalAttendanceConstraints")}
           value={additionalConstraints.map((c) => c.constraint_name).join(", ")}
           valid={Boolean(additionalConstraints.length)}
