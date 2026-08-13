@@ -396,6 +396,19 @@ export const attendancePresenceMessages = new MessagesGroup({
     "The clock-in window for this shift has closed",
     "انتهت نافذة تسجيل الحضور لهذه الفترة",
   ),
+  clockInNotAllowed: _m(
+    "Clock-in is not allowed on this day",
+    "لا يمكن تسجيل الحضور في هذا اليوم",
+  ),
+  workingHoursCompleted: _m(
+    "Working hours completed — overtime is not enabled on your constraint",
+    "تم استيفاء ساعات العمل — الإضافي غير مفعل على محددك",
+  ),
+  remainingWorkHours: _m(
+    "Remaining: {hours}h {minutes}m",
+    "المتبقي: {hours}س {minutes}د",
+  ),
+  workedHours: _m("Worked Hours", "ساعات العمل المنجزة"),
   expectedClockOut: _m("Expected clock-out", "الانصراف المتوقع"),
 
   // Work log

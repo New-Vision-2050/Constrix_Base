@@ -3,6 +3,8 @@ import { Branch } from "@/modules/user-profile/types/branch";
 import { Department } from "@/modules/user-profile/types/department";
 import { Management } from "@/modules/user-profile/types/mangement";
 
+export type AttendanceType = "regular" | "flexible";
+
 export type ProfessionalT = {
   branch: Branch;
   company_id: string;
@@ -15,6 +17,7 @@ export type ProfessionalT = {
   management: Management;
   roles: string[];
   attendance_constraint: { id: string; constraint_name: string };
+  attendance_type?: AttendanceType;
 };
 
 type ResponseT = {

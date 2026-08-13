@@ -59,12 +59,15 @@ interface AttendanceActionDialogsProps {
   locationWork: LocationWork;
   additionalLocations?: LocationWork[];
   disabled?: boolean;
+  isFlexible?: boolean;
 }
 
 const CLOCK_IN_ERROR_TYPE_KEYS: Record<string, string> = {
   clock_in_too_early: "clockInTooEarly",
   clock_in_deadline_passed: "clockInDeadlinePassed",
   clock_in_window_closed: "clockInWindowClosed",
+  clock_in_not_allowed: "clockInNotAllowed",
+  working_hours_completed: "workingHoursCompleted",
 };
 
 function getApiErrorMessage(error: unknown, t: (key: string) => string) {
@@ -101,6 +104,7 @@ export default function AttendanceActionDialogs({
   locationWork,
   additionalLocations = [],
   disabled = false,
+  isFlexible = false,
 }: AttendanceActionDialogsProps) {
   const t = useTranslations("AttendancePresence");
   const { isRtl } = useAttendanceDirection();
@@ -163,10 +167,10 @@ export default function AttendanceActionDialogs({
         return;
       }
 
-      setLateMinutes(getLateMinutes(now, startTime));
+      setLateMinutes(isFlexible ? 0 : getLateMinutes(now, startTime));
       setStep("clock-in-confirm");
     },
-    [isClockOut, locationWork, additionalLocations, now, startTime],
+    [isClockOut, isFlexible, locationWork, additionalLocations, now, startTime],
   );
 
   const startAttendanceFlow = useCallback(async () => {

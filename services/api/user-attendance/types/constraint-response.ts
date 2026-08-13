@@ -30,6 +30,7 @@ export interface WorkPeriodConstraint {
   can_clock_in_until?: string | null;
   can_clock_out_until?: string | null;
   expected_clock_out_time?: string | null;
+  expected_clock_out_at?: string | null;
   absent_at?: string | null;
   required_work_minutes?: number;
   is_absent?: boolean;
@@ -46,11 +47,15 @@ export interface LocationWork {
   reference_id?: string | null;
 }
 
+export type AttendanceType = "regular" | "flexible";
+
 export interface UserConstraintWorkRules {
   day_status: string;
   day_name: string;
   is_holiday: boolean;
   reason: string;
+  attendance_type?: AttendanceType;
+  flexible_required_work_minutes?: number;
   all_work_periods: WorkPeriodConstraint[];
   location_work: LocationWork;
   additional_locations: LocationWork[];

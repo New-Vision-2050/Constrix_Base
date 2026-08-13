@@ -230,6 +230,9 @@ export const userProfileMessages = new MessagesGroup({
       jobTitle: _m("Job Title", "المسمى الوظيفي"),
       jobCode: _m("Job Code", "الرقم الوظيفي"),
       attendanceConstraint: _m("Attendance Constraint", "المحدد"),
+      attendanceType: _m("Attendance Type", "نوع الحضور"),
+      regular: _m("Regular", "عادي"),
+      flexible: _m("Flexible", "مرن"),
       additionalAttendanceConstraints: _m(
         "Additional Attendance Constraints",
         "محددات الحضور الإضافية",
