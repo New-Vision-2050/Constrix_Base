@@ -16,6 +16,7 @@ function normalizeApprovalAction(action: string): string {
 function approvalActionLabel(
   action: string,
   t: (key: string) => string,
+  decisionScope?: string | null,
 ): string {
   switch (normalizeApprovalAction(action)) {
     case "request_created":
@@ -35,6 +36,12 @@ function approvalActionLabel(
     case "request_declined":
       return t("historyActionRequestDeclined");
     case "attachment_declined":
+      if (decisionScope === "partial") {
+        return t("historyActionAttachmentDeclinedPartial");
+      }
+      if (decisionScope === "full") {
+        return t("historyActionAttachmentDeclinedFull");
+      }
       return t("historyActionAttachmentDeclined");
     case "request_update":
       return t("historyActionRequestUpdate");
@@ -126,7 +133,7 @@ export default function ApprovalTimeline({ steps }: ApprovalTimelineProps) {
               </Box>
               <Box sx={{ pt: 0.25 }}>
                 <Typography variant="body2" fontWeight={600}>
-                  {approvalActionLabel(step.action, t)}
+                  {approvalActionLabel(step.action, t, step.decisionScope)}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {step.status === "pending"

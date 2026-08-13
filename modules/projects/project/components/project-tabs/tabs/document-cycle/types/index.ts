@@ -34,6 +34,8 @@ export interface ApprovalStep {
   status: ApprovalStepStatus;
   user: ApprovalStepUser[] | null;
   date: string;
+  /** From history `metadata.decision_scope` when present (e.g. attachment_declined). */
+  decisionScope?: "partial" | "full" | string | null;
 }
 
 export interface DocumentComment {
