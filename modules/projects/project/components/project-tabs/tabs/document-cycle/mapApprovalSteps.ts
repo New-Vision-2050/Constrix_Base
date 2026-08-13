@@ -24,6 +24,13 @@ function approvalStepStatus(action: string): ApprovalStepStatus {
   }
 }
 
+function historyDecisionScope(
+  metadata?: Record<string, unknown> | null,
+): string | null {
+  const scope = metadata?.decision_scope;
+  return typeof scope === "string" && scope.trim() ? scope.trim().toLowerCase() : null;
+}
+
 export function mapApprovalSteps(
   item: AttachmentRequest,
 ): ApprovalStep[] | undefined {
@@ -35,5 +42,6 @@ export function mapApprovalSteps(
     status: approvalStepStatus(h.action),
     user: Array.isArray(h.user) ? h.user : null,
     date: h.timestamp ?? "",
+    decisionScope: historyDecisionScope(h.metadata),
   }));
 }

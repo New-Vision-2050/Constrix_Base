@@ -302,6 +302,11 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
       selectManagement: _m("Select management", "اختر الادارة"),
       selectDistrict: _m("Select district", "اختر المنطقة"),
       selectLocation: _m("Select location", "اختر الموقع"),
+      searchExisting: _m(
+        "Type at least 2 characters to search",
+        "اكتب حرفين على الأقل للبحث",
+      ),
+      noUdsMatches: _m("No matching work orders", "لا توجد أوامر عمل مطابقة"),
     }),
     review: new MessagesGroup({
       workOrdersCountLabel: _m("Work orders count", "عدد اوامر العمل"),

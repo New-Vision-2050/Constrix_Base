@@ -35,6 +35,22 @@ export interface ProjectOrderPermitContractorDto {
   contractor_name?: string | null;
 }
 
+/** UDS work-order lookup response (`/uds-work-orders`). */
+export interface UdsWorkOrderDto {
+  assigned_date?: string | null;
+  price?: number | string | null;
+  consultant_price?: number | string | null;
+  contractor?: ProjectOrderPermitContractorDto | null;
+  executing_entity?: string | null;
+  office?: string | null;
+}
+
+export interface UdsWorkOrderResponse {
+  code: string;
+  message: string | null;
+  payload: UdsWorkOrderDto | UdsWorkOrderDto[] | null;
+}
+
 export interface ProjectOrderPermitNestedDto {
   id?: number | null;
   type?: string | null;

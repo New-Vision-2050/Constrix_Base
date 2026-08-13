@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -38,6 +38,8 @@ import { useProjectManagements } from "@/modules/projects/project/query/useProje
 import { useProjectDistricts } from "@/modules/projects/project/query/useProjectDistricts";
 import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
 import { buildCreateWorkOrdersPayload } from "./buildCreatePayload";
+import WorkOrderTypeField from "./WorkOrderTypeField";
+import WorkOrderUdsPrefill from "./WorkOrderUdsPrefill";
 
 const STEP_KEYS = ["workOrderData", "review"] as const;
 
@@ -208,6 +210,15 @@ export default function AddWorkOrderDialog({
     return map;
   }, [districtsQuery.data]);
 
+  const udsLookups = useMemo(
+    () => ({
+      orderPermits: orderPermitsQuery.data ?? [],
+      contractors: contractorOptions,
+      districts: districtsQuery.data ?? [],
+    }),
+    [contractorOptions, districtsQuery.data, orderPermitsQuery.data],
+  );
+
   useEffect(() => {
     if (!open) {
       setActiveStep(0);
@@ -224,14 +235,14 @@ export default function AddWorkOrderDialog({
 
   const emptyDash = t("emptyDash");
 
-  const updateEntry = (
-    id: string,
-    patch: Partial<Omit<WorkOrderEntry, "id">>,
-  ) => {
-    setEntries((prev) =>
-      prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)),
-    );
-  };
+  const updateEntry = useCallback(
+    (id: string, patch: Partial<Omit<WorkOrderEntry, "id">>) => {
+      setEntries((prev) =>
+        prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)),
+      );
+    },
+    [],
+  );
 
   const addEntry = () => {
     setEntries((prev) => [...prev, createWorkOrderEntry()]);
@@ -436,15 +447,24 @@ export default function AddWorkOrderDialog({
                   {readOnly ? (
                     entry.workOrderId
                   ) : (
-                    <TextField
-                      value={entry.workOrderId}
-                      onChange={(e) =>
-                        updateEntry(entry.id, { workOrderId: e.target.value })
-                      }
-                      size="small"
-                      fullWidth
-                      required
-                    />
+                    <>
+                      <WorkOrderUdsPrefill
+                        projectId={projectId}
+                        name={entry.workOrderId}
+                        orderPermitId={entry.workOrderType}
+                        lookups={udsLookups}
+                        onApply={(patch) => updateEntry(entry.id, patch)}
+                      />
+                      <TextField
+                        value={entry.workOrderId}
+                        onChange={(e) =>
+                          updateEntry(entry.id, { workOrderId: e.target.value })
+                        }
+                        size="small"
+                        fullWidth
+                        required
+                      />
+                    </>
                   )}
                 </TableCell>
                 <TableCell>
@@ -455,27 +475,14 @@ export default function AddWorkOrderDialog({
                       emptyDash,
                     )
                   ) : (
-                    <TextField
-                      select
+                    <WorkOrderTypeField
+                      workOrderName={entry.workOrderId}
                       value={entry.workOrderType}
-                      onChange={(e) =>
-                        updateEntry(entry.id, {
-                          workOrderType: e.target.value,
-                        })
+                      fallbackOptions={orderPermitsQuery.data ?? []}
+                      onChange={(workOrderType) =>
+                        updateEntry(entry.id, { workOrderType })
                       }
-                      size="small"
-                      fullWidth
-                      disabled={orderPermitsQuery.isLoading}
-                    >
-                      <MenuItem value="">
-                        <em>{tFields("selectType")}</em>
-                      </MenuItem>
-                      {(orderPermitsQuery.data ?? []).map((item) => (
-                        <MenuItem key={item.id} value={String(item.id)}>
-                          {getOrderPermitLabel(item)}
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                    />
                   )}
                 </TableCell>
                 <TableCell>
