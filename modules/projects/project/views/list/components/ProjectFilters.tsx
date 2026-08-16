@@ -4,10 +4,6 @@ import {
   Box,
   Typography,
   Paper,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
@@ -16,6 +12,7 @@ import {
   useProjectFilters,
   type ProjectFilterValues,
 } from "../hooks/useProjectFilters";
+import SearchableSelect from "@/components/shared/SearchableSelect";
 
 type OptionItem = { id: number | string; name: string };
 
@@ -35,30 +32,6 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
     managersData,
     ownerOptionsData,
   } = filterManager;
-
-  const renderSelect = (
-    label: string,
-    value: string,
-    onChange: (val: string) => void,
-    options: OptionItem[],
-    disabled?: boolean,
-  ) => (
-    <FormControl size="small" fullWidth disabled={disabled}>
-      <InputLabel>{label}</InputLabel>
-      <Select
-        value={value}
-        label={label}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <MenuItem value="">{t("project.all")}</MenuItem>
-        {options.map((opt) => (
-          <MenuItem key={opt.id} value={String(opt.id)}>
-            {opt.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
 
   return (
     <Paper
@@ -102,65 +75,104 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
           gap: 2,
         }}
       >
-        {renderSelect(
-          t("project.projectType"),
-          filters.project_type_id,
-          (val) => setFilter("project_type_id", val),
-          projectTypesData,
-        )}
+        <SearchableSelect
+          label={t("project.projectType")}
+          value={filters.project_type_id}
+          onChange={(val) => setFilter("project_type_id", String(val))}
+          placeholder={t("project.all")}
+          options={[
+            { value: "", label: t("project.all") },
+            ...projectTypesData.map((opt) => ({
+              value: String(opt.id),
+              label: opt.name,
+            })),
+          ]}
+        />
 
-        {renderSelect(
-          t("project.subProjectType"),
-          filters.sub_project_type_id,
-          (val) => setFilter("sub_project_type_id", val),
-          subProjectTypesData,
-          !filters.project_type_id,
-        )}
+        <SearchableSelect
+          label={t("project.subProjectType")}
+          value={filters.sub_project_type_id}
+          onChange={(val) => setFilter("sub_project_type_id", String(val))}
+          placeholder={t("project.all")}
+          disabled={!filters.project_type_id}
+          options={[
+            { value: "", label: t("project.all") },
+            ...subProjectTypesData.map((opt) => ({
+              value: String(opt.id),
+              label: opt.name,
+            })),
+          ]}
+        />
 
-        {renderSelect(
-          t("project.subSubProjectType"),
-          filters.sub_sub_project_type_id,
-          (val) => setFilter("sub_sub_project_type_id", val),
-          subSubProjectTypesData,
-          !filters.sub_project_type_id,
-        )}
+        <SearchableSelect
+          label={t("project.subSubProjectType")}
+          value={filters.sub_sub_project_type_id}
+          onChange={(val) => setFilter("sub_sub_project_type_id", String(val))}
+          placeholder={t("project.all")}
+          disabled={!filters.sub_project_type_id}
+          options={[
+            { value: "", label: t("project.all") },
+            ...subSubProjectTypesData.map((opt) => ({
+              value: String(opt.id),
+              label: opt.name,
+            })),
+          ]}
+        />
 
-        {renderSelect(
-          t("project.projectManager"),
-          filters.manager_id,
-          (val) => setFilter("manager_id", val),
-          managersData,
-        )}
+        <SearchableSelect
+          label={t("project.projectManager")}
+          value={filters.manager_id}
+          onChange={(val) => setFilter("manager_id", String(val))}
+          placeholder={t("project.all")}
+          options={[
+            { value: "", label: t("project.all") },
+            ...managersData.map((m) => ({
+              value: String(m.id),
+              label: m.name,
+            })),
+          ]}
+        />
 
-        {renderSelect(
-          t("project.projectOwner"),
-          filters.project_owner_type,
-          (val) => setFilter("project_owner_type", val),
-          [
-            { id: "company", name: t("project.entity") },
-            { id: "individual", name: t("project.individual") },
-          ],
-        )}
+        <SearchableSelect
+          label={t("project.projectOwner")}
+          value={filters.project_owner_type}
+          onChange={(val) => setFilter("project_owner_type", String(val))}
+          placeholder={t("project.all")}
+          options={[
+            { value: "", label: t("project.all") },
+            { value: "company", label: t("project.entity") },
+            { value: "individual", label: t("project.individual") },
+          ]}
+        />
 
-        {renderSelect(
-          t("project.selectClient"),
-          filters.project_owner_id,
-          (val) => setFilter("project_owner_id", val),
-          ownerOptionsData,
-          !filters.project_owner_type,
-        )}
+        <SearchableSelect
+          label={t("project.selectClient")}
+          value={filters.project_owner_id}
+          onChange={(val) => setFilter("project_owner_id", String(val))}
+          placeholder={t("project.all")}
+          disabled={!filters.project_owner_type}
+          options={[
+            { value: "", label: t("project.all") },
+            ...ownerOptionsData.map((o) => ({
+              value: String(o.id),
+              label: o.name,
+            })),
+          ]}
+        />
 
-        {renderSelect(
-          t("project.projectStatus"),
-          filters.status,
-          (val) => setFilter("status", val),
-          [
-            { id: "1", name: t("project.statusOngoing") },
-            { id: "0", name: t("project.statusInProgress") },
-            { id: "-1", name: t("project.statusStopped") },
-            { id: "2", name: t("project.statusCompleted") },
-          ],
-        )}
+        <SearchableSelect
+          label={t("project.projectStatus")}
+          value={filters.status}
+          onChange={(val) => setFilter("status", String(val))}
+          placeholder={t("project.all")}
+          options={[
+            { value: "", label: t("project.all") },
+            { value: "1", label: t("project.statusOngoing") },
+            { value: "0", label: t("project.statusInProgress") },
+            { value: "-1", label: t("project.statusStopped") },
+            { value: "2", label: t("project.statusCompleted") },
+          ]}
+        />
       </Box>
     </Paper>
   );
