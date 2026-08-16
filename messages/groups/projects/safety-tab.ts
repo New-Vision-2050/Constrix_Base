@@ -65,6 +65,26 @@ export const projectSafetyTabMessages = new MessagesGroup({
         "The report can only be downloaded after the violation is completed.",
         "لا يمكن تحميل التقرير إلا بعد اكتمال المخالفة.",
       ),
+      downloadReportNoViolationsTooltip: _m(
+        "The report can only be downloaded when at least one violation exists.",
+        "لا يمكن تحميل التقرير إلا عند وجود مخالفة واحدة على الأقل.",
+      ),
+      downloadReportError: _m(
+        "Failed to download the report. Please try again.",
+        "فشل تحميل التقرير. يرجى المحاولة مرة أخرى.",
+      ),
+    }),
+    reportDownloadDialog: new MessagesGroup({
+      title: _m("Download Report", "تحميل التقرير"),
+      downloadMakkahReport: _m(
+        "Download Makkah Report",
+        "تنزيل تقرير مكة",
+      ),
+      downloadJeddahReport: _m(
+        "Download Jeddah Report",
+        "تنزيل تقرير جدة",
+      ),
+      cancel: _m("Cancel", "إلغاء"),
       downloadReportError: _m(
         "Failed to download the report. Please try again.",
         "فشل تحميل التقرير. يرجى المحاولة مرة أخرى.",

@@ -62,6 +62,26 @@ export function getSafetyViolationDisplayLabel(
   return getSafetyViolationWeightLabel(weight) ?? "_";
 }
 
+/** True when the violation is marked as an existing violation (reportable). */
+export function isExistingSafetyViolation(violation: SafetyViolation): boolean {
+  const weight = parseViolationWeight(violation.weight);
+  if (weight !== null && weight < 0) return true;
+
+  if (violation.status !== null && violation.status < 0) return true;
+
+  return false;
+}
+
+export function canDownloadSafetyVisitReport(row: SafetyVisitRow): boolean {
+  const isCompleted =
+    row.status?.toLowerCase().includes("complet") ||
+    row.status?.toLowerCase().includes("مكتمل");
+
+  if (!isCompleted) return false;
+
+  return row.violations.some(isExistingSafetyViolation);
+}
+
 export type SafetyVisitRow = {
   id: string;
   workOrderNumber: string;
