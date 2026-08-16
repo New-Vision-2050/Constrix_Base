@@ -27,6 +27,15 @@ export const ProjectSafetyApi = {
       { responseType: "blob" },
     ),
 
+  getViolationFormReport: (
+    projectId: string | number,
+    safetyId: string | number,
+  ) =>
+    baseApi.get<Blob>(
+      `projects/${projectId}/safety/${safetyId}/violation-form-report`,
+      { responseType: "blob" },
+    ),
+
   listVisitsForProject: (
     projectId: string | number,
     params?: ListProjectSafetyVisitsParams,
