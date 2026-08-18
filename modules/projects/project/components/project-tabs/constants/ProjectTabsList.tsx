@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import FolderSyncIconWithCount from "@/components/icons/folder-sync";
 import type { ProjectPermissions } from "@/services/api/all-projects/types/response";
+import ProjectDataTab from "../tabs/project-data";
 import AttachmentsTab from "../tabs/attachments";
 import StaffTab from "../tabs/staff";
 import CadreTab from "../tabs/cadre";
@@ -216,6 +217,13 @@ export function useProjectTabsList(): SystemTab[] {
     useProjectMyPermissionsFlat(projectId);
 
   return useMemo(() => {
+    const projectDataTab: SystemTab = {
+      id: "project-tab-data",
+      title: tProject("tabs.projectDetails"),
+      icon: <Building2 className="w-4 h-4" />,
+      content: <ProjectDataTab />,
+    };
+
     const attachmentsTab: SystemTab = {
       id: "project-tab-attachments",
       title: tProject("tabs.attachments"),
@@ -318,7 +326,8 @@ export function useProjectTabsList(): SystemTab[] {
       content: <SafetyTab />,
     };
 
-    const topLevel: SystemTab[] = [];
+    const topLevel: SystemTab[] = [projectDataTab];
+
     if (
       shouldShowTopLevelTab(
         "project-tab-attachments",
