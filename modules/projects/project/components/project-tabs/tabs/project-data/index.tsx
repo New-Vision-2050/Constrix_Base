@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import ProjectInfoSection from "./project-info";
 import ProjectDetailsSection from "./project-details";
 import ProjectStatusSection from "./project-status";
+import ProjectStampSection from "./project-stamp";
 import ProjectStatsBar from "../../../stats-bar";
 
 export default function ProjectDataTab() {
@@ -31,6 +32,9 @@ export default function ProjectDataTab() {
 
       {/* حالة المشروع */}
       <ProjectStatusSection />
+
+      {/* ختم المشروع */}
+      <ProjectStampSection />
     </div>
   );
 }
