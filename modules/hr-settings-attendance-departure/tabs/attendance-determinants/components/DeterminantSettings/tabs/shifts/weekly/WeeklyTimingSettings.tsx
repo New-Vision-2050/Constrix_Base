@@ -87,10 +87,10 @@ export default function WeeklyTimingSettings({
                   key={idx}
                   className="border border-border rounded-lg p-3"
                 >
-                  <p className="text-xs text-muted-foreground mb-2 text-end">
+                  <p className="text-xs text-muted-foreground mb-2 text-start">
                     {PERIOD_KEYS[idx] ? t(PERIOD_KEYS[idx]) : String(idx + 1)}
                   </p>
-                  <p className="text-sm text-end tabular-nums">
+                  <p className="text-sm text-start tabular-nums">
                     {t("from")} {row.from} {row.fromMeridiem} — {t("to")} {row.to}{" "}
                     {row.toMeridiem}
                     {row.endsNextDay ? (
@@ -121,7 +121,7 @@ export default function WeeklyTimingSettings({
 
       <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
         {assignWeeklyShiftsError ? (
-          <p className="text-end text-sm text-destructive" role="alert">
+          <p className="text-start text-sm text-destructive" role="alert">
             {assignWeeklyShiftsError}
           </p>
         ) : null}

@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { WEEK_DAYS } from "./timing-constants";
 import type { DayPeriodRow } from "./timing-types";
 import { shiftPeriodLabel } from "./timing-types";
@@ -20,11 +22,15 @@ export default function WeeklyTimingSettings({
   onToggleDay,
   onOpenPeriodsDialog,
 }: WeeklyTimingSettingsProps) {
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.workPeriods",
+  );
+  const isRtl = useIsRtl();
   const hasPeriods = periodRows.length > 0;
 
   return (
-    <div className="border border-border rounded-xl px-3 py-4 md:px-4 md:py-5">
-      <p className="text-right text-lg font-semibold mb-3">فترات الدوام</p>
+    <div dir={isRtl ? "rtl" : "ltr"} className="border border-border rounded-xl px-3 py-4 md:px-4 md:py-5">
+      <p className="text-start text-lg font-semibold mb-3">{t("shiftsTitle")}</p>
 
       <div className="border border-border rounded-lg px-3 py-4 space-y-4">
         <div className="flex items-center justify-between gap-6 flex-wrap">
@@ -40,7 +46,7 @@ export default function WeeklyTimingSettings({
                   onCheckedChange={() => onToggleDay(day.id)}
                   className="border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
-                <span>{day.label}</span>
+                <span>{t(day.id)}</span>
               </label>
             );
           })}
@@ -54,7 +60,7 @@ export default function WeeklyTimingSettings({
             onClick={() => onOpenPeriodsDialog("add")}
           >
             <Plus className="h-4 w-4" />
-            اضافة الفترات
+            {t("addPeriods")}
           </Button>
         ) : (
           <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6">
@@ -64,16 +70,16 @@ export default function WeeklyTimingSettings({
                   key={idx}
                   className="border border-border rounded-lg p-3"
                 >
-                  <p className="text-xs text-muted-foreground mb-2 text-right">
+                  <p className="text-xs text-muted-foreground mb-2 text-start">
                     {shiftPeriodLabel(idx)}
                   </p>
-                  <p className="text-sm text-right tabular-nums">
-                    من {row.from} {row.fromMeridiem} — الى {row.to}{" "}
+                  <p className="text-sm text-start tabular-nums">
+                    {t("from")} {row.from} {row.fromMeridiem} — {t("to")} {row.to}{" "}
                     {row.toMeridiem}
                     {row.endsNextDay ? (
                       <span className="text-muted-foreground">
                         {" "}
-                        — اليوم التالي
+                        — {t("nextDay")}
                       </span>
                     ) : null}
                   </p>
@@ -89,7 +95,7 @@ export default function WeeklyTimingSettings({
                 onClick={() => onOpenPeriodsDialog("edit")}
               >
                 <Pencil className="h-4 w-4" />
-                تعديل الفترات
+                {t("editPeriods")}
               </Button>
             </div>
           </div>
