@@ -1,16 +1,15 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import Image from "next/image";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { useProjectStamp } from "@/modules/projects/project/query/useProjectStamp";
 
 export default function ProjectStampPreviewMode() {
   const { projectId } = useProject();
-  const { data, isLoading, isError } = useProjectStamp(projectId);
+  const { data, isPending, isError } = useProjectStamp(projectId);
   const stampUrl = data?.url ?? null;
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <Typography variant="body2" color="text.secondary">
         جاري التحميل...
@@ -62,12 +61,15 @@ export default function ProjectStampPreviewMode() {
           p: 2,
         }}
       >
-        <Image
+        <Box
+          component="img"
           src={stampUrl}
           alt="ختم المشروع"
-          fill
-          unoptimized
-          style={{ objectFit: "contain" }}
+          sx={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+          }}
         />
       </Box>
     </Box>

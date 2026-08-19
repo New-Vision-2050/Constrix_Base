@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   useCallback,
@@ -45,6 +45,8 @@ import {
   ApryseWebViewer,
   type ApryseWebViewerHandle,
 } from "./ApryseWebViewer";
+import { useProjectStamp } from "@/modules/projects/project/query/useProjectStamp";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 
 export type SaveAnnotatedDocumentPayload = {
   blob: Blob;
@@ -318,6 +320,9 @@ export default function FileViewerDialog({
 }: FileViewerDialogProps) {
   const t = useTranslations("project.documentCycle");
   const queryClient = useQueryClient();
+  const project = useOptionalProject();
+  const projectId = project?.projectId;
+  const { data: stampData } = useProjectStamp(projectId);
   const [note, setNote] = useState("");
   const [previewFile, setPreviewFile] = useState<DocumentAttachment | null>(
     null,
@@ -562,6 +567,52 @@ export default function FileViewerDialog({
                 <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
                   {t("previousNotes")}
                 </Typography>
+
+                {activeFile.response_notes && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 1.5,
+                      mb: 2,
+                    }}
+                  >
+                    <Avatar sx={{ width: 32, height: 32, fontSize: 14 }}>
+                      {getInitials(activeFile.responded_by?.name || "N/A")}
+                    </Avatar>
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Typography variant="body2" fontWeight={600}>
+                          {activeFile.responded_by?.name || "N/A"}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {activeFile.responded_at || ""}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          bgcolor: "primary.main",
+                          color: "primary.contrastText",
+                          borderRadius: 2,
+                          px: 2,
+                          py: 1,
+                          mt: 0.5,
+                        }}
+                      >
+                        <Typography variant="body2">
+                          {activeFile.response_notes}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+
                 {document.comments?.map((comment) => (
                   <Box
                     key={comment.id}
@@ -815,6 +866,7 @@ export default function FileViewerDialog({
                         extension={viewer.extension}
                         fileName={viewerFile?.name ?? activeFile.name}
                         onViewerReady={viewer.onViewerReady}
+                        stampUrl={stampData?.url ?? null}
                       />
                     </Box>
                   )}

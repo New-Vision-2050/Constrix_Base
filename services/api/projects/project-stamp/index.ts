@@ -5,16 +5,105 @@ import type {
   UploadProjectStampResponse,
 } from "./types/response";
 
-export function resolveProjectStampUrl(
-  payload: ProjectStampDto | string | null | undefined,
-): string | null {
-  if (!payload) return null;
-  if (typeof payload === "string") return payload.trim() || null;
+const URL_KEYS = [
+  "url",
+  "stamp_url",
+  "file_url",
+  "image_url",
+  "original_url",
+  "preview_url",
+  "full_url",
+  "path",
+  "file_path",
+  "src",
+] as const;
+
+const NESTED_KEYS = [
+  "stamp",
+  "file",
+  "media",
+  "image",
+  "data",
+  "payload",
+] as const;
+
+function looksLikeUrl(value: string): boolean {
+  const t = value.trim();
+  if (!t) return false;
   return (
-    payload.url?.trim() ||
-    payload.stamp_url?.trim() ||
-    payload.file_url?.trim() ||
-    null
+    /^(https?:|blob:|data:)/i.test(t) ||
+    t.startsWith("/") ||
+    t.includes("/") ||
+    /\.(png|jpe?g|webp|gif|svg)(\?|#|$)/i.test(t)
+  );
+}
+
+function toAbsoluteProjectStampUrl(url: string): string {
+  const t = url.trim();
+  if (!t) return t;
+  if (/^(https?:|blob:|data:)/i.test(t)) return t;
+  const origin = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(
+    /\/$/,
+    "",
+  );
+  if (!origin) return t;
+  return t.startsWith("/") ? `${origin}${t}` : `${origin}/${t}`;
+}
+
+function findStampUrl(value: unknown, depth = 0): string | null {
+  if (value == null || depth > 5) return null;
+
+  if (typeof value === "string") {
+    const t = value.trim();
+    return t && looksLikeUrl(t) ? t : null;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = findStampUrl(item, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  if (typeof value !== "object") return null;
+
+  const obj = value as Record<string, unknown>;
+  for (const key of URL_KEYS) {
+    const raw = obj[key];
+    if (typeof raw === "string" && raw.trim()) {
+      const t = raw.trim();
+      if (looksLikeUrl(t) || key !== "path") return t;
+    }
+  }
+
+  for (const key of NESTED_KEYS) {
+    if (key in obj) {
+      const found = findStampUrl(obj[key], depth + 1);
+      if (found) return found;
+    }
+  }
+
+  return null;
+}
+
+export function resolveProjectStampUrl(
+  payload: ProjectStampDto | string | null | undefined | unknown,
+): string | null {
+  const found = findStampUrl(payload);
+  return found ? toAbsoluteProjectStampUrl(found) : null;
+}
+
+/** Reads stamp URL from a full API body (`payload`, `data`, or the body itself). */
+export function resolveStampUrlFromApiBody(body: unknown): string | null {
+  if (!body || typeof body !== "object") {
+    return resolveProjectStampUrl(body);
+  }
+  const obj = body as Record<string, unknown>;
+  return (
+    resolveProjectStampUrl(obj.payload) ||
+    resolveProjectStampUrl(obj.data) ||
+    resolveProjectStampUrl(obj)
   );
 }
 
@@ -38,6 +127,11 @@ export function validateProjectStampFile(file: File): string | null {
 export const ProjectStampApi = {
   get: (projectId: string | number) =>
     baseApi.get<GetProjectStampResponse>(`projects/${projectId}/stamp`),
+
+  getAsBlob: (projectId: string | number) =>
+    baseApi.get<Blob>(`projects/${projectId}/stamp`, {
+      responseType: "blob",
+    }),
 
   upload: (projectId: string | number, file: File) => {
     const formData = new FormData();

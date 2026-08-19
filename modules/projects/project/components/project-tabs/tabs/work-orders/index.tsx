@@ -40,6 +40,8 @@ import { useUpdateOrderPermit } from "@/modules/projects/project/query/useUpdate
 
 import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-permits";
 
+import { downloadFromResponse } from "@/utils/downloadFromResponse";
+
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
 import { PerRowEditablePermitCell, type EditablePermitField } from "./EditablePermitCell";
 import NoteLogsEye from "./NoteLogsEye";
@@ -277,6 +279,8 @@ export default function WorkOrdersTab({
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const [isImporting, setIsImporting] = useState(false);
+
+  const [isDownloadingUdsModel, setIsDownloadingUdsModel] = useState(false);
 
   const importFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -637,6 +641,21 @@ export default function WorkOrdersTab({
     }
   };
 
+  const handleDownloadUdsModel = async () => {
+    if (!projectId || isDownloadingUdsModel) return;
+
+    setIsDownloadingUdsModel(true);
+    try {
+      const response = await ProjectOrderPermitsApi.downloadUdsModel(projectId);
+      downloadFromResponse(response, "uds-template.xlsx");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message ?? t("downloadUdsModelError"));
+    } finally {
+      setIsDownloadingUdsModel(false);
+    }
+  };
+
   if (!projectId) {
     return null;
   }
@@ -760,6 +779,21 @@ export default function WorkOrdersTab({
                   variant="outlined"
                   color="info"
                   startIcon={
+                    isDownloadingUdsModel ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      <FileDownloadOutlined />
+                    )
+                  }
+                  disabled={isDownloadingUdsModel || isImporting}
+                  onClick={() => void handleDownloadUdsModel()}
+                >
+                  {t("downloadUdsModel")}
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  startIcon={
                     isImporting ? (
                       <CircularProgress size={18} color="inherit" />
                     ) : (
@@ -771,6 +805,7 @@ export default function WorkOrdersTab({
                 >
                   {t("refreshFromUds")}
                 </Button>
+
                 <Button
                   variant="contained"
                   color="primary"

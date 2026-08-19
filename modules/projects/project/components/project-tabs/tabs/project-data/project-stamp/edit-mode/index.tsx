@@ -9,8 +9,13 @@ import { useProject } from "@/modules/all-project/context/ProjectContext";
 import {
   projectStampQueryKey,
   useProjectStamp,
+  type ProjectStampQueryData,
 } from "@/modules/projects/project/query/useProjectStamp";
-import { ProjectStampApi, validateProjectStampFile } from "@/services/api/projects/project-stamp";
+import {
+  ProjectStampApi,
+  resolveStampUrlFromApiBody,
+  validateProjectStampFile,
+} from "@/services/api/projects/project-stamp";
 
 function getApiErrorMessage(error: unknown, fallback: string): string {
   const message = (
@@ -23,21 +28,42 @@ function getApiErrorMessage(error: unknown, fallback: string): string {
 export default function ProjectStampEditMode() {
   const { projectId } = useProject();
   const queryClient = useQueryClient();
-  const { data: stampData, isLoading } = useProjectStamp(projectId);
+  const { data: stampData, isPending } = useProjectStamp(projectId);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const stampUrl = stampData?.url ?? null;
 
   useEffect(() => {
     setSelectedFile(null);
-  }, [stampData?.url]);
+  }, [stampUrl]);
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       if (!projectId) throw new Error("Missing project id");
       return ProjectStampApi.upload(projectId, file);
     },
-    onSuccess: (res) => {
+    onSuccess: async (res, file) => {
       toast.success(res.data?.message ?? "تم حفظ ختم المشروع بنجاح");
-      queryClient.invalidateQueries({ queryKey: projectStampQueryKey(projectId) });
+
+      const uploadedUrl =
+        resolveStampUrlFromApiBody(res.data) || URL.createObjectURL(file);
+      const nextData: ProjectStampQueryData = {
+        raw: res.data?.payload ?? null,
+        url: uploadedUrl,
+      };
+
+      queryClient.setQueryData(projectStampQueryKey(projectId), nextData);
+
+      await queryClient.invalidateQueries({
+        queryKey: projectStampQueryKey(projectId),
+      });
+
+      const after = queryClient.getQueryData<ProjectStampQueryData>(
+        projectStampQueryKey(projectId),
+      );
+      if (!after?.url) {
+        queryClient.setQueryData(projectStampQueryKey(projectId), nextData);
+      }
+
       setSelectedFile(null);
     },
     onError: (error) => {
@@ -71,7 +97,7 @@ export default function ProjectStampEditMode() {
     uploadMutation.mutate(selectedFile);
   };
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <CircularProgress size={20} />
@@ -90,9 +116,10 @@ export default function ProjectStampEditMode() {
       </Typography>
 
       <ProjectImageUpload
+        key={stampUrl ?? "no-stamp"}
         label="ختم المشروع"
         accept="image/jpeg,image/jpg,image/png,image/webp"
-        initialValue={stampData?.url ?? null}
+        initialValue={stampUrl}
         onChange={handleFileChange}
       />
 

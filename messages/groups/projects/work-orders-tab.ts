@@ -12,6 +12,11 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   recentlyAdded: _m("Recently added", "المضافة حديثاً"),
   export: _m("Export", "تصدير"),
   refreshFromUds: _m("Refresh data from UDS", "تحديث البيانات من UDS"),
+  downloadUdsModel: _m("Download UDS model", "تحميل نموذج UDS"),
+  downloadUdsModelError: _m(
+    "Could not download UDS model",
+    "تعذر تحميل نموذج UDS",
+  ),
   importSuccess: _m("Work orders updated successfully", "تم تحديث أوامر العمل بنجاح"),
   importError: _m("Could not import work orders", "تعذر استيراد أوامر العمل"),
   invalidImportFile: _m(
