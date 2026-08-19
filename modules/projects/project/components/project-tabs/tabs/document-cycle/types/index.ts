@@ -12,6 +12,9 @@ export interface DocumentAttachment {
   url: string;
   type: string;
   size: string;
+  response_notes?: string | null;
+  responded_by?: { id: string; name: string } | null;
+  responded_at?: string | null;
 }
 
 export type ApprovalStepStatus =

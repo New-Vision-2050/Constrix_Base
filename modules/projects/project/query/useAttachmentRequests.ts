@@ -53,7 +53,7 @@ function resolveReceiverName(item: AttachmentRequest): string {
 }
 
 function mapToDocumentRow(item: AttachmentRequestWithFlow): DocumentRow {
-  const preview = item.attachments_preview ?? item.items ?? [];
+  const preview = item.items ?? item.attachments_preview ?? [];
   const firstFile = preview[0];
   const docCount =
     preview.length > 0 ? preview.length : (item.statistics?.total_items ?? 0);

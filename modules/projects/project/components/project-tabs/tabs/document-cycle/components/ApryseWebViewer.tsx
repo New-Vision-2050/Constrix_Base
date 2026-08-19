@@ -12,6 +12,7 @@ import type {
   WebViewerInstance,
   WebViewerOptions,
 } from "@pdftron/webviewer";
+import { fetchStampAsDataUrl } from "../attachmentActions";
 
 const WEBVIEWER_PATH = "/webviewer";
 
@@ -176,6 +177,25 @@ async function toBlob(data: ArrayBuffer | Blob): Promise<Blob> {
   return new Blob([data], { type: "application/pdf" });
 }
 
+/** Registers the project stamp in Apryse Standard Stamps (first in the list). */
+async function registerProjectStampInApryse(
+  instance: WebViewerInstance,
+  stampUrl: string,
+): Promise<void> {
+  const { documentViewer, Tools } = instance.Core;
+  const stampTool = documentViewer.getTool(Tools.ToolNames.RUBBER_STAMP) as {
+    setStandardStamps?: (stamps: string[]) => void;
+    getDefaultStamps?: () => string[];
+  } | null;
+
+  if (!stampTool?.setStandardStamps) return;
+
+  const dataUrl = await fetchStampAsDataUrl(stampUrl);
+  const defaultStamps = stampTool.getDefaultStamps?.() ?? [];
+
+  stampTool.setStandardStamps([dataUrl, ...defaultStamps]);
+}
+
 export type ApryseWebViewerHandle = {
   exportDocumentWithAnnotations: () => Promise<Blob>;
 };
@@ -186,18 +206,21 @@ type ApryseWebViewerProps = {
   extension: string;
   fileName?: string;
   onViewerReady?: () => void;
+  /** Project stamp URL to register in Apryse Stamps panel */
+  stampUrl?: string | null;
 };
 
 export const ApryseWebViewer = forwardRef<
   ApryseWebViewerHandle,
   ApryseWebViewerProps
 >(function ApryseWebViewer(
-  { documentBuffer, extension: extRaw, fileName, onViewerReady },
+  { documentBuffer, extension: extRaw, fileName, onViewerReady, stampUrl },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<WebViewerInstance | null>(null);
   const onViewerReadyRef = useRef(onViewerReady);
+  const stampResizeCleanupRef = useRef<(() => void) | null>(null);
   onViewerReadyRef.current = onViewerReady;
 
   const ext = (extRaw || "pdf").toLowerCase();
@@ -336,6 +359,8 @@ export const ApryseWebViewer = forwardRef<
     return () => {
       cancelled = true;
       clearTimeout(initTimeout);
+      stampResizeCleanupRef.current?.();
+      stampResizeCleanupRef.current = null;
       const inst = instanceRef.current;
       instanceRef.current = null;
       if (inst) {
@@ -344,6 +369,71 @@ export const ApryseWebViewer = forwardRef<
       el.replaceChildren();
     };
   }, [documentBuffer, fileName, ext]);
+
+  // Register project stamp in Apryse Standard Stamps panel once viewer is ready.
+  useEffect(() => {
+    const instance = instanceRef.current;
+    if (!instance || status !== "ready" || !stampUrl) return;
+
+    let cancelled = false;
+
+    const setupStampResize = () => {
+      stampResizeCleanupRef.current?.();
+
+      const { annotationManager, Annotations } = instance.Core;
+      const stampTool = instance.Core.documentViewer.getTool(
+        instance.Core.Tools.ToolNames.RUBBER_STAMP,
+      ) as { getDefaultStamps?: () => string[] } | null;
+      const builtInNames = new Set(stampTool?.getDefaultStamps?.() ?? []);
+
+      const onAnnotationChanged = (
+        annots: unknown[],
+        action: string,
+        info?: { imported?: boolean },
+      ) => {
+        if (info?.imported || action !== "add") return;
+
+        for (const annot of annots) {
+          if (!(annot instanceof Annotations.StampAnnotation)) continue;
+
+          const icon = annot.Icon;
+          const isBuiltIn =
+            typeof icon === "string" && builtInNames.has(icon);
+          if (isBuiltIn) continue;
+
+          const aspect = annot.Width / annot.Height || 1;
+          annot.Height = 120;
+          annot.Width = Math.round(120 * aspect);
+          annotationManager.redrawAnnotation(annot);
+        }
+      };
+
+      annotationManager.addEventListener(
+        "annotationChanged",
+        onAnnotationChanged,
+      );
+      stampResizeCleanupRef.current = () => {
+        annotationManager.removeEventListener(
+          "annotationChanged",
+          onAnnotationChanged,
+        );
+      };
+    };
+
+    (async () => {
+      try {
+        await registerProjectStampInApryse(instance, stampUrl);
+        if (cancelled) return;
+        setupStampResize();
+      } catch (stampError) {
+        console.warn("Failed to register project stamp in Apryse:", stampError);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [stampUrl, status]);
 
   return (
     <Box

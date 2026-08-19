@@ -18,6 +18,7 @@ export const projectMessages = new MessagesGroup({
   managementsTab: projectManagementsTabMessages,
   districtsTab: projectDistrictsTabMessages,
   tabs: new MessagesGroup({
+    projectDetails: _m("Project Details", "بيانات المشروع"),
     attachments: _m("Attachments", "المرفقات"),
     documentManagement: _m("Document Management", "إدارة الوثائق"),
     documentCycle: _m("Document cycle", "دورة الوثائق"),

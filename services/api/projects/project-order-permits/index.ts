@@ -78,6 +78,12 @@ export const ProjectOrderPermitsApi = {
       { params: { order_permit_id: orderPermitId } },
     ),
 
+  downloadUdsModel: (projectId: string | number) =>
+    baseApi.get<Blob>(
+      `projects/${projectId}/order-permits/export-uds-template`,
+      { responseType: "blob" },
+    ),
+
   import: (projectId: string | number, file: File) => {
     const formData = new FormData();
     formData.append("file", file);
