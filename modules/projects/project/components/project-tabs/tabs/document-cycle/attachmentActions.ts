@@ -67,6 +67,43 @@ export async function fetchAuthenticatedFileBuffer(
   return data as ArrayBuffer;
 }
 
+/**
+ * Loads a stamp image and returns a data URL for Apryse `setStandardStamps`.
+ * Handles blob URLs, auth-protected API paths, and external storage URLs.
+ */
+export async function fetchStampAsDataUrl(rawUrl: string): Promise<string> {
+  const u = rawUrl.trim();
+  if (!u) throw new Error("Missing stamp URL");
+  if (u.startsWith("data:")) return u;
+
+  let buffer: ArrayBuffer;
+  if (u.startsWith("blob:")) {
+    const res = await fetch(u);
+    if (!res.ok) {
+      throw new Error(`Failed to load stamp (${res.status})`);
+    }
+    buffer = await res.arrayBuffer();
+  } else {
+    buffer = await fetchAuthenticatedFileBuffer(u);
+  }
+
+  const blob = new Blob([buffer]);
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (typeof result === "string" && result.startsWith("data:")) {
+        resolve(result);
+      } else {
+        reject(new Error("Failed to convert stamp to data URL"));
+      }
+    };
+    reader.onerror = () =>
+      reject(reader.error ?? new Error("Failed to read stamp image"));
+    reader.readAsDataURL(blob);
+  });
+}
+
 /** Opens the file URL for download (new tab / save). Cross-origin URLs may open in-browser instead of forcing download. */
 export function downloadAttachmentFile(file: {
   url: string;

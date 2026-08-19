@@ -17,6 +17,9 @@ export function mapAttachmentRequestFileToDocumentAttachment(entry: {
   file_url: string;
   file_type: string;
   file_size_formatted: string;
+  response_notes?: string | null;
+  responded_by?: { id: string; name: string } | null;
+  responded_at?: string | null;
 }): DocumentAttachment {
   const name = entry.file_name?.trim() || displayNameFromUrl(entry.file_url);
   return {
@@ -25,6 +28,9 @@ export function mapAttachmentRequestFileToDocumentAttachment(entry: {
     url: entry.file_url,
     type: entry.file_type,
     size: entry.file_size_formatted,
+    response_notes: entry.response_notes,
+    responded_by: entry.responded_by,
+    responded_at: entry.responded_at,
   };
 }
 

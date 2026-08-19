@@ -67,10 +67,15 @@ export default function ProjectImageUpload({
     "content-management-system.projects.addProjectForm",
   );
   const tCommon = useTranslations("common.imageUpload");
-  const [imagePreview, setImagePreview] = useState<string>("");
+  const [imagePreview, setImagePreview] = useState<string>(() =>
+    !multiple && typeof initialValue === "string" ? initialValue : "",
+  );
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [initialPreviews, setInitialPreviews] = useState<SubImageStoredValue[]>(
-    [],
+    () =>
+      multiple && Array.isArray(initialValue)
+        ? ([...initialValue] as SubImageStoredValue[])
+        : [],
   );
   const [uploadId, setUploadId] = useState<string>("");
 
