@@ -251,6 +251,14 @@ export function createTableComponent<TRow>() {
       ? props.state.columnGrouping?.columnGroupMap
       : props.columnGroupMap;
     const loadingOptions = props.loadingOptions || { rows: 5 };
+    const stickyHeader = props.stickyHeader ?? true;
+    // MUI's TableContainer sets overflow-x: auto by default, which makes the
+    // browser treat it as the nearest scrolling ancestor for position:
+    // sticky purposes — but without an explicit height it just grows to fit
+    // its content, so there's never any actual scrolling for the header to
+    // stick within. A bounded default height gives stickyHeader a real
+    // scrollport to work inside instead of silently doing nothing.
+    const maxHeight = props.maxHeight ?? (stickyHeader ? "70vh" : undefined);
 
     // Selection config
     const selectable = isUsingState
@@ -339,6 +347,30 @@ export function createTableComponent<TRow>() {
       return () => observer.disconnect();
     }, [stickyCount, measureStickyOffsets]);
 
+    // When both stickyHeader and column grouping are active, the group row
+    // and the column row must stick one below the other (not both at
+    // top: 0), so the column row's sticky offset needs the group row's
+    // rendered height — measured the same ref+ResizeObserver way as the
+    // pinned-column offsets above, since header row height is also
+    // content-driven and can change (font loading, wrapping, zoom).
+    const groupHeaderRowRef = useRef<HTMLTableRowElement | null>(null);
+    const [groupRowHeight, setGroupRowHeight] = useState(0);
+
+    useLayoutEffect(() => {
+      if (!stickyHeader || !hasAnyGroups) {
+        setGroupRowHeight(0);
+        return undefined;
+      }
+      const measure = () =>
+        setGroupRowHeight(
+          groupHeaderRowRef.current?.getBoundingClientRect().height ?? 0,
+        );
+      measure();
+      const observer = new ResizeObserver(measure);
+      if (groupHeaderRowRef.current) observer.observe(groupHeaderRowRef.current);
+      return () => observer.disconnect();
+    }, [stickyHeader, hasAnyGroups, columns, data, loading]);
+
     // minWidth stops the column from shrinking away; overflowWrap lets long
     // unbroken content (emails, IDs, URLs) break and wrap within that width
     // instead of spilling out of the cell.
@@ -358,22 +390,29 @@ export function createTableComponent<TRow>() {
       textOverflow: "ellipsis",
     };
 
-    const getStickyHeaderSx = (index: number) =>
-      index < stickyCount
-        ? {
-            position: "sticky" as const,
-            left: stickyOffsets[index] ?? 0,
-            zIndex: 3,
-            backgroundColor: isGreenTheme
-              ? "primary.main"
-              : "background.default",
-            ...stickyTextSx,
-            ...(index === stickyCount - 1 && {
-              borderRight: "1px solid",
-              borderRightColor: "divider",
-            }),
-          }
-        : undefined;
+    // A cell can be sticky on either axis independently: left-sticky (pinned
+    // column, existing behavior) and/or top-sticky (stickyHeader, new).
+    // Left-sticky cells keep zIndex 3 regardless, so a "corner" cell (both
+    // pinned and in a sticky header) still layers above plain sticky-header
+    // cells (zIndex 2) and sticky-body-column cells (zIndex 1) as the table
+    // scrolls on both axes at once.
+    const getStickyHeaderSx = (index: number, topOffset = 0) => {
+      const isLeftSticky = index < stickyCount;
+      if (!isLeftSticky && !stickyHeader) return undefined;
+      return {
+        position: "sticky" as const,
+        ...(isLeftSticky && { left: stickyOffsets[index] ?? 0 }),
+        ...(stickyHeader && { top: topOffset }),
+        zIndex: isLeftSticky ? 3 : 2,
+        backgroundColor: isGreenTheme ? "primary.main" : "background.default",
+        ...(isLeftSticky && stickyTextSx),
+        ...(isLeftSticky &&
+          index === stickyCount - 1 && {
+            borderRight: "1px solid",
+            borderRightColor: "divider",
+          }),
+      };
+    };
 
     // Row tint tokens like "action.hover"/"action.selected" are semi-
     // transparent by design (meant to overlay a solid surface) — setting one
@@ -477,6 +516,7 @@ export function createTableComponent<TRow>() {
       column: ColumnDef<TRow>,
       stickyIndex: number,
       rowSpan?: number,
+      topOffset = 0,
     ) => (
       <TableCell
         key={column.key}
@@ -489,7 +529,7 @@ export function createTableComponent<TRow>() {
         }}
         sx={{
           ...getColumnSizingSx(column),
-          ...getStickyHeaderSx(stickyIndex),
+          ...getStickyHeaderSx(stickyIndex, topOffset),
         }}
       >
         {column.sortable ? (
@@ -658,7 +698,9 @@ export function createTableComponent<TRow>() {
             </Box>
           </Alert>
         )}
-        <TableContainer>
+        <TableContainer
+          sx={maxHeight ? { maxHeight, overflow: "auto" } : undefined}
+        >
           <Table
             sx={{
               tableLayout: "auto",
@@ -679,6 +721,7 @@ export function createTableComponent<TRow>() {
             <TableHead>
               {hasAnyGroups && (
                 <TableRow
+                  ref={groupHeaderRowRef}
                   sx={{
                     ".MuiTableCell-root": {
                       fontWeight: 600,
@@ -735,6 +778,8 @@ export function createTableComponent<TRow>() {
                             renderColumnHeaderCell(
                               column,
                               (selectable ? 1 : 0) + run.startIndex + offset,
+                              undefined,
+                              groupRowHeight,
                             ),
                           )
                         : [],
