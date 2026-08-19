@@ -1,4 +1,5 @@
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
+import { isSettingShown } from "@/modules/projects/settings/utils/is-setting-shown";
 import type {
   UpdateArchiveLibrarySettingsArgs,
   UpdateContractorSettingsArgs,
@@ -8,6 +9,10 @@ import type {
   UpdateRolesAndPermissionsSettingsArgs,
   UpdateProjectSharingSettingsArgs,
   UpdateMaintenanceAndEmergenciesSettingsArgs,
+  UpdateConstructionSettingsArgs,
+  UpdateSafetyTaskSettingsArgs,
+  UpdateProjectOrderPermitSettingsArgs,
+  UpdateProjectManagementSettingsArgs,
 } from "@/services/api/projects/project-types/types/args";
 import type {
   ArchiveLibrarySettings,
@@ -18,6 +23,10 @@ import type {
   RolesAndPermissionsSettings,
   ProjectSharingSettings,
   MaintenanceAndEmergenciesSettings,
+  ConstructionSettings,
+  SafetyTaskSettings,
+  ProjectOrderPermitSettings,
+  ProjectManagementSettings,
 } from "@/services/api/projects/project-types/types/response";
 
 export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
@@ -27,8 +36,12 @@ export const BULK_TOGGLE_SUPPORTED_TABS = new Set([
   "team",
   "roles-and-permissions",
   "project-sharing",
+  "managements",
   "document-cycle",
   "maintenance-and-emergencies",
+  "constructions",
+  "safety",
+  "work-orders",
 ]);
 
 /** Tabs grouped under «أصحاب المصلحة» in schema settings (not attachments / document-cycle). */
@@ -37,6 +50,7 @@ export const STAKEHOLDER_GROUP_TAB_VALUES = [
   "team",
   "roles-and-permissions",
   "project-sharing",
+  "managements",
 ] as const;
 
 const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
@@ -52,7 +66,7 @@ const DATA_SETTINGS_KEYS: (keyof UpdateDataSettingsArgs)[] = [
 ];
 
 function isTruthySetting(v: unknown): boolean {
-  return v === true || v === 1;
+  return isSettingShown(v);
 }
 
 export function getTabBulkCheckboxState(
@@ -66,6 +80,10 @@ export function getTabBulkCheckboxState(
     rolesAndPermissions: RolesAndPermissionsSettings | null | undefined;
     projectSharing: ProjectSharingSettings | null | undefined;
     maintenanceAndEmergencies: MaintenanceAndEmergenciesSettings | null | undefined;
+    constructions: ConstructionSettings | null | undefined;
+    safety: SafetyTaskSettings | null | undefined;
+    projectOrderPermit: ProjectOrderPermitSettings | null | undefined;
+    projectManagement: ProjectManagementSettings | null | undefined;
   },
 ): { checked: boolean; indeterminate: boolean } | null {
   if (!BULK_TOGGLE_SUPPORTED_TABS.has(tabValue)) return null;
@@ -133,8 +151,44 @@ export function getTabBulkCheckboxState(
     };
   }
 
+  if (tabValue === "managements") {
+    const v = data.projectManagement?.is_shown;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
   if (tabValue === "maintenance-and-emergencies") {
     const v = data.maintenanceAndEmergencies?.is_shown;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "constructions") {
+    const v = data.constructions?.is_shown;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "safety") {
+    const v = data.safety?.is_shown;
+    if (v === undefined) return null;
+    return {
+      checked: isTruthySetting(v),
+      indeterminate: false,
+    };
+  }
+
+  if (tabValue === "work-orders") {
+    const v = data.projectOrderPermit?.is_shown;
     if (v === undefined) return null;
     return {
       checked: isTruthySetting(v),
@@ -253,11 +307,48 @@ export async function bulkToggleTabSettings(
       );
       return;
     }
+    case "managements": {
+      const payload: UpdateProjectManagementSettingsArgs = {
+        is_shown: v,
+      };
+      await ProjectTypesApi.updateProjectManagementSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
     case "maintenance-and-emergencies": {
       const payload: UpdateMaintenanceAndEmergenciesSettingsArgs = {
         is_shown: v,
       };
       await ProjectTypesApi.updateMaintenanceAndEmergenciesSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "constructions": {
+      const payload: UpdateConstructionSettingsArgs = {
+        is_shown: v,
+      };
+      await ProjectTypesApi.updateConstructionSettings(
+        projectTypeId,
+        payload,
+      );
+      return;
+    }
+    case "safety": {
+      const payload: UpdateSafetyTaskSettingsArgs = {
+        is_shown: v,
+      };
+      await ProjectTypesApi.updateSafetyTaskSettings(projectTypeId, payload);
+      return;
+    }
+    case "work-orders": {
+      const payload: UpdateProjectOrderPermitSettingsArgs = {
+        is_shown: v,
+      };
+      await ProjectTypesApi.updateProjectOrderPermitSettings(
         projectTypeId,
         payload,
       );

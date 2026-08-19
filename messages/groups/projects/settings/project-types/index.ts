@@ -18,6 +18,9 @@ export const projectTypesMessages = new MessagesGroup({
       "Maintenance & Emergencies",
       "الصيانة والطوارئ",
     ),
+    constructions: _m("Constructions", "الانشاءات"),
+    safety: _m("Safety", "السلامة"),
+    managements: _m("Managements", "الإدارات"),
   }),
   add: _m("Add", "اضافة"),
   addProjectType: new MessagesGroup({
@@ -177,5 +180,53 @@ export const projectTypesMessages = new MessagesGroup({
     ),
     loading: _m("Loading...", "جاري التحميل..."),
     siteStatusTypes: _m("Site Status Types", "أنواع حالة الموقع"),
+  }),
+  constructions: new MessagesGroup({
+    sectionTitle: _m("Constructions", "الانشاءات"),
+    showAllData: _m(
+      "Show all constructions data",
+      "إظهار جميع البيانات الخاصة بالانشاءات",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
+  safety: new MessagesGroup({
+    sectionTitle: _m("Safety", "السلامة"),
+    showAllData: _m(
+      "Show all safety data",
+      "إظهار جميع البيانات الخاصة بالسلامة",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
+  workOrders: new MessagesGroup({
+    sectionTitle: _m("Work Orders", "اوامر العمل"),
+    showAllData: _m(
+      "Show all work orders data",
+      "إظهار جميع البيانات الخاصة بأوامر العمل",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
+  }),
+  managements: new MessagesGroup({
+    sectionTitle: _m("Managements", "الإدارات"),
+    showAllData: _m(
+      "Show all managements data",
+      "إظهار جميع البيانات الخاصة بالإدارات",
+    ),
+    selectProjectType: _m(
+      "Please select a project type",
+      "الرجاء اختيار نوع مشروع",
+    ),
+    loading: _m("Loading...", "جاري التحميل..."),
   }),
 });

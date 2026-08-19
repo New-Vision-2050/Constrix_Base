@@ -15,6 +15,10 @@ import {
     UpdateRolesAndPermissionsSettingsArgs,
     UpdateProjectSharingSettingsArgs,
     UpdateMaintenanceAndEmergenciesSettingsArgs,
+    UpdateConstructionSettingsArgs,
+    UpdateSafetyTaskSettingsArgs,
+    UpdateProjectOrderPermitSettingsArgs,
+    UpdateProjectManagementSettingsArgs,
 } from "./types/args";
 import {
     CreateSecondLevelProjectTypeResponse,
@@ -44,6 +48,14 @@ import {
     UpdateProjectSharingSettingsResponse,
     GetMaintenanceAndEmergenciesSettingsResponse,
     UpdateMaintenanceAndEmergenciesSettingsResponse,
+    GetConstructionSettingsResponse,
+    UpdateConstructionSettingsResponse,
+    GetSafetyTaskSettingsResponse,
+    UpdateSafetyTaskSettingsResponse,
+    GetProjectOrderPermitSettingsResponse,
+    UpdateProjectOrderPermitSettingsResponse,
+    GetProjectManagementSettingsResponse,
+    UpdateProjectManagementSettingsResponse,
 } from "./types/response";
 
 export const ProjectTypesApi = {
@@ -206,6 +218,54 @@ export const ProjectTypesApi = {
     ) =>
         baseApi.put<UpdateMaintenanceAndEmergenciesSettingsResponse>(
             `project-types/${projectTypeId}/maintenance-emergency-settings`,
+            args,
+        ),
+    getConstructionSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetConstructionSettingsResponse>(
+            `project-types/${projectTypeId}/construction-settings`,
+        ),
+    updateConstructionSettings: (
+        projectTypeId: number | string,
+        args: UpdateConstructionSettingsArgs,
+    ) =>
+        baseApi.put<UpdateConstructionSettingsResponse>(
+            `project-types/${projectTypeId}/construction-settings`,
+            args,
+        ),
+    getSafetyTaskSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetSafetyTaskSettingsResponse>(
+            `project-types/${projectTypeId}/safety-task-settings`,
+        ),
+    updateSafetyTaskSettings: (
+        projectTypeId: number | string,
+        args: UpdateSafetyTaskSettingsArgs,
+    ) =>
+        baseApi.put<UpdateSafetyTaskSettingsResponse>(
+            `project-types/${projectTypeId}/safety-task-settings`,
+            args,
+        ),
+    getProjectOrderPermitSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetProjectOrderPermitSettingsResponse>(
+            `project-types/${projectTypeId}/project-order-permit-settings`,
+        ),
+    updateProjectOrderPermitSettings: (
+        projectTypeId: number | string,
+        args: UpdateProjectOrderPermitSettingsArgs,
+    ) =>
+        baseApi.put<UpdateProjectOrderPermitSettingsResponse>(
+            `project-types/${projectTypeId}/project-order-permit-settings`,
+            args,
+        ),
+    getProjectManagementSettings: (projectTypeId: number | string) =>
+        baseApi.get<GetProjectManagementSettingsResponse>(
+            `project-types/${projectTypeId}/project-management-settings`,
+        ),
+    updateProjectManagementSettings: (
+        projectTypeId: number | string,
+        args: UpdateProjectManagementSettingsArgs,
+    ) =>
+        baseApi.put<UpdateProjectManagementSettingsResponse>(
+            `project-types/${projectTypeId}/project-management-settings`,
             args,
         ),
 };
