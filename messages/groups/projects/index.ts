@@ -28,7 +28,7 @@ export const projectMessages = new MessagesGroup({
     documentRequirements: _m("Document Requirements", "متطلبات الوثائق"),
     stakeholders: _m("Stakeholders", "أصحاب المصلحة"),
     concernedParties: _m("Concerned parties", "المعنيين"),
-    staff: _m("Staff", "الكادر"),
+    staff: _m("Cadre", "الكادر"),
     contractors: _m("Contractors", "المقاولين"),
     rolesAndPermissions: _m("Roles and permissions", "الأدوار والصلاحيات"),
     sharedEntities: _m("Shared entities", "الجهات المشاركة"),
