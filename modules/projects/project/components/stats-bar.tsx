@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   Typography,
@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { ZoomIn } from "lucide-react";
+import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { useProjectContractors } from "@/modules/projects/project/query/useProjectContractors";
 
 function RingBadge({
   value,
@@ -48,23 +50,23 @@ function RingBadge({
 
 function ContractorRow({
   name,
-  avatarSrc,
   ringColor,
 }: {
   name: string;
-  avatarSrc: string;
   ringColor: string;
 }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <Avatar
-        src={avatarSrc}
         sx={{
           width: 32,
           height: 32,
           border: `2px solid ${ringColor}`,
+          fontSize: 12,
         }}
-      />
+      >
+        {name.charAt(0)}
+      </Avatar>
       <Typography sx={{ fontSize: 11, color: "text.secondary" }}>{name}</Typography>
     </Box>
   );
@@ -101,13 +103,33 @@ function WavyLineChart({ color }: { color: string }) {
   );
 }
 
-// ─── Mini Bar Chart Data ────────────────────────────────────────────────
-const barChartLabels = ["الاصايل", "الهاجدية", "الانوار"];
-const barSeries1 = [700, 450, 600]; // red/orange bars
-const barSeries2 = [500, 350, 500]; // yellow bars
+const MAX_VISIBLE_CONTRACTORS = 3;
 
 export default function ProjectStatsBar() {
   const { palette } = useTheme();
+  const { projectId } = useProject();
+  const { data: contractors = [] } = useProjectContractors(projectId);
+
+  const contractorRingColors = [
+    palette.warning.main,
+    palette.secondary.main,
+    palette.text.secondary,
+  ];
+
+  const visibleContractors = useMemo(
+    () => contractors.slice(0, MAX_VISIBLE_CONTRACTORS),
+    [contractors],
+  );
+
+  const barChartLabels = useMemo(
+    () => visibleContractors.map((contractor) => contractor.name),
+    [visibleContractors],
+  );
+
+  const zeroBarSeries = useMemo(
+    () => barChartLabels.map(() => 0),
+    [barChartLabels],
+  );
 
   return (
     <Box
@@ -149,7 +171,7 @@ export default function ProjectStatsBar() {
               <Typography
                 sx={{ fontSize: 22, fontWeight: 700, color: "text.primary", lineHeight: 1 }}
               >
-                100,000
+                0
               </Typography>
               <Typography sx={{ fontSize: 11, color: "text.secondary" }}>ريال</Typography>
             </Box>
@@ -183,7 +205,7 @@ export default function ProjectStatsBar() {
               <Typography
                 sx={{ fontSize: 22, fontWeight: 700, color: "text.primary", lineHeight: 1 }}
               >
-                15,000
+                0
               </Typography>
               <Typography sx={{ fontSize: 11, color: "text.secondary" }}>ريال</Typography>
             </Box>
@@ -192,9 +214,9 @@ export default function ProjectStatsBar() {
       </Stack>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, minWidth: 220 }}>
-        <RingBadge value="500" label="المفوتر" ringColor={palette.text.secondary} />
-        <RingBadge value="1000" label="المسدد" ringColor={palette.warning.main} />
-        <RingBadge value="500" label="المتبقي" ringColor={palette.primary.main} />
+        <RingBadge value="0" label="المفوتر" ringColor={palette.text.secondary} />
+        <RingBadge value="0" label="المسدد" ringColor={palette.warning.main} />
+        <RingBadge value="0" label="المتبقي" ringColor={palette.primary.main} />
       </Box>
 
       <Box sx={{ minWidth: 160 }}>
@@ -210,25 +232,17 @@ export default function ProjectStatsBar() {
             المقاولين
           </Typography>
           <Typography sx={{ fontSize: 18, fontWeight: 700, color: "text.primary" }}>
-            4
+            {contractors.length}
           </Typography>
         </Box>
         <Stack spacing={0.8}>
-          <ContractorRow
-            name="الاصايل"
-            avatarSrc="https://i.pravatar.cc/40?img=11"
-            ringColor={palette.warning.main}
-          />
-          <ContractorRow
-            name="الهاجدية"
-            avatarSrc="https://i.pravatar.cc/40?img=32"
-            ringColor={palette.secondary.main}
-          />
-          <ContractorRow
-            name="الانوار"
-            avatarSrc="https://i.pravatar.cc/40?img=53"
-            ringColor={palette.text.secondary}
-          />
+          {visibleContractors.map((contractor, index) => (
+            <ContractorRow
+              key={contractor.id}
+              name={contractor.name}
+              ringColor={contractorRingColors[index % contractorRingColors.length]}
+            />
+          ))}
         </Stack>
       </Box>
 
@@ -250,7 +264,7 @@ export default function ProjectStatsBar() {
         <Typography
           sx={{ fontSize: 32, fontWeight: 700, color: "text.primary", lineHeight: 1, mt: -0.5 }}
         >
-          900
+          0
         </Typography>
       </Box>
 
@@ -285,8 +299,8 @@ export default function ProjectStatsBar() {
               },
             ]}
             series={[
-              { data: barSeries1, color: palette.error.main },
-              { data: barSeries2, color: palette.warning.main },
+              { data: zeroBarSeries, color: palette.error.main },
+              { data: zeroBarSeries, color: palette.warning.main },
             ]}
             width={210}
             height={120}
