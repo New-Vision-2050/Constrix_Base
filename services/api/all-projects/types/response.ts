@@ -119,6 +119,38 @@ export interface MaintenanceEmergencySetting {
   updated_at: string;
 }
 
+export interface ConstructionSetting {
+  id: number;
+  project_type_id: number;
+  is_shown: boolean | number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SafetyTaskSetting {
+  id: number;
+  project_type_id: number;
+  is_shown: boolean | number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectOrderPermitSetting {
+  id: number;
+  project_type_id: number;
+  is_shown: boolean | number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectManagementSetting {
+  id: number;
+  project_type_id: number;
+  is_shown: boolean | number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ProjectPermissions {
   project_data_setting: ProjectDataSetting | null;
   attachment_contract_setting: AttachmentSetting | null;
@@ -131,6 +163,10 @@ export interface ProjectPermissions {
   roles_and_permissions_setting: ContractSetting | null;
   project_sharing_setting: ContractSetting | null;
   maintenance_emergency_setting: MaintenanceEmergencySetting | null;
+  construction_setting: ConstructionSetting | null;
+  safety_task_setting: SafetyTaskSetting | null;
+  project_order_permit_setting: ProjectOrderPermitSetting | null;
+  project_management_setting: ProjectManagementSetting | null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────

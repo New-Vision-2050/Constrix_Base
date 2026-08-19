@@ -45,11 +45,14 @@ import ContractorsView from "../contractors";
 import TeamView from "../team";
 import RolesAndPermissionsView from "../roles-and-permissions";
 import ProjectSharingView from "../project-sharing";
+import ManagementsView from "../managements";
 import DocumentCycleView from "../document-cycle";
 import WorkOrdersView from "../work-orders";
 import FinancialView from "../financial";
 import ContractManagementView from "../contract-management";
 import MaintenanceAndEmergenciesView from "../maintenance-and-emergencies";
+import ConstructionsView from "../constructions";
+import SafetyView from "../safety";
 import { SettingsTabItemProps } from "../../types";
 import type { ProjectSettingsTab } from "../../../../constants/current-tabs";
 import { APP_ICONS } from "@/constants/icons";
@@ -58,6 +61,27 @@ function isStakeholderSchemaTab(tab: ProjectSettingsTab): boolean {
   return (STAKEHOLDER_GROUP_TAB_VALUES as readonly string[]).includes(
     tab.value,
   );
+}
+
+function isManagementsSchema(schema: { id: number; name: string }): boolean {
+  const name = schema.name.trim().toLowerCase();
+  return (
+    name.includes("إدارات") ||
+    name.includes("الادارات") ||
+    name.includes("management") ||
+    name.includes("managements")
+  );
+}
+
+function isSettingsTabEnabled(
+  tab: ProjectSettingsTab,
+  schemas: { id: number; name: string }[],
+): boolean {
+  if (schemas.some((schema) => schema.id === tab.schema_id)) return true;
+  if (tab.value === "managements") {
+    return schemas.some(isManagementsSchema);
+  }
+  return false;
 }
 
 function renderTabContent(tab: string, props: SettingsTabItemProps) {
@@ -76,6 +100,8 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
       return <RolesAndPermissionsView {...props} />;
     case "project-sharing":
       return <ProjectSharingView {...props} />;
+    case "managements":
+      return <ManagementsView {...props} />;
     case "document-cycle":
       return <DocumentCycleView {...props} />;
     case "work-orders":
@@ -86,6 +112,10 @@ function renderTabContent(tab: string, props: SettingsTabItemProps) {
       return <ContractManagementView {...props} />;
     case "maintenance-and-emergencies":
       return <MaintenanceAndEmergenciesView {...props} />;
+    case "constructions":
+      return <ConstructionsView {...props} />;
+    case "safety":
+      return <SafetyView {...props} />;
     default:
       return null;
   }
@@ -159,7 +189,7 @@ const TabWithCheckbox = ({
 }) => (
   <Tab
     value={value}
-    sx={{ py: 0, opacity: 1 }}
+    sx={{ py: 0, opacity: 1, flexShrink: 0, maxWidth: "none", minWidth: "auto" }}
     onClick={onClick}
     label={
       <div className="flex items-center">
@@ -212,13 +242,28 @@ export default function SchemaLevelTabs({
 
   const schemas = useMemo(() => data ?? [], [data]);
 
-  const filteredTabs = useMemo(
-    () =>
-      allTabs.filter((tab) =>
-        schemas.some((schema) => schema.id === tab.schema_id),
-      ),
-    [schemas, allTabs],
-  );
+  const filteredTabs = useMemo(() => {
+    const tabs = allTabs.filter((tab) => isSettingsTabEnabled(tab, schemas));
+
+    const hasStakeholderTab = tabs.some((tab) => isStakeholderSchemaTab(tab));
+    const hasManagementsTab = tabs.some((tab) => tab.value === "managements");
+
+    if (hasStakeholderTab && !hasManagementsTab) {
+      const managementsTab = allTabs.find((tab) => tab.value === "managements");
+      if (managementsTab) {
+        const sharingIndex = tabs.findIndex(
+          (tab) => tab.value === "project-sharing",
+        );
+        if (sharingIndex >= 0) {
+          tabs.splice(sharingIndex + 1, 0, managementsTab);
+        } else {
+          tabs.push(managementsTab);
+        }
+      }
+    }
+
+    return tabs;
+  }, [schemas, allTabs]);
 
   const thirdLevelId = selectedSchema?.id ?? null;
 
@@ -344,6 +389,61 @@ export default function SchemaLevelTabs({
     retry: false,
   });
 
+  const constructionSettingsQuery = useQuery({
+    queryKey: ["construction-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getConstructionSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "constructions"),
+    retry: false,
+  });
+
+  const safetyTaskSettingsQuery = useQuery({
+    queryKey: ["safety-task-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getSafetyTaskSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null && filteredTabs.some((t) => t.value === "safety"),
+    retry: false,
+  });
+
+  const projectOrderPermitSettingsQuery = useQuery({
+    queryKey: ["project-order-permit-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getProjectOrderPermitSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "work-orders"),
+    retry: false,
+  });
+
+  const projectManagementSettingsQuery = useQuery({
+    queryKey: ["project-management-settings", thirdLevelId],
+    queryFn: async () => {
+      const response = await ProjectTypesApi.getProjectManagementSettings(
+        thirdLevelId!,
+      );
+      return response.data.payload;
+    },
+    enabled:
+      thirdLevelId != null &&
+      filteredTabs.some((t) => t.value === "managements"),
+    retry: false,
+  });
+
   const bulkSettingsData = useMemo(
     () => ({
       dataSettings: dataSettingsQuery.data,
@@ -354,6 +454,10 @@ export default function SchemaLevelTabs({
       rolesAndPermissions: rolesAndPermissionsSettingsQuery.data,
       projectSharing: projectSharingSettingsQuery.data,
       maintenanceAndEmergencies: maintenanceAndEmergenciesSettingsQuery.data,
+      constructions: constructionSettingsQuery.data,
+      safety: safetyTaskSettingsQuery.data,
+      projectOrderPermit: projectOrderPermitSettingsQuery.data,
+      projectManagement: projectManagementSettingsQuery.data,
     }),
     [
       dataSettingsQuery.data,
@@ -364,6 +468,10 @@ export default function SchemaLevelTabs({
       rolesAndPermissionsSettingsQuery.data,
       projectSharingSettingsQuery.data,
       maintenanceAndEmergenciesSettingsQuery.data,
+      constructionSettingsQuery.data,
+      safetyTaskSettingsQuery.data,
+      projectOrderPermitSettingsQuery.data,
+      projectManagementSettingsQuery.data,
     ],
   );
 
@@ -383,8 +491,16 @@ export default function SchemaLevelTabs({
         return rolesAndPermissionsSettingsQuery.isLoading;
       case "project-sharing":
         return projectSharingSettingsQuery.isLoading;
+      case "managements":
+        return projectManagementSettingsQuery.isLoading;
       case "maintenance-and-emergencies":
         return maintenanceAndEmergenciesSettingsQuery.isLoading;
+      case "constructions":
+        return constructionSettingsQuery.isLoading;
+      case "safety":
+        return safetyTaskSettingsQuery.isLoading;
+      case "work-orders":
+        return projectOrderPermitSettingsQuery.isLoading;
       default:
         return false;
     }
@@ -429,6 +545,18 @@ export default function SchemaLevelTabs({
       });
       await queryClient.invalidateQueries({
         queryKey: ["maintenance-emergency-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["construction-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["safety-task-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["project-order-permit-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["project-management-settings", thirdLevelId],
       });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -567,6 +695,18 @@ export default function SchemaLevelTabs({
       await queryClient.invalidateQueries({
         queryKey: ["maintenance-emergency-settings", thirdLevelId],
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["construction-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["safety-task-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["project-order-permit-settings", thirdLevelId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["project-management-settings", thirdLevelId],
+      });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       toast.error(
@@ -657,11 +797,23 @@ export default function SchemaLevelTabs({
               parentId={parentId}
             />
           </Grid>
-          <Grid size={9}>
+          <Grid size={9} sx={{ minWidth: 0 }}>
             {selectedSchema && !isLoading && effectiveTabValue && data && (
               <div className="space-y-4">
                 <Paper>
-                  <Tabs value={mainTabsValue}>
+                  <Tabs
+                    value={mainTabsValue}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    allowScrollButtonsMobile
+                    sx={{
+                      width: "100%",
+                      "& .MuiTab-root": {
+                        flexShrink: 0,
+                        maxWidth: "none",
+                      },
+                    }}
+                  >
                     {mainRowItems.map((item) => {
                       if (item.kind === "group") {
                         return (
@@ -728,7 +880,19 @@ export default function SchemaLevelTabs({
                       borderColor: "divider",
                     }}
                   >
-                    <Tabs value={effectiveTabValue}>
+                    <Tabs
+                      value={effectiveTabValue}
+                      variant="scrollable"
+                      scrollButtons="auto"
+                      allowScrollButtonsMobile
+                      sx={{
+                        width: "100%",
+                        "& .MuiTab-root": {
+                          flexShrink: 0,
+                          maxWidth: "none",
+                        },
+                      }}
+                    >
                       {stakeholderTabsInSchema.map((tab) => {
                         const supportsBulk = BULK_TOGGLE_SUPPORTED_TABS.has(
                           tab.value,

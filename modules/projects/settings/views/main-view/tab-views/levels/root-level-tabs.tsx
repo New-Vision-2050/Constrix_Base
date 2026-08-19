@@ -44,6 +44,16 @@ export default function RootLevelTabs() {
                   const root = roots.find((r) => r.id === value);
                   if (root) setSelectedRoot(root);
                 }}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                sx={{
+                  width: "100%",
+                  "& .MuiTab-root": {
+                    flexShrink: 0,
+                    maxWidth: "none",
+                  },
+                }}
               >
                 {roots.map((root) => (
                   <Tab key={root.id} label={root.name} value={root.id} />
