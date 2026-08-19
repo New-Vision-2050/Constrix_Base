@@ -290,17 +290,17 @@ export default function AttendanceSettingsSection({
         );
 
   return (
-    <section className="relative rounded-xl border border-primary/90 mt-4 px-5 pb-6 pt-5 shadow-sm backdrop-blur-[2px] sm:px-6 sm:pb-7 sm:pt-6">
+    <section dir={isRtl ? "rtl" : "ltr"} className="relative rounded-xl border border-primary/90 mt-4 px-5 pb-6 pt-5 shadow-sm backdrop-blur-[2px] sm:px-6 sm:pb-7 sm:pt-6">
       {sectionToolbar != null ? (
         <SectionBorderActions>{sectionToolbar}</SectionBorderActions>
       ) : null}
 
-      <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground" dir={isRtl ? "rtl" : "ltr"}>
+      <p className="mb-6 text-start text-sm font-semibold leading-snug tracking-tight text-foreground">
         {t("attendanceSettingsTitle")}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-end flex flex-col justify-center">
+        <div className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-start flex flex-col justify-center">
           <p className="text-3xl font-semibold text-primary leading-none">
             {shiftsQuery.isLoading
               ? "—"
@@ -312,7 +312,7 @@ export default function AttendanceSettingsSection({
           return (
             <div
               key={option.id}
-              className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-end flex flex-col justify-center"
+              className="bg-background border border-border rounded-lg min-h-[92px] px-4 py-3 text-start flex flex-col justify-center"
             >
               {isEditing ? (
                 <div className="flex items-center gap-2 justify-start">
@@ -324,7 +324,7 @@ export default function AttendanceSettingsSection({
                     onChange={(e) =>
                       handleAmountChange(option.id, e.target.value)
                     }
-                    className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-end outline-none focus:border-primary disabled:opacity-50"
+                    className="h-10 w-16 rounded-md border border-border bg-background px-2 text-lg font-semibold text-primary text-start outline-none focus:border-primary disabled:opacity-50"
                   />
                   <span className="text-lg font-semibold text-primary">
                     {t(`${option.id}_unit`)}

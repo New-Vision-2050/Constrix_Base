@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddPeriodsDialog from "./AddPeriodsDialog";
 import DailyTimingSettings from "./DailyTimingSettings";
@@ -21,6 +23,10 @@ type PeriodsDialogState =
   | { mode: "weekly"; intent: "add" | "edit" };
 
 export default function TimingSettingsSection() {
+  const tShifts = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantSettings.shifts",
+  );
+  const isRtl = useIsRtl();
   const [weeklyDays, setWeeklyDays] = useState<string[]>(["sunday"]);
   const [weeklyPeriodRows, setWeeklyPeriodRows] =
     useState<DayPeriodRow[]>(INITIAL_WEEKLY_ROWS);
@@ -55,11 +61,11 @@ export default function TimingSettingsSection() {
   }, [periodsDialog, dayPeriodRows, weeklyPeriodRows]);
 
   const dialogTitle = useMemo(() => {
-    if (!periodsDialog) return "اضافة الفترات";
+    if (!periodsDialog) return tShifts("dialogAddPeriods");
     return periodsDialog.intent === "edit"
-      ? "تعديل الفترات"
-      : "اضافة الفترات";
-  }, [periodsDialog]);
+      ? tShifts("dialogEditPeriods")
+      : tShifts("dialogAddPeriods");
+  }, [periodsDialog, tShifts]);
 
   const handleSavePeriods = (rows: DayPeriodRow[]) => {
     if (!periodsDialog) return;
@@ -76,19 +82,19 @@ export default function TimingSettingsSection() {
 
   return (
     <>
-      <Tabs defaultValue="weekly" dir="rtl" className="gap-4">
+      <Tabs defaultValue="weekly" dir={isRtl ? "rtl" : "ltr"} className="gap-4">
         <TabsList className="h-auto p-1 bg-transparent border border-border rounded-xl mx-auto justify-center gap-2">
           <TabsTrigger
             value="daily"
             className="rounded-lg px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
           >
-            يومي
+            {tShifts("modeDaily")}
           </TabsTrigger>
           <TabsTrigger
             value="weekly"
             className="rounded-lg px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
           >
-            اسبوعي
+            {tShifts("modeWeekly")}
           </TabsTrigger>
         </TabsList>
 

@@ -71,6 +71,14 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
         attendanceRegistrationRequired: _m("Attendance registration method is required", "تسجيل الحضور و الانصراف من خلال يجب أن يختار"),
         location: _m("Location", "الموقع"),
         duplicateDayError: _m("This day has already been selected", "هذا اليوم تم اختياره بالفعل"),
+        nextDayConflict: _m(
+          "Cannot extend to the next day ({nextDayName}) because it already has work periods that may conflict with the extended period",
+          "لا يمكن التمديد لليوم التالي ({nextDayName}) لأنه يحتوي على فترات عمل قد تتعارض مع الفترة الممتدة",
+        ),
+        extendsToNextDaySplitMsg: _m(
+          "The period has extended to the next day: {currentDay}: [{startTime} - 24:00], {nextDay}: [00:00 - {endTime}]",
+          "لقد أمتدت الفترة الى اليوم التالي لتصبح: {currentDay}: [{startTime} - 24:00], {nextDay}: [00:00 - {endTime}]",
+        ),
         minute: _m("minute", "دقيقة"),
         hour: _m("hour", "ساعة"),
         day: _m("day", "يوم")
