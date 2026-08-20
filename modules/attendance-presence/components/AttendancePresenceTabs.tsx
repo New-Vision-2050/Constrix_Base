@@ -112,6 +112,15 @@ export default function AttendancePresenceTabs() {
     return activeMainTab?.content ?? null;
   }, [activeMainTab, nestedTabs, activeNestedTab]);
 
+  const activeContentKey = useMemo(() => {
+    if (nestedTabs?.length) {
+      const sub =
+        nestedTabs.find((tab) => tab.id === activeNestedTab) ?? nestedTabs[0];
+      return sub.id;
+    }
+    return activeMainTab?.id ?? String(value);
+  }, [activeMainTab, nestedTabs, activeNestedTab, value]);
+
   const showNestedTabsRow = Boolean(nestedTabs && nestedTabs.length > 0);
 
   return (
@@ -181,7 +190,9 @@ export default function AttendancePresenceTabs() {
         </Paper>
       )}
 
-      <div className="pt-4">{activeContent}</div>
+      <div key={activeContentKey} className="pt-4">
+        {activeContent}
+      </div>
     </div>
   );
 }

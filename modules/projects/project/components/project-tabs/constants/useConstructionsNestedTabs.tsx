@@ -23,14 +23,19 @@ export function useConstructionsNestedTabs(
     const departmentTabs: SystemTab[] = departments.map((department) => ({
       id: `${prefix}-tab-department-${department.id}`,
       title: getProjectOrderPermitDepartmentLabel(department),
-      content: <WorkOrdersDepartmentTab departmentId={department.id} />,
+      content: (
+        <WorkOrdersDepartmentTab
+          key={department.id}
+          departmentId={department.id}
+        />
+      ),
     }));
 
     const permitsTab: SystemTab = {
       id: `${prefix}-tab-work-orders`,
       title: tProject("tabs.workOrders"),
       icon: <ClipboardList className="w-4 h-4" />,
-      content: <WorkOrdersTab isEditable />,
+      content: <WorkOrdersTab key="permits" isEditable />,
     };
 
     return [...departmentTabs, permitsTab];

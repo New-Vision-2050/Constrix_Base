@@ -26,8 +26,10 @@ export default function DocumentCycleTab() {
         <Tab value="indicators" label={t("tabs.indicators")} />
       </Tabs>
 
-      {activeTab === "requests" && <AttachmentRequestsTable />}
-      {activeTab === "indicators" && <AttachmentRequestChartsView />}
+      <Box key={activeTab}>
+        {activeTab === "requests" && <AttachmentRequestsTable />}
+        {activeTab === "indicators" && <AttachmentRequestChartsView />}
+      </Box>
     </Box>
   );
 }

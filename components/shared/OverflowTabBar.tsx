@@ -21,7 +21,7 @@ import {
 import { alpha, type SxProps, type Theme } from "@mui/material/styles";
 import { PlusIcon } from "lucide-react";
 import { ChevronDown } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 import CustomMenu from "@/components/headless/custom-menu";
 
 const OVERFLOW_BTN_WIDTH = 44;
@@ -165,8 +165,7 @@ export default function OverflowTabBar<T extends { id: number }>({
   paperSx,
   overflowTriggerAriaLabel,
 }: OverflowTabBarProps<T>) {
-  const locale = useLocale();
-  const isRtl = locale === "ar";
+  const isRtl = useIsRtl();
   const paperRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const paperWidth = useContainerWidth(paperRef);
@@ -208,6 +207,13 @@ export default function OverflowTabBar<T extends { id: number }>({
     () => tabs.filter((_, index) => !visibleSet.has(index)),
     [tabs, visibleSet],
   );
+
+  const visibleBarTabs = useMemo(
+    () => tabs.filter((_, index) => visibleSet.has(index)),
+    [tabs, visibleSet],
+  );
+
+  const barDirection = isRtl ? "rtl" : "ltr";
 
   const handleTabSelect = useCallback(
     (id: number) => {
@@ -464,28 +470,27 @@ export default function OverflowTabBar<T extends { id: number }>({
     return null;
   };
 
+  const sideControlRow = showSideControl ? (
+    <Box sx={{ flexShrink: 0 }}>{renderSideControl()}</Box>
+  ) : null;
+
   const tabsRow = (
     <Box
+      dir={barDirection}
       sx={{
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "flex-end",
+        justifyContent: "flex-start",
         flex: 1,
         minWidth: 0,
         gap: `${TAB_GAP}px`,
         overflow: "hidden",
       }}
     >
-      {tabs
-        .filter((_, index) => visibleSet.has(index))
-        .map((tab) => renderTabButton(tab, "bar"))}
+      {visibleBarTabs.map((tab) => renderTabButton(tab, "bar"))}
     </Box>
   );
-
-  const sideControlRow = showSideControl ? (
-    <Box sx={{ flexShrink: 0 }}>{renderSideControl()}</Box>
-  ) : null;
 
   return (
     <Paper
@@ -508,8 +513,17 @@ export default function OverflowTabBar<T extends { id: number }>({
           direction: "ltr",
         }}
       >
-        {tabsRow}
-        {sideControlRow}
+        {isRtl ? (
+          <>
+            {tabsRow}
+            {sideControlRow}
+          </>
+        ) : (
+          <>
+            {tabsRow}
+            {sideControlRow}
+          </>
+        )}
       </Box>
 
       <Box

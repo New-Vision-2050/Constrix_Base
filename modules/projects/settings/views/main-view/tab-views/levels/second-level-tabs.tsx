@@ -24,6 +24,7 @@ import { Settings } from "@mui/icons-material";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import OverflowTabBar from "@/components/shared/OverflowTabBar";
+import { useIsRtl } from "@/hooks/use-is-rtl";
 
 interface SecondLevelTabsProps {
   parentId: number;
@@ -71,6 +72,7 @@ function EditProjectTypeDialogTrigger({
 
 export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
   const t = useTranslations("Projects.Settings.projectTypes");
+  const isRtl = useIsRtl();
   const [selectedItem, setSelectedItem] = useState<PRJ_ProjectType | null>(
     null,
   );
@@ -108,6 +110,7 @@ export default function SecondLevelTabs({ parentId }: SecondLevelTabsProps) {
 
     return (
       <Box
+        dir={isRtl ? "rtl" : "ltr"}
         sx={{
           display: "flex",
           alignItems: "center",
