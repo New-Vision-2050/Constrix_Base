@@ -21,14 +21,14 @@ export default function ProjectDetailsPreviewMode() {
         <PreviewTextField
           valid={true}
           label="الطاقة السوقية"
-          value="100,000 ريال"
+          value=""
         />
       </div>
       <div className="p-2">
         <PreviewTextField
           valid={true}
           label="تاريخ العقد"
-          value="01/01/2024"
+          value=""
           type="date"
         />
       </div>
@@ -36,7 +36,7 @@ export default function ProjectDetailsPreviewMode() {
         <PreviewTextField
           valid={true}
           label="تاريخ التسليم"
-          value="30/09/2025"
+          value=""
           type="date"
         />
       </div>
