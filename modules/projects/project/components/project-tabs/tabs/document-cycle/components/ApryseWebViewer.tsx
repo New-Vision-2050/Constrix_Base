@@ -181,6 +181,25 @@ async function toBlob(data: ArrayBuffer | Blob): Promise<Blob> {
   return new Blob([data], { type: "application/pdf" });
 }
 
+/** Registers the project stamp in Apryse Standard Stamps (first in the list). */
+async function registerProjectStampInApryse(
+  instance: WebViewerInstance,
+  stampUrl: string,
+): Promise<void> {
+  const { documentViewer, Tools } = instance.Core;
+  const stampTool = documentViewer.getTool(Tools.ToolNames.RUBBER_STAMP) as {
+    setStandardStamps?: (stamps: string[]) => void;
+    getDefaultStamps?: () => string[];
+  } | null;
+
+  if (!stampTool?.setStandardStamps) return;
+
+  const dataUrl = await fetchStampAsDataUrl(stampUrl);
+  const defaultStamps = stampTool.getDefaultStamps?.() ?? [];
+
+  stampTool.setStandardStamps([dataUrl, ...defaultStamps]);
+}
+
 export type ApryseWebViewerHandle = {
   exportDocumentWithAnnotations: () => Promise<Blob>;
 };
