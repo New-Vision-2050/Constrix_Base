@@ -147,6 +147,8 @@ function passesProjectTypeVisibility(
       );
     case "project-tab-share":
       return permissions.project_sharing_setting?.is_all_data_visible === 1;
+    case "project-tab-managements":
+      return isSettingShown(permissions.project_management_setting?.is_shown);
     case "project-tab-document-cycle":
     case "project-tab-sequence-of-procedures":
     case "project-tab-document-requirements":
@@ -157,7 +159,17 @@ function passesProjectTypeVisibility(
       return isSettingShown(
         permissions.maintenance_emergency_setting?.is_shown,
       );
+    case CONSTRUCTIONS_GROUP_ID:
+    case "project-tab-work-orders":
+      return isSettingShown(permissions.construction_setting?.is_shown);
+    case "project-tab-work-orders-top":
+      return isSettingShown(permissions.project_order_permit_setting?.is_shown);
+    case "project-tab-safety":
+      return isSettingShown(permissions.safety_task_setting?.is_shown);
     default:
+      if (tabId.startsWith("project-tab-department-")) {
+        return isSettingShown(permissions.construction_setting?.is_shown);
+      }
       return true;
   }
 }
@@ -342,11 +354,31 @@ export function useProjectTabsList(): SystemTab[] {
 
     if (stakeholdersTab) topLevel.push(stakeholdersTab);
 
-    topLevel.push(workOrdersTopTab);
+    if (
+      shouldShowTopLevelTab(
+        "project-tab-work-orders-top",
+        permissions,
+        projectId,
+        flatPermissionsFetched,
+        flatPerms,
+      )
+    ) {
+      topLevel.push(workOrdersTopTab);
+    }
 
     if (constructionsTab) topLevel.push(constructionsTab);
 
-    topLevel.push(safetyTab);
+    if (
+      shouldShowTopLevelTab(
+        "project-tab-safety",
+        permissions,
+        projectId,
+        flatPermissionsFetched,
+        flatPerms,
+      )
+    ) {
+      topLevel.push(safetyTab);
+    }
 
     if (documentManagementTab) topLevel.push(documentManagementTab);
 

@@ -186,3 +186,59 @@ export interface GetMaintenanceAndEmergenciesSettingsResponse extends ApiBaseRes
 
 export interface UpdateMaintenanceAndEmergenciesSettingsResponse extends ApiBaseResponse<MaintenanceAndEmergenciesSettings> {
 }
+
+export interface ConstructionSettings {
+    id: number;
+    project_type_id: number;
+    is_shown: boolean | number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetConstructionSettingsResponse extends ApiBaseResponse<ConstructionSettings> {
+}
+
+export interface UpdateConstructionSettingsResponse extends ApiBaseResponse<ConstructionSettings> {
+}
+
+export interface SafetyTaskSettings {
+    id: number;
+    project_type_id: number;
+    is_shown: boolean | number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetSafetyTaskSettingsResponse extends ApiBaseResponse<SafetyTaskSettings> {
+}
+
+export interface UpdateSafetyTaskSettingsResponse extends ApiBaseResponse<SafetyTaskSettings> {
+}
+
+export interface ProjectOrderPermitSettings {
+    id: number;
+    project_type_id: number;
+    is_shown: boolean | number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetProjectOrderPermitSettingsResponse extends ApiBaseResponse<ProjectOrderPermitSettings> {
+}
+
+export interface UpdateProjectOrderPermitSettingsResponse extends ApiBaseResponse<ProjectOrderPermitSettings> {
+}
+
+export interface ProjectManagementSettings {
+    id: number;
+    project_type_id: number;
+    is_shown: boolean | number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GetProjectManagementSettingsResponse extends ApiBaseResponse<ProjectManagementSettings> {
+}
+
+export interface UpdateProjectManagementSettingsResponse extends ApiBaseResponse<ProjectManagementSettings> {
+}

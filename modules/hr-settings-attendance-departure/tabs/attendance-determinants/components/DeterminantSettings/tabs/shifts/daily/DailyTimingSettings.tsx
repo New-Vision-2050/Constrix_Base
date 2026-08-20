@@ -80,7 +80,7 @@ export default function DailyTimingSettings({
         <div className="border border-border rounded-lg p-2 md:p-3 space-y-3">
           <div className="flex flex-col gap-2">
             {selectedWeekDays.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-end">
+              <p className="text-sm text-muted-foreground text-start">
                 {t("noSelectedDays")}
               </p>
             ) : (
@@ -109,10 +109,10 @@ export default function DailyTimingSettings({
                             key={idx}
                             className="border border-border rounded-md p-2"
                           >
-                            <p className="text-xs text-muted-foreground text-end mb-2">
+                            <p className="text-xs text-muted-foreground text-start mb-2">
                               {PERIOD_KEYS[idx] ? t(PERIOD_KEYS[idx]) : String(idx + 1)}
                             </p>
-                            <p className="text-sm text-end tabular-nums">
+                            <p className="text-sm text-start tabular-nums">
                               {t("from")} {row.from} {row.fromMeridiem} — {t("to")} {row.to}{" "}
                               {row.toMeridiem}
                               {row.endsNextDay ? (
@@ -162,7 +162,7 @@ export default function DailyTimingSettings({
 
       <div className="mt-6 flex flex-col gap-2">
         {assignDailyShiftsError ? (
-          <p className="text-end text-sm text-destructive" role="alert">
+          <p className="text-start text-sm text-destructive" role="alert">
             {assignDailyShiftsError}
           </p>
         ) : null}

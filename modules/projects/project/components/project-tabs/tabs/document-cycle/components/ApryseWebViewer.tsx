@@ -13,6 +13,10 @@ import type {
   WebViewerOptions,
 } from "@pdftron/webviewer";
 import { fetchStampAsDataUrl } from "../attachmentActions";
+import {
+  bindApryseViewerPersistence,
+  restoreApryseViewerPersistence,
+} from "./apryseViewerPersistence";
 
 const WEBVIEWER_PATH = "/webviewer";
 
@@ -221,6 +225,7 @@ export const ApryseWebViewer = forwardRef<
   const instanceRef = useRef<WebViewerInstance | null>(null);
   const onViewerReadyRef = useRef(onViewerReady);
   const stampResizeCleanupRef = useRef<(() => void) | null>(null);
+  const persistenceCleanupRef = useRef<(() => void) | null>(null);
   onViewerReadyRef.current = onViewerReady;
 
   const ext = (extRaw || "pdf").toLowerCase();
@@ -361,6 +366,8 @@ export const ApryseWebViewer = forwardRef<
       clearTimeout(initTimeout);
       stampResizeCleanupRef.current?.();
       stampResizeCleanupRef.current = null;
+      persistenceCleanupRef.current?.();
+      persistenceCleanupRef.current = null;
       const inst = instanceRef.current;
       instanceRef.current = null;
       if (inst) {
@@ -370,10 +377,10 @@ export const ApryseWebViewer = forwardRef<
     };
   }, [documentBuffer, fileName, ext]);
 
-  // Register project stamp in Apryse Standard Stamps panel once viewer is ready.
+  // Restore saved stamps/signatures and register the project stamp once ready.
   useEffect(() => {
     const instance = instanceRef.current;
-    if (!instance || status !== "ready" || !stampUrl) return;
+    if (!instance || status !== "ready") return;
 
     let cancelled = false;
 
@@ -422,16 +429,27 @@ export const ApryseWebViewer = forwardRef<
 
     (async () => {
       try {
-        await registerProjectStampInApryse(instance, stampUrl);
+        let projectStampDataUrl: string | null = null;
+        if (stampUrl) {
+          projectStampDataUrl = await fetchStampAsDataUrl(stampUrl);
+        }
         if (cancelled) return;
+
+        await restoreApryseViewerPersistence(instance, projectStampDataUrl);
+        if (cancelled) return;
+
+        persistenceCleanupRef.current?.();
+        persistenceCleanupRef.current = bindApryseViewerPersistence(instance);
         setupStampResize();
       } catch (stampError) {
-        console.warn("Failed to register project stamp in Apryse:", stampError);
+        console.warn("Failed to set up Apryse stamp persistence:", stampError);
       }
     })();
 
     return () => {
       cancelled = true;
+      persistenceCleanupRef.current?.();
+      persistenceCleanupRef.current = null;
     };
   }, [stampUrl, status]);
 

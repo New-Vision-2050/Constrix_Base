@@ -12,6 +12,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { InitialTimeHours, PeriodHour } from "../constants/time";
 import { DAYS_OF_WEEK } from "../constants/days";
 
@@ -138,6 +139,10 @@ export const AttendanceDayCxtProvider = (
   // ** declare and define component state and variables
   const { children, standaloneConfig } = props;
   const isStandalone = Boolean(standaloneConfig);
+  const tDialog = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog",
+  );
+  const locale = useLocale();
   // ** handle side effects
   const [dayAvsilableHours, setdayAvailableHours] = useState(InitialTimeHours);
   const [selectedDay, SetSelectedDay] = useState<string>("");
@@ -224,9 +229,12 @@ export const AttendanceDayCxtProvider = (
       const _nextDayName =
         DAYS_OF_WEEK[(_periodDayIndex + 1) % DAYS_OF_WEEK.length];
       // prepare message
-      const _message = `
-      لقد أمتدت الفترة الى اليوم التالي لتصبح :${_periodDay.labelAr} : [${_period.start_time} - 24:00] , ${_nextDayName.labelAr} : [00:00 - ${_period.end_time}]
-      `;
+      const _message = tDialog("extendsToNextDaySplitMsg", {
+        currentDay: locale === "ar" ? _periodDay.labelAr : _periodDay.labelEn,
+        startTime: _period.start_time,
+        nextDay: locale === "ar" ? _nextDayName.labelAr : _nextDayName.labelEn,
+        endTime: _period.end_time,
+      });
       SetExtendsToNextDayMsg(_message);
       // validation according next day config
       const _weekly_schedule = isStandalone
@@ -291,7 +299,7 @@ export const AttendanceDayCxtProvider = (
     );
     const nextDayIndex = (currentDayIndex + 1) % DAYS_OF_WEEK.length;
     const nextDayValue = DAYS_OF_WEEK[nextDayIndex].value;
-    const nextDayName = DAYS_OF_WEEK[nextDayIndex].labelAr;
+    const nextDayName = locale === "ar" ? DAYS_OF_WEEK[nextDayIndex].labelAr : DAYS_OF_WEEK[nextDayIndex].labelEn;
 
     // Get weekly schedule
     const _weekly_schedule = isStandalone
@@ -319,7 +327,7 @@ export const AttendanceDayCxtProvider = (
       if (hasConflictingPeriod) {
         setNextDayHasConflict(true);
         setNextDayConflictMsg(
-          `لا يمكن التمديد لليوم التالي (${nextDayName}) لأنه يحتوي على فترات عمل قد تتعارض مع الفترة الممتدة`,
+          tDialog("nextDayConflict", { nextDayName }),
         );
       } else {
         setNextDayHasConflict(false);

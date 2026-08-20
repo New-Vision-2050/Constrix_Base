@@ -98,3 +98,19 @@ export interface UpdateProjectSharingSettingsArgs {
 export interface UpdateMaintenanceAndEmergenciesSettingsArgs {
     is_shown?: 0 | 1;
 }
+
+export interface UpdateConstructionSettingsArgs {
+    is_shown?: 0 | 1;
+}
+
+export interface UpdateSafetyTaskSettingsArgs {
+    is_shown?: 0 | 1;
+}
+
+export interface UpdateProjectOrderPermitSettingsArgs {
+    is_shown?: 0 | 1;
+}
+
+export interface UpdateProjectManagementSettingsArgs {
+    is_shown?: 0 | 1;
+}
