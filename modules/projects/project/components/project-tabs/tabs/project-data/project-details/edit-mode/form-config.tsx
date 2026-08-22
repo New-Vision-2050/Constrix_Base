@@ -38,9 +38,9 @@ export const ProjectDetailsFormConfig = (): FormConfig => {
     ],
     initialValues: {
       project_manager: "احمد خالد",
-      market_capacity: "100,000 ريال",
-      contract_date: "2024-01-01",
-      delivery_date: "2025-09-30",
+      market_capacity: "",
+      contract_date: "",
+      delivery_date: "",
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
