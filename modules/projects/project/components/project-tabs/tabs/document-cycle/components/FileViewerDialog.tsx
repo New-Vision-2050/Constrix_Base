@@ -298,7 +298,12 @@ function useViewerBufferState(
       apryseReady,
   );
 
-  const viewerInstanceKey = `${activeFile?.id ?? "none"}-${activeFile?.url ?? ""}-${extension}`;
+  // Intentionally excludes `url`: saving annotations replaces the file with
+  // a new signed URL for the *same* logical document, and remounting the
+  // whole WebViewer instance on every save causes a jarring full reload
+  // (and can race with Apryse's own in-flight draw calls). The instance is
+  // reused and just re-loads the document when the buffer changes.
+  const viewerInstanceKey = `${activeFile?.id ?? "none"}-${extension}`;
 
   const onViewerReady = useCallback(() => {
     setApryseReady(true);
