@@ -20,7 +20,12 @@ import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
@@ -262,6 +267,9 @@ function useViewerBufferState(
     queryFn: () => fetchAuthenticatedFileBuffer(activeFile!.url),
     enabled: Boolean(open && activeFile?.url && !serverOnlyCad),
     staleTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   const [apryseReady, setApryseReady] = useState(false);
@@ -509,6 +517,9 @@ export default function FileViewerDialog({
         <DialogTitle className="sr-only">
           {[document.name, activeFile.name].filter(Boolean).join(" — ")}
         </DialogTitle>
+        <DialogDescription className="sr-only">
+          {t("documentReview")}
+        </DialogDescription>
 
         <Box sx={layout.rootColumn}>
           <Box sx={layout.headerRow}>
