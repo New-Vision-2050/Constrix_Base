@@ -103,6 +103,8 @@ function WavyLineChart({ color }: { color: string }) {
   );
 }
 
+const MAX_VISIBLE_CONTRACTORS = 3;
+
 export default function ProjectStatsBar() {
   const { palette } = useTheme();
   const { projectId } = useProject();
@@ -114,8 +116,20 @@ export default function ProjectStatsBar() {
     palette.text.secondary,
   ];
 
-  const barChartLabels = ["", "", ""];
-  const zeroBarSeries = [0, 0, 0];
+  const visibleContractors = useMemo(
+    () => contractors.slice(0, MAX_VISIBLE_CONTRACTORS),
+    [contractors],
+  );
+
+  const barChartLabels = useMemo(
+    () => visibleContractors.map((contractor) => contractor.name),
+    [visibleContractors],
+  );
+
+  const zeroBarSeries = useMemo(
+    () => barChartLabels.map(() => 0),
+    [barChartLabels],
+  );
 
   return (
     <Box
@@ -221,20 +235,8 @@ export default function ProjectStatsBar() {
             {contractors.length}
           </Typography>
         </Box>
-        <Stack
-          spacing={0.8}
-          sx={{
-            maxHeight: 96,
-            overflowY: "auto",
-            pr: 0.5,
-            "&::-webkit-scrollbar": { width: 4 },
-            "&::-webkit-scrollbar-thumb": {
-              bgcolor: "divider",
-              borderRadius: 2,
-            },
-          }}
-        >
-          {contractors.map((contractor, index) => (
+        <Stack spacing={0.8}>
+          {visibleContractors.map((contractor, index) => (
             <ContractorRow
               key={contractor.id}
               name={contractor.name}

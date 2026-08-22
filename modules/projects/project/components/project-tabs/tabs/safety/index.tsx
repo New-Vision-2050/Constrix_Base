@@ -31,10 +31,12 @@ export default function SafetyTab() {
         ))}
       </Tabs>
 
-      {activeTab === "safetyReports" && <SafetyReportsView />}
-      {activeTab === "visits" && <SafetyVisitsView />}
-      {activeTab === "reports" && <SafetyReportsTabView />}
-      {activeTab === "indicators" && <SafetyIndicatorsView />}
+      <Box key={activeTab}>
+        {activeTab === "safetyReports" && <SafetyReportsView />}
+        {activeTab === "visits" && <SafetyVisitsView />}
+        {activeTab === "reports" && <SafetyReportsTabView />}
+        {activeTab === "indicators" && <SafetyIndicatorsView />}
+      </Box>
     </Box>
   );
 }

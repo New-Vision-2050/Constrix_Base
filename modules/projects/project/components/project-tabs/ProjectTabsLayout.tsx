@@ -106,6 +106,20 @@ export default function ProjectTabsLayout({
     return activeMainTab?.content ?? null;
   }, [activeMainTab, nestedTabs, activeNestedTabObj, activeDeepNestedTab]);
 
+  const activeContentKey = useMemo(() => {
+    if (nestedTabs?.length) {
+      const sub = activeNestedTabObj ?? nestedTabs[0];
+      if (sub.nestedTabs?.length) {
+        const deep =
+          sub.nestedTabs.find((tab) => tab.id === activeDeepNestedTab) ??
+          sub.nestedTabs[0];
+        return deep.id;
+      }
+      return sub.id;
+    }
+    return activeMainTab?.id ?? String(value);
+  }, [activeMainTab, nestedTabs, activeNestedTabObj, activeDeepNestedTab, value]);
+
   const showNestedTabsRow = Boolean(nestedTabs?.length);
   const showDeepNestedTabsRow = Boolean(deepNestedTabs?.length);
 
@@ -440,7 +454,10 @@ export default function ProjectTabsLayout({
         </Paper>
       )}
 
-      <Box className="py-4 min-h-[350px] transition-all duration-300">
+      <Box
+        key={activeContentKey}
+        className="py-4 min-h-[350px] transition-all duration-300"
+      >
         {activeContent}
       </Box>
     </div>

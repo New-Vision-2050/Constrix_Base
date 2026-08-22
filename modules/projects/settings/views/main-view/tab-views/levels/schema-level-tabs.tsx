@@ -929,7 +929,7 @@ export default function SchemaLevelTabs({
                     </Tabs>
                   </Paper>
                 ) : null}
-                <Paper className="p-4">
+                <Paper key={effectiveTabValue} className="p-4">
                   {renderTabContent(effectiveTabValue, {
                     firstLevelId,
                     secondLevelId: parentId,
