@@ -25,7 +25,7 @@ interface ProjectFiltersProps {
 
 export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
   const t = useTranslations();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const {
     filters,
     setFilter,

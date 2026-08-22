@@ -514,6 +514,9 @@ export default function AttachmentRequestDetailDialog({
         maxWidth="lg"
         fullWidth
         scroll="paper"
+        disableEnforceFocus={fileViewerOpen}
+        disableAutoFocus={fileViewerOpen}
+        disableRestoreFocus={fileViewerOpen}
         slotProps={{
           paper: {
             sx: {
