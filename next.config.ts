@@ -22,6 +22,38 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // Apryse WebViewer runs inside its own iframe served from /webviewer.
+  // These headers enable WASM threading (cross-origin isolation) for that
+  // iframe only, and tell the browser the pre-compressed .br/.gz wasm
+  // assets are already encoded so it can decode them correctly.
+  // https://docs.apryse.com/documentation/web/faq/wasm-threads
+  // https://docs.apryse.com/documentation/web/faq/content-encoding
+  async headers() {
+    return [
+      {
+        source: "/webviewer/:path*",
+        headers: [
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+        ],
+      },
+      {
+        source: "/webviewer/:path*.br.wasm",
+        headers: [
+          { key: "Content-Encoding", value: "br" },
+          { key: "Content-Type", value: "application/wasm" },
+        ],
+      },
+      {
+        source: "/webviewer/:path*.gz.wasm",
+        headers: [
+          { key: "Content-Encoding", value: "gzip" },
+          { key: "Content-Type", value: "application/wasm" },
+        ],
+      },
+    ];
+  },
+
   // Add cache busting for static assets
   generateBuildId: async () => {
     // Use environment variable if available, otherwise use timestamp
