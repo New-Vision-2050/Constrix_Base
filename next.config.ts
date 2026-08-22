@@ -31,10 +31,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/webviewer/:path*",
+        // Site-wide cross-origin isolation so any page embedding WebViewer
+        // qualifies for WASM threads. "credentialless" (instead of
+        // "require-corp") avoids hard-blocking cross-origin <img>/<script>
+        // resources (e.g. S3 images, Google Maps) that lack a CORP header.
+        source: "/:path*",
         headers: [
           { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+          { key: "Cross-Origin-Embedder-Policy", value: "credentialless" },
         ],
       },
       {
