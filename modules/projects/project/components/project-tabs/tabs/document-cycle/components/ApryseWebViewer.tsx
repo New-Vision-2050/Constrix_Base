@@ -267,9 +267,81 @@ export const ApryseWebViewer = forwardRef<
     },
   }));
 
+  const isOffice = OFFICE_EXTENSIONS.has(ext);
+  const initPromiseRef = useRef<Promise<WebViewerInstance> | null>(null);
+
+  // Creates the WebViewer instance once per mount (or when switching between
+  // the Office and non-Office rendering pipelines, which require different
+  // initialization). Loading a *different document* into an already-created
+  // instance is handled by the effect below via `instance.UI.loadDocument`,
+  // instead of disposing and recreating the whole viewer — disposing while
+  // Apryse still has in-flight draw calls from the previous load causes a
+  // "Cannot read properties of null (reading 'drawImage')" crash, and a full
+  // re-init is also a slow, jarring reload for what is otherwise just a
+  // document swap (e.g. after saving annotations).
   useEffect(() => {
     const el = containerRef.current;
-    if (!el || !documentBuffer.byteLength) return;
+    if (!el) return;
+
+    let cancelled = false;
+
+    const licenseKey = getLicenseKey();
+
+    initPromiseRef.current = (async () => {
+      const { default: WebViewer } = await import("@pdftron/webviewer");
+
+      const officePreload = isLegacyOfficeExtension(ext)
+        ? `${WebViewer.WorkerTypes.OFFICE},${WebViewer.WorkerTypes.LEGACY_OFFICE}`
+        : WebViewer.WorkerTypes.OFFICE;
+
+      const baseOptions: WebViewerOptions = {
+        path: WEBVIEWER_PATH,
+        licenseKey,
+        ...(isOffice
+          ? {
+              enableOfficeEditing: true,
+              fullAPI: true,
+              preloadWorker: officePreload,
+            }
+          : {}),
+      };
+
+      const instance = isOffice
+        ? await WebViewer(baseOptions, el)
+        : await WebViewer.Iframe(baseOptions, el);
+
+      if (cancelled) {
+        void instance.UI.dispose();
+        throw new Error("cancelled");
+      }
+
+      instanceRef.current = instance;
+      return instance;
+    })();
+
+    initPromiseRef.current.catch(() => {
+      /* handled by the load effect below */
+    });
+
+    return () => {
+      cancelled = true;
+      initPromiseRef.current = null;
+      stampResizeCleanupRef.current?.();
+      stampResizeCleanupRef.current = null;
+      persistenceCleanupRef.current?.();
+      persistenceCleanupRef.current = null;
+      const inst = instanceRef.current;
+      instanceRef.current = null;
+      if (inst) {
+        void inst.UI.dispose();
+      }
+      el.replaceChildren();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOffice]);
+
+  useEffect(() => {
+    if (!documentBuffer.byteLength) return;
 
     if (CAD_EXTENSIONS.has(ext)) {
       setStatus("error");
@@ -282,9 +354,6 @@ export const ApryseWebViewer = forwardRef<
     let cancelled = false;
     setStatus("loading");
     setErrorMessage(null);
-
-    const licenseKey = getLicenseKey();
-    const isOffice = OFFICE_EXTENSIONS.has(ext);
 
     const initTimeoutMs = isOffice ? 180000 : 90000;
     const initTimeout = window.setTimeout(() => {
@@ -300,35 +369,8 @@ export const ApryseWebViewer = forwardRef<
 
     (async () => {
       try {
-        const { default: WebViewer } = await import("@pdftron/webviewer");
-
-        if (cancelled || !containerRef.current) return;
-
-        const officePreload = isLegacyOfficeExtension(ext)
-          ? `${WebViewer.WorkerTypes.OFFICE},${WebViewer.WorkerTypes.LEGACY_OFFICE}`
-          : WebViewer.WorkerTypes.OFFICE;
-
-        const baseOptions: WebViewerOptions = {
-          path: WEBVIEWER_PATH,
-          licenseKey,
-          ...(isOffice
-            ? {
-                enableOfficeEditing: true,
-                fullAPI: true,
-                preloadWorker: officePreload,
-              }
-            : {}),
-        };
-
-        const instance = isOffice
-          ? await WebViewer(baseOptions, el)
-          : await WebViewer.Iframe(baseOptions, el);
-        if (cancelled) {
-          void instance.UI.dispose();
-          return;
-        }
-
-        instanceRef.current = instance;
+        const instance = await initPromiseRef.current;
+        if (cancelled || !instance) return;
 
         const loadName = safeViewerFileName(fileName, ext);
 
@@ -364,18 +406,8 @@ export const ApryseWebViewer = forwardRef<
     return () => {
       cancelled = true;
       clearTimeout(initTimeout);
-      stampResizeCleanupRef.current?.();
-      stampResizeCleanupRef.current = null;
-      persistenceCleanupRef.current?.();
-      persistenceCleanupRef.current = null;
-      const inst = instanceRef.current;
-      instanceRef.current = null;
-      if (inst) {
-        void inst.UI.dispose();
-      }
-      el.replaceChildren();
     };
-  }, [documentBuffer, fileName, ext]);
+  }, [documentBuffer, fileName, ext, isOffice]);
 
   // Restore saved stamps/signatures and register the project stamp once ready.
   useEffect(() => {
