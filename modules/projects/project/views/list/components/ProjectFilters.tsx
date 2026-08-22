@@ -5,9 +5,12 @@ import {
   Typography,
   Paper,
   Button,
+  Collapse,
+  IconButton,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 import {
   useProjectFilters,
   type ProjectFilterValues,
@@ -22,6 +25,7 @@ interface ProjectFiltersProps {
 
 export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
   const t = useTranslations();
+  const [collapsed, setCollapsed] = useState(false);
   const {
     filters,
     setFilter,
@@ -49,12 +53,19 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2,
         }}
       >
-        <Typography variant="subtitle1" fontWeight="bold">
-          {t("project.filterSearch")}
-        </Typography>
+        <Box
+          sx={{ display: "flex", alignItems: "center", cursor: "pointer", userSelect: "none" }}
+          onClick={() => setCollapsed((prev) => !prev)}
+        >
+          <IconButton size="small" sx={{ p: 0.5, mr: 0.5 }}>
+            {collapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+          </IconButton>
+          <Typography variant="subtitle1" fontWeight="bold">
+            {t("project.filterSearch")}
+          </Typography>
+        </Box>
         <Button
           size="small"
           variant="outlined"
@@ -64,6 +75,7 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
           {t("project.clearFilters")}
         </Button>
       </Box>
+      <Collapse in={!collapsed}>
       <Box
         sx={{
           display: "grid",
@@ -73,6 +85,7 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
             md: "repeat(3, 1fr)",
           },
           gap: 2,
+          mt: 2,
         }}
       >
         <SearchableSelect
@@ -174,6 +187,7 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
           ]}
         />
       </Box>
+      </Collapse>
     </Paper>
   );
 }
