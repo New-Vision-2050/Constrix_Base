@@ -98,16 +98,18 @@ export default function MaintenanceEmergencyTab() {
         ))}
       </Tabs>
 
-      {activeTab === "notifications" && <ProjectNotificationsView />}
-      {activeTab === "siteStatusTypes" && (
-        <SiteStatusTypesTab projectTypeId={project?.projectData?.sub_sub_project_type_id} />
-      )}
-      {activeTab === "indicators" && <ProjectNotificationChartsView />}
-      {(activeTab === "violations" || activeTab === "reports") && (
-        <Box sx={{ p: 4, textAlign: "center" }}>
-          <Alert severity="info">{t("comingSoon")}</Alert>
-        </Box>
-      )}
+      <Box key={activeTab}>
+        {activeTab === "notifications" && <ProjectNotificationsView />}
+        {activeTab === "siteStatusTypes" && (
+          <SiteStatusTypesTab projectTypeId={project?.projectData?.sub_sub_project_type_id} />
+        )}
+        {activeTab === "indicators" && <ProjectNotificationChartsView />}
+        {(activeTab === "violations" || activeTab === "reports") && (
+          <Box sx={{ p: 4, textAlign: "center" }}>
+            <Alert severity="info">{t("comingSoon")}</Alert>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 }
