@@ -32,7 +32,7 @@ export const ProjectStatusFormConfig = (): FormConfig => {
     ],
     initialValues: {
       project_status: "in_progress",
-      approval_percentage: 10,
+      approval_percentage: "",
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",

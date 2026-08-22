@@ -14,7 +14,7 @@ export default function ProjectStatusPreviewMode() {
         <PreviewTextField
           valid={true}
           label="نسبة الاعتماد"
-          value="10%"
+          value=""
         />
       </div>
     </div>
