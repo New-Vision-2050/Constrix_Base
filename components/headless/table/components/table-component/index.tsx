@@ -28,6 +28,7 @@ import { useTheme } from "next-themes";
 import { ColumnDef, TableProps } from "./types";
 import { computeColumnRuns } from "../column-grouping";
 import type { ColumnGroupDef } from "../column-grouping";
+import { useDragToScroll } from "./useDragToScroll";
 
 // ============================================================================
 // Table Component Factory
@@ -259,6 +260,12 @@ export function createTableComponent<TRow>() {
     // stick within. A bounded default height gives stickyHeader a real
     // scrollport to work inside instead of silently doing nothing.
     const maxHeight = props.maxHeight ?? (stickyHeader ? "70vh" : undefined);
+    const enableDragScroll = props.enableDragScroll ?? true;
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { onMouseDown: onContainerMouseDown } = useDragToScroll(
+      containerRef,
+      enableDragScroll
+    );
 
     // Selection config
     const selectable = isUsingState
@@ -699,6 +706,8 @@ export function createTableComponent<TRow>() {
           </Alert>
         )}
         <TableContainer
+          ref={containerRef}
+          onMouseDown={onContainerMouseDown}
           sx={maxHeight ? { maxHeight, overflow: "auto" } : undefined}
         >
           <Table

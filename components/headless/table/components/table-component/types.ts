@@ -31,6 +31,7 @@ export type TablePropsWithState<TRow> = {
   loadingOptions?: LoadingOptions;
   stickyHeader?: boolean; // Keep the header row(s) pinned to the top while the body scrolls (default: true; pass false to opt out)
   maxHeight?: number | string; // Constrains TableContainer height and enables its own scrollbar (default: "70vh" when stickyHeader is on, otherwise unset)
+  enableDragScroll?: boolean; // Click-and-drag panning of the table body (default: true)
 };
 
 // Props when using individual props (backward compatibility)
@@ -49,6 +50,7 @@ export type TablePropsWithoutState<TRow> = {
   columnGroupMap?: Record<string, string>;
   stickyHeader?: boolean; // Keep the header row(s) pinned to the top while the body scrolls (default: true; pass false to opt out)
   maxHeight?: number | string; // Constrains TableContainer height and enables its own scrollbar (default: "70vh" when stickyHeader is on, otherwise unset)
+  enableDragScroll?: boolean; // Click-and-drag panning of the table body (default: true)
   state?: never;
 };
 
