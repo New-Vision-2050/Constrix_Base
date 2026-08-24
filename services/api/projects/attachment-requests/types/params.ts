@@ -41,7 +41,10 @@ export interface CreateAttachmentRequestData {
   procedure_setting_id?: string;
   attachment_sub_type_id?: string;
   attachment_sub_sub_type_id?: string;
-  attachments: File[];
+  /** Small files sent directly as multipart. */
+  attachments?: File[];
+  /** Tokens returned from the completed chunked-upload flow for large files. */
+  attachment_upload_ids?: string[];
   notes?: string;
 }
 
@@ -51,9 +54,35 @@ export interface RespondAttachmentItemPayload {
   notes?: string;
 }
 
-/** POST `projects/attachment-requests/items/replace-media` (multipart) */
-export interface ReplaceAttachmentItemMediaPayload {
-  item_id: string;
-  /** File field name expected by the API */
-  new_file: File;
+/** POST `projects/attachment-requests/items/replace-media` */
+export type ReplaceAttachmentItemMediaPayload =
+  | { item_id: string; new_file: File; upload_id?: never }
+  | { item_id: string; upload_id: string; new_file?: never };
+
+/* ── Chunked (resumable) upload session types ───────────────────────────── */
+
+export type ChunkedUploadStatus = "pending" | "completed" | "aborted";
+
+export interface ChunkedUploadSession {
+  upload_id: string;
+  file_name: string;
+  mime_type: string;
+  file_size: number;
+  total_chunks: number;
+  received_chunks: number[];
+  status: ChunkedUploadStatus;
+}
+
+export interface InitChunkedUploadParams {
+  file_name: string;
+  file_size: number;
+  total_chunks: number;
+  mime_type: string;
+}
+
+export interface CompletedChunkedUpload {
+  upload_id: string;
+  file_name: string;
+  file_size: number;
+  mime_type: string;
 }

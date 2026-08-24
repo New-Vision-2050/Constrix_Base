@@ -29,7 +29,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
-import type { RespondAttachmentItemPayload } from "@/services/api/projects/attachment-requests/types/params";
+import {
+  isLargeFile,
+  uploadLargeFile,
+} from "@/services/api/projects/attachment-requests/chunkedUpload";
+import type {
+  ReplaceAttachmentItemMediaPayload,
+  RespondAttachmentItemPayload,
+} from "@/services/api/projects/attachment-requests/types/params";
 import type { AttachmentRequest } from "@/services/api/projects/attachment-requests/types/response";
 import {
   mapAttachmentRequestFileToDocumentAttachment,
@@ -373,7 +380,7 @@ export default function FileViewerDialog({
   });
 
   const replaceMediaMutation = useMutation({
-    mutationFn: (body: { item_id: string; new_file: File }) =>
+    mutationFn: (body: ReplaceAttachmentItemMediaPayload) =>
       AttachmentRequestsApi.replaceItemMedia(body),
   });
 
@@ -450,10 +457,13 @@ export default function FileViewerDialog({
       await onSaveAnnotatedDocument(payload);
     } else {
       const file = new File([blob], uploadName, { type: blob.type });
-      const response = await replaceMediaMutation.mutateAsync({
-        item_id: activeFile.id,
-        new_file: file,
-      });
+      const replaceBody: ReplaceAttachmentItemMediaPayload = isLargeFile(file)
+        ? {
+            item_id: activeFile.id,
+            upload_id: await uploadLargeFile(file),
+          }
+        : { item_id: activeFile.id, new_file: file };
+      const response = await replaceMediaMutation.mutateAsync(replaceBody);
       applyUpdatedAttachment(response.data.payload, activeFile.id);
     }
     onAnnotationsSaved?.(activeFile.id);
