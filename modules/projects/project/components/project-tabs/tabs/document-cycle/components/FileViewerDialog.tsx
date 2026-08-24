@@ -592,12 +592,20 @@ export default function FileViewerDialog({
     return "ready";
   })();
 
-  const annotatedButtonLabels: Record<AnnotatedActionButtonPhase, string> = {
+  const saveWithNotesLabels: Record<AnnotatedActionButtonPhase, string> = {
     viewerPreparing: t("viewerPreparing"),
     noEdits: t("saveWithNotes"),
     editsPreparing: t("editsPreparing"),
     loadingChanges: t("loadingChanges"),
     ready: t("saveWithNotes"),
+  };
+
+  const approveWithNotesLabels: Record<AnnotatedActionButtonPhase, string> = {
+    viewerPreparing: t("viewerPreparing"),
+    noEdits: t("approveWithNotes"),
+    editsPreparing: t("editsPreparing"),
+    loadingChanges: t("loadingChanges"),
+    ready: t("approveWithNotes"),
   };
 
   const annotatedButtonTitles: Partial<
@@ -617,11 +625,6 @@ export default function FileViewerDialog({
 
   const annotatedButtonDisabled =
     !canOpenConfirm || saveExportBusy || respondBusy;
-
-  const approveWithNotesLabel =
-    annotatedButtonPhase === "ready"
-      ? t("requestModification")
-      : annotatedButtonLabels[annotatedButtonPhase];
 
   if (!document || !activeFile) return null;
 
@@ -868,7 +871,7 @@ export default function FileViewerDialog({
                     ) : (
                       <span className="me-1">✓</span>
                     )}
-                    {approveWithNotesLabel}
+                    {approveWithNotesLabels[annotatedButtonPhase]}
                   </Button>
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 whitespace-nowrap"
@@ -901,7 +904,7 @@ export default function FileViewerDialog({
                       ) : (
                         <Save className="w-4 h-4 me-1" />
                       )}
-                      {annotatedButtonLabels[annotatedButtonPhase]}
+                      {saveWithNotesLabels[annotatedButtonPhase]}
                     </Button>
                   )}
                   <Button

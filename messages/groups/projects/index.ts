@@ -180,6 +180,7 @@ export const projectMessages = new MessagesGroup({
     notes: _m("Notes", "ملاحظات"),
     save: _m("Save", "حفظ"),
     saveWithNotes: _m("Save with notes", "حفظ بملاحظات"),
+    approveWithNotes: _m("Approve with notes", "الاعتماد بملاحظات"),
     viewerPreparing: _m(
       "Preparing viewer…",
       "جاري تجهيز العارض…",
@@ -209,7 +210,10 @@ export const projectMessages = new MessagesGroup({
       "جاري تحميل المعاينة…",
     ),
     confirmSaveWithNotes: _m("Confirm save", "تأكيد الحفظ"),
-    confirmApproveWithNotes: _m("Confirm approval", "تأكيد الاعتماد"),
+    confirmApproveWithNotes: _m(
+      "Confirm approve with notes",
+      "تأكيد الاعتماد بملاحظات",
+    ),
     saveViewerChangesSuccess: _m(
       "Document changes saved",
       "تم حفظ تغييرات المستند",
