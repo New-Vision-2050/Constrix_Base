@@ -433,7 +433,12 @@ export default function FileViewerDialog({
   }, [activeFile, notesPayload, respondMutation]);
 
   const persistAnnotatedDocument = useCallback(async () => {
-    if (!activeFile || !viewer.canExport || !apryseRef.current) return;
+    if (!activeFile) {
+      throw new Error("No active file selected.");
+    }
+    if (!viewer.canExport || !apryseRef.current) {
+      throw new Error(t("saveViewerChangesError"));
+    }
     const blob = await apryseRef.current.exportDocumentWithAnnotations();
     const uploadName = fileNameForReplaceUpload(activeFile.name, blob);
     const payload: SaveAnnotatedDocumentPayload = {
@@ -459,6 +464,7 @@ export default function FileViewerDialog({
     replaceMediaMutation,
     applyUpdatedAttachment,
     onAnnotationsSaved,
+    t,
   ]);
 
   const handleSaveWithNotes = useCallback(async () => {
