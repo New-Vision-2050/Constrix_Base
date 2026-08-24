@@ -219,6 +219,19 @@ async function finalizeAnnotationsForExport(
   });
 }
 
+/** Re-measure the host and fit the current page to the visible area. */
+function syncViewerLayout(instance: WebViewerInstance): void {
+  try {
+    const ui = instance.UI as typeof instance.UI & { resize?: () => void };
+    ui.resize?.();
+    instance.Core.documentViewer.updateView();
+    const fitPage = instance.UI.FitMode?.FitPage ?? "FitPage";
+    instance.UI.setFitMode(fitPage);
+  } catch {
+    /* UI may not be ready during teardown */
+  }
+}
+
 export type ApryseWebViewerHandle = {
   exportDocumentWithAnnotations: () => Promise<Blob>;
 };
@@ -236,6 +249,8 @@ type ApryseWebViewerProps = {
   onAnnotationEdited?: () => void;
   /** Project stamp URL to register in Apryse Stamps panel */
   stampUrl?: string | null;
+  /** When true, fills a flex/absolute parent (no minHeight fallback). */
+  fillParent?: boolean;
 };
 
 export const ApryseWebViewer = forwardRef<
@@ -250,6 +265,7 @@ export const ApryseWebViewer = forwardRef<
     onViewerReady,
     onAnnotationEdited,
     stampUrl,
+    fillParent = false,
   },
   ref,
 ) {
@@ -453,6 +469,7 @@ export const ApryseWebViewer = forwardRef<
         await instance.UI.loadDocument(docSource, loadOpts as never);
 
         if (cancelled) return;
+        syncViewerLayout(instance);
         setStatus("ready");
       } catch (err: unknown) {
         if (cancelled) return;
@@ -576,13 +593,39 @@ export const ApryseWebViewer = forwardRef<
     };
   }, [stampUrl, status]);
 
+  // Re-fit when the host resizes (e.g. confirm dialog flex layout settling).
+  useEffect(() => {
+    if (status !== "ready") return;
+
+    const instance = instanceRef.current;
+    const el = containerRef.current;
+    if (!instance || !el) return;
+
+    const sync = () => syncViewerLayout(instance);
+
+    sync();
+    const delayedSync = window.setTimeout(sync, 150);
+
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(sync);
+    });
+    observer.observe(el);
+
+    return () => {
+      clearTimeout(delayedSync);
+      observer.disconnect();
+    };
+  }, [status, documentBuffer]);
+
+  const viewerMinHeight = fillParent ? 0 : 400;
+
   return (
     <Box
       sx={{
         position: "relative",
         width: "100%",
         height: "100%",
-        minHeight: 400,
+        minHeight: viewerMinHeight,
         bgcolor: "background.default",
       }}
     >
@@ -591,7 +634,7 @@ export const ApryseWebViewer = forwardRef<
         sx={{
           width: "100%",
           height: "100%",
-          minHeight: 400,
+          minHeight: viewerMinHeight,
           "& iframe": { border: 0 },
         }}
       />

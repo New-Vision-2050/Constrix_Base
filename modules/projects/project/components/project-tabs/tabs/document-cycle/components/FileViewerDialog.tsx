@@ -57,6 +57,8 @@ import {
   ApryseWebViewer,
   type ApryseWebViewerHandle,
 } from "./ApryseWebViewer";
+import AnnotatedDocumentConfirmDialog from "./AnnotatedDocumentConfirmDialog";
+import { useAnnotatedDocumentWorkflow } from "./useAnnotatedDocumentWorkflow";
 import { useProjectStamp } from "@/modules/projects/project/query/useProjectStamp";
 import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 
@@ -135,7 +137,13 @@ function patchAttachmentRequestInQueryCache(
 }
 
 const STACKED_Z = "z-[1600]";
-const EDIT_SETTLE_MS = 3000;
+
+type AnnotatedActionButtonPhase =
+  | "viewerPreparing"
+  | "noEdits"
+  | "editsPreparing"
+  | "loadingChanges"
+  | "ready";
 
 /** Layout / look — unchanged from previous implementation */
 const layout = {
@@ -367,49 +375,42 @@ export default function FileViewerDialog({
   );
 
   const apryseRef = useRef<ApryseWebViewerHandle>(null);
-  const [savePending, setSavePending] = useState(false);
-  const [editsSettling, setEditsSettling] = useState(false);
-  const editSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const viewerFile = previewFile ?? activeFile;
   const viewer = useViewerBufferState(open, viewerFile);
 
-  const clearEditSettleTimer = useCallback(() => {
-    if (editSettleTimerRef.current) {
-      clearTimeout(editSettleTimerRef.current);
-      editSettleTimerRef.current = null;
-    }
-  }, []);
-
-  const onAnnotationEdited = useCallback(() => {
-    setEditsSettling(true);
-    clearEditSettleTimer();
-    editSettleTimerRef.current = setTimeout(() => {
-      setEditsSettling(false);
-      editSettleTimerRef.current = null;
-    }, EDIT_SETTLE_MS);
-  }, [clearEditSettleTimer]);
-
-  const canSaveWithNotes = viewer.canExport && !editsSettling;
-
-  useEffect(() => {
-    if (!open) {
-      setEditsSettling(false);
-      clearEditSettleTimer();
-    }
-  }, [open, clearEditSettleTimer]);
-
-  useEffect(() => {
-    setEditsSettling(false);
-    clearEditSettleTimer();
-  }, [viewer.viewerInstanceKey, viewer.buffer, clearEditSettleTimer]);
-
-  useEffect(
-    () => () => {
-      clearEditSettleTimer();
+  const onExportError = useCallback(
+    (message: string) => {
+      toast.error(message.trim() || t("saveViewerChangesError"));
     },
-    [clearEditSettleTimer],
+    [t],
   );
+
+  const workflow = useAnnotatedDocumentWorkflow({
+    open,
+    viewerCanExport: viewer.canExport,
+    viewerInstanceKey: viewer.viewerInstanceKey,
+    apryseRef,
+    onExportError,
+  });
+
+  const {
+    hasEdits,
+    editsSettling,
+    confirmExporting,
+    confirmPreviewReady,
+    confirmState,
+    applyPending,
+    setApplyPending,
+    canOpenConfirm,
+    isBusy,
+    onAnnotationEdited,
+    requestConfirm,
+    closeConfirm,
+    markApplied,
+    onPreviewPreparing,
+    onPreviewReady,
+  } = workflow;
 
   useEffect(() => {
     if (open) {
@@ -443,8 +444,7 @@ export default function FileViewerDialog({
 
   const respondBusy = respondMutation.isPending;
   const replaceBusy = replaceMediaMutation.isPending;
-  const saveExportBusy =
-    savePending || replaceBusy;
+  const saveExportBusy = isBusy || replaceBusy;
 
   const handleDownload = useCallback(() => {
     if (!viewerFile) return;
@@ -496,50 +496,63 @@ export default function FileViewerDialog({
     });
   }, [activeFile, notesPayload, respondMutation]);
 
-  const persistAnnotatedDocument = useCallback(async () => {
-    if (!activeFile) {
-      throw new Error("No active file selected.");
-    }
-    if (!canSaveWithNotes || !apryseRef.current) {
-      throw new Error(t("saveViewerChangesError"));
-    }
-    const blob = await apryseRef.current.exportDocumentWithAnnotations();
-    const uploadName = fileNameForReplaceUpload(activeFile.name, blob);
-    const payload: SaveAnnotatedDocumentPayload = {
-      blob,
-      itemId: activeFile.id,
-      fileName: uploadName,
-    };
-    if (onSaveAnnotatedDocument) {
-      await onSaveAnnotatedDocument(payload);
-    } else {
-      const file = new File([blob], uploadName, { type: blob.type });
-      const replaceBody: ReplaceAttachmentItemMediaPayload = isLargeFile(file)
-        ? {
-            item_id: activeFile.id,
-            upload_id: await uploadLargeFile(file),
-          }
-        : { item_id: activeFile.id, new_file: file };
-      const response = await replaceMediaMutation.mutateAsync(replaceBody);
-      applyUpdatedAttachment(response.data.payload, activeFile.id);
-    }
-    onAnnotationsSaved?.(activeFile.id);
-  }, [
-    activeFile,
-    canSaveWithNotes,
-    onSaveAnnotatedDocument,
-    replaceMediaMutation,
-    applyUpdatedAttachment,
-    onAnnotationsSaved,
-    t,
-  ]);
+  const replaceAnnotatedMedia = useCallback(
+    async (blob: Blob) => {
+      if (!activeFile) {
+        throw new Error("No active file selected.");
+      }
 
-  const handleSaveWithNotes = useCallback(async () => {
-    if (!activeFile || !canSaveWithNotes || !apryseRef.current) return;
-    setSavePending(true);
+      const uploadName = fileNameForReplaceUpload(activeFile.name, blob);
+      const payload: SaveAnnotatedDocumentPayload = {
+        blob,
+        itemId: activeFile.id,
+        fileName: uploadName,
+      };
+
+      if (onSaveAnnotatedDocument) {
+        await onSaveAnnotatedDocument(payload);
+      } else {
+        const file = new File([blob], uploadName, { type: blob.type });
+        const replaceBody: ReplaceAttachmentItemMediaPayload = isLargeFile(file)
+          ? {
+              item_id: activeFile.id,
+              upload_id: await uploadLargeFile(file),
+            }
+          : { item_id: activeFile.id, new_file: file };
+        const response = await replaceMediaMutation.mutateAsync(replaceBody);
+        applyUpdatedAttachment(response.data.payload, activeFile.id);
+      }
+
+      onAnnotationsSaved?.(activeFile.id);
+    },
+    [
+      activeFile,
+      onSaveAnnotatedDocument,
+      replaceMediaMutation,
+      applyUpdatedAttachment,
+      onAnnotationsSaved,
+    ],
+  );
+
+  /** Step 5: apply replace-media after confirmation preview is accepted. */
+  const handleConfirmAnnotatedAction = useCallback(async () => {
+    if (!confirmState || !confirmPreviewReady || !activeFile) return;
+
+    setApplyPending(true);
     try {
-      await persistAnnotatedDocument();
-      toast.success(t("saveViewerChangesSuccess"));
+      await replaceAnnotatedMedia(confirmState.blob);
+
+      if (confirmState.action === "save") {
+        toast.success(t("saveViewerChangesSuccess"));
+        markApplied();
+      } else {
+        await respondMutation.mutateAsync({
+          item_id: activeFile.id,
+          action: "approve",
+          notes: notesPayload,
+        });
+        markApplied();
+      }
     } catch (e: unknown) {
       toast.error(
         axiosErrorMessage(e)?.trim() ||
@@ -547,43 +560,75 @@ export default function FileViewerDialog({
           t("saveViewerChangesError"),
       );
     } finally {
-      setSavePending(false);
-    }
-  }, [activeFile, canSaveWithNotes, persistAnnotatedDocument, t]);
-
-  const handleSaveWithNotesAndApprove = useCallback(async () => {
-    if (!activeFile || !canSaveWithNotes || !apryseRef.current) return;
-    setSavePending(true);
-    try {
-      await persistAnnotatedDocument();
-      await respondMutation.mutateAsync({
-        item_id: activeFile.id,
-        action: "approve",
-        notes: notesPayload,
-      });
-    } catch (e: unknown) {
-      toast.error(
-        axiosErrorMessage(e)?.trim() ||
-          (e instanceof Error ? e.message : String(e)) ||
-          t("saveViewerChangesError"),
-      );
-    } finally {
-      setSavePending(false);
+      setApplyPending(false);
     }
   }, [
     activeFile,
-    canSaveWithNotes,
+    confirmPreviewReady,
+    confirmState,
+    markApplied,
     notesPayload,
-    persistAnnotatedDocument,
+    replaceAnnotatedMedia,
     respondMutation,
+    setApplyPending,
     t,
   ]);
+
+  const handleSaveWithNotes = useCallback(() => {
+    void requestConfirm("save");
+  }, [requestConfirm]);
+
+  const handleSaveWithNotesAndApprove = useCallback(() => {
+    void requestConfirm("approve");
+  }, [requestConfirm]);
+
+  const annotatedButtonPhase: AnnotatedActionButtonPhase = (() => {
+    if (viewer.isViewerPreparing || !viewer.canExport) {
+      return "viewerPreparing";
+    }
+    if (!hasEdits) return "noEdits";
+    if (editsSettling) return "editsPreparing";
+    if (confirmExporting) return "loadingChanges";
+    return "ready";
+  })();
+
+  const annotatedButtonLabels: Record<AnnotatedActionButtonPhase, string> = {
+    viewerPreparing: t("viewerPreparing"),
+    noEdits: t("saveWithNotes"),
+    editsPreparing: t("editsPreparing"),
+    loadingChanges: t("loadingChanges"),
+    ready: t("saveWithNotes"),
+  };
+
+  const annotatedButtonTitles: Partial<
+    Record<AnnotatedActionButtonPhase, string>
+  > = {
+    viewerPreparing: t("viewerPreparing"),
+    noEdits: t("makeChangesBeforeSave"),
+    editsPreparing: t("editsPreparing"),
+    loadingChanges: t("loadingChanges"),
+  };
+
+  const annotatedButtonBusy =
+    saveExportBusy ||
+    annotatedButtonPhase === "viewerPreparing" ||
+    annotatedButtonPhase === "editsPreparing" ||
+    annotatedButtonPhase === "loadingChanges";
+
+  const annotatedButtonDisabled =
+    !canOpenConfirm || saveExportBusy || respondBusy;
+
+  const approveWithNotesLabel =
+    annotatedButtonPhase === "ready"
+      ? t("requestModification")
+      : annotatedButtonLabels[annotatedButtonPhase];
 
   if (!document || !activeFile) return null;
 
   const showWorkflow = !!document.canTakeAction;
 
   return (
+    <>
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         overlayClassName={STACKED_Z}
@@ -811,11 +856,19 @@ export default function FileViewerDialog({
                   <Button
                     className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 whitespace-nowrap"
                     onClick={handleSaveWithNotesAndApprove}
-                    disabled={
-                      !canSaveWithNotes || saveExportBusy || respondBusy
-                    }
+                    disabled={annotatedButtonDisabled}
+                    title={annotatedButtonTitles[annotatedButtonPhase]}
                   >
-                    ✓ {t("requestModification")}
+                    {annotatedButtonBusy ? (
+                      <CircularProgress
+                        size={16}
+                        sx={{ color: "inherit" }}
+                        className="me-1"
+                      />
+                    ) : (
+                      <span className="me-1">✓</span>
+                    )}
+                    {approveWithNotesLabel}
                   </Button>
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 whitespace-nowrap"
@@ -836,20 +889,10 @@ export default function FileViewerDialog({
                       size="sm"
                       className="bg-yellow-500 hover:bg-yellow-600 text-white disabled:opacity-50"
                       onClick={handleSaveWithNotes}
-                      disabled={
-                        !canSaveWithNotes || saveExportBusy || respondBusy
-                      }
-                      title={
-                        viewer.isViewerPreparing
-                          ? t("viewerPreparing")
-                          : editsSettling
-                            ? t("editsPreparing")
-                            : undefined
-                      }
+                      disabled={annotatedButtonDisabled}
+                      title={annotatedButtonTitles[annotatedButtonPhase]}
                     >
-                      {savePending ||
-                      viewer.isViewerPreparing ||
-                      editsSettling ? (
+                      {annotatedButtonBusy ? (
                         <CircularProgress
                           size={16}
                           sx={{ color: "inherit" }}
@@ -858,11 +901,7 @@ export default function FileViewerDialog({
                       ) : (
                         <Save className="w-4 h-4 me-1" />
                       )}
-                      {viewer.isViewerPreparing
-                        ? t("viewerPreparing")
-                        : editsSettling
-                          ? t("editsPreparing")
-                          : t("saveWithNotes")}
+                      {annotatedButtonLabels[annotatedButtonPhase]}
                     </Button>
                   )}
                   <Button
@@ -989,5 +1028,22 @@ export default function FileViewerDialog({
         </Box>
       </DialogContent>
     </Dialog>
+
+    <AnnotatedDocumentConfirmDialog
+      open={confirmState !== null}
+      action={confirmState?.action ?? null}
+      buffer={confirmState?.buffer ?? null}
+      extension={viewer.extension}
+      fileName={viewerFile?.name ?? activeFile.name}
+      previewReady={confirmPreviewReady}
+      confirmPending={applyPending}
+      onPreviewPreparing={onPreviewPreparing}
+      onPreviewReady={onPreviewReady}
+      onConfirm={() => {
+        void handleConfirmAnnotatedAction();
+      }}
+      onCancel={closeConfirm}
+    />
+    </>
   );
 }

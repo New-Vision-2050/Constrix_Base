@@ -188,6 +188,28 @@ export const projectMessages = new MessagesGroup({
       "Preparing edits…",
       "جاري تجهيز التعديلات",
     ),
+    loadingChanges: _m(
+      "Loading changes…",
+      "جاري تحميل التعديلات…",
+    ),
+    makeChangesBeforeSave: _m(
+      "Make changes on the document before saving",
+      "قم بإجراء تعديلات على المستند قبل الحفظ",
+    ),
+    confirmAnnotatedDocumentTitle: _m(
+      "Review your changes",
+      "مراجعة التعديلات",
+    ),
+    confirmAnnotatedDocumentDescription: _m(
+      "Verify the document includes your annotations before continuing.",
+      "تأكد من أن المستند يتضمن ملاحظاتك قبل المتابعة.",
+    ),
+    confirmAnnotatedDocumentLoading: _m(
+      "Loading preview…",
+      "جاري تحميل المعاينة…",
+    ),
+    confirmSaveWithNotes: _m("Confirm save", "تأكيد الحفظ"),
+    confirmApproveWithNotes: _m("Confirm approval", "تأكيد الاعتماد"),
     saveViewerChangesSuccess: _m(
       "Document changes saved",
       "تم حفظ تغييرات المستند",
