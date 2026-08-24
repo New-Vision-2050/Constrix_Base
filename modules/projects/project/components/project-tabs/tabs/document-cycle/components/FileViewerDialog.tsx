@@ -783,7 +783,15 @@ export default function FileViewerDialog({
                         !viewer.canExport || saveExportBusy || respondBusy
                       }
                     >
-                      <Save className="w-4 h-4 me-1" />
+                      {savePending ? (
+                        <CircularProgress
+                          size={16}
+                          sx={{ color: "inherit" }}
+                          className="me-1"
+                        />
+                      ) : (
+                        <Save className="w-4 h-4 me-1" />
+                      )}
                       {t("saveWithNotes")}
                     </Button>
                   )}
