@@ -180,6 +180,14 @@ export const projectMessages = new MessagesGroup({
     notes: _m("Notes", "ملاحظات"),
     save: _m("Save", "حفظ"),
     saveWithNotes: _m("Save with notes", "حفظ بملاحظات"),
+    viewerPreparing: _m(
+      "Preparing viewer…",
+      "جاري تجهيز العارض…",
+    ),
+    editsPreparing: _m(
+      "Preparing edits…",
+      "جاري تجهيز التعديلات",
+    ),
     saveViewerChangesSuccess: _m(
       "Document changes saved",
       "تم حفظ تغييرات المستند",

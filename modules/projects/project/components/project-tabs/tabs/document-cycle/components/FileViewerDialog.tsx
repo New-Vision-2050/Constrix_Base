@@ -135,6 +135,7 @@ function patchAttachmentRequestInQueryCache(
 }
 
 const STACKED_Z = "z-[1600]";
+const EDIT_SETTLE_MS = 3000;
 
 /** Layout / look — unchanged from previous implementation */
 const layout = {
@@ -251,6 +252,8 @@ type ViewerBufferState = {
   isBufferLoading: boolean;
   fetchError: string | null;
   canExport: boolean;
+  isViewerPreparing: boolean;
+  onViewerPreparing: () => void;
   onViewerReady: () => void;
   viewerInstanceKey: string;
 };
@@ -305,12 +308,25 @@ function useViewerBufferState(
       apryseReady,
   );
 
+  const isViewerPreparing = Boolean(
+    !serverOnlyCad &&
+      query.isSuccess &&
+      buffer &&
+      !query.isError &&
+      !query.isFetching &&
+      !apryseReady,
+  );
+
   // Intentionally excludes `url`: saving annotations replaces the file with
   // a new signed URL for the *same* logical document, and remounting the
   // whole WebViewer instance on every save causes a jarring full reload
   // (and can race with Apryse's own in-flight draw calls). The instance is
   // reused and just re-loads the document when the buffer changes.
   const viewerInstanceKey = `${activeFile?.id ?? "none"}-${extension}`;
+
+  const onViewerPreparing = useCallback(() => {
+    setApryseReady(false);
+  }, []);
 
   const onViewerReady = useCallback(() => {
     setApryseReady(true);
@@ -323,6 +339,8 @@ function useViewerBufferState(
     isBufferLoading,
     fetchError,
     canExport,
+    isViewerPreparing,
+    onViewerPreparing,
     onViewerReady,
     viewerInstanceKey,
   };
@@ -350,9 +368,48 @@ export default function FileViewerDialog({
 
   const apryseRef = useRef<ApryseWebViewerHandle>(null);
   const [savePending, setSavePending] = useState(false);
+  const [editsSettling, setEditsSettling] = useState(false);
+  const editSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const viewerFile = previewFile ?? activeFile;
   const viewer = useViewerBufferState(open, viewerFile);
+
+  const clearEditSettleTimer = useCallback(() => {
+    if (editSettleTimerRef.current) {
+      clearTimeout(editSettleTimerRef.current);
+      editSettleTimerRef.current = null;
+    }
+  }, []);
+
+  const onAnnotationEdited = useCallback(() => {
+    setEditsSettling(true);
+    clearEditSettleTimer();
+    editSettleTimerRef.current = setTimeout(() => {
+      setEditsSettling(false);
+      editSettleTimerRef.current = null;
+    }, EDIT_SETTLE_MS);
+  }, [clearEditSettleTimer]);
+
+  const canSaveWithNotes = viewer.canExport && !editsSettling;
+
+  useEffect(() => {
+    if (!open) {
+      setEditsSettling(false);
+      clearEditSettleTimer();
+    }
+  }, [open, clearEditSettleTimer]);
+
+  useEffect(() => {
+    setEditsSettling(false);
+    clearEditSettleTimer();
+  }, [viewer.viewerInstanceKey, viewer.buffer, clearEditSettleTimer]);
+
+  useEffect(
+    () => () => {
+      clearEditSettleTimer();
+    },
+    [clearEditSettleTimer],
+  );
 
   useEffect(() => {
     if (open) {
@@ -443,7 +500,7 @@ export default function FileViewerDialog({
     if (!activeFile) {
       throw new Error("No active file selected.");
     }
-    if (!viewer.canExport || !apryseRef.current) {
+    if (!canSaveWithNotes || !apryseRef.current) {
       throw new Error(t("saveViewerChangesError"));
     }
     const blob = await apryseRef.current.exportDocumentWithAnnotations();
@@ -469,7 +526,7 @@ export default function FileViewerDialog({
     onAnnotationsSaved?.(activeFile.id);
   }, [
     activeFile,
-    viewer.canExport,
+    canSaveWithNotes,
     onSaveAnnotatedDocument,
     replaceMediaMutation,
     applyUpdatedAttachment,
@@ -478,7 +535,7 @@ export default function FileViewerDialog({
   ]);
 
   const handleSaveWithNotes = useCallback(async () => {
-    if (!activeFile || !viewer.canExport || !apryseRef.current) return;
+    if (!activeFile || !canSaveWithNotes || !apryseRef.current) return;
     setSavePending(true);
     try {
       await persistAnnotatedDocument();
@@ -492,10 +549,10 @@ export default function FileViewerDialog({
     } finally {
       setSavePending(false);
     }
-  }, [activeFile, viewer.canExport, persistAnnotatedDocument, t]);
+  }, [activeFile, canSaveWithNotes, persistAnnotatedDocument, t]);
 
   const handleSaveWithNotesAndApprove = useCallback(async () => {
-    if (!activeFile || !viewer.canExport || !apryseRef.current) return;
+    if (!activeFile || !canSaveWithNotes || !apryseRef.current) return;
     setSavePending(true);
     try {
       await persistAnnotatedDocument();
@@ -515,7 +572,7 @@ export default function FileViewerDialog({
     }
   }, [
     activeFile,
-    viewer.canExport,
+    canSaveWithNotes,
     notesPayload,
     persistAnnotatedDocument,
     respondMutation,
@@ -755,7 +812,7 @@ export default function FileViewerDialog({
                     className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 whitespace-nowrap"
                     onClick={handleSaveWithNotesAndApprove}
                     disabled={
-                      !viewer.canExport || saveExportBusy || respondBusy
+                      !canSaveWithNotes || saveExportBusy || respondBusy
                     }
                   >
                     ✓ {t("requestModification")}
@@ -780,10 +837,19 @@ export default function FileViewerDialog({
                       className="bg-yellow-500 hover:bg-yellow-600 text-white disabled:opacity-50"
                       onClick={handleSaveWithNotes}
                       disabled={
-                        !viewer.canExport || saveExportBusy || respondBusy
+                        !canSaveWithNotes || saveExportBusy || respondBusy
+                      }
+                      title={
+                        viewer.isViewerPreparing
+                          ? t("viewerPreparing")
+                          : editsSettling
+                            ? t("editsPreparing")
+                            : undefined
                       }
                     >
-                      {savePending ? (
+                      {savePending ||
+                      viewer.isViewerPreparing ||
+                      editsSettling ? (
                         <CircularProgress
                           size={16}
                           sx={{ color: "inherit" }}
@@ -792,7 +858,11 @@ export default function FileViewerDialog({
                       ) : (
                         <Save className="w-4 h-4 me-1" />
                       )}
-                      {t("saveWithNotes")}
+                      {viewer.isViewerPreparing
+                        ? t("viewerPreparing")
+                        : editsSettling
+                          ? t("editsPreparing")
+                          : t("saveWithNotes")}
                     </Button>
                   )}
                   <Button
@@ -905,7 +975,9 @@ export default function FileViewerDialog({
                         documentBuffer={viewer.buffer}
                         extension={viewer.extension}
                         fileName={viewerFile?.name ?? activeFile.name}
+                        onViewerPreparing={viewer.onViewerPreparing}
                         onViewerReady={viewer.onViewerReady}
+                        onAnnotationEdited={onAnnotationEdited}
                         stampUrl={stampData?.url ?? null}
                       />
                     </Box>
