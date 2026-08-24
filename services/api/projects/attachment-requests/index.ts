@@ -74,7 +74,10 @@ export const AttachmentRequestsApi = {
         "attachment_sub_sub_type_id",
         data.attachment_sub_sub_type_id,
       );
-    data.attachments.forEach((file) => formData.append("attachments[]", file));
+    data.attachments?.forEach((file) => formData.append("attachments[]", file));
+    data.attachment_upload_ids?.forEach((id) =>
+      formData.append("attachment_upload_ids[]", id),
+    );
     if (data.notes) formData.append("notes", data.notes);
 
     return baseApi.post<{ code: string; message: string | null }>(
@@ -100,11 +103,21 @@ export const AttachmentRequestsApi = {
       body,
     ),
 
-  /** POST multipart: `item_id`, `new_file` — returns updated attachment request in `payload`. */
+  /**
+   * POST `item_id` + either `new_file` (multipart, small files) or `upload_id`
+   * (JSON, token from the completed chunked-upload flow for large files).
+   * Returns updated attachment request in `payload`.
+   */
   replaceItemMedia: (body: ReplaceAttachmentItemMediaPayload) => {
+    if ("upload_id" in body && body.upload_id) {
+      return baseApi.post<ApiBaseResponse<AttachmentRequest>>(
+        "projects/attachment-requests/items/replace-media",
+        { item_id: body.item_id, upload_id: body.upload_id },
+      );
+    }
     const formData = new FormData();
     formData.append("item_id", body.item_id);
-    formData.append("new_file", body.new_file);
+    formData.append("new_file", (body as { new_file: File }).new_file);
     return baseApi.post<ApiBaseResponse<AttachmentRequest>>(
       "projects/attachment-requests/items/replace-media",
       formData,

@@ -32,6 +32,10 @@ import CancelButton from "@/components/shared/buttons/cancel";
 import FormDatePicker from "@/components/shared/FormDatePicker";
 import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
 import { AttachmentRequestsApi } from "@/services/api/projects/attachment-requests";
+import {
+  isLargeFile,
+  uploadLargeFile,
+} from "@/services/api/projects/attachment-requests/chunkedUpload";
 import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
 import { useParams } from "next/navigation";
 
@@ -117,6 +121,32 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
     mutationFn: async (data: FormValues) => {
       if (!projectId) throw new Error("Missing project id");
       setUploadPercent(0);
+
+      const smallFiles = files.filter((f) => !isLargeFile(f));
+      const largeFiles = files.filter((f) => isLargeFile(f));
+      const totalBytes = files.reduce((sum, f) => sum + f.size, 0) || 1;
+      const smallBytes = smallFiles.reduce((sum, f) => sum + f.size, 0);
+      const uploadedLargeBytes = new Array(largeFiles.length).fill(0);
+      let smallUploadedBytes = 0;
+
+      const reportProgress = () => {
+        const uploaded =
+          uploadedLargeBytes.reduce((sum, b) => sum + b, 0) +
+          smallUploadedBytes;
+        setUploadPercent(Math.min(100, Math.round((uploaded / totalBytes) * 100)));
+      };
+
+      const attachment_upload_ids = await Promise.all(
+        largeFiles.map((file, index) =>
+          uploadLargeFile(file, {
+            onProgress: (percent) => {
+              uploadedLargeBytes[index] = (percent / 100) * file.size;
+              reportProgress();
+            },
+          }),
+        ),
+      );
+
       return AttachmentRequestsApi.create(
         {
           name: data.name,
@@ -124,11 +154,15 @@ export default function AddFileDialog({ open, onClose }: AddFileDialogProps) {
           project_id: projectId,
           serial_number: data.serial_number || undefined,
           procedure_setting_id: data.attachment_type_id || undefined,
-          attachments: files,
+          attachments: smallFiles,
+          attachment_upload_ids,
           notes: data.notes || undefined,
         },
         {
-          onUploadProgress: (percent) => setUploadPercent(percent),
+          onUploadProgress: (percent) => {
+            smallUploadedBytes = (percent / 100) * smallBytes;
+            reportProgress();
+          },
         },
       );
     },
