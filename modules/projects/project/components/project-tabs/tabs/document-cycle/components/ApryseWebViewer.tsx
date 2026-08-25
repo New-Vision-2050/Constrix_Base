@@ -200,6 +200,38 @@ async function registerProjectStampInApryse(
   stampTool.setStandardStamps([dataUrl, ...defaultStamps]);
 }
 
+/** Commit in-progress ink/freehand strokes before exporting annotations. */
+async function finalizeAnnotationsForExport(
+  instance: WebViewerInstance,
+): Promise<void> {
+  const { documentViewer, Tools } = instance.Core;
+  const activeTool = documentViewer.getToolMode() as {
+    end?: () => void;
+    complete?: () => void;
+  } | null;
+
+  activeTool?.end?.();
+  activeTool?.complete?.();
+  documentViewer.setToolMode(documentViewer.getTool(Tools.ToolNames.PAN));
+
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+}
+
+/** Re-measure the host and fit the current page to the visible area. */
+function syncViewerLayout(instance: WebViewerInstance): void {
+  try {
+    const ui = instance.UI as typeof instance.UI & { resize?: () => void };
+    ui.resize?.();
+    instance.Core.documentViewer.updateView();
+    const fitPage = instance.UI.FitMode?.FitPage ?? "FitPage";
+    instance.UI.setFitMode(fitPage);
+  } catch {
+    /* UI may not be ready during teardown */
+  }
+}
+
 export type ApryseWebViewerHandle = {
   exportDocumentWithAnnotations: () => Promise<Blob>;
 };
@@ -209,24 +241,45 @@ type ApryseWebViewerProps = {
   /** Lowercase extension from {@link resolveWebViewerExtension} — drives Office vs PDF pipeline. */
   extension: string;
   fileName?: string;
+  /** Fired when a new document load starts — use to disable save/export. */
+  onViewerPreparing?: () => void;
+  /** Fired when the viewer can reliably export annotations (after stamp setup). */
   onViewerReady?: () => void;
+  /** Fired when the user adds, modifies, or deletes a document annotation. */
+  onAnnotationEdited?: () => void;
   /** Project stamp URL to register in Apryse Stamps panel */
   stampUrl?: string | null;
+  /** When true, fills a flex/absolute parent (no minHeight fallback). */
+  fillParent?: boolean;
 };
 
 export const ApryseWebViewer = forwardRef<
   ApryseWebViewerHandle,
   ApryseWebViewerProps
 >(function ApryseWebViewer(
-  { documentBuffer, extension: extRaw, fileName, onViewerReady, stampUrl },
+  {
+    documentBuffer,
+    extension: extRaw,
+    fileName,
+    onViewerPreparing,
+    onViewerReady,
+    onAnnotationEdited,
+    stampUrl,
+    fillParent = false,
+  },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<WebViewerInstance | null>(null);
+  const onViewerPreparingRef = useRef(onViewerPreparing);
   const onViewerReadyRef = useRef(onViewerReady);
+  const onAnnotationEditedRef = useRef(onAnnotationEdited);
   const stampResizeCleanupRef = useRef<(() => void) | null>(null);
+  const editListenerCleanupRef = useRef<(() => void) | null>(null);
   const persistenceCleanupRef = useRef<(() => void) | null>(null);
+  onViewerPreparingRef.current = onViewerPreparing;
   onViewerReadyRef.current = onViewerReady;
+  onAnnotationEditedRef.current = onAnnotationEdited;
 
   const ext = (extRaw || "pdf").toLowerCase();
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -245,6 +298,8 @@ export const ApryseWebViewer = forwardRef<
       if (!doc) {
         throw new Error("No document is loaded in the viewer.");
       }
+
+      await finalizeAnnotationsForExport(inst);
 
       const xfdfString = await annotationManager.exportAnnotations();
       const exportExt = getExtensionFromFileName(fileName) || ext;
@@ -269,6 +324,7 @@ export const ApryseWebViewer = forwardRef<
 
   const isOffice = OFFICE_EXTENSIONS.has(ext);
   const initPromiseRef = useRef<Promise<WebViewerInstance> | null>(null);
+  const disposeChainRef = useRef<Promise<void>>(Promise.resolve());
 
   // Creates the WebViewer instance once per mount (or when switching between
   // the Office and non-Office rendering pipelines, which require different
@@ -279,15 +335,27 @@ export const ApryseWebViewer = forwardRef<
   // "Cannot read properties of null (reading 'drawImage')" crash, and a full
   // re-init is also a slow, jarring reload for what is otherwise just a
   // document swap (e.g. after saving annotations).
+  //
+  // Apryse requires a unique DOM node per instance. React Strict Mode (and
+  // rapid remounts) re-run this effect on the same host element, so we mount
+  // into a fresh child div and serialize dispose → init across effect cycles.
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    const host = containerRef.current;
+    if (!host) return;
 
     let cancelled = false;
+    let viewerElement: HTMLDivElement | null = null;
 
     const licenseKey = getLicenseKey();
 
-    initPromiseRef.current = (async () => {
+    const initPromise = disposeChainRef.current.then(async () => {
+      if (cancelled) throw new Error("cancelled");
+
+      viewerElement = document.createElement("div");
+      viewerElement.style.width = "100%";
+      viewerElement.style.height = "100%";
+      host.replaceChildren(viewerElement);
+
       const { default: WebViewer } = await import("@pdftron/webviewer");
 
       const officePreload = isLegacyOfficeExtension(ext)
@@ -307,19 +375,20 @@ export const ApryseWebViewer = forwardRef<
       };
 
       const instance = isOffice
-        ? await WebViewer(baseOptions, el)
-        : await WebViewer.Iframe(baseOptions, el);
+        ? await WebViewer(baseOptions, viewerElement)
+        : await WebViewer.Iframe(baseOptions, viewerElement);
 
       if (cancelled) {
-        void instance.UI.dispose();
+        await instance.UI.dispose();
         throw new Error("cancelled");
       }
 
       instanceRef.current = instance;
       return instance;
-    })();
+    });
 
-    initPromiseRef.current.catch(() => {
+    initPromiseRef.current = initPromise;
+    initPromise.catch(() => {
       /* handled by the load effect below */
     });
 
@@ -330,12 +399,20 @@ export const ApryseWebViewer = forwardRef<
       stampResizeCleanupRef.current = null;
       persistenceCleanupRef.current?.();
       persistenceCleanupRef.current = null;
-      const inst = instanceRef.current;
-      instanceRef.current = null;
-      if (inst) {
-        void inst.UI.dispose();
-      }
-      el.replaceChildren();
+
+      disposeChainRef.current = initPromise
+        .then(async (instance) => {
+          if (instanceRef.current === instance) {
+            instanceRef.current = null;
+          }
+          await instance.UI.dispose();
+        })
+        .catch(() => {
+          instanceRef.current = null;
+        })
+        .finally(() => {
+          viewerElement?.remove();
+        });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOffice]);
@@ -354,6 +431,7 @@ export const ApryseWebViewer = forwardRef<
     let cancelled = false;
     setStatus("loading");
     setErrorMessage(null);
+    onViewerPreparingRef.current?.();
 
     const initTimeoutMs = isOffice ? 180000 : 90000;
     const initTimeout = window.setTimeout(() => {
@@ -391,8 +469,8 @@ export const ApryseWebViewer = forwardRef<
         await instance.UI.loadDocument(docSource, loadOpts as never);
 
         if (cancelled) return;
+        syncViewerLayout(instance);
         setStatus("ready");
-        onViewerReadyRef.current?.();
       } catch (err: unknown) {
         if (cancelled) return;
         const msg = err instanceof Error ? err.message : String(err);
@@ -473,17 +551,73 @@ export const ApryseWebViewer = forwardRef<
         persistenceCleanupRef.current?.();
         persistenceCleanupRef.current = bindApryseViewerPersistence(instance);
         setupStampResize();
+
+        editListenerCleanupRef.current?.();
+        const { annotationManager } = instance.Core;
+        const onUserAnnotationChanged = (
+          _annots: unknown[],
+          action: string,
+          info?: { imported?: boolean },
+        ) => {
+          if (info?.imported) return;
+          if (action !== "add" && action !== "modify" && action !== "delete") {
+            return;
+          }
+          onAnnotationEditedRef.current?.();
+        };
+        annotationManager.addEventListener(
+          "annotationChanged",
+          onUserAnnotationChanged,
+        );
+        editListenerCleanupRef.current = () => {
+          annotationManager.removeEventListener(
+            "annotationChanged",
+            onUserAnnotationChanged,
+          );
+        };
       } catch (stampError) {
         console.warn("Failed to set up Apryse stamp persistence:", stampError);
+      } finally {
+        if (!cancelled) {
+          onViewerReadyRef.current?.();
+        }
       }
     })();
 
     return () => {
       cancelled = true;
+      editListenerCleanupRef.current?.();
+      editListenerCleanupRef.current = null;
       persistenceCleanupRef.current?.();
       persistenceCleanupRef.current = null;
     };
   }, [stampUrl, status]);
+
+  // Re-fit when the host resizes (e.g. confirm dialog flex layout settling).
+  useEffect(() => {
+    if (status !== "ready") return;
+
+    const instance = instanceRef.current;
+    const el = containerRef.current;
+    if (!instance || !el) return;
+
+    const sync = () => syncViewerLayout(instance);
+
+    sync();
+    const delayedSync = window.setTimeout(sync, 150);
+
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(sync);
+    });
+    observer.observe(el);
+
+    return () => {
+      clearTimeout(delayedSync);
+      observer.disconnect();
+    };
+  }, [status, documentBuffer]);
+
+  const viewerMinHeight = fillParent ? 0 : 400;
 
   return (
     <Box
@@ -491,7 +625,7 @@ export const ApryseWebViewer = forwardRef<
         position: "relative",
         width: "100%",
         height: "100%",
-        minHeight: 400,
+        minHeight: viewerMinHeight,
         bgcolor: "background.default",
       }}
     >
@@ -500,7 +634,7 @@ export const ApryseWebViewer = forwardRef<
         sx={{
           width: "100%",
           height: "100%",
-          minHeight: 400,
+          minHeight: viewerMinHeight,
           "& iframe": { border: 0 },
         }}
       />
