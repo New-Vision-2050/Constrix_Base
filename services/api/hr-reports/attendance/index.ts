@@ -1,6 +1,5 @@
 import { baseApi } from "@/config/axios/instances/base";
 import type { CreateReportApiBody } from "./types/request";
-import { downloadFromResponse } from "@/utils/downloadFromResponse";
 import type {
   ListReportsParams,
   ListReportTemplatesParams,
@@ -10,6 +9,7 @@ import type {
   AttendanceReportMutationRaw,
   attendanceReportListResponse,
   AttendanceReportsListRaw,
+  ReportDownloadRaw,
 } from "./types/response";
 
 export const AttendanceReportsApi = {
@@ -29,10 +29,16 @@ export const AttendanceReportsApi = {
     baseApi.get<AttendanceReportsListRaw>("reports/templates", { params }),
 
   download: async (reportId: string) => {
-    const response = await baseApi.get(`reports/${reportId}/download`, {
-      responseType: "blob",
-    });
-    downloadFromResponse(response, `report-${reportId}`);
+    const { data } = await baseApi.get<ReportDownloadRaw>(
+      `reports/${reportId}/download`,
+      { headers: { Accept: "application/json" } },
+    );
+    const url = data?.payload?.download_url;
+    if (!url) {
+      throw new Error("download_url missing from report download response");
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+    return data.payload;
   },
   delete: (reportId: string) =>
     baseApi.delete(`reports/${reportId}`),
@@ -47,6 +53,7 @@ export type {
   AttendanceReportDetailRaw,
   AttendanceReportMutationRaw,
   AttendanceReportsListRaw,
+  ReportDownloadRaw,
   attendanceReport,
   attendanceReportListResponse,
 } from "./types/response";

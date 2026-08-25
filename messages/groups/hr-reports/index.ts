@@ -98,6 +98,11 @@ export const hrReportsMessages = new MessagesGroup({
         "Please try again later.",
         "يُرجى المحاولة لاحقاً.",
       ),
+      downloadReportStarting: _m("Starting download…", "جاري بدء التحميل…"),
+      downloadReportStartingDesc: _m(
+        "Your file will be saved shortly.",
+        "سيتم حفظ الملف قريباً.",
+      ),
       emptyReports: _m(
         "No reports yet. Create one using the button above.",
         "لا توجد تقارير بعد. أنشئ تقريراً باستخدام الزر أعلاه.",
