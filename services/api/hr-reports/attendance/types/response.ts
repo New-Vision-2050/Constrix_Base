@@ -44,6 +44,18 @@ export type attendanceReport = {
   serial_number: string;
 }
 
+export type ReportDownloadRaw = {
+  code: string;
+  message: string | null;
+  payload: {
+    download_url: string;
+    file_name: string;
+    mime: string;
+    file_size: number | null;
+    expires_in: number;
+  };
+};
+
 export type AttendanceReportsListRaw = unknown;
 export type AttendanceReportDetailRaw = unknown;
 export type AttendanceReportMutationRaw = unknown;

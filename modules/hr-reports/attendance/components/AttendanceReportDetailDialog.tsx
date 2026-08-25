@@ -151,6 +151,10 @@ export default function AttendanceReportDetailDialog({
     setDownloading(true);
     try {
       await AttendanceReportsApi.download(reportId);
+      toast({
+        title: t("downloadReportStarting"),
+        description: t("downloadReportStartingDesc"),
+      });
     } catch (err) {
       toast({
         variant: "destructive",
