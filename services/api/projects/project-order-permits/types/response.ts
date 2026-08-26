@@ -233,5 +233,6 @@ export interface NoteLog {
 }
 
 export interface NoteLogsResponse {
-  data: NoteLog[];
+  payload?: NoteLog[];
+  data?: NoteLog[];
 }

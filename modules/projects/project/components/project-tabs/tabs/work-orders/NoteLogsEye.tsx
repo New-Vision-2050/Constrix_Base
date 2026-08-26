@@ -1,51 +1,65 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
-  Popover,
-  Paper,
-  Typography,
   Box,
   CircularProgress,
-  Divider,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Tooltip,
+  Typography,
 } from "@mui/material";
+import { Close } from "@mui/icons-material";
 import { Eye } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useNoteLogs } from "@/modules/projects/project/query/useNoteLogs";
+import type { NoteLog } from "@/services/api/projects/project-order-permits/types/response";
+import type { NoteLogTypeFilter } from "./noteLogTypes";
 
 interface NoteLogsEyeProps {
   projectId: string | undefined;
   orderPermitId: string;
   emptyDash: string;
-  noteType?: string;
+  noteTypes?: NoteLogTypeFilter;
 }
 
-function formatLogDate(dateStr: string | null, timeStr: string | null): string {
-  if (!dateStr) return "—";
-  const time = timeStr ? ` ${timeStr}` : "";
-  return `${dateStr}${time}`;
+function formatLogDateTime(log: NoteLog): string {
+  if (log.created_at) return log.created_at;
+  if (!log.created_at_date) return "—";
+  const time = log.created_at_time ? ` ${log.created_at_time}` : "";
+  return `${log.created_at_date}${time}`;
+}
+
+function getLogUserName(log: NoteLog): string {
+  return log.user_name?.trim() || log.created_by_name?.trim() || "—";
 }
 
 export default function NoteLogsEye({
   projectId,
   orderPermitId,
   emptyDash,
-  noteType,
+  noteTypes,
 }: NoteLogsEyeProps) {
+  const t = useTranslations("project.workOrdersTab.noteLogs");
   const [open, setOpen] = useState(false);
-  const anchorRef = useRef<HTMLButtonElement>(null);
   const { data: logs, isLoading } = useNoteLogs(
-    open ? projectId : null,
-    open ? orderPermitId : null,
-    noteType,
+    open ? projectId : undefined,
+    open ? orderPermitId : undefined,
+    noteTypes,
   );
 
   return (
     <>
-      <Tooltip title="View note logs">
+      <Tooltip title={t("viewTooltip")}>
         <IconButton
-          ref={anchorRef}
           size="small"
           onClick={(e) => {
             e.stopPropagation();
@@ -56,53 +70,68 @@ export default function NoteLogsEye({
           <Eye className="w-4 h-4" />
         </IconButton>
       </Tooltip>
-      <Popover
+      <Dialog
         open={open}
-        anchorEl={anchorRef.current}
         onClose={() => setOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
-        slotProps={{
-          paper: {
-            sx: {
-              maxWidth: 480,
-              width: 480,
-              maxHeight: 400,
-              overflow: "auto",
-              p: 2,
-            },
-          },
-        }}
+        maxWidth="md"
+        fullWidth
+        onClick={(e) => e.stopPropagation()}
       >
-        <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
-          Note Logs
-        </Typography>
-        <Divider sx={{ mb: 1 }} />
-        {isLoading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
-            <CircularProgress size={24} />
-          </Box>
-        ) : !logs || logs.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: "center" }}>
-            {emptyDash}
-          </Typography>
-        ) : (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            {logs.map((log, idx) => (
-              <Box key={log.id ?? idx}>
-                <Typography variant="caption" color="text.secondary">
-                  {formatLogDate(log.created_at_date, log.created_at_time)}
-                  {log.created_by_name ? ` — ${log.created_by_name}` : ""}
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 0.25 }}>
-                  {log.note || emptyDash}
-                </Typography>
-                {idx < logs.length - 1 && <Divider sx={{ mt: 1.5 }} />}
-              </Box>
-            ))}
-          </Box>
-        )}
-      </Popover>
+        <DialogTitle sx={{ pr: 6 }}>
+          {t("title")}
+          <IconButton
+            onClick={() => setOpen(false)}
+            aria-label={t("title")}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ p: 0 }}>
+          {isLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+              <CircularProgress size={28} />
+            </Box>
+          ) : !logs || logs.length === 0 ? (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 4, textAlign: "center" }}
+            >
+              {t("empty")}
+            </Typography>
+          ) : (
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: "action.hover" }}>
+                    <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap" }}>
+                      {t("user")}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>{t("note")}</TableCell>
+                    <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap" }}>
+                      {t("dateTime")}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {logs.map((log, idx) => (
+                    <TableRow key={log.id ?? idx}>
+                      <TableCell sx={{ whiteSpace: "nowrap" }}>
+                        {getLogUserName(log)}
+                      </TableCell>
+                      <TableCell>{log.note?.trim() || emptyDash}</TableCell>
+                      <TableCell sx={{ whiteSpace: "nowrap" }}>
+                        {formatLogDateTime(log)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
