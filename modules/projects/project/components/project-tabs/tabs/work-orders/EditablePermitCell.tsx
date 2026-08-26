@@ -15,6 +15,7 @@ import {
 import { useProjectEmployees } from "@/modules/projects/project/query/useProjectEmployees";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { noteTextDisplaySx } from "./noteColumns";
 
 export type EditablePermitField =
   | "permitStatus"
@@ -52,6 +53,34 @@ interface EditablePermitCellProps {
     value: string,
     row: WorkOrderRow,
   ) => string | null;
+}
+
+const MULTILINE_TEXT_FIELDS = new Set<EditablePermitField>([
+  "noteFromPermitToDepartments",
+  "noteFromDepartmentsToPermit",
+  "descriptionDetails",
+  "consultantStatement",
+]);
+
+const NOTE_INPUT_MIN_ROWS = 3;
+const NOTE_INPUT_MAX_ROWS = 10;
+
+const noteTextEditorSx = {
+  minWidth: 280,
+  maxWidth: 420,
+  width: "100%",
+  "& .MuiInputBase-root": {
+    alignItems: "flex-start",
+  },
+  "& textarea": {
+    overflow: "auto !important",
+    resize: "none",
+    lineHeight: 1.5,
+  },
+} as const;
+
+function isMultilineTextField(field: EditablePermitField): boolean {
+  return MULTILINE_TEXT_FIELDS.has(field);
 }
 
 function parseOptionalNumber(value: string): number | null {
@@ -323,10 +352,10 @@ export default function EditablePermitCell({
         onClick={startEditing}
         style={{
           cursor: "pointer",
-          display: "inline-flex",
+          display: isMultilineTextField(field) ? "inline-block" : "inline-flex",
           alignItems: "center",
           gap: 4,
-          minWidth: 60,
+          minWidth: isMultilineTextField(field) ? 200 : 60,
           minHeight: 28,
           padding: "2px 8px",
           borderRadius: 4,
@@ -334,6 +363,7 @@ export default function EditablePermitCell({
           backgroundColor: "rgba(25, 118, 210, 0.04)",
           transition: "border-color 0.2s, background-color 0.2s",
           fontSize: "0.875rem",
+          ...(isMultilineTextField(field) ? noteTextDisplaySx : {}),
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = "rgba(25, 118, 210, 1)";
@@ -350,9 +380,18 @@ export default function EditablePermitCell({
   }
 
   const commonSx = { minWidth: 120 };
+  const isMultilineField = isMultilineTextField(field);
 
   return (
-    <div ref={anchorRef} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+    <div
+      ref={anchorRef}
+      style={{
+        display: "flex",
+        alignItems: isMultilineField ? "flex-start" : "center",
+        gap: 4,
+        maxWidth: "100%",
+      }}
+    >
       {field === "permitStatus" && (
         <Select
           size="small"
@@ -421,9 +460,21 @@ export default function EditablePermitCell({
 
       {(field === "noteFromPermitToDepartments" ||
         field === "noteFromDepartmentsToPermit" ||
-        field === "evaluationPermitStatus" ||
         field === "descriptionDetails" ||
         field === "consultantStatement") && (
+        <TextField
+          size="small"
+          multiline
+          minRows={NOTE_INPUT_MIN_ROWS}
+          maxRows={NOTE_INPUT_MAX_ROWS}
+          value={value || ""}
+          onChange={(e) => setValue(e.target.value)}
+          sx={noteTextEditorSx}
+          autoFocus
+        />
+      )}
+
+      {field === "evaluationPermitStatus" && (
         <TextField
           size="small"
           value={value || ""}

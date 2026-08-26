@@ -51,6 +51,7 @@ import {
   canEditNoteFromPermit,
   NOTE_FROM_DEPARTMENTS_COLUMN,
   NOTE_FROM_PERMIT_COLUMN,
+  noteTextDisplaySx,
 } from "./noteColumns";
 import {
   DEPARTMENTS_TO_PERMIT_NOTE_TYPES,
@@ -516,7 +517,7 @@ export default function WorkOrdersTab({
           render: (row: WorkOrderRow) => {
             if (key === NOTE_FROM_PERMIT_COLUMN) {
               return (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, minWidth: 0 }}>
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5, minWidth: 0 }}>
                   {canEditNoteFromPermit(isEditable) ? (
                     <PerRowEditablePermitCell
                       row={row}
@@ -528,7 +529,9 @@ export default function WorkOrdersTab({
                       validateDrillingField={validateDrillingField}
                     />
                   ) : (
-                    <span>{row.noteFromPermitToDepartments || emptyDash}</span>
+                    <Box component="span" sx={noteTextDisplaySx}>
+                      {row.noteFromPermitToDepartments || emptyDash}
+                    </Box>
                   )}
                   <NoteLogsEye
                     projectId={projectId}
@@ -542,7 +545,7 @@ export default function WorkOrdersTab({
 
             if (key === NOTE_FROM_DEPARTMENTS_COLUMN) {
               return (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, minWidth: 0 }}>
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5, minWidth: 0 }}>
                   {canEditNoteFromDepartments(isProjectEditable) ? (
                     <PerRowEditablePermitCell
                       row={row}
@@ -554,7 +557,9 @@ export default function WorkOrdersTab({
                       validateDrillingField={validateDrillingField}
                     />
                   ) : (
-                    <span>{row.noteFromDepartmentsToPermit || emptyDash}</span>
+                    <Box component="span" sx={noteTextDisplaySx}>
+                      {row.noteFromDepartmentsToPermit || emptyDash}
+                    </Box>
                   )}
                   <NoteLogsEye
                     projectId={projectId}

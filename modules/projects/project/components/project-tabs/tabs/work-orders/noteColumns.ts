@@ -21,3 +21,11 @@ export function canEditNoteFromPermit(isEditable: boolean): boolean {
 export function canEditNoteFromDepartments(isProjectEditable: boolean): boolean {
   return isProjectEditable;
 }
+
+export const noteTextDisplaySx = {
+  whiteSpace: "pre-wrap",
+  wordBreak: "break-word",
+  minWidth: 200,
+  maxWidth: 320,
+  display: "inline-block",
+} as const;
