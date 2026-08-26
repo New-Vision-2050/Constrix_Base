@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useDeferredValue } from "react";
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   CircularProgress,
@@ -18,7 +19,8 @@ import { useOptionalProject } from "@/modules/all-project/context/ProjectContext
 import { useOptionalContractualEngagement } from "@/modules/projects/project/context/ContractualEngagementContext";
 import { useAttachmentRequests } from "@/modules/projects/project/query/useAttachmentRequests";
 import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
-import { ProjectSharingApi } from "@/services/api/projects/project-sharing";
+import { InternalProcedureSettingsApi } from "@/services/api/hr-settings/internal-procedure-settings";
+import { baseApi } from "@/config/axios/instances/base";
 import {
   PROJECT_ARCHIVE_CYCLE_CREATE,
   PROJECT_ARCHIVE_CYCLE_LIST,
@@ -34,7 +36,9 @@ import AddFileDialog from "./AddFileDialog";
 import AttachmentRequestDetailDialog from "./AttachmentRequestDetailDialog";
 import { EyeIcon } from "lucide-react";
 
-const TableLayout = HeadlessTableLayout<DocumentRow>(
+const DOCUMENT_TYPE_PROCEDURE = "project_procedure";
+
+type CompanyOption = { id: string; name: string };const TableLayout = HeadlessTableLayout<DocumentRow>(
   "attachment-requests-table",
 );
 
@@ -130,19 +134,45 @@ export default function AttachmentRequestsTable() {
     [engagement, flatPerms],
   );
 
-  // Fetch shared companies for receiver filter dropdown
-  const { data: sharesData } = useQuery({
-    queryKey: ["project-shares", projectId],
-    queryFn: () => ProjectSharingApi.listForProject(projectId!),
-    enabled: !!projectId,
+  // Companies API for الجهة filter → receiver_company_ids[]
+  const [companySearch, setCompanySearch] = useState("");
+  const deferredCompanySearch = useDeferredValue(companySearch);
+  const { data: companies = [], isFetching: loadingCompanies } = useQuery({
+    queryKey: ["companies", "attachment-requests-filter", deferredCompanySearch],
+    queryFn: async (): Promise<CompanyOption[]> => {
+      const res = await baseApi.get("companies", {
+        params: {
+          per_page: 50,
+          ...(deferredCompanySearch.trim()
+            ? { name: deferredCompanySearch.trim() }
+            : {}),
+        },
+      });
+      const raw =
+        res.data?.payload ?? res.data?.data ?? res.data?.companies ?? [];
+      const list = Array.isArray(raw) ? raw : [];
+      return list
+        .map((item: { id?: string | number; name?: string }) => ({
+          id: String(item.id ?? ""),
+          name: String(item.name ?? "").trim(),
+        }))
+        .filter((c: CompanyOption) => c.id && c.name);
+    },
   });
 
-  const sharedCompanies = useMemo(() => {
-    const shares = sharesData?.data?.payload ?? [];
-    return shares
-      .map((share) => share.shared_with_company)
-      .filter((c): c is NonNullable<typeof c> => !!c && !!c.name);
-  }, [sharesData]);
+  // Document types (نوع الوثيقة) — same source as AddFileDialog
+  const { data: documentTypes = [], isLoading: loadingDocumentTypes } =
+    useQuery({
+      queryKey: ["internal-procedures", DOCUMENT_TYPE_PROCEDURE, projectId],
+      queryFn: async () => {
+        if (!projectId) return [];
+        return InternalProcedureSettingsApi.getInternalProcedures(
+          DOCUMENT_TYPE_PROCEDURE,
+          { projectId },
+        );
+      },
+      enabled: !!projectId,
+    });
 
   const [addFileOpen, setAddFileOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -151,11 +181,9 @@ export default function AttachmentRequestsTable() {
   );
 
   const [filterType, setFilterType] = useState("");
-  const [filterEndDate, setFilterEndDate] = useState("");
-  const [filterDirection, setFilterDirection] = useState<
-    "" | "incoming" | "outgoing"
-  >("");
-  const [filterReceiverId, setFilterReceiverId] = useState("");
+  const [filterProcedureSettingId, setFilterProcedureSettingId] = useState("");
+  const [filterReceiverCompany, setFilterReceiverCompany] =
+    useState<CompanyOption | null>(null);
 
   const params = TableLayout.useTableParams({
     initialPage: 1,
@@ -168,9 +196,10 @@ export default function AttachmentRequestsTable() {
     page: params.page,
     perPage: params.limit,
     type: filterType || undefined,
-    endDate: filterEndDate || undefined,
-    direction: filterDirection,
-    receiverId: filterReceiverId || undefined,
+    procedureSettingId: filterProcedureSettingId || undefined,
+    receiverCompanyIds: filterReceiverCompany?.id
+      ? [filterReceiverCompany.id]
+      : undefined,
     name: params.search || undefined,
   });
 
@@ -336,43 +365,59 @@ export default function AttachmentRequestsTable() {
                 <TextField
                   select
                   size="small"
-                  label={t("requestDirectionFilter")}
-                  value={filterDirection}
+                  label={t("documentType")}
+                  value={filterProcedureSettingId}
                   onChange={(e) => {
-                    setFilterDirection(
-                      e.target.value as "" | "incoming" | "outgoing",
-                    );
+                    setFilterProcedureSettingId(e.target.value);
                     params.setPage(1);
                   }}
+                  disabled={loadingDocumentTypes}
                   sx={filterSx}
                 >
                   <MenuItem value="">{t("all")}</MenuItem>
-                  <MenuItem value="outgoing">
-                    {t("requestTypeOutgoing")}
-                  </MenuItem>
-                  <MenuItem value="incoming">
-                    {t("requestTypeIncoming")}
-                  </MenuItem>
-                </TextField>
-
-                <TextField
-                  select
-                  size="small"
-                  label={t("counterpartyColumn")}
-                  value={filterReceiverId}
-                  onChange={(e) => {
-                    setFilterReceiverId(e.target.value);
-                    params.setPage(1);
-                  }}
-                  sx={filterSx}
-                >
-                  <MenuItem value="">{t("all")}</MenuItem>
-                  {sharedCompanies.map((company) => (
-                    <MenuItem key={company.id} value={String(company.id)}>
-                      {company.name}
+                  {documentTypes.map((type) => (
+                    <MenuItem key={type.id} value={String(type.id)}>
+                      {type.name}
                     </MenuItem>
                   ))}
                 </TextField>
+
+                <Autocomplete
+                  size="small"
+                  options={companies}
+                  loading={loadingCompanies}
+                  value={filterReceiverCompany}
+                  onChange={(_, value) => {
+                    setFilterReceiverCompany(value);
+                    params.setPage(1);
+                  }}
+                  onInputChange={(_, value, reason) => {
+                    if (reason === "input") setCompanySearch(value);
+                    if (reason === "clear") setCompanySearch("");
+                  }}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(a, b) => a.id === b.id}
+                  filterOptions={(x) => x}
+                  sx={filterSx}
+                  renderInput={(inputParams) => (
+                    <TextField
+                      {...inputParams}
+                      label={t("counterpartyColumn")}
+                      placeholder={t("all")}
+                      InputProps={{
+                        ...inputParams.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingCompanies ? (
+                              <CircularProgress color="inherit" size={16} />
+                            ) : null}
+                            {inputParams.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                    />
+                  )}
+                />
 
                 <TextField
                   select
@@ -393,19 +438,6 @@ export default function AttachmentRequestsTable() {
                     {t("partiallyApproved")}
                   </MenuItem>
                 </TextField>
-
-                <TextField
-                  size="small"
-                  label={t("endDate")}
-                  type="date"
-                  value={filterEndDate}
-                  onChange={(e) => {
-                    setFilterEndDate(e.target.value);
-                    params.setPage(1);
-                  }}
-                  InputLabelProps={{ shrink: true }}
-                  sx={filterSx}
-                />
               </Stack>
 
               <TableLayout.TopActions
