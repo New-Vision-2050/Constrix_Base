@@ -47,8 +47,6 @@ export type AttendanceDataTypeId =
   | "official_out"
   | "actual_in"
   | "actual_out"
-  | "task_in"
-  | "task_out"
   | "delay"
   | "overtime"
   | "total_hours";

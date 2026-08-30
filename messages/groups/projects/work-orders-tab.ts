@@ -30,6 +30,24 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   all: _m("All", "الكل"),
   yes: _m("Yes", "نعم"),
   no: _m("No", "لا"),
+  validation: new MessagesGroup({
+    achievedDrillingExceedsTarget: _m(
+      "Achieved drilling cannot be greater than target drilling",
+      "الحفر المنفذ لا يمكن أن يكون أكبر من الحفر المستهدف",
+    ),
+    achievedExtentionExceedsTarget: _m(
+      "Achieved extension cannot be greater than target extension",
+      "التمديد المنفذ لا يمكن أن يكون أكبر من التمديد المستهدف",
+    ),
+  }),
+  noteLogs: new MessagesGroup({
+    title: _m("Note logs", "سجل الملاحظات"),
+    viewTooltip: _m("View note logs", "عرض سجل الملاحظات"),
+    user: _m("User", "المستخدم"),
+    note: _m("Note", "الملاحظة"),
+    dateTime: _m("Date & time", "التاريخ والوقت"),
+    empty: _m("No notes yet", "لا توجد ملاحظات"),
+  }),
   filters: new MessagesGroup({
     workOrderId: _m("Work order", "امر العمل"),
     workOrderType: _m("Work order type", "نوع امر العمل"),

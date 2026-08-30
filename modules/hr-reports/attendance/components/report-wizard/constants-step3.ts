@@ -17,8 +17,6 @@ export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   { id: "official_out", column: "a" },
   { id: "actual_in", column: "a" },
   { id: "actual_out", column: "b" },
-  { id: "task_in", column: "b" },
-  { id: "task_out", column: "b" },
   { id: "delay", column: "b" },
   { id: "overtime", column: "b" },
   { id: "total_hours", column: "b" },

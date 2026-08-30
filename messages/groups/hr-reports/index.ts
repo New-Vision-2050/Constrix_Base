@@ -509,14 +509,6 @@ export const hrReportsMessages = new MessagesGroup({
           official_out: _m("Official Out", "موعد الخروج الرسمي"),
           actual_in: _m("Actual In", "موعد الدخول الفعلي"),
           actual_out: _m("Actual Out", "موعد الخروج الفعلي"),
-          task_in: _m(
-            "Task In",
-            "موعد بداية المهمة الخارجية",
-          ),
-          task_out: _m(
-            "Task Out",
-            "موعد نهاية المهمة الخارجية",
-          ),
           delay: _m("Delay", "التأخير"),
           overtime: _m("Overtime", "الوقت الإضافي"),
           total_hours: _m("Total Hours", "إجمالي ساعات العمل"),

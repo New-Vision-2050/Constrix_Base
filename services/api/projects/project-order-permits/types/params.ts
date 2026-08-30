@@ -33,6 +33,7 @@ export interface ListUdsWorkOrdersParams {
 
 export interface UpdateProjectOrderPermitArgs {
   permit_status_id?: number | null;
+  phase_status_id?: number | null;
   start_permit_date?: string | null;
   end_permit_date?: string | null;
   note_from_permit_to_departments?: string | null;
@@ -41,4 +42,12 @@ export interface UpdateProjectOrderPermitArgs {
   count_of_days_from_assigned_date?: number | string | null;
   evaluation_permit_status?: string | null;
   employee_id?: string | number | null;
+  completion_phase_id?: number | null;
+  target_drilling?: number | null;
+  achieved_drilling?: number | null;
+  target_extention?: number | null;
+  achieved_extention?: number | null;
+  description_details?: string | null;
+  consultant_statement?: string | null;
+  last_date_consultant_statement?: string | null;
 }

@@ -44,11 +44,26 @@ export const AttachmentRequestsApi = {
     }),
 
   /** GET `projects/attachment-requests` — combined incoming + outgoing (use row `direction` / `type`) */
-  getList: (params: AttachmentRequestsListParams) =>
-    baseApi.get<GetAttachmentRequestsListResponse>(
+  getList: (params: AttachmentRequestsListParams) => {
+    const { receiver_company_ids, ...rest } = params;
+    return baseApi.get<GetAttachmentRequestsListResponse>(
       "projects/attachment-requests",
-      { params },
-    ),
+      {
+        params: rest,
+        paramsSerializer: (p) => {
+          const searchParams = new URLSearchParams();
+          Object.entries(p).forEach(([key, value]) => {
+            if (value === undefined || value === null || value === "") return;
+            searchParams.append(key, String(value));
+          });
+          receiver_company_ids?.forEach((id) => {
+            if (id) searchParams.append("receiver_company_ids[]", id);
+          });
+          return searchParams.toString();
+        },
+      },
+    );
+  },
 
   create: (
     data: CreateAttachmentRequestData,
