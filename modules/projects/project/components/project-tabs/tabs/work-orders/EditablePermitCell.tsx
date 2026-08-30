@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Checkbox, IconButton, MenuItem, Select, TextField, Tooltip } from "@mui/material";
 import { Check, X } from "lucide-react";
+import { toast } from "sonner";
 import type { WorkOrderRow } from "./types";
 import type { CompletionPhase, CompletionPhaseStatus } from "@/services/api/projects/project-order-permits/types/response";
 import {
@@ -13,6 +14,8 @@ import {
 } from "@/modules/projects/project/query/useCompletionData";
 import { useProjectEmployees } from "@/modules/projects/project/query/useProjectEmployees";
 import { useProject } from "@/modules/all-project/context/ProjectContext";
+import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { noteTextDisplaySx } from "./noteColumns";
 
 export type EditablePermitField =
   | "permitStatus"
@@ -45,6 +48,59 @@ interface EditablePermitCellProps {
   completionStatuses: CompletionPhaseStatus[];
   employeeOptions: { id: string; name: string }[];
   onSave: (id: string, body: Record<string, unknown>) => void;
+  validateDrillingField?: (
+    field: EditablePermitField,
+    value: string,
+    row: WorkOrderRow,
+  ) => string | null;
+}
+
+const MULTILINE_TEXT_FIELDS = new Set<EditablePermitField>([
+  "noteFromPermitToDepartments",
+  "noteFromDepartmentsToPermit",
+  "descriptionDetails",
+  "consultantStatement",
+]);
+
+const NOTE_INPUT_MIN_ROWS = 3;
+const NOTE_INPUT_MAX_ROWS = 10;
+
+const noteTextEditorSx = {
+  minWidth: 280,
+  maxWidth: 420,
+  width: "100%",
+  "& .MuiInputBase-root": {
+    alignItems: "flex-start",
+  },
+  "& textarea": {
+    overflow: "auto !important",
+    resize: "none",
+    lineHeight: 1.5,
+  },
+} as const;
+
+function isMultilineTextField(field: EditablePermitField): boolean {
+  return MULTILINE_TEXT_FIELDS.has(field);
+}
+
+function parseOptionalNumber(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const num = Number(trimmed);
+  return Number.isNaN(num) ? null : num;
+}
+
+function getAchievedFieldMax(
+  field: EditablePermitField,
+  row: WorkOrderRow,
+): number | undefined {
+  if (field === "achievedDrilling") {
+    return parseOptionalNumber(row.targetDrilling) ?? undefined;
+  }
+  if (field === "achievedExtention") {
+    return parseOptionalNumber(row.targetExtention) ?? undefined;
+  }
+  return undefined;
 }
 
 function getRowValue(row: WorkOrderRow, field: EditablePermitField): string {
@@ -100,9 +156,9 @@ function buildBody(
     case "endPermitDate":
       return { end_permit_date: value || null };
     case "noteFromPermitToDepartments":
-      return { note_from_permit_to_departments: value || null };
+      return { note_from_permit_to_departments: value.trim() || null };
     case "noteFromDepartmentsToPermit":
-      return { note_from_departments_to_permit: value || null };
+      return { note_from_departments_to_permit: value.trim() || null };
     case "isTakedAction":
       return {
         is_taked_action:
@@ -130,8 +186,16 @@ function buildBody(
       return { achieved_extention: value ? Number(value) : null };
     case "descriptionDetails":
       return { description_details: value || null };
-    case "consultantStatement":
-      return { consultant_statement: value || null };
+    case "consultantStatement": {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return { consultant_statement: null };
+      }
+      return {
+        consultant_statement: trimmed,
+        last_date_consultant_statement: formatDateYYYYMMDD(new Date()),
+      };
+    }
     case "lastDateConsultantStatement":
       return { last_date_consultant_statement: value || null };
   }
@@ -144,6 +208,7 @@ export function PerRowEditablePermitCell({
   yesLabel,
   noLabel,
   onSave,
+  validateDrillingField,
 }: Omit<EditablePermitCellProps, "permitStatusOptions" | "completionPhases" | "completionStatuses" | "employeeOptions">) {
   const { projectId } = useProject();
   const completionDataQuery = useCompletionData(Number(row.id));
@@ -180,6 +245,7 @@ export function PerRowEditablePermitCell({
       completionStatuses={completionStatuses}
       employeeOptions={employeeOptions}
       onSave={onSave}
+      validateDrillingField={validateDrillingField}
     />
   );
 }
@@ -195,6 +261,7 @@ export default function EditablePermitCell({
   completionStatuses,
   employeeOptions,
   onSave,
+  validateDrillingField,
 }: EditablePermitCellProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState("");
@@ -211,10 +278,15 @@ export default function EditablePermitCell({
 
   const save = useCallback(() => {
     if (value !== currentValue) {
+      const validationError = validateDrillingField?.(field, value, row);
+      if (validationError) {
+        toast.error(validationError);
+        return;
+      }
       onSave(row.id, buildBody(field, value));
     }
     setEditing(false);
-  }, [value, currentValue, row.id, field, onSave]);
+  }, [value, currentValue, row, field, onSave, validateDrillingField]);
 
   useEffect(() => {
     if (!editing) return;
@@ -280,10 +352,10 @@ export default function EditablePermitCell({
         onClick={startEditing}
         style={{
           cursor: "pointer",
-          display: "inline-flex",
+          display: isMultilineTextField(field) ? "inline-block" : "inline-flex",
           alignItems: "center",
           gap: 4,
-          minWidth: 60,
+          minWidth: isMultilineTextField(field) ? 200 : 60,
           minHeight: 28,
           padding: "2px 8px",
           borderRadius: 4,
@@ -291,6 +363,7 @@ export default function EditablePermitCell({
           backgroundColor: "rgba(25, 118, 210, 0.04)",
           transition: "border-color 0.2s, background-color 0.2s",
           fontSize: "0.875rem",
+          ...(isMultilineTextField(field) ? noteTextDisplaySx : {}),
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = "rgba(25, 118, 210, 1)";
@@ -307,9 +380,18 @@ export default function EditablePermitCell({
   }
 
   const commonSx = { minWidth: 120 };
+  const isMultilineField = isMultilineTextField(field);
 
   return (
-    <div ref={anchorRef} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+    <div
+      ref={anchorRef}
+      style={{
+        display: "flex",
+        alignItems: isMultilineField ? "flex-start" : "center",
+        gap: 4,
+        maxWidth: "100%",
+      }}
+    >
       {field === "permitStatus" && (
         <Select
           size="small"
@@ -367,14 +449,32 @@ export default function EditablePermitCell({
           onChange={(e) => setValue(e.target.value)}
           sx={commonSx}
           autoFocus
+          inputProps={{
+            min: 0,
+            ...(validateDrillingField
+              ? { max: getAchievedFieldMax(field, row) }
+              : {}),
+          }}
         />
       )}
 
       {(field === "noteFromPermitToDepartments" ||
         field === "noteFromDepartmentsToPermit" ||
-        field === "evaluationPermitStatus" ||
         field === "descriptionDetails" ||
         field === "consultantStatement") && (
+        <TextField
+          size="small"
+          multiline
+          minRows={NOTE_INPUT_MIN_ROWS}
+          maxRows={NOTE_INPUT_MAX_ROWS}
+          value={value || ""}
+          onChange={(e) => setValue(e.target.value)}
+          sx={noteTextEditorSx}
+          autoFocus
+        />
+      )}
+
+      {field === "evaluationPermitStatus" && (
         <TextField
           size="small"
           value={value || ""}

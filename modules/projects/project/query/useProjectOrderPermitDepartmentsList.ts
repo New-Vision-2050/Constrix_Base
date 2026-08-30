@@ -16,6 +16,28 @@ export function getProjectOrderPermitDepartmentLabel(
   );
 }
 
+const DRILLING_VALIDATION_DEPARTMENT_LABELS = new Set([
+  "المشاريع",
+  "مشاريع",
+  "العمليات",
+  "عمليات",
+  "projects",
+  "operations",
+]);
+
+export function isDrillingValidationDepartment(
+  department: ProjectSharingDepartmentPayload,
+): boolean {
+  const label = getProjectOrderPermitDepartmentLabel(department).trim();
+  if (DRILLING_VALIDATION_DEPARTMENT_LABELS.has(label)) return true;
+
+  const normalizedLabel = label.replace(/^ال/, "");
+  if (DRILLING_VALIDATION_DEPARTMENT_LABELS.has(normalizedLabel)) return true;
+
+  const code = department.code?.trim().toLowerCase();
+  return code === "projects" || code === "operations";
+}
+
 export function useProjectOrderPermitDepartmentsList(enabled = true) {
   return useQuery({
     queryKey: projectOrderPermitDepartmentsListQueryKey(),

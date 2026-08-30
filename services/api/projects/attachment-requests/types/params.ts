@@ -23,12 +23,16 @@ export interface AttachmentRequestsListParams {
   page?: number;
   per_page?: number;
   document_type?: string;
+  /** Document type / procedure filter */
+  procedure_setting_id?: string;
   /** Status filter (draft / approved / …) */
   type?: string;
   end_date?: string;
   /** Optional: restrict to incoming or outgoing rows when API supports it */
   direction?: "incoming" | "outgoing";
   receiver_id?: string;
+  /** Filter by receiver company ids (`receiver_company_ids[]`) */
+  receiver_company_ids?: string[];
   name?: string;
 }
 

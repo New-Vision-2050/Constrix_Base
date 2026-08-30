@@ -108,10 +108,14 @@ export interface UseAttachmentRequestsParams {
   page: number;
   perPage: number;
   documentType?: string;
+  /** Document type filter → `procedure_setting_id` */
+  procedureSettingId?: string;
   type?: string;
   endDate?: string;
   direction?: "" | "incoming" | "outgoing";
   receiverId?: string;
+  /** Receiver company filter → `receiver_company_ids[]` */
+  receiverCompanyIds?: string[];
   name?: string;
 }
 
@@ -132,10 +136,12 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
     page,
     perPage,
     documentType,
+    procedureSettingId,
     type,
     endDate,
     direction,
     receiverId,
+    receiverCompanyIds,
     name,
   } = params;
 
@@ -146,12 +152,18 @@ export function useAttachmentRequests(params: UseAttachmentRequestsParams) {
         page,
         per_page: perPage,
         ...(documentType ? { document_type: documentType } : {}),
+        ...(procedureSettingId
+          ? { procedure_setting_id: procedureSettingId }
+          : {}),
         ...(type ? { type } : {}),
         ...(endDate ? { end_date: endDate } : {}),
         ...(direction === "incoming" || direction === "outgoing"
           ? { direction }
           : {}),
         ...(receiverId ? { receiver_id: receiverId } : {}),
+        ...(receiverCompanyIds?.length
+          ? { receiver_company_ids: receiverCompanyIds }
+          : {}),
         ...(name ? { name } : {}),
         ...(contractualEngagementKey
           ? { contractual_engagement_key: contractualEngagementKey }

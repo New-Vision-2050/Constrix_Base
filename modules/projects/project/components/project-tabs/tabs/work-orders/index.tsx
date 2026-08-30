@@ -43,8 +43,20 @@ import { ProjectOrderPermitsApi } from "@/services/api/projects/project-order-pe
 import { downloadFromResponse } from "@/utils/downloadFromResponse";
 
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
+import { getDrillingValidationErrorKey } from "./drillingValidation";
 import { PerRowEditablePermitCell, type EditablePermitField } from "./EditablePermitCell";
 import NoteLogsEye from "./NoteLogsEye";
+import {
+  canEditNoteFromDepartments,
+  canEditNoteFromPermit,
+  NOTE_FROM_DEPARTMENTS_COLUMN,
+  NOTE_FROM_PERMIT_COLUMN,
+  noteTextDisplaySx,
+} from "./noteColumns";
+import {
+  DEPARTMENTS_TO_PERMIT_NOTE_TYPES,
+  PERMIT_TO_DEPARTMENTS_NOTE_TYPES,
+} from "./noteLogTypes";
 
 import type { WorkOrderFilters, WorkOrderRow } from "./types";
 
@@ -167,7 +179,6 @@ const NON_PERMIT_COLUMN_KEYS = new Set<WorkOrderColumnKey>([
   "descriptionDetails",
   "consultantStatement",
   "lastDateConsultantStatement",
-  "noteFromDepartmentsToPermit",
   "officialProjectHours",
   "numberOfDaysToAchieveColumn155",
   "percentageTime",
@@ -268,6 +279,8 @@ export default function WorkOrdersTab({
 
   const tFields = useTranslations("project.workOrdersTab.dialog.fields");
 
+  const tValidation = useTranslations("project.workOrdersTab.validation");
+
   const emptyDash = t("emptyDash");
   const yesLabel = t("yes");
   const noLabel = t("no");
@@ -291,6 +304,15 @@ export default function WorkOrdersTab({
   });
 
   const workOrdersQuery = useProjectOrderPermits(projectId, departmentId);
+
+  const validateDrillingField = useCallback(
+    (field: EditablePermitField, value: string, row: WorkOrderRow) => {
+      if (!isProjectEditable) return null;
+      const errorKey = getDrillingValidationErrorKey(field, value, row);
+      return errorKey ? tValidation(errorKey) : null;
+    },
+    [isProjectEditable, tValidation],
+  );
 
   const allRows = useMemo(
     () => workOrdersQuery.data ?? [],
@@ -493,10 +515,10 @@ export default function WorkOrdersTab({
           sortable: false,
 
           render: (row: WorkOrderRow) => {
-            if (key === "noteFromPermitToDepartments") {
+            if (key === NOTE_FROM_PERMIT_COLUMN) {
               return (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  {isEditable ? (
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5, minWidth: 0 }}>
+                  {canEditNoteFromPermit(isEditable) ? (
                     <PerRowEditablePermitCell
                       row={row}
                       field={key as EditablePermitField}
@@ -504,19 +526,27 @@ export default function WorkOrdersTab({
                       yesLabel={yesLabel}
                       noLabel={noLabel}
                       onSave={handlePermitSave}
+                      validateDrillingField={validateDrillingField}
                     />
                   ) : (
-                    <span>{row.noteFromPermitToDepartments || emptyDash}</span>
+                    <Box component="span" sx={noteTextDisplaySx}>
+                      {row.noteFromPermitToDepartments || emptyDash}
+                    </Box>
                   )}
-                  <NoteLogsEye projectId={projectId} orderPermitId={row.id} emptyDash={emptyDash} noteType="permit_to_departments" />
+                  <NoteLogsEye
+                    projectId={projectId}
+                    orderPermitId={row.id}
+                    emptyDash={emptyDash}
+                    noteTypes={PERMIT_TO_DEPARTMENTS_NOTE_TYPES}
+                  />
                 </Box>
               );
             }
 
-            if (key === "noteFromDepartmentsToPermit") {
+            if (key === NOTE_FROM_DEPARTMENTS_COLUMN) {
               return (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  {isProjectEditable ? (
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5, minWidth: 0 }}>
+                  {canEditNoteFromDepartments(isProjectEditable) ? (
                     <PerRowEditablePermitCell
                       row={row}
                       field={key as EditablePermitField}
@@ -524,11 +554,19 @@ export default function WorkOrdersTab({
                       yesLabel={yesLabel}
                       noLabel={noLabel}
                       onSave={handlePermitSave}
+                      validateDrillingField={validateDrillingField}
                     />
                   ) : (
-                    <span>{row.noteFromDepartmentsToPermit || emptyDash}</span>
+                    <Box component="span" sx={noteTextDisplaySx}>
+                      {row.noteFromDepartmentsToPermit || emptyDash}
+                    </Box>
                   )}
-                  <NoteLogsEye projectId={projectId} orderPermitId={row.id} emptyDash={emptyDash} noteType="departments_to_permit" />
+                  <NoteLogsEye
+                    projectId={projectId}
+                    orderPermitId={row.id}
+                    emptyDash={emptyDash}
+                    noteTypes={DEPARTMENTS_TO_PERMIT_NOTE_TYPES}
+                  />
                 </Box>
               );
             }
@@ -542,6 +580,7 @@ export default function WorkOrdersTab({
                   yesLabel={yesLabel}
                   noLabel={noLabel}
                   onSave={handlePermitSave}
+                  validateDrillingField={validateDrillingField}
                 />
               );
             }
@@ -555,6 +594,7 @@ export default function WorkOrdersTab({
                   yesLabel={yesLabel}
                   noLabel={noLabel}
                   onSave={handlePermitSave}
+                  validateDrillingField={validateDrillingField}
                 />
               );
             }
@@ -570,7 +610,7 @@ export default function WorkOrdersTab({
         };
       }),
 
-    [columnLabels, tTable, emptyDash, isEditable, isProjectEditable, handlePermitSave, yesLabel, noLabel],
+    [columnLabels, tTable, emptyDash, isEditable, isProjectEditable, handlePermitSave, validateDrillingField, yesLabel, noLabel],
   );
 
   const handleExport = () => {
