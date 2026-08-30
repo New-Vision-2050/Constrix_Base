@@ -47,6 +47,7 @@ export type WizardPayloadSummaryLabels = {
   reportTypesLabel: string;
   employeeStatusLabel: string;
   branchLabel: string;
+  attendanceConstraintsLabel: string;
   exportLabel: string;
   languageLabel: string;
   /** Payroll / scheduling steps are omitted from this flow. */
@@ -142,6 +143,13 @@ export function buildWizardPayloadSummary(
       ? tr.reviewScreen("noneSelected")
       : (step2.branchName?.trim() || step2.branchId);
 
+  const attendanceConstraintsLabel =
+    step2.attendanceConstraintIds.length === 0
+      ? tr.reviewScreen("noneSelected")
+      : tr.employeesData("attendanceConstraintsSummary", {
+          count: step2.attendanceConstraintIds.length,
+        });
+
   return {
     periodLabel: resolveReportPeriodLabel(
       step1,
@@ -155,6 +163,7 @@ export function buildWizardPayloadSummary(
       tr.employeesData,
     ),
     branchLabel,
+    attendanceConstraintsLabel,
     exportLabel,
     languageLabel,
     emailLabel,

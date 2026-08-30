@@ -196,6 +196,8 @@ function normalizeStep2Inbound(
     management_id?: string;
     job_title?: string;
     employee_user_ids?: unknown;
+    attendance_constraint_ids?: unknown;
+    attendanceConstraintIds?: unknown;
   };
   const merged = mergeStep(base, patch) as M;
 
@@ -254,6 +256,13 @@ function normalizeStep2Inbound(
     nationality: coerceStep2OptionalString(merged.nationality),
     gender,
     contractTypeIds: [...merged.contractTypeIds],
+    attendanceConstraintIds: Array.isArray(
+      merged.attendanceConstraintIds ?? merged.attendance_constraint_ids,
+    )
+      ? (merged.attendanceConstraintIds ?? merged.attendance_constraint_ids).map(
+          (x: unknown) => String(x),
+        )
+      : [],
     branchName:
       typeof merged.branchName === "string" ? merged.branchName : undefined,
     managementName:

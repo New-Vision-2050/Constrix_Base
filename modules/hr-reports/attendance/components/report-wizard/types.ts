@@ -32,6 +32,8 @@ export type ReportWizardStep2 = {
   contractTypeIds: EmployeeContractTypeId[];
   nationality: string;
   gender: string;
+  /** Selected attendance constraint UUIDs — sent as `config.step2.attendance_constraint_ids`. */
+  attendanceConstraintIds: string[];
   /** Cached labels for review summary (optional). */
   branchName?: string;
   managementName?: string;

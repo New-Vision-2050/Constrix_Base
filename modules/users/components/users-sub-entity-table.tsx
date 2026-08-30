@@ -154,7 +154,7 @@ const UsersSubEntityTable = ({
         !(
           programName === SUPER_ENTITY_SLUG.HRM &&
           slug === "employees" &&
-          field.key === "company_id"
+          (field.key === "company_id" || field.key === "start_date")
         ),
     );
 

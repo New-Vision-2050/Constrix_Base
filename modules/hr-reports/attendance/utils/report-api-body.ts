@@ -201,6 +201,7 @@ export function mapStep2ForApi(step2: ReportWizardPayload["step2"]) {
       step2.gender === "all" || step2.gender.trim() === ""
         ? null
         : step2.gender,
+    attendance_constraint_ids: [...step2.attendanceConstraintIds],
   };
 }
 

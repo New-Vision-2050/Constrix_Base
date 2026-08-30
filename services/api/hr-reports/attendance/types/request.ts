@@ -35,6 +35,7 @@ export type CreateReportApiBody = {
       contractTypeIds: string[];
       nationality: string | null;
       gender: string | null;
+      attendance_constraint_ids: string[];
     };
     step3: {
       attendanceDataTypeIds: string[];
