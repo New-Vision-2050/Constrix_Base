@@ -96,6 +96,64 @@ export function useAttendanceWizardManagements(branchId: string | undefined) {
   });
 }
 
+export type WizardAttendanceConstraintOption = {
+  id: string;
+  constraint_name: string;
+  is_active: boolean;
+  label: { ar: string; en: string };
+};
+
+type ReportsLookupsResponse = {
+  payload?: {
+    attendance_constraints?: Array<{
+      id?: unknown;
+      constraint_name?: unknown;
+      is_active?: unknown;
+      label?: { ar?: unknown; en?: unknown };
+    }>;
+  };
+};
+
+function normalizeAttendanceConstraints(
+  data: unknown,
+): WizardAttendanceConstraintOption[] {
+  if (!data || typeof data !== "object") return [];
+  const maybePayload = data as ReportsLookupsResponse;
+  const raw = maybePayload.payload?.attendance_constraints;
+  if (!Array.isArray(raw)) return [];
+
+  return raw
+    .map((row) => {
+      const id = String(row?.id ?? "");
+      const constraint_name = String(row?.constraint_name ?? "").trim();
+      if (!id || !constraint_name) return null;
+      const labelAr = String(row?.label?.ar ?? constraint_name).trim();
+      const labelEn = String(row?.label?.en ?? constraint_name).trim();
+      return {
+        id,
+        constraint_name,
+        is_active: row?.is_active !== false,
+        label: { ar: labelAr, en: labelEn },
+      } satisfies WizardAttendanceConstraintOption;
+    })
+    .filter(
+      (r): r is WizardAttendanceConstraintOption => r !== null,
+    );
+}
+
+export function useAttendanceWizardAttendanceConstraints() {
+  return useQuery({
+    queryKey: ["hr-attendance-wizard-attendance-constraints"],
+    queryFn: async () => {
+      const res = await apiClient.get<ReportsLookupsResponse>(
+        "/reports/lookups",
+      );
+      return normalizeAttendanceConstraints(res.data);
+    },
+    staleTime: 5 * 60_000,
+  });
+}
+
 export type WizardJobTitleOption = { id: string; name: string };
 
 export function useAttendanceWizardJobTitles() {

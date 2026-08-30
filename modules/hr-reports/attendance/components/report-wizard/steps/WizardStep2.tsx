@@ -19,7 +19,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type {
   EmployeeContractTypeId,
   EmployeeScopeMode,
@@ -32,10 +32,12 @@ import {
   STEP2_NATIONALITY_VALUES,
 } from "../constants-step2";
 import {
+  useAttendanceWizardAttendanceConstraints,
   useAttendanceWizardBranches,
   useAttendanceWizardEmployees,
   useAttendanceWizardJobTitles,
   useAttendanceWizardManagements,
+  type WizardAttendanceConstraintOption,
 } from "../useAttendanceWizardStep2Queries";
 
 type Props = {
@@ -46,6 +48,7 @@ type Props = {
 const SCOPE_VALUES: EmployeeScopeMode[] = ["all", "select_employees"];
 
 export default function WizardStep2({ value, onChange }: Props) {
+  const locale = useLocale();
   const tWizard = useTranslations("HRReports.attendanceReport.wizard");
   const t = useTranslations("HRReports.attendanceReport.wizard.employeesData");
   const tNat = useTranslations(
@@ -66,6 +69,7 @@ export default function WizardStep2({ value, onChange }: Props) {
     branchSelected ? value.branchId : undefined,
   );
   const jobTitlesQuery = useAttendanceWizardJobTitles();
+  const constraintsQuery = useAttendanceWizardAttendanceConstraints();
   const employeesQuery = useAttendanceWizardEmployees({
     enabled: value.employeeScope === "select_employees",
     branchId: value.branchId,
@@ -81,6 +85,18 @@ export default function WizardStep2({ value, onChange }: Props) {
   const branchOptions = branchesQuery.data ?? [];
   const managementOptions = managementQuery.data ?? [];
   const jobTitleOptions = jobTitlesQuery.data ?? [];
+  const constraintOptions = (constraintsQuery.data ?? []).filter(
+    (c) => c.is_active !== false,
+  );
+
+  const selectedConstraints = React.useMemo(() => {
+    return constraintOptions.filter((o) =>
+      value.attendanceConstraintIds.includes(o.id),
+    );
+  }, [constraintOptions, value.attendanceConstraintIds]);
+
+  const constraintLabel = (opt: WizardAttendanceConstraintOption) =>
+    locale === "ar" ? opt.label.ar : opt.label.en;
 
   const selectedEmployees = React.useMemo(() => {
     const opts = employeesQuery.data ?? [];
@@ -193,6 +209,58 @@ export default function WizardStep2({ value, onChange }: Props) {
                 ))}
               </Select>
             </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <Autocomplete
+              multiple
+              disableCloseOnSelect
+              options={constraintOptions}
+              loading={constraintsQuery.isFetching}
+              value={selectedConstraints}
+              isOptionEqualToValue={(opt, val) => opt.id === val.id}
+              getOptionLabel={constraintLabel}
+              onChange={(_, v) =>
+                onChange({
+                  attendanceConstraintIds: v.map((o) => o.id),
+                })
+              }
+              renderOption={(props, option, { selected }) => {
+                const { key, ...listItemProps } = props;
+                return (
+                  <li key={key ?? option.id} {...listItemProps}>
+                    <Checkbox
+                      style={{ marginInlineEnd: 8 }}
+                      checked={selected}
+                      size="small"
+                    />
+                    {constraintLabel(option)}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("fieldAttendanceConstraints")}
+                  size="small"
+                  placeholder={t("attendanceConstraintsPickerLabel")}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {constraintsQuery.isFetching ? (
+                          <CircularProgress
+                            color="inherit"
+                            size={18}
+                            sx={{ mr: 1 }}
+                          />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+            />
           </Grid>
         </Grid>
       </Paper>

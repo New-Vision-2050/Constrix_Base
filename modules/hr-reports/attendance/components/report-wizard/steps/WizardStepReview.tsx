@@ -72,6 +72,7 @@ export default function WizardStepReview({
     reportTypesLabel,
     employeeStatusLabel,
     branchLabel,
+    attendanceConstraintsLabel,
     exportLabel,
     languageLabel,
     emailLabel,
@@ -97,6 +98,10 @@ export default function WizardStepReview({
           value={employeeStatusLabel}
         />
         <SummaryCell label={tReview("labelBranches")} value={branchLabel} />
+        <SummaryCell
+          label={tReview("labelAttendanceConstraints")}
+          value={attendanceConstraintsLabel}
+        />
         <SummaryCell label={tReview("labelExport")} value={exportLabel} />
         <SummaryCell label={tReview("labelLanguage")} value={languageLabel} />
         <SummaryCell label={tReview("labelEmailEnabled")} value={emailLabel} />

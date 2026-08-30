@@ -283,6 +283,10 @@ export const hrReportsMessages = new MessagesGroup({
         labelPeriod: _m("Period", "الفترة"),
         labelEmployeeStatus: _m("Employee status", "حالة الموظف"),
         labelBranches: _m("Branches", "الفروع"),
+        labelAttendanceConstraints: _m(
+          "Attendance constraints",
+          "قيود الحضور",
+        ),
         labelExport: _m("Export format", "تنسيق التصدير"),
         labelLanguage: _m("Language", "اللغة"),
         labelEmailEnabled: _m("Send email", "إرسال بالبريد"),
@@ -378,6 +382,18 @@ export const hrReportsMessages = new MessagesGroup({
           "اختر الفرع أعلاه لتحميل قائمة الموظفين.",
         ),
         employeePickerEmpty: _m("No employees found.", "لا يوجد موظفون."),
+        fieldAttendanceConstraints: _m(
+          "Attendance constraints",
+          "قيود الحضور",
+        ),
+        attendanceConstraintsPickerLabel: _m(
+          "Filter by attendance constraint(s)",
+          "تصفية حسب قيد الحضور",
+        ),
+        attendanceConstraintsSummary: _m(
+          "Constraints ({count})",
+          "القيود ({count})",
+        ),
         statusActive: _m("Active only", "نشط فقط"),
         statusInactive: _m("Inactive", "غير نشط"),
         statusOnLeave: _m("On leave", "في إجازة"),

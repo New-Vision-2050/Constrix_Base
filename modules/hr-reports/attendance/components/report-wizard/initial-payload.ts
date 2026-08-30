@@ -31,6 +31,7 @@ export function createInitialReportWizardPayload(): ReportWizardPayload {
       contractTypeIds: [],
       nationality: STEP2_FILTER_UNSET,
       gender: "all",
+      attendanceConstraintIds: [],
     },
     step3: {
       attendanceDataTypeIds: [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS],
