@@ -5,6 +5,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
+import NoCropImageUpload from "@/components/shared/NoCropImageUpload";
 
 export const IqamaDataFormConfig = () => {
   const { userId } = useUserProfileCxt();
@@ -88,9 +89,24 @@ export const IqamaDataFormConfig = () => {
                 "image/png",
                 "image/webp",
               ],
-              useImageDialog: true,
             },
             placeholder: t("iqamaAttachment"),
+            render: (_field, value, onChange) => {
+              const existing = Array.isArray(value) ? value : value ? [value] : [];
+              const previewUrl =
+                existing[0]?.url ||
+                (typeof existing[0] === "string" ? existing[0] : null);
+
+              return (
+                <NoCropImageUpload
+                  label={t("iqamaAttachment")}
+                  previewImage={previewUrl}
+                  onChange={(file) => onChange(file ? [file] : [])}
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  maxSize="5MB"
+                />
+              );
+            },
           },
         ],
         columns: 2,
