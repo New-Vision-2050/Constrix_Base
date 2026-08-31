@@ -67,10 +67,21 @@ export default function StaffRoleSelect({
         });
       }
     },
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(
-        error?.response?.data?.message ?? t("staff.roleAssignError"),
-      );
+    onError: (error: unknown) => {
+      const message = (
+        error as { response?: { data?: { message?: unknown } } }
+      )?.response?.data?.message;
+      const text =
+        typeof message === "string" && message.trim()
+          ? message.trim()
+          : message &&
+              typeof message === "object" &&
+              "description" in message &&
+              typeof (message as { description: unknown }).description ===
+                "string"
+            ? (message as { description: string }).description.trim()
+            : "";
+      toast.error(text || t("staff.roleAssignError"));
       setValue(serverRoleId);
     },
   });

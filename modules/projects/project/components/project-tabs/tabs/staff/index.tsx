@@ -47,10 +47,28 @@ import { Employee } from "./types";
 import AddStaffDialog, {
   employeesNotInProjectQueryKey,
 } from "./add-staff/AddStaffDialog";
+import EditStaffDialog from "./EditStaffDialog";
 import StaffRoleSelect from "./StaffRoleSelect";
 import dynamic from "next/dynamic";
 import { getProjectEmployeeAttendanceColumns } from "./shared/projectEmployeeAttendanceColumns";
 import { ProjectStaffAttendanceShell } from "./shared/ProjectStaffAttendanceShell";
+
+function resolveApiMessage(error: unknown, fallback: string): string {
+  const message = (
+    error as { response?: { data?: { message?: unknown } } }
+  )?.response?.data?.message;
+  if (typeof message === "string" && message.trim()) return message.trim();
+  if (
+    message &&
+    typeof message === "object" &&
+    "description" in message &&
+    typeof (message as { description: unknown }).description === "string"
+  ) {
+    const description = (message as { description: string }).description.trim();
+    if (description) return description;
+  }
+  return fallback;
+}
 
 const ProjectStaffMap = dynamic(
   () =>
@@ -80,6 +98,7 @@ export default function StaffTab() {
   const queryClient = useQueryClient();
   const [openStaff, setAddStaffOpen] = useState(false);
   const [view, setView] = useState<"table" | "map">("table");
+  const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
   const [employeeToRemove, setEmployeeToRemove] = useState<Employee | null>(
     null,
   );
@@ -134,8 +153,8 @@ export default function StaffTab() {
         });
       }
     },
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      toast.error(error?.response?.data?.message ?? t("staff.removeError"));
+    onError: (error: unknown) => {
+      toast.error(resolveApiMessage(error, t("staff.removeError")));
     },
   });
 
@@ -244,7 +263,12 @@ export default function StaffTab() {
             )}
           >
             {canUpdate ? (
-              <MenuItem onClick={() => {}}>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEmployeeToEdit(row);
+                }}
+              >
                 <EditIcon className="w-4 h-4 me-2" />
                 {t("staff.edit")}
               </MenuItem>
@@ -355,6 +379,14 @@ export default function StaffTab() {
       {!engagement && (
         <AddStaffDialog open={openStaff} setOpen={setAddStaffOpen} />
       )}
+
+      <EditStaffDialog
+        open={employeeToEdit !== null}
+        employee={employeeToEdit}
+        projectId={projectId}
+        canChangeRole={canChangeStaffRole}
+        onClose={() => setEmployeeToEdit(null)}
+      />
 
       <Dialog
         open={employeeToRemove !== null}
