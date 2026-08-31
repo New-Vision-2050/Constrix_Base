@@ -89,6 +89,7 @@ export const IqamaDataFormConfig = () => {
                 "image/webp",
               ],
               useImageDialog: true,
+              cropOptions: { noCrop: true },
             },
             placeholder: t("iqamaAttachment"),
           },

@@ -69,11 +69,35 @@ export default function ImageUploadWithCrop({
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      setTempSelectedFile(file);
-      setTempCroppedImageUrl(null);
-      setDialogOpen(true);
+    if (!file || !file.type.startsWith("image/")) {
+      // Reset input value so the same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
     }
+
+    if (cropOptions?.noCrop) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        setCroppedImageUrl(base64);
+        setCroppedFile(file);
+        setSelectedFile(file);
+        onChange(file, base64);
+      };
+      reader.readAsDataURL(file);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    setTempSelectedFile(file);
+    setTempCroppedImageUrl(null);
+    setDialogOpen(true);
+
     // Reset input value so the same file can be selected again
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -208,7 +232,7 @@ export default function ImageUploadWithCrop({
                 style={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",
+                  objectFit: cropOptions?.noCrop ? "contain" : "cover",
                 }}
               />
               {!loading && (
@@ -290,6 +314,7 @@ export default function ImageUploadWithCrop({
       loading,
       handleClearImage,
       t,
+      cropOptions,
     ],
   );
 

@@ -62,6 +62,7 @@ export const BorderNumberFormConfig = () => {
                 "image/webp",
               ],
               useImageDialog: true,
+              cropOptions: { noCrop: true },
             },
             placeholder: t("borderNumberAttachment"),
           },

@@ -79,6 +79,7 @@ export const WorkLicenseFormConfig = () => {
                 "image/webp",
               ],
               useImageDialog: true,
+              cropOptions: { noCrop: true },
             },
           },
         ],

@@ -107,6 +107,7 @@ export const IdentityDataFormConfig = () => {
                 "image/webp",
               ],
               useImageDialog: true,
+              cropOptions: { noCrop: true },
             },
           },
         ],

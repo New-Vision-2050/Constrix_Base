@@ -1,4 +1,5 @@
 import React from "react";
+import { ImageCropOptions } from "@/components/shared/image-crop";
 
 export interface ValidationRule {
   type:
@@ -161,6 +162,7 @@ export interface FieldConfig {
     uploadHeaders?: Record<string, string>; // Custom headers for the upload request
     showThumbnails?: boolean; // Whether to show thumbnails for files
     useImageDialog?: boolean; // Open image-upload-with-crop dialog instead of native file picker
+    cropOptions?: ImageCropOptions; // Crop options when useImageDialog is enabled
   };
   label: string;
   placeholder?: string;

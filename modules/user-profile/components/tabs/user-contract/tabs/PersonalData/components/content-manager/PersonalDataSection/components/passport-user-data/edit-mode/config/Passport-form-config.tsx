@@ -86,6 +86,7 @@ export const PassportDataFormConfig = () => {
                 "image/webp",
               ],
               useImageDialog: true,
+              cropOptions: { noCrop: true },
             },
           },
         ],

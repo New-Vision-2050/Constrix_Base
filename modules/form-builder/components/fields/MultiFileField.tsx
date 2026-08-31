@@ -741,6 +741,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
               onChange([...existingFiles, file]);
               return { image_url: URL.createObjectURL(file) };
             }}
+            cropOptions={field.fileConfig?.cropOptions}
           />
         )}
       </div>

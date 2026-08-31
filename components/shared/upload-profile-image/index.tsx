@@ -6,7 +6,9 @@ import { ProfileImageMsg } from "@/modules/dashboard/types/valdation-message-use
 
 import UploadProfileImageDialogHeader from "./UploadProfileImageDialogHeader";
 import ShowFeedbackMessages from "./ShowFeedbackMessages";
-import ImageUploadWithCrop from "@/components/shared/image-upload-with-crop";
+import ImageUploadWithCrop, {
+  ImageUploadWithCropProps,
+} from "@/components/shared/image-upload-with-crop";
 import { useTranslations } from "next-intl";
 import { ValidCompanyProfileImage } from "@/modules/company-profile/types/valdation-message-company-image";
 
@@ -20,6 +22,7 @@ type PropsT = {
     image: File,
   ): Promise<ProfileImageMsg[] | ValidCompanyProfileImage[]>; // external image validation logic
   uploadImageFn(image: File): Promise<{ image_url: string }>; // external upload logic
+  cropOptions?: ImageUploadWithCropProps["cropOptions"];
 };
 
 // initial validation messages to display before upload
@@ -36,6 +39,7 @@ export default function UploadProfileImageDialog({
   onSuccess,
   validateImageFn,
   uploadImageFn,
+  cropOptions,
 }: PropsT) {
   // declare and define component state and vars
   const [valid, setValid] = useState(false);
@@ -116,10 +120,7 @@ export default function UploadProfileImageDialog({
             loading={loading}
             previewImage={croppedImageBase64}
             disabled={false}
-            cropOptions={{
-              minWidth: 100,
-              aspect: 9 / 16,
-            }}
+            cropOptions={cropOptions ?? { minWidth: 100, aspect: 9 / 16 }}
           />
         </div>
 

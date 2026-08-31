@@ -11,6 +11,8 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ImageCropOptions } from "@/components/shared/image-crop";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -49,6 +51,8 @@ type DocCardConfig = {
    * /company-users/identity-data instead of /hr/attendance/attachments.
    */
   useIdentityDataEndpoint?: boolean;
+  /** Crop options for the upload dialog (noCrop uses the full image) */
+  cropOptions?: ImageCropOptions;
 };
 
 // ─── Card configs (matches real API field names) ───────────────────────────────
@@ -63,6 +67,7 @@ const DOC_CARDS: DocCardConfig[] = [
     titleKey: "passport",
     showImagePreview: true,
     PlaceholderIcon: UserCircle2,
+    cropOptions: { noCrop: true },
   },
   {
     docKey: "identity",
@@ -73,6 +78,7 @@ const DOC_CARDS: DocCardConfig[] = [
     titleKey: "identity",
     showImagePreview: true,
     PlaceholderIcon: IdCard,
+    cropOptions: { noCrop: true },
   },
   {
     docKey: "border_number",
@@ -349,7 +355,10 @@ function DocumentCard({
                   src={bgUrl}
                   alt={t(config.titleKey)}
                   fill
-                  className="object-cover"
+                  className={cn(
+                    "w-full h-full",
+                    config.cropOptions?.noCrop ? "object-contain" : "object-cover"
+                  )}
                   unoptimized
                 />
               ) : (
@@ -524,6 +533,7 @@ function DocumentCard({
           validateImageFn={handleImageDialogValidate}
           uploadImageFn={handleImageDialogUpload}
           onSuccess={() => setImageDialogOpen(false)}
+          cropOptions={config.cropOptions}
         />
       )}
     </Card>

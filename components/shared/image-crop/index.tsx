@@ -19,6 +19,8 @@ export interface ImageCropOptions {
   aspect?: number;
   unit?: "px" | "%";
   locked?: boolean;
+  /** When true, the crop dialog is skipped and the original full image is used. */
+  noCrop?: boolean;
 }
 
 export interface ImageCropProps {
