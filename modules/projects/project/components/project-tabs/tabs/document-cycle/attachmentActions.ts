@@ -33,7 +33,9 @@ export async function createAuthenticatedPreviewUrl(
       const { data } = await baseApi.get(rel, { responseType: "blob" });
       return URL.createObjectURL(data);
     }
-    return u;
+    const buffer = await fetchFileBufferViaDownloadProxy(u);
+    const blob = new Blob([buffer]);
+    return URL.createObjectURL(blob);
   }
 
   const path = u.replace(/^\//, "");
