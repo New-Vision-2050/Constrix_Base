@@ -29,7 +29,11 @@ export default function UserCV() {
       >
         <Can check={[PERMISSIONS.profile.cv.view]}>
           {userCV?.files ? (
-            <PdfViewer src={userCV?.files?.url ?? ""} />
+            <PdfViewer
+              src={userCV?.files?.url ?? ""}
+              mimeType={userCV?.files?.mime_type}
+              fileType={userCV?.files?.type}
+            />
           ) : (
             <NoDataFounded
               title={t("noData")}

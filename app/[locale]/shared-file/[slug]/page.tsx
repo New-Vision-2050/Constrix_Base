@@ -1,4 +1,5 @@
 import { getFile } from "./api";
+import SharedFilePreview from "./SharedFilePreview";
 
 interface PageProps {
   params: Promise<{
@@ -13,23 +14,17 @@ export default async function SharedFilePage({ params }: PageProps) {
   try {
     const file = await getFile(slug);
     const fileType = file?.file?.type;
-    const isImg = fileType == "image";
 
     return (
       <div>
         {file && (
           <div className="w-full h-full p-6">
-            {/* Display file information here */}
-            {isImg ? (
-              <img
-                src={file?.file?.url}
-                alt={file?.name}
-                width={"100%"}
-                height={"500px"}
-              />
-            ) : (
-              <iframe src={file?.file?.url} width={"100%"} height={"500px"} />
-            )}
+            <SharedFilePreview
+              url={file.file?.url ?? ""}
+              name={file.name ?? "Shared file"}
+              fileType={fileType}
+              mimeType={file.file?.mime_type}
+            />
           </div>
         )}
       </div>

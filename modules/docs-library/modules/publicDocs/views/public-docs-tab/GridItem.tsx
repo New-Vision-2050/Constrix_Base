@@ -33,6 +33,7 @@ import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import PdfGridThumbnail from "@/modules/docs-library/components/PdfGridThumbnail";
 
 export default function GridItem({
   document,
@@ -107,8 +108,7 @@ export default function GridItem({
         imageIcon = UndefinedIcon;
     }
   }
-  // check if file is pdf
-  const isPdf = fileType === "pdf" && isValidUrl(imageUrl);
+  const isPdf = fileType === "pdf" && !isDir;
 
   const isDocInDetails =
     selectedDocument && document.id == selectedDocument?.id;
@@ -183,7 +183,9 @@ export default function GridItem({
                   height={48}
                 />
               )}
-              {isPdf && <iframe src={imageUrl} width={48} height={48} className="pointer-events-none" />}
+              {isPdf && document.file && (
+                <PdfGridThumbnail fileId={document.id} file={document.file} />
+              )}
             </div>
 
             {/* name — truncated, fixed height */}
