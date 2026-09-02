@@ -387,6 +387,7 @@ export const projectMessages = new MessagesGroup({
     columnActions: _m("Actions", "الإجراء"),
     actionMenu: _m("Action", "إجراء"),
     edit: _m("Edit", "تعديل"),
+    editStakeholder: _m("Edit stakeholder", "تعديل صاحب مصلحة"),
     delete: _m("Remove", "إزالة"),
     deleteConfirm: _m(
       "Remove this employee from the project?",

@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState, useDeferredValue } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Autocomplete,
   Box,
   Button,
   CircularProgress,
+  MenuItem,
   Stack,
   TextField,
-  MenuItem,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import { Eye } from "lucide-react";
 import HeadlessTableLayout from "@/components/headless/table";
 import CustomMenu from "@/components/headless/custom-menu";
 import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
@@ -30,20 +31,20 @@ import {
   hasAnyProjectPermissionKey,
   hasProjectPermissionKey,
 } from "@/modules/projects/project/utils/projectMyPermissions";
-import { DocumentRow } from "../types";
+import type { DocumentRow } from "../types";
 import StatusBadge from "./StatusBadge";
 import AddFileDialog from "./AddFileDialog";
 import AttachmentRequestDetailDialog from "./AttachmentRequestDetailDialog";
-import { EyeIcon } from "lucide-react";
 
 const DOCUMENT_TYPE_PROCEDURE = "project_procedure";
 
-type CompanyOption = { id: string; name: string };const TableLayout = HeadlessTableLayout<DocumentRow>(
-  "attachment-requests-table",
-);
+type CompanyOption = { id: string; name: string };
+
+const TableLayout = HeadlessTableLayout<DocumentRow>("attachment-requests-table");
 
 const filterSx = {
   flex: 1,
+  minWidth: 180,
   "& .MuiOutlinedInput-root": { borderRadius: "8px" },
 } as const;
 
@@ -75,6 +76,7 @@ function RequestFlowCell({
       </Box>
     );
   }
+
   const incoming = row.flow === "incoming";
   return (
     <Box
@@ -100,6 +102,7 @@ function RequestFlowCell({
 export default function AttachmentRequestsTable() {
   const t = useTranslations("project.documentCycle");
   const tCommon = useTranslations("common");
+  const tProject = useTranslations("project");
   const engagement = useOptionalContractualEngagement();
   const project = useOptionalProject();
   const projectId = project?.projectId;
@@ -117,12 +120,14 @@ export default function AttachmentRequestsTable() {
           ]),
     [engagement, flatPerms],
   );
+
   const canCreateCycle = useMemo(
     () =>
       !engagement &&
       hasProjectPermissionKey(flatPerms, PROJECT_ARCHIVE_CYCLE_CREATE),
     [engagement, flatPerms],
   );
+
   const canOpenDetail = useMemo(
     () =>
       engagement
@@ -134,11 +139,14 @@ export default function AttachmentRequestsTable() {
     [engagement, flatPerms],
   );
 
-  // Companies API for الجهة filter → receiver_company_ids[]
   const [companySearch, setCompanySearch] = useState("");
   const deferredCompanySearch = useDeferredValue(companySearch);
   const { data: companies = [], isFetching: loadingCompanies } = useQuery({
-    queryKey: ["companies", "attachment-requests-filter", deferredCompanySearch],
+    queryKey: [
+      "companies",
+      "attachment-requests-filter",
+      deferredCompanySearch,
+    ],
     queryFn: async (): Promise<CompanyOption[]> => {
       const res = await baseApi.get("companies", {
         params: {
@@ -156,11 +164,10 @@ export default function AttachmentRequestsTable() {
           id: String(item.id ?? ""),
           name: String(item.name ?? "").trim(),
         }))
-        .filter((c: CompanyOption) => c.id && c.name);
+        .filter((company: CompanyOption) => Boolean(company.id && company.name));
     },
   });
 
-  // Document types (نوع الوثيقة) — same source as AddFileDialog
   const { data: documentTypes = [], isLoading: loadingDocumentTypes } =
     useQuery({
       queryKey: ["internal-procedures", DOCUMENT_TYPE_PROCEDURE, projectId],
@@ -209,9 +216,9 @@ export default function AttachmentRequestsTable() {
 
   useEffect(() => {
     if (!selectedDocument) return;
-    const row = data.find((r) => r.id === selectedDocument.id);
+    const row = data.find((item) => item.id === selectedDocument.id);
     if (row) setSelectedDocument(row);
-  }, [data, selectedDocument?.id]);
+  }, [data, selectedDocument]);
 
   const handleView = (row: DocumentRow) => {
     setSelectedDocument(row);
@@ -235,7 +242,9 @@ export default function AttachmentRequestsTable() {
         key: "serialNumber",
         name: t("serialNumber"),
         sortable: false,
-        render: (row: DocumentRow) => <span>{row.serialNumber || row.id}</span>,
+        render: (row: DocumentRow) => (
+          <span>{row.serialNumber || row.id}</span>
+        ),
       },
       {
         key: "sender",
@@ -303,15 +312,13 @@ export default function AttachmentRequestsTable() {
               </Button>
             )}
           >
-            <Button
-              size="small"
-              sx={{ width: "100%", justifyContent: "flex-start", px: 2 }}
+            <MenuItem
               onClick={() => handleView(row)}
               disabled={!canOpenDetail}
             >
               {t("view")}
-              <EyeIcon className="h-4 w-4 ms-2" />
-            </Button>
+              <Eye className="h-4 w-4 ms-2" />
+            </MenuItem>
           </CustomMenu>
         ),
       },
@@ -374,7 +381,7 @@ export default function AttachmentRequestsTable() {
                   disabled={loadingDocumentTypes}
                   sx={filterSx}
                 >
-                  <MenuItem value="">{t("all")}</MenuItem>
+                  <MenuItem value="">{tProject("all")}</MenuItem>
                   {documentTypes.map((type) => (
                     <MenuItem key={type.id} value={String(type.id)}>
                       {type.name}
@@ -397,13 +404,13 @@ export default function AttachmentRequestsTable() {
                   }}
                   getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(a, b) => a.id === b.id}
-                  filterOptions={(x) => x}
+                  filterOptions={(options) => options}
                   sx={filterSx}
                   renderInput={(inputParams) => (
                     <TextField
                       {...inputParams}
                       label={t("counterpartyColumn")}
-                      placeholder={t("all")}
+                      placeholder={tProject("all")}
                       InputProps={{
                         ...inputParams.InputProps,
                         endAdornment: (
@@ -430,7 +437,7 @@ export default function AttachmentRequestsTable() {
                   }}
                   sx={filterSx}
                 >
-                  <MenuItem value="">{t("all")}</MenuItem>
+                  <MenuItem value="">{tProject("all")}</MenuItem>
                   <MenuItem value="pending">{t("pending")}</MenuItem>
                   <MenuItem value="approved">{t("approved")}</MenuItem>
                   <MenuItem value="declined">{t("declined")}</MenuItem>
@@ -463,7 +470,10 @@ export default function AttachmentRequestsTable() {
       </Box>
 
       {!engagement && (
-        <AddFileDialog open={addFileOpen} onClose={() => setAddFileOpen(false)} />
+        <AddFileDialog
+          open={addFileOpen}
+          onClose={() => setAddFileOpen(false)}
+        />
       )}
 
       <AttachmentRequestDetailDialog

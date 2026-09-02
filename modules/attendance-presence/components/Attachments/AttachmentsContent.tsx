@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Pencil, X, Upload, Eye, RefreshCw, UserCircle2, ChevronDown, ChevronUp, Camera, ImagePlus, IdCard, BriefcaseBusiness, ShieldCheck, MapPinned, HardHat, Copy } from "lucide-react";
 import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
+import NoCropImageUpload from "@/components/shared/NoCropImageUpload";
 import validateProfileImage from "@/modules/dashboard/api/validate-image";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import Image from "next/image";
@@ -187,6 +188,7 @@ function DocumentCard({
   const [newFile, setNewFile] = useState<File | null>(null);
   const [newFilePreviewUrl, setNewFilePreviewUrl] = useState<string | null>(null);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const isNoCrop = config.docKey === "passport" || config.docKey === "identity";
 
   const handleImageDialogValidate = async (file: File) => {
     const isImage = ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type);
@@ -301,7 +303,11 @@ function DocumentCard({
               variant="ghost"
               size="icon"
               className="h-7 w-7 text-muted-foreground hover:bg-primary/10 hover:text-primary"
-              onClick={() => setImageDialogOpen(true)}
+              onClick={() =>
+                isNoCrop
+                  ? document.getElementById(`no-crop-upload-${config.docKey}`)?.click()
+                  : setImageDialogOpen(true)
+              }
               disabled={mutation.isPending}
               title={t("uploadFile")}
             >
@@ -342,6 +348,31 @@ function DocumentCard({
           const bgUrl = editing && newFilePreviewUrl
             ? newFilePreviewUrl
             : previewImages[0]?.url ?? null;
+
+          if (isNoCrop) {
+            return (
+              <NoCropImageUpload
+                id={`no-crop-upload-${config.docKey}`}
+                compact
+                hideDelete
+                objectFit="cover"
+                disableHover
+                disableClick
+                previewImage={newFilePreviewUrl ?? previewImages[0]?.url ?? null}
+                onChange={(file, base64) => {
+                  setNewFile(file);
+                  setNewFilePreviewUrl(base64);
+                  if (file) {
+                    setEditing(true);
+                    setExpanded(true);
+                  }
+                }}
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                maxSize="5MB"
+              />
+            );
+          }
+
           return (
             <div className="relative w-full h-40 rounded-md overflow-hidden border border-sidebar-border bg-sidebar-accent/50 flex items-center justify-center">
               {bgUrl ? (
@@ -453,8 +484,8 @@ function DocumentCard({
               )}
             </div>
 
-            {/* File picker — only in edit mode */}
-            {editing && (
+            {/* File picker — only in edit mode and non-no-crop cards */}
+            {editing && !isNoCrop && (
               <div className="space-y-1 pt-1">
                 {newFile ? (
                   <div className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-md text-sm">
@@ -516,7 +547,7 @@ function DocumentCard({
       </CardContent>
 
       {/* Reuse the existing profile image dialog (crop + validation) */}
-      {config.showImagePreview && (
+      {config.showImagePreview && !isNoCrop && (
         <UploadProfileImageDialog
           title={tUpload("title")}
           open={imageDialogOpen}
