@@ -13,6 +13,7 @@ import {
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslations } from "next-intl";
+import EmbeddedFilePreview from "@/components/shared/EmbeddedFilePreview";
 
 interface FileUploadButtonProps {
   onChange?: (file: File | File[] | null) => void;
@@ -198,8 +199,12 @@ export default function FileUploadButton({
         >
           <CloseIcon />
         </IconButton>
-        {/* file iframe */}
-        <iframe src={existingFile} width={"100%"} height={"100px"} />
+        {/* file preview */}
+        <EmbeddedFilePreview
+          src={existingFile}
+          width="100%"
+          height="100px"
+        />
       </div>
     );
   }

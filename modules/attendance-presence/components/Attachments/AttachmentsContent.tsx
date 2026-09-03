@@ -188,7 +188,7 @@ function DocumentCard({
   const [newFile, setNewFile] = useState<File | null>(null);
   const [newFilePreviewUrl, setNewFilePreviewUrl] = useState<string | null>(null);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const isNoCrop = config.docKey === "passport" || config.docKey === "identity";
+  const isNoCrop = true;
 
   const handleImageDialogValidate = async (file: File) => {
     const isImage = ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type);
