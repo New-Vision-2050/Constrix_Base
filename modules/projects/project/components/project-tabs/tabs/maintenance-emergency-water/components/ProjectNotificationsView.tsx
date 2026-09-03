@@ -1,0 +1,1036 @@
+﻿"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  Plus,
+  Eye,
+  EyeOff,
+  FileDown,
+  Pencil,
+  Trash2,
+  Phone,
+  Clock,
+  MessageSquare,
+} from "lucide-react";
+import { Map } from "@mui/icons-material";
+import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import HeadlessTableLayout from "@/components/headless/table";
+import CustomMenu from "@/components/headless/custom-menu";
+import I18nLink from "@i18n/link";
+import { ROUTER } from "@/router";
+import { useProjectMyPermissionsFlat } from "@/modules/projects/project/query/useProjectMyPermissionsFlat";
+import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
+import {
+  buildNotificationsExportArgs,
+  notificationScopeExportFilename,
+} from "@/modules/projects/project/utils/notificationScope";
+import {
+  useProjectWaterNotifications,
+  projectWaterNotificationsQueryKey,
+} from "@/modules/projects/project/query/useProjectWaterNotifications";
+import { useProjectWaterNotificationTypes } from "@/modules/projects/project/query/useProjectWaterNotificationTypes";
+import {
+  useProjectWaterNotificationReadStatusMutation,
+  useAddProjectWaterNotificationNoteMutation,
+} from "@/modules/projects/project/query/useProjectWaterNotificationMutations";
+import { ProjectWaterNotificationsApi } from "@/services/api/projects/notifications-water";
+import type { ProjectNotification } from "@/services/api/projects/notifications-water/types/response";
+import {
+  PROJECT_NOTIFICATION_APPROVE,
+  PROJECT_NOTIFICATION_CREATE,
+  PROJECT_NOTIFICATION_DELETE,
+  PROJECT_NOTIFICATION_EXPORT,
+  PROJECT_NOTIFICATION_LIST,
+  PROJECT_NOTIFICATION_REJECT,
+  PROJECT_NOTIFICATION_UPDATE,
+  PROJECT_NOTIFICATION_VIEW,
+} from "@/modules/projects/project/constants/projectPermissionKeys";
+import {
+  hasAnyProjectPermissionKey,
+  hasProjectPermissionKey,
+} from "@/modules/projects/project/utils/projectMyPermissions";
+import { isNotificationActionable } from "@/modules/projects/project/utils/notificationStatusConfig";
+import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceFormat";
+import NotificationStatusBadge from "./NotificationStatusBadge";
+import NotificationSeverityBadge from "./NotificationSeverityBadge";
+import CreateNotificationWizard from "./wizard/CreateNotificationWizard";
+import ReassignTaskModal from "./ReassignTaskModal";
+
+const ProjectNotificationMapTasksView = dynamic(
+  () => import("./ProjectNotificationMapTasksView"),
+  {
+    ssr: false,
+    loading: () => (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress size={28} />
+      </Box>
+    ),
+  },
+);
+
+const TableLayout = HeadlessTableLayout<ProjectNotification>(
+  "project-notifications-table",
+);
+
+const THIRTY_MINUTES_MS = 30 * 60 * 1000;
+
+interface TimerCellProps {
+  createdAt: string;
+  lastSiteUpdateDate?: string | null;
+  status?: string;
+  updatedAt?: string;
+}
+
+function TimerCell({
+  createdAt,
+  lastSiteUpdateDate,
+  status,
+  updatedAt,
+}: TimerCellProps) {
+  const [elapsed, setElapsed] = useState<number>(0);
+  const [isStale, setIsStale] = useState(false);
+
+  useEffect(() => {
+    const compute = () => {
+      const now = new Date().getTime();
+      const created = new Date(createdAt).getTime();
+      const endTime =
+        status === "completed" && updatedAt
+          ? new Date(updatedAt).getTime()
+          : now;
+
+      setElapsed(Math.max(0, endTime - created));
+
+      if (lastSiteUpdateDate) {
+        const updateTime = new Date(lastSiteUpdateDate).getTime();
+        setIsStale(now - updateTime > THIRTY_MINUTES_MS);
+      } else {
+        setIsStale(true);
+      }
+    };
+
+    compute();
+    if (status === "completed") return;
+    const interval = setInterval(compute, 1000);
+    return () => clearInterval(interval);
+  }, [createdAt, lastSiteUpdateDate, status, updatedAt]);
+
+  const formatTime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}:${minutes.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <span
+      className={`text-sm font-semibold ${isStale ? "text-red-600" : "text-green-600"}`}
+    >
+      {formatTime(elapsed)}
+    </span>
+  );
+}
+
+const filterSx = {
+  flex: 1,
+  "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+} as const;
+
+function formatDateTime(value: string | null | undefined): string {
+  if (!value) return "—";
+  const d = new Date(value.replace(" ", "T"));
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleString();
+}
+
+const STATUS_OPTIONS: { value: string; labelKey: string }[] = [
+  { value: "pending", labelKey: "statuses.pending" },
+  { value: "approved", labelKey: "statuses.approved" },
+  { value: "rejected", labelKey: "statuses.rejected" },
+  { value: "in_progress", labelKey: "statuses.inProgress" },
+  { value: "completed", labelKey: "statuses.completed" },
+  { value: "cancelled", labelKey: "statuses.cancelled" },
+  { value: "draft", labelKey: "statuses.draft" },
+];
+const SEVERITY_OPTIONS = ["low", "medium", "high", "critical"];
+const WORK_TYPE_OPTIONS = ["electrical", "mechanical", "civil", "finishing", "landscaping"];
+
+export default function WaterProjectNotificationsView() {
+  const t = useTranslations("project.maintenanceEmergencyWater.notifications");
+  const tCommon = useTranslations("common");
+  const {
+    projectId,
+    contractualEngagementKey,
+    isEngagement,
+    hasScope,
+  } = useNotificationScope();
+  const queryClient = useQueryClient();
+
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterSeverity, setFilterSeverity] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [filterFromDate, setFilterFromDate] = useState("");
+  const [filterToDate, setFilterToDate] = useState("");
+  const [filterAssignedUser, setFilterAssignedUser] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<ProjectNotification | null>(null);
+  const [viewTarget, setViewTarget] = useState<ProjectNotification | null>(null);
+  const [reassignTarget, setReassignTarget] = useState<ProjectNotification | null>(null);
+  const [addNoteTarget, setAddNoteTarget] = useState<ProjectNotification | null>(null);
+  const [addNoteText, setAddNoteText] = useState("");
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardMode, setWizardMode] = useState<"create" | "edit">("create");
+  const [editTargetId, setEditTargetId] = useState<string | null>(null);
+  const [view, setView] = useState<"table" | "map">("table");
+
+  const { data: flatPerms, isLoading: isLoadingPerms } =
+    useProjectMyPermissionsFlat(projectId);
+  const notificationTypesQuery = useProjectWaterNotificationTypes();
+  const notificationTypes = notificationTypesQuery.data ?? [];
+
+  const canView = useMemo(
+    () =>
+      isEngagement
+        ? true
+        : hasAnyProjectPermissionKey(flatPerms, [
+            PROJECT_NOTIFICATION_VIEW,
+            PROJECT_NOTIFICATION_LIST,
+          ]),
+    [isEngagement, flatPerms],
+  );
+  const canCreate = useMemo(
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_CREATE),
+    [isEngagement, flatPerms],
+  );
+  const canUpdate = useMemo(
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_UPDATE),
+    [isEngagement, flatPerms],
+  );
+  const canDelete = useMemo(
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_DELETE),
+    [isEngagement, flatPerms],
+  );
+  const canExport = useMemo( 
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_EXPORT),
+    [isEngagement, flatPerms],
+  );
+  const canApprove = useMemo(
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_APPROVE),
+    [isEngagement, flatPerms],
+  );
+  const canReject = useMemo(
+    () =>
+      isEngagement ||
+      hasProjectPermissionKey(flatPerms, PROJECT_NOTIFICATION_REJECT),
+    [isEngagement, flatPerms],
+  );
+
+  const params = TableLayout.useTableParams({
+    initialPage: 1,
+    initialLimit: 10,
+  });
+
+  const { data: queryResult, isLoading } = useProjectWaterNotifications({
+    projectId,
+    contractualEngagementKey,
+    page: params.page,
+    perPage: params.limit,
+    status: filterStatus || undefined,
+    severity: filterSeverity || undefined,
+    notificationType: filterType || undefined,
+    fromDate: filterFromDate || undefined,
+    toDate: filterToDate || undefined,
+    assignedUserId: filterAssignedUser || undefined,
+    search: params.search || undefined,
+  });
+
+  const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
+  const totalPages = queryResult?.pagination?.last_page ?? 1;
+  const totalItems = queryResult?.pagination?.result_count ?? data.length;
+
+  const notificationScope = { projectId, contractualEngagementKey };
+
+  const addNoteMutation = useAddProjectWaterNotificationNoteMutation(
+    addNoteTarget?.id,
+    notificationScope,
+  );
+
+  const invalidateNotifications = () => {
+    queryClient.invalidateQueries({
+      queryKey: projectWaterNotificationsQueryKey(notificationScope),
+    });
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => ProjectWaterNotificationsApi.delete(id),
+    onSuccess: () => {
+      setDeleteTarget(null);
+      toast.success(t("deleteSuccess"));
+      invalidateNotifications();
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? t("deleteError"));
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: (id: string) => ProjectWaterNotificationsApi.approve(id),
+    onSuccess: () => {
+      toast.success(t("approveSuccess"));
+      invalidateNotifications();
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? t("approveError"));
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (id: string) =>
+      ProjectWaterNotificationsApi.reject(id, { rejection_reason: "" }),
+    onSuccess: () => {
+      toast.success(t("rejectSuccess"));
+      invalidateNotifications();
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? t("rejectError"));
+    },
+  });
+
+  const readStatusMutation = useProjectWaterNotificationReadStatusMutation(notificationScope);
+
+  useEffect(() => {
+    if (viewTarget && viewTarget.is_read === false && !readStatusMutation.isPending) {
+      readStatusMutation.mutate({ id: viewTarget.id, is_read: true });
+    }
+  }, [viewTarget, readStatusMutation]);
+
+  const notifyByVoiceMutation = useMutation({
+    mutationFn: (id: string) =>
+      ProjectWaterNotificationsApi.notifySiteStatusUpdateByVoice(id),
+    onSuccess: () => {
+      toast.success(t("notifyByVoiceSuccess"));
+      invalidateNotifications();
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? t("notifyByVoiceError"));
+    },
+  });
+
+  const columns = useMemo(
+    () => [
+      {
+        key: "notification_number",
+        name: t("notificationNumber"),
+        sortable: false,
+        render: (row: ProjectNotification) =>
+          row.notification_number ? (
+            <I18nLink
+              href={
+                contractualEngagementKey
+                  ? ROUTER.UNIFIED_CONTRACT_NOTIFICATION_DETAILS(
+                      contractualEngagementKey,
+                      row.id,
+                    )
+                  : ROUTER.PROJECT_NOTIFICATION_DETAILS(projectId!, row.id)
+              }
+              className={`p-2 text-sm underline hover:underline ${row.is_read === false ? "font-extrabold" : "font-bold"}`}
+            >
+              {row.notification_number}
+            </I18nLink>
+          ) : (
+            <span className={`p-2 text-sm ${row.is_read === false ? "font-extrabold" : ""}`}>—</span>
+          ),
+      },
+      {
+        key: "status",
+        name: t("status"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <NotificationStatusBadge
+            status={row.status}
+            statusLabel={row.status_label}
+          />
+        ),
+      },
+      {
+        key: "notification_type",
+        name: t("type"),
+        sortable: false,
+        render: (row: ProjectNotification) => <span>{row.notification_type}</span>,
+      },
+      {
+        key: "last_site_update_status",
+        name: t("lastSiteUpdateStatus"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{row.last_site_update_status?.trim() || "—"}</span>
+        ),
+      },
+      {
+        key: "timer",
+        name: t("timer"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <TimerCell
+            createdAt={row.created_at}
+            lastSiteUpdateDate={row.last_site_update_date}
+            status={row.status}
+            updatedAt={row.updated_at}
+          />
+        ),
+      },
+      {
+        key: "last_site_update_date",
+        name: t("lastSiteUpdateDate"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{formatDateTime(row.last_site_update_date)}</span>
+        ),
+      },
+        {
+            key: "date",
+            name: t("date"),
+            sortable: false,
+            render: (row: ProjectNotification) => (
+                <span>{formatDateTime(row.created_at)}</span>
+            ),
+        },
+      {
+        key: "last_note",
+        name: t("lastNote"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <Stack spacing={0.25}>
+            <Typography
+              variant="body2"
+              noWrap
+              title={row.last_note?.note?.trim() || undefined}
+              sx={{ maxWidth: 240 }}
+            >
+              {row.last_note?.note?.trim() || "—"}
+            </Typography>
+            {row.last_note?.user?.name ? (
+              <Typography variant="caption" color="text.secondary">
+                {row.last_note.user.name} &bull; {formatDateTime(row.last_note.created_at)}
+              </Typography>
+            ) : null}
+          </Stack>
+        ),
+      },
+      {
+        key: "contractor",
+        name: t("contractor"),
+        sortable: false,
+        render: (row: ProjectNotification) => <span>{row.contractor_name}</span>,
+      },
+      {
+        key: "company_name",
+        name: t("companyName"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <span>{row.company_name?.trim() || "—"}</span>
+        ),
+      },
+      {
+        key: "engineer",
+        name: t("engineer"),
+        sortable: false,
+        render: (row: ProjectNotification) => (
+          <Stack spacing={0.25}>
+            <span>
+            {row.assigned_users && row.assigned_users.length > 0
+              ? row.assigned_users.map((u) => u.name).join(", ")
+              : (row.assigned_user?.name ?? "—")}
+          </span>
+            {row.assigned_user?.phone ? (
+              <Typography variant="caption" color="text.secondary">
+                {t("phone")}: {row.assigned_user.phone}
+              </Typography>
+            ) : null}
+          </Stack>
+        ),
+      },
+      {
+        key: "location",
+        name: t("location"),
+        sortable: false,
+        render: (row: ProjectNotification) => <span>{row.repair_point}</span>,
+      },
+
+      {
+        key: "actions",
+        name: t("columnActions"),
+        sortable: false,
+        render: (row: ProjectNotification) => {
+          const actionable = isNotificationActionable(row.status);
+          return (
+            <CustomMenu
+              renderAnchor={({ onClick }) => (
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={onClick}
+                >
+                  {t("action")}
+                </Button>
+              )}
+            >
+              <MenuItem onClick={() => setViewTarget(row)}>
+                <Eye className="w-4 h-4 me-2" />
+                {t("view")}
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setAddNoteTarget(row);
+                  setAddNoteText("");
+                }}
+              >
+                <MessageSquare className="w-4 h-4 me-2" />
+                {t("addNote")}
+              </MenuItem>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  readStatusMutation.mutate({
+                    id: row.id,
+                    is_read: !row.is_read,
+                  });
+                }}
+                disabled={readStatusMutation.isPending}
+              >
+                {row.is_read ? (
+                  <>
+                    <EyeOff className="w-4 h-4 me-2" />
+                    {t("markAsUnread")}
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4 me-2" />
+                    {t("markAsRead")}
+                  </>
+                )}
+              </MenuItem>
+              {row.employee_task && canUpdate ? (
+                <MenuItem onClick={() => setReassignTarget(row)}>
+                  {t("reassignTask", { defaultValue: "Reassign Task" })}
+                </MenuItem>
+              ) : null}
+              {actionable && canUpdate ? (
+                <MenuItem
+                  onClick={() => {
+                    setWizardMode("edit");
+                    setEditTargetId(row.id);
+                    setWizardOpen(true);
+                  }}
+                >
+                  <Pencil className="w-4 h-4 me-2" />
+                  {t("edit")}
+                </MenuItem>
+              ) : null}
+              {actionable && canApprove ? (
+                <MenuItem
+                  onClick={() => approveMutation.mutate(row.id)}
+                  disabled={approveMutation.isPending}
+                >
+                  {t("approve")}
+                </MenuItem>
+              ) : null}
+              {actionable && canReject ? (
+                <MenuItem
+                  onClick={() => rejectMutation.mutate(row.id)}
+                  disabled={rejectMutation.isPending}
+                  sx={{ color: "error.main" }}
+                >
+                  {t("reject")}
+                </MenuItem>
+              ) : null}
+              <MenuItem
+                onClick={() => notifyByVoiceMutation.mutate(row.id)}
+                disabled={notifyByVoiceMutation.isPending}
+              >
+                <Phone className="w-4 h-4 me-2" />
+                {t("notifyByCall")}
+              </MenuItem>
+              {actionable && canDelete ? (
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteTarget(row);
+                  }}
+                  disabled={deleteMutation.isPending}
+                  sx={{ color: "error.main" }}
+                >
+                  <Trash2 className="w-4 h-4 me-2" />
+                  {t("delete")}
+                </MenuItem>
+              ) : null}
+            </CustomMenu>
+          );
+        },
+      },
+    ],
+    [
+      t,
+      projectId,
+      contractualEngagementKey,
+      canUpdate,
+      canDelete,
+      canApprove,
+      canReject,
+      approveMutation.isPending,
+      rejectMutation.isPending,
+      deleteMutation.isPending,
+    ],
+  );
+
+  const state = TableLayout.useTableState({
+    data,
+    columns,
+    totalPages,
+    totalItems,
+    params,
+    selectable: true,
+    getRowId: (row: ProjectNotification) => row.id,
+    getRowSx: (row: ProjectNotification) =>
+      row.is_read === false
+        ? {
+            borderLeft: "4px solid #0284c7",
+            backgroundColor: "transparent",
+            "&:hover": { backgroundColor: "#f0f9ff" },
+          }
+        : undefined,
+    loading: isLoading,
+    searchable: true,
+  });
+
+  const exportMutation = useMutation({
+    mutationFn: async (ids?: string[]) => {
+      const res = await ProjectWaterNotificationsApi.export(
+        buildNotificationsExportArgs(notificationScope, {
+          format: "xlsx",
+          status: filterStatus || undefined,
+          notification_type: filterType || undefined,
+          date_from: filterFromDate || undefined,
+          date_to: filterToDate || undefined,
+          assigned_user_id: filterAssignedUser || undefined,
+          search: params.search || undefined,
+          ...(ids?.length ? { ids } : {}),
+        }),
+      );
+      const url = window.URL.createObjectURL(res.data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = notificationScopeExportFilename(notificationScope);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error?.response?.data?.message ?? tCommon("states.error"));
+    },
+  });
+
+  if (!hasScope) {
+    return null;
+  }
+
+  if (!isEngagement && isLoadingPerms) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  if (!canView) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning">{tCommon("noProjectTabPermission")}</Alert>
+      </Box>
+    );
+  }
+
+  const handleClearFilters = () => {
+    setFilterStatus("");
+    setFilterSeverity("");
+    setFilterType("");
+    setFilterFromDate("");
+    setFilterToDate("");
+    setFilterAssignedUser("");
+    params.setPage(1);
+    params.setSearch("");
+  };
+
+  return (
+    <>
+      {view === "map" ? (
+        <ProjectNotificationMapTasksView
+          projectId={projectId}
+          contractualEngagementKey={contractualEngagementKey}
+          onBackToTable={() => setView("table")}
+        />
+      ) : (
+      <Box>
+        <TableLayout
+          filters={
+            <Stack spacing={2}>
+              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+                <TextField
+                  select
+                  size="small"
+                  label={t("status")}
+                  value={filterStatus}
+                  onChange={(e) => {
+                    setFilterStatus(e.target.value);
+                    params.setPage(1);
+                  }}
+                  sx={filterSx}
+                >
+                  <MenuItem value="">{t("all")}</MenuItem>
+                  {STATUS_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {t(option.labelKey)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+
+
+
+
+                <TextField
+                  size="small"
+                  label={t("fromDate")}
+                  type="date"
+                  value={filterFromDate}
+                  onChange={(e) => {
+                    setFilterFromDate(e.target.value);
+                    params.setPage(1);
+                  }}
+                  InputLabelProps={{ shrink: true }}
+                  sx={filterSx}
+                />
+
+                <TextField
+                  size="small"
+                  label={t("toDate")}
+                  type="date"
+                  value={filterToDate}
+                  onChange={(e) => {
+                    setFilterToDate(e.target.value);
+                    params.setPage(1);
+                  }}
+                  InputLabelProps={{ shrink: true }}
+                  sx={filterSx}
+                />
+
+                <TextField
+                  size="small"
+                  label={t("engineer")}
+                  value={filterAssignedUser}
+                  onChange={(e) => {
+                    setFilterAssignedUser(e.target.value);
+                    params.setPage(1);
+                  }}
+                  sx={filterSx}
+                />
+              </Stack>
+
+              <TableLayout.TopActions
+                state={state}
+                customActions={
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      startIcon={<Map />}
+                      onClick={() => setView("map")}
+                    >
+                      {t("showMap")}
+                    </Button>
+                    {canCreate ? (
+                      <Button
+                        variant="contained"
+                        startIcon={<Plus />}
+                        onClick={() => {
+                          setWizardMode("create");
+                          setEditTargetId(null);
+                          setWizardOpen(true);
+                        }}
+                      >
+                        {t("addNotification")}
+                      </Button>
+                    ) : null}
+                    {canView ? (
+                      <Button
+                        variant="outlined"
+                        startIcon={<FileDown />}
+                        onClick={() =>
+                          exportMutation.mutate(
+                            state.selection.selectedRows.map((row) => row.id),
+                          )
+                        }
+                        disabled={exportMutation.isPending}
+                      >
+                        {t("export")}
+                      </Button>
+                    ) : null}
+                    <Button variant="outlined" onClick={handleClearFilters}>
+                      {t("clearFilters")}
+                    </Button>
+                  </Stack>
+                }
+              />
+            </Stack>
+          }
+          table={
+            <TableLayout.Table state={state} loadingOptions={{ rows: 5 }} />
+          }
+          pagination={<TableLayout.Pagination state={state} />}
+        />
+      </Box>
+      )}
+
+      <CreateNotificationWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        mode={wizardMode}
+        notificationId={editTargetId}
+      />
+
+      {reassignTarget && (
+        <ReassignTaskModal
+          notification={reassignTarget}
+          scope={notificationScope}
+          open
+          onClose={() => setReassignTarget(null)}
+        />
+      )}
+
+      <Dialog
+        open={deleteTarget !== null}
+        onClose={() => {
+          if (deleteMutation.isPending) return;
+          setDeleteTarget(null);
+        }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>{t("deleteNotification")}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {t("deleteConfirm")}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setDeleteTarget(null)}
+            disabled={deleteMutation.isPending}
+          >
+            {tCommon("cancel")}
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            disabled={deleteMutation.isPending}
+            onClick={() => {
+              if (deleteTarget) {
+                deleteMutation.mutate(deleteTarget.id);
+              }
+            }}
+          >
+            {t("delete")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={viewTarget !== null}
+        onClose={() => setViewTarget(null)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{t("viewNotification")}</DialogTitle>
+        <DialogContent dividers>
+          {viewTarget && (
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("notificationNumber")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.notification_number ?? "-"}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("status")}
+                </Typography>
+                <Box sx={{ mt: 0.5 }}>
+                  <NotificationStatusBadge
+                    status={viewTarget.status}
+                    statusLabel={viewTarget.status_label}
+                  />
+                </Box>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("type")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.notification_type}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("severity")}
+                </Typography>
+                <Box sx={{ mt: 0.5 }}>
+                  <NotificationSeverityBadge severity={viewTarget.severity} />
+                </Box>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("contractor")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.contractor_name}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("companyName")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.company_name || "-"}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("engineer")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.assigned_users && viewTarget.assigned_users.length > 0
+                    ? viewTarget.assigned_users.map((u) => u.name).join(", ")
+                    : (viewTarget.assigned_user?.name ?? "-")}
+                </Typography>
+                {viewTarget.assigned_user?.phone ? (
+                  <Typography variant="body2" color="text.secondary">
+                    {t("phone")}: {viewTarget.assigned_user.phone}
+                  </Typography>
+                ) : null}
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("description")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.work_description}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("location")}
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {viewTarget.repair_point}
+                </Typography>
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setViewTarget(null)}>{tCommon("close")}</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={addNoteTarget !== null}
+        onClose={() => {
+          if (addNoteMutation.isPending) return;
+          setAddNoteTarget(null);
+          setAddNoteText("");
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{t("addNote")}</DialogTitle>
+        <DialogContent dividers>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            value={addNoteText}
+            onChange={(e) => setAddNoteText(e.target.value)}
+            placeholder={t("writeNote")}
+            disabled={addNoteMutation.isPending}
+            inputProps={{ maxLength: 1000 }}
+          />
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
+            {addNoteText.length}/1000
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => {
+              setAddNoteTarget(null);
+              setAddNoteText("");
+            }}
+            disabled={addNoteMutation.isPending}
+          >
+            {tCommon("cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            disabled={!addNoteText.trim() || addNoteMutation.isPending}
+            onClick={async () => {
+              if (!addNoteTarget) return;
+              const trimmed = addNoteText.trim();
+              if (!trimmed) return;
+              try {
+                await addNoteMutation.mutateAsync({ note: trimmed });
+                toast.success(t("addNoteSuccess"));
+                setAddNoteTarget(null);
+                setAddNoteText("");
+              } catch (error: unknown) {
+                const err = error as { response?: { data?: { message?: string } } };
+                toast.error(err?.response?.data?.message ?? t("addNoteError"));
+              }
+            }}
+          >
+            {addNoteMutation.isPending ? t("addingNote") : t("addNote")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}

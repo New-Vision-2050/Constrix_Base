@@ -54,6 +54,7 @@ export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScop
 };
 
 export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {
+  type?: string | null;
   notification_number?: string | null;
   notification_type: string;
   feeder_number?: string | null;

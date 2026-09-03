@@ -1,0 +1,1513 @@
+"use client";
+
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import {
+  Alert,
+  Autocomplete,
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  MenuItem,
+  Paper,
+  Stack,
+  Step,
+  StepLabel,
+  Stepper,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { useOptionalProject } from "@/modules/all-project/context/ProjectContext";
+import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
+import {
+  useCreateProjectWaterNotificationMutation,
+  useProjectWaterNotificationDetail,
+  useSaveProjectWaterNotificationDraftMutation,
+  useUpdateProjectWaterNotificationMutation,
+} from "@/modules/projects/project/query/useProjectWaterNotificationMutations";
+import { useProjectWaterNotificationEmployees } from "@/modules/projects/project/query/useProjectWaterNotificationEmployees";
+import { useProjectWaterNotificationContractors } from "@/modules/projects/project/query/useProjectWaterNotificationContractors";
+import { useProjectWaterNotificationTypes } from "@/modules/projects/project/query/useProjectWaterNotificationTypes";
+import { useWaterSiteStatusTypes } from "@/modules/projects/project/query/useWaterSiteStatusTypes";
+import type {
+  ProjectNotification,
+  ProjectNotificationEmployee,
+  ProjectNotificationType,
+  SiteStatusTypeWithKeys,
+} from "@/services/api/projects/notifications-water/types/response";
+import { useGoogleRouteDistances } from "./useGoogleRouteDistances";
+import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
+import {
+  EMPTY_FORM,
+  type WizardFormData,
+  type WizardFormErrors,
+  type WizardStep,
+} from "./types";
+import { notificationToWizardForm } from "./normalize";
+import { buildCreatePayload, buildUpdatePayload } from "./buildPayload";
+import { validateStep, firstStepWithError } from "./validate";
+import { useProjectNotificationLocationPolygons } from "./useProjectNotificationLocationPolygons";
+import { isPointInAnyPolygon } from "./utils";
+
+const ProjectNotificationMap = dynamic(
+  () => import("./ProjectNotificationMap"),
+  { ssr: false },
+);
+
+interface CreateNotificationWizardProps {
+  open: boolean;
+  onClose: () => void;
+  mode?: "create" | "edit";
+  notificationId?: string | null;
+}
+
+const STEP_COUNT = 5;
+
+export default function CreateNotificationWizard({
+  open,
+  onClose,
+  mode = "create",
+  notificationId,
+}: CreateNotificationWizardProps) {
+  const t = useTranslations("project.maintenanceEmergencyWater.notifications");
+  const { projectId, contractualEngagementKey, hasScope } =
+    useNotificationScope();
+  const notificationScope = { projectId, contractualEngagementKey };
+
+  const { data: existingNotification, isLoading: isLoadingDetail } =
+    useProjectWaterNotificationDetail(
+      notificationScope,
+      mode === "edit" ? notificationId ?? undefined : undefined,
+    );
+
+  const [step, setStep] = useState<WizardStep>(1);
+  const [data, setData] = useState<WizardFormData>(EMPTY_FORM);
+  const [errors, setErrors] = useState<WizardFormErrors>({});
+  const [confirmed, setConfirmed] = useState({
+    dataReviewed: false,
+    readyToSend: false,
+  });
+  const [draftId, setDraftId] = useState<string | null>(null);
+
+  const createMutation = useCreateProjectWaterNotificationMutation();
+  const updateMutation = useUpdateProjectWaterNotificationMutation();
+  const draftMutation = useSaveProjectWaterNotificationDraftMutation();
+  const isFinalizing =
+    createMutation.isPending || updateMutation.isPending;
+  const notificationTypesQuery = useProjectWaterNotificationTypes();
+  const notificationTypes = notificationTypesQuery.data ?? [];
+
+  const project = useOptionalProject();
+  const projectTypeId = project?.projectData?.sub_sub_project_type_id;
+
+  const selectedNotificationTypeId = useMemo(() => {
+    const match = notificationTypes.find(
+      (nt) => nt.value === data.notification_type,
+    );
+    return match?.id;
+  }, [notificationTypes, data.notification_type]);
+
+  const siteStatusTypesQuery = useWaterSiteStatusTypes({
+    projectTypeId,
+    projectId,
+    notificationTypeId: selectedNotificationTypeId,
+  });
+  const siteStatusTypes = siteStatusTypesQuery.data ?? [];
+
+  const employeeQuery = useProjectWaterNotificationEmployees({
+    projectId,
+    contractualEngagementKey,
+    latitude: data.task_latitude ?? undefined,
+    longitude: data.task_longitude ?? undefined,
+    enabled: step === 4,
+  });
+
+  const employees = useMemo(() => {
+    const list = employeeQuery.data ?? [];
+    return [...list].sort((a, b) => a.distance_meters - b.distance_meters);
+  }, [employeeQuery.data]);
+
+  const locationPolygons = useProjectNotificationLocationPolygons(hasScope);
+
+  const isInsideAllowedZone = useMemo(() => {
+    if (data.task_latitude == null || data.task_longitude == null) return true;
+    return isPointInAnyPolygon(
+      { lat: data.task_latitude, lng: data.task_longitude },
+      locationPolygons,
+    );
+  }, [data.task_latitude, data.task_longitude, locationPolygons]);
+
+  useEffect(() => {
+    if (!open) {
+      setStep(1);
+      setData(EMPTY_FORM);
+      setErrors({});
+      setConfirmed({ dataReviewed: false, readyToSend: false });
+      setDraftId(null);
+      return;
+    }
+
+    if (mode === "edit" && existingNotification) {
+      setData(notificationToWizardForm(existingNotification));
+    } else if (mode === "create") {
+      setData(EMPTY_FORM);
+    }
+  }, [open, mode, existingNotification]);
+
+  const saveDraftRef = useRef(saveDraft);
+  saveDraftRef.current = saveDraft;
+
+  useEffect(() => {
+    if (!open || !hasScope) return;
+
+    const isDraftModeActive =
+      mode === "create" || existingNotification?.status === "draft";
+    if (!isDraftModeActive) return;
+
+    const hasData = Boolean(
+      data.notification_type?.trim() ||
+        data.contractor_name?.trim() ||
+        data.repair_point?.trim() ||
+        data.notification_number?.trim() ||
+        data.work_description?.trim() ||
+        data.notes?.trim() ||
+        data.contractor_notes?.trim() ||
+        data.assigned_user_ids.length > 0 ||
+        draftId,
+    );
+    if (!hasData) return;
+
+    const timeout = setTimeout(() => {
+      saveDraftRef.current({ silent: true }).catch(() => {});
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [data, open, hasScope, mode, existingNotification?.status, draftId]);
+
+  const updateField = useCallback(
+    function updateField<K extends keyof WizardFormData>(
+      field: K,
+      value: WizardFormData[K],
+    ) {
+      setData((prev) => ({ ...prev, [field]: value }));
+      setErrors((prev) =>
+        prev[field] ? { ...prev, [field]: undefined } : prev,
+      );
+    },
+    [],
+  );
+
+  function isDraftMode() {
+    if (mode === "create") return true;
+    return existingNotification?.status === "draft";
+  }
+
+  async function handleNext() {
+    const validation = validateStep(step, data);
+    if (!validation.valid) {
+      setErrors(validation.errors);
+      return;
+    }
+    if (step === 3 && !isInsideAllowedZone) {
+      toast.error(t("locationOutsideAllowedZone"));
+      return;
+    }
+    if (step < STEP_COUNT) {
+      setStep((prev) => ((prev + 1) as WizardStep));
+    }
+  }
+
+  function handleBack() {
+    if (step > 1) {
+      setStep((prev) => ((prev - 1) as WizardStep));
+    }
+  }
+
+  function shouldPersistDraftOnClose() {
+    if (mode === "edit") {
+      return existingNotification?.status === "draft" && Boolean(notificationId);
+    }
+    return Boolean(
+      data.notification_type?.trim() ||
+        data.contractor_name?.trim() ||
+        data.repair_point?.trim() ||
+        data.notification_number?.trim() ||
+        data.work_description?.trim() ||
+        data.notes?.trim() ||
+        data.contractor_notes?.trim() ||
+        data.assigned_user_ids.length > 0 ||
+        draftId,
+    );
+  }
+
+  async function handleClose() {
+    if (hasScope && isDraftMode() && shouldPersistDraftOnClose()) {
+      await saveDraft().catch(() => {});
+    }
+    onClose();
+  }
+
+  function handleApiError(error: unknown, messageKey: string = "createdError") {
+    const axiosError = error as {
+      response?: {
+        status?: number;
+        data?: {
+          message?: {
+            validations?: { field: string; errors: string[] }[];
+            description?: string;
+          };
+          payload?: { field: string; errors: string[] }[];
+        };
+      };
+    };
+
+    if (axiosError.response?.status === 422) {
+      const validations =
+        axiosError.response.data?.message?.validations ??
+        axiosError.response.data?.payload ??
+        [];
+      const fieldErrors: WizardFormErrors = Object.fromEntries(
+        validations.map(({ field, errors }) => [field, errors?.[0]]),
+      );
+      setErrors(fieldErrors);
+      const errorStep = firstStepWithError(fieldErrors);
+      if (errorStep) setStep(errorStep);
+      toast.error(t(messageKey));
+    } else {
+      toast.error(
+        axiosError.response?.data?.message?.description ?? t(messageKey),
+      );
+    }
+  }
+
+  async function saveDraft(
+    { silent = false }: { silent?: boolean } = {},
+  ): Promise<boolean> {
+    if (!hasScope) return false;
+
+    try {
+      if (mode === "edit" && notificationId) {
+        await draftMutation.mutateAsync(
+          buildUpdatePayload(notificationId, notificationScope, data, {
+            isDraft: true,
+          }),
+        );
+        if (!silent) toast.success(t("draftSaved"));
+        return true;
+      }
+
+      if (draftId) {
+        await draftMutation.mutateAsync(
+          buildUpdatePayload(draftId, notificationScope, data, {
+            isDraft: true,
+          }),
+        );
+        if (!silent) toast.success(t("draftSaved"));
+        return true;
+      }
+
+      const saved = await draftMutation.mutateAsync(
+        buildCreatePayload(notificationScope, data, { isDraft: true }),
+      );
+      if (saved?.id) {
+        setDraftId(saved.id);
+      }
+      if (!silent) toast.success(t("draftSaved"));
+      return true;
+    } catch (error) {
+      if (!silent) handleApiError(error, "draftSavedError");
+      return false;
+    }
+  }
+
+  async function handleSubmit() {
+    if (!hasScope) return;
+
+    const validation = validateStep(4, data);
+    if (!validation.valid) {
+      setErrors(validation.errors);
+      setStep(4);
+      return;
+    }
+
+    try {
+      if (mode === "edit" && notificationId) {
+        await updateMutation.mutateAsync(
+          buildUpdatePayload(notificationId, notificationScope, data),
+        );
+        toast.success(t("updatedSuccess"));
+      } else if (draftId) {
+        await updateMutation.mutateAsync(
+          buildUpdatePayload(draftId, notificationScope, data),
+        );
+        toast.success(t("createdSuccess"));
+      } else {
+        await createMutation.mutateAsync(
+          buildCreatePayload(notificationScope, data),
+        );
+        toast.success(t("createdSuccess"));
+      }
+      onClose();
+    } catch (error) {
+      handleApiError(error);
+    }
+  }
+
+  const steps = [
+    t("step1"),
+    t("step2"),
+    t("step3"),
+    t("step4"),
+    t("step5"),
+  ];
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pr: 6,
+        }}
+      >
+        <span>
+          {mode === "edit" ? t("wizardEdit") : t("wizard")}
+        </span>
+        <IconButton
+          onClick={onClose}
+          disabled={isFinalizing}
+          aria-label={t("cancel")}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
+          <Close />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        {mode === "edit" && isLoadingDetail ? (
+          <Box sx={{ py: 8, textAlign: "center" }}>
+            <Typography color="text.secondary">{t("loading")}</Typography>
+          </Box>
+        ) : (
+          <>
+            <Stepper activeStep={step - 1} alternativeLabel sx={{ mb: 4 }}>
+              {steps.map((label, index) => (
+                <Step key={index}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            {step === 1 && (
+              <Step1Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                notificationTypes={notificationTypes}
+                siteStatusTypes={siteStatusTypes}
+              />
+            )}
+            {step === 2 && (
+              <Step2Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                projectId={projectId}
+              />
+            )}
+            {step === 3 && (
+              <Step3Form
+                data={data}
+                errors={errors}
+                onChange={updateField}
+                t={t}
+                polygons={locationPolygons}
+                isInsideAllowedZone={isInsideAllowedZone}
+              />
+            )}
+            {step === 4 && (
+              <Step4Form
+                data={data}
+                errors={errors}
+                employees={employees}
+                isLoading={employeeQuery.isLoading}
+                onChange={updateField}
+                t={t}
+                polygons={locationPolygons}
+              />
+            )}
+            {step === 5 && (
+              <Step5Form
+                data={data}
+                employees={employees}
+                siteStatusTypes={siteStatusTypes}
+                confirmed={confirmed}
+                onChangeConfirmed={(value) => setConfirmed(value)}
+                t={t}
+                projectId={projectId}
+                existingNotification={existingNotification}
+              />
+            )}
+          </>
+        )}
+      </DialogContent>
+
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button onClick={handleClose} disabled={isFinalizing}>
+          {t("cancel")}
+        </Button>
+        <Box sx={{ flex: 1 }} />
+        {step > 1 && (
+          <Button onClick={handleBack} disabled={isFinalizing}>
+            {t("previous")}
+          </Button>
+        )}
+        {step < STEP_COUNT && (
+          <Button variant="contained" onClick={handleNext} disabled={isFinalizing}>
+            {t("next")}
+          </Button>
+        )}
+        {step === STEP_COUNT && (
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={
+              isFinalizing || !confirmed.dataReviewed || !confirmed.readyToSend
+            }
+          >
+            {isFinalizing
+              ? t("loading")
+              : mode === "edit"
+                ? t("update")
+                : t("send")}
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ============================================================================
+// Step 1: Notification Info
+// ============================================================================
+
+function Step1Form({
+  data,
+  errors,
+  onChange,
+  t,
+  notificationTypes,
+  siteStatusTypes,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: ReturnType<typeof useTranslations>;
+  notificationTypes: ProjectNotificationType[];
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+}) {
+  return (
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("notification_number", { defaultValue: "رقم الإشعار" })}
+          value={data.notification_number}
+          onChange={(e) => onChange("notification_number", e.target.value)}
+          error={Boolean(errors.notification_number)}
+          helperText={errors.notification_number}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("notificationType", { defaultValue: "نوع الاشعار" })}
+          value={data.notification_type}
+          onChange={(e) => {
+            onChange("notification_type", e.target.value);
+            onChange("site_status_type_id", "");
+            onChange("site_status_values", {});
+          }}
+          error={Boolean(errors.notification_type)}
+          helperText={errors.notification_type}
+        >
+          {notificationTypes.map((option) => (
+            <MenuItem key={option.id} value={option.value}>
+              {option.value}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          size="small"
+          label={t("description")}
+          value={data.work_description}
+          onChange={(e) => onChange("work_description", e.target.value)}
+          error={Boolean(errors.work_description)}
+          helperText={errors.work_description}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          type="date"
+          label={t("taskDate")}
+          value={data.task_date}
+          onChange={(e) => onChange("task_date", e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          type="number"
+          label={t("durationHours")}
+          value={data.duration_hours}
+          onChange={(e) => onChange("duration_hours", Number(e.target.value))}
+          inputProps={{ min: 1 }}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={2}
+          size="small"
+          label={t("notes")}
+          value={data.notes}
+          onChange={(e) => onChange("notes", e.target.value)}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
+          value={data.site_status_type_id}
+          onChange={(e) => {
+            const selectedId = e.target.value;
+            onChange("site_status_type_id", selectedId);
+            const selectedType = siteStatusTypes.find((type) => type.id === selectedId);
+            const initialValues: Record<string, string> = {};
+            (selectedType?.keys ?? []).forEach((key) => {
+              initialValues[key.id] = "";
+            });
+            onChange("site_status_values", initialValues);
+          }}
+          disabled={siteStatusTypes.length === 0}
+        >
+          <MenuItem value="">
+            {t("selectSiteStatusType", { defaultValue: "اختر صيغة الإشعار" })}
+          </MenuItem>
+          {siteStatusTypes.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name_ar || type.name_en}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      {data.site_status_type_id && (
+        <SiteStatusValueInputs
+          siteStatusTypeId={data.site_status_type_id}
+          siteStatusTypes={siteStatusTypes}
+          values={data.site_status_values}
+          onChange={(values) => onChange("site_status_values", values)}
+          t={t}
+        />
+      )}
+    </Grid>
+  );
+}
+
+function SiteStatusSummaryCard({
+  siteStatusTypeId,
+  siteStatusTypes,
+  values,
+  t,
+}: {
+  siteStatusTypeId: string;
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+  values: Record<string, string>;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const selectedType = siteStatusTypes.find((type) => type.id === siteStatusTypeId);
+  const rows = (selectedType?.keys ?? [])
+    .filter((key) => values[key.id] !== undefined && values[key.id] !== "")
+    .map((key) => ({
+      label: key.name_ar || key.name_en || key.key,
+      value: values[key.id],
+    }));
+
+  return (
+    <SummaryCard
+      title={t("summarySiteStatus", { defaultValue: "حالة الموقع" })}
+      rows={[
+        {
+          label: t("siteStatusType", { defaultValue: "صيغة الإشعار" }),
+          value: selectedType?.name_ar || selectedType?.name_en || "—",
+        },
+        ...rows,
+      ]}
+    />
+  );
+}
+
+function SiteStatusValueInputs({
+  siteStatusTypeId,
+  siteStatusTypes,
+  values,
+  onChange,
+  t,
+}: {
+  siteStatusTypeId: string;
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+  values: Record<string, string>;
+  onChange: (values: Record<string, string>) => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const selectedType = siteStatusTypes.find((type) => type.id === siteStatusTypeId);
+  const keys = selectedType?.keys ?? [];
+
+  function updateValue(keyId: string, value: string) {
+    onChange({ ...values, [keyId]: value });
+  }
+
+  if (!keys.length) {
+    return (
+      <Grid size={{ xs: 12 }}>
+        <Typography variant="body2" color="text.secondary">
+          {t("noKeys", { defaultValue: "لا توجد مفاتيح محددة" })}
+        </Typography>
+      </Grid>
+    );
+  }
+
+  return keys.map((key) => {
+    const label = key.name_ar || key.name_en || key.key;
+    const value = values[key.id] ?? "";
+
+    if (key.field_type === "select" && (key.options ?? []).length > 0) {
+      return (
+        <Grid size={{ xs: 12, md: 6 }} key={key.id}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={label}
+            value={value}
+            onChange={(e) => updateValue(key.id, e.target.value)}
+          >
+            {(key.options ?? []).map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+      );
+    }
+
+    const inputType = key.field_type === "number" ? "number" : key.field_type === "date" ? "date" : "text";
+
+    return (
+      <Grid size={{ xs: 12, md: 6 }} key={key.id}>
+        <TextField
+          fullWidth
+          size="small"
+          type={inputType}
+          label={label}
+          value={value}
+          onChange={(e) => updateValue(key.id, e.target.value)}
+          InputLabelProps={inputType === "date" ? { shrink: true } : undefined}
+        />
+      </Grid>
+    );
+  });
+}
+
+// ============================================================================
+// Step 2: Contractor Info
+// ============================================================================
+
+function Step2Form({
+  data,
+  errors,
+  onChange,
+  t,
+  projectId,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: ReturnType<typeof useTranslations>;
+  projectId: string | undefined;
+}) {
+  const contractorsQuery = useProjectWaterNotificationContractors(projectId);
+  const contractors = contractorsQuery.data ?? [];
+
+  function handleContractorChange(contractorId: string) {
+    const selected = contractors.find((c) => c.id === contractorId);
+    onChange("contractor_id", contractorId);
+    onChange("contractor_name", selected?.name ?? "");
+    onChange("contractor_representative_id", "");
+  }
+
+  const selectedContractor = contractors.find((c) => c.id === data.contractor_id);
+  const representatives = selectedContractor?.representatives ?? [];
+
+  return (
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Autocomplete
+          fullWidth
+          size="small"
+          options={contractors}
+          loading={contractorsQuery.isLoading}
+          getOptionLabel={(option) => option.name ?? ""}
+          isOptionEqualToValue={(option, value) => option.id === value?.id}
+          value={contractors.find((c) => c.id === data.contractor_id) ?? null}
+          onChange={(_e, value) => handleContractorChange(value?.id ?? "")}
+          renderOption={(props, option) => (
+            <li {...props} key={option.id}>
+              {option.name}
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("contractor")}
+              error={Boolean(errors.contractor_name)}
+              helperText={errors.contractor_name}
+              placeholder={t("chooseContractor", { defaultValue: "Choose contractor" })}
+            />
+          )}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("contractorRepresentative", { defaultValue: "Contractor Representative" })}
+          value={data.contractor_representative_id}
+          onChange={(e) => onChange("contractor_representative_id", e.target.value)}
+          disabled={!data.contractor_id || representatives.length === 0}
+        >
+          <MenuItem value="">
+            {t("chooseRepresentative", { defaultValue: "Choose representative" })}
+          </MenuItem>
+          {representatives.map((rep) => (
+            <MenuItem key={rep.id} value={rep.id}>
+              {rep.name}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          size="small"
+          label={t("contractorNotes")}
+          value={data.contractor_notes}
+          onChange={(e) => onChange("contractor_notes", e.target.value)}
+        />
+      </Grid>
+    </Grid>
+  );
+}
+
+// ============================================================================
+// Step 3: Location
+// ============================================================================
+
+function Step3Form({
+  data,
+  errors,
+  onChange,
+  t,
+  polygons,
+  isInsideAllowedZone,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: ReturnType<typeof useTranslations>;
+  polygons: MapPolygon[];
+  isInsideAllowedZone: boolean;
+}) {
+  const center = useMemo(
+    () => ({
+      lat: data.task_latitude ?? 24.7136,
+      lng: data.task_longitude ?? 46.6753,
+    }),
+    [data.task_latitude, data.task_longitude],
+  );
+
+  function setLocation(lat: number, lng: number) {
+    onChange("task_latitude", lat);
+    onChange("task_longitude", lng);
+    onChange("location_link", `https://maps.google.com/?q=${lat},${lng}`);
+  }
+
+  function onPinMoved(lat: number, lng: number) {
+    setLocation(lat, lng);
+  }
+
+  function parseLink() {
+    const url = data.location_link;
+    const match = url.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (match) {
+      setLocation(parseFloat(match[1]), parseFloat(match[2]));
+      toast.success(t("locationConfirmed"));
+    } else {
+      toast.error(t("invalidLocationLink"));
+    }
+  }
+
+  return (
+    <Stack spacing={2}>
+      <ProjectNotificationMap
+        center={center}
+        radius={data.location_radius}
+        height="350px"
+        interactivePin
+        showEmployees={false}
+        polygons={polygons}
+        onPinMoved={onPinMoved}
+        showPin={data.task_latitude != null && data.task_longitude != null}
+        showControls
+      />
+
+      {polygons.length > 0 && !isInsideAllowedZone && (
+        <Alert severity="error">{t("locationOutsideAllowedZone")}</Alert>
+      )}
+
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            label={t("latitude")}
+            value={data.task_latitude ?? ""}
+            onChange={(e) =>
+              onChange("task_latitude", e.target.value === "" ? null : parseFloat(e.target.value))
+            }
+            error={Boolean(errors.task_latitude)}
+            helperText={errors.task_latitude}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            label={t("longitude")}
+            value={data.task_longitude ?? ""}
+            onChange={(e) =>
+              onChange("task_longitude", e.target.value === "" ? null : parseFloat(e.target.value))
+            }
+            error={Boolean(errors.task_longitude)}
+            helperText={errors.task_longitude}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            label={t("locationRadius")}
+            value={data.location_radius}
+            onChange={(e) => onChange("location_radius", Number(e.target.value))}
+            error={Boolean(errors.location_radius)}
+            helperText={errors.location_radius}
+            inputProps={{ min: 1 }}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 8 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t("locationLink")}
+            value={data.location_link}
+            onChange={(e) => onChange("location_link", e.target.value)}
+            placeholder={t("parseLinkPlaceholder")}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Button variant="outlined" onClick={parseLink} fullWidth>
+            {t("parseLink")}
+          </Button>
+        </Grid>
+      </Grid>
+    </Stack>
+  );
+}
+
+// ============================================================================
+// Step 4: Assign to Employee
+// ============================================================================
+
+function Step4Form({
+  data,
+  errors,
+  employees,
+  isLoading,
+  onChange,
+  t,
+  polygons,
+}: {
+  data: WizardFormData;
+  errors: WizardFormErrors;
+  employees: ProjectNotificationEmployee[];
+  isLoading: boolean;
+  onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
+  t: ReturnType<typeof useTranslations>;
+  polygons: MapPolygon[];
+}) {
+  const center = useMemo(
+    () => ({
+      lat: data.task_latitude ?? 24.7136,
+      lng: data.task_longitude ?? 46.6753,
+    }),
+    [data.task_latitude, data.task_longitude],
+  );
+
+  const [statusFilter, setStatusFilter] = useState("");
+  const [nameFilter, setNameFilter] = useState("");
+  const [branchFilter, setBranchFilter] = useState("");
+
+  const statusOptions = [
+    {
+      value: "",
+      label: t("allStatuses", { defaultValue: "All statuses" }),
+    },
+    { value: "available", label: t("available", { defaultValue: "Available" }) },
+    { value: "available_far", label: t("availableFar", { defaultValue: "Available (Far)" }) },
+    { value: "busy", label: t("busy", { defaultValue: "Busy" }) },
+    { value: "no_location", label: t("noLocation", { defaultValue: "No Location" }) },
+    { value: "not_connected", label: t("notConnected", { defaultValue: "Not Connected" }) },
+    { value: "offline", label: t("offline", { defaultValue: "Offline" }) },
+    { value: "absent", label: t("absent", { defaultValue: "Absent" }) },
+  ];
+
+  const branchOptions = useMemo(() => {
+    const branches = new Set<string>();
+    employees.forEach((e) => {
+      if (e.branch) branches.add(e.branch);
+    });
+    return [
+      {
+        value: "",
+        label: t("allBranches", { defaultValue: "All branches" }),
+      },
+      ...Array.from(branches).map((b) => ({ value: b, label: b })),
+    ];
+  }, [employees, t]);
+
+  const filteredEmployees = useMemo(() => {
+    return employees.filter((employee) => {
+      const matchesStatus = !statusFilter || employee.status === statusFilter;
+      const matchesName =
+        !nameFilter || employee.name.toLowerCase().includes(nameFilter.toLowerCase());
+      const matchesBranch = !branchFilter || employee.branch === branchFilter;
+      return matchesStatus && matchesName && matchesBranch;
+    });
+  }, [employees, statusFilter, nameFilter, branchFilter]);
+
+  const routeDistances = useGoogleRouteDistances(filteredEmployees, center);
+
+  const enrichedEmployees = useMemo(() => {
+    return filteredEmployees.map((employee) => {
+      const route = routeDistances[employee.user_id];
+      return {
+        ...employee,
+        route_distance_meters: route?.distance.value ?? employee.distance_meters,
+        route_distance_label: route?.distance.text ?? employee.distance_label,
+        route_duration_text: route?.duration.text ?? "",
+      };
+    });
+  }, [filteredEmployees, routeDistances]);
+
+  const sortedEmployees = useMemo(() => {
+    return [...enrichedEmployees].sort(
+      (a, b) => a.route_distance_meters - b.route_distance_meters,
+    );
+  }, [enrichedEmployees]);
+
+  useEffect(() => {
+    const selected = sortedEmployees.find(
+      (employee) => employee.user_id === data.assigned_user_ids[0],
+    );
+    if (selected) {
+      onChange("selected_distance_meters", selected.route_distance_meters);
+    }
+  }, [sortedEmployees, data.assigned_user_ids, onChange]);
+
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "available":
+      case "available_far":
+        return "#22c55e";
+      case "busy":
+        return "#f97316";
+      case "no_location":
+        return "#ef4444";
+      case "absent":
+        return "#dc3545";
+      case "not_connected":
+        return "#9CA3AF";
+      default:
+        return "#6b7280";
+    }
+  };
+
+  const statusLabel = (employee: ProjectNotificationEmployee) => employee.status_label;
+
+  return (
+    <Grid container spacing={2} sx={{ height: "500px" }}>
+      <Grid size={{ xs: 12, md: 7 }} sx={{ height: "100%" }}>
+        <ProjectNotificationMap
+          center={center}
+          radius={data.location_radius}
+          employees={sortedEmployees}
+          selectedUserIds={data.assigned_user_ids}
+          onSelectEmployee={(userId) => {
+            const current = data.assigned_user_ids;
+            if (current.includes(userId)) {
+              onChange("assigned_user_ids", current.filter((id) => id !== userId));
+            } else {
+              onChange("assigned_user_ids", [...current, userId]);
+            }
+          }}
+          height="100%"
+          polygons={polygons}
+          showPolyline
+          routeDistances={routeDistances}
+          showPin={data.task_latitude != null && data.task_longitude != null}
+          showEmployees
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 5 }} sx={{ height: "100%", overflow: "auto" }}>
+        <Paper variant="outlined" sx={{ p: 2, height: "100%" }}>
+          <Typography variant="subtitle2" gutterBottom>
+            {t("employees")}
+          </Typography>
+
+          <FormControlLabel
+            sx={{ mb: 1 }}
+            control={
+              <Switch
+                checked={data.independent_progress}
+                onChange={(e) => onChange("independent_progress", e.target.checked)}
+              />
+            }
+            label={t("independentProgress", { defaultValue: "Independent progress" })}
+          />
+
+          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+            <TextField
+              select
+              size="small"
+              label={t("filterByStatus")}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              sx={{ minWidth: 130 }}
+            >
+              {statusOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              size="small"
+              label={t("searchByName", { defaultValue: "Search by name" })}
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              sx={{ flex: 1 }}
+            />
+
+            {branchOptions.length > 1 && (
+              <TextField
+                select
+                size="small"
+                label={t("branch", { defaultValue: "Branch" })}
+                value={branchFilter}
+                onChange={(e) => setBranchFilter(e.target.value)}
+                sx={{ minWidth: 130 }}
+              >
+                {branchOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          </Stack>
+
+          <Divider sx={{ mb: 2 }} />
+
+          {isLoading ? (
+            <Typography color="text.secondary">{t("loading")}</Typography>
+          ) : filteredEmployees.length === 0 ? (
+            <Typography color="text.secondary">
+              {t("noEmployeesMatch", { defaultValue: "No employees match the filters" })}
+            </Typography>
+          ) : (
+            <TableContainer component={Box} sx={{ border: "1px solid", borderColor: "divider" }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: "action.hover" }}>
+                    <TableCell align="center" sx={{ fontWeight: 700 }}>
+                      {t("assignment", { defaultValue: "Assign" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("employeeName", { defaultValue: "Employee name" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("employeeStatus", { defaultValue: "Status" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("routeDistance", { defaultValue: "Distance" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("estimatedDuration", { defaultValue: "Duration" })}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      {t("currentLocation", { defaultValue: "Current location" })}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedEmployees.map((employee) => {
+                    const isSelected = data.assigned_user_ids.includes(employee.user_id);
+                    const hasLocation =
+                      employee.location?.latitude != null &&
+                      employee.location?.longitude != null;
+                    return (
+                      <TableRow
+                        key={employee.user_id}
+                        onClick={() => {
+                          const current = data.assigned_user_ids;
+                          if (current.includes(employee.user_id)) {
+                            onChange("assigned_user_ids", current.filter((id) => id !== employee.user_id));
+                          } else {
+                            onChange("assigned_user_ids", [...current, employee.user_id]);
+                          }
+                        }}
+                        sx={{
+                          cursor: "pointer",
+                          bgcolor: isSelected ? "action.selected" : "background.paper",
+                          "&:hover": { bgcolor: "action.hover" },
+                        }}
+                      >
+                        <TableCell align="center">
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={(e) => {
+                              const current = data.assigned_user_ids;
+                              if (e.target.checked) {
+                                onChange("assigned_user_ids", [...current, employee.user_id]);
+                              } else {
+                                onChange("assigned_user_ids", current.filter((id) => id !== employee.user_id));
+                              }
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={600}>
+                            {employee.name}
+                          </Typography>
+                          {employee.branch && (
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              {employee.branch}
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Box
+                              sx={{
+                                width: 10,
+                                height: 10,
+                                borderRadius: "50%",
+                                bgcolor: statusColor(employee.status),
+                              }}
+                            />
+                            <Typography variant="body2">{statusLabel(employee)}</Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {employee.route_distance_label}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {employee.route_duration_text || "-"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {hasLocation ? (
+                            <Typography variant="caption" color="text.secondary">
+                              {Number(employee.location?.latitude)?.toFixed(4)},{" "}
+                              {Number(employee.location?.longitude)?.toFixed(4)}
+                            </Typography>
+                          ) : (
+                            <Typography variant="caption" color="text.secondary">
+                              {t("noLocation", { defaultValue: "No location" })}
+                            </Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+
+          {errors.assigned_user_ids && (
+            <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
+              {errors.assigned_user_ids}
+            </Typography>
+          )}
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+}
+
+// ============================================================================
+// Step 5: Confirm & Send
+// ============================================================================
+
+function Step5Form({
+  data,
+  employees,
+  siteStatusTypes,
+  confirmed,
+  onChangeConfirmed,
+  t,
+  projectId,
+  existingNotification,
+}: {
+  data: WizardFormData;
+  employees: ProjectNotificationEmployee[];
+  siteStatusTypes: SiteStatusTypeWithKeys[];
+  confirmed: { dataReviewed: boolean; readyToSend: boolean };
+  onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
+  t: ReturnType<typeof useTranslations>;
+  projectId: string | undefined;
+  existingNotification: ProjectNotification | null | undefined;
+}) {
+  const contractorsQuery = useProjectWaterNotificationContractors(projectId);
+  const contractors = contractorsQuery.data ?? [];
+  const selectedContractor = contractors.find((c) => c.id === data.contractor_id);
+  const representatives = selectedContractor?.representatives ?? [];
+  const selectedEmployees = useMemo(
+    () => employees.filter((e) => data.assigned_user_ids.includes(e.user_id)),
+    [employees, data.assigned_user_ids],
+  );
+  const center = useMemo(() => {
+    if (data.task_latitude == null || data.task_longitude == null) return null;
+    return { lat: data.task_latitude, lng: data.task_longitude };
+  }, [data.task_latitude, data.task_longitude]);
+  const routeDistances = useGoogleRouteDistances(selectedEmployees, center);
+
+  return (
+    <Stack spacing={3}>
+      <SummaryCard
+        title={t("summaryNotification")}
+        rows={[
+          { label: t("notification_number", { defaultValue: "رقم الإشعار" }), value: data.notification_number },
+          { label: t("notificationType", { defaultValue: "نوع الاشعار" }), value: data.notification_type },
+          { label: t("description"), value: data.work_description },
+        ]}
+      />
+
+      {data.site_status_type_id && (
+        <SiteStatusSummaryCard
+          siteStatusTypeId={data.site_status_type_id}
+          siteStatusTypes={siteStatusTypes}
+          values={data.site_status_values}
+          t={t}
+        />
+      )}
+
+      <SummaryCard
+        title={t("summaryContractor")}
+        rows={[
+          { label: t("contractor"), value: data.contractor_name },
+          {
+            label: t("contractorRepresentative", { defaultValue: "Contractor Representative" }),
+            value:
+              representatives.find((r) => r.id === data.contractor_representative_id)?.name ??
+              existingNotification?.contractor_representative_name ??
+              "-",
+          },
+        ]}
+      />
+
+      <SummaryCard
+        title={t("summaryLocation")}
+        rows={[
+          {
+            label: t("coordinates"),
+            value: `${data.task_latitude ?? ""}, ${data.task_longitude ?? ""}`,
+          },
+          { label: t("locationRadius"), value: `${data.location_radius} ${t("meters")}` },
+        ]}
+      >
+        {data.task_latitude != null && data.task_longitude != null && (
+          <Box sx={{ mt: 2, height: 160 }}>
+            <ProjectNotificationMap
+              center={{ lat: data.task_latitude, lng: data.task_longitude }}
+              radius={data.location_radius}
+              height="160px"
+              employees={selectedEmployees}
+              selectedUserIds={data.assigned_user_ids}
+              showEmployees={selectedEmployees.length > 0}
+              showPolyline={selectedEmployees.length > 0}
+              routeDistances={routeDistances}
+              interactivePin={false}
+              showPin={data.task_latitude != null && data.task_longitude != null}
+            />
+          </Box>
+        )}
+      </SummaryCard>
+
+      <SummaryCard
+        title={t("summaryAssignment")}
+        rows={[
+          {
+            label: t("employeeName"),
+            value: selectedEmployees.length > 0
+              ? selectedEmployees.map((e) => e.name).join(", ")
+              : "-",
+          },
+          {
+            label: t("distance"),
+            value: selectedEmployees[0]?.distance_label ?? "-",
+          },
+          {
+            label: t("employeeStatus"),
+            value: selectedEmployees[0]?.status_label ?? "-",
+          },
+          {
+            label: t("independentProgress", { defaultValue: "Independent progress" }),
+            value: data.independent_progress
+              ? t("yes", { defaultValue: "Yes" })
+              : t("no", { defaultValue: "No" }),
+          },
+        ]}
+      />
+
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={confirmed.dataReviewed}
+              onChange={(e) =>
+                onChangeConfirmed({ ...confirmed, dataReviewed: e.target.checked })
+              }
+            />
+          }
+          label={t("confirmData")}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={confirmed.readyToSend}
+              onChange={(e) =>
+                onChangeConfirmed({ ...confirmed, readyToSend: e.target.checked })
+              }
+            />
+          }
+          label={t("readyToSend")}
+        />
+      </Paper>
+    </Stack>
+  );
+}
+
+function SummaryCard({
+  title,
+  rows,
+  children,
+}: {
+  title: string;
+  rows: { label: string; value: React.ReactNode }[];
+  children?: React.ReactNode;
+}) {
+  return (
+    <Paper variant="outlined" sx={{ p: 2 }}>
+      <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+        {title}
+      </Typography>
+      <Grid container spacing={1}>
+        {rows.map((row, index) => (
+          <Grid size={{ xs: 12, sm: 6 }} key={index}>
+            <Typography variant="caption" color="text.secondary" display="block">
+              {row.label}
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>
+              {row.value || "-"}
+            </Typography>
+          </Grid>
+        ))}
+      </Grid>
+      {children}
+    </Paper>
+  );
+}

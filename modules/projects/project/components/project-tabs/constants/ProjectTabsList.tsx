@@ -42,6 +42,7 @@ import {
 import ShareTab from "../tabs/share";
 import ContractorsTab from "../tabs/contractors";
 import MaintenanceEmergencyTab from "../tabs/maintenance-emergency";
+import MaintenanceEmergencyWaterTab from "../tabs/maintenance-emergency-water";
 import ManagementsTab from "../tabs/managements";
 import DistrictsTab from "../tabs/districts";
 import { useConstructionsNestedTabs } from "./useConstructionsNestedTabs";
@@ -156,6 +157,7 @@ function passesProjectTypeVisibility(
     case "project-tab-attachments":
       return permissions.archive_library_setting?.is_all_data_visible === 1;
     case "project-tab-maintenance":
+    case "project-tab-maintenance-water":
       return isSettingShown(
         permissions.maintenance_emergency_setting?.is_shown,
       );
@@ -196,6 +198,7 @@ function passesFlatPermission(
     case "project-tab-share":
       return hasAnyShareTabPermission(flatPerms);
     case "project-tab-maintenance":
+    case "project-tab-maintenance-water":
       return hasAnyMaintenanceTabPermission(flatPerms);
     default:
       return true;
@@ -247,6 +250,12 @@ export function useProjectTabsList(): SystemTab[] {
       title: tProject("tabs.maintenanceAndEmergencies"),
       icon: <Wrench className="w-4 h-4" />,
       content: <MaintenanceEmergencyTab />,
+    };
+    const maintenanceWaterTab: SystemTab = {
+      id: "project-tab-maintenance-water",
+      title: tProject("tabs.maintenanceAndEmergenciesWater"),
+      icon: <Wrench className="w-4 h-4" />,
+      content: <MaintenanceEmergencyWaterTab />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
     const documentManagementSubTabs =
@@ -392,6 +401,18 @@ export function useProjectTabsList(): SystemTab[] {
       )
     ) {
       topLevel.push(maintenanceTab);
+    }
+
+    if (
+      shouldShowTopLevelTab(
+        "project-tab-maintenance-water",
+        permissions,
+        projectId,
+        flatPermissionsFetched,
+        flatPerms,
+      )
+    ) {
+      topLevel.push(maintenanceWaterTab);
     }
 
     return topLevel;
