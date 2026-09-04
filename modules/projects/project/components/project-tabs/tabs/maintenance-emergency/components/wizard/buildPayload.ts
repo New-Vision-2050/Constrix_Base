@@ -45,7 +45,7 @@ export function buildCreatePayload(
   return buildCreateNotificationArgs(scope, {
     ...wizardDataToNotificationFields(data),
     is_draft: isDraft,
-    type: "alc",
+    type: "elc",
   });
 }
 
@@ -59,6 +59,6 @@ export function buildUpdatePayload(
     id,
     ...wizardDataToNotificationFields(data),
     is_draft: isDraft,
-    type: "alc",
+    type: "elc",
   });
 }
