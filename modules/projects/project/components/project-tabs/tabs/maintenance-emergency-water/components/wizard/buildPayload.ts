@@ -1,4 +1,4 @@
-import type { UpdateProjectNotificationArgs } from "@/services/api/projects/notifications/types/args";
+import type { UpdateProjectNotificationArgs } from "@/services/api/projects/notifications-water/types/args";
 import type { WizardFormData } from "./types";
 import {
   buildCreateNotificationArgs,
@@ -45,7 +45,7 @@ export function buildCreatePayload(
   return buildCreateNotificationArgs(scope, {
     ...wizardDataToNotificationFields(data),
     is_draft: isDraft,
-    type: "elc",
+    type: "water",
   });
 }
 
@@ -59,6 +59,6 @@ export function buildUpdatePayload(
     id,
     ...wizardDataToNotificationFields(data),
     is_draft: isDraft,
-    type: "elc",
+    type: "water",
   });
 }

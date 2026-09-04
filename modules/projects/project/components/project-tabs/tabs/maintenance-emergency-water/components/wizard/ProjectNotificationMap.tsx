@@ -1,0 +1,619 @@
+﻿"use client";
+
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/config/google-maps";
+import {
+  Autocomplete,
+  Box,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useTranslations } from "next-intl";
+import { MyLocation, Search } from "@mui/icons-material";
+import type { ProjectNotificationEmployee } from "@/services/api/projects/notifications-water/types/response";
+import type { RouteInfo } from "./useGoogleRouteDistances";
+import { computeRoute } from "./googleRoutesApi";
+import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
+
+interface ProjectNotificationMapProps {
+  center: { lat: number; lng: number };
+  radius: number;
+  employees?: ProjectNotificationEmployee[];
+  selectedUserIds?: string[];
+  onSelectEmployee?: (userId: string) => void;
+  onPinMoved?: (lat: number, lng: number) => void;
+  height?: string;
+  /** Draw allowed-zone polygons on the map. */
+  polygons?: MapPolygon[];
+  /** Allow dropping/moving the notification pin by clicking the map. */
+  interactivePin?: boolean;
+  /** Show employee markers. */
+  showEmployees?: boolean;
+  /** Draw a polyline from the selected employee to the notification pin. */
+  showPolyline?: boolean;
+  routeDistances?: Record<string, RouteInfo>;
+  /** Show the notification pin marker. */
+  showPin?: boolean;
+  /** Show map search and current-location controls. */
+  showControls?: boolean;
+}
+
+const DEFAULT_CENTER = { lat: 24.7136, lng: 46.6753 };
+const DEFAULT_ZOOM = 14;
+
+const statusColors: Record<string, string> = {
+  available: "#22c55e",
+  busy: "#f97316",
+  offline: "#6b7280",
+  no_location: "#ef4444",
+  available_far: "#eab308",
+};
+
+export default function ProjectNotificationMap({
+  center,
+  radius,
+  employees = [],
+  selectedUserIds = [],
+  onSelectEmployee,
+  onPinMoved,
+  height = "400px",
+  polygons = [],
+  interactivePin = false,
+  showEmployees = true,
+  showPolyline = false,
+  routeDistances,
+  showPin = true,
+  showControls = false,
+}: ProjectNotificationMapProps) {
+  const t = useTranslations("project.maintenanceEmergencyWater.notifications");
+  const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
+
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const notificationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const circleRef = useRef<google.maps.Circle | null>(null);
+  const employeeMarkersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const employeeInfoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const polygonRefs = useRef<google.maps.Polygon[]>([]);
+  const polylineRef = useRef<google.maps.Polyline[]>([]);
+  const clickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
+  const dragEndListenerRef = useRef<google.maps.MapsEventListener | null>(null);
+  const searchTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOptions, setSearchOptions] = useState<
+    { label: string; lat: number; lng: number }[]
+  >([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
+
+  const activeCenter = {
+    lat: Number(center?.lat ?? DEFAULT_CENTER.lat),
+    lng: Number(center?.lng ?? DEFAULT_CENTER.lng),
+  };
+
+  const movePin = useCallback(
+    (lat: number, lng: number) => {
+      if (notificationMarkerRef.current) {
+        notificationMarkerRef.current.position = { lat, lng };
+      }
+      circleRef.current?.setCenter({ lat, lng });
+      onPinMoved?.(lat, lng);
+    },
+    [onPinMoved],
+  );
+
+  useEffect(() => {
+    if (!isLoaded || !window.google?.maps?.places) return;
+    searchTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [isLoaded]);
+
+  const handleSearch = useCallback(
+    (_event: React.SyntheticEvent, value: string) => {
+      setSearchQuery(value);
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      if (!value || value.length < 2 || !window.google?.maps?.places) {
+        setSearchOptions([]);
+        setSearchLoading(false);
+        return;
+      }
+      setSearchLoading(true);
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          const request: google.maps.places.AutocompleteRequest = {
+            input: value,
+            sessionToken: searchTokenRef.current || undefined,
+          };
+          const { suggestions } = await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+          const results = await Promise.all(
+            suggestions.slice(0, 5).map(async (suggestion) => {
+              const placePrediction = suggestion.placePrediction;
+              if (!placePrediction) return null;
+              const place = placePrediction.toPlace();
+              await place.fetchFields({ fields: ["location"] });
+              if (!place.location) return null;
+              return {
+                label: placePrediction.text.text,
+                lat: place.location.lat(),
+                lng: place.location.lng(),
+              };
+            }),
+          );
+          setSearchOptions(results.filter(Boolean) as { label: string; lat: number; lng: number }[]);
+        } catch (error) {
+          console.error("Error fetching place suggestions:", error);
+          setSearchOptions([]);
+        } finally {
+          setSearchLoading(false);
+        }
+      }, 350);
+    },
+    [],
+  );
+
+  const handleSelect = useCallback(
+    (_event: React.SyntheticEvent, option: { label: string; lat: number; lng: number } | null) => {
+      if (!option) return;
+      movePin(option.lat, option.lng);
+      mapInstance?.panTo({ lat: option.lat, lng: option.lng });
+      setSearchQuery("");
+      setSearchOptions([]);
+      searchTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
+    },
+    [mapInstance, movePin],
+  );
+
+  const handleGetCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert(t("geolocationNotSupported", { defaultValue: "Geolocation is not supported by your browser" }));
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        movePin(latitude, longitude);
+        mapInstance?.panTo({ lat: latitude, lng: longitude });
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        alert(t("geolocationDenied", { defaultValue: "Could not get your location" }));
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+    );
+  }, [mapInstance, movePin, t]);
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstance) return;
+
+    if (!showPin) {
+      if (notificationMarkerRef.current) {
+        notificationMarkerRef.current.map = null;
+      }
+      notificationMarkerRef.current = null;
+      dragEndListenerRef.current?.remove();
+      dragEndListenerRef.current = null;
+      return;
+    }
+
+    if (!notificationMarkerRef.current) {
+      const pinEl = document.createElement("img");
+      pinEl.src = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+      pinEl.width = 40;
+      pinEl.height = 40;
+      pinEl.style.cursor = interactivePin ? "move" : "pointer";
+      notificationMarkerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
+        map: mapInstance,
+        position: activeCenter,
+        title: t("repairPoint"),
+        gmpDraggable: interactivePin,
+        content: pinEl,
+      });
+    } else {
+      notificationMarkerRef.current.position = activeCenter;
+      notificationMarkerRef.current.gmpDraggable = interactivePin;
+    }
+
+    dragEndListenerRef.current?.remove();
+    if (interactivePin) {
+      dragEndListenerRef.current = notificationMarkerRef.current.addListener(
+        "dragend",
+        () => {
+          const position = notificationMarkerRef.current?.position;
+          if (!position) return;
+          const lat = typeof position.lat === "function" ? position.lat() : position.lat;
+          const lng = typeof position.lng === "function" ? position.lng() : position.lng;
+          if (lat != null && lng != null) {
+            movePin(lat, lng);
+          }
+        },
+      );
+    }
+
+    mapInstance.panTo(activeCenter);
+  }, [isLoaded, mapInstance, activeCenter, t, interactivePin, movePin, showPin]);
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstance) return;
+
+    clickListenerRef.current?.remove();
+    clickListenerRef.current = null;
+
+    if (interactivePin) {
+      clickListenerRef.current = mapInstance.addListener(
+        "click",
+        (e: google.maps.MapMouseEvent) => {
+          const latLng = e.latLng;
+          if (!latLng) return;
+          movePin(latLng.lat(), latLng.lng());
+        },
+      );
+    }
+  }, [isLoaded, mapInstance, interactivePin, movePin]);
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstance) return;
+
+    if (!showPin) {
+      circleRef.current?.setMap(null);
+      circleRef.current = null;
+      return;
+    }
+
+    if (!circleRef.current) {
+      circleRef.current = new window.google.maps.Circle({
+        map: mapInstance,
+        center: activeCenter,
+        radius,
+        fillColor: "#4F46E5",
+        fillOpacity: 0.1,
+        strokeColor: "#4F46E5",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+      });
+    } else {
+      circleRef.current.setCenter(activeCenter);
+      circleRef.current.setRadius(radius);
+    }
+  }, [isLoaded, mapInstance, activeCenter, radius, showPin]);
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstance) return;
+
+    polygonRefs.current.forEach((polygon) => polygon.setMap(null));
+    polygonRefs.current = [];
+
+    if (!polygons.length) return;
+
+    const bounds = new window.google.maps.LatLngBounds();
+    bounds.extend(activeCenter);
+
+    polygons.forEach((polygon) => {
+      if (!polygon.length) return;
+      polygon.forEach((point) => bounds.extend(point));
+      const p = new window.google.maps.Polygon({
+        map: mapInstance,
+        paths: polygon.map((point) => ({ lat: point.lat, lng: point.lng })),
+        fillColor: "#22c55e",
+        fillOpacity: 0.25,
+        strokeColor: "#16a34a",
+        strokeOpacity: 1,
+        strokeWeight: 3,
+        clickable: false,
+      });
+      polygonRefs.current.push(p);
+    });
+
+    // Defer fitBounds so any marker panTo runs first, then we zoom to show polygons.
+    setTimeout(() => mapInstance.fitBounds(bounds), 0);
+  }, [isLoaded, mapInstance, polygons]);
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstance) return;
+
+    employeeMarkersRef.current.forEach((marker) => {
+      marker.map = null;
+    });
+    employeeMarkersRef.current = [];
+    employeeInfoWindowRef.current?.close();
+
+    if (!showEmployees) return;
+
+    if (!employeeInfoWindowRef.current) {
+      employeeInfoWindowRef.current = new window.google.maps.InfoWindow({
+        maxWidth: 280,
+      });
+    }
+
+    employees.forEach((employee) => {
+      const lat = Number(employee.location?.latitude);
+      const lng = Number(employee.location?.longitude);
+      if (!lat || !lng) return;
+      const position = { lat, lng };
+      const color = statusColors[employee.status] ?? "#6b7280";
+      const isSelected = selectedUserIds.includes(employee.user_id);
+
+      const markerEl = document.createElement("div");
+      markerEl.style.width = isSelected ? "26px" : "20px";
+      markerEl.style.height = isSelected ? "26px" : "20px";
+      markerEl.style.borderRadius = "50%";
+      markerEl.style.backgroundColor = color;
+      markerEl.style.border = `${isSelected ? 3 : 2}px solid ${isSelected ? "#000" : "#fff"}`;
+      markerEl.style.boxShadow = "0 1px 4px rgba(0,0,0,0.35)";
+      markerEl.style.cursor = "pointer";
+      markerEl.style.pointerEvents = "auto";
+
+      const marker = new window.google.maps.marker.AdvancedMarkerElement({
+        map: mapInstance,
+        position,
+        content: markerEl,
+      });
+
+      const routeInfo = routeDistances?.[employee.user_id];
+      const attendance = employee.attendance;
+      const infoLines = [
+        employee.name
+          ? `${t("employeeName", { defaultValue: "Name" })}: ${employee.name}`
+          : null,
+        employee.status_label || employee.status
+          ? `${t("employeeStatus", { defaultValue: "Status" })}: ${employee.status_label || employee.status}`
+          : null,
+        routeInfo?.distance?.text
+          ? `${t("distance", { defaultValue: "Distance" })}: ${routeInfo.distance.text}`
+          : employee.distance_label
+            ? `${t("distance", { defaultValue: "Distance" })}: ${employee.distance_label}`
+            : null,
+        routeInfo?.duration?.text
+          ? `${t("estimatedDuration", { defaultValue: "Duration" })}: ${routeInfo.duration.text}`
+          : null,
+        employee.branch
+          ? `${t("branch", { defaultValue: "Branch" })}: ${employee.branch}`
+          : null,
+        employee.last_update
+          ? `${t("lastUpdate", { defaultValue: "Last update" })}: ${employee.last_update}`
+          : null,
+        attendance?.["status"]
+          ? `${t("attendance", { defaultValue: "Attendance" })}: ${String(attendance["status"])}${
+              attendance["clock_in_time"] ? ` (${String(attendance["clock_in_time"])})` : ""
+            }`
+          : null,
+        employee.location?.source
+          ? `${t("locationSource", { defaultValue: "Location source" })}: ${employee.location.source}`
+          : null,
+        employee.location?.accuracy != null
+          ? `${t("accuracy", { defaultValue: "Accuracy" })}: ${employee.location.accuracy}m`
+          : null,
+      ].filter((line): line is string => Boolean(line));
+
+      const content = `<div style="direction:rtl;text-align:right;font-family:Arial,sans-serif;padding:8px;color:#000;background:#fff;min-width:120px;border-radius:4px;line-height:1.5">
+        ${infoLines.length > 0 ? infoLines.join("<br/>") : t("noData", { defaultValue: "No data" })}
+      </div>`;
+
+      markerEl.addEventListener("mouseenter", () => {
+        employeeInfoWindowRef.current?.setContent(content);
+        employeeInfoWindowRef.current?.open(mapInstance, marker);
+      });
+
+      markerEl.addEventListener("mouseleave", () => {
+        employeeInfoWindowRef.current?.close();
+      });
+
+      marker.addListener("gmp-click", () => {
+        employeeInfoWindowRef.current?.setContent(content);
+        employeeInfoWindowRef.current?.open(mapInstance, marker);
+        onSelectEmployee?.(employee.user_id);
+      });
+
+      employeeMarkersRef.current.push(marker);
+    });
+  }, [isLoaded, mapInstance, employees, selectedUserIds, onSelectEmployee, showEmployees, routeDistances, t]);
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstance) return;
+
+    polylineRef.current.forEach((p) => p.setMap(null));
+    polylineRef.current = [];
+
+    if (!showPolyline || selectedUserIds.length === 0) return;
+
+    const polylines: google.maps.Polyline[] = [];
+    let cancelled = false;
+
+    selectedUserIds.forEach((userId) => {
+      const selectedEmployee = employees.find((e) => e.user_id === userId);
+      const selLat = Number(selectedEmployee?.location?.latitude);
+      const selLng = Number(selectedEmployee?.location?.longitude);
+      if (!selLat || !selLng) return;
+
+      const routeInfo = routeDistances?.[userId];
+
+      if (routeInfo) {
+        computeRoute(
+          { lat: selLat, lng: selLng },
+          { lat: activeCenter.lat, lng: activeCenter.lng },
+        ).then((route) => {
+          if (cancelled || !mapInstance) return;
+          if (route && route.encodedPolyline) {
+            const path =
+              window.google.maps.geometry.encoding.decodePath(
+                route.encodedPolyline,
+              );
+            polylines.push(new window.google.maps.Polyline({
+              map: mapInstance,
+              path,
+              geodesic: true,
+              strokeColor: "#4F46E5",
+              strokeOpacity: 0.8,
+              strokeWeight: 4,
+            }));
+          } else {
+            polylines.push(new window.google.maps.Polyline({
+              map: mapInstance,
+              path: [
+                { lat: selLat, lng: selLng },
+                activeCenter,
+              ],
+              geodesic: true,
+              strokeColor: "#4F46E5",
+              strokeOpacity: 0.8,
+              strokeWeight: 3,
+            }));
+          }
+        });
+      } else if (routeDistances === undefined) {
+        polylines.push(new window.google.maps.Polyline({
+          map: mapInstance,
+          path: [
+            { lat: selLat, lng: selLng },
+            activeCenter,
+          ],
+          geodesic: true,
+          strokeColor: "#4F46E5",
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+        }));
+      }
+    });
+
+    polylineRef.current = polylines;
+    return () => {
+      cancelled = true;
+      polylines.forEach((p) => p.setMap(null));
+    };
+  }, [isLoaded, mapInstance, showPolyline, selectedUserIds, employees, activeCenter, routeDistances]);
+
+  if (!isLoaded) {
+    return (
+      <Box
+        sx={{
+          height,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 2,
+          bgcolor: "action.hover",
+        }}
+      >
+        <Typography color="text.secondary">{t("loading")}</Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ height, borderRadius: 2, overflow: "hidden", position: "relative" }}>
+      {showControls && (
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            position: "absolute",
+            top: 12,
+            left: 12,
+            right: 12,
+            zIndex: 10,
+            bgcolor: "background.paper",
+            borderRadius: 1,
+            p: 0.5,
+            boxShadow: 1,
+          }}
+        >
+          <Autocomplete
+            size="small"
+            sx={{ flex: 1 }}
+            value={null}
+            blurOnSelect
+            options={searchOptions}
+            getOptionLabel={(o) => (typeof o === "string" ? o : o.label)}
+            inputValue={searchQuery}
+            onInputChange={handleSearch}
+            onChange={handleSelect}
+            loading={searchLoading}
+            noOptionsText={t("searchNoResults", { defaultValue: "No results" })}
+            filterOptions={(x) => x}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder={t("searchMap", { defaultValue: "Search map" })}
+                size="small"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search fontSize="small" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <>
+                      {searchLoading ? (
+                        <CircularProgress size={16} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
+          <IconButton
+            size="small"
+            onClick={handleGetCurrentLocation}
+            title={t("myLocation", { defaultValue: "My location" })}
+            disabled={locating}
+            sx={{ bgcolor: "background.paper" }}
+          >
+            {locating ? <CircularProgress size={18} /> : <MyLocation />}
+          </IconButton>
+        </Stack>
+      )}
+      <GoogleMap
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+        center={activeCenter}
+        zoom={DEFAULT_ZOOM}
+        onLoad={(map) => {
+          mapRef.current = map;
+          setMapInstance(map);
+        }}
+        onUnmount={() => {
+          clickListenerRef.current?.remove();
+          clickListenerRef.current = null;
+          dragEndListenerRef.current?.remove();
+          dragEndListenerRef.current = null;
+          if (notificationMarkerRef.current) {
+            notificationMarkerRef.current.map = null;
+          }
+          notificationMarkerRef.current = null;
+          circleRef.current?.setMap(null);
+          circleRef.current = null;
+          polygonRefs.current.forEach((polygon) => polygon.setMap(null));
+          polygonRefs.current = [];
+          employeeMarkersRef.current.forEach((marker) => {
+            marker.map = null;
+          });
+          employeeMarkersRef.current = [];
+          employeeInfoWindowRef.current?.close();
+          employeeInfoWindowRef.current = null;
+          polylineRef.current.forEach((p) => p.setMap(null));
+          polylineRef.current = [];
+          mapRef.current = null;
+          setMapInstance(null);
+        }}
+        options={{
+          zoomControl: true,
+          fullscreenControl: true,
+          mapTypeId: "roadmap",
+          draggableCursor: interactivePin ? "crosshair" : undefined,
+          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID",
+        }}
+      />
+    </Box>
+  );
+}
