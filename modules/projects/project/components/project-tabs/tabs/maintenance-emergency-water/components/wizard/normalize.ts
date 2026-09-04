@@ -1,4 +1,4 @@
-﻿import type { ProjectNotification } from "@/services/api/projects/notifications-water/types/response";
+import type { ProjectNotification } from "@/services/api/projects/notifications-water/types/response";
 import type { WizardFormData } from "./types";
 
 export function notificationToWizardForm(
@@ -12,12 +12,14 @@ export function notificationToWizardForm(
       machine_number: "",
       work_description: "",
       task_date: new Date().toISOString().split("T")[0],
+      task_time: "",
       duration_hours: 4,
       notes: "",
       site_status_type_id: "",
       site_status_values: {},
       contractor_id: "",
       contractor_name: "",
+      contractor_number: "",
       contractor_representative_id: "",
       contractor_category: "",
       contractor_notes: "",
@@ -42,6 +44,7 @@ export function notificationToWizardForm(
     machine_number: notification.machine_number ?? "",
     work_description: notification.work_description ?? "",
     task_date: notification.task_date ?? new Date().toISOString().split("T")[0],
+    task_time: "",
     duration_hours: notification.duration_hours ?? 4,
     notes: notification.notes ?? "",
     site_status_type_id: notification.site_status_type_id ?? "",
@@ -51,6 +54,7 @@ export function notificationToWizardForm(
 
     contractor_id: notification.contractor_id ?? "",
     contractor_name: notification.contractor_name ?? "",
+    contractor_number: "",
     contractor_representative_id: notification.contractor_representative_id ?? "",
     contractor_category: notification.contractor_category ?? "",
     contractor_notes: notification.contractor_notes ?? "",

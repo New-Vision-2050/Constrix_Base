@@ -529,11 +529,14 @@ function Step1Form({
 }) {
   return (
     <Grid container spacing={2}>
+      {/* Row 1: رقم الإشعار | نوع الإشعار */}
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           fullWidth
           size="small"
-          label={t("notification_number", { defaultValue: "رقم الإشعار" })}
+          label={t("notification_number")}
+
+          InputLabelProps={{ shrink: true }}
           value={data.notification_number}
           onChange={(e) => onChange("notification_number", e.target.value)}
           error={Boolean(errors.notification_number)}
@@ -546,7 +549,9 @@ function Step1Form({
           select
           fullWidth
           size="small"
-          label={t("notificationType", { defaultValue: "نوع الاشعار" })}
+          label={t("notificationType")}
+          inputProps={{ placeholder: t("notificationType") }}
+          InputLabelProps={{ shrink: true }}
           value={data.notification_type}
           onChange={(e) => {
             onChange("notification_type", e.target.value);
@@ -564,62 +569,13 @@ function Step1Form({
         </TextField>
       </Grid>
 
-      <Grid size={{ xs: 12 }}>
-        <TextField
-          fullWidth
-          multiline
-          rows={4}
-          size="small"
-          label={t("description")}
-          value={data.work_description}
-          onChange={(e) => onChange("work_description", e.target.value)}
-          error={Boolean(errors.work_description)}
-          helperText={errors.work_description}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          type="date"
-          label={t("taskDate")}
-          value={data.task_date}
-          onChange={(e) => onChange("task_date", e.target.value)}
-          InputLabelProps={{ shrink: true }}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          size="small"
-          type="number"
-          label={t("durationHours")}
-          value={data.duration_hours}
-          onChange={(e) => onChange("duration_hours", Number(e.target.value))}
-          inputProps={{ min: 1 }}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12 }}>
-        <TextField
-          fullWidth
-          multiline
-          rows={2}
-          size="small"
-          label={t("notes")}
-          value={data.notes}
-          onChange={(e) => onChange("notes", e.target.value)}
-        />
-      </Grid>
-
+      {/* Row 2: صيغة التحديث (half width, right side) */}
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           select
           fullWidth
           size="small"
-          label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
+          label={t("siteStatusType", { defaultValue: "صيغة التحديث" })}
           value={data.site_status_type_id}
           onChange={(e) => {
             const selectedId = e.target.value;
@@ -634,7 +590,7 @@ function Step1Form({
           disabled={siteStatusTypes.length === 0}
         >
           <MenuItem value="">
-            {t("selectSiteStatusType", { defaultValue: "اختر صيغة الإشعار" })}
+            {t("selectSiteStatusType", { defaultValue: "اختر صيغة التحديث" })}
           </MenuItem>
           {siteStatusTypes.map((type) => (
             <MenuItem key={type.id} value={type.id}>
@@ -642,6 +598,48 @@ function Step1Form({
             </MenuItem>
           ))}
         </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }} />
+
+      {/* Row 3: تاريخ مباشرة الموقع | وقت مباشرة الموقع */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          type="date"
+          label={t("taskDate", { defaultValue: "تاريخ مباشرة الموقع" })}
+          value={data.task_date}
+          onChange={(e) => onChange("task_date", e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          type="time"
+          label={t("taskTime", { defaultValue: "وقت مباشرة الموقع" })}
+          value={data.task_time}
+          onChange={(e) => onChange("task_time", e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Grid>
+
+      {/* Row 4: وصف العطل (full width) */}
+      <Grid size={{ xs: 12 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          size="small"
+          label={t("description", { defaultValue: "وصف العطل.." })}
+          value={data.work_description}
+          onChange={(e) => onChange("work_description", e.target.value)}
+          error={Boolean(errors.work_description)}
+          helperText={errors.work_description}
+        />
       </Grid>
 
       {data.site_status_type_id && (
@@ -795,6 +793,7 @@ function Step2Form({
 
   return (
     <Grid container spacing={2}>
+      {/* Row 1: اسم المقاول (dropdown) | رقم المقاول (text) */}
       <Grid size={{ xs: 12, md: 6 }}>
         <Autocomplete
           fullWidth
@@ -814,9 +813,10 @@ function Step2Form({
             <TextField
               {...params}
               label={t("contractor")}
+              placeholder={t("contractor")}
+              InputLabelProps={{ shrink: true }}
               error={Boolean(errors.contractor_name)}
               helperText={errors.contractor_name}
-              placeholder={t("chooseContractor", { defaultValue: "Choose contractor" })}
             />
           )}
         />
@@ -824,16 +824,30 @@ function Step2Form({
 
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
+          fullWidth
+          size="small"
+          label={t("contractorNumber")}
+          placeholder={t("contractorNumber")}
+          InputLabelProps={{ shrink: true }}
+          value={data.contractor_number}
+          onChange={(e) => onChange("contractor_number", e.target.value)}
+        />
+      </Grid>
+
+      {/* Row 2: فني المقاول (select) | رقم الفني (text) */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
           select
           fullWidth
           size="small"
-          label={t("contractorRepresentative", { defaultValue: "Contractor Representative" })}
+          label={t("contractorCategory")}
+          InputLabelProps={{ shrink: true }}
           value={data.contractor_representative_id}
           onChange={(e) => onChange("contractor_representative_id", e.target.value)}
           disabled={!data.contractor_id || representatives.length === 0}
         >
           <MenuItem value="">
-            {t("chooseRepresentative", { defaultValue: "Choose representative" })}
+            {t("chooseRepresentative", { defaultValue: "اختر فني المقاول" })}
           </MenuItem>
           {representatives.map((rep) => (
             <MenuItem key={rep.id} value={rep.id}>
@@ -843,6 +857,34 @@ function Step2Form({
         </TextField>
       </Grid>
 
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("contractorTechnicalNumber")}
+          placeholder={t("contractorTechnicalNumber")}
+          InputLabelProps={{ shrink: true }}
+          value={data.contractor_category}
+          onChange={(e) => onChange("contractor_category", e.target.value)}
+        />
+      </Grid>
+
+      {/* Row 3: رقم الجول (half width, right side) */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={t("permitSource")}
+          placeholder={t("permitSource")}
+          InputLabelProps={{ shrink: true }}
+          value={data.permit_source}
+          onChange={(e) => onChange("permit_source", e.target.value)}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 6 }} />
+
+      {/* Row 4: ملاحظات المقاول (full width textarea) */}
       <Grid size={{ xs: 12 }}>
         <TextField
           fullWidth
@@ -850,6 +892,8 @@ function Step2Form({
           rows={4}
           size="small"
           label={t("contractorNotes")}
+          placeholder={t("contractorNotes")}
+          InputLabelProps={{ shrink: true }}
           value={data.contractor_notes}
           onChange={(e) => onChange("contractor_notes", e.target.value)}
         />
@@ -925,27 +969,34 @@ function Step3Form({
       )}
 
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 4 }}>
+        {/* رابط خرائط جوجل - full width */}
+        <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
             size="small"
-            type="number"
-            label={t("latitude")}
-            value={data.task_latitude ?? ""}
-            onChange={(e) =>
-              onChange("task_latitude", e.target.value === "" ? null : parseFloat(e.target.value))
-            }
-            error={Boolean(errors.task_latitude)}
-            helperText={errors.task_latitude}
+            label={t("locationLink")}
+            placeholder={t("parseLinkPlaceholder")}
+            InputLabelProps={{ shrink: true }}
+            value={data.location_link}
+            onChange={(e) => {
+              onChange("location_link", e.target.value);
+              const match = e.target.value.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+              if (match) {
+                onChange("task_latitude", parseFloat(match[1]));
+                onChange("task_longitude", parseFloat(match[2]));
+              }
+            }}
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 4 }}>
+        {/* خط الطول | خط العرض */}
+        <Grid size={{ xs: 12, md: 6 }}>
           <TextField
             fullWidth
             size="small"
             type="number"
             label={t("longitude")}
+            InputLabelProps={{ shrink: true }}
             value={data.task_longitude ?? ""}
             onChange={(e) =>
               onChange("task_longitude", e.target.value === "" ? null : parseFloat(e.target.value))
@@ -955,35 +1006,20 @@ function Step3Form({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <TextField
             fullWidth
             size="small"
             type="number"
-            label={t("locationRadius")}
-            value={data.location_radius}
-            onChange={(e) => onChange("location_radius", Number(e.target.value))}
-            error={Boolean(errors.location_radius)}
-            helperText={errors.location_radius}
-            inputProps={{ min: 1 }}
+            label={t("latitude")}
+            InputLabelProps={{ shrink: true }}
+            value={data.task_latitude ?? ""}
+            onChange={(e) =>
+              onChange("task_latitude", e.target.value === "" ? null : parseFloat(e.target.value))
+            }
+            error={Boolean(errors.task_latitude)}
+            helperText={errors.task_latitude}
           />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 8 }}>
-          <TextField
-            fullWidth
-            size="small"
-            label={t("locationLink")}
-            value={data.location_link}
-            onChange={(e) => onChange("location_link", e.target.value)}
-            placeholder={t("parseLinkPlaceholder")}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Button variant="outlined" onClick={parseLink} fullWidth>
-            {t("parseLink")}
-          </Button>
         </Grid>
       </Grid>
     </Stack>
