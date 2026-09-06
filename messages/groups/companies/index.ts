@@ -118,6 +118,13 @@ export const companiesMessages = new MessagesGroup({
     ContractStartDate: _m("Contract Start Date", "تاريخ بداية العقد"),
     NoticePeriod: _m("Notice Period", "فترة الإشعار"),
     Salary: _m("Salary", "الراتب"),
+    ViewOtpData: _m("View OTP Data", "عرض بيانات الـ OTP"),
+    OtpCode: _m("OTP Code", "رمز التحقق"),
+    OtpSentAt: _m("Sent At", "وقت الإرسال"),
+    NoOtpData: _m("No OTP data available", "لا توجد بيانات OTP متاحة"),
+    CopyOtp: _m("Copy OTP", "نسخ الرمز"),
+    OtpCopied: _m("OTP copied successfully", "تم نسخ رمز التحقق بنجاح"),
+    OtpCopyError: _m("Failed to copy OTP", "فشل نسخ رمز التحقق"),
   }),
   // sub entities form
   SubEntitiesForm: new MessagesGroup({
