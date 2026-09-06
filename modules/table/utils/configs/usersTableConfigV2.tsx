@@ -9,8 +9,9 @@ import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
-import { Trash2, UserIcon } from "lucide-react";
+import { KeyRound, Trash2, UserIcon } from "lucide-react";
 import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
+import OtpDataDialog from "@/modules/users/components/otp-data-dialog";
 import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
 import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
 import { editIndividualClientFormConfig } from "@/modules/form-builder/configs/editIndividualClientFormConfig";
@@ -51,6 +52,8 @@ export interface UserTableRow {
   attendance_work_date?: string | null;
   attendance_status_code?: string | null;
   attendance_status_label?: string | null;
+  last_otp?: string | null;
+  last_otp_sent_at?: string | null;
   [key: string]: any; // For any other properties
 }
 
@@ -627,6 +630,20 @@ export const UsersConfigV2 = (options?: {
               dialogProps: (row: UserTableRow) => {
                 return {
                   user: row,
+                };
+              },
+            },
+            {
+              id: "view-otp-data",
+              label: tSubTable("ViewOtpData"),
+              icon: <KeyRound className="w-4 h-4" />,
+              action: "view-otp-data",
+              dialogComponent: OtpDataDialog,
+              disabled: !options?.canView,
+              dialogProps: (row: UserTableRow) => {
+                return {
+                  user: row,
+                  title: tSubTable("ViewOtpData"),
                 };
               },
             },

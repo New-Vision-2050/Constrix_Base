@@ -41,6 +41,8 @@ export interface UserProfileData {
   phone?: string;
   residence?: string;
   user_professional_data?: ProfessionalT;
+  last_otp?: string | null;
+  last_otp_sent_at?: string | null;
 }
 
 // Define the API response type
