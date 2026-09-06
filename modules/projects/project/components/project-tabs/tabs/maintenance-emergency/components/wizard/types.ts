@@ -19,10 +19,7 @@ export interface WizardFormData {
   contractor_id: string;
   contractor_name: string;
   contractor_representative_id: string;
-  contractor_category: string;
   contractor_notes: string;
-  permit_source: string;
-  permit_recipient: string;
 
   // Step 3
   task_latitude: number | null;
@@ -48,7 +45,7 @@ export const EMPTY_FORM: WizardFormData = {
   feeder_number: "",
   machine_number: "",
   work_description: "",
-  task_date: new Date().toISOString().split("T")[0],
+  task_date: new Date().toISOString().slice(0, 16),
   duration_hours: 4,
   notes: "",
   site_status_type_id: "",
@@ -57,10 +54,7 @@ export const EMPTY_FORM: WizardFormData = {
   contractor_id: "",
   contractor_name: "",
   contractor_representative_id: "",
-  contractor_category: "",
   contractor_notes: "",
-  permit_source: "",
-  permit_recipient: "",
 
   task_latitude: null,
   task_longitude: null,

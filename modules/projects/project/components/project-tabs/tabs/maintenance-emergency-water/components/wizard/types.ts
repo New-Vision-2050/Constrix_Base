@@ -21,10 +21,9 @@ export interface WizardFormData {
   contractor_name: string;
   contractor_number: string;
   contractor_representative_id: string;
-  contractor_category: string;
+  technician_number: string;
   contractor_notes: string;
-  permit_source: string;
-  permit_recipient: string;
+  round_number: string;
 
   // Step 3
   task_latitude: number | null;
@@ -61,10 +60,9 @@ export const EMPTY_FORM: WizardFormData = {
   contractor_name: "",
   contractor_number: "",
   contractor_representative_id: "",
-  contractor_category: "",
+  technician_number: "",
   contractor_notes: "",
-  permit_source: "",
-  permit_recipient: "",
+  round_number: "",
 
   task_latitude: null,
   task_longitude: null,

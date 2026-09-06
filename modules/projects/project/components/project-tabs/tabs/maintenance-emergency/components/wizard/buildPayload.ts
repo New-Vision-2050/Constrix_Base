@@ -22,7 +22,6 @@ function wizardDataToNotificationFields(data: WizardFormData) {
     contractor_id: data.contractor_id || null,
     contractor_name: data.contractor_name || null,
     contractor_representative_id: data.contractor_representative_id || null,
-    contractor_category: data.contractor_category || null,
     contractor_notes: data.contractor_notes || null,
 
     task_latitude: data.task_latitude ?? 0,

@@ -306,6 +306,7 @@ export const ProjectWaterNotificationsApi = {
   getNotificationTypes: () =>
     baseApi.get<ProjectNotificationTypesResponse>(
       "projects/notifications/notification-types",
+      { params: { type: "water" } },
     ),
 
   getSiteStatusTypesWithKeys: (args: {

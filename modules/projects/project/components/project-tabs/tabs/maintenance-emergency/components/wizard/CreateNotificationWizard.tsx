@@ -582,7 +582,7 @@ function Step1Form({
         <TextField
           fullWidth
           size="small"
-          type="date"
+          type="datetime-local"
           label={t("taskDate")}
           value={data.task_date}
           onChange={(e) => onChange("task_date", e.target.value)}
@@ -827,13 +827,13 @@ function Step2Form({
           select
           fullWidth
           size="small"
-          label={t("contractorRepresentative", { defaultValue: "Contractor Representative" })}
+          label={t("contractorRepresentative")}
           value={data.contractor_representative_id}
           onChange={(e) => onChange("contractor_representative_id", e.target.value)}
           disabled={!data.contractor_id || representatives.length === 0}
         >
           <MenuItem value="">
-            {t("chooseRepresentative", { defaultValue: "Choose representative" })}
+            {t("chooseRepresentative")}
           </MenuItem>
           {representatives.map((rep) => (
             <MenuItem key={rep.id} value={rep.id}>
@@ -1390,7 +1390,7 @@ function Step5Form({
         rows={[
           { label: t("contractor"), value: data.contractor_name },
           {
-            label: t("contractorRepresentative", { defaultValue: "Contractor Representative" }),
+            label: t("contractorRepresentative"),
             value:
               representatives.find((r) => r.id === data.contractor_representative_id)?.name ??
               existingNotification?.contractor_representative_name ??

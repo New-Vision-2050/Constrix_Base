@@ -569,13 +569,13 @@ function Step1Form({
         </TextField>
       </Grid>
 
-      {/* Row 2: صيغة التحديث (half width, right side) */}
+      {/* Row 2: صيغة الإشعار */}
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           select
           fullWidth
           size="small"
-          label={t("siteStatusType", { defaultValue: "صيغة التحديث" })}
+          label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
           value={data.site_status_type_id}
           onChange={(e) => {
             const selectedId = e.target.value;
@@ -599,8 +599,6 @@ function Step1Form({
           ))}
         </TextField>
       </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }} />
 
       {/* Row 3: تاريخ مباشرة الموقع | وقت مباشرة الموقع */}
       <Grid size={{ xs: 12, md: 6 }}>
@@ -840,7 +838,7 @@ function Step2Form({
           select
           fullWidth
           size="small"
-          label={t("contractorCategory")}
+          label={t("contractorCategory", { defaultValue: "فني المقاول" })}
           InputLabelProps={{ shrink: true }}
           value={data.contractor_representative_id}
           onChange={(e) => onChange("contractor_representative_id", e.target.value)}
@@ -864,8 +862,8 @@ function Step2Form({
           label={t("contractorTechnicalNumber")}
           placeholder={t("contractorTechnicalNumber")}
           InputLabelProps={{ shrink: true }}
-          value={data.contractor_category}
-          onChange={(e) => onChange("contractor_category", e.target.value)}
+          value={data.technician_number}
+          onChange={(e) => onChange("technician_number", e.target.value)}
         />
       </Grid>
 
@@ -877,8 +875,8 @@ function Step2Form({
           label={t("permitSource")}
           placeholder={t("permitSource")}
           InputLabelProps={{ shrink: true }}
-          value={data.permit_source}
-          onChange={(e) => onChange("permit_source", e.target.value)}
+          value={data.round_number}
+          onChange={(e) => onChange("round_number", e.target.value)}
         />
       </Grid>
 
@@ -1425,13 +1423,16 @@ function Step5Form({
         title={t("summaryContractor")}
         rows={[
           { label: t("contractor"), value: data.contractor_name },
+          { label: t("contractorNumber"), value: data.contractor_number },
           {
-            label: t("contractorRepresentative", { defaultValue: "Contractor Representative" }),
+            label: t("contractorCategory"),
             value:
               representatives.find((r) => r.id === data.contractor_representative_id)?.name ??
               existingNotification?.contractor_representative_name ??
               "-",
           },
+          { label: t("contractorTechnicalNumber"), value: data.technician_number },
+          { label: t("permitSource"), value: data.round_number },
         ]}
       />
 
