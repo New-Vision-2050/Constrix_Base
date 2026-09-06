@@ -21,7 +21,10 @@ export function useProjectNotificationContractors(projectId?: string) {
         (dto): ProjectNotificationContractor => ({
           id: String(dto.id),
           name: dto.name ?? dto.contractor_name ?? "",
-          number: dto.mobile ?? dto.phone ?? "",
+          number:
+            dto.number != null && String(dto.number).trim() !== ""
+              ? String(dto.number)
+              : dto.mobile ?? dto.phone ?? "",
           mobile: dto.mobile ?? null,
           notes: null,
           representatives: (dto.representatives ?? []).map(

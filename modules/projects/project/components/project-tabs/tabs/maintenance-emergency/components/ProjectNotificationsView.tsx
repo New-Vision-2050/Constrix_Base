@@ -205,7 +205,7 @@ export default function ProjectNotificationsView() {
 
   const { data: flatPerms, isLoading: isLoadingPerms } =
     useProjectMyPermissionsFlat(projectId);
-  const notificationTypesQuery = useProjectNotificationTypes();
+  const notificationTypesQuery = useProjectNotificationTypes(utilityType);
   const notificationTypes = notificationTypesQuery.data ?? [];
 
   const canView = useMemo(

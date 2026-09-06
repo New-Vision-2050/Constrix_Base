@@ -46,12 +46,14 @@ import {
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
 import { useProjectNotificationContractors } from "@/modules/projects/project/query/useProjectNotificationContractors";
 import { useProjectNotificationTypes } from "@/modules/projects/project/query/useProjectNotificationTypes";
+import { useUpdateSiteStatuses } from "@/modules/projects/project/query/useUpdateSiteStatuses";
 import { useSiteStatusTypes } from "@/modules/projects/project/query/useSiteStatusTypes";
 import type {
   ProjectNotification,
   ProjectNotificationEmployee,
   ProjectNotificationType,
   SiteStatusTypeWithKeys,
+  UpdateSiteStatus,
 } from "@/services/api/projects/notifications/types/response";
 import { useGoogleRouteDistances } from "./useGoogleRouteDistances";
 import type { MapPolygon } from "@/components/shared/MapPolygonDrawer";
@@ -114,7 +116,8 @@ export default function CreateNotificationWizard({
   const draftMutation = useSaveProjectNotificationDraftMutation();
   const isFinalizing =
     createMutation.isPending || updateMutation.isPending;
-  const notificationTypesQuery = useProjectNotificationTypes();
+  const isWater = utilityType === "water";
+  const notificationTypesQuery = useProjectNotificationTypes(utilityType);
   const notificationTypes = notificationTypesQuery.data ?? [];
 
   const project = useOptionalProject();
@@ -131,8 +134,11 @@ export default function CreateNotificationWizard({
     projectTypeId,
     projectId,
     notificationTypeId: selectedNotificationTypeId,
+    enabled: !isWater,
   });
   const siteStatusTypes = siteStatusTypesQuery.data ?? [];
+  const updateSiteStatusesQuery = useUpdateSiteStatuses(isWater);
+  const updateSiteStatuses = updateSiteStatusesQuery.data ?? [];
 
   const employeeQuery = useProjectNotificationEmployees({
     projectId,
@@ -427,8 +433,10 @@ export default function CreateNotificationWizard({
                 errors={errors}
                 onChange={updateField}
                 t={t}
+                isWater={isWater}
                 notificationTypes={notificationTypes}
                 siteStatusTypes={siteStatusTypes}
+                updateSiteStatuses={updateSiteStatuses}
               />
             )}
             {step === 2 && (
@@ -437,6 +445,7 @@ export default function CreateNotificationWizard({
                 errors={errors}
                 onChange={updateField}
                 t={t}
+                isWater={isWater}
                 projectId={projectId}
               />
             )}
@@ -466,9 +475,11 @@ export default function CreateNotificationWizard({
                 data={data}
                 employees={employees}
                 siteStatusTypes={siteStatusTypes}
+                updateSiteStatuses={updateSiteStatuses}
                 confirmed={confirmed}
                 onChangeConfirmed={(value) => setConfirmed(value)}
                 t={t}
+                isWater={isWater}
                 projectId={projectId}
                 existingNotification={existingNotification}
               />
@@ -521,16 +532,131 @@ function Step1Form({
   errors,
   onChange,
   t,
+  isWater,
   notificationTypes,
   siteStatusTypes,
+  updateSiteStatuses,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: ReturnType<typeof useTranslations>;
+  isWater: boolean;
   notificationTypes: ProjectNotificationType[];
   siteStatusTypes: SiteStatusTypeWithKeys[];
+  updateSiteStatuses: UpdateSiteStatus[];
 }) {
+  if (isWater) {
+    return (
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t("wfmNotificationNumber")}
+            value={data.notification_number}
+            onChange={(e) => onChange("notification_number", e.target.value)}
+            error={Boolean(errors.notification_number)}
+            helperText={errors.notification_number}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={t("wfmNotificationType")}
+            value={data.notification_type}
+            onChange={(e) => onChange("notification_type", e.target.value)}
+            error={Boolean(errors.notification_type)}
+            helperText={errors.notification_type}
+          >
+            {notificationTypes.map((option) => (
+              <MenuItem key={option.id} value={option.value}>
+                {option.name_ar || option.value}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={t("updateSiteStatus")}
+            value={data.update_site_status_id}
+            onChange={(e) => onChange("update_site_status_id", e.target.value)}
+            error={Boolean(errors.update_site_status_id)}
+            helperText={errors.update_site_status_id}
+          >
+            <MenuItem value="">
+              {t("selectUpdateSiteStatus")}
+            </MenuItem>
+            {updateSiteStatuses.map((status) => (
+              <MenuItem key={status.id} value={status.id}>
+                {status.name_ar || status.name_en || status.name || status.value || status.id}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="date"
+            label={t("siteStartDate")}
+            value={data.task_date}
+            onChange={(e) => onChange("task_date", e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="time"
+            label={t("siteStartTime")}
+            value={data.task_time}
+            onChange={(e) => onChange("task_time", e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            error={Boolean(errors.task_time)}
+            helperText={errors.task_time}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="number"
+            label={t("durationHours")}
+            value={data.duration_hours}
+            onChange={(e) => onChange("duration_hours", Number(e.target.value))}
+            inputProps={{ min: 1 }}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12 }}>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            size="small"
+            label={t("workDescription")}
+            value={data.work_description}
+            onChange={(e) => onChange("work_description", e.target.value)}
+            error={Boolean(errors.work_description)}
+            helperText={errors.work_description}
+          />
+        </Grid>
+      </Grid>
+    );
+  }
+
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, md: 6 }}>
@@ -776,12 +902,14 @@ function Step2Form({
   errors,
   onChange,
   t,
+  isWater,
   projectId,
 }: {
   data: WizardFormData;
   errors: WizardFormErrors;
   onChange: <K extends keyof WizardFormData>(field: K, value: WizardFormData[K]) => void;
   t: ReturnType<typeof useTranslations>;
+  isWater: boolean;
   projectId: string | undefined;
 }) {
   const contractorsQuery = useProjectNotificationContractors(projectId);
@@ -791,11 +919,110 @@ function Step2Form({
     const selected = contractors.find((c) => c.id === contractorId);
     onChange("contractor_id", contractorId);
     onChange("contractor_name", selected?.name ?? "");
-    onChange("contractor_representative_id", "");
+    if (isWater) {
+      onChange("contractor_number", selected?.number ?? "");
+      onChange("contractor_technician_id", "");
+    } else {
+      onChange("contractor_representative_id", "");
+    }
   }
 
   const selectedContractor = contractors.find((c) => c.id === data.contractor_id);
   const representatives = selectedContractor?.representatives ?? [];
+
+  if (isWater) {
+    return (
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Autocomplete
+            fullWidth
+            size="small"
+            options={contractors}
+            loading={contractorsQuery.isLoading}
+            getOptionLabel={(option) => option.name ?? ""}
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            value={contractors.find((c) => c.id === data.contractor_id) ?? null}
+            onChange={(_e, value) => handleContractorChange(value?.id ?? "")}
+            renderOption={(props, option) => (
+              <li {...props} key={option.id}>
+                {option.name}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("contractor")}
+                error={Boolean(errors.contractor_name)}
+                helperText={errors.contractor_name}
+                placeholder={t("chooseContractor", { defaultValue: "Choose contractor" })}
+              />
+            )}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t("contractorNumber")}
+            value={data.contractor_number}
+            onChange={(e) => onChange("contractor_number", e.target.value)}
+            error={Boolean(errors.contractor_number)}
+            helperText={errors.contractor_number}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={t("contractorTechnician")}
+            value={data.contractor_technician_id}
+            onChange={(e) => onChange("contractor_technician_id", e.target.value)}
+            disabled={!data.contractor_id || representatives.length === 0}
+            error={Boolean(errors.contractor_technician_id)}
+            helperText={errors.contractor_technician_id}
+          >
+            <MenuItem value="">
+              {t("chooseContractorTechnician")}
+            </MenuItem>
+            {representatives.map((rep) => (
+              <MenuItem key={rep.id} value={rep.id}>
+                {rep.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t("contractorTechnicianNumber")}
+            value={data.contractor_technician_number}
+            onChange={(e) =>
+              onChange("contractor_technician_number", e.target.value)
+            }
+            error={Boolean(errors.contractor_technician_number)}
+            helperText={errors.contractor_technician_number}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t("poleNumber")}
+            value={data.pole_number}
+            onChange={(e) => onChange("pole_number", e.target.value)}
+            error={Boolean(errors.pole_number)}
+            helperText={errors.pole_number}
+          />
+        </Grid>
+      </Grid>
+    );
+  }
 
   return (
     <Grid container spacing={2}>
@@ -1340,18 +1567,22 @@ function Step5Form({
   data,
   employees,
   siteStatusTypes,
+  updateSiteStatuses,
   confirmed,
   onChangeConfirmed,
   t,
+  isWater,
   projectId,
   existingNotification,
 }: {
   data: WizardFormData;
   employees: ProjectNotificationEmployee[];
   siteStatusTypes: SiteStatusTypeWithKeys[];
+  updateSiteStatuses: UpdateSiteStatus[];
   confirmed: { dataReviewed: boolean; readyToSend: boolean };
   onChangeConfirmed: (value: { dataReviewed: boolean; readyToSend: boolean }) => void;
   t: ReturnType<typeof useTranslations>;
+  isWater: boolean;
   projectId: string | undefined;
   existingNotification: ProjectNotification | null | undefined;
 }) {
@@ -1368,19 +1599,79 @@ function Step5Form({
     return { lat: data.task_latitude, lng: data.task_longitude };
   }, [data.task_latitude, data.task_longitude]);
   const routeDistances = useGoogleRouteDistances(selectedEmployees, center);
+  const selectedUpdateSiteStatus = updateSiteStatuses.find(
+    (status) => status.id === data.update_site_status_id,
+  );
+
+  const notificationSummaryRows = isWater
+    ? [
+        { label: t("wfmNotificationNumber"), value: data.notification_number },
+        { label: t("wfmNotificationType"), value: data.notification_type },
+        {
+          label: t("updateSiteStatus"),
+          value:
+            selectedUpdateSiteStatus?.name_ar ||
+            selectedUpdateSiteStatus?.name_en ||
+            selectedUpdateSiteStatus?.name ||
+            selectedUpdateSiteStatus?.value ||
+            data.update_site_status_id ||
+            "-",
+        },
+        { label: t("siteStartDate"), value: data.task_date || "-" },
+        { label: t("siteStartTime"), value: data.task_time || "-" },
+        { label: t("workDescription"), value: data.work_description },
+      ]
+    : [
+        {
+          label: t("notification_number", { defaultValue: "رقم الإشعار" }),
+          value: data.notification_number,
+        },
+        {
+          label: t("notificationType", { defaultValue: "نوع الاشعار" }),
+          value: data.notification_type,
+        },
+        { label: t("description"), value: data.work_description },
+      ];
+
+  const contractorSummaryRows = isWater
+    ? [
+        { label: t("contractor"), value: data.contractor_name },
+        { label: t("contractorNumber"), value: data.contractor_number || "-" },
+        {
+          label: t("contractorTechnician"),
+          value:
+            representatives.find((r) => r.id === data.contractor_technician_id)
+              ?.name ?? "-",
+        },
+        {
+          label: t("contractorTechnicianNumber"),
+          value: data.contractor_technician_number || "-",
+        },
+        { label: t("poleNumber"), value: data.pole_number || "-" },
+      ]
+    : [
+        { label: t("contractor"), value: data.contractor_name },
+        {
+          label: t("contractorRepresentative", {
+            defaultValue: "Contractor Representative",
+          }),
+          value:
+            representatives.find(
+              (r) => r.id === data.contractor_representative_id,
+            )?.name ??
+            existingNotification?.contractor_representative_name ??
+            "-",
+        },
+      ];
 
   return (
     <Stack spacing={3}>
       <SummaryCard
         title={t("summaryNotification")}
-        rows={[
-          { label: t("notification_number", { defaultValue: "رقم الإشعار" }), value: data.notification_number },
-          { label: t("notificationType", { defaultValue: "نوع الاشعار" }), value: data.notification_type },
-          { label: t("description"), value: data.work_description },
-        ]}
+        rows={notificationSummaryRows}
       />
 
-      {data.site_status_type_id && (
+      {!isWater && data.site_status_type_id && (
         <SiteStatusSummaryCard
           siteStatusTypeId={data.site_status_type_id}
           siteStatusTypes={siteStatusTypes}
@@ -1391,16 +1682,7 @@ function Step5Form({
 
       <SummaryCard
         title={t("summaryContractor")}
-        rows={[
-          { label: t("contractor"), value: data.contractor_name },
-          {
-            label: t("contractorRepresentative", { defaultValue: "Contractor Representative" }),
-            value:
-              representatives.find((r) => r.id === data.contractor_representative_id)?.name ??
-              existingNotification?.contractor_representative_name ??
-              "-",
-          },
-        ]}
+        rows={contractorSummaryRows}
       />
 
       <SummaryCard

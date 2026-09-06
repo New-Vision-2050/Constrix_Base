@@ -22,6 +22,7 @@ export interface UseSiteStatusTypesParams {
   projectTypeId?: string | number;
   projectId?: string;
   notificationTypeId?: string;
+  enabled?: boolean;
 }
 
 export function siteStatusTypesQueryKey(params: UseSiteStatusTypesParams) {
@@ -53,7 +54,9 @@ export function useSiteStatusTypes(params: UseSiteStatusTypesParams) {
       });
       return res.data.payload ?? [];
     },
-    enabled: !!params.projectTypeId || !!params.projectId,
+    enabled:
+      params.enabled !== false &&
+      (!!params.projectTypeId || !!params.projectId),
   });
 }
 
