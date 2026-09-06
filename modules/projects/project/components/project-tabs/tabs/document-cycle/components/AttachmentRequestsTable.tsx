@@ -188,6 +188,9 @@ export default function AttachmentRequestsTable() {
   );
 
   const [filterType, setFilterType] = useState("");
+  const [filterDirection, setFilterDirection] = useState<
+    "" | "incoming" | "outgoing"
+  >("");
   const [filterProcedureSettingId, setFilterProcedureSettingId] = useState("");
   const [filterReceiverCompany, setFilterReceiverCompany] =
     useState<CompanyOption | null>(null);
@@ -203,6 +206,7 @@ export default function AttachmentRequestsTable() {
     page: params.page,
     perPage: params.limit,
     type: filterType || undefined,
+    direction: filterDirection || undefined,
     procedureSettingId: filterProcedureSettingId || undefined,
     receiverCompanyIds: filterReceiverCompany?.id
       ? [filterReceiverCompany.id]
@@ -430,6 +434,24 @@ export default function AttachmentRequestsTable() {
                   select
                   size="small"
                   label={t("type")}
+                  value={filterDirection}
+                  onChange={(e) => {
+                    setFilterDirection(
+                      e.target.value as "" | "incoming" | "outgoing",
+                    );
+                    params.setPage(1);
+                  }}
+                  sx={filterSx}
+                >
+                  <MenuItem value="">{tProject("all")}</MenuItem>
+                  <MenuItem value="incoming">{t("requestTypeIncoming")}</MenuItem>
+                  <MenuItem value="outgoing">{t("requestTypeOutgoing")}</MenuItem>
+                </TextField>
+
+                <TextField
+                  select
+                  size="small"
+                  label={t("status")}
                   value={filterType}
                   onChange={(e) => {
                     setFilterType(e.target.value);
