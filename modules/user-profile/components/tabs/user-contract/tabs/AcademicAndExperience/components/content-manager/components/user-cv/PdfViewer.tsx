@@ -1,15 +1,19 @@
-import React from "react";
+import EmbeddedFilePreview from "@/components/shared/EmbeddedFilePreview";
 
 interface PropsT {
   src: string;
+  mimeType?: string;
+  fileType?: string;
 }
 
-export default function PdfViewer({ src }: PropsT) {
+export default function PdfViewer({ src, mimeType, fileType }: PropsT) {
   return (
-    <iframe
+    <EmbeddedFilePreview
       src={src}
+      mimeType={mimeType}
+      fileType={fileType}
+      title="File preview"
       className="w-[95%] h-[70vh] rounded-[3rem] border-none"
-      title="PDF Viewer"
     />
   );
 }

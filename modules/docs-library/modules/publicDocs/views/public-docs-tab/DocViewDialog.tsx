@@ -22,6 +22,7 @@ import { useOptionalDocsLibraryCxt } from "@/modules/docs-library/context/docs-l
 import { useTranslations } from "next-intl";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import ShareDialog from "./share-dialog";
+import { useFilePreviewUrl } from "@/modules/docs-library/hooks/useFilePreviewUrl";
 
 export default function DocViewDialog() {
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,10 @@ export default function DocViewDialog() {
   const { docToView, setDocToView, refetchDocs, projectId } = usePublicDocsCxt();
   const fileType = docToView?.file?.type;
   const isImg = fileType == "image";
+  const { previewUrl, loading: previewLoading } = useFilePreviewUrl(
+    docToView?.id,
+    docToView?.file,
+  );
   const [isFavorite, setIsFavorite] = useState(
     Boolean(docToView?.is_favourite)
   );
@@ -210,17 +215,18 @@ export default function DocViewDialog() {
             </div>
           </DialogHeader>
           <div className="flex-1 overflow-auto bg-black flex items-center justify-center">
-            {isImg ? (
+            {previewLoading ? (
+              <p className="text-white text-sm">جاري تحميل المعاينة...</p>
+            ) : isImg ? (
               <img
-                src={docToView?.file?.url}
+                src={previewUrl ?? docToView?.file?.url}
                 alt={docToView?.name}
                 className="max-w-full max-h-full object-contain"
               />
+            ) : previewUrl ? (
+              <iframe src={previewUrl} className="w-full h-full" title={docToView?.name} />
             ) : (
-              <iframe
-                src={docToView?.file?.url}
-                className="w-full h-full"
-              />
+              <p className="text-white text-sm">تعذر تحميل المعاينة</p>
             )}
           </div>
         </DialogContent>

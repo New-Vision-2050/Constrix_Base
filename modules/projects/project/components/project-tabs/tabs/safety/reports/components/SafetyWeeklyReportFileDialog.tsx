@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,6 +13,7 @@ import {
 import { OpenInNew } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import type { SafetyWeeklyReportRow } from "../types";
+import { useExternalFilePreviewUrl } from "@/hooks/useExternalFilePreviewUrl";
 
 type SafetyWeeklyReportFileDialogProps = {
   open: boolean;
@@ -45,6 +47,11 @@ export default function SafetyWeeklyReportFileDialog({
   const fileUrl = report?.downloadUrl ?? "";
   const canPreviewPdf = Boolean(fileUrl && isPdfUrl(fileUrl));
   const canPreviewOffice = Boolean(fileUrl && isOfficeDocUrl(fileUrl));
+  const { previewUrl: pdfPreviewUrl, loading: pdfLoading } =
+    useExternalFilePreviewUrl(fileUrl, {
+      mimeType: "application/pdf",
+      enabled: open && canPreviewPdf,
+    });
   const officeViewerUrl = canPreviewOffice
     ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl)}`
     : "";
@@ -56,18 +63,33 @@ export default function SafetyWeeklyReportFileDialog({
         {!fileUrl ? (
           <Typography color="text.secondary">{t("unavailable")}</Typography>
         ) : canPreviewPdf ? (
-          <Box
-            component="iframe"
-            src={fileUrl}
-            title={report?.name || t("title")}
-            sx={{
-              width: "100%",
-              height: { xs: 420, md: 640 },
-              border: 0,
-              borderRadius: 1,
-              bgcolor: "grey.100",
-            }}
-          />
+          pdfLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: { xs: 420, md: 640 },
+              }}
+            >
+              <CircularProgress size={32} />
+            </Box>
+          ) : pdfPreviewUrl ? (
+            <Box
+              component="iframe"
+              src={pdfPreviewUrl}
+              title={report?.name || t("title")}
+              sx={{
+                width: "100%",
+                height: { xs: 420, md: 640 },
+                border: 0,
+                borderRadius: 1,
+                bgcolor: "grey.100",
+              }}
+            />
+          ) : (
+            <Typography color="text.secondary">{t("previewUnsupported")}</Typography>
+          )
         ) : canPreviewOffice ? (
           <Box
             component="iframe"
