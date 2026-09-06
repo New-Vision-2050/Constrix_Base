@@ -137,7 +137,7 @@ export default function CreateNotificationWizard({
     enabled: !isWater,
   });
   const siteStatusTypes = siteStatusTypesQuery.data ?? [];
-  const updateSiteStatusesQuery = useUpdateSiteStatuses(isWater);
+  const updateSiteStatusesQuery = useUpdateSiteStatuses(true);
   const updateSiteStatuses = updateSiteStatusesQuery.data ?? [];
 
   const employeeQuery = useProjectNotificationEmployees({
@@ -546,117 +546,6 @@ function Step1Form({
   siteStatusTypes: SiteStatusTypeWithKeys[];
   updateSiteStatuses: UpdateSiteStatus[];
 }) {
-  if (isWater) {
-    return (
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            fullWidth
-            size="small"
-            label={t("wfmNotificationNumber")}
-            value={data.notification_number}
-            onChange={(e) => onChange("notification_number", e.target.value)}
-            error={Boolean(errors.notification_number)}
-            helperText={errors.notification_number}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            select
-            fullWidth
-            size="small"
-            label={t("wfmNotificationType")}
-            value={data.notification_type}
-            onChange={(e) => onChange("notification_type", e.target.value)}
-            error={Boolean(errors.notification_type)}
-            helperText={errors.notification_type}
-          >
-            {notificationTypes.map((option) => (
-              <MenuItem key={option.id} value={option.value}>
-                {option.name_ar || option.value}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            select
-            fullWidth
-            size="small"
-            label={t("updateSiteStatus")}
-            value={data.update_site_status_id}
-            onChange={(e) => onChange("update_site_status_id", e.target.value)}
-            error={Boolean(errors.update_site_status_id)}
-            helperText={errors.update_site_status_id}
-          >
-            <MenuItem value="">
-              {t("selectUpdateSiteStatus")}
-            </MenuItem>
-            {updateSiteStatuses.map((status) => (
-              <MenuItem key={status.id} value={status.id}>
-                {status.name_ar || status.name_en || status.name || status.value || status.id}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            fullWidth
-            size="small"
-            type="date"
-            label={t("siteStartDate")}
-            value={data.task_date}
-            onChange={(e) => onChange("task_date", e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            fullWidth
-            size="small"
-            type="time"
-            label={t("siteStartTime")}
-            value={data.task_time}
-            onChange={(e) => onChange("task_time", e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            error={Boolean(errors.task_time)}
-            helperText={errors.task_time}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            fullWidth
-            size="small"
-            type="number"
-            label={t("durationHours")}
-            value={data.duration_hours}
-            onChange={(e) => onChange("duration_hours", Number(e.target.value))}
-            inputProps={{ min: 1 }}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12 }}>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            size="small"
-            label={t("workDescription")}
-            value={data.work_description}
-            onChange={(e) => onChange("work_description", e.target.value)}
-            error={Boolean(errors.work_description)}
-            helperText={errors.work_description}
-          />
-        </Grid>
-      </Grid>
-    );
-  }
-
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, md: 6 }}>
@@ -680,19 +569,87 @@ function Step1Form({
           value={data.notification_type}
           onChange={(e) => {
             onChange("notification_type", e.target.value);
-            onChange("site_status_type_id", "");
-            onChange("site_status_values", {});
+            if (!isWater) {
+              onChange("site_status_type_id", "");
+              onChange("site_status_values", {});
+            }
           }}
           error={Boolean(errors.notification_type)}
           helperText={errors.notification_type}
         >
           {notificationTypes.map((option) => (
             <MenuItem key={option.id} value={option.value}>
-              {option.value}
+              {option.name_ar || option.value}
             </MenuItem>
           ))}
         </TextField>
       </Grid>
+
+      {!isWater && (
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
+            value={data.site_status_type_id}
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              onChange("site_status_type_id", selectedId);
+              const selectedType = siteStatusTypes.find((type) => type.id === selectedId);
+              const initialValues: Record<string, string> = {};
+              (selectedType?.keys ?? []).forEach((key) => {
+                initialValues[key.id] = "";
+              });
+              onChange("site_status_values", initialValues);
+            }}
+            disabled={siteStatusTypes.length === 0}
+          >
+            <MenuItem value="">
+              {t("selectSiteStatusType", { defaultValue: "اختر صيغة الإشعار" })}
+            </MenuItem>
+            {siteStatusTypes.map((type) => (
+              <MenuItem key={type.id} value={type.id}>
+                {type.name_ar || type.name_en}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+      )}
+
+      <Grid size={{ xs: 12, md: 6 }}>
+        <TextField
+          select
+          fullWidth
+          size="small"
+          label={t("updateSiteStatus")}
+          value={data.update_site_status_id}
+          onChange={(e) => onChange("update_site_status_id", e.target.value)}
+          error={Boolean(errors.update_site_status_id)}
+          helperText={errors.update_site_status_id}
+        >
+          <MenuItem value="">{t("selectUpdateSiteStatus")}</MenuItem>
+          {updateSiteStatuses.map((status) => (
+            <MenuItem key={status.id} value={status.id}>
+              {status.name_ar ||
+                status.name_en ||
+                status.name ||
+                status.value ||
+                status.id}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      {!isWater && data.site_status_type_id && (
+        <SiteStatusValueInputs
+          siteStatusTypeId={data.site_status_type_id}
+          siteStatusTypes={siteStatusTypes}
+          values={data.site_status_values}
+          onChange={(values) => onChange("site_status_values", values)}
+          t={t}
+        />
+      )}
 
       <Grid size={{ xs: 12 }}>
         <TextField
@@ -732,6 +689,22 @@ function Step1Form({
         />
       </Grid>
 
+      {isWater && (
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
+            type="time"
+            label={t("siteStartTime")}
+            value={data.task_time}
+            onChange={(e) => onChange("task_time", e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            error={Boolean(errors.task_time)}
+            helperText={errors.task_time}
+          />
+        </Grid>
+      )}
+
       <Grid size={{ xs: 12 }}>
         <TextField
           fullWidth
@@ -743,46 +716,6 @@ function Step1Form({
           onChange={(e) => onChange("notes", e.target.value)}
         />
       </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          select
-          fullWidth
-          size="small"
-          label={t("siteStatusType", { defaultValue: "صيغة الإشعار" })}
-          value={data.site_status_type_id}
-          onChange={(e) => {
-            const selectedId = e.target.value;
-            onChange("site_status_type_id", selectedId);
-            const selectedType = siteStatusTypes.find((type) => type.id === selectedId);
-            const initialValues: Record<string, string> = {};
-            (selectedType?.keys ?? []).forEach((key) => {
-              initialValues[key.id] = "";
-            });
-            onChange("site_status_values", initialValues);
-          }}
-          disabled={siteStatusTypes.length === 0}
-        >
-          <MenuItem value="">
-            {t("selectSiteStatusType", { defaultValue: "اختر صيغة الإشعار" })}
-          </MenuItem>
-          {siteStatusTypes.map((type) => (
-            <MenuItem key={type.id} value={type.id}>
-              {type.name_ar || type.name_en}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Grid>
-
-      {data.site_status_type_id && (
-        <SiteStatusValueInputs
-          siteStatusTypeId={data.site_status_type_id}
-          siteStatusTypes={siteStatusTypes}
-          values={data.site_status_values}
-          onChange={(values) => onChange("site_status_values", values)}
-          t={t}
-        />
-      )}
     </Grid>
   );
 }
@@ -962,18 +895,6 @@ function Step2Form({
 
         <Grid size={{ xs: 12, md: 6 }}>
           <TextField
-            fullWidth
-            size="small"
-            label={t("contractorNumber")}
-            value={data.contractor_number}
-            onChange={(e) => onChange("contractor_number", e.target.value)}
-            error={Boolean(errors.contractor_number)}
-            helperText={errors.contractor_number}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
             select
             fullWidth
             size="small"
@@ -999,6 +920,18 @@ function Step2Form({
           <TextField
             fullWidth
             size="small"
+            label={t("contractorNumber")}
+            value={data.contractor_number}
+            onChange={(e) => onChange("contractor_number", e.target.value)}
+            error={Boolean(errors.contractor_number)}
+            helperText={errors.contractor_number}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            size="small"
             label={t("contractorTechnicianNumber")}
             value={data.contractor_technician_number}
             onChange={(e) =>
@@ -1018,6 +951,18 @@ function Step2Form({
             onChange={(e) => onChange("pole_number", e.target.value)}
             error={Boolean(errors.pole_number)}
             helperText={errors.pole_number}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12 }}>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            size="small"
+            label={t("contractorNotes")}
+            value={data.contractor_notes}
+            onChange={(e) => onChange("contractor_notes", e.target.value)}
           />
         </Grid>
       </Grid>
@@ -1603,35 +1548,31 @@ function Step5Form({
     (status) => status.id === data.update_site_status_id,
   );
 
-  const notificationSummaryRows = isWater
-    ? [
-        { label: t("wfmNotificationNumber"), value: data.notification_number },
-        { label: t("wfmNotificationType"), value: data.notification_type },
-        {
-          label: t("updateSiteStatus"),
-          value:
-            selectedUpdateSiteStatus?.name_ar ||
-            selectedUpdateSiteStatus?.name_en ||
-            selectedUpdateSiteStatus?.name ||
-            selectedUpdateSiteStatus?.value ||
-            data.update_site_status_id ||
-            "-",
-        },
-        { label: t("siteStartDate"), value: data.task_date || "-" },
-        { label: t("siteStartTime"), value: data.task_time || "-" },
-        { label: t("workDescription"), value: data.work_description },
-      ]
-    : [
-        {
-          label: t("notification_number", { defaultValue: "رقم الإشعار" }),
-          value: data.notification_number,
-        },
-        {
-          label: t("notificationType", { defaultValue: "نوع الاشعار" }),
-          value: data.notification_type,
-        },
-        { label: t("description"), value: data.work_description },
-      ];
+  const notificationSummaryRows = [
+    {
+      label: t("notification_number", { defaultValue: "رقم الإشعار" }),
+      value: data.notification_number,
+    },
+    {
+      label: t("notificationType", { defaultValue: "نوع الاشعار" }),
+      value: data.notification_type,
+    },
+    { label: t("description"), value: data.work_description },
+    { label: t("taskDate"), value: data.task_date || "-" },
+    ...(isWater
+      ? [{ label: t("siteStartTime"), value: data.task_time || "-" }]
+      : []),
+    {
+      label: t("updateSiteStatus"),
+      value:
+        selectedUpdateSiteStatus?.name_ar ||
+        selectedUpdateSiteStatus?.name_en ||
+        selectedUpdateSiteStatus?.name ||
+        selectedUpdateSiteStatus?.value ||
+        data.update_site_status_id ||
+        "-",
+    },
+  ];
 
   const contractorSummaryRows = isWater
     ? [

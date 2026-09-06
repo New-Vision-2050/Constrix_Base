@@ -37,6 +37,7 @@ function electricityNotificationFields(data: WizardFormData) {
             : String(value),
       }),
     ),
+    update_site_status_id: data.update_site_status_id || null,
 
     contractor_id: data.contractor_id || null,
     contractor_name: data.contractor_name || null,
@@ -57,6 +58,7 @@ function waterNotificationFields(data: WizardFormData) {
     task_date: data.task_date || null,
     task_time: data.task_time || null,
     duration_hours: data.duration_hours || null,
+    notes: data.notes || null,
 
     contractor_id: data.contractor_id || null,
     contractor_name: data.contractor_name || null,
@@ -64,6 +66,7 @@ function waterNotificationFields(data: WizardFormData) {
     contractor_technician_id: data.contractor_technician_id || null,
     contractor_technician_number: data.contractor_technician_number || null,
     pole_number: data.pole_number || null,
+    contractor_notes: data.contractor_notes || null,
 
     ...sharedLocationAndAssignmentFields(data),
   };
