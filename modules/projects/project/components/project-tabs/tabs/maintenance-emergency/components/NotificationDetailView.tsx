@@ -43,6 +43,11 @@ import SiteStatusUpdatesTab from "./SiteStatusUpdatesTab";
 import NotificationNotesTab from "./NotificationNotesTab";
 import ReassignTaskModal from "./ReassignTaskModal";
 import type { ProjectNotificationAttachment } from "@/services/api/projects/notifications/types/response";
+import {
+  engagementMaintenanceTabId,
+  isMaintenanceUtilityType,
+  projectMaintenanceTabId,
+} from "../types/maintenanceUtilityType";
 
 interface NotificationDetailViewProps {
   projectId?: string;
@@ -254,14 +259,20 @@ export default function NotificationDetailView({
   );
 
   const handleBack = () => {
+    const utilityType = isMaintenanceUtilityType(notification?.type)
+      ? notification.type
+      : "electricity";
+
     if (contractualEngagementKey) {
       router.push(
-        `${ROUTER.UNIFIED_CONTRACT(contractualEngagementKey)}?tab=engagement-tab-maintenance`,
+        `${ROUTER.UNIFIED_CONTRACT(contractualEngagementKey)}?tab=${engagementMaintenanceTabId(utilityType)}`,
       );
       return;
     }
     if (projectId) {
-      router.push(`/projects/${projectId}?tab=project-tab-maintenance`);
+      router.push(
+        `/projects/${projectId}?tab=${projectMaintenanceTabId(utilityType)}`,
+      );
       return;
     }
     router.push(ROUTER.AttendancePresence);

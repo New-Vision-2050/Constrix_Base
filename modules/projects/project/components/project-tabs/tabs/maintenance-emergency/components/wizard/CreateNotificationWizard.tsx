@@ -63,6 +63,7 @@ import {
 } from "./types";
 import { notificationToWizardForm } from "./normalize";
 import { buildCreatePayload, buildUpdatePayload } from "./buildPayload";
+import { useMaintenanceUtilityType } from "../../MaintenanceUtilityTypeContext";
 import { validateStep, firstStepWithError } from "./validate";
 import { useProjectNotificationLocationPolygons } from "./useProjectNotificationLocationPolygons";
 import { isPointInAnyPolygon } from "./utils";
@@ -90,6 +91,7 @@ export default function CreateNotificationWizard({
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const { projectId, contractualEngagementKey, hasScope } =
     useNotificationScope();
+  const utilityType = useMaintenanceUtilityType();
   const notificationScope = { projectId, contractualEngagementKey };
 
   const { data: existingNotification, isLoading: isLoadingDetail } =
@@ -308,6 +310,7 @@ export default function CreateNotificationWizard({
         await draftMutation.mutateAsync(
           buildUpdatePayload(notificationId, notificationScope, data, {
             isDraft: true,
+            type: utilityType,
           }),
         );
         if (!silent) toast.success(t("draftSaved"));
@@ -318,6 +321,7 @@ export default function CreateNotificationWizard({
         await draftMutation.mutateAsync(
           buildUpdatePayload(draftId, notificationScope, data, {
             isDraft: true,
+            type: utilityType,
           }),
         );
         if (!silent) toast.success(t("draftSaved"));
@@ -325,7 +329,7 @@ export default function CreateNotificationWizard({
       }
 
       const saved = await draftMutation.mutateAsync(
-        buildCreatePayload(notificationScope, data, { isDraft: true }),
+        buildCreatePayload(notificationScope, data, { isDraft: true, type: utilityType }),
       );
       if (saved?.id) {
         setDraftId(saved.id);
@@ -351,17 +355,17 @@ export default function CreateNotificationWizard({
     try {
       if (mode === "edit" && notificationId) {
         await updateMutation.mutateAsync(
-          buildUpdatePayload(notificationId, notificationScope, data),
+          buildUpdatePayload(notificationId, notificationScope, data, { type: utilityType }),
         );
         toast.success(t("updatedSuccess"));
       } else if (draftId) {
         await updateMutation.mutateAsync(
-          buildUpdatePayload(draftId, notificationScope, data),
+          buildUpdatePayload(draftId, notificationScope, data, { type: utilityType }),
         );
         toast.success(t("createdSuccess"));
       } else {
         await createMutation.mutateAsync(
-          buildCreatePayload(notificationScope, data),
+          buildCreatePayload(notificationScope, data, { type: utilityType }),
         );
         toast.success(t("createdSuccess"));
       }

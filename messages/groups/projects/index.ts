@@ -37,6 +37,14 @@ export const projectMessages = new MessagesGroup({
       "Maintenance & Emergencies",
       "الصيانة والطوارئ",
     ),
+    maintenanceAndEmergenciesElectricity: _m(
+      "Maintenance & Emergencies — Electricity",
+      "صيانة وطوارئ كهرباء",
+    ),
+    maintenanceAndEmergenciesWater: _m(
+      "Maintenance & Emergencies — Water",
+      "صيانة وطوارئ مياه",
+    ),
     constructions: _m("Constructions", "الانشاءات"),
     departments: _m("Departments", "الاقسام"),
     workOrders: _m("Permits", "التصاريح"),

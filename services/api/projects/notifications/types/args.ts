@@ -13,6 +13,8 @@ export type ProjectNotificationsListArgs = ProjectNotificationScopeArgs & {
   to_date?: string;
   assigned_user_id?: string;
   search?: string;
+  /** Utility domain: electricity | water (tab split). */
+  type?: string;
 };
 
 /** Mobile list endpoints do not require project_id; backend filters by current employee. */
@@ -38,12 +40,14 @@ export type ProjectNotificationsExportArgs = ProjectNotificationScopeArgs & {
   created_by_user_id?: string;
   sort?: string;
   ids?: string[];
+  type?: string;
 };
 
 export type ProjectNotificationsMapTasksArgs = ProjectNotificationScopeArgs & {
   status?: string;
   date_from?: string;
   date_to?: string;
+  type?: string;
 };
 
 export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScopeArgs & {
@@ -56,6 +60,11 @@ export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScop
 export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {
   notification_number?: string | null;
   notification_type: string;
+  /**
+   * Utility domain distinguishing electricity vs water maintenance tabs.
+   * Sent as query/body `type` (e.g. `electricity` | `water`).
+   */
+  type?: string;
   feeder_number?: string | null;
   work_description?: string | null;
   contractor_id?: string | null;
@@ -180,6 +189,7 @@ export interface ProjectNotificationsChartsArgs {
   date_from?: string;
   date_to?: string;
   search?: string;
+  type?: string;
 }
 
 /* ── Site Status Types ── */

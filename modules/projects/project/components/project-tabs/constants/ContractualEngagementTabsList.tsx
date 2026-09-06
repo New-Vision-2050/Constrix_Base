@@ -104,11 +104,18 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       nestedTabs: constructionsNestedTabs,
     };
 
-    const maintenanceTab: SystemTab = {
-      id: "engagement-tab-maintenance",
-      title: tProject("tabs.maintenanceAndEmergencies"),
+    const maintenanceElectricityTab: SystemTab = {
+      id: "engagement-tab-maintenance-electricity",
+      title: tProject("tabs.maintenanceAndEmergenciesElectricity"),
       icon: <Wrench className="w-4 h-4" />,
-      content: <MaintenanceEmergencyTab />,
+      content: <MaintenanceEmergencyTab type="electricity" />,
+    };
+
+    const maintenanceWaterTab: SystemTab = {
+      id: "engagement-tab-maintenance-water",
+      title: tProject("tabs.maintenanceAndEmergenciesWater"),
+      icon: <Wrench className="w-4 h-4" />,
+      content: <MaintenanceEmergencyTab type="water" />,
     };
 
     const safetyTab: SystemTab = {
@@ -124,7 +131,8 @@ export function useContractualEngagementTabsList(): SystemTab[] {
       constructionsTab,
       safetyTab,
       documentManagementTab,
-      maintenanceTab,
+      maintenanceElectricityTab,
+      maintenanceWaterTab,
     ];
   }, [tProject, constructionsNestedTabs]);
 }

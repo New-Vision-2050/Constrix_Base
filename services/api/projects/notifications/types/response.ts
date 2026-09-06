@@ -109,6 +109,8 @@ export interface ProjectNotification {
   project_id: string;
   notification_number: string | null;
   notification_type: string;
+  /** Utility domain: electricity | water */
+  type?: string | null;
   severity: NotificationSeverity;
   feeder_number: string;
   work_type: string;

@@ -156,6 +156,8 @@ function passesProjectTypeVisibility(
     case "project-tab-attachments":
       return permissions.archive_library_setting?.is_all_data_visible === 1;
     case "project-tab-maintenance":
+    case "project-tab-maintenance-electricity":
+    case "project-tab-maintenance-water":
       return isSettingShown(
         permissions.maintenance_emergency_setting?.is_shown,
       );
@@ -196,6 +198,8 @@ function passesFlatPermission(
     case "project-tab-share":
       return hasAnyShareTabPermission(flatPerms);
     case "project-tab-maintenance":
+    case "project-tab-maintenance-electricity":
+    case "project-tab-maintenance-water":
       return hasAnyMaintenanceTabPermission(flatPerms);
     default:
       return true;
@@ -242,11 +246,17 @@ export function useProjectTabsList(): SystemTab[] {
       icon: <Paperclip className="w-4 h-4" />,
       content: <AttachmentsTab />,
     };
-    const maintenanceTab: SystemTab = {
-      id: "project-tab-maintenance",
-      title: tProject("tabs.maintenanceAndEmergencies"),
+    const maintenanceElectricityTab: SystemTab = {
+      id: "project-tab-maintenance-electricity",
+      title: tProject("tabs.maintenanceAndEmergenciesElectricity"),
       icon: <Wrench className="w-4 h-4" />,
-      content: <MaintenanceEmergencyTab />,
+      content: <MaintenanceEmergencyTab type="electricity" />,
+    };
+    const maintenanceWaterTab: SystemTab = {
+      id: "project-tab-maintenance-water",
+      title: tProject("tabs.maintenanceAndEmergenciesWater"),
+      icon: <Wrench className="w-4 h-4" />,
+      content: <MaintenanceEmergencyTab type="water" />,
     };
     const stakeholderSubTabs = createStakeholderSubTabs(tProject);
     const documentManagementSubTabs =
@@ -384,14 +394,26 @@ export function useProjectTabsList(): SystemTab[] {
 
     if (
       shouldShowTopLevelTab(
-        "project-tab-maintenance",
+        "project-tab-maintenance-electricity",
         permissions,
         projectId,
         flatPermissionsFetched,
         flatPerms,
       )
     ) {
-      topLevel.push(maintenanceTab);
+      topLevel.push(maintenanceElectricityTab);
+    }
+
+    if (
+      shouldShowTopLevelTab(
+        "project-tab-maintenance-water",
+        permissions,
+        projectId,
+        flatPermissionsFetched,
+        flatPerms,
+      )
+    ) {
+      topLevel.push(maintenanceWaterTab);
     }
 
     return topLevel;

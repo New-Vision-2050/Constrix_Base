@@ -23,6 +23,8 @@ export interface UseProjectNotificationsParams extends NotificationScope {
   toDate?: string;
   assignedUserId?: string;
   search?: string;
+  /** Utility domain: electricity | water */
+  type?: string;
 }
 
 export function projectNotificationsQueryKey(
@@ -50,6 +52,7 @@ export function useProjectNotifications(params: UseProjectNotificationsParams) {
     toDate,
     assignedUserId,
     search,
+    type,
   } = params;
 
   return useQuery({
@@ -68,6 +71,7 @@ export function useProjectNotifications(params: UseProjectNotificationsParams) {
           ...(toDate ? { to_date: toDate } : {}),
           ...(assignedUserId ? { assigned_user_id: assignedUserId } : {}),
           ...(search ? { search } : {}),
+          ...(type ? { type } : {}),
         },
       );
 

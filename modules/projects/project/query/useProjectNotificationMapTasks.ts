@@ -72,6 +72,7 @@ export interface ProjectNotificationMapTasksFilters {
   status?: string;
   dateFrom?: string;
   dateTo?: string;
+  type?: string;
 }
 
 export function projectNotificationMapTasksQueryKey(
@@ -85,6 +86,7 @@ export function projectNotificationMapTasksQueryKey(
     filters.status,
     filters.dateFrom,
     filters.dateTo,
+    filters.type,
   ] as const;
 }
 
@@ -98,7 +100,7 @@ export function useProjectNotificationMapTasks(
   filters: ProjectNotificationMapTasksFilters = {},
 ) {
   const { projectId, contractualEngagementKey } = scope;
-  const { status, dateFrom, dateTo } = filters;
+  const { status, dateFrom, dateTo, type } = filters;
 
   return useQuery({
     queryKey: projectNotificationMapTasksQueryKey(scope, filters),
@@ -108,6 +110,7 @@ export function useProjectNotificationMapTasks(
           status: status || undefined,
           date_from: dateFrom || undefined,
           date_to: dateTo || undefined,
+          ...(type ? { type } : {}),
         }),
       );
 

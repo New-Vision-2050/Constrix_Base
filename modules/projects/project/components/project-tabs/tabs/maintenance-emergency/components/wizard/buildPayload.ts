@@ -43,11 +43,15 @@ function wizardDataToNotificationFields(data: WizardFormData) {
 export function buildCreatePayload(
   scope: NotificationScope,
   data: WizardFormData,
-  { isDraft = false }: { isDraft?: boolean } = {},
+  {
+    isDraft = false,
+    type,
+  }: { isDraft?: boolean; type?: string } = {},
 ) {
   return buildCreateNotificationArgs(scope, {
     ...wizardDataToNotificationFields(data),
     is_draft: isDraft,
+    ...(type ? { type } : {}),
   });
 }
 
@@ -55,11 +59,15 @@ export function buildUpdatePayload(
   id: string,
   scope: NotificationScope,
   data: WizardFormData,
-  { isDraft = false }: { isDraft?: boolean } = {},
+  {
+    isDraft = false,
+    type,
+  }: { isDraft?: boolean; type?: string } = {},
 ): UpdateProjectNotificationArgs {
   return buildUpdateNotificationArgs(scope, {
     id,
     ...wizardDataToNotificationFields(data),
     is_draft: isDraft,
+    ...(type ? { type } : {}),
   });
 }

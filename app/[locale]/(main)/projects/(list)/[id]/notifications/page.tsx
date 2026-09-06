@@ -6,5 +6,8 @@ export default async function ProjectNotificationsRedirectPage({
   params: Promise<{ id: string; locale: string }>;
 }) {
   const { id, locale } = await params;
-  redirect({ href: `/projects/${id}?tab=project-tab-maintenance`, locale });
+  redirect({
+    href: `/projects/${id}?tab=project-tab-maintenance-electricity`,
+    locale,
+  });
 }
