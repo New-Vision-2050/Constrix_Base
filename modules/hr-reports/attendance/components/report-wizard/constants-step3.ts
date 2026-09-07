@@ -5,6 +5,13 @@ export const DISPLAY_MODE_VALUES: ReportDisplayModeId[] = [
   "by_day",
 ];
 
+/** Always included in reports; shown checked and disabled in the wizard. */
+export const REQUIRED_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
+  "name",
+  "employee_status",
+  "date",
+];
+
 /** Section 1 — two columns (RTL: column “a” renders first in DOM ≈ visual right). */
 export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   id: AttendanceDataTypeId;
@@ -22,8 +29,18 @@ export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   { id: "total_hours", column: "b" },
 ];
 
-export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] =
-  ATTENDANCE_DATA_TYPE_OPTIONS.map((o) => o.id);
+export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
+  ...REQUIRED_ATTENDANCE_DATA_TYPE_IDS,
+  ...ATTENDANCE_DATA_TYPE_OPTIONS.map((o) => o.id),
+];
+
+/** Optional step-3 ids only — excludes always-on columns (not sent in API payload). */
+export function selectableAttendanceDataTypeIds(
+  ids: AttendanceDataTypeId[],
+): AttendanceDataTypeId[] {
+  const required = new Set(REQUIRED_ATTENDANCE_DATA_TYPE_IDS);
+  return ids.filter((id) => !required.has(id));
+}
 
 /** Backend `ATT_PATTERN_*`. */
 export const STEP3_PATTERN_VALUES = [

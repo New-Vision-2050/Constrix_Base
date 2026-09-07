@@ -18,11 +18,37 @@ type ResponseT = {
 type GetConstraintsParams = {
   page?: number;
   per_page?: number;
-  name?: string;
+  search?: string;
+  branch_id?: string;
+  management_id?: string;
+  job_title_id?: string;
 };
 
 /** Matches `/attendance/constraints?per_page=10&page=1` */
 export const CONSTRAINTS_PER_PAGE = 10;
+
+export type GetConstraintsPageFilters = {
+  search?: string;
+  branch_id?: string;
+  management_id?: string;
+  job_title_id?: string;
+};
+
+function buildConstraintsQueryParams(
+  page: number,
+  filters?: GetConstraintsPageFilters,
+  per_page: number = CONSTRAINTS_PER_PAGE,
+): Record<string, string | number> {
+  const params: Record<string, string | number> = { per_page, page };
+
+  const search = filters?.search?.trim();
+  if (search) params.search = search;
+  if (filters?.branch_id) params.branch_id = filters.branch_id;
+  if (filters?.management_id) params.management_id = filters.management_id;
+  if (filters?.job_title_id) params.job_title_id = filters.job_title_id;
+
+  return params;
+}
 
 /**
  * Single page: GET `/attendance/constraints?per_page={n}&page={n}`
@@ -34,11 +60,16 @@ export default async function getConstraints(
   },
 ) {
   const res = await apiClient.get<ResponseT>("/attendance/constraints", {
-    params: {
-      per_page: params.per_page ?? CONSTRAINTS_PER_PAGE,
-      page: params.page ?? 1,
-      ...(params.name ? { name: params.name } : {}),
-    },
+    params: buildConstraintsQueryParams(
+      params.page ?? 1,
+      {
+        search: params.search,
+        branch_id: params.branch_id,
+        management_id: params.management_id,
+        job_title_id: params.job_title_id,
+      },
+      params.per_page ?? CONSTRAINTS_PER_PAGE,
+    ),
   });
 
   const payload = res.data.payload;
@@ -79,14 +110,16 @@ function parseConstraintsPagination(
 
 export async function getConstraintsPage(
   page: number,
-  name?: string,
+  search?: string,
+  filters?: Omit<GetConstraintsPageFilters, "search">,
 ): Promise<ConstraintsPageResult> {
   const res = await apiClient.get<ResponseT>("/attendance/constraints", {
-    params: {
-      per_page: CONSTRAINTS_PER_PAGE,
-      page,
-      ...(name ? { name } : {}),
-    },
+    params: buildConstraintsQueryParams(page, {
+      search,
+      branch_id: filters?.branch_id,
+      management_id: filters?.management_id,
+      job_title_id: filters?.job_title_id,
+    }),
   });
 
   const items = Array.isArray(res.data.payload) ? res.data.payload : [];

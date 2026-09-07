@@ -360,22 +360,103 @@ export default function AttendanceReportTable() {
   });
 
   return (
-    <Box
-      component={Paper}
-      elevation={0}
-      sx={{ p: 0, border: 1, borderColor: "divider", borderRadius: 2 }}
-    >
-      <Box sx={{ px: 2, pt: 2 }}>
-        <Typography variant="subtitle1" fontWeight={700}>
-          {t("createdReportsTitle")}
+    <>
+      <Paper
+        variant="outlined"
+        elevation={0}
+        sx={{
+          p: 2.5,
+          mb: 2,
+          borderRadius: 2,
+          bgcolor: "grey.100",
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+          {t("filtersTitle")}
         </Typography>
-        {totalItems === 0 && !listLoading ? (
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {t("emptyReports")}
+
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          alignItems={{ xs: "stretch", sm: "center" }}
+        >
+          <TextField
+            type="date"
+            size="small"
+            label={tWizard("periodDateFrom")}
+            value={dateFrom}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (!v) {
+                setDateFrom("");
+                params.setPage(1);
+                return;
+              }
+              const clampedFrom = v > todayIso ? todayIso : v;
+              const clamped = clampPastDateRange(clampedFrom, dateTo);
+              setDateFrom(clamped.dateFrom);
+              setDateTo(clamped.dateTo);
+              params.setPage(1);
+            }}
+            slotProps={{
+              htmlInput: { max: periodDateFromMax },
+              inputLabel: { shrink: true },
+            }}
+            sx={{ minWidth: 160 }}
+          />
+          <TextField
+            type="date"
+            size="small"
+            label={tWizard("periodDateTo")}
+            value={dateTo}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (!v) {
+                setDateTo("");
+                params.setPage(1);
+                return;
+              }
+              const clampedTo = v > todayIso ? todayIso : v;
+              const clamped = clampPastDateRange(dateFrom, clampedTo);
+              setDateFrom(clamped.dateFrom);
+              setDateTo(clamped.dateTo);
+              params.setPage(1);
+            }}
+            slotProps={{
+              htmlInput: { min: periodDateToMin, max: todayIso },
+              inputLabel: { shrink: true },
+            }}
+            sx={{ minWidth: 160 }}
+          />
+          {hasDateFilter ? (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleClearDateFilter}
+            >
+              {tLabels("reset")}
+            </Button>
+          ) : null}
+        </Stack>
+      </Paper>
+
+      <Box
+        component={Paper}
+        elevation={0}
+        sx={{ p: 0, border: 1, borderColor: "divider", borderRadius: 2 }}
+      >
+        <Box sx={{ px: 2, pt: 2, pb: 1 }}>
+          <Typography variant="subtitle1" fontWeight={700}>
+            {t("createdReportsTitle")}
           </Typography>
-        ) : null}
-      </Box>
-      <HeadlessCreatedReportsTable
+          {totalItems === 0 && !listLoading ? (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              {t("emptyReports")}
+            </Typography>
+          ) : null}
+        </Box>
+
+        <HeadlessCreatedReportsTable
         filters={
           <HeadlessCreatedReportsTable.TopActions
             state={state}
@@ -389,72 +470,7 @@ export default function AttendanceReportTable() {
                 {tPage("createAttendanceReport")}
               </Button>
             }
-          >
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={2}
-              alignItems={{ xs: "stretch", sm: "center" }}
-              sx={{ mb: 1 }}
-            >
-              <TextField
-                type="date"
-                size="small"
-                label={tWizard("periodDateFrom")}
-                value={dateFrom}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (!v) {
-                    setDateFrom("");
-                    params.setPage(1);
-                    return;
-                  }
-                  const clampedFrom = v > todayIso ? todayIso : v;
-                  const clamped = clampPastDateRange(clampedFrom, dateTo);
-                  setDateFrom(clamped.dateFrom);
-                  setDateTo(clamped.dateTo);
-                  params.setPage(1);
-                }}
-                slotProps={{
-                  htmlInput: { max: periodDateFromMax },
-                  inputLabel: { shrink: true },
-                }}
-                sx={{ minWidth: 160 }}
-              />
-              <TextField
-                type="date"
-                size="small"
-                label={tWizard("periodDateTo")}
-                value={dateTo}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (!v) {
-                    setDateTo("");
-                    params.setPage(1);
-                    return;
-                  }
-                  const clampedTo = v > todayIso ? todayIso : v;
-                  const clamped = clampPastDateRange(dateFrom, clampedTo);
-                  setDateFrom(clamped.dateFrom);
-                  setDateTo(clamped.dateTo);
-                  params.setPage(1);
-                }}
-                slotProps={{
-                  htmlInput: { min: periodDateToMin, max: todayIso },
-                  inputLabel: { shrink: true },
-                }}
-                sx={{ minWidth: 160 }}
-              />
-              {hasDateFilter ? (
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={handleClearDateFilter}
-                >
-                  {tLabels("reset")}
-                </Button>
-              ) : null}
-            </Stack>
-          </HeadlessCreatedReportsTable.TopActions>
+          />
         }
         table={
           <HeadlessCreatedReportsTable.Table
@@ -484,6 +500,7 @@ export default function AttendanceReportTable() {
         onClose={() => setReportToDeleteId(null)}
         onConfirm={handleConfirmDeleteReport}
       />
-    </Box>
+      </Box>
+    </>
   );
 }
