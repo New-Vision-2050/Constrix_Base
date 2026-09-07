@@ -40,8 +40,11 @@ export type ReportWizardStep2 = {
   jobTitleName?: string;
 };
 
-/** Attendance column ids (step 3, section 1) — sent as `config.step3.attendanceDataTypeIds`. */
+/** Attendance column ids (step 3, section 1). `name`, `employee_status`, and `date` are always-on UI fields and are not sent in `config.step3.attendanceDataTypeIds`. */
 export type AttendanceDataTypeId =
+  | "name"
+  | "employee_status"
+  | "date"
   | "day"
   | "branch"
   | "management"

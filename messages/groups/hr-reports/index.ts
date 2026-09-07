@@ -53,6 +53,7 @@ export const hrReportsMessages = new MessagesGroup({
         "Generated reports",
         "التقارير المُنشأة",
       ),
+      filtersTitle: _m("Search filters", "فلاتر البحث"),
       colCreated: _m("Created", "تاريخ الإنشاء"),
       colSerialNumber: _m("Serial number", "الرقم التسلسلي"),
       colPeriod: _m("Period", "الفترة"),
@@ -518,6 +519,9 @@ export const hrReportsMessages = new MessagesGroup({
           four_hours_or_more: _m("Four hours or more", "4 ساعات فأكثر"),
         }),
         dataTypes: new MessagesGroup({
+          name: _m("Name", "الاسم"),
+          employee_status: _m("Employee status", "حالة الموظف"),
+          date: _m("Date", "التاريخ"),
           day: _m("Day", "اليوم"),
           branch: _m("Branch", "الفرع"),
           management: _m("Management", "الادارة"),

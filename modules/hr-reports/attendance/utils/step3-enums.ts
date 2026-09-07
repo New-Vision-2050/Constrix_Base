@@ -1,4 +1,5 @@
 import {
+  REQUIRED_ATTENDANCE_DATA_TYPE_IDS,
   STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS,
 } from "../components/report-wizard/constants-step3";
 import type {
@@ -42,7 +43,13 @@ function normalizeAttendanceDataTypeIds(
     out.push(mapped);
   }
 
-  return out.length ? out : [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS];
+  return out.length ? withRequiredAttendanceDataTypeIds(out) : [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS];
+}
+
+function withRequiredAttendanceDataTypeIds(
+  ids: AttendanceDataTypeId[],
+): AttendanceDataTypeId[] {
+  return [...new Set([...REQUIRED_ATTENDANCE_DATA_TYPE_IDS, ...ids])];
 }
 
 /**

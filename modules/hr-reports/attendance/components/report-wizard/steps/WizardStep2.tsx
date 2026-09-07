@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -21,18 +21,16 @@ import {
 } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
 import type {
-  EmployeeContractTypeId,
   EmployeeScopeMode,
   ReportWizardStep2,
 } from "../types";
 import {
-  EMPLOYEE_CONTRACT_OPTIONS,
   STEP2_FILTER_UNSET,
-  STEP2_GENDER_VALUES,
-  STEP2_NATIONALITY_VALUES,
 } from "../constants-step2";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
 import {
-  useAttendanceWizardAttendanceConstraints,
+  CONSTRAINT_SEARCH_DEBOUNCE_MS,
+  useAttendanceWizardAttendanceConstraintsSearch,
   useAttendanceWizardBranches,
   useAttendanceWizardEmployees,
   useAttendanceWizardJobTitles,
@@ -51,15 +49,6 @@ export default function WizardStep2({ value, onChange }: Props) {
   const locale = useLocale();
   const tWizard = useTranslations("HRReports.attendanceReport.wizard");
   const t = useTranslations("HRReports.attendanceReport.wizard.employeesData");
-  const tNat = useTranslations(
-    "HRReports.attendanceReport.wizard.employeesData.nationalities",
-  );
-  const tGender = useTranslations(
-    "HRReports.attendanceReport.wizard.employeesData.genders",
-  );
-  const tContracts = useTranslations(
-    "HRReports.attendanceReport.wizard.employeesData.contracts",
-  );
 
   const branchSelected =
     value.branchId !== STEP2_FILTER_UNSET && value.branchId.trim() !== "";
@@ -69,31 +58,122 @@ export default function WizardStep2({ value, onChange }: Props) {
     branchSelected ? value.branchId : undefined,
   );
   const jobTitlesQuery = useAttendanceWizardJobTitles();
-  const constraintsQuery = useAttendanceWizardAttendanceConstraints();
+  const [constraintSearch, setConstraintSearch] = useState("");
+  const debouncedConstraintSearch = useDebouncedValue(
+    constraintSearch,
+    CONSTRAINT_SEARCH_DEBOUNCE_MS,
+  );
+  const constraintsQuery = useAttendanceWizardAttendanceConstraintsSearch({
+    search: debouncedConstraintSearch,
+    branchId: value.branchId,
+    managementId: value.managementId,
+    jobTitleId: value.jobTitleId,
+  });
   const employeesQuery = useAttendanceWizardEmployees({
     enabled: value.employeeScope === "select_employees",
     branchId: value.branchId,
+    attendanceConstraintIds: value.attendanceConstraintIds,
   });
-
-  const toggleContract = (id: EmployeeContractTypeId) => {
-    const next = value.contractTypeIds.includes(id)
-      ? value.contractTypeIds.filter((x) => x !== id)
-      : [...value.contractTypeIds, id];
-    onChange({ contractTypeIds: next });
-  };
 
   const branchOptions = branchesQuery.data ?? [];
   const managementOptions = managementQuery.data ?? [];
   const jobTitleOptions = jobTitlesQuery.data ?? [];
-  const constraintOptions = (constraintsQuery.data ?? []).filter(
-    (c) => c.is_active !== false,
+
+  const constraintOptionsFromApi = useMemo(() => {
+    const merged: WizardAttendanceConstraintOption[] = [];
+    const seen = new Set<string>();
+
+    for (const page of constraintsQuery.data?.pages ?? []) {
+      for (const item of page.items) {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          merged.push(item);
+        }
+      }
+    }
+
+    return merged;
+  }, [constraintsQuery.data]);
+
+  const constraintOptions = useMemo(() => {
+    const byId = new Map(
+      constraintOptionsFromApi.map((option) => [option.id, option]),
+    );
+
+    for (const id of value.attendanceConstraintIds) {
+      if (!byId.has(id)) {
+        byId.set(id, {
+          id,
+          constraint_name: id,
+          is_active: true,
+          label: { ar: id, en: id },
+        });
+      }
+    }
+
+    return [...byId.values()];
+  }, [constraintOptionsFromApi, value.attendanceConstraintIds]);
+
+  const selectedConstraints = useMemo(
+    () =>
+      constraintOptions.filter((option) =>
+        value.attendanceConstraintIds.includes(option.id),
+      ),
+    [constraintOptions, value.attendanceConstraintIds],
   );
 
-  const selectedConstraints = React.useMemo(() => {
-    return constraintOptions.filter((o) =>
-      value.attendanceConstraintIds.includes(o.id),
-    );
-  }, [constraintOptions, value.attendanceConstraintIds]);
+  const handleConstraintListboxScroll = useCallback(
+    (event: React.UIEvent<HTMLElement>) => {
+      const target = event.currentTarget;
+      const nearBottom =
+        target.scrollTop + target.clientHeight >= target.scrollHeight - 40;
+
+      if (
+        nearBottom &&
+        constraintsQuery.hasNextPage &&
+        !constraintsQuery.isFetchingNextPage
+      ) {
+        void constraintsQuery.fetchNextPage();
+      }
+    },
+    [
+      constraintsQuery.fetchNextPage,
+      constraintsQuery.hasNextPage,
+      constraintsQuery.isFetchingNextPage,
+    ],
+  );
+
+  const constraintListboxComponent = useMemo(
+    () =>
+      React.forwardRef<
+        HTMLUListElement,
+        React.HTMLAttributes<HTMLElement>
+      >(function ConstraintListbox(props, ref) {
+        const { children, onScroll, style, ...rest } = props;
+
+        return (
+          <ul
+            ref={ref}
+            {...rest}
+            onScroll={(event) => {
+              onScroll?.(event);
+              handleConstraintListboxScroll(event);
+            }}
+            style={{
+              ...style,
+              maxHeight: 320,
+              overflow: "auto",
+              margin: 0,
+              padding: 0,
+              listStyle: "none",
+            }}
+          >
+            {children}
+          </ul>
+        );
+      }),
+    [handleConstraintListboxScroll],
+  );
 
   const constraintLabel = (opt: WizardAttendanceConstraintOption) =>
     locale === "ar" ? opt.label.ar : opt.label.en;
@@ -215,14 +295,27 @@ export default function WizardStep2({ value, onChange }: Props) {
               multiple
               disableCloseOnSelect
               options={constraintOptions}
-              loading={constraintsQuery.isFetching}
+              loading={constraintsQuery.isLoading || constraintsQuery.isFetching}
               value={selectedConstraints}
+              inputValue={constraintSearch}
+              filterOptions={(opts) => opts}
               isOptionEqualToValue={(opt, val) => opt.id === val.id}
+              getOptionKey={(opt) => opt.id}
               getOptionLabel={constraintLabel}
+              onInputChange={(_, inputValue, reason) => {
+                if (reason === "input" || reason === "clear") {
+                  setConstraintSearch(inputValue);
+                }
+              }}
               onChange={(_, v) =>
                 onChange({
                   attendanceConstraintIds: v.map((o) => o.id),
                 })
+              }
+              ListboxComponent={
+                constraintListboxComponent as React.ComponentType<
+                  React.HTMLAttributes<HTMLElement>
+                >
               }
               renderOption={(props, option, { selected }) => {
                 const { key, ...listItemProps } = props;
@@ -247,7 +340,8 @@ export default function WizardStep2({ value, onChange }: Props) {
                     ...params.InputProps,
                     endAdornment: (
                       <>
-                        {constraintsQuery.isFetching ? (
+                        {constraintsQuery.isLoading ||
+                        constraintsQuery.isFetching ? (
                           <CircularProgress
                             color="inherit"
                             size={18}
