@@ -1,7 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { getConstraintsPage } from "@/modules/attendance-departure/api/getConstraints";
 import { fetchManagementHierarchyOptions } from "@/utils/fetchDropdownOptions";
 import { STEP2_FILTER_UNSET } from "./constants-step2";
 
@@ -37,20 +38,50 @@ function resolveWizardBranchFilter(
   return branchId.trim();
 }
 
+function resolveWizardFilterId(value: string | undefined): string | undefined {
+  if (!value || value === STEP2_FILTER_UNSET || value.trim() === "") {
+    return undefined;
+  }
+  return value.trim();
+}
+
+type FetchEmployeesFilters = {
+  branchId?: string;
+  constraintIds?: string[];
+};
+
 async function fetchEmployees(
-  branchId?: string,
+  filters: FetchEmployeesFilters = {},
 ): Promise<WizardEmployeeOption[]> {
   const per_page = 100;
   let page = 1;
   let last_page = 1;
   const acc: WizardEmployeeOption[] = [];
+  const constraintIds = (filters.constraintIds ?? []).filter(
+    (id) => id.trim().length > 0,
+  );
 
   do {
     const params: Record<string, unknown> = { page, per_page };
-    if (branchId) params.branch_id = branchId;
+    if (filters.branchId) params.branch_id = filters.branchId;
 
     const res = await apiClient.get<EmployeesResponse>("/company-users/employees", {
       params,
+      paramsSerializer: (serializedParams) => {
+        const searchParams = new URLSearchParams();
+
+        Object.entries(serializedParams).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            searchParams.append(key, String(value));
+          }
+        });
+
+        for (const id of constraintIds) {
+          searchParams.append("constraints_ids[]", id);
+        }
+
+        return searchParams.toString();
+      },
     });
     const data = res.data;
     last_page = data?.pagination?.last_page ?? 1;
@@ -103,56 +134,86 @@ export type WizardAttendanceConstraintOption = {
   label: { ar: string; en: string };
 };
 
-type ReportsLookupsResponse = {
-  payload?: {
-    attendance_constraints?: Array<{
-      id?: unknown;
-      constraint_name?: unknown;
-      is_active?: unknown;
-      label?: { ar?: unknown; en?: unknown };
-    }>;
+function mapConstraintToWizardOption(item: {
+  id: string;
+  constraint_name: string;
+}): WizardAttendanceConstraintOption {
+  const constraint_name =
+    String(item.constraint_name ?? "").trim() || String(item.id);
+  return {
+    id: String(item.id),
+    constraint_name,
+    is_active: true,
+    label: { ar: constraint_name, en: constraint_name },
   };
+}
+
+type WizardConstraintsPage = {
+  items: WizardAttendanceConstraintOption[];
+  hasMore: boolean;
 };
 
-function normalizeAttendanceConstraints(
-  data: unknown,
-): WizardAttendanceConstraintOption[] {
-  if (!data || typeof data !== "object") return [];
-  const maybePayload = data as ReportsLookupsResponse;
-  const raw = maybePayload.payload?.attendance_constraints;
-  if (!Array.isArray(raw)) return [];
+type WizardConstraintsSearchFilters = {
+  search?: string;
+  branchId?: string;
+  managementId?: string;
+  jobTitleId?: string;
+};
 
-  return raw
-    .map((row) => {
-      const id = String(row?.id ?? "");
-      const constraint_name = String(row?.constraint_name ?? "").trim();
-      if (!id || !constraint_name) return null;
-      const labelAr = String(row?.label?.ar ?? constraint_name).trim();
-      const labelEn = String(row?.label?.en ?? constraint_name).trim();
-      return {
-        id,
-        constraint_name,
-        is_active: row?.is_active !== false,
-        label: { ar: labelAr, en: labelEn },
-      } satisfies WizardAttendanceConstraintOption;
-    })
-    .filter(
-      (r): r is WizardAttendanceConstraintOption => r !== null,
-    );
+async function fetchWizardConstraintsPage(
+  page: number,
+  filters: WizardConstraintsSearchFilters,
+): Promise<WizardConstraintsPage> {
+  const trimmedSearch = filters.search?.trim();
+  const result = await getConstraintsPage(
+    page,
+    trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined,
+    {
+      branch_id: resolveWizardFilterId(filters.branchId),
+      management_id: resolveWizardFilterId(filters.managementId),
+      job_title_id: resolveWizardFilterId(filters.jobTitleId),
+    },
+  );
+
+  return {
+    items: result.items.map(mapConstraintToWizardOption),
+    hasMore: result.hasMore,
+  };
 }
 
-export function useAttendanceWizardAttendanceConstraints() {
-  return useQuery({
-    queryKey: ["hr-attendance-wizard-attendance-constraints"],
-    queryFn: async () => {
-      const res = await apiClient.get<ReportsLookupsResponse>(
-        "/reports/lookups",
-      );
-      return normalizeAttendanceConstraints(res.data);
-    },
-    staleTime: 5 * 60_000,
+const CONSTRAINT_SEARCH_DEBOUNCE_MS = 300;
+
+export function useAttendanceWizardAttendanceConstraintsSearch(
+  filters: WizardConstraintsSearchFilters,
+) {
+  const trimmedSearch = filters.search?.trim() ?? "";
+  const branchId = resolveWizardFilterId(filters.branchId);
+  const managementId = resolveWizardFilterId(filters.managementId);
+  const jobTitleId = resolveWizardFilterId(filters.jobTitleId);
+
+  return useInfiniteQuery({
+    queryKey: [
+      "hr-attendance-wizard-attendance-constraints",
+      trimmedSearch,
+      branchId ?? "",
+      managementId ?? "",
+      jobTitleId ?? "",
+    ],
+    queryFn: ({ pageParam }) =>
+      fetchWizardConstraintsPage(pageParam, {
+        search: trimmedSearch,
+        branchId: filters.branchId,
+        managementId: filters.managementId,
+        jobTitleId: filters.jobTitleId,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      lastPage.hasMore ? lastPageParam + 1 : undefined,
+    staleTime: 60_000,
   });
 }
+
+export { CONSTRAINT_SEARCH_DEBOUNCE_MS };
 
 export type WizardJobTitleOption = { id: string; name: string };
 
@@ -179,12 +240,25 @@ export function useAttendanceWizardJobTitles() {
 export function useAttendanceWizardEmployees(options: {
   enabled: boolean;
   branchId: string;
+  attendanceConstraintIds?: string[];
 }) {
   const branchFilter = resolveWizardBranchFilter(options.branchId);
+  const constraintIds = [...(options.attendanceConstraintIds ?? [])]
+    .map((id) => id.trim())
+    .filter(Boolean)
+    .sort();
 
   return useQuery({
-    queryKey: ["hr-attendance-wizard-employees", branchFilter ?? "all"],
-    queryFn: () => fetchEmployees(branchFilter),
+    queryKey: [
+      "hr-attendance-wizard-employees",
+      branchFilter ?? "all",
+      constraintIds,
+    ],
+    queryFn: () =>
+      fetchEmployees({
+        branchId: branchFilter,
+        constraintIds: options.attendanceConstraintIds,
+      }),
     enabled: options.enabled,
     staleTime: 60_000,
   });

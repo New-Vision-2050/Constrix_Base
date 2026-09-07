@@ -6,6 +6,7 @@ import type {
   ReportWizardStep1,
 } from "../components/report-wizard/types";
 import { STEP2_FILTER_UNSET } from "../components/report-wizard/constants-step2";
+import { selectableAttendanceDataTypeIds } from "../components/report-wizard/constants-step3";
 import { normalizeStep3EnumFields } from "./step3-enums";
 
 function asGroup(
@@ -210,7 +211,9 @@ function sanitizeStep3ForApi(
 ): CreateReportApiBody["config"]["step3"] {
   const n = normalizeStep3EnumFields(step3);
   return {
-    attendanceDataTypeIds: [...n.attendanceDataTypeIds],
+    attendanceDataTypeIds: selectableAttendanceDataTypeIds(
+      n.attendanceDataTypeIds,
+    ),
     display_mode: n.displayMode,
     includeEntryExitTime: n.includeEntryExitTime,
     includeShiftName: n.includeShiftName,

@@ -27,6 +27,7 @@ import type {
 import {
   ATTENDANCE_DATA_TYPE_OPTIONS,
   DISPLAY_MODE_VALUES,
+  REQUIRED_ATTENDANCE_DATA_TYPE_IDS,
 } from "../constants-step3";
 
 type Props = {
@@ -40,12 +41,22 @@ export default function WizardStep3({ value, onChange }: Props) {
   const t = useTranslations("HRReports.attendanceReport.wizard.attendanceData");
 
   const selected = new Set(value.attendanceDataTypeIds);
+  const requiredSet = new Set(REQUIRED_ATTENDANCE_DATA_TYPE_IDS);
+
+  const emitDataTypeIds = (ids: AttendanceDataTypeId[]) => {
+    onChange({
+      attendanceDataTypeIds: [
+        ...new Set([...REQUIRED_ATTENDANCE_DATA_TYPE_IDS, ...ids]),
+      ],
+    });
+  };
 
   const toggleDataType = (id: AttendanceDataTypeId) => {
+    if (requiredSet.has(id)) return;
     const next = selected.has(id)
       ? value.attendanceDataTypeIds.filter((x) => x !== id)
       : [...value.attendanceDataTypeIds, id];
-    onChange({ attendanceDataTypeIds: next });
+    emitDataTypeIds(next);
   };
 
   const colA = ATTENDANCE_DATA_TYPE_OPTIONS.filter((o) => o.column === "a");
@@ -56,7 +67,10 @@ export default function WizardStep3({ value, onChange }: Props) {
       ? t("displayModeEmployeePerPage")
       : t("displayModeByDay");
 
-  const renderColumn = (options: typeof ATTENDANCE_DATA_TYPE_OPTIONS) => (
+  const renderColumn = (
+    options: typeof ATTENDANCE_DATA_TYPE_OPTIONS,
+    locked = false,
+  ) => (
     <Stack spacing={1}>
       {options.map(({ id }) => (
         <Paper
@@ -66,13 +80,14 @@ export default function WizardStep3({ value, onChange }: Props) {
             px: 1.5,
             py: 0.5,
             borderRadius: 2,
-            bgcolor: selected.has(id) ? "background.paper" : "action.hover",
+            bgcolor: locked || selected.has(id) ? "background.paper" : "action.hover",
           }}
         >
           <FormControlLabel
             control={
               <Checkbox
-                checked={selected.has(id)}
+                checked={locked || selected.has(id)}
+                disabled={locked}
                 onChange={() => toggleDataType(id)}
                 color="primary"
                 size="small"
@@ -102,7 +117,16 @@ export default function WizardStep3({ value, onChange }: Props) {
           })}
         </Typography>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 6 }}>{renderColumn(colA)}</Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            {renderColumn(
+              REQUIRED_ATTENDANCE_DATA_TYPE_IDS.map((id) => ({
+                id,
+                column: "a" as const,
+              })),
+              true,
+            )}
+            {renderColumn(colA)}
+          </Grid>
           <Grid size={{ xs: 12, md: 6 }}>{renderColumn(colB)}</Grid>
         </Grid>
       </Paper>
