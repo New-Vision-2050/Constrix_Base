@@ -364,14 +364,39 @@ export default function AttendanceReportTable() {
       <Paper
         variant="outlined"
         elevation={0}
-        sx={{
+        sx={(theme) => ({
           p: 2.5,
           mb: 2,
           borderRadius: 2,
-          bgcolor: "grey.100",
-        }}
+          bgcolor:
+            theme.palette.background.card ?? theme.palette.background.paper,
+          borderColor: "divider",
+          color: "text.primary",
+          "& .MuiInputBase-root": {
+            bgcolor: theme.palette.background.paper,
+            color: "text.primary",
+          },
+          "& .MuiInputLabel-root": {
+            color: "text.secondary",
+          },
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "divider",
+          },
+          "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "text.secondary",
+          },
+          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+            {
+              borderColor: "primary.main",
+            },
+        })}
       >
-        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+        <Typography
+          variant="subtitle1"
+          fontWeight={700}
+          color="text.primary"
+          sx={{ mb: 2 }}
+        >
           {t("filtersTitle")}
         </Typography>
 
