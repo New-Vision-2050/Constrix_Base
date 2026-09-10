@@ -45,10 +45,18 @@ const AttendanceLocationMap = dynamic(() => import("./AttendanceLocationMap"), {
   loading: () => <div className="h-52 rounded-xl bg-muted animate-pulse" />,
 });
 
+const FaceLivenessCamera = dynamic(() => import("./FaceLivenessCamera"), {
+  ssr: false,
+  loading: () => (
+    <div className="mx-auto aspect-[3/4] w-full max-w-[320px] animate-pulse rounded-2xl bg-muted" />
+  ),
+});
+
 type DialogStep =
   | "closed"
   | "location-permission"
   | "out-of-location"
+  | "face-liveness"
   | "clock-in-confirm"
   | "clock-in-success"
   | "clock-out-confirm"
@@ -76,7 +84,15 @@ function getApiErrorMessage(error: unknown, t: (key: string) => string) {
     error !== null &&
     "response" in error
   ) {
-    const response = (error as { response?: { data?: { message?: string; errors?: { type?: string }[]; error?: { type?: string } } } }).response;
+    const response = (error as {
+      response?: {
+        data?: {
+          message?: string;
+          errors?: { type?: string }[];
+          error?: { type?: string };
+        };
+      };
+    }).response;
     const data = response?.data;
 
     if (data?.errors && Array.isArray(data.errors)) {
@@ -119,6 +135,7 @@ export default function AttendanceActionDialogs({
     latitude: number;
     longitude: number;
   } | null>(null);
+  const [faceImage, setFaceImage] = useState<File | null>(null);
   const [distanceKm, setDistanceKm] = useState(0);
   const [lateMinutes, setLateMinutes] = useState(0);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
@@ -130,9 +147,19 @@ export default function AttendanceActionDialogs({
   const reset = useCallback(() => {
     setStep("closed");
     setUserCoords(null);
+    setFaceImage(null);
     setDistanceKm(0);
     setLateMinutes(0);
   }, []);
+
+  const goToConfirm = useCallback(() => {
+    if (isClockOut) {
+      setStep("clock-out-confirm");
+      return;
+    }
+    setLateMinutes(isFlexible ? 0 : getLateMinutes(now, startTime));
+    setStep("clock-in-confirm");
+  }, [isClockOut, isFlexible, now, startTime]);
 
   const proceedWithLocation = useCallback(
     async (latitude: number, longitude: number) => {
@@ -162,15 +189,10 @@ export default function AttendanceActionDialogs({
         return;
       }
 
-      if (isClockOut) {
-        setStep("clock-out-confirm");
-        return;
-      }
-
-      setLateMinutes(isFlexible ? 0 : getLateMinutes(now, startTime));
-      setStep("clock-in-confirm");
+      setFaceImage(null);
+      setStep("face-liveness");
     },
-    [isClockOut, isFlexible, locationWork, additionalLocations, now, startTime],
+    [locationWork, additionalLocations],
   );
 
   const startAttendanceFlow = useCallback(async () => {
@@ -193,15 +215,29 @@ export default function AttendanceActionDialogs({
     } finally {
       setIsFetchingLocation(false);
     }
-  }, [disabled, isClockOut, now, proceedWithLocation, t, workPeriod]);
+  }, [disabled, proceedWithLocation, t]);
+
+  const handleFaceVerified = useCallback(
+    (file: File) => {
+      setFaceImage(file);
+      goToConfirm();
+    },
+    [goToConfirm],
+  );
 
   const handleConfirm = async () => {
     if (!userCoords) return;
+    if (!faceImage) {
+      toast.error(t("faceLiveness.required"));
+      setStep("face-liveness");
+      return;
+    }
 
     try {
       if (isClockOut) {
         await clockOutMutation.mutateAsync({
           location: userCoords,
+          face_image: faceImage,
         });
         setStep("clock-out-success");
         return;
@@ -209,6 +245,7 @@ export default function AttendanceActionDialogs({
 
       await clockInMutation.mutateAsync({
         location: userCoords,
+        face_image: faceImage,
       });
       setStep("clock-in-success");
     } catch (error) {
@@ -318,6 +355,28 @@ export default function AttendanceActionDialogs({
         >
           {outOfLocationButtons}
         </div>
+      </AttendanceDialogShell>
+
+      <AttendanceDialogShell
+        open={step === "face-liveness"}
+        onClose={reset}
+        title={
+          isClockOut
+            ? t("faceLiveness.titleClockOut")
+            : t("faceLiveness.titleClockIn")
+        }
+        className="max-w-[480px]"
+      >
+        <h3 className="text-center text-xl font-semibold text-foreground mb-4">
+          {isClockOut
+            ? t("faceLiveness.titleClockOut")
+            : t("faceLiveness.titleClockIn")}
+        </h3>
+        <FaceLivenessCamera
+          active={step === "face-liveness"}
+          onVerified={handleFaceVerified}
+          onCancel={reset}
+        />
       </AttendanceDialogShell>
 
       <AttendanceDialogShell

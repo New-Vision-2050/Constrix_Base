@@ -340,6 +340,49 @@ export const attendancePresenceMessages = new MessagesGroup({
   registerAttendance: _m("Register Attendance", "تسجيل حضور"),
   registerDeparture: _m("Register Departure", "تسجيل انصراف"),
   requestPermission: _m("Request Permission", "طلب اذن"),
+  faceLiveness: new MessagesGroup({
+    title: _m("Face verification", "التحقق ببصمة الوجه"),
+    titleClockIn: _m(
+      "Verify face to register attendance",
+      "تحقق ببصمة الوجه لتسجيل الحضور",
+    ),
+    titleClockOut: _m(
+      "Verify face to register departure",
+      "تحقق ببصمة الوجه لتسجيل الانصراف",
+    ),
+    preparingCamera: _m(
+      "Preparing camera...",
+      "جاري تجهيز الكاميرا...",
+    ),
+    cameraError: _m(
+      "Could not open the laptop camera. Please allow camera access and try again.",
+      "تعذر فتح كاميرا اللابتوب. اسمح بالوصول للكاميرا ثم أعد المحاولة.",
+    ),
+    positionFace: _m(
+      "Place your face inside the frame",
+      "ضع وجهك داخل الإطار",
+    ),
+    blinkPrompt: _m(
+      "Hold still while we verify your face",
+      "اثبت بدون حركة أثناء التحقق من وجهك",
+    ),
+    readyToCapture: _m(
+      "Verified. Capture your photo",
+      "تم التحقق. التقط صورتك",
+    ),
+    capturing: _m("Capturing...", "جاري الالتقاط..."),
+    reviewPhoto: _m("Review your photo", "راجع صورتك"),
+    capture: _m("Capture", "التقاط"),
+    usePhoto: _m("Use photo", "استخدام الصورة"),
+    retake: _m("Retake", "إعادة الالتقاط"),
+    retryCamera: _m("Retry camera", "إعادة فتح الكاميرا"),
+    cancel: _m("Cancel", "إلغاء"),
+    capturedAlt: _m("Captured face photo", "صورة الوجه الملتقطة"),
+    required: _m(
+      "Face verification is required",
+      "التحقق ببصمة الوجه مطلوب",
+    ),
+  }),
   todayGoalLabel: _m(
     "Today's Goal: {hours} hours",
     "هدف اليوم : {hours} ساعات",
