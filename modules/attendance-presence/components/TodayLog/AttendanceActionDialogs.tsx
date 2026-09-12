@@ -16,10 +16,7 @@ import {
   useClockOutMutation,
 } from "../../hooks/useAttendanceActions";
 import { useCurrentDateTime } from "../../hooks/useCurrentDateTime";
-import {
-  getLateMinutes,
-  useFormattedNow,
-} from "../../utils/attendance";
+import { getLateMinutes, useFormattedNow } from "../../utils/attendance";
 import {
   GeolocationRequestError,
   getDistanceKilometers,
@@ -79,20 +76,18 @@ const CLOCK_IN_ERROR_TYPE_KEYS: Record<string, string> = {
 };
 
 function getApiErrorMessage(error: unknown, t: (key: string) => string) {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error
-  ) {
-    const response = (error as {
-      response?: {
-        data?: {
-          message?: string;
-          errors?: { type?: string }[];
-          error?: { type?: string };
+  if (typeof error === "object" && error !== null && "response" in error) {
+    const response = (
+      error as {
+        response?: {
+          data?: {
+            message?: string;
+            errors?: { type?: string }[];
+            error?: { type?: string };
+          };
         };
-      };
-    }).response;
+      }
+    ).response;
     const data = response?.data;
 
     if (data?.errors && Array.isArray(data.errors)) {
@@ -225,10 +220,15 @@ export default function AttendanceActionDialogs({
     [goToConfirm],
   );
 
+  const handleCameraUnavailable = useCallback(() => {
+    toast.error(t("faceLiveness.cannotRegisterWithoutCamera"));
+    reset();
+  }, [reset, t]);
+
   const handleConfirm = async () => {
     if (!userCoords) return;
     if (!faceImage) {
-      toast.error(t("faceLiveness.required"));
+      toast.error(t("faceLiveness.cannotRegisterWithoutCamera"));
       setStep("face-liveness");
       return;
     }
@@ -237,7 +237,7 @@ export default function AttendanceActionDialogs({
       if (isClockOut) {
         await clockOutMutation.mutateAsync({
           location: userCoords,
-          face_image: faceImage,
+          photo: faceImage,
         });
         setStep("clock-out-success");
         return;
@@ -245,7 +245,7 @@ export default function AttendanceActionDialogs({
 
       await clockInMutation.mutateAsync({
         location: userCoords,
-        face_image: faceImage,
+        photo: faceImage,
       });
       setStep("clock-in-success");
     } catch (error) {
@@ -263,6 +263,7 @@ export default function AttendanceActionDialogs({
       <Button
         className="min-w-32"
         loading={isSubmitting}
+        disabled={!faceImage || isSubmitting}
         onClick={handleConfirm}
       >
         {t("confirm")}
@@ -365,17 +366,23 @@ export default function AttendanceActionDialogs({
             ? t("faceLiveness.titleClockOut")
             : t("faceLiveness.titleClockIn")
         }
-        className="max-w-[480px]"
+        className="max-w-[760px] w-[min(96vw,760px)] max-h-[92vh] overflow-hidden p-4 sm:p-5 gap-3"
       >
-        <h3 className="text-center text-xl font-semibold text-foreground mb-4">
-          {isClockOut
-            ? t("faceLiveness.titleClockOut")
-            : t("faceLiveness.titleClockIn")}
-        </h3>
+        <div className="space-y-0.5 text-center pr-6">
+          <h3 className="text-lg sm:text-xl font-semibold text-foreground">
+            {isClockOut
+              ? t("faceLiveness.titleClockOut")
+              : t("faceLiveness.titleClockIn")}
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            {t("faceLiveness.subtitle")}
+          </p>
+        </div>
         <FaceLivenessCamera
           active={step === "face-liveness"}
           onVerified={handleFaceVerified}
           onCancel={reset}
+          onCameraUnavailable={handleCameraUnavailable}
         />
       </AttendanceDialogShell>
 

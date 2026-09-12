@@ -1,16 +1,19 @@
 import { serialize } from "object-to-formdata";
 import { baseApi } from "@/config/axios/instances/base";
-import type { ClockLocationRequest, ClockActionResponse } from "./types/clock-request";
+import type {
+  ClockLocationRequest,
+  ClockActionResponse,
+} from "./types/clock-request";
 import type { UserAttendanceCalendarParams } from "./types/params";
 import type { UserAttendanceCalendarResponse } from "./types/response";
 import type { UserConstraintTodayResponse } from "./types/constraint-response";
 
 function buildClockBody(body: ClockLocationRequest) {
-  if (body.face_image instanceof File) {
+  if (body.photo instanceof File) {
     return serialize(
       {
         location: body.location,
-        face_image: body.face_image,
+        photo: body.photo,
       },
       {
         indices: true,
@@ -56,7 +59,10 @@ export type {
 } from "./types/response";
 
 export type { UserAttendanceCalendarParams } from "./types/params";
-export type { ClockLocationRequest, ClockActionResponse } from "./types/clock-request";
+export type {
+  ClockLocationRequest,
+  ClockActionResponse,
+} from "./types/clock-request";
 export type {
   AttendanceRecord,
   WorkPeriodConstraint,

@@ -4,7 +4,7 @@ export interface ClockLocationRequest {
     longitude: number;
   };
   /** Face liveness capture from laptop webcam. */
-  face_image?: File | null;
+  photo?: File | null;
 }
 
 export interface ClockActionResponse {
