@@ -16,10 +16,7 @@ import {
   useClockOutMutation,
 } from "../../hooks/useAttendanceActions";
 import { useCurrentDateTime } from "../../hooks/useCurrentDateTime";
-import {
-  getLateMinutes,
-  useFormattedNow,
-} from "../../utils/attendance";
+import { getLateMinutes, useFormattedNow } from "../../utils/attendance";
 import {
   GeolocationRequestError,
   getDistanceKilometers,
@@ -45,10 +42,18 @@ const AttendanceLocationMap = dynamic(() => import("./AttendanceLocationMap"), {
   loading: () => <div className="h-52 rounded-xl bg-muted animate-pulse" />,
 });
 
+const FaceLivenessCamera = dynamic(() => import("./FaceLivenessCamera"), {
+  ssr: false,
+  loading: () => (
+    <div className="mx-auto aspect-[3/4] w-full max-w-[320px] animate-pulse rounded-2xl bg-muted" />
+  ),
+});
+
 type DialogStep =
   | "closed"
   | "location-permission"
   | "out-of-location"
+  | "face-liveness"
   | "clock-in-confirm"
   | "clock-in-success"
   | "clock-out-confirm"
@@ -71,12 +76,18 @@ const CLOCK_IN_ERROR_TYPE_KEYS: Record<string, string> = {
 };
 
 function getApiErrorMessage(error: unknown, t: (key: string) => string) {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error
-  ) {
-    const response = (error as { response?: { data?: { message?: string; errors?: { type?: string }[]; error?: { type?: string } } } }).response;
+  if (typeof error === "object" && error !== null && "response" in error) {
+    const response = (
+      error as {
+        response?: {
+          data?: {
+            message?: string;
+            errors?: { type?: string }[];
+            error?: { type?: string };
+          };
+        };
+      }
+    ).response;
     const data = response?.data;
 
     if (data?.errors && Array.isArray(data.errors)) {
@@ -119,6 +130,7 @@ export default function AttendanceActionDialogs({
     latitude: number;
     longitude: number;
   } | null>(null);
+  const [faceImage, setFaceImage] = useState<File | null>(null);
   const [distanceKm, setDistanceKm] = useState(0);
   const [lateMinutes, setLateMinutes] = useState(0);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
@@ -130,9 +142,19 @@ export default function AttendanceActionDialogs({
   const reset = useCallback(() => {
     setStep("closed");
     setUserCoords(null);
+    setFaceImage(null);
     setDistanceKm(0);
     setLateMinutes(0);
   }, []);
+
+  const goToConfirm = useCallback(() => {
+    if (isClockOut) {
+      setStep("clock-out-confirm");
+      return;
+    }
+    setLateMinutes(isFlexible ? 0 : getLateMinutes(now, startTime));
+    setStep("clock-in-confirm");
+  }, [isClockOut, isFlexible, now, startTime]);
 
   const proceedWithLocation = useCallback(
     async (latitude: number, longitude: number) => {
@@ -162,15 +184,10 @@ export default function AttendanceActionDialogs({
         return;
       }
 
-      if (isClockOut) {
-        setStep("clock-out-confirm");
-        return;
-      }
-
-      setLateMinutes(isFlexible ? 0 : getLateMinutes(now, startTime));
-      setStep("clock-in-confirm");
+      setFaceImage(null);
+      setStep("face-liveness");
     },
-    [isClockOut, isFlexible, locationWork, additionalLocations, now, startTime],
+    [locationWork, additionalLocations],
   );
 
   const startAttendanceFlow = useCallback(async () => {
@@ -193,15 +210,34 @@ export default function AttendanceActionDialogs({
     } finally {
       setIsFetchingLocation(false);
     }
-  }, [disabled, isClockOut, now, proceedWithLocation, t, workPeriod]);
+  }, [disabled, proceedWithLocation, t]);
+
+  const handleFaceVerified = useCallback(
+    (file: File) => {
+      setFaceImage(file);
+      goToConfirm();
+    },
+    [goToConfirm],
+  );
+
+  const handleCameraUnavailable = useCallback(() => {
+    toast.error(t("faceLiveness.cannotRegisterWithoutCamera"));
+    reset();
+  }, [reset, t]);
 
   const handleConfirm = async () => {
     if (!userCoords) return;
+    if (!faceImage) {
+      toast.error(t("faceLiveness.cannotRegisterWithoutCamera"));
+      setStep("face-liveness");
+      return;
+    }
 
     try {
       if (isClockOut) {
         await clockOutMutation.mutateAsync({
           location: userCoords,
+          photo: faceImage,
         });
         setStep("clock-out-success");
         return;
@@ -209,6 +245,7 @@ export default function AttendanceActionDialogs({
 
       await clockInMutation.mutateAsync({
         location: userCoords,
+        photo: faceImage,
       });
       setStep("clock-in-success");
     } catch (error) {
@@ -226,6 +263,7 @@ export default function AttendanceActionDialogs({
       <Button
         className="min-w-32"
         loading={isSubmitting}
+        disabled={!faceImage || isSubmitting}
         onClick={handleConfirm}
       >
         {t("confirm")}
@@ -318,6 +356,34 @@ export default function AttendanceActionDialogs({
         >
           {outOfLocationButtons}
         </div>
+      </AttendanceDialogShell>
+
+      <AttendanceDialogShell
+        open={step === "face-liveness"}
+        onClose={reset}
+        title={
+          isClockOut
+            ? t("faceLiveness.titleClockOut")
+            : t("faceLiveness.titleClockIn")
+        }
+        className="max-w-[760px] w-[min(96vw,760px)] max-h-[92vh] overflow-hidden p-4 sm:p-5 gap-3"
+      >
+        <div className="space-y-0.5 text-center pr-6">
+          <h3 className="text-lg sm:text-xl font-semibold text-foreground">
+            {isClockOut
+              ? t("faceLiveness.titleClockOut")
+              : t("faceLiveness.titleClockIn")}
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            {t("faceLiveness.subtitle")}
+          </p>
+        </div>
+        <FaceLivenessCamera
+          active={step === "face-liveness"}
+          onVerified={handleFaceVerified}
+          onCancel={reset}
+          onCameraUnavailable={handleCameraUnavailable}
+        />
       </AttendanceDialogShell>
 
       <AttendanceDialogShell

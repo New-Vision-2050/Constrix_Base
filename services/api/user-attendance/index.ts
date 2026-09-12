@@ -1,8 +1,29 @@
+import { serialize } from "object-to-formdata";
 import { baseApi } from "@/config/axios/instances/base";
-import type { ClockLocationRequest, ClockActionResponse } from "./types/clock-request";
+import type {
+  ClockLocationRequest,
+  ClockActionResponse,
+} from "./types/clock-request";
 import type { UserAttendanceCalendarParams } from "./types/params";
 import type { UserAttendanceCalendarResponse } from "./types/response";
 import type { UserConstraintTodayResponse } from "./types/constraint-response";
+
+function buildClockBody(body: ClockLocationRequest) {
+  if (body.photo instanceof File) {
+    return serialize(
+      {
+        location: body.location,
+        photo: body.photo,
+      },
+      {
+        indices: true,
+        nullsAsUndefineds: true,
+      },
+    );
+  }
+
+  return body;
+}
 
 export const UserAttendanceApi = {
   getCalendar: (params: UserAttendanceCalendarParams) =>
@@ -17,10 +38,16 @@ export const UserAttendanceApi = {
     ),
 
   clockIn: (body: ClockLocationRequest) =>
-    baseApi.post<ClockActionResponse>("/attendance/clock-in", body),
+    baseApi.post<ClockActionResponse>(
+      "/attendance/clock-in",
+      buildClockBody(body),
+    ),
 
   clockOut: (body: ClockLocationRequest) =>
-    baseApi.post<ClockActionResponse>("/attendance/clock-out", body),
+    baseApi.post<ClockActionResponse>(
+      "/attendance/clock-out",
+      buildClockBody(body),
+    ),
 };
 
 export type {
@@ -32,7 +59,10 @@ export type {
 } from "./types/response";
 
 export type { UserAttendanceCalendarParams } from "./types/params";
-export type { ClockLocationRequest, ClockActionResponse } from "./types/clock-request";
+export type {
+  ClockLocationRequest,
+  ClockActionResponse,
+} from "./types/clock-request";
 export type {
   AttendanceRecord,
   WorkPeriodConstraint,

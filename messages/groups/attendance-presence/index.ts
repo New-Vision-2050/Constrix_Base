@@ -340,6 +340,66 @@ export const attendancePresenceMessages = new MessagesGroup({
   registerAttendance: _m("Register Attendance", "تسجيل حضور"),
   registerDeparture: _m("Register Departure", "تسجيل انصراف"),
   requestPermission: _m("Request Permission", "طلب اذن"),
+  faceLiveness: new MessagesGroup({
+    title: _m("Face verification", "التحقق ببصمة الوجه"),
+    titleClockIn: _m(
+      "Verify face to register attendance",
+      "تحقق ببصمة الوجه لتسجيل الحضور",
+    ),
+    titleClockOut: _m(
+      "Verify face to register departure",
+      "تحقق ببصمة الوجه لتسجيل الانصراف",
+    ),
+    subtitle: _m(
+      "Keep your whole face inside the circle, then blink to confirm",
+      "خلي وجهك بالكامل داخل الدائرة ثم رمّش للتأكيد",
+    ),
+    preparingCamera: _m(
+      "Preparing camera...",
+      "جاري تجهيز الكاميرا...",
+    ),
+    cameraError: _m(
+      "Could not open the laptop camera. Please allow camera access and try again.",
+      "تعذر فتح كاميرا اللابتوب. اسمح بالوصول للكاميرا ثم أعد المحاولة.",
+    ),
+    cannotRegisterWithoutCamera: _m(
+      "Attendance cannot be registered without a working camera.",
+      "لا يمكن تسجيل الحضور أو الانصراف بدون كاميرا تعمل.",
+    ),
+    closeWithoutCamera: _m("Close", "إغلاق"),
+    positionFace: _m(
+      "Place your face inside the frame",
+      "ضع وجهك داخل الإطار",
+    ),
+    centerFace: _m(
+      "Keep your whole face inside the circle",
+      "خلي وجهك بالكامل داخل الدائرة",
+    ),
+    blinkPrompt: _m(
+      "Blink once: close your eyes then open them",
+      "رمّش مرة: أغلق عينيك ثم افتحهما",
+    ),
+    readyToCapture: _m(
+      "Face verified successfully",
+      "تم التحقق من الوجه بنجاح",
+    ),
+    matchScore: _m("Match", "نسبة التطابق"),
+    stepFace: _m("Detect face", "رصد الوجه"),
+    stepOval: _m("Inside circle", "داخل الدائرة"),
+    stepBlink: _m("Blink", "رمشة العين"),
+    capturing: _m("Capturing...", "جاري الالتقاط..."),
+    reviewPhoto: _m("Review your photo", "راجع صورتك"),
+    capture: _m("Capture", "التقاط"),
+    usePhoto: _m("Use photo", "استخدام الصورة"),
+    retake: _m("Retake", "إعادة الالتقاط"),
+    retryCamera: _m("Retry camera", "إعادة فتح الكاميرا"),
+    cancel: _m("Cancel", "إلغاء"),
+    capturedAlt: _m("Captured face photo", "صورة الوجه الملتقطة"),
+    required: _m(
+      "Face verification is required",
+      "التحقق ببصمة الوجه مطلوب",
+    ),
+  }),
   todayGoalLabel: _m(
     "Today's Goal: {hours} hours",
     "هدف اليوم : {hours} ساعات",

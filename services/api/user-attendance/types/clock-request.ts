@@ -3,6 +3,8 @@ export interface ClockLocationRequest {
     latitude: number;
     longitude: number;
   };
+  /** Face liveness capture from laptop webcam. */
+  photo?: File | null;
 }
 
 export interface ClockActionResponse {
