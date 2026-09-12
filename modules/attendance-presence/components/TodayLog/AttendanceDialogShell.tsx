@@ -3,6 +3,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { useAttendanceDirection } from "../../utils/direction";
 
 interface AttendanceDialogShellProps {
@@ -25,7 +26,10 @@ export default function AttendanceDialogShell({
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <DialogContent
-        className={`bg-sidebar border-border max-w-md w-[calc(100%-2rem)] p-6 sm:rounded-2xl ${className}`}
+        className={cn(
+          "bg-sidebar border-border max-w-md w-[calc(100%-2rem)] p-6 sm:rounded-2xl",
+          className,
+        )}
         withCrossButton={false}
       >
         <DialogTitle className="sr-only">{title}</DialogTitle>
