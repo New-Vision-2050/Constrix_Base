@@ -7,6 +7,27 @@ import type {
 import type { UserAttendanceCalendarParams } from "./types/params";
 import type { UserAttendanceCalendarResponse } from "./types/response";
 import type { UserConstraintTodayResponse } from "./types/constraint-response";
+import type {
+  FaceVerificationExceptionResponse,
+  UpdateFaceVerificationExceptionBody,
+} from "./types/face-verification-exception";
+
+function buildClockBody(body: ClockLocationRequest) {
+  if (body.photo instanceof File) {
+    return serialize(
+      {
+        location: body.location,
+        photo: body.photo,
+      },
+      {
+        indices: true,
+        nullsAsUndefineds: true,
+      },
+    );
+  }
+
+  return body;
+}
 
 function buildClockBody(body: ClockLocationRequest) {
   if (body.photo instanceof File) {
@@ -48,6 +69,20 @@ export const UserAttendanceApi = {
       "/attendance/clock-out",
       buildClockBody(body),
     ),
+
+  getFaceVerificationException: (userId: string) =>
+    baseApi.get<FaceVerificationExceptionResponse>(
+      `/attendance/users/${userId}/face-verification-exception`,
+    ),
+
+  updateFaceVerificationException: (
+    userId: string,
+    body: UpdateFaceVerificationExceptionBody,
+  ) =>
+    baseApi.put<FaceVerificationExceptionResponse>(
+      `/attendance/users/${userId}/face-verification-exception`,
+      body,
+    ),
 };
 
 export type {
@@ -70,3 +105,8 @@ export type {
   UserConstraintTodayPayload,
   UserConstraintTodayResponse,
 } from "./types/constraint-response";
+export type {
+  FaceVerificationExceptionPayload,
+  FaceVerificationExceptionResponse,
+  UpdateFaceVerificationExceptionBody,
+} from "./types/face-verification-exception";

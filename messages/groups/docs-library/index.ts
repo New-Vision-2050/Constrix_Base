@@ -125,6 +125,14 @@ export const docsLibraryMessages = new MessagesGroup({
         hide: _m("Hide", "أخفاء"),
         delete: _m("Delete", "حذف"),
         download: _m("Download", "تحميل"),
+        downloadSuccess: _m(
+          "Document downloaded successfully",
+          "تم تحميل المستند بنجاح",
+        ),
+        downloadFailed: _m(
+          "Failed to download document",
+          "حدث خطأ أثناء تحميل المستند",
+        ),
         favorite: _m("Favorite", "المفضلة"),
         move: _m("Move", "نقل"),
         share: _m("Share", "مشاركة"),

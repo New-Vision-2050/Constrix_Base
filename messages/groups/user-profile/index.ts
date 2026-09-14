@@ -238,6 +238,17 @@ export const userProfileMessages = new MessagesGroup({
         "محددات الحضور الإضافية",
       ),
       roles: _m("Roles", "الصلاحيات"),
+      faceVerification: _m("Face Verification", "التحقق ببصمة الوجه"),
+      enabled: _m("Enabled", "مفعل"),
+      disabled: _m("Disabled", "غير مفعل"),
+      faceVerificationSaveSuccess: _m(
+        "Face verification updated successfully",
+        "تم تحديث التحقق ببصمة الوجه بنجاح",
+      ),
+      faceVerificationSaveError: _m(
+        "Failed to update face verification",
+        "فشل تحديث التحقق ببصمة الوجه",
+      ),
       validation: new MessagesGroup({
         branchRequired: _m("Branch is required", "الفرع مطلوب"),
         managementRequired: _m("Management is required", "الادارة مطلوب"),

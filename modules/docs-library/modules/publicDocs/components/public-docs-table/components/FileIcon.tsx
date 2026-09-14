@@ -2,34 +2,28 @@ import { Folder, FileText } from "lucide-react";
 
 /**
  * File icon component
- * Displays appropriate icon based on file type
+ * Uses API file `type` (not archive `name` / storage URL) for icon color.
  */
 interface FileIconProps {
   isFolder?: boolean;
+  /** Archive document code — display only; not used for extension sniffing. */
   fileName?: string;
+  /** Media.type from API: image | pdf | document | ... */
+  fileType?: string;
 }
 
-export const FileIcon = ({ isFolder, fileName }: FileIconProps) => {
+export const FileIcon = ({ isFolder, fileType }: FileIconProps) => {
   const getFileIcon = () => {
     if (isFolder) {
       return <Folder className="h-5 w-5 text-primary" />;
     }
-    
-    const extension = fileName?.split('.').pop()?.toLowerCase();
-    
-    switch (extension) {
-      case 'pdf':
+
+    switch (fileType) {
+      case "pdf":
         return <FileText className="h-5 w-5 text-red-500" />;
-      case 'doc':
-      case 'docx':
+      case "document":
         return <FileText className="h-5 w-5 text-blue-600" />;
-      case 'xls':
-      case 'xlsx':
-        return <FileText className="h-5 w-5 text-green-600" />;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
+      case "image":
         return <FileText className="h-5 w-5 text-purple-500" />;
       default:
         return <FileText className="h-5 w-5 text-muted-foreground" />;

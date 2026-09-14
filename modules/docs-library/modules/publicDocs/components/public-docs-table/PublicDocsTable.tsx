@@ -108,7 +108,11 @@ export const PublicDocsTable = () => {
         sortable: false,
         render: (row: DocRow) => (
           <div className="flex items-center gap-3">
-            <FileIcon isFolder={row.isFolder} fileName={row.document.name} />
+            <FileIcon
+              isFolder={row.isFolder}
+              fileName={row.document.name}
+              fileType={row.document.file?.type}
+            />
             <span
               onClick={() => handleRowClick(row)}
               className="font-medium hover:underline cursor-pointer"

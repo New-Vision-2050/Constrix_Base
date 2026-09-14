@@ -5,6 +5,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useTranslations } from "next-intl";
 import { useFunctionalContractualCxt } from "../../context";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import FaceVerificationSwitch from "./FaceVerificationSwitch";
 
 export const JobFormConfig = () => {
   const t = useTranslations("common");
@@ -272,6 +273,12 @@ export const JobFormConfig = () => {
               },
             ],
           },
+          {
+            name: "_face_verification_switch",
+            label: "",
+            type: "checkbox",
+            render: () => <FaceVerificationSwitch userId={userId ?? undefined} />,
+          },
         ],
         columns: 2,
       },
@@ -303,10 +310,11 @@ export const JobFormConfig = () => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const { additional_constraint_ids, ...restData } = formData;
 
-      const body = {
+      const body: Record<string, unknown> = {
         ...restData,
         user_id: userId,
       };
+      delete body._face_verification_switch;
 
       const result = await defaultSubmitHandler(serialize(body), jobFormConfig, {
         url: `/user_professional_data`,
