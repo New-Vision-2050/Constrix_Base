@@ -86,8 +86,24 @@ export const ActionButtons = ({ document, isFolder }: ActionButtonsProps) => {
         break;
       case "download":
         if (!isFolder) {
-          const _url = document?.file?.url;
-          window.open(_url, "_blank");
+          void (async () => {
+            try {
+              const { downloadArchiveFile } = await import(
+                "@/modules/docs-library/utils/downloadArchiveFile"
+              );
+              await downloadArchiveFile({
+                fileId: document.id,
+                downloadName: document.name,
+                fileType: document.file?.type,
+                mimeType: document.file?.mime_type,
+              });
+              toast.success(t("downloadSuccess"));
+            } catch (error: any) {
+              const errorMsg =
+                error?.response?.data?.message || error?.message;
+              toast.error(errorMsg || t("downloadFailed"));
+            }
+          })();
         }
         break;
       case "share":

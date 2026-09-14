@@ -93,7 +93,11 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
 
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
-          <FileIcon isFolder={isFolder} fileName={document.name} />
+          <FileIcon
+            isFolder={isFolder}
+            fileName={document.name}
+            fileType={document.file?.type}
+          />
           <span
             onClick={handleClick}
             className={`font-medium hover:underline cursor-pointer`}

@@ -112,57 +112,19 @@ export default function DocViewDialog() {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const _url = baseURL + `/files/${docToView?.id}/download`;
-      const response = await apiClient.get(_url, {
-        responseType: "blob",
+      const { downloadArchiveFile } = await import(
+        "@/modules/docs-library/utils/downloadArchiveFile"
+      );
+      await downloadArchiveFile({
+        fileId: String(docToView?.id),
+        downloadName: docToView?.name || "document",
+        fileType: docToView?.file?.type,
+        mimeType: docToView?.file?.mime_type,
       });
 
-      // Determine MIME type based on file type
-      const getMimeType = (fileType: string, fileName: string) => {
-        const extension = fileName?.split(".").pop()?.toLowerCase();
-
-        switch (fileType) {
-          case "image":
-            if (extension === "png") return "image/png";
-            if (extension === "jpg" || extension === "jpeg")
-              return "image/jpeg";
-            if (extension === "gif") return "image/gif";
-            if (extension === "webp") return "image/webp";
-            return "image/*";
-          case "pdf":
-            return "application/pdf";
-          case "document":
-            if (extension === "doc" || extension === "docx")
-              return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-            if (extension === "xls" || extension === "xlsx")
-              return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            if (extension === "ppt" || extension === "pptx")
-              return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-            if (extension === "txt") return "text/plain";
-            return "application/octet-stream";
-          default:
-            return "application/octet-stream";
-        }
-      };
-
-      // Create blob URL and trigger download with proper MIME type
-      const mimeType = getMimeType(
-        docToView?.file?.type || "",
-        docToView?.file?.url || ""
-      );
-      const blob = new Blob([response.data], { type: mimeType });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = docToView?.name || "document";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast.success("تم تحميل المستند بنجاح");
+      toast.success(t("downloadSuccess"));
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحميل المستند");
+      toast.error(t("downloadFailed"));
     } finally {
       setLoading(false);
     }
