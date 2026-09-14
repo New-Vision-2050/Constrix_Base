@@ -1,6 +1,7 @@
 import PreviewTextField from "../../../components/previewTextField";
 import { useFunctionalContractualCxt } from "../../context";
 import { useTranslations } from "next-intl";
+import FaceVerificationPreview from "./FaceVerificationPreview";
 
 export default function JobInformationPreviewMode() {
   const { professionalData, additionalConstraints } =
@@ -98,6 +99,10 @@ export default function JobInformationPreviewMode() {
           valid={Boolean(professionalData?.roles?.length)}
           required
         />
+      </div>
+
+      <div className="p-2">
+        <FaceVerificationPreview />
       </div>
     </div>
   );
