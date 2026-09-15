@@ -27,6 +27,9 @@ export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   { id: "delay", column: "b" },
   { id: "overtime", column: "b" },
   { id: "total_hours", column: "b" },
+  { id: "clock_out_cause", column: "b" },
+  { id: "clock_in_location", column: "b" },
+  { id: "clock_out_location", column: "b" },
 ];
 
 export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [

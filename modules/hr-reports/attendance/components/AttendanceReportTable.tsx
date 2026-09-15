@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  Collapse,
+  IconButton,
   MenuItem,
   Paper,
   Stack,
@@ -14,7 +16,8 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { useFormatter, useTranslations } from "next-intl";
+import { ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
 import { toast } from "@/modules/table/hooks/use-toast";
 import { getErrorMessage } from "@/utils/errorHandler";
@@ -46,15 +49,14 @@ const HeadlessCreatedReportsTable = HeadlessTableLayout<attendanceReport>(
 export default function AttendanceReportTable() {
   const t = useTranslations("HRReports.attendanceReport.table");
   const tPage = useTranslations("HRReports.attendanceReport");
-  const format = useFormatter();
 
   const tDeleteConfirm = useTranslations("common.deleteConfirmation");
   const tWizard = useTranslations("HRReports.attendanceReport.wizard");
   const tRt = useTranslations("HRReports.attendanceReport.wizard.reportTypes");
   const tMonth = useTranslations("HRReports.attendanceReport.wizard.month");
-  const tLabels = useTranslations("labels");
 
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [filtersCollapsed, setFiltersCollapsed] = useState(true);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [reports, setReports] = useState<attendanceReport[]>([]);
@@ -76,22 +78,6 @@ export default function AttendanceReportTable() {
   const periodDateFromMax =
     dateTo && dateTo < todayIso ? dateTo : todayIso;
   const periodDateToMin = dateFrom || todayIso;
-
-  const formatCreatedAt = useCallback(
-    (iso: string) => {
-      const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return iso;
-      return format.dateTime(d, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      });
-    },
-    [format],
-  );
 
   const listDateFilters = useMemo(() => {
     if (!dateFrom && !dateTo) return {};
@@ -342,7 +328,6 @@ export default function AttendanceReportTable() {
       tMonth,
       tWizard,
       tRt,
-      formatCreatedAt,
     ],
   );
 
@@ -362,107 +347,110 @@ export default function AttendanceReportTable() {
   return (
     <>
       <Paper
-        variant="outlined"
         elevation={0}
-        sx={(theme) => ({
+        sx={{
           p: 2.5,
           mb: 2,
           borderRadius: 2,
-          bgcolor:
-            theme.palette.background.card ?? theme.palette.background.paper,
+          border: 1,
           borderColor: "divider",
-          color: "text.primary",
-          "& .MuiInputBase-root": {
-            bgcolor: theme.palette.background.paper,
-            color: "text.primary",
-          },
-          "& .MuiInputLabel-root": {
-            color: "text.secondary",
-          },
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "divider",
-          },
-          "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "text.secondary",
-          },
-          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-            {
-              borderColor: "primary.main",
-            },
-        })}
+        }}
       >
-        <Typography
-          variant="subtitle1"
-          fontWeight={700}
-          color="text.primary"
-          sx={{ mb: 2 }}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-          {t("filtersTitle")}
-        </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              userSelect: "none",
+            }}
+            onClick={() => setFiltersCollapsed((prev) => !prev)}
+          >
+            <IconButton size="small" sx={{ p: 0.5, mr: 0.5 }}>
+              {filtersCollapsed ? (
+                <ChevronDown size={18} />
+              ) : (
+                <ChevronUp size={18} />
+              )}
+            </IconButton>
+            <Typography variant="subtitle1" fontWeight="bold">
+              {t("filtersTitle")}
+            </Typography>
+          </Box>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<RotateCcw size={14} />}
+            onClick={handleClearDateFilter}
+            disabled={!hasDateFilter}
+          >
+            {t("clearFilters")}
+          </Button>
+        </Box>
 
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          alignItems={{ xs: "stretch", sm: "center" }}
-        >
-          <TextField
-            type="date"
-            size="small"
-            label={tWizard("periodDateFrom")}
-            value={dateFrom}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (!v) {
-                setDateFrom("");
-                params.setPage(1);
-                return;
-              }
-              const clampedFrom = v > todayIso ? todayIso : v;
-              const clamped = clampPastDateRange(clampedFrom, dateTo);
-              setDateFrom(clamped.dateFrom);
-              setDateTo(clamped.dateTo);
-              params.setPage(1);
-            }}
-            slotProps={{
-              htmlInput: { max: periodDateFromMax },
-              inputLabel: { shrink: true },
-            }}
-            sx={{ minWidth: 160 }}
-          />
-          <TextField
-            type="date"
-            size="small"
-            label={tWizard("periodDateTo")}
-            value={dateTo}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (!v) {
-                setDateTo("");
-                params.setPage(1);
-                return;
-              }
-              const clampedTo = v > todayIso ? todayIso : v;
-              const clamped = clampPastDateRange(dateFrom, clampedTo);
-              setDateFrom(clamped.dateFrom);
-              setDateTo(clamped.dateTo);
-              params.setPage(1);
-            }}
-            slotProps={{
-              htmlInput: { min: periodDateToMin, max: todayIso },
-              inputLabel: { shrink: true },
-            }}
-            sx={{ minWidth: 160 }}
-          />
-          {hasDateFilter ? (
-            <Button
-              variant="outlined"
+        <Collapse in={!filtersCollapsed}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            alignItems={{ xs: "stretch", sm: "center" }}
+            sx={{ mt: 2 }}
+          >
+            <TextField
+              type="date"
               size="small"
-              onClick={handleClearDateFilter}
-            >
-              {tLabels("reset")}
-            </Button>
-          ) : null}
-        </Stack>
+              label={tWizard("periodDateFrom")}
+              value={dateFrom}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (!v) {
+                  setDateFrom("");
+                  params.setPage(1);
+                  return;
+                }
+                const clampedFrom = v > todayIso ? todayIso : v;
+                const clamped = clampPastDateRange(clampedFrom, dateTo);
+                setDateFrom(clamped.dateFrom);
+                setDateTo(clamped.dateTo);
+                params.setPage(1);
+              }}
+              slotProps={{
+                htmlInput: { max: periodDateFromMax },
+                inputLabel: { shrink: true },
+              }}
+              sx={{ minWidth: 160 }}
+            />
+            <TextField
+              type="date"
+              size="small"
+              label={tWizard("periodDateTo")}
+              value={dateTo}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (!v) {
+                  setDateTo("");
+                  params.setPage(1);
+                  return;
+                }
+                const clampedTo = v > todayIso ? todayIso : v;
+                const clamped = clampPastDateRange(dateFrom, clampedTo);
+                setDateFrom(clamped.dateFrom);
+                setDateTo(clamped.dateTo);
+                params.setPage(1);
+              }}
+              slotProps={{
+                htmlInput: { min: periodDateToMin, max: todayIso },
+                inputLabel: { shrink: true },
+              }}
+              sx={{ minWidth: 160 }}
+            />
+          </Stack>
+        </Collapse>
       </Paper>
 
       <Box
