@@ -54,7 +54,10 @@ export type AttendanceDataTypeId =
   | "actual_out"
   | "delay"
   | "overtime"
-  | "total_hours";
+  | "total_hours"
+  | "clock_out_cause"
+  | "clock_in_location"
+  | "clock_out_location";
 
 /** Report layout — step 3 section 2 (was pattern filters UI). */
 export type ReportDisplayModeId = "employee_per_page" | "by_day";
