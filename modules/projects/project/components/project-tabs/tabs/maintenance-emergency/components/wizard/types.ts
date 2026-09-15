@@ -10,17 +10,26 @@ export interface WizardFormData {
   machine_number: string;
   work_description: string;
   task_date: string;
+  /** Water-only: `HH:mm` */
+  task_time: string;
   duration_hours: number;
   notes: string;
   site_status_type_id: string;
   site_status_values: Record<string, string>;
+  /** Water-only: update formula UUID */
+  update_site_status_id: string;
 
   // Step 2
   contractor_id: string;
   contractor_name: string;
+  contractor_number: string;
   contractor_representative_id: string;
   contractor_category: string;
   contractor_notes: string;
+  /** Water-only */
+  contractor_technician_id: string;
+  contractor_technician_number: string;
+  pole_number: string;
   permit_source: string;
   permit_recipient: string;
 
@@ -49,16 +58,22 @@ export const EMPTY_FORM: WizardFormData = {
   machine_number: "",
   work_description: "",
   task_date: new Date().toISOString().split("T")[0],
+  task_time: "",
   duration_hours: 4,
   notes: "",
   site_status_type_id: "",
   site_status_values: {},
+  update_site_status_id: "",
 
   contractor_id: "",
   contractor_name: "",
+  contractor_number: "",
   contractor_representative_id: "",
   contractor_category: "",
   contractor_notes: "",
+  contractor_technician_id: "",
+  contractor_technician_number: "",
+  pole_number: "",
   permit_source: "",
   permit_recipient: "",
 

@@ -13,6 +13,8 @@ export type ProjectNotificationsListArgs = ProjectNotificationScopeArgs & {
   to_date?: string;
   assigned_user_id?: string;
   search?: string;
+  /** Utility domain: electricity | water (tab split). */
+  type?: string;
 };
 
 /** Mobile list endpoints do not require project_id; backend filters by current employee. */
@@ -38,12 +40,14 @@ export type ProjectNotificationsExportArgs = ProjectNotificationScopeArgs & {
   created_by_user_id?: string;
   sort?: string;
   ids?: string[];
+  type?: string;
 };
 
 export type ProjectNotificationsMapTasksArgs = ProjectNotificationScopeArgs & {
   status?: string;
   date_from?: string;
   date_to?: string;
+  type?: string;
 };
 
 export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScopeArgs & {
@@ -56,13 +60,25 @@ export type ProjectNotificationsEmployeesLocationsArgs = ProjectNotificationScop
 export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {
   notification_number?: string | null;
   notification_type: string;
+  /**
+   * Utility domain distinguishing electricity vs water maintenance tabs.
+   * Sent as query/body `type` (e.g. `electricity` | `water`).
+   */
+  type?: string;
   feeder_number?: string | null;
   work_description?: string | null;
   contractor_id?: string | null;
   contractor_name?: string | null;
+  contractor_number?: string | null;
   contractor_representative_id?: string | null;
   contractor_category?: string | null;
   contractor_notes?: string | null;
+  /** Water-only: technician selected from contractor representatives. */
+  contractor_technician_id?: string | null;
+  /** Water-only: free-text technician number. */
+  contractor_technician_number?: string | null;
+  /** Water-only: pole number. */
+  pole_number?: string | null;
   permit_source?: string | null;
   permit_recipient?: string | null;
   task_latitude: number;
@@ -74,12 +90,16 @@ export type CreateProjectNotificationArgs = ProjectNotificationScopeArgs & {
   selected_distance_meters: number;
   independent_progress?: boolean;
   task_date?: string | null;
+  /** Water-only: site start time `HH:mm`. */
+  task_time?: string | null;
   duration_hours?: number | null;
   notes?: string | null;
   machine_number?: string | null;
   is_draft?: boolean;
   site_status_type_id?: string | null;
   site_status_type_values?: SiteStatusTypeValue[];
+  /** Water-only: UUID from update-site-statuses. */
+  update_site_status_id?: string | null;
 };
 
 export type UpdateProjectNotificationArgs = {
@@ -180,6 +200,7 @@ export interface ProjectNotificationsChartsArgs {
   date_from?: string;
   date_to?: string;
   search?: string;
+  type?: string;
 }
 
 /* ── Site Status Types ── */

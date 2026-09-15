@@ -20,7 +20,8 @@ export type ChartFilterKey =
   | "assigned_user_id"
   | "date_from"
   | "date_to"
-  | "search";
+  | "search"
+  | "type";
 
 export type ChartFilters = Partial<
   Pick<

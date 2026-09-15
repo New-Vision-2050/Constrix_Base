@@ -45,6 +45,7 @@ import type {
   SiteStatusTypesResponse,
   EndTaskStatusesResponse,
   SiteStatusUpdatesResponse,
+  UpdateSiteStatusesResponse,
 } from "./types/response";
 
 export type {
@@ -305,9 +306,15 @@ export const ProjectNotificationsApi = {
       "projects/notifications/filters",
     ),
 
-  getNotificationTypes: () =>
+  getNotificationTypes: (args?: { type?: string }) =>
     baseApi.get<ProjectNotificationTypesResponse>(
       "projects/notifications/notification-types",
+      { params: args?.type ? { type: args.type } : undefined },
+    ),
+
+  getUpdateSiteStatuses: () =>
+    baseApi.get<UpdateSiteStatusesResponse>(
+      "projects/notifications/update-site-statuses",
     ),
 
   getSiteStatusTypesWithKeys: (args: {

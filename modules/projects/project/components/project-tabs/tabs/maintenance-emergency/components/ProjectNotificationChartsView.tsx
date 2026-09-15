@@ -47,6 +47,7 @@ import {
 } from "recharts";
 import { useProjectNotificationCharts } from "@/modules/projects/project/query/useProjectNotificationCharts";
 import type { ChartFilters } from "@/modules/projects/project/query/useProjectNotificationCharts";
+import { useMaintenanceUtilityType } from "../MaintenanceUtilityTypeContext";
 import { useNotificationScope } from "@/modules/projects/project/hooks/useNotificationScope";
 import type {
   NotificationChartDimensionData,
@@ -878,12 +879,13 @@ function ChartsContent({
 /* ── Main Component ── */
 
 export default function ProjectNotificationChartsView() {
+  const utilityType = useMaintenanceUtilityType();
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const tCharts = useTranslations("project.maintenanceEmergency.notifications.charts");
   const theme = useTheme();
   const { projectId, contractualEngagementKey } = useNotificationScope();
 
-  const [filters, setFilters] = useState<ChartFilters>({});
+  const [filters, setFilters] = useState<ChartFilters>({ type: utilityType });
   const [filterLabels, setFilterLabels] = useState<Partial<Record<keyof ChartFilters, string>>>({});
   const [searchInput, setSearchInput] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -925,12 +927,12 @@ export default function ProjectNotificationChartsView() {
   );
 
   const handleClearFilters = useCallback(() => {
-    setFilters({});
+    setFilters({ type: utilityType });
     setFilterLabels({});
     setSearchInput("");
     setDateFrom("");
     setDateTo("");
-  }, []);
+  }, [utilityType]);
 
   const handleApplySearch = useCallback(() => {
     setFilters((prev) => ({
@@ -942,7 +944,10 @@ export default function ProjectNotificationChartsView() {
   }, [searchInput, dateFrom, dateTo]);
 
   const activeFilterCount = useMemo(
-    () => Object.values(filters).filter((v) => v != null && v !== "").length,
+    () =>
+      Object.entries(filters).filter(
+        ([key, v]) => key !== "type" && v != null && v !== "",
+      ).length,
     [filters],
   );
 

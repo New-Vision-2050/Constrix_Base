@@ -18,6 +18,7 @@ export interface ProjectContractorDto {
   commercialRegister?: string | null;
   tax_id?: string | null;
   tax_card?: string | null;
+  number?: string | null;
   mobile?: string | null;
   phone?: string | null;
   email?: string | null;

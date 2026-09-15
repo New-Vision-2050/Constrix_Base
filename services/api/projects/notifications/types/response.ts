@@ -109,16 +109,22 @@ export interface ProjectNotification {
   project_id: string;
   notification_number: string | null;
   notification_type: string;
+  /** Utility domain: electricity | water */
+  type?: string | null;
   severity: NotificationSeverity;
   feeder_number: string;
   work_type: string;
   work_description: string;
   contractor_id?: string | null;
   contractor_name: string;
+  contractor_number?: string | null;
   contractor_representative_id?: string | null;
   contractor_representative_name?: string | null;
   contractor_category?: string | null;
   contractor_notes?: string | null;
+  contractor_technician_id?: string | null;
+  contractor_technician_number?: string | null;
+  pole_number?: string | null;
   permit_source?: string | null;
   permit_recipient?: string | null;
   task_latitude: number;
@@ -132,6 +138,7 @@ export interface ProjectNotification {
   assigned_users: ProjectNotificationUser[];
   independent_progress: boolean;
   task_date: string;
+  task_time?: string | null;
   duration_hours: number;
   notes?: string | null;
   company_name?: string | null;
@@ -158,6 +165,8 @@ export interface ProjectNotification {
   site_status_type?: SiteStatusTypeRef | null;
   /** Values stored for each key of the linked site status type. */
   site_status_values?: SiteStatusNotificationValue[] | null;
+  /** Water-only: selected update-site-status formula. */
+  update_site_status_id?: string | null;
 }
 
 export interface ProjectNotificationNotesData {
@@ -245,12 +254,27 @@ export interface ProjectNotificationType {
   value: string;
   name_ar: string;
   name_en: string;
+  type?: string | null;
   sort_order: number;
   is_active: boolean;
 }
 
 export interface ProjectNotificationTypesResponse extends ApiBaseResponse<
   ProjectNotificationType[]
+> {}
+
+export interface UpdateSiteStatus {
+  id: string;
+  name_ar?: string | null;
+  name_en?: string | null;
+  name?: string | null;
+  value?: string | null;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+}
+
+export interface UpdateSiteStatusesResponse extends ApiBaseResponse<
+  UpdateSiteStatus[]
 > {}
 
 export interface ProjectNotificationDeleteResponse {

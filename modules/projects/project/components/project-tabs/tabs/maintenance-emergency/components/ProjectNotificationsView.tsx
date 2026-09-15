@@ -72,6 +72,7 @@ import { formatDistanceMeters } from "@/modules/projects/project/utils/distanceF
 import NotificationStatusBadge from "./NotificationStatusBadge";
 import NotificationSeverityBadge from "./NotificationSeverityBadge";
 import CreateNotificationWizard from "./wizard/CreateNotificationWizard";
+import { useMaintenanceUtilityType } from "../MaintenanceUtilityTypeContext";
 import ReassignTaskModal from "./ReassignTaskModal";
 
 const ProjectNotificationMapTasksView = dynamic(
@@ -175,6 +176,7 @@ const SEVERITY_OPTIONS = ["low", "medium", "high", "critical"];
 const WORK_TYPE_OPTIONS = ["electrical", "mechanical", "civil", "finishing", "landscaping"];
 
 export default function ProjectNotificationsView() {
+  const utilityType = useMaintenanceUtilityType();
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const tCommon = useTranslations("common");
   const {
@@ -203,7 +205,7 @@ export default function ProjectNotificationsView() {
 
   const { data: flatPerms, isLoading: isLoadingPerms } =
     useProjectMyPermissionsFlat(projectId);
-  const notificationTypesQuery = useProjectNotificationTypes();
+  const notificationTypesQuery = useProjectNotificationTypes(utilityType);
   const notificationTypes = notificationTypesQuery.data ?? [];
 
   const canView = useMemo(
@@ -270,6 +272,7 @@ export default function ProjectNotificationsView() {
     toDate: filterToDate || undefined,
     assignedUserId: filterAssignedUser || undefined,
     search: params.search || undefined,
+    type: utilityType,
   });
 
   const data = useMemo(() => queryResult?.data ?? [], [queryResult]);
@@ -636,6 +639,7 @@ export default function ProjectNotificationsView() {
     mutationFn: async (ids?: string[]) => {
       const res = await ProjectNotificationsApi.export(
         buildNotificationsExportArgs(notificationScope, {
+          type: utilityType,
           format: "xlsx",
           status: filterStatus || undefined,
           notification_type: filterType || undefined,

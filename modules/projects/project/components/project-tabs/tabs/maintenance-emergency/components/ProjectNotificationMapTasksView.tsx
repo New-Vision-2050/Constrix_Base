@@ -29,6 +29,7 @@ import { Close, ExpandLess, ExpandMore, People, Place, Refresh, TableChart, Visi
 import { useLocale, useTranslations } from "next-intl";
 import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/config/google-maps";
 import { useProjectNotificationMapTasks } from "@/modules/projects/project/query/useProjectNotificationMapTasks";
+import { useMaintenanceUtilityType } from "../MaintenanceUtilityTypeContext";
 import { useProjectNotificationEmployees } from "@/modules/projects/project/query/useProjectNotificationEmployees";
 import type {
   ProjectNotificationEmployee,
@@ -151,6 +152,7 @@ export default function ProjectNotificationMapTasksView({
   contractualEngagementKey,
   onBackToTable,
 }: ProjectNotificationMapTasksViewProps) {
+  const utilityType = useMaintenanceUtilityType();
   const t = useTranslations("project.maintenanceEmergency.notifications");
   const locale = useLocale();
   const [selectedStatus, setSelectedStatus] = useState<string>("");
@@ -162,6 +164,7 @@ export default function ProjectNotificationMapTasksView({
       status: selectedStatus,
       dateFrom,
       dateTo,
+      type: utilityType,
     });
 
   const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);

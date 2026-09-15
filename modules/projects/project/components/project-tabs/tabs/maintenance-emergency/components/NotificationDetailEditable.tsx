@@ -105,7 +105,11 @@ export default function NotificationDetailEditable({
   const updateMutation = useUpdateProjectNotificationMutation();
   const contractorsQuery = useProjectNotificationContractors();
   const contractors = contractorsQuery.data ?? [];
-  const notificationTypesQuery = useProjectNotificationTypes();
+  const notificationTypesQuery = useProjectNotificationTypes(
+    notification.type === "water" || notification.type === "electricity"
+      ? notification.type
+      : undefined,
+  );
   const notificationTypes = notificationTypesQuery.data ?? [];
   const locationPolygons = useProjectNotificationLocationPolygons(hasScope);
 
@@ -141,7 +145,12 @@ export default function NotificationDetailEditable({
     try {
       const mergedData = { ...formData, ...partialData };
       await updateMutation.mutateAsync(
-        buildUpdatePayload(notification.id, notificationScope, mergedData),
+        buildUpdatePayload(notification.id, notificationScope, mergedData, {
+          type:
+            notification.type === "water" || notification.type === "electricity"
+              ? notification.type
+              : undefined,
+        }),
       );
       setFormData(mergedData);
       toast.success(t("updatedSuccess"));

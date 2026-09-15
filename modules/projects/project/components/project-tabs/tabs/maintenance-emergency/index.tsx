@@ -21,6 +21,8 @@ import {
   hasAnyProjectPermissionKey,
 } from "@/modules/projects/project/utils/projectMyPermissions";
 import ProjectNotificationsView from "./components/ProjectNotificationsView";
+import { MaintenanceUtilityTypeProvider } from "./MaintenanceUtilityTypeContext";
+import type { MaintenanceUtilityType } from "./types/maintenanceUtilityType";
 
 const SiteStatusTypesTab = dynamic(
   () => import("./components/site-status-types"),
@@ -40,7 +42,11 @@ const TABS = [
   { id: "indicators", labelKey: "indicators" },
 ] as const;
 
-export default function MaintenanceEmergencyTab() {
+export default function MaintenanceEmergencyTab({
+  type = "electricity",
+}: {
+  type?: MaintenanceUtilityType;
+}) {
   const t = useTranslations("project.maintenanceEmergency");
   const tCommon = useTranslations("common");
   const engagement = useOptionalContractualEngagement();
@@ -83,33 +89,37 @@ export default function MaintenanceEmergencyTab() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Tabs
-        value={activeTab}
-        onChange={(_, v) => setActiveTab(v)}
-        sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
-      >
-        {TABS.map((tab) => (
-          <Tab
-            key={tab.id}
-            value={tab.id}
-            label={t(`tabs.${tab.labelKey}`)}
-          />
-        ))}
-      </Tabs>
+    <MaintenanceUtilityTypeProvider type={type}>
+      <Box sx={{ p: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => setActiveTab(v)}
+          sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
+        >
+          {TABS.map((tab) => (
+            <Tab
+              key={tab.id}
+              value={tab.id}
+              label={t(`tabs.${tab.labelKey}`)}
+            />
+          ))}
+        </Tabs>
 
-      <Box key={activeTab}>
-        {activeTab === "notifications" && <ProjectNotificationsView />}
-        {activeTab === "siteStatusTypes" && (
-          <SiteStatusTypesTab projectTypeId={project?.projectData?.sub_sub_project_type_id} />
-        )}
-        {activeTab === "indicators" && <ProjectNotificationChartsView />}
-        {(activeTab === "violations" || activeTab === "reports") && (
-          <Box sx={{ p: 4, textAlign: "center" }}>
-            <Alert severity="info">{t("comingSoon")}</Alert>
-          </Box>
-        )}
+        <Box key={`${type}-${activeTab}`}>
+          {activeTab === "notifications" && <ProjectNotificationsView />}
+          {activeTab === "siteStatusTypes" && (
+            <SiteStatusTypesTab
+              projectTypeId={project?.projectData?.sub_sub_project_type_id}
+            />
+          )}
+          {activeTab === "indicators" && <ProjectNotificationChartsView />}
+          {(activeTab === "violations" || activeTab === "reports") && (
+            <Box sx={{ p: 4, textAlign: "center" }}>
+              <Alert severity="info">{t("comingSoon")}</Alert>
+            </Box>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </MaintenanceUtilityTypeProvider>
   );
 }
