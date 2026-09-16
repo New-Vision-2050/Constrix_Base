@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { useLocale } from "next-intl";
 import type {
   WebViewerInstance,
   WebViewerOptions,
@@ -19,6 +20,208 @@ import {
 } from "./apryseViewerPersistence";
 
 const WEBVIEWER_PATH = "/webviewer";
+
+/** Apryse UI languages that enable RTL FreeText defaults (Noto Sans Arabic, right align). */
+const APRYSE_UI_RTL_LOCALES: Record<string, string> = {
+  ar: "ar",
+  he: "he",
+  fa: "fa",
+  ur: "ur",
+};
+
+const RTL_ANNOTATION_FONT = "Noto Sans Arabic";
+
+const ARABIC_SCRIPT_RE =
+  /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+const FREE_TEXT_TOOL_NAMES = [
+  "AnnotationCreateFreeText",
+  "AnnotationCreateFreeText2",
+  "AnnotationCreateFreeText3",
+  "AnnotationCreateFreeText4",
+  "AnnotationCreateCallout",
+] as const;
+
+const appearanceHandlerInstances = new WeakSet<WebViewerInstance>();
+
+type CoreWithFontMatching = WebViewerInstance["Core"] & {
+  enableStrictAnnotationFontMatching?: (
+    annotationManager: WebViewerInstance["Core"]["annotationManager"],
+  ) => void;
+};
+
+type FreeTextLike = {
+  Font?: string;
+  TextAlign?: string;
+  getContents?: () => string;
+  Contents?: string;
+  setModified?: (shouldKeepAppearance?: boolean) => void;
+};
+
+function resolveApryseUiLanguage(locale: string): string | undefined {
+  const base = locale.split("-")[0]?.toLowerCase();
+  return base ? APRYSE_UI_RTL_LOCALES[base] : undefined;
+}
+
+function textUsesArabicScript(text: string): boolean {
+  return ARABIC_SCRIPT_RE.test(text);
+}
+
+function getFreeTextPlainContents(annot: FreeTextLike): string {
+  return annot.getContents?.() ?? annot.Contents ?? "";
+}
+
+function rtlFreeTextNeedsSync(annot: FreeTextLike): boolean {
+  if (!textUsesArabicScript(getFreeTextPlainContents(annot))) return false;
+  if (annot.Font !== RTL_ANNOTATION_FONT) return true;
+  return annot.TextAlign !== "right";
+}
+
+/**
+ * Apryse saves FreeText using PDF appearance streams; without this handler,
+ * Arabic often falls back to Helvetica and renders as separated LTR glyphs.
+ */
+function setupFreeTextAppearanceGeneration(instance: WebViewerInstance): void {
+  if (appearanceHandlerInstances.has(instance)) return;
+
+  const { Annotations } = instance.Core;
+  Annotations.setCustomDrawHandler(
+    Annotations.FreeTextAnnotation,
+    (_ctx, _pageMatrix, _rotation, options) => {
+      options.originalDraw(_ctx, _pageMatrix, _rotation);
+    },
+    { generateAppearance: true },
+  );
+
+  appearanceHandlerInstances.add(instance);
+}
+
+function configureFreeTextToolDefaults(
+  instance: WebViewerInstance,
+  locale: string,
+): void {
+  const { documentViewer, Tools } = instance.Core;
+  const isRtlUi = Boolean(resolveApryseUiLanguage(locale));
+  const styles: Record<string, string> = { Font: RTL_ANNOTATION_FONT };
+  if (isRtlUi) {
+    styles.TextAlign = "right";
+  }
+
+  const toolNames = new Set<string>([...FREE_TEXT_TOOL_NAMES]);
+  const enumNames = [
+    Tools.ToolNames?.FREE_TEXT,
+    Tools.ToolNames?.FREE_TEXT2,
+    Tools.ToolNames?.FREE_TEXT3,
+    Tools.ToolNames?.FREE_TEXT4,
+    Tools.ToolNames?.CALLOUT,
+  ];
+  for (const name of enumNames) {
+    if (typeof name === "string") toolNames.add(name);
+  }
+
+  for (const name of toolNames) {
+    try {
+      const tool = documentViewer.getTool(name) as {
+        setStyles?: (styles: Record<string, string>) => void;
+      } | null;
+      tool?.setStyles?.(styles);
+    } catch {
+      /* tool may not exist in this UI configuration */
+    }
+  }
+}
+
+function syncRtlFreeTextAnnotation(
+  instance: WebViewerInstance,
+  annot: FreeTextLike,
+): boolean {
+  if (!rtlFreeTextNeedsSync(annot)) return false;
+
+  annot.Font = RTL_ANNOTATION_FONT;
+  annot.TextAlign = "right";
+  annot.setModified?.();
+
+  const { annotationManager } = instance.Core;
+  annotationManager.updateAnnotation(annot as never);
+  annotationManager.redrawAnnotation(annot as never);
+  return true;
+}
+
+/** Patch XFDF so Core embeds Arabic-capable fonts instead of Helvetica. */
+function patchArabicFreeTextXfdf(xfdf: string): string {
+  return xfdf.replace(
+    /<freetext\b([^>]*)>([\s\S]*?)<\/freetext>/gi,
+    (block, attrs, inner) => {
+      const contentsMatch = inner.match(/<contents[^>]*>([\s\S]*?)<\/contents>/i);
+      const rawText =
+        contentsMatch?.[1]?.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ") ??
+        "";
+      if (!textUsesArabicScript(rawText)) return block;
+
+      let patchedInner = inner
+        .replace(
+          /<defaultappearance[^>]*>[\s\S]*?<\/defaultappearance>/i,
+          (appearance) =>
+            appearance
+              .replace(/\/Helvetica\b/g, "/NotoSansArabic")
+              .replace(/\/Arial\b/g, "/NotoSansArabic")
+              .replace(/\/Times-Roman\b/g, "/NotoSansArabic"),
+        )
+        .replace(/<defaultstyle[^>]*>[\s\S]*?<\/defaultstyle>/i, (style) =>
+          style
+            .replace(/font:\s*[^;"]+/gi, `font: ${RTL_ANNOTATION_FONT}`)
+            .replace(/text-align:\s*left/gi, "text-align: right"),
+        );
+
+      let patchedAttrs = attrs.replace(
+        /\bFont="[^"]*"/i,
+        `Font="${RTL_ANNOTATION_FONT}"`,
+      );
+      if (!/\bFont="/i.test(patchedAttrs)) {
+        patchedAttrs += ` Font="${RTL_ANNOTATION_FONT}"`;
+      }
+
+      return `<freetext${patchedAttrs}>${patchedInner}</freetext>`;
+    },
+  );
+}
+
+/** RTL + embedded-font consistency for FreeText (see Apryse RTL / strict font matching guides). */
+function configureApryseRtlAndFonts(
+  instance: WebViewerInstance,
+  locale: string,
+): void {
+  setupFreeTextAppearanceGeneration(instance);
+
+  const core = instance.Core as CoreWithFontMatching;
+  core.enableStrictAnnotationFontMatching?.(core.annotationManager);
+  configureFreeTextToolDefaults(instance, locale);
+
+  const apryseLang = resolveApryseUiLanguage(locale);
+  if (apryseLang) {
+    try {
+      instance.UI.setLanguage(apryseLang);
+    } catch {
+      /* UI may not be ready during early init */
+    }
+  }
+}
+
+/** Ensures Arabic FreeText uses a shaping-capable font before flattening into the PDF. */
+async function prepareRtlFreeTextAnnotationsForExport(
+  instance: WebViewerInstance,
+): Promise<void> {
+  const { Annotations, annotationManager } = instance.Core;
+
+  for (const annot of annotationManager.getAnnotationsList()) {
+    if (!(annot instanceof Annotations.FreeTextAnnotation)) continue;
+    syncRtlFreeTextAnnotation(instance, annot as FreeTextLike);
+  }
+
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+}
 
 /** Extensions that use the Office editing pipeline (Word/Excel/PowerPoint, OpenDocument, RTF). */
 const OFFICE_EXTENSIONS = new Set([
@@ -269,6 +472,7 @@ export const ApryseWebViewer = forwardRef<
   },
   ref,
 ) {
+  const locale = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<WebViewerInstance | null>(null);
   const onViewerPreparingRef = useRef(onViewerPreparing);
@@ -293,24 +497,43 @@ export const ApryseWebViewer = forwardRef<
       if (!inst) {
         throw new Error("Viewer is not ready yet.");
       }
-      const { documentViewer, annotationManager } = inst.Core;
+      const { documentViewer, annotationManager, PDFNet } = inst.Core;
       const doc = documentViewer.getDocument();
       if (!doc) {
         throw new Error("No document is loaded in the viewer.");
       }
 
       await finalizeAnnotationsForExport(inst);
+      await prepareRtlFreeTextAnnotationsForExport(inst);
 
-      const xfdfString = await annotationManager.exportAnnotations();
+      let xfdfString = await annotationManager.exportAnnotations();
+      xfdfString = patchArabicFreeTextXfdf(xfdfString);
+
       const exportExt = getExtensionFromFileName(fileName) || ext;
       const downloadType = OFFICE_EXTENSIONS.has(exportExt)
         ? "office"
         : "pdf";
 
-      const data = await doc.getFileData({
+      if (downloadType === "pdf" && PDFNet?.initialize) {
+        await PDFNet.initialize(getLicenseKey() || undefined);
+      }
+
+      const getFileDataOpts = {
         xfdfString,
         downloadType,
-      });
+        ...(downloadType === "pdf" ? { flatten: true as const } : {}),
+      };
+
+      let data: ArrayBuffer | Blob;
+      try {
+        data = (await doc.getFileData(getFileDataOpts)) as ArrayBuffer | Blob;
+      } catch (exportErr) {
+        if (downloadType !== "pdf") throw exportErr;
+        data = (await doc.getFileData({
+          xfdfString,
+          downloadType,
+        })) as ArrayBuffer | Blob;
+      }
 
       const blob = await toBlob(data as ArrayBuffer | Blob);
       if (downloadType === "pdf") {
@@ -365,10 +588,10 @@ export const ApryseWebViewer = forwardRef<
       const baseOptions: WebViewerOptions = {
         path: WEBVIEWER_PATH,
         licenseKey,
+        fullAPI: true,
         ...(isOffice
           ? {
               enableOfficeEditing: true,
-              fullAPI: true,
               preloadWorker: officePreload,
             }
           : {}),
@@ -384,6 +607,7 @@ export const ApryseWebViewer = forwardRef<
       }
 
       instanceRef.current = instance;
+      configureApryseRtlAndFonts(instance, locale);
       return instance;
     });
 
@@ -553,13 +777,22 @@ export const ApryseWebViewer = forwardRef<
         setupStampResize();
 
         editListenerCleanupRef.current?.();
-        const { annotationManager } = instance.Core;
+        const { Annotations, annotationManager } = instance.Core;
         const onUserAnnotationChanged = (
-          _annots: unknown[],
+          annots: unknown[],
           action: string,
           info?: { imported?: boolean },
         ) => {
           if (info?.imported) return;
+
+          if (action === "add" || action === "modify") {
+            for (const annot of annots) {
+              if (annot instanceof Annotations.FreeTextAnnotation) {
+                syncRtlFreeTextAnnotation(instance, annot as FreeTextLike);
+              }
+            }
+          }
+
           if (action !== "add" && action !== "modify" && action !== "delete") {
             return;
           }
@@ -616,6 +849,12 @@ export const ApryseWebViewer = forwardRef<
       observer.disconnect();
     };
   }, [status, documentBuffer]);
+
+  useEffect(() => {
+    const instance = instanceRef.current;
+    if (!instance || status !== "ready") return;
+    configureApryseRtlAndFonts(instance, locale);
+  }, [locale, status]);
 
   const viewerMinHeight = fillParent ? 0 : 400;
 
