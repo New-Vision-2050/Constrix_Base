@@ -29,23 +29,6 @@ function buildClockBody(body: ClockLocationRequest) {
   return body;
 }
 
-function buildClockBody(body: ClockLocationRequest) {
-  if (body.photo instanceof File) {
-    return serialize(
-      {
-        location: body.location,
-        photo: body.photo,
-      },
-      {
-        indices: true,
-        nullsAsUndefineds: true,
-      },
-    );
-  }
-
-  return body;
-}
-
 export const UserAttendanceApi = {
   getCalendar: (params: UserAttendanceCalendarParams) =>
     baseApi.get<UserAttendanceCalendarResponse>(
