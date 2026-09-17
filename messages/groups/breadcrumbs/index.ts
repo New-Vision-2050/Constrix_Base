@@ -11,6 +11,7 @@ export const breadcrumbsMessages = new MessagesGroup({
   "attendance-presence": _m("Attendance & Presence", "الحضور والتواجد"),
   "hr-reports": _m("Reports", "التقارير"),
   "hr-reports/attendance": _m("Attendance reports", "تقارير الحضور"),
+  "hr-reports/employee-tasks": _m("Task reports", "تقارير المهام"),
   users: _m("Users", "المستخدمون"),
   "users/list": _m("Users List", "قائمة المستخدمين"),
   "users/permissions": _m("User Permissions", "صلاحيات المستخدمين"),
