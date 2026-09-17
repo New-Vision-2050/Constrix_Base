@@ -84,12 +84,31 @@ export const ProjectOrderPermitsApi = {
       { responseType: "blob" },
     ),
 
+  downloadOrderPermitTemplate: (projectId: string | number) =>
+    baseApi.get<Blob>(
+      `projects/${projectId}/order-permits/export-construction-template`,
+      { responseType: "blob" },
+    ),
+
   import: (projectId: string | number, file: File) => {
     const formData = new FormData();
     formData.append("file", file);
 
     return baseApi.post<ImportProjectOrderPermitsResponse>(
       `projects/${projectId}/order-permits/import`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
+  },
+
+  importOrderPermits: (projectId: string | number, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return baseApi.post<ImportProjectOrderPermitsResponse>(
+      `projects/${projectId}/order-permits/import-construction`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
