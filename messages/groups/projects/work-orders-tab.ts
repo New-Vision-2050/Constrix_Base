@@ -17,6 +17,18 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
     "Could not download UDS model",
     "تعذر تحميل نموذج UDS",
   ),
+  refreshFromOrderPermitTemplate: _m(
+    "Refresh data from template",
+    "تحديث البيانات من النموذج",
+  ),
+  downloadOrderPermitTemplate: _m(
+    "Download user template",
+    "تحميل النموذج المستخدم",
+  ),
+  downloadOrderPermitTemplateError: _m(
+    "Could not download template",
+    "تعذر تحميل النموذج",
+  ),
   importSuccess: _m("Work orders updated successfully", "تم تحديث أوامر العمل بنجاح"),
   importError: _m("Could not import work orders", "تعذر استيراد أوامر العمل"),
   invalidImportFile: _m(
