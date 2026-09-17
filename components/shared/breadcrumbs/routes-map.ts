@@ -20,7 +20,7 @@ export interface RoutesMap {
  */
 export const getRoutesMap = (
   locale: string,
-  t: (key: string) => string
+  t: (key: string) => string,
 ): RoutesMap => {
   const getText = (key: string, defaultText: string) => {
     return t ? t(key) : defaultText;
@@ -42,21 +42,18 @@ export const getRoutesMap = (
     },
     "attendance-determinants": getText(
       "attendance-determinants",
-      "إعدادات الحضور والانصراف"
+      "إعدادات الحضور والانصراف",
     ),
     "attendance-departure": getText("attendance-departure", "الحضور والانصراف"),
     "attendance-presence": getText("attendance-presence", "الحضور والتواجد"),
     "hr-reports": {
       label: getText("hr-reports", "التقارير"),
-      href: `/${locale}/hr-reports`,
+      href: `/hr-reports`,
     },
-    "hr-reports/attendance": getText(
-      "hr-reports/attendance",
-      "تقارير الحضور"
-    ),
+    "hr-reports/attendance": getText("hr-reports/attendance", "تقارير الحضور"),
     "hr-reports/employee-tasks": getText(
       "hr-reports/employee-tasks",
-      "تقارير المهام"
+      "تقارير المهام",
     ),
 
     // User routes
@@ -77,11 +74,11 @@ export const getRoutesMap = (
     // Examples of compound routes
     "hr-settings/attendance-determinants": getText(
       "hr-settings/attendance-determinants",
-      "إعدادات الحضور والانصراف"
+      "إعدادات الحضور والانصراف",
     ),
     "hr-settings/attendance-determinants/create": getText(
       "hr-settings/attendance-determinants/create",
-      "إنشاء حضور جديد"
+      "إنشاء حضور جديد",
     ),
     "activities-logs": getText("activities-logs", "سجل الأنشطة"),
     bouquet: getText("bouquet", "الباقة"),
@@ -93,7 +90,7 @@ export const getRoutesMap = (
     "human-resources": getText("human-resources", "الموارد البشرية"),
     "organizational-structure": getText(
       "organizational-structure",
-      "هيكل المنظمة"
+      "هيكل المنظمة",
     ),
     "work-panel": getText("work-panel", "لوحة العمل"),
     projects: {
@@ -130,37 +127,57 @@ export const getRoutesMap = (
     "stores/payment-methods": getText("stores/payment-methods", "وسائل الدفع"),
 
     // Content Management System routes
-    "content-management-system": getText("content-management-system", "إدارة المحتوى"),
+    "content-management-system": getText(
+      "content-management-system",
+      "إدارة المحتوى",
+    ),
     "setting-news": getText("cms_setting-news", "اعدادات الأخبار"),
 
     "content-management-system/categories": getText("cms_categories", "الفئات"),
     "content-management-system/icons": getText("cms_icons", "الأيقونات"),
     "content-management-system/main-settings": getText(
       "cms_main-settings",
-      "اعدادات الرئيسية"
+      "اعدادات الرئيسية",
     ),
     "content-management-system/contact-setting": getText(
       "cms_contact-setting",
-      "اعدادات التواصل"
+      "اعدادات التواصل",
     ),
     "content-management-system/terms-conditions": getText(
       "cms_terms-conditions",
-      "الشروط والأحكام"
+      "الشروط والأحكام",
     ),
-    "content-management-system/mainData": getText("cms_mainData", "البيانات الأساسية"),
-    "content-management-system/setting-founder": getText("cms_setting-founder", "المؤسسين"),
+    "content-management-system/mainData": getText(
+      "cms_mainData",
+      "البيانات الأساسية",
+    ),
+    "content-management-system/setting-founder": getText(
+      "cms_setting-founder",
+      "المؤسسين",
+    ),
     "content-management-system/services": getText("cms_services", "الخدمات"),
-    "content-management-system/our-services": getText("cms_our-services", "خدماتنا"),
+    "content-management-system/our-services": getText(
+      "cms_our-services",
+      "خدماتنا",
+    ),
     "content-management-system/projects": getText("cms_projects", "المشاريع"),
     "content-management-system/theme-setting": getText(
       "cms_theme-setting",
-      "إعدادات المظهر"
+      "إعدادات المظهر",
     ),
-    "content-management-system/communication-messages":
-      getText("cms_communication-messages", "رسائل التواصل"),
+    "content-management-system/communication-messages": getText(
+      "cms_communication-messages",
+      "رسائل التواصل",
+    ),
     "content-management-system/themes": getText("cms_themes", "المظاهر"),
-    "content-management-system/communication-settings": getText("cms_communication-settings", "اعدادات التواصل"),
-    "content-management-system/about-setting": getText("cms_about-setting", "اعدادات النبذة"),
+    "content-management-system/communication-settings": getText(
+      "cms_communication-settings",
+      "اعدادات التواصل",
+    ),
+    "content-management-system/about-setting": getText(
+      "cms_about-setting",
+      "اعدادات النبذة",
+    ),
     "change-password": getText("change-password", "تغيير كلمة المرور"),
   };
 
