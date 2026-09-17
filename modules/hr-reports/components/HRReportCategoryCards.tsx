@@ -8,6 +8,7 @@ import {
   FolderClosed,
   LineChart,
   FileText,
+  ListTodo,
   LucideIcon,
 } from "lucide-react";
 import { ROUTER } from "@/router";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 type CategoryDef = {
   key:
     | "attendanceReports"
+    | "taskReports"
     | "employeeReports"
     | "performanceReports"
     | "generalReports";
@@ -29,6 +31,11 @@ const CATEGORIES: CategoryDef[] = [
     key: "attendanceReports",
     icon: FileText,
     href: ROUTER.HR_REPORTS_ATTENDANCE,
+  },
+  {
+    key: "taskReports",
+    icon: ListTodo,
+    href: ROUTER.HR_REPORTS_EMPLOYEE_TASKS,
   },
   { key: "employeeReports", icon: FolderClosed, disabled: true },
   { key: "performanceReports", icon: LineChart, disabled: true },
