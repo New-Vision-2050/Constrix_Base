@@ -52,7 +52,7 @@ export interface Currency {
 }
 
 export interface ProjectClassification {
-  id: number;
+  id: number | string;
   name: string;
 }
 
@@ -188,7 +188,7 @@ export interface ProjectDetails {
   contract_type_id?: string | null;
   contractual_engagement?: ContractualEngagement | null;
   client_id: string | null;
-  project_classification_id: number | null;
+  project_classification_id: number | string | null;
   cost_center_branch_id: number | null;
   management_id: number | string | null;
   currency_id: number | null;
