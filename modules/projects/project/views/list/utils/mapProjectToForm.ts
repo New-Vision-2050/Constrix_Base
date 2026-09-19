@@ -10,7 +10,7 @@ export type ProjectEditSelections = {
   manager?: { id: string; name: string } | null;
   projectOwner?: { id: string; name: string; type?: string } | null;
   contractType?: { id: string; name: string } | null;
-  projectClassification?: { id: number; name: string } | null;
+  projectClassification?: { id: number | string; name: string } | null;
 };
 
 function toIdString(value: unknown): string | undefined {
