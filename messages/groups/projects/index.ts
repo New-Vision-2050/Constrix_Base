@@ -74,6 +74,7 @@ export const projectMessages = new MessagesGroup({
   tableActions: _m("Actions", "الإجراءات"),
   filterSearch: _m("Filter & Search", "التصفية والبحث"),
   projectClassification: _m("Project Classification", "تصنيف المشروع"),
+  projectTag: _m("Project Tag", "وسم المشروع"),
   clearFilters: _m("Clear filters", "مسح التصفية"),
   all: _m("All", "الكل"),
   projectStatus: _m("Project Status", "حالة المشروع"),

@@ -35,6 +35,7 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
     subSubProjectTypesData,
     managersData,
     ownerOptionsData,
+    projectTagsData,
   } = filterManager;
 
   return (
@@ -184,6 +185,20 @@ export function ProjectFilters({ filterManager }: ProjectFiltersProps) {
             { value: "0", label: t("project.statusInProgress") },
             { value: "-1", label: t("project.statusStopped") },
             { value: "2", label: t("project.statusCompleted") },
+          ]}
+        />
+
+        <SearchableSelect
+          label={t("project.projectTag")}
+          value={filters.project_tag_id}
+          onChange={(val) => setFilter("project_tag_id", String(val))}
+          placeholder={t("project.all")}
+          options={[
+            { value: "", label: t("project.all") },
+            ...projectTagsData.map((tag) => ({
+              value: String(tag.id),
+              label: tag.name,
+            })),
           ]}
         />
       </Box>
