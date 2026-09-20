@@ -22,6 +22,8 @@ export const REMOVED_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
   "management",
   "official_in",
   "official_out",
+  "clock_in_location",
+  "clock_out_location",
 ];
 
 /** Section 1 — two columns (RTL: column “a” renders first in DOM ≈ visual right). */
@@ -36,8 +38,6 @@ export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   { id: "overtime", column: "b" },
   { id: "total_hours", column: "b" },
   { id: "clock_out_cause", column: "b" },
-  { id: "clock_in_location", column: "b" },
-  { id: "clock_out_location", column: "b" },
 ];
 
 export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
