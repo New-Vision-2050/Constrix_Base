@@ -273,6 +273,8 @@ export default function WorkOrdersTab({
 
   const t = useTranslations("project.workOrdersTab");
 
+  const isDepartmentTab = departmentId != null;
+
   const tFilters = useTranslations("project.workOrdersTab.filters");
 
   const tTable = useTranslations("project.workOrdersTab.table");
@@ -668,7 +670,9 @@ export default function WorkOrdersTab({
 
     setIsImporting(true);
     try {
-      const res = await ProjectOrderPermitsApi.import(projectId, file);
+      const res = isDepartmentTab
+        ? await ProjectOrderPermitsApi.importOrderPermits(projectId, file)
+        : await ProjectOrderPermitsApi.import(projectId, file);
       toast.success(res.data?.message ?? t("importSuccess"));
       await queryClient.invalidateQueries({
         queryKey: projectOrderPermitsQueryKey(projectId),
@@ -686,11 +690,23 @@ export default function WorkOrdersTab({
 
     setIsDownloadingUdsModel(true);
     try {
-      const response = await ProjectOrderPermitsApi.downloadUdsModel(projectId);
-      downloadFromResponse(response, "uds-template.xlsx");
+      const response = isDepartmentTab
+        ? await ProjectOrderPermitsApi.downloadOrderPermitTemplate(projectId)
+        : await ProjectOrderPermitsApi.downloadUdsModel(projectId);
+      downloadFromResponse(
+        response,
+        isDepartmentTab ? "order-permit-template.xlsx" : "uds-template.xlsx",
+      );
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err?.response?.data?.message ?? t("downloadUdsModelError"));
+      toast.error(
+        err?.response?.data?.message ??
+          t(
+            isDepartmentTab
+              ? "downloadOrderPermitTemplateError"
+              : "downloadUdsModelError",
+          ),
+      );
     } finally {
       setIsDownloadingUdsModel(false);
     }
@@ -828,7 +844,11 @@ export default function WorkOrdersTab({
                   disabled={isDownloadingUdsModel || isImporting}
                   onClick={() => void handleDownloadUdsModel()}
                 >
-                  {t("downloadUdsModel")}
+                  {t(
+                    isDepartmentTab
+                      ? "downloadOrderPermitTemplate"
+                      : "downloadUdsModel",
+                  )}
                 </Button>
                 <Button
                   variant="outlined"
@@ -843,7 +863,11 @@ export default function WorkOrdersTab({
                   disabled={isImporting}
                   onClick={handleImportClick}
                 >
-                  {t("refreshFromUds")}
+                  {t(
+                    isDepartmentTab
+                      ? "refreshFromOrderPermitTemplate"
+                      : "refreshFromUds",
+                  )}
                 </Button>
 
                 <Button

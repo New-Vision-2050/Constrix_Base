@@ -14,6 +14,7 @@ export interface ProjectFilterValues {
   project_owner_id: string;
   management_id: string;
   status: string;
+  project_tag_id: string;
 }
 
 export const initialFilterValues: ProjectFilterValues = {
@@ -26,6 +27,7 @@ export const initialFilterValues: ProjectFilterValues = {
   project_owner_id: "",
   management_id: "",
   status: "",
+  project_tag_id: "",
 };
 
 export function useProjectFilters() {
@@ -60,6 +62,21 @@ export function useProjectFilters() {
       return response.data.payload ?? [];
     },
     enabled: !!filters.sub_project_type_id,
+  });
+
+  const { data: projectTagsData } = useQuery<OptionItem[]>({
+    queryKey: ["project-filter-tags"],
+    queryFn: async () => {
+      const response = await AllProjectsApi.getProjectClassifications({
+        page: 1,
+        per_page: 100,
+      });
+      return (response.data.payload ?? []).map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      }));
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: managersData } = useQuery<OptionItem[]>({
@@ -128,5 +145,6 @@ export function useProjectFilters() {
     subSubProjectTypesData: subSubProjectTypesData ?? [],
     managersData: managersData ?? [],
     ownerOptionsData: ownerOptionsData ?? [],
+    projectTagsData: projectTagsData ?? [],
   };
 }
