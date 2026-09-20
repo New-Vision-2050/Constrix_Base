@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  Chip,
   Collapse,
   IconButton,
   MenuItem,
@@ -85,7 +86,6 @@ export default function AttendanceReportTable() {
     return {
       ...(clamped.dateFrom ? { date_from: clamped.dateFrom } : {}),
       ...(clamped.dateTo ? { date_to: clamped.dateTo } : {}),
-      status: "ready" as const,
     };
   }, [dateFrom, dateTo]);
 
@@ -277,6 +277,22 @@ export default function AttendanceReportTable() {
           <span className="p-2 text-sm font-medium">
             {attendanceReportExportLabel(row.export_format, tWizard)}
           </span>
+        ),
+      },
+      {
+        key: "status",
+        name: t("colStatus"),
+        sortable: false,
+        render: (row: attendanceReport) => (
+          <Chip
+            size="small"
+            label={
+              row.status === "ready" ? t("statusReady") : t("statusPending")
+            }
+            color={row.status === "ready" ? "success" : "warning"}
+            variant="outlined"
+            sx={{ fontWeight: 600 }}
+          />
         ),
       },
       {
