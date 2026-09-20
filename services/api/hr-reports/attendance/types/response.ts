@@ -27,9 +27,11 @@ export type attendanceReportListResponse = {
     result_count: number;
   };
 };
+export type AttendanceReportRowStatus = "ready" | "pending";
+
 export type attendanceReport = {
   id: string;
-  status: string;
+  status: AttendanceReportRowStatus;
   branch: string;
   export_format: string;
   generated_at: string;

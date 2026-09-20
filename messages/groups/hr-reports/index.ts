@@ -112,6 +112,8 @@ export const hrReportsMessages = new MessagesGroup({
       checkOut: _m("Check-out", "خروج"),
       workingHours: _m("Hours", "الساعات"),
       status: _m("Status", "الحالة"),
+      statusReady: _m("Ready", "جاهز"),
+      statusPending: _m("Pending", "قيد المعالجة"),
       createdReportsTitle: _m(
         "Generated reports",
         "التقارير المُنشأة",
