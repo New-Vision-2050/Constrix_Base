@@ -114,6 +114,7 @@ function ProjectsList() {
           ? { project_owner_id: f.project_owner_id }
           : {}),
         ...(f.management_id ? { management_id: f.management_id } : {}),
+        ...(f.project_tag_id ? { project_tag_id: f.project_tag_id } : {}),
       });
 
       const payload = response.data.payload ?? [];

@@ -11,6 +11,7 @@ export interface ProjectParams {
   project_owner_type?: "company" | "individual";
   project_owner_id?: string;
   management_id?: string;
+  project_tag_id?: string;
   sort_by?: string;
   sort_order?: "asc" | "desc";
 }
@@ -28,7 +29,7 @@ export interface CreateProjectData {
   status: number;
   project_owner_type?: "company" | "individual";
   contractual_engagement_id?: string;
-  project_classification_id?: string;
+  project_tag_id?: string;
 }
 
 export interface UpdateProjectData extends Partial<CreateProjectData> {}
