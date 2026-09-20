@@ -176,8 +176,7 @@ export function ProjectFormDrawer({
         project_owner_type: data.project_owner_type || undefined,
         contractual_engagement_id:
           data.contractual_engagement_id?.trim() || undefined,
-        project_classification_id:
-          data.project_classification_id || undefined,
+        project_tag_id: data.project_classification_id || undefined,
       };
 
       if (editingProjectId) {
