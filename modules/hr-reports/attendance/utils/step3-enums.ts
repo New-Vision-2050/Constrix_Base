@@ -1,4 +1,5 @@
 import {
+  REMOVED_ATTENDANCE_DATA_TYPE_IDS,
   REQUIRED_ATTENDANCE_DATA_TYPE_IDS,
   STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS,
 } from "../components/report-wizard/constants-step3";
@@ -10,6 +11,9 @@ import type {
 
 const VALID_ATTENDANCE_DATA_TYPE_IDS = new Set<AttendanceDataTypeId>(
   STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS,
+);
+const REMOVED_ATTENDANCE_DATA_TYPE_ID_SET = new Set<AttendanceDataTypeId>(
+  REMOVED_ATTENDANCE_DATA_TYPE_IDS,
 );
 
 /** Maps removed wizard metric ids to the new column ids. */
@@ -37,13 +41,19 @@ function normalizeAttendanceDataTypeIds(
     if (typeof item !== "string") continue;
     const mapped =
       LEGACY_ATTENDANCE_DATA_TYPE_IDS[item] ?? (item as AttendanceDataTypeId);
-    if (!VALID_ATTENDANCE_DATA_TYPE_IDS.has(mapped) || out.includes(mapped)) {
+    if (
+      !VALID_ATTENDANCE_DATA_TYPE_IDS.has(mapped) ||
+      REMOVED_ATTENDANCE_DATA_TYPE_ID_SET.has(mapped) ||
+      out.includes(mapped)
+    ) {
       continue;
     }
     out.push(mapped);
   }
 
-  return out.length ? withRequiredAttendanceDataTypeIds(out) : [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS];
+  return out.length
+    ? withRequiredAttendanceDataTypeIds(out)
+    : [...STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS];
 }
 
 function withRequiredAttendanceDataTypeIds(

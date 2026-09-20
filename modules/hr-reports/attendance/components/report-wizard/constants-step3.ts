@@ -12,16 +12,24 @@ export const REQUIRED_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
   "date",
 ];
 
+/**
+ * Columns removed from the detailed attendance PDF table as of Sep 2026.
+ * They are no longer selectable in the wizard and are stripped from persisted
+ * payloads / legacy lookups before the API call is built.
+ */
+export const REMOVED_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
+  "branch",
+  "management",
+  "official_in",
+  "official_out",
+];
+
 /** Section 1 — two columns (RTL: column “a” renders first in DOM ≈ visual right). */
 export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   id: AttendanceDataTypeId;
   column: "a" | "b";
 }[] = [
   { id: "day", column: "a" },
-  { id: "branch", column: "a" },
-  { id: "management", column: "a" },
-  { id: "official_in", column: "a" },
-  { id: "official_out", column: "a" },
   { id: "actual_in", column: "a" },
   { id: "actual_out", column: "b" },
   { id: "delay", column: "b" },
@@ -41,8 +49,11 @@ export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
 export function selectableAttendanceDataTypeIds(
   ids: AttendanceDataTypeId[],
 ): AttendanceDataTypeId[] {
-  const required = new Set(REQUIRED_ATTENDANCE_DATA_TYPE_IDS);
-  return ids.filter((id) => !required.has(id));
+  const excluded = new Set([
+    ...REQUIRED_ATTENDANCE_DATA_TYPE_IDS,
+    ...REMOVED_ATTENDANCE_DATA_TYPE_IDS,
+  ]);
+  return ids.filter((id) => !excluded.has(id));
 }
 
 /** Backend `ATT_PATTERN_*`. */
