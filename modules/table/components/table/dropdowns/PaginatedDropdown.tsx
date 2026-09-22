@@ -180,7 +180,7 @@ const t = useTranslations();
 
   return (
     <div className="space-y-2">
-      {label && <Label className="mb-2 block">{label}</Label>}
+      {label && <Label>{label}</Label>}
       <Popover
         open={isDisabled ? false : open}
         onOpenChange={isDisabled ? undefined : setOpen}

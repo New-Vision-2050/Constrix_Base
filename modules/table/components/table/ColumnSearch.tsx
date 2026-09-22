@@ -8,7 +8,15 @@ import {
 import DropdownSearch from "./DropdownSearch";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
 import { useTranslations } from "next-intl";
-import { format } from "date-fns";
+import { Label } from "@/modules/table/components/ui/label";
+
+const filterFieldClass = "flex w-full min-w-0 flex-col gap-2";
+
+function toDateInputValue(value: string | string[] | undefined): string {
+  if (typeof value !== "string" || !value.trim()) return "";
+  const isoDate = value.match(/^(\d{4}-\d{2}-\d{2})/);
+  return isoDate ? isoDate[1] : value;
+}
 
 interface ColumnSearchProps {
   columns: ColumnConfig[];
@@ -162,7 +170,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
   return (
     <div className="space-y-4">
       <h2 className="px-5 pt-5 font-medium text-xl">{t("Table.FilterSearch")}</h2>
-      <div className="grid p-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4 ">
+      <div className="mb-4 grid grid-cols-1 gap-4 p-5 md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:items-end">
         {searchableColumns.map((column) => {
           const searchType = column.searchType || { type: "text" };
           const stateValue = columnSearchState[column.key] || "";
@@ -175,20 +183,25 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
           switch (searchType.type) {
             case "dropdown":
               return (
-                <DropdownSearch
-                  key={column.key}
-                  columnKey={column.key}
-                  label={column.label}
-                  value={stateValue}
-                  onChange={(newValue) => handleDropdownChange(column.key, newValue)}
-                  options={searchType.dropdownOptions}
-                  dynamicConfig={searchType.dynamicDropdown}
-                  dependencies={dependenciesMap[column.key]}
-                  placeholder={
-                    searchType.placeholder ||
-                    `Filter by ${column.label.toLowerCase()}`
-                  }
-                />
+                <div key={column.key} className={filterFieldClass}>
+                  <DropdownSearch
+                    columnKey={column.key}
+                    label={column.label}
+                    value={stateValue}
+                    onChange={(newValue) =>
+                      handleDropdownChange(column.key, newValue)
+                    }
+                    options={searchType.dropdownOptions}
+                    dynamicConfig={searchType.dynamicDropdown}
+                    dependencies={dependenciesMap[column.key]}
+                    placeholder={
+                      searchType.placeholder ||
+                      (column.label
+                        ? `Filter by ${String(column.label).toLowerCase()}`
+                        : "Select option")
+                    }
+                  />
+                </div>
               );
             
             case "date":
@@ -243,26 +256,22 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
               }
 
               return (
-                <div key={column.key} className="text-right" dir="rtl">
+                <div key={column.key} className={filterFieldClass}>
                   {column.label ? (
-                    <label
-                      htmlFor={`search-${column.key}`}
-                      className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right mb-2 block"
-                    >
+                    <Label htmlFor={`search-${column.key}`}>
                       {column.label}
-                    </label>
+                    </Label>
                   ) : null}
                   <Input
                     id={`search-${column.key}`}
                     type="date"
-                    placeholder={searchType.placeholder || `اختر ${column.label}`}
-                    value={typeof displayValue === 'string' ? displayValue : ''}
+                    placeholder={searchType.placeholder || column.label}
+                    value={toDateInputValue(displayValue)}
                     onChange={(e) =>
                       handleInputChange(column.key, e.target.value)
                     }
-                    style={{ textAlign: 'right' }}
-                    className="w-full text-right"
-                    dir="rtl"
+                    className="h-10 w-full bg-sidebar"
+                    dir="ltr"
                     min={effectiveMinDate ? formatDateForInput(effectiveMinDate) : undefined}
                     max={effectiveMaxDate ? formatDateForInput(effectiveMaxDate) : undefined}
                   />
@@ -272,14 +281,11 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
             case "text":
             default:
               return (
-                <div key={column.key}>
+                <div key={column.key} className={filterFieldClass}>
                   {column.label ? (
-                    <label
-                      htmlFor={`search-${column.key}`}
-                      className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
-                    >
+                    <Label htmlFor={`search-${column.key}`}>
                       {column.label}
-                    </label>
+                    </Label>
                   ) : null}
                   <Input
                     id={`search-${column.key}`}
@@ -289,7 +295,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                     onChange={(e) =>
                       handleInputChange(column.key, e.target.value)
                     }
-                    className="w-full"
+                    className="h-10 w-full bg-sidebar"
                   />
                 </div>
               );

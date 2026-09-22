@@ -138,6 +138,7 @@ const DateField: React.FC<DateFieldProps> = ({
             }}
             disabled={field.disabled}
             initialFocus
+            fixedYear={field.fixedYear}
             {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {fromDate: getMinDate()}:{}}
             {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {toDate: getMaxDate()}:{}}
             {...props}
