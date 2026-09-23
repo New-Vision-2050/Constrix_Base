@@ -150,7 +150,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
 
   return (
     <div className="space-y-2">
-      {label && <Label className="mb-2 block">{label}</Label>}
+      {label && <Label>{label}</Label>}
       <Popover
         open={shouldBeDisabled ? false : open}
         onOpenChange={shouldBeDisabled ? undefined : setOpen}
