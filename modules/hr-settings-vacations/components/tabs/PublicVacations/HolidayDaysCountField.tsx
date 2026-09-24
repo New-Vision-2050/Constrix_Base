@@ -5,18 +5,18 @@ import { Label } from "@/modules/table/components/ui/label";
 import { useFormInstance } from "@/modules/form-builder/hooks/useFormStore";
 import { countHolidayDays } from "@/modules/hr-settings-vacations/utils/holiday-dates";
 
-const FORM_ID = "public-vacations-form";
-
 type HolidayDaysCountFieldProps = {
+  formId: string;
   label: string;
   year: number;
 };
 
 export default function HolidayDaysCountField({
+  formId,
   label,
   year,
 }: HolidayDaysCountFieldProps) {
-  const { values } = useFormInstance(FORM_ID);
+  const { values } = useFormInstance(formId);
   const days = countHolidayDays(values.date_start, values.date_end, year);
   const display = days != null ? String(days) : "";
 

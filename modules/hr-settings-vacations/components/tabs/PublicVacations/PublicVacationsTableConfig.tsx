@@ -3,7 +3,10 @@ import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { PublicVacation } from "@/modules/hr-settings-vacations/types/PublicVacation";
-import { toMonthDay } from "@/modules/hr-settings-vacations/utils/holiday-dates";
+import {
+  countHolidayDays,
+  toMonthDay,
+} from "@/modules/hr-settings-vacations/utils/holiday-dates";
 import { getSetPublicVacationFormConfig } from "./SetPublicVacationFormConfig";
 
 type TableFilters = {
@@ -56,8 +59,15 @@ export const getPublicVacationTableConfig = (filters?: TableFilters) => {
         key: "count_days",
         label: t("daysCount"),
         sortable: false,
-        render: (_: unknown, row: PublicVacation) =>
-          row.count_days != null ? row.count_days : "—",
+        render: (_: unknown, row: PublicVacation) => {
+          const computed = countHolidayDays(
+            row.date_start,
+            row.date_end,
+            filters?.year
+          );
+          if (computed != null) return computed;
+          return row.count_days != null ? row.count_days : "—";
+        },
       },
     ],
     allSearchedFields: [

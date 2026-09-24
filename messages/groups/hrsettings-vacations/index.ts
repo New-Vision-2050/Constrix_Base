@@ -107,6 +107,7 @@ export const hrsettingsVacationsMessages = new MessagesGroup({
       daysCount: _m("Vacation days", "عدد ايام الاجازة"),
       year: _m("Year", "السنة"),
       noHolidays: _m("No holidays", "لا توجد إجازات"),
+      backToBranches: _m("Back to branches", "العودة إلى الفروع"),
       monthFilter: _m("Month", "الشهر"),
       countryFilter: _m("Country", "الدولة"),
       startDateFilter: _m("Start date", "تاريخ البداية"),
