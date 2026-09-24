@@ -57,6 +57,8 @@ interface UseSheetFormResult {
   clearFiledError: (fieldName: string) => void;
   // Form ID
   formId: string;
+  /** Bumps when the form store is reset so fields remount with fresh local state. */
+  formSessionKey: number;
 }
 
 import { apiClient } from "@/config/axios-config";
@@ -76,6 +78,7 @@ export function useSheetForm({
   const actualFormId = config.formId || "sheet-form";
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
+  const [formSessionKey, setFormSessionKey] = useState(0);
 
   // Edit mode state
   const [isLoadingEditData, setIsLoadingEditData] = useState(false);
@@ -127,28 +130,35 @@ export function useSheetForm({
 
   // Edit mode state is now managed by FormBuilder
 
-  // Reset form when config changes
-  useEffect(() => {
-    if (config.initialValues) {
-      setValues(config.initialValues);
-    }
-  }, [config, setValues]);
-
-  // Edit mode data loading is now handled by FormBuilder
+  const applyCreateModeReset = useCallback(() => {
+    const initialValues = config.initialValues || {};
+    useFormStore.getState().resetForm(actualFormId, initialValues);
+    setFormSessionKey((key) => key + 1);
+  }, [actualFormId, config.initialValues]);
 
   // Open and close sheet
   const openSheet = useCallback(() => {
+    if (config.resetOnOpen && !recordId && !config.isEditMode) {
+      applyCreateModeReset();
+    }
     setIsOpen(true);
     // Reset to first step when opening the sheet in step-based mode
     if (isStepBased) {
       setCurrentStep(0);
     }
-  }, [isStepBased]);
+  }, [
+    config.resetOnOpen,
+    config.isEditMode,
+    recordId,
+    applyCreateModeReset,
+    isStepBased,
+  ]);
 
   const closeSheet = useCallback(() => {
     // Reset form state when sheet is closed
     if (config.resetOnSuccess) {
-      resetForm();
+      useFormStore.getState().resetForm(actualFormId, config.initialValues || {});
+      setFormSessionKey((key) => key + 1);
     }
     // Always reset to first step when closing the sheet in step-based mode
     if (isStepBased) {
@@ -156,7 +166,7 @@ export function useSheetForm({
     }
 
     setIsOpen(false);
-  }, [config.resetOnSuccess, isStepBased, resetForm]);
+  }, [actualFormId, config.resetOnSuccess, config.initialValues, isStepBased]);
 
   const clearFiledError = useCallback(
     (fieldName: string) => {
@@ -332,7 +342,10 @@ export function useSheetForm({
 
           // Reset form if configured to do so
           if (config.resetOnSuccess) {
-            resetForm();
+            useFormStore
+              .getState()
+              .resetForm(actualFormId, config.initialValues || {});
+            setFormSessionKey((key) => key + 1);
           }
         } else {
           // Handle API error message
@@ -692,7 +705,8 @@ export function useSheetForm({
 
   // Handle form cancel
   const handleCancel = useCallback(() => {
-    resetForm();
+    useFormStore.getState().resetForm(actualFormId, config.initialValues || {});
+    setFormSessionKey((key) => key + 1);
     if (isStepBased) {
       setCurrentStep(0);
       closeSheet();
@@ -710,6 +724,7 @@ export function useSheetForm({
     resetForm,
     onCancel,
     config.onCancel,
+    config.initialValues,
   ]);
 
   return {
@@ -752,5 +767,6 @@ export function useSheetForm({
     clearFiledError,
     // Form ID
     formId: actualFormId,
+    formSessionKey,
   };
 }

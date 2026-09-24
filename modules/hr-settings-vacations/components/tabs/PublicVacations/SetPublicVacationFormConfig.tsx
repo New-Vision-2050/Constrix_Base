@@ -17,9 +17,14 @@ export function getSetPublicVacationFormConfig(
   options?: FormOptions
 ): FormConfig {
   const currentYear = options?.year ?? new Date().getFullYear();
+  const formId = options?.isEdit
+    ? "public-vacations-form"
+    : "public-vacations-add-form";
+  const branchIdValue =
+    options?.branchId != null ? String(options.branchId) : "";
 
   return {
-    formId: "public-vacations-form",
+    formId,
     title: options?.isEdit ? t("form.editTitle") : t("form.title"),
     apiUrl: `${baseURL}/public-holidays`,
     laravelValidation: {
@@ -27,8 +32,12 @@ export function getSetPublicVacationFormConfig(
       errorsPath: "errors",
     },
     initialValues: {
-      branch_id: options?.branchId != null ? String(options.branchId) : "",
+      name: "",
+      date_start: "",
+      date_end: "",
+      branch_id: branchIdValue,
     },
+    resetOnOpen: !options?.isEdit,
     sections: [
       {
         fields: [
@@ -50,14 +59,13 @@ export function getSetPublicVacationFormConfig(
             name: "branch_id",
             label: "branch_id",
             hidden: true,
-            defaultValue:
-              options?.branchId != null ? String(options.branchId) : "",
+            defaultValue: branchIdValue,
           },
           {
             name: "date_start",
             label: t("form.startDate"),
             type: "date",
-            placeholder: "MM-DD",
+            placeholder: t("form.startDatePlaceholder"),
             required: true,
             fixedYear: true,
             validation: [
@@ -65,29 +73,19 @@ export function getSetPublicVacationFormConfig(
                 type: "required",
                 message: t("form.startDateRequired"),
               },
-              {
-                type: "pattern",
-                pattern: /^\d{2}-\d{2}$/,
-                message: "Date must be in MM-DD format",
-              },
             ],
           },
           {
             name: "date_end",
             label: t("form.endDate"),
             type: "date",
-            placeholder: "MM-DD",
+            placeholder: t("form.endDatePlaceholder"),
             required: true,
             fixedYear: true,
             validation: [
               {
                 type: "required",
                 message: t("form.endDateRequired"),
-              },
-              {
-                type: "pattern",
-                pattern: /^\d{2}-\d{2}$/,
-                message: "Date must be in MM-DD format",
               },
             ],
           },
@@ -97,6 +95,7 @@ export function getSetPublicVacationFormConfig(
             label: t("daysCount"),
             render: () => (
               <HolidayDaysCountField
+                formId={formId}
                 label={t("daysCount")}
                 year={currentYear}
               />
