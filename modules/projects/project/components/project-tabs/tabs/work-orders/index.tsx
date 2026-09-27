@@ -622,13 +622,15 @@ export default function WorkOrdersTab({
   );
 
   const handleExport = async () => {
-    if (!projectId || departmentId == null || isExporting) return;
+    const exportAllPermits = isEditable && departmentId == null;
+    if (!projectId || isExporting) return;
+    if (departmentId == null && !exportAllPermits) return;
 
     setIsExporting(true);
     try {
       const response = await ProjectOrderPermitsApi.exportConstructionData(
         projectId,
-        departmentId,
+        exportAllPermits ? undefined : departmentId,
       );
       downloadFromResponse(response, "construction-data.xlsx");
     } catch (error: unknown) {
@@ -953,7 +955,7 @@ export default function WorkOrdersTab({
                       <FileDownloadOutlined />
                     )
                   }
-                  disabled={isExporting || !isDepartmentTab}
+                  disabled={isExporting || (!isDepartmentTab && !isEditable)}
                   onClick={() => void handleExport()}
                 >
                   {t("export")}
