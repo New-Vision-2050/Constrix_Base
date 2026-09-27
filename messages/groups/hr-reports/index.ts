@@ -599,6 +599,7 @@ export const hrReportsMessages = new MessagesGroup({
           overtime: _m("Overtime", "الوقت الإضافي"),
           total_hours: _m("Total Hours", "إجمالي ساعات العمل"),
           clock_out_cause: _m("Clock-out reason", "سبب الإنصراف"),
+          penalty: _m("Penalty", "الجزاء"),
           clock_in_location: _m("Clock-in location", "موقع الحضور"),
           clock_out_location: _m("Clock-out location", "موقع الإنصراف"),
         }),

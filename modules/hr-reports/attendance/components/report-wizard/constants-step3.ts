@@ -16,12 +16,11 @@ export const REQUIRED_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
  * Columns removed from the detailed attendance PDF table as of Sep 2026.
  * They are no longer selectable in the wizard and are stripped from persisted
  * payloads / legacy lookups before the API call is built.
+ * `official_in` / `official_out` were restored (Sep 2026) and are selectable again.
  */
 export const REMOVED_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [
   "branch",
   "management",
-  "official_in",
-  "official_out",
   "clock_in_location",
   "clock_out_location",
 ];
@@ -32,12 +31,15 @@ export const ATTENDANCE_DATA_TYPE_OPTIONS: {
   column: "a" | "b";
 }[] = [
   { id: "day", column: "a" },
+  { id: "official_in", column: "a" },
   { id: "actual_in", column: "a" },
+  { id: "official_out", column: "b" },
   { id: "actual_out", column: "b" },
   { id: "delay", column: "b" },
   { id: "overtime", column: "b" },
   { id: "total_hours", column: "b" },
   { id: "clock_out_cause", column: "b" },
+  { id: "penalty", column: "b" },
 ];
 
 export const STEP3_ALL_ATTENDANCE_DATA_TYPE_IDS: AttendanceDataTypeId[] = [

@@ -56,6 +56,7 @@ export type AttendanceDataTypeId =
   | "overtime"
   | "total_hours"
   | "clock_out_cause"
+  | "penalty"
   | "clock_in_location"
   | "clock_out_location";
 
