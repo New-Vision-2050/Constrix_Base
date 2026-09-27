@@ -11,6 +11,11 @@ export const projectWorkOrdersTabMessages = new MessagesGroup({
   addWorkOrder: _m("Add work order", "إضافة أمر عمل"),
   recentlyAdded: _m("Recently added", "المضافة حديثاً"),
   export: _m("Export", "تصدير"),
+  exportAllConstructions: _m(
+    "Export all constructions",
+    "تصدير كافة الانشاءات",
+  ),
+  exportError: _m("Could not export data", "تعذر تصدير البيانات"),
   refreshFromUds: _m("Refresh data from UDS", "تحديث البيانات من UDS"),
   downloadUdsModel: _m("Download UDS model", "تحميل نموذج UDS"),
   downloadUdsModelError: _m(

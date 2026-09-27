@@ -35,7 +35,9 @@ export function useConstructionsNestedTabs(
       id: `${prefix}-tab-work-orders`,
       title: tProject("tabs.workOrders"),
       icon: <ClipboardList className="w-4 h-4" />,
-      content: <WorkOrdersTab key="permits" isEditable />,
+      content: (
+        <WorkOrdersTab key="permits" isEditable showExportAllConstructions />
+      ),
     };
 
     return [...departmentTabs, permitsTab];

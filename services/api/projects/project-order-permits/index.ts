@@ -90,6 +90,24 @@ export const ProjectOrderPermitsApi = {
       { responseType: "blob" },
     ),
 
+  exportConstructionData: (
+    projectId: string | number,
+    orderPermitDepartmentId?: number,
+  ) =>
+    baseApi.get<Blob>(
+      `projects/${projectId}/order-permits/export-construction-data`,
+      {
+        ...(orderPermitDepartmentId != null
+          ? {
+              params: {
+                order_permit_department_id: orderPermitDepartmentId,
+              },
+            }
+          : {}),
+        responseType: "blob",
+      },
+    ),
+
   import: (projectId: string | number, file: File) => {
     const formData = new FormData();
     formData.append("file", file);
