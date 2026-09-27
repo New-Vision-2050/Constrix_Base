@@ -5,6 +5,7 @@ import { useTableStore } from "@/modules/table/store/useTableStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { TableConfig } from "@/modules/table/utils/configs/tableConfig";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
+import { SearchTypeConfig } from "@/modules/table/utils/tableTypes";
 import { Button } from "@/modules/table/components/ui/button";
 import ErrorMessage from "./ErrorMessage";
 import { useToast } from "@/modules/table/hooks/use-toast";
@@ -81,12 +82,24 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // Use URL from config if direct URL not provided
   const dataUrl = url || (config ? config.url : "");
 
+  const columnValueTransformers: Record<string, (value: string) => string> =
+    {};
+  (config?.allSearchedFields ?? []).forEach((field) => {
+    const key = field.key as string | undefined;
+    const transform = (field.searchType as SearchTypeConfig | undefined)
+      ?.transformValue;
+    if (key && transform) {
+      columnValueTransformers[key] = transform;
+    }
+  });
+
   // Extract search configuration from the config
   const searchConfig = {
     defaultFields: config?.searchFields,
     paramName: config?.searchParamName || "q",
     fieldParamName: config?.searchFieldParamName,
     allowFieldSelection: config?.allowSearchFieldSelection,
+    columnValueTransformers,
   };
 
   const {

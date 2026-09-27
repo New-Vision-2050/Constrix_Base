@@ -94,7 +94,11 @@ export const buildRequestUrl = (
         } else {
           // For string values, add as normal but prevent double encoding
           // Use direct parameter setting to ensure consistent encoding
-          newUrl.searchParams.set(columnKey, searchValue);
+          const transform = searchConfig?.columnValueTransformers?.[columnKey];
+          const finalValue = transform ? transform(searchValue) : searchValue;
+          if (finalValue) {
+            newUrl.searchParams.set(columnKey, finalValue);
+          }
         }
       }
     });

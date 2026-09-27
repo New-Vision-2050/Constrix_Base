@@ -18,8 +18,9 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   value,
+  fixedYear,
   ...props
-}: CalendarProps & { value: string; onChange: (date: string) => void }) {
+}: CalendarProps & { value: string; onChange: (date: string) => void; fixedYear?: boolean }) {
   const [month, setMonth] = React.useState(() => value ? new Date(value): new Date() );
   const [popoverOpen, setPopoverOpen] = React.useState(false);
   // Generate a range of years (start from 1950 to current year + 20)
@@ -127,38 +128,44 @@ console.log("value", value);
               {/* Month & Year vertical stack on left */}
               <div className="flex flex-col items-start space-y-1">
                 {/* Year Popover */}
-                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className="text-md font-medium cursor-pointer hover:underline px-2 py-0 rounded focus:outline-none focus:ring my-0"
-                      onClick={() => setPopoverOpen((open) => !open)}
+                {fixedYear ? (
+                  <span className="text-md font-medium px-2 py-0 my-0">
+                    {month.getFullYear()}
+                  </span>
+                ) : (
+                  <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-md font-medium cursor-pointer hover:underline px-2 py-0 rounded focus:outline-none focus:ring my-0"
+                        onClick={() => setPopoverOpen((open) => !open)}
+                      >
+                        {month.getFullYear()}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="start"
+                      className="max-h-60 overflow-y-auto min-w-[220px] p-0"
                     >
-                      {month.getFullYear()}
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    align="start"
-                    className="max-h-60 overflow-y-auto min-w-[220px] p-0"
-                  >
-                    <div className="grid grid-cols-3 gap-2 p-2">
-                      {years.map((year) => (
-                        <button
-                          key={year}
-                          type="button"
-                          className={`rounded shadow text-center px-2 py-3 hover:bg-accent transition-colors ${
-                            year === month.getFullYear()
-                              ? "bg-accent font-bold"
-                              : "bg-background"
-                          }`}
-                          onClick={() => handleYearChange(year)}
-                        >
-                          {year}
-                        </button>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                      <div className="grid grid-cols-3 gap-2 p-2">
+                        {years.map((year) => (
+                          <button
+                            key={year}
+                            type="button"
+                            className={`rounded shadow text-center px-2 py-3 hover:bg-accent transition-colors ${
+                              year === month.getFullYear()
+                                ? "bg-accent font-bold"
+                                : "bg-background"
+                            }`}
+                            onClick={() => handleYearChange(year)}
+                          >
+                            {year}
+                          </button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
                 {/* Month Popover */}
                 <Popover
                   open={monthPopoverOpen}

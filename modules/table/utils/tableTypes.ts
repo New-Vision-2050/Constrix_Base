@@ -26,6 +26,7 @@ export interface SearchConfig {
   paramName?: string;
   fieldParamName?: string;
   allowFieldSelection?: boolean;
+  columnValueTransformers?: Record<string, (value: string) => string>;
 }
 
 export interface ColumnSearchState {
@@ -47,6 +48,8 @@ export interface SearchTypeConfig {
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
   isMulti?: boolean;
   defaultValue?: string | string[] | Date | number; // Valor predeterminado para el campo
+  // Applied to the value only when building the request, the input keeps the raw value
+  transformValue?: (value: string) => string;
 }
 
 export interface ColumnSearchConfig {

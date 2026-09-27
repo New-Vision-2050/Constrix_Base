@@ -19,7 +19,6 @@ import FileField from "./fields/FileField";
 import MultiFileField from "./fields/MultiFileField";
 import FieldHelperText from "./fields/FieldHelperText";
 import {useFormInstance} from "../hooks/useFormStore";
-import { format } from "date-fns";
 
 interface FormFieldProps {
   field: FieldConfig;
@@ -211,7 +210,9 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <DateField
             field={field}
-            value={fieldValue || format(Date.now(), "yyyy-MM-dd")}
+            value={
+              fieldValue != null && fieldValue !== "" ? String(fieldValue) : ""
+            }
             error={error}
             touched={touched}
             onChange={onChange}

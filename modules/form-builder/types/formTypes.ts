@@ -266,6 +266,8 @@ export interface FormConfig {
   showSubmitLoader?: boolean;
   initialValues?: Record<string, any>;
   resetOnSuccess?: boolean;
+  /** Reset fields to initialValues each time the sheet/dialog opens (create mode). */
+  resetOnOpen?: boolean;
   // Form mode configuration
   wizard?: boolean; // Enable wizard mode (multi-step form)
   accordion?: boolean; // Enable accordion mode (collapsible sections with step navigation)

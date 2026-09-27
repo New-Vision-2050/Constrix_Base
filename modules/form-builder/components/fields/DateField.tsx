@@ -111,7 +111,7 @@ const DateField: React.FC<DateFieldProps> = ({
             ? field?.isHijri
               ? valueState
               : format(new Date(valueState), 'PPP')
-            : field.placeholder || 'Select a date'}
+            : field.placeholder || "Select a date"}
         </Button>
       </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -138,6 +138,7 @@ const DateField: React.FC<DateFieldProps> = ({
             }}
             disabled={field.disabled}
             initialFocus
+            fixedYear={field.fixedYear}
             {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {fromDate: getMinDate()}:{}}
             {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {toDate: getMaxDate()}:{}}
             {...props}

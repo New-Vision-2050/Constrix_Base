@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FormConfig } from "../types/formTypes";
 import { useSheetForm } from "../hooks/useSheetForm";
+import { useFormStore } from "../hooks/useFormStore";
 import FormBuilder from "./FormBuilder";
 
 interface SheetFormBuilderProps {
@@ -77,6 +78,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     clearFiledError,
     isLoadingEditData,
     editError,
+    formSessionKey,
   } = useSheetForm({
     config,
     recordId,
@@ -89,13 +91,19 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
 
   // Handle open state changes
   const handleOpenChange = (open: boolean) => {
-    if (onOpenChange) {
-      onOpenChange(open);
-    }
     if (open) {
+      if (config.resetOnOpen && !recordId && !config.isEditMode) {
+        useFormStore.getState().resetForm(
+          config.formId || "sheet-form",
+          config.initialValues || {}
+        );
+      }
       openSheet();
     } else {
       closeSheet();
+    }
+    if (onOpenChange) {
+      onOpenChange(open);
     }
   };
 
@@ -128,39 +136,42 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           )}
         </SheetHeader>
 
-        <FormBuilder
-          config={config}
-          values={values}
-          errors={errors}
-          touched={touched}
-          isSubmitting={isSubmitting}
-          submitSuccess={submitSuccess}
-          submitError={submitError}
-          handleSubmit={handleSubmit}
-          handleCancel={handleCancel}
-          resetForm={resetForm}
-          setValue={setValue}
-          setValues={setValues}
-          setTouched={setTouched}
-          isWizard={isWizard}
-          isAccordion={isAccordion}
-          isStepBased={isStepBased}
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          goToNextStep={goToNextStep}
-          goToPrevStep={goToPrevStep}
-          goToStep={goToStep}
-          isFirstStep={isFirstStep}
-          isLastStep={isLastStep}
-          submitCurrentStep={submitCurrentStep}
-          isSubmittingStep={isSubmittingStep}
-          stepResponses={stepResponses}
-          getStepResponseData={getStepResponseData}
-          clearFiledError={clearFiledError}
-          isLoadingEditData={isLoadingEditData}
-          editError={editError}
-          recordId={recordId}
-        />
+        {isOpen ? (
+          <FormBuilder
+            key={`${config.formId || "sheet-form"}-${formSessionKey}`}
+            config={config}
+            values={values}
+            errors={errors}
+            touched={touched}
+            isSubmitting={isSubmitting}
+            submitSuccess={submitSuccess}
+            submitError={submitError}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+            resetForm={resetForm}
+            setValue={setValue}
+            setValues={setValues}
+            setTouched={setTouched}
+            isWizard={isWizard}
+            isAccordion={isAccordion}
+            isStepBased={isStepBased}
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+            goToNextStep={goToNextStep}
+            goToPrevStep={goToPrevStep}
+            goToStep={goToStep}
+            isFirstStep={isFirstStep}
+            isLastStep={isLastStep}
+            submitCurrentStep={submitCurrentStep}
+            isSubmittingStep={isSubmittingStep}
+            stepResponses={stepResponses}
+            getStepResponseData={getStepResponseData}
+            clearFiledError={clearFiledError}
+            isLoadingEditData={isLoadingEditData}
+            editError={editError}
+            recordId={recordId}
+          />
+        ) : null}
 
         <SheetFooter />
       </SheetContent>

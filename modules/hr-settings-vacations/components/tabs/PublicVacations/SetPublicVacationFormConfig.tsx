@@ -1,25 +1,46 @@
-// Define the form configuration
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { toMonthDay } from "@/modules/hr-settings-vacations/utils/holiday-dates";
+import HolidayDaysCountField from "./HolidayDaysCountField";
+
+type FormOptions = {
+  branchId?: string | number | null;
+  year?: number;
+  isEdit?: boolean;
+};
 
 export function getSetPublicVacationFormConfig(
   t: ReturnType<typeof useTranslations>,
-  onSuccessFn?: () => void
+  onSuccessFn?: () => void,
+  options?: FormOptions
 ): FormConfig {
+  const currentYear = options?.year ?? new Date().getFullYear();
+  const formId = options?.isEdit
+    ? "public-vacations-form"
+    : "public-vacations-add-form";
+  const branchIdValue =
+    options?.branchId != null ? String(options.branchId) : "";
+
   return {
-    formId: "public-vacations-form",
-    title: t("form.title"),
+    formId,
+    title: options?.isEdit ? t("form.editTitle") : t("form.title"),
     apiUrl: `${baseURL}/public-holidays`,
     laravelValidation: {
       enabled: true,
-      errorsPath: "errors", // This is the default in Laravel
+      errorsPath: "errors",
     },
+    initialValues: {
+      name: "",
+      date_start: "",
+      date_end: "",
+      branch_id: branchIdValue,
+    },
+    resetOnOpen: !options?.isEdit,
     sections: [
       {
         fields: [
-          // name
           {
             type: "text",
             name: "name",
@@ -33,42 +54,20 @@ export function getSetPublicVacationFormConfig(
               },
             ],
           },
-          // country
           {
-            type: "select",
-            name: "country_id",
-            label:t("form.country"),
-            placeholder: t("form.countryPlaceholder"),
-            required: true,
-            dynamicOptions: {
-              url: `${baseURL}/countries`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 1000,
-              totalCountHeader: "X-Total-Count",
-            },
-            validation: [
-              {
-                type: "required",
-                message: t("form.countryRequired"),
-              },
-            ],
+            type: "text",
+            name: "branch_id",
+            label: "branch_id",
+            hidden: true,
+            defaultValue: branchIdValue,
           },
-          // start_date
           {
             name: "date_start",
             label: t("form.startDate"),
             type: "date",
             placeholder: t("form.startDatePlaceholder"),
             required: true,
-            maxDate: {
-              formId: "public-vacations-form",
-              field: "date_end",
-            },
+            fixedYear: true,
             validation: [
               {
                 type: "required",
@@ -76,35 +75,46 @@ export function getSetPublicVacationFormConfig(
               },
             ],
           },
-          // end_date
           {
             name: "date_end",
             label: t("form.endDate"),
             type: "date",
             placeholder: t("form.endDatePlaceholder"),
             required: true,
-            minDate: {
-              formId: "public-vacations-form",
-              field: "date_start",
-            },
+            fixedYear: true,
             validation: [
               {
                 type: "required",
                 message: t("form.endDateRequired"),
               },
             ],
-          }
+          },
+          {
+            type: "text",
+            name: "holiday_days_count_display",
+            label: t("daysCount"),
+            render: () => (
+              <HolidayDaysCountField
+                formId={formId}
+                label={t("daysCount")}
+                year={currentYear}
+              />
+            ),
+          },
         ],
-      }
+      },
     ],
     onSubmit: async (formData: any) => {
       const newFormData = {
-        ...formData,
-        date_start: new Date(formData.date_start).toISOString().split("T")[0],
-        date_end: new Date(formData.date_end).toISOString().split("T")[0],
+        name: formData.name,
+        branch_id: formData.branch_id || options?.branchId,
+        date_start: toMonthDay(formData.date_start) || formData.date_start,
+        date_end: toMonthDay(formData.date_end) || formData.date_end,
       };
-      // const url
-      return await defaultSubmitHandler(newFormData, getSetPublicVacationFormConfig(t));
+      return await defaultSubmitHandler(
+        newFormData,
+        getSetPublicVacationFormConfig(t, onSuccessFn, options)
+      );
     },
     onSuccess: onSuccessFn,
     submitButtonText: t("form.submitButtonText"),

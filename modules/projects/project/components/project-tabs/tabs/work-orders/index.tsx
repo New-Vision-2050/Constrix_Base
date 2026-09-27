@@ -252,10 +252,12 @@ export default function WorkOrdersTab({
   departmentId,
   isEditable = false,
   isProjectEditable = false,
+  showExportAllConstructions = false,
 }: {
   departmentId?: number;
   isEditable?: boolean;
   isProjectEditable?: boolean;
+  showExportAllConstructions?: boolean;
 } = {}) {
   const { projectId } = useProject();
 
@@ -296,6 +298,10 @@ export default function WorkOrdersTab({
   const [isImporting, setIsImporting] = useState(false);
 
   const [isDownloadingUdsModel, setIsDownloadingUdsModel] = useState(false);
+
+  const [isExporting, setIsExporting] = useState(false);
+
+  const [isExportingAll, setIsExportingAll] = useState(false);
 
   const importFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -615,8 +621,40 @@ export default function WorkOrdersTab({
     [columnLabels, tTable, emptyDash, isEditable, isProjectEditable, handlePermitSave, validateDrillingField, yesLabel, noLabel],
   );
 
-  const handleExport = () => {
-    // TODO: export when API is available
+  const handleExport = async () => {
+    const exportAllPermits = isEditable && departmentId == null;
+    if (!projectId || isExporting) return;
+    if (departmentId == null && !exportAllPermits) return;
+
+    setIsExporting(true);
+    try {
+      const response = await ProjectOrderPermitsApi.exportConstructionData(
+        projectId,
+        exportAllPermits ? undefined : departmentId,
+      );
+      downloadFromResponse(response, "construction-data.xlsx");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message ?? t("exportError"));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportAllConstructions = async () => {
+    if (!projectId || isExportingAll) return;
+
+    setIsExportingAll(true);
+    try {
+      const response =
+        await ProjectOrderPermitsApi.exportConstructionData(projectId);
+      downloadFromResponse(response, "construction-data.xlsx");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message ?? t("exportError"));
+    } finally {
+      setIsExportingAll(false);
+    }
   };
 
   const handleRecentlyAdded = () => {
@@ -725,9 +763,34 @@ export default function WorkOrdersTab({
       ) : null}
 
       <Paper variant="outlined" sx={{ p: 2.5, mb: 2, borderRadius: 2 }}>
-        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
-          {t("filtersTitle")}
-        </Typography>
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mb: 2 }}
+        >
+          <Typography variant="subtitle1" fontWeight={700}>
+            {t("filtersTitle")}
+          </Typography>
+
+          {showExportAllConstructions ? (
+            <Button
+              variant="outlined"
+              startIcon={
+                isExportingAll ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : (
+                  <FileDownloadOutlined />
+                )
+              }
+              disabled={isExportingAll}
+              onClick={() => void handleExportAllConstructions()}
+            >
+              {t("exportAllConstructions")}
+            </Button>
+          ) : null}
+        </Stack>
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -885,8 +948,15 @@ export default function WorkOrdersTab({
 
                 <Button
                   variant="outlined"
-                  startIcon={<FileDownloadOutlined />}
-                  onClick={handleExport}
+                  startIcon={
+                    isExporting ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : (
+                      <FileDownloadOutlined />
+                    )
+                  }
+                  disabled={isExporting || (!isDepartmentTab && !isEditable)}
+                  onClick={() => void handleExport()}
                 >
                   {t("export")}
                 </Button>
