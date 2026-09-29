@@ -78,7 +78,8 @@ const nextConfig: NextConfig = {
         hostname: 'constrix.fra1.digitaloceanspaces.com',
         port: '',
         pathname: '/**/**',
-        search: '',
+        // Omit `search` so presigned private-bucket URLs (X-Amz-* query) match.
+        // An empty search only allows URLs with no query string.
       },
     ],
   },
