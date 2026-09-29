@@ -126,6 +126,7 @@ export const hrReportsMessages = new MessagesGroup({
       colReportTypes: _m("Report types", "أنواع التقرير"),
       colBranch: _m("Branch", "الفرع"),
       colEmployeeStatus: _m("Employee status", "حالة الموظف"),
+      colStatus: _m("Status", "الحالة"),
       colExport: _m("Export", "التصدير"),
       colLanguage: _m("Language", "اللغة"),
       colEmail: _m("Email delivery", "إرسال بالبريد"),
