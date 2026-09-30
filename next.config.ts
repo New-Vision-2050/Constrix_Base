@@ -78,7 +78,6 @@ const nextConfig: NextConfig = {
         hostname: 'constrix.fra1.digitaloceanspaces.com',
         port: '',
         pathname: '/**/**',
-        search: '',
       },
     ],
   },
