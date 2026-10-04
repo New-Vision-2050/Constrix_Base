@@ -104,14 +104,39 @@ export const useFormStore = create<FormState>((set, get) => ({
   // Set the active form ID
   setFormId: (formId: string) => set({ activeFormId: formId }),
 
-  // Initialize a new form instance if it doesn't exist
+  // Initialize a new form instance if it doesn't exist.
+  // If it already exists, fill any fields that are still undefined with the
+  // latest initial values. This fixes forms that mounted before async edit
+  // data finished loading without overwriting user edits.
   initForm: (formId: string, initialValues = {}) =>
-    set((state: FormState) => ({
-      forms: {
-        ...state.forms,
-        [formId]: state.forms[formId] || getDefaultFormState(initialValues),
-      },
-    })),
+    set((state: FormState) => {
+      const existing = state.forms[formId];
+      if (!existing) {
+        return {
+          forms: {
+            ...state.forms,
+            [formId]: getDefaultFormState(initialValues),
+          },
+        };
+      }
+
+      const mergedValues = { ...existing.values };
+      Object.keys(initialValues).forEach((key) => {
+        if (mergedValues[key] === undefined) {
+          mergedValues[key] = initialValues[key];
+        }
+      });
+
+      return {
+        forms: {
+          ...state.forms,
+          [formId]: {
+            ...existing,
+            values: mergedValues,
+          },
+        },
+      };
+    }),
 
   // Actions for specific form instances
   setValue: (formId: string, field: string, value: any, clearError: boolean = true) => {
