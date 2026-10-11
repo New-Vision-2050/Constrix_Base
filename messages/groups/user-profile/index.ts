@@ -79,6 +79,27 @@ export const userProfileMessages = new MessagesGroup({
       ),
       financialPrivileges: _m("Financial Benefits", "الامتيازات المالية"),
       contractManagement: _m("Contract Management", "ادارة العقد"),
+      contractSettings: new MessagesGroup({
+        title: _m("Contract Settings", "اعدادات العقد"),
+        leaves: _m("Leaves", "الاجازات"),
+        advances: _m("Advances", "السلف"),
+        entitledLeaves: _m("Entitled leaves", "الاجازات المستحقة"),
+        consumedLeaves: _m("Consumed leaves", "الاجازات المستهلكة"),
+        takenLeaves: _m("Taken leaves", "الاجازات المأخوذة"),
+        entitledAdvances: _m("Entitled advances", "السلف المستحقة"),
+        consumedAdvances: _m("Consumed advances", "السلف المستهلكة"),
+        takenAdvances: _m("Taken advances", "السلف المأخوذة"),
+        leaveSystem: _m("Leave system", "نظام الاجازات"),
+        advanceSystem: _m("Advance system", "نظام السلف"),
+        selectLeaveSystem: _m("Select leave systems", "اختر نظام الاجازات"),
+        selectAdvanceSystem: _m("Select an advance system", "اختر نظام السلف"),
+        save: _m("Save", "حفظ"),
+        apiPending: _m(
+          "Saving is unavailable until the service is connected.",
+          "الحفظ غير متاح قبل ربط الخدمة",
+        ),
+        emptyValue: _m("—", "—"),
+      }),
     }),
     verticalLists: new MessagesGroup({
       personalList: new MessagesGroup({

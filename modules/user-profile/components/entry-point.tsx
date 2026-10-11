@@ -81,10 +81,8 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
         />
       </UserProfileHeader>
 
-      {/* Statistics cards */}
-      <StatisticsCardsSection />
-      {/* tabs */}
       <UserProfileTabs userId={userId} companyId={companyId} />
+      <StatisticsCardsSection />
     </div>
   );
 }
