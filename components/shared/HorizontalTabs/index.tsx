@@ -2,6 +2,7 @@
 import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useLocale } from "next-intl";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
+import { ReactNode } from "react";
 import TabsTriggerList from "./TabsTriggerList";
 import TabsContentList from "./TabsContentList";
 
@@ -12,6 +13,8 @@ type PropsT = {
   onTabClick?: (tab: SystemTab) => void;
   bgStyleApproach?: boolean;
   additionalClassiess?: string;
+  /** Optional content rendered between the tab bar and the tab panels. */
+  children?: ReactNode;
 };
 
 export default function HorizontalTabs({
@@ -21,6 +24,7 @@ export default function HorizontalTabs({
   value,
   bgStyleApproach,
   additionalClassiess,
+  children,
 }: PropsT) {
   // declare and define component state and variables.
   const locale = useLocale();
@@ -46,6 +50,7 @@ export default function HorizontalTabs({
           bgStyleApproach={bgStyleApproach}
         />
       </TabsList>
+      {children}
       <TabsContentList list={list} />
     </Tabs>
   );

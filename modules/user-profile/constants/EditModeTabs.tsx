@@ -2,8 +2,9 @@ import { SystemTab } from "@/modules/settings/types/SystemTab";
 import UserContractTab from "../components/tabs/user-contract";
 import UserProfileTab from "../components/tabs/user-profile";
 import UserActionsTabs from "../components/tabs/user-actions";
-import { UserIcon, Users } from "lucide-react";
+import { Settings, UserIcon, Users } from "lucide-react";
 import BackpackIcon from "@/public/icons/backpack";
+import ContractSettingsTab from "../components/tabs/user-contract/tabs/ContractSettings";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
@@ -53,6 +54,13 @@ export const useGetEditModeTabsList = (
         PERMISSIONS.profile.privileges.view,
         PERMISSIONS.profile.salaryInfo.view,
       ]),
+    },
+    {
+      id: "edit-mode-tabs-contract-settings",
+      title: t("contractTabs.contractSettings.title"),
+      icon: <Settings />,
+      content: <ContractSettingsTab userId={userId} />,
+      show: true,
     },
     {
       id: "edit-mode-tabs-attendance",

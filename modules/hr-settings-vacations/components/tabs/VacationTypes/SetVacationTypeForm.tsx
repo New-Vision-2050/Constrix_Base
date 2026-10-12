@@ -1,24 +1,49 @@
 // Define the form configuration
 import { FormConfig } from "@/modules/form-builder";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
+import {
+  OutlinedSelectField,
+  OutlinedTextField,
+  SwitchRowField,
+} from "../../shared/OutlinedFields";
+
+const FORM_ID = "vacation-types-form";
 
 export function getSetVacationTypeFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void
 ): FormConfig {
+  const paidOptions = [
+    { value: "1", label: t("paid") },
+    { value: "0", label: t("notPaid") },
+  ];
+  const deductOptions = [
+    { value: "1", label: t("duduct") },
+    { value: "0", label: t("form.withoutBalance") },
+  ];
+
   return {
-    formId: "vacation-types-form",
+    formId: FORM_ID,
     title: t("form.title"),
     apiUrl: `${baseURL}/leave-types`,
     laravelValidation: {
       enabled: true,
-      errorsPath: "errors", // This is the default in Laravel
+      errorsPath: "errors",
     },
+    initialValues: {
+      is_payed: "0",
+      is_deduct_from_balance: "0",
+      requires_attachment: false,
+    },
+    subWrapperParentClassName:
+      "!border-0 !rounded-none !mb-0 !bg-transparent !shadow-none",
+    subWrapperClassName: "!bg-transparent !p-0",
     sections: [
       {
+        collapsible: false,
         fields: [
-          // name
           {
             type: "text",
             name: "name",
@@ -31,82 +56,89 @@ export function getSetVacationTypeFormConfig(
                 message: t("form.nameRequired"),
               },
             ],
+            render: (_field, value, onChange) => (
+              <OutlinedTextField
+                formId={FORM_ID}
+                name="name"
+                heading={t("form.typeData")}
+                label={t("form.name")}
+                placeholder={t("form.namePlaceholder")}
+                value={String(value ?? "")}
+                onChange={onChange}
+                required
+              />
+            ),
           },
-          // is_payed
           {
             name: "is_payed",
             label: t("form.isPaid"),
             type: "select",
             placeholder: t("form.isPaidPlaceholder"),
-            required: true,
-            options: [
-              { value: "1", label: t("paid") },
-              { value: "0", label: t("notPaid") },
-            ],
-            validation: [
-              {
-                type: "required",
-                message: t("form.isPaidRequired"),
-              },
-            ],
+            options: paidOptions,
+            render: (_field, value, onChange) => (
+              <OutlinedSelectField
+                formId={FORM_ID}
+                name="is_payed"
+                label={t("form.isPaid")}
+                placeholder={t("form.isPaidPlaceholder")}
+                value={String(value ?? "")}
+                onChange={onChange}
+                options={paidOptions}
+              />
+            ),
           },
-          // is_deduct_from_balance
           {
             name: "is_deduct_from_balance",
             label: t("form.isDuduct"),
             type: "select",
             placeholder: t("form.isDuductPlaceholder"),
-            required: true,
-            options: [
-              { value: "1", label: t("duduct") },
-              { value: "0", label: t("notDuduct") },
-            ],
-            validation: [
-              {
-                type: "required",
-                message: t("form.isDuductRequired"),
-              },
-            ],
+            options: deductOptions,
+            render: (_field, value, onChange) => (
+              <OutlinedSelectField
+                formId={FORM_ID}
+                name="is_deduct_from_balance"
+                label={t("form.isDuduct")}
+                placeholder={t("form.isDuductPlaceholder")}
+                value={String(value ?? "")}
+                onChange={onChange}
+                options={deductOptions}
+              />
+            ),
           },
-          // conditions
           {
-            name: "conditions",
-            label: t("form.conditions"),
-            type: "text",
-            placeholder: t("form.conditionsPlaceholder"),
-            required: true,
-          },
-          // branch_ids
-          {
-            name: "branch_ids",
-            label: t("form.branches"),
-            type: "select",
-            isMulti: true,
-            placeholder: t("form.branchesPlaceholder"),
-            dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=branch`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
-            },
+            name: "requires_attachment",
+            label: t("form.requiresAttachment"),
+            type: "checkbox",
+            render: (_field, value, onChange) => (
+              <SwitchRowField
+                heading={t("form.requestAndApproval")}
+                label={t("form.requiresAttachment")}
+                value={Boolean(value)}
+                onChange={onChange}
+              />
+            ),
           },
         ],
       },
     ],
-    editDataTransformer: (data) => {
-      console.log("editDataTransformer", data);
-      data.is_deduct_from_balance = Boolean(data.is_deduct_from_balance)
-        ? "1"
-        : "0";
-      data.is_payed = Boolean(data.is_payed) ? "1" : "0";
-      data.branch_ids = data.branches.map((branch: any) => branch.id.toString());
-      return data;
-    },
+    editDataTransformer: (data) => ({
+      id: data.id,
+      name: data.name,
+      is_payed: Number(data.is_payed) ? "1" : "0",
+      is_deduct_from_balance: Number(data.is_deduct_from_balance) ? "1" : "0",
+      requires_attachment: Boolean(Number(data.requires_attachment)),
+    }),
+    onSubmit: async (values, formConfig) =>
+      defaultSubmitHandler(
+        {
+          ...(values.id ? { id: values.id } : {}),
+          name: values.name,
+          is_payed: values.is_payed === "1",
+          is_deduct_from_balance: values.is_deduct_from_balance === "1",
+          requires_attachment: Boolean(values.requires_attachment),
+        },
+        formConfig,
+      ),
     onSuccess: onSuccessFn,
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
