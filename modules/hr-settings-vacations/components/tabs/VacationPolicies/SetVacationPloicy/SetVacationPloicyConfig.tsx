@@ -2,12 +2,16 @@ import { baseURL } from "@/config/axios-config";
 import { FieldConfig, FormConfig, useFormInstance } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
-import { DaysTypes } from "@/modules/hr-settings-vacations/constants/days-types";
+import {
+  DaysTypes,
+  EntitlementStarts,
+  EntitlementTypes,
+  PromotionTypes,
+} from "@/modules/hr-settings-vacations/constants/days-types";
 import { VacationPolicie } from "@/modules/hr-settings-vacations/types/VacationPolicie";
 import { VacationType } from "@/modules/hr-settings-vacations/types/VacationType";
 import {
   OutlinedSelectField,
-  OutlinedTextareaField,
   OutlinedTextField,
   RadioCardsField,
   SwitchRowField,
@@ -15,9 +19,9 @@ import {
 
 export const VACATION_POLICY_FORM_ID = "create-vacation-policy-form";
 
-const AccrualTypes = { advance: "advance", monthly: "monthly" } as const;
-const AccrualStarts = { hireDate: "hire_date", yearStart: "year_start" } as const;
-const UpgradeTypes = { none: "none", afterPeriod: "after_period" } as const;
+const NO_PROMOTION = "none";
+
+type Values = Record<string, unknown>;
 
 type PropsT = {
   onSuccessFn: () => void;
@@ -26,18 +30,32 @@ type PropsT = {
   editedPolicy?: VacationPolicie;
 };
 
-export function isUnpaidLeaveType(
+/**
+ * Returns `true` for balance types, `false` for non-balance types and
+ * `undefined` while no leave type is selected.
+ */
+export function resolveIsBalanced(
   leaveTypes: VacationType[],
   leaveTypeId: unknown,
-) {
+  editedPolicy?: VacationPolicie,
+): boolean | undefined {
   if (leaveTypeId === undefined || leaveTypeId === null || leaveTypeId === "") {
-    return false;
+    return undefined;
   }
   const type = leaveTypes.find((item) => String(item.id) === String(leaveTypeId));
-  return Boolean(type) && !type?.is_deduct_from_balance;
+  if (type) return Boolean(Number(type.is_deduct_from_balance));
+  if (editedPolicy && String(editedPolicy.leave_type_id) === String(leaveTypeId)) {
+    return Boolean(Number(editedPolicy.is_deduct_from_balance));
+  }
+  return undefined;
 }
 
-function AccrualField({
+const toInt = (value: unknown) =>
+  value === undefined || value === null || value === ""
+    ? undefined
+    : Number(value);
+
+function EntitlementField({
   t,
   value,
   onChange,
@@ -53,18 +71,18 @@ function AccrualField({
   return (
     <RadioCardsField
       formId={VACATION_POLICY_FORM_ID}
-      name="accrual_type"
+      name="entitlement_type"
       heading={t("form.accrual")}
       value={value}
       onChange={onChange}
       options={[
         {
-          value: AccrualTypes.advance,
+          value: EntitlementTypes.upfront,
           label: t("form.accrualAdvance"),
           description: t("form.accrualAdvanceHint", { days }),
         },
         {
-          value: AccrualTypes.monthly,
+          value: EntitlementTypes.monthly,
           label: t("form.accrualMonthly"),
           description: t("form.accrualMonthlyHint", { days, perMonth }),
         },
@@ -73,12 +91,6 @@ function AccrualField({
   );
 }
 
-const numberRule = (message: string) => ({
-  type: "pattern" as const,
-  value: /^\d+(\.\d+)?$/,
-  message,
-});
-
 export const getSetVacationPloicyConfig = ({
   onSuccessFn,
   t,
@@ -86,45 +98,65 @@ export const getSetVacationPloicyConfig = ({
   editedPolicy,
 }: PropsT): FormConfig => {
   const isEdit = Boolean(editedPolicy);
-  const isBalanced = (values: Record<string, unknown>) =>
-    Boolean(values.leave_type_id) &&
-    !isUnpaidLeaveType(leaveTypes, values.leave_type_id);
-  const isUpgradeAfterPeriod = (values: Record<string, unknown>) =>
-    isBalanced(values) && values.upgrade_type === UpgradeTypes.afterPeriod;
-  const isRolloverOn = (values: Record<string, unknown>) =>
+  const variant = (values: Values) =>
+    resolveIsBalanced(leaveTypes, values.leave_type_id, editedPolicy);
+  const isBalanced = (values: Values) => variant(values) === true;
+  const isWithoutBalance = (values: Values) => variant(values) === false;
+  const hasPromotion = (values: Values) =>
+    isBalanced(values) && values.promotion_type === PromotionTypes.after_duration;
+  const isRolloverOn = (values: Values) =>
     isBalanced(values) && Boolean(values.is_rollover_allowed);
 
   const leaveTypeOptions = leaveTypes.map((type) => ({
     value: String(type.id),
     label: type.name,
   }));
+  if (
+    editedPolicy?.leave_type_id &&
+    !leaveTypeOptions.some((o) => o.value === String(editedPolicy.leave_type_id))
+  ) {
+    leaveTypeOptions.push({
+      value: String(editedPolicy.leave_type_id),
+      label: editedPolicy.leave_type_name ?? "",
+    });
+  }
   const dayTypeOptions = [
     { value: DaysTypes.work_day, label: t("form.workDaysOnly") },
-    { value: DaysTypes.calender, label: t("form.calendarDays") },
+    { value: DaysTypes.calendar, label: t("form.calendarDays") },
   ];
-  const accrualStartOptions = [
-    { value: AccrualStarts.hireDate, label: t("form.hireDate") },
-    { value: AccrualStarts.yearStart, label: t("form.yearStart") },
+  const entitlementStartOptions = [
+    { value: EntitlementStarts.hire_date, label: t("form.hireDate") },
   ];
-  const upgradeOptions = [
-    { value: UpgradeTypes.none, label: t("form.noUpgrade") },
-    { value: UpgradeTypes.afterPeriod, label: t("form.afterPeriod") },
+  const promotionOptions = [
+    { value: NO_PROMOTION, label: t("form.noUpgrade") },
+    { value: PromotionTypes.after_duration, label: t("form.afterPeriod") },
   ];
 
-  const numberField = (
-    name: string,
-    label: string,
-    requiredMessage: string,
-    condition?: (values: Record<string, unknown>) => boolean,
-  ): FieldConfig => ({
+  const numberField = ({
+    name,
+    label,
+    requiredMessage,
+    condition,
+  }: {
+    name: string;
+    label: string;
+    requiredMessage?: string;
+    condition: (values: Values) => boolean;
+  }): FieldConfig => ({
     type: "number",
     name,
     label,
-    required: true,
+    required: Boolean(requiredMessage),
     condition,
     validation: [
-      { type: "required", message: requiredMessage },
-      numberRule(t("form.numberRequired")),
+      ...(requiredMessage
+        ? [{ type: "required" as const, message: requiredMessage }]
+        : []),
+      {
+        type: "pattern",
+        value: /^\d*$/,
+        message: t("form.numberRequired"),
+      },
     ],
     render: (_field, value, onChange) => (
       <OutlinedTextField
@@ -134,7 +166,7 @@ export const getSetVacationPloicyConfig = ({
         label={label}
         value={String(value ?? "")}
         onChange={onChange}
-        required
+        required={Boolean(requiredMessage)}
       />
     ),
   });
@@ -155,19 +187,20 @@ export const getSetVacationPloicyConfig = ({
         ? String(editedPolicy.leave_type_id)
         : "",
       name: editedPolicy?.name ?? "",
-      total_days: editedPolicy?.total_days ?? "",
+      max_days: editedPolicy?.max_days ?? "",
       max_balance_days: editedPolicy?.max_balance_days ?? "",
-      min_notice_days: editedPolicy?.min_notice_days ?? 0,
-      day_type: editedPolicy?.day_type ?? DaysTypes.work_day,
-      accrual_type: editedPolicy?.accrual_type ?? AccrualTypes.advance,
-      accrual_start: editedPolicy?.accrual_start ?? AccrualStarts.hireDate,
-      upgrade_type: editedPolicy?.upgrade_type ?? UpgradeTypes.none,
-      upgrade_after_months: editedPolicy?.upgrade_after_months ?? "",
-      is_rollover_allowed: editedPolicy?.is_rollover_allowed ?? false,
-      rollover_months: editedPolicy?.rollover_months ?? "",
-      allow_exceed_balance: editedPolicy?.allow_exceed_balance ?? false,
-      is_allow_half_day: editedPolicy?.is_allow_half_day ?? false,
-      notes: editedPolicy?.notes ?? "",
+      total_days: editedPolicy?.total_days ?? "",
+      min_notice_days: editedPolicy?.min_notice_days ?? "",
+      day_calculation_type:
+        editedPolicy?.day_calculation_type ?? DaysTypes.work_day,
+      entitlement_type: editedPolicy?.entitlement_type ?? EntitlementTypes.upfront,
+      entitlement_start_from:
+        editedPolicy?.entitlement_start_from ?? EntitlementStarts.hire_date,
+      promotion_type: editedPolicy?.promotion_type ?? NO_PROMOTION,
+      promotion_duration_months: editedPolicy?.promotion_duration_months ?? "",
+      is_rollover_allowed: Boolean(Number(editedPolicy?.is_rollover_allowed ?? 0)),
+      rollover_duration_months: editedPolicy?.rollover_duration_months ?? "",
+      allow_exceed_balance: Boolean(Number(editedPolicy?.allow_exceed_balance ?? 0)),
     },
     subWrapperParentClassName:
       "!border-0 !rounded-none !mb-0 !bg-transparent !shadow-none",
@@ -193,6 +226,8 @@ export const getSetVacationPloicyConfig = ({
                 value={String(value ?? "")}
                 options={leaveTypeOptions}
                 onChange={onChange}
+                disabled={isEdit}
+                required
               />
             ),
           },
@@ -204,9 +239,9 @@ export const getSetVacationPloicyConfig = ({
             validation: [
               { type: "required", message: t("form.nameRequired") },
               {
-                type: "pattern",
-                value: /^[\p{L}\p{N}\s]+$/u,
-                message: t("form.namePattern"),
+                type: "maxLength",
+                value: 255,
+                message: t("form.nameMaxLength"),
               },
             ],
             render: (_field, value, onChange) => (
@@ -220,26 +255,31 @@ export const getSetVacationPloicyConfig = ({
               />
             ),
           },
-          numberField(
-            "total_days",
-            t("form.totalDays"),
-            t("form.totalDaysRequired"),
-            isBalanced,
-          ),
-          numberField(
-            "max_balance_days",
-            t("form.maxBalanceDays"),
-            t("form.maxBalanceDaysRequired"),
-          ),
-          numberField(
-            "min_notice_days",
-            t("form.minNoticeDays"),
-            t("form.minNoticeDaysRequired"),
-            isBalanced,
-          ),
+          numberField({
+            name: "max_days",
+            label: t("form.maxDays"),
+            requiredMessage: t("form.maxDaysRequired"),
+            condition: isWithoutBalance,
+          }),
+          numberField({
+            name: "total_days",
+            label: t("form.totalDays"),
+            requiredMessage: t("form.totalDaysRequired"),
+            condition: isBalanced,
+          }),
+          numberField({
+            name: "max_balance_days",
+            label: t("form.maxBalanceDays"),
+            condition: isBalanced,
+          }),
+          numberField({
+            name: "min_notice_days",
+            label: t("form.minNoticeDays"),
+            condition: isBalanced,
+          }),
           {
             type: "select",
-            name: "day_type",
+            name: "day_calculation_type",
             label: t("form.dayCalculation"),
             required: true,
             condition: isBalanced,
@@ -248,21 +288,26 @@ export const getSetVacationPloicyConfig = ({
             render: (_field, value, onChange) => (
               <OutlinedSelectField
                 formId={VACATION_POLICY_FORM_ID}
-                name="day_type"
+                name="day_calculation_type"
                 label={t("form.dayCalculation")}
                 value={String(value ?? "")}
                 options={dayTypeOptions}
                 onChange={onChange}
+                required
               />
             ),
           },
           {
             type: "radio",
-            name: "accrual_type",
+            name: "entitlement_type",
             label: t("form.accrual"),
+            required: true,
             condition: isBalanced,
+            validation: [
+              { type: "required", message: t("form.entitlementRequired") },
+            ],
             render: (_field, value, onChange) => (
-              <AccrualField
+              <EntitlementField
                 t={t}
                 value={String(value ?? "")}
                 onChange={onChange}
@@ -271,45 +316,45 @@ export const getSetVacationPloicyConfig = ({
           },
           {
             type: "select",
-            name: "accrual_start",
+            name: "entitlement_start_from",
             label: t("form.accrualStart"),
             condition: isBalanced,
-            options: accrualStartOptions,
+            options: entitlementStartOptions,
             render: (_field, value, onChange) => (
               <OutlinedSelectField
                 formId={VACATION_POLICY_FORM_ID}
-                name="accrual_start"
+                name="entitlement_start_from"
                 label={t("form.accrualStart")}
                 value={String(value ?? "")}
-                options={accrualStartOptions}
+                options={entitlementStartOptions}
                 onChange={onChange}
               />
             ),
           },
           {
             type: "select",
-            name: "upgrade_type",
+            name: "promotion_type",
             label: t("form.upgradeType"),
             condition: isBalanced,
-            options: upgradeOptions,
+            options: promotionOptions,
             render: (_field, value, onChange) => (
               <OutlinedSelectField
                 formId={VACATION_POLICY_FORM_ID}
-                name="upgrade_type"
+                name="promotion_type"
                 heading={t("form.upgrade")}
                 label={t("form.upgradeType")}
-                value={String(value ?? "")}
-                options={upgradeOptions}
+                value={String(value ?? NO_PROMOTION)}
+                options={promotionOptions}
                 onChange={onChange}
               />
             ),
           },
-          numberField(
-            "upgrade_after_months",
-            t("form.upgradePeriod"),
-            t("form.upgradePeriodRequired"),
-            isUpgradeAfterPeriod,
-          ),
+          numberField({
+            name: "promotion_duration_months",
+            label: t("form.upgradePeriod"),
+            requiredMessage: t("form.upgradePeriodRequired"),
+            condition: hasPromotion,
+          }),
           {
             type: "checkbox",
             name: "is_rollover_allowed",
@@ -324,12 +369,11 @@ export const getSetVacationPloicyConfig = ({
               />
             ),
           },
-          numberField(
-            "rollover_months",
-            t("form.rolloverMonths"),
-            t("form.rolloverMonthsRequired"),
-            isRolloverOn,
-          ),
+          numberField({
+            name: "rollover_duration_months",
+            label: t("form.rolloverMonths"),
+            condition: isRolloverOn,
+          }),
           {
             type: "checkbox",
             name: "allow_exceed_balance",
@@ -343,33 +387,45 @@ export const getSetVacationPloicyConfig = ({
               />
             ),
           },
-          {
-            type: "textarea",
-            name: "notes",
-            label: t("form.notes"),
-            condition: isBalanced,
-            render: (_field, value, onChange) => (
-              <OutlinedTextareaField
-                formId={VACATION_POLICY_FORM_ID}
-                name="notes"
-                label={t("form.notes")}
-                value={String(value ?? "")}
-                onChange={onChange}
-              />
-            ),
-          },
         ],
       },
     ],
     onSubmit: async (values, formConfig) => {
-      const body = isBalanced(values)
-        ? values
-        : {
-            ...(values.id ? { id: values.id } : {}),
-            leave_type_id: values.leave_type_id,
-            name: values.name,
-            max_balance_days: values.max_balance_days,
-          };
+      const common: Values = {
+        ...(values.id ? { id: values.id } : {}),
+        name: values.name,
+        ...(isEdit ? {} : { leave_type_id: values.leave_type_id }),
+      };
+
+      const body: Values = isBalanced(values)
+        ? {
+            ...common,
+            total_days: toInt(values.total_days),
+            max_balance_days: toInt(values.max_balance_days),
+            min_notice_days: toInt(values.min_notice_days),
+            day_calculation_type: values.day_calculation_type,
+            entitlement_type: values.entitlement_type,
+            entitlement_start_from: values.entitlement_start_from || undefined,
+            ...(hasPromotion(values)
+              ? {
+                  promotion_type: PromotionTypes.after_duration,
+                  promotion_duration_months: toInt(
+                    values.promotion_duration_months,
+                  ),
+                }
+              : { promotion_type: null, promotion_duration_months: null }),
+            is_rollover_allowed: Boolean(values.is_rollover_allowed),
+            rollover_duration_months: values.is_rollover_allowed
+              ? toInt(values.rollover_duration_months)
+              : null,
+            allow_exceed_balance: Boolean(values.allow_exceed_balance),
+          }
+        : { ...common, max_days: toInt(values.max_days) };
+
+      Object.keys(body).forEach((key) => {
+        if (body[key] === undefined) delete body[key];
+      });
+
       return defaultSubmitHandler(body, formConfig);
     },
     onSuccess: () => {

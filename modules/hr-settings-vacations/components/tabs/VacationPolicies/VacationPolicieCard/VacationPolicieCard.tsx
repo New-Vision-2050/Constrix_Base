@@ -8,6 +8,10 @@ import PolicyDetail from "./PolicyDetail";
 import PolicyToggle from "./PolicyToggle";
 import PolicyFooter from "./PolicyFooter";
 import { VacationPolicie } from "@/modules/hr-settings-vacations/types/VacationPolicie";
+import {
+  DaysTypes,
+  PromotionTypes,
+} from "@/modules/hr-settings-vacations/constants/days-types";
 import { useTranslations } from "next-intl";
 
 interface VacationPolicieCardProps {
@@ -25,6 +29,7 @@ const VacationPolicieCard: React.FC<VacationPolicieCardProps> = ({
   className = "",
 }) => {
   const t = useTranslations("HRSettingsVacations.leavesPolicies");
+  const isBalanced = Boolean(Number(policy.is_deduct_from_balance));
 
   return (
     <div
@@ -35,36 +40,56 @@ const VacationPolicieCard: React.FC<VacationPolicieCardProps> = ({
 
       {/* Policy Details */}
       <div className="space-y-4">
-        <PolicyDetail
-          label={t("totalDays")}
-          value={policy.total_days.toString()}
-        />
+        {policy.leave_type_name ? (
+          <PolicyDetail label={t("leaveType")} value={policy.leave_type_name} />
+        ) : null}
 
-        <PolicyDetail label={t("dayType")} value={policy.day_type === "calender" ? t("calender") : t("work_day")} />
+        {isBalanced ? (
+          <>
+            <PolicyDetail
+              label={t("totalDays")}
+              value={String(policy.total_days ?? "-")}
+            />
 
-        {/* Policy Toggles */}
-        <PolicyToggle
-          label={t("IsTheLeaveCarriedOver")}
-          enabledLabel={t("leaveCarriedOver")}
-          disabledLabel={t("leaveNotCarriedOver")}
-          enabled={policy.is_rollover_allowed}
-        />
+            <PolicyDetail
+              label={t("dayType")}
+              value={
+                policy.day_calculation_type === DaysTypes.calendar
+                  ? t("calendar")
+                  : t("work_day")
+              }
+            />
 
-        <PolicyToggle
-          label={t("isAllowHalfDay")}
-          enabledLabel={t("allowed")}
-          disabledLabel={t("notAllowed")}
-          enabled={policy.is_allow_half_day}
-        />
+            <PolicyToggle
+              label={t("IsTheLeaveCarriedOver")}
+              enabledLabel={t("leaveCarriedOver")}
+              disabledLabel={t("leaveNotCarriedOver")}
+              enabled={Boolean(Number(policy.is_rollover_allowed))}
+            />
 
-        {/* Policy Note/Footer */}
-        <PolicyFooter
-          note={
-            policy.upgrade_condition
-              ? policy.upgrade_condition
-              : t("noUpgradeCondition")
-          }
-        />
+            <PolicyToggle
+              label={t("allowExceedBalance")}
+              enabledLabel={t("allowed")}
+              disabledLabel={t("notAllowed")}
+              enabled={Boolean(Number(policy.allow_exceed_balance))}
+            />
+
+            <PolicyFooter
+              note={
+                policy.promotion_type === PromotionTypes.after_duration
+                  ? t("promotionAfter", {
+                      months: policy.promotion_duration_months ?? 0,
+                    })
+                  : t("noUpgradeCondition")
+              }
+            />
+          </>
+        ) : (
+          <PolicyDetail
+            label={t("maxDays")}
+            value={String(policy.max_days ?? "-")}
+          />
+        )}
       </div>
     </div>
   );

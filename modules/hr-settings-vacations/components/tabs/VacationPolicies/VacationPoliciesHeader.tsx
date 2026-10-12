@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { SheetFormBuilder, useFormInstance } from "@/modules/form-builder";
+import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import {
   getSetVacationPloicyConfig,
-  isUnpaidLeaveType,
+  resolveIsBalanced,
   VACATION_POLICY_FORM_ID,
 } from "./SetVacationPloicy/SetVacationPloicyConfig";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,18 @@ export default function VacationPoliciesHeader() {
     editedPolicy,
   });
 
-  if (!editedPolicy && isUnpaidLeaveType(leaveTypes, values?.leave_type_id)) {
+  useEffect(() => {
+    if (!openVPForm) return;
+    useFormStore
+      .getState()
+      .resetForm(VACATION_POLICY_FORM_ID, config.initialValues || {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openVPForm, editedPolicy]);
+
+  if (
+    !editedPolicy &&
+    resolveIsBalanced(leaveTypes, values?.leave_type_id) === false
+  ) {
     config.title = t("form.unpaidTitle");
   }
 
