@@ -20,7 +20,7 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
   // declare and define component state
   const t = useTranslations("UserProfile.header.uploadPhoto");
   const [openDialog, setOpenDialog] = useState(false);
-  const { user, isLoading, userPersonalData, handleUpdateImage, userId: profileUserId } =
+  const { user, isLoading, userPersonalData, handleUpdateImage, userId: profileUserId, tab1 } =
     useUserProfileCxt();
   const photoUserId = profileUserId ?? userId;
   
@@ -52,37 +52,43 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
 
   return (
     <div className="flex flex-col gap-12  p-12">
-      {/* header */}
-      <UserProfileHeader
-        imgSrc={user?.image_url}
-        loading={isLoading}
-        name={
-          userPersonalData?.is_default == 1
-            ? userPersonalData?.nickname
-            : userPersonalData?.name
-        }
-        subItems={subItems}
-        job_title={user?.job_title}
-        branch={user?.branch ?? ""}
-        address={userContactData?.address ?? ""}
-        date_appointment={user?.date_appointment}
-        setOpenUploadImgDialog={setOpenDialog}
-        actionSlot={<ProfileRoleSelector id={userPersonalData?.id ?? ''} userTypes={userPersonalData?.user_types ?? []} readonly={false} />}
-      >
-        <UploadProfileImageDialog
-          title={t("title")}
-          open={openDialog}
-          setOpen={setOpenDialog}
-          validateImageFn={(file) => validateProfileImage(file, photoUserId)}
-          uploadImageFn={(file) => uploadProfileImage(file, photoUserId)}
-          onSuccess={(url: string) => {
-            handleUpdateImage(url);
-          }}
-        />
-      </UserProfileHeader>
+      {/* tab bar first; image section + widgets show only on عقد العمل, then tab panels */}
+      <UserProfileTabs userId={userId} companyId={companyId}>
+        {tab1 === "edit-mode-tabs-contract" && (
+          <div className="flex flex-col gap-12 py-6">
+            {/* header */}
+            <UserProfileHeader
+              imgSrc={user?.image_url}
+              loading={isLoading}
+              name={
+                userPersonalData?.is_default == 1
+                  ? userPersonalData?.nickname
+                  : userPersonalData?.name
+              }
+              subItems={subItems}
+              job_title={user?.job_title}
+              branch={user?.branch ?? ""}
+              address={userContactData?.address ?? ""}
+              date_appointment={user?.date_appointment}
+              setOpenUploadImgDialog={setOpenDialog}
+              actionSlot={<ProfileRoleSelector id={userPersonalData?.id ?? ''} userTypes={userPersonalData?.user_types ?? []} readonly={false} />}
+            >
+              <UploadProfileImageDialog
+                title={t("title")}
+                open={openDialog}
+                setOpen={setOpenDialog}
+                validateImageFn={(file) => validateProfileImage(file, photoUserId)}
+                uploadImageFn={(file) => uploadProfileImage(file, photoUserId)}
+                onSuccess={(url: string) => {
+                  handleUpdateImage(url);
+                }}
+              />
+            </UserProfileHeader>
 
-      <StatisticsCardsSection />
-      <UserProfileTabs userId={userId} companyId={companyId} />
+            <StatisticsCardsSection />
+          </div>
+        )}
+      </UserProfileTabs>
     </div>
   );
 }
