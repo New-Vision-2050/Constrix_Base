@@ -1,62 +1,30 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import FormFieldSet from "../../components/FormFieldSet";
-import BalanceCards from "../components/BalanceCards";
-import ContractSystemForm from "../components/ContractSystemForm";
-import { useAssignmentFormConfig } from "../components/assignment-form-config";
-import {
-  contractSettingsApi,
-  contractSettingsRequestFields,
-} from "../api/endpoints";
-import { emptyContractBalance } from "../api/map-balance";
-import useContractBalance from "../hooks/useContractBalance";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import LeaveBalancesPanel from "./components/LeaveBalancesPanel";
 
-const SUMMARY_SCOPE = "contract-settings-leaves";
-
+/**
+ * "الإجازات" tab (user profile → contract settings).
+ *
+ * Shows the user's leave policies with live per-year balances and lets HR
+ * assign/unassign policies (sync semantics). Visible only with the
+ * `leave-policy.assign` permission.
+ */
 export default function LeavesTab({ userId }: { userId: string }) {
-  const t = useTranslations("UserProfile.tabs.contractTabs.contractSettings");
-  const summaryUrl = contractSettingsApi.leaveSummary(userId);
-  const { data, isLoading, isFetching } = useContractBalance(
-    SUMMARY_SCOPE,
-    summaryUrl,
-  );
-  const balance = data ?? emptyContractBalance;
-  const formConfig = useAssignmentFormConfig({
-    formId: "contract-settings-leaves-form",
-    fieldName: contractSettingsRequestFields.leaveSystemIds,
-    label: t("leaveSystem"),
-    placeholder: t("selectLeaveSystem"),
-    isMulti: true,
-    systemsUrl: contractSettingsApi.leaveSystems,
-    submitUrl: contractSettingsApi.assignLeaveSystems,
-    initialValue: balance.systemIds,
-    summaryScope: SUMMARY_SCOPE,
-    summaryUrl,
-    userId,
-    buildBody: (value, currentUserId) => ({
-      [contractSettingsRequestFields.userId]: currentUserId,
-      [contractSettingsRequestFields.leaveSystemIds]: Array.isArray(value)
-        ? value
-        : value
-          ? [value]
-          : [],
-    }),
-  });
-
+  // Spec gates this section on `leave-policy.assign`. That permission key is
+  // not registered in the backend catalog yet, so accept the existing
+  // `LEAVE_POLICY_VIEW` as a fallback (OR) until it ships.
   return (
-    <div className="flex flex-col gap-8">
-      <BalanceCards
-        loading={Boolean(summaryUrl) && (isLoading || isFetching)}
-        items={[
-          { label: t("entitledLeaves"), value: balance.entitled },
-          { label: t("consumedLeaves"), value: balance.consumed },
-          { label: t("takenLeaves"), value: balance.taken },
-        ]}
-      />
-      <FormFieldSet title={t("leaveSystem")}>
-        <ContractSystemForm config={formConfig} />
-      </FormFieldSet>
-    </div>
+    <Can
+      check={[
+        [
+          PERMISSIONS.vacations.settings.leavePolicy.assign,
+          PERMISSIONS.vacations.settings.leavePolicy.view,
+        ],
+      ]}
+    >
+      <LeaveBalancesPanel userId={userId} />
+    </Can>
   );
 }

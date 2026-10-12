@@ -9,6 +9,11 @@ export const DEFAULT_HR_PROCEDURES_OUTER_TABS: ProceduresSettingsOuterTab[] = [
     name: "workTasks",
     type: "employee_task",
   },
+  {
+    id: 1,
+    name: "leaveRequests",
+    type: "leave_request",
+  },
 ];
 
 export const DEFAULT_HR_PROCEDURES_CONFIG: ProceduresSettingsConfig = {
