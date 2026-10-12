@@ -73,6 +73,7 @@ export const SalaryFormConfig = () => {
   const tSalary = useTranslations("UserProfile.nestedTabs.basicSalaryEdit");
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
+  const formId = `salary-data-form-${userId}`;
 
   const { data: userContractData } = useUserContractData(userId ?? "");
 
@@ -92,7 +93,7 @@ export const SalaryFormConfig = () => {
 
   useEffect(() => {
     const formStore = useFormStore.getState();
-    const values = formStore.getValues("salary-data-form");
+    const values = formStore.getValues(formId);
     if (
       values?.salary_type_code !== SalaryTypes.constants ||
       !values?.salary ||
@@ -112,11 +113,11 @@ export const SalaryFormConfig = () => {
       periodName,
     );
 
-    formStore.setValues("salary-data-form", { hour_rate: hourlyRate });
+    formStore.setValues(formId, { hour_rate: hourlyRate });
   }, [userContractData?.working_hours, periodNameMap]);
 
   const salaryFormConfig: FormConfig = {
-    formId: "salary-data-form",
+    formId: formId,
     apiUrl: `${baseURL}/user_salaries`,
     laravelValidation: {
       enabled: true,
@@ -160,11 +161,11 @@ export const SalaryFormConfig = () => {
                   userContractData?.working_hours,
                   periodName,
                 );
-                formStore.setValues("salary-data-form", {
+                formStore.setValues(formId, {
                   hour_rate: hourlyRate,
                 });
               } else if (newValue !== SalaryTypes.constants) {
-                formStore.setValues("salary-data-form", { hour_rate: "" });
+                formStore.setValues(formId, { hour_rate: "" });
               }
             },
           },
@@ -222,11 +223,11 @@ export const SalaryFormConfig = () => {
                   userContractData?.working_hours,
                   periodName,
                 );
-                formStore.setValues("salary-data-form", {
+                formStore.setValues(formId, {
                   hour_rate: hourlyRate,
                 });
               } else {
-                formStore.setValues("salary-data-form", { hour_rate: "" });
+                formStore.setValues(formId, { hour_rate: "" });
               }
             },
           },
@@ -264,11 +265,11 @@ export const SalaryFormConfig = () => {
                   userContractData?.working_hours,
                   periodName,
                 );
-                formStore.setValues("salary-data-form", {
+                formStore.setValues(formId, {
                   hour_rate: hourlyRate,
                 });
               } else {
-                formStore.setValues("salary-data-form", { hour_rate: "" });
+                formStore.setValues(formId, { hour_rate: "" });
               }
             },
           },

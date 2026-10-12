@@ -14,8 +14,9 @@ export const WorkLicenseFormConfig = () => {
   const t = useTranslations("UserProfile.nestedTabs.licenseData");
   const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
+  const formId = `ConnectionInformation-license-data-form-${userId}`;
   const workLicenseFormConfig: FormConfig = {
-    formId: "ConnectionInformation-license-data-form",
+    formId,
     title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
@@ -44,7 +45,7 @@ export const WorkLicenseFormConfig = () => {
             type: "date",
             placeholder: t("licenseStartDate"),
             maxDate: {
-              formId: `ConnectionInformation-license-data-form`,
+              formId,
               field: "entry_number_end_date",
             },
             validation: [],
@@ -55,7 +56,7 @@ export const WorkLicenseFormConfig = () => {
             type: "date",
             placeholder: t("licenseEndDate"),
             minDate: {
-              formId: `ConnectionInformation-license-data-form`,
+              formId,
               field: "work_permit_start_date",
             },
             required:true,
