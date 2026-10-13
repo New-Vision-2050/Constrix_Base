@@ -30,6 +30,7 @@ import { attendanceDepartureModuleMessages } from "./groups/attendance-departure
 import { hrSettingsMessages } from "./groups/hr-settings";
 import { hrsettingsAttendanceDepartureModuleMessages } from "./groups/hrsettings-attendance-departure-module";
 import { hrsettingsVacationsMessages } from "./groups/hrsettings-vacations";
+import { hrsettingsAdvancesMessages } from "./groups/hrsettings-advances";
 import { roleTypesMessages } from "./groups/role-types";
 import { createRoleMessages } from "./groups/create-role";
 import { programsMessages } from "./groups/programs";
@@ -105,6 +106,7 @@ export const messagesStructure = new MessagesGroup({
   HRSettingsAttendanceDepartureModule:
     hrsettingsAttendanceDepartureModuleMessages,
   HRSettingsVacations: hrsettingsVacationsMessages,
+  HRSettingsAdvances: hrsettingsAdvancesMessages,
   RoleTypes: roleTypesMessages,
   CreateRole: createRoleMessages,
   Programs: programsMessages,

@@ -1,6 +1,7 @@
 import React from "react";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
-import { CircleUser, Inbox, Building } from "lucide-react";
+import { CircleUser, Inbox, Building, Wallet } from "lucide-react";
+import HRSettingsAdvances from "@/modules/hr-settings-advances";
 import BackpackIcon from "@/public/icons/backpack";
 import HRSettingsAttendanceDeparture from "@/modules/hr-settings-attendance-departure";
 import { useTranslations } from "next-intl";
@@ -42,6 +43,12 @@ const createHRSettingsTabs = (): SystemTab[] => {
       title: t("vacations"),
       icon: <Inbox />,
       content: <HRSettingsVacations />,
+    },
+    {
+      id: "advances",
+      title: t("advances"),
+      icon: <Wallet />,
+      content: <HRSettingsAdvances />,
     },
     {
       id: "departments",

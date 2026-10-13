@@ -105,19 +105,6 @@ export function getSetVacationTypeFormConfig(
               />
             ),
           },
-          {
-            name: "requires_attachment",
-            label: t("form.requiresAttachment"),
-            type: "checkbox",
-            render: (_field, value, onChange) => (
-              <SwitchRowField
-                heading={t("form.requestAndApproval")}
-                label={t("form.requiresAttachment")}
-                value={Boolean(value)}
-                onChange={onChange}
-              />
-            ),
-          },
         ],
       },
     ],
@@ -126,19 +113,7 @@ export function getSetVacationTypeFormConfig(
       name: data.name,
       is_payed: Number(data.is_payed) ? "1" : "0",
       is_deduct_from_balance: Number(data.is_deduct_from_balance) ? "1" : "0",
-      requires_attachment: Boolean(Number(data.requires_attachment)),
     }),
-    onSubmit: async (values, formConfig) =>
-      defaultSubmitHandler(
-        {
-          ...(values.id ? { id: values.id } : {}),
-          name: values.name,
-          is_payed: values.is_payed === "1",
-          is_deduct_from_balance: values.is_deduct_from_balance === "1",
-          requires_attachment: Boolean(values.requires_attachment),
-        },
-        formConfig,
-      ),
     onSuccess: onSuccessFn,
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
