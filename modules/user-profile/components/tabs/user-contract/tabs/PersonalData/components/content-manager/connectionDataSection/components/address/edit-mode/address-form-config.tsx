@@ -14,7 +14,7 @@ export const AddressFormConfig = () => {
   const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   const addressFormConfig: FormConfig = {
-    formId: "ConnectionInformation-address-data-form",
+    formId: `ConnectionInformation-address-data-form-${userId}`,
     title: t("title"),
     apiUrl: `${baseURL}/contactinfos/address${Boolean(userId) ? "/" + userId : ""}`,
     laravelValidation: {

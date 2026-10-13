@@ -14,8 +14,9 @@ export const IdentityDataFormConfig = () => {
   const { handleRefetchDataStatus, userId } = useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.identityData");
 
+  const formId = `Identity-data-form-${userId}`;
   const IdentityFormConfig: FormConfig = {
-    formId: "Identity-data-form",
+    formId,
     title: t("title"),
     apiUrl: `${baseURL}/company-users/identity-data`,
     laravelValidation: {
@@ -70,7 +71,7 @@ export const IdentityDataFormConfig = () => {
               },
             ],
             maxDate: {
-              formId: `Identity-data-form`,
+              formId,
               field: "identity_end_date",
             },
           },
@@ -86,7 +87,7 @@ export const IdentityDataFormConfig = () => {
               },
             ],
             minDate: {
-              formId: `Identity-data-form`,
+              formId,
               field: "identity_start_date",
               // shift:{
               //   value: -3, //any number

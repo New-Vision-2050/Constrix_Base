@@ -71,9 +71,15 @@ export const PERMISSIONS = {
   vacations: {
     settings: {
       leaveType: create("LEAVE_TYPE"),
-      leavePolicy: create("LEAVE_POLICY"),
+      leavePolicy: {
+        ...create("LEAVE_POLICY"),
+        /** human-resources.settings*leave-policy.assign — assign leave policies to a user */
+        assign: "LEAVE_POLICY_ASSIGN",
+      },
       publicHoliday: create("PUBLIC_HOLIDAY"),
     },
+    /** human-resources.leave-requests*leave-request.* — admin leave-requests list */
+    leaveRequests: create("LEAVE_REQUEST"),
   },
   crm: {
     settings: create("CLIENT_SETTING"),

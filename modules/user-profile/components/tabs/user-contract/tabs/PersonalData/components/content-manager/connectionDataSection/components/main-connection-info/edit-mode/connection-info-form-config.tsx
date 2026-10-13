@@ -12,7 +12,7 @@ export const ConnectionInformationFormConfig = () => {
   const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   const _ConnectionInformationFormConfig: FormConfig = {
-    formId: "ConnectionInformation-data-form",
+    formId: `ConnectionInformation-data-form-${userId}`,
     title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {

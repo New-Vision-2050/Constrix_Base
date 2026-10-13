@@ -7,15 +7,19 @@ import { Button } from "@/components/ui/button";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useQueryClient } from "@tanstack/react-query";
+import { LEAVE_TYPES_OPTIONS_QUERY_KEY } from "@/modules/hr-settings-vacations/hooks/useLeaveTypes";
 
 export default function VacationTypes() {
   const config = getVacationTypeTableConfig();
   const t = useTranslations("HRSettingsVacations.leavesTypes.table");
+  const queryClient = useQueryClient();
 
   const handleOnSuccessFn = () => {
     const tableStore = useTableStore.getState();
     // Use the centralized reloadTable method from the TableStore
     tableStore.reloadTable(config.tableId);
+    queryClient.invalidateQueries({ queryKey: LEAVE_TYPES_OPTIONS_QUERY_KEY });
   };
 
   return (

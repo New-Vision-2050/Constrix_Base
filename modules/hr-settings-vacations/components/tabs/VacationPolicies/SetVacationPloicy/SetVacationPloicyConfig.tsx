@@ -1,189 +1,442 @@
-import { Label } from "@/components/ui/label";
 import { baseURL } from "@/config/axios-config";
-import { FormConfig } from "@/modules/form-builder";
-import { DaysTypes } from "@/modules/hr-settings-vacations/constants/days-types";
+import { FieldConfig, FormConfig, useFormInstance } from "@/modules/form-builder";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
+import {
+  DaysTypes,
+  EntitlementStarts,
+  EntitlementTypes,
+  PromotionTypes,
+} from "@/modules/hr-settings-vacations/constants/days-types";
 import { VacationPolicie } from "@/modules/hr-settings-vacations/types/VacationPolicie";
+import { VacationType } from "@/modules/hr-settings-vacations/types/VacationType";
+import {
+  OutlinedSelectField,
+  OutlinedTextField,
+  RadioCardsField,
+  SwitchRowField,
+} from "../../../shared/OutlinedFields";
+
+export const VACATION_POLICY_FORM_ID = "create-vacation-policy-form";
+
+const NO_PROMOTION = "none";
+
+type Values = Record<string, unknown>;
 
 type PropsT = {
   onSuccessFn: () => void;
-  t?: (key: string) => string;
-  // Optional constraint for editing mode
+  t: ReturnType<typeof useTranslations>;
+  leaveTypes: VacationType[];
   editedPolicy?: VacationPolicie;
 };
-// Function to get form config with dynamic day sections
-export const getSetVacationPloicyConfig = (props: PropsT): FormConfig => {
-  // Props
-  const { onSuccessFn, t, editedPolicy } = props;
 
-  // Function to get text with default value
-  const getText = (key: string, defaultText: string) => {
-    return t ? t(key) : defaultText;
-  };
+/**
+ * Returns `true` for balance types, `false` for non-balance types and
+ * `undefined` while no leave type is selected.
+ */
+export function resolveIsBalanced(
+  leaveTypes: VacationType[],
+  leaveTypeId: unknown,
+  editedPolicy?: VacationPolicie,
+): boolean | undefined {
+  if (leaveTypeId === undefined || leaveTypeId === null || leaveTypeId === "") {
+    return undefined;
+  }
+  const type = leaveTypes.find((item) => String(item.id) === String(leaveTypeId));
+  if (type) return Boolean(Number(type.is_deduct_from_balance));
+  if (editedPolicy && String(editedPolicy.leave_type_id) === String(leaveTypeId)) {
+    return Boolean(Number(editedPolicy.is_deduct_from_balance));
+  }
+  return undefined;
+}
 
+const toInt = (value: unknown) =>
+  value === undefined || value === null || value === ""
+    ? undefined
+    : Number(value);
+
+function EntitlementField({
+  t,
+  value,
+  onChange,
+}: {
+  t: ReturnType<typeof useTranslations>;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const { values } = useFormInstance(VACATION_POLICY_FORM_ID);
+  const days = Number(values?.total_days) || 0;
+  const perMonth = Math.round((days / 12) * 100) / 100;
+
+  return (
+    <RadioCardsField
+      formId={VACATION_POLICY_FORM_ID}
+      name="entitlement_type"
+      heading={t("form.accrual")}
+      value={value}
+      onChange={onChange}
+      options={[
+        {
+          value: EntitlementTypes.upfront,
+          label: t("form.accrualAdvance"),
+          description: t("form.accrualAdvanceHint", { days }),
+        },
+        {
+          value: EntitlementTypes.monthly,
+          label: t("form.accrualMonthly"),
+          description: t("form.accrualMonthlyHint", { days, perMonth }),
+        },
+      ]}
+    />
+  );
+}
+
+export const getSetVacationPloicyConfig = ({
+  onSuccessFn,
+  t,
+  leaveTypes,
+  editedPolicy,
+}: PropsT): FormConfig => {
   const isEdit = Boolean(editedPolicy);
-  const title = isEdit
-    ? getText("form.editTitle", "تعديل نظام اجازة")
-    : getText("form.title", "اضافة نظام اجازة جديد");
+  const variant = (values: Values) =>
+    resolveIsBalanced(leaveTypes, values.leave_type_id, editedPolicy);
+  const isBalanced = (values: Values) => variant(values) === true;
+  const isWithoutBalance = (values: Values) => variant(values) === false;
+  const hasPromotion = (values: Values) =>
+    isBalanced(values) && values.promotion_type === PromotionTypes.after_duration;
+  const isRolloverOn = (values: Values) =>
+    isBalanced(values) && Boolean(values.is_rollover_allowed);
 
-  // ------------- return form config -------------
+  const leaveTypeOptions = leaveTypes.map((type) => ({
+    value: String(type.id),
+    label: type.name,
+  }));
+  if (
+    editedPolicy?.leave_type_id &&
+    !leaveTypeOptions.some((o) => o.value === String(editedPolicy.leave_type_id))
+  ) {
+    leaveTypeOptions.push({
+      value: String(editedPolicy.leave_type_id),
+      label: editedPolicy.leave_type_name ?? "",
+    });
+  }
+  const dayTypeOptions = [
+    { value: DaysTypes.work_day, label: t("form.workDaysOnly") },
+    { value: DaysTypes.calendar, label: t("form.calendarDays") },
+  ];
+  const entitlementStartOptions = [
+    { value: EntitlementStarts.hire_date, label: t("form.hireDate") },
+  ];
+  const promotionOptions = [
+    { value: NO_PROMOTION, label: t("form.noUpgrade") },
+    { value: PromotionTypes.after_duration, label: t("form.afterPeriod") },
+  ];
+
+  const numberField = ({
+    name,
+    label,
+    requiredMessage,
+    condition,
+  }: {
+    name: string;
+    label: string;
+    requiredMessage?: string;
+    condition: (values: Values) => boolean;
+  }): FieldConfig => ({
+    type: "number",
+    name,
+    label,
+    required: Boolean(requiredMessage),
+    condition,
+    validation: [
+      ...(requiredMessage
+        ? [{ type: "required" as const, message: requiredMessage }]
+        : []),
+      {
+        type: "pattern",
+        value: /^\d*$/,
+        message: t("form.numberRequired"),
+      },
+    ],
+    render: (_field, value, onChange) => (
+      <OutlinedTextField
+        formId={VACATION_POLICY_FORM_ID}
+        type="number"
+        name={name}
+        label={label}
+        value={String(value ?? "")}
+        onChange={onChange}
+        required={Boolean(requiredMessage)}
+      />
+    ),
+  });
+
   return {
-    formId: "create-vacation-policy-form",
-    title,
+    formId: VACATION_POLICY_FORM_ID,
+    title: isEdit ? t("form.editTitle") : t("form.title"),
     apiUrl: `${baseURL}/leave-policies`,
     editApiUrl: `${baseURL}/leave-policies/${editedPolicy?.id}`,
     editApiMethod: "PUT",
     isEditMode: isEdit,
-    initialValues: {
-      name: editedPolicy?.name || "",
-      total_days: editedPolicy?.total_days || "",
-      day_type: editedPolicy?.day_type || "",
-      is_rollover_allowed: editedPolicy?.is_rollover_allowed || true,
-      is_allow_half_day: editedPolicy?.is_allow_half_day || false,
-      upgrade_condition: editedPolicy?.upgrade_condition || "",
-      vacation_type: getText("yearly", "سنوية"),
+    laravelValidation: {
+      enabled: true,
+      errorsPath: "errors",
     },
+    initialValues: {
+      leave_type_id: editedPolicy?.leave_type_id
+        ? String(editedPolicy.leave_type_id)
+        : "",
+      name: editedPolicy?.name ?? "",
+      max_days: editedPolicy?.max_days ?? "",
+      max_balance_days: editedPolicy?.max_balance_days ?? "",
+      total_days: editedPolicy?.total_days ?? "",
+      min_notice_days: editedPolicy?.min_notice_days ?? "",
+      day_calculation_type:
+        editedPolicy?.day_calculation_type ?? DaysTypes.work_day,
+      entitlement_type: editedPolicy?.entitlement_type ?? EntitlementTypes.upfront,
+      entitlement_start_from:
+        editedPolicy?.entitlement_start_from ?? EntitlementStarts.hire_date,
+      promotion_type: editedPolicy?.promotion_type ?? NO_PROMOTION,
+      promotion_duration_months: editedPolicy?.promotion_duration_months ?? "",
+      is_rollover_allowed: Boolean(Number(editedPolicy?.is_rollover_allowed ?? 0)),
+      rollover_duration_months: editedPolicy?.rollover_duration_months ?? "",
+      allow_exceed_balance: Boolean(Number(editedPolicy?.allow_exceed_balance ?? 0)),
+    },
+    subWrapperParentClassName:
+      "!border-0 !rounded-none !mb-0 !bg-transparent !shadow-none",
+    subWrapperClassName: "!bg-transparent !p-0",
     sections: [
       {
+        collapsible: false,
         fields: [
-          // policy name
+          {
+            type: "select",
+            name: "leave_type_id",
+            label: t("form.leaveType"),
+            required: true,
+            options: leaveTypeOptions,
+            validation: [{ type: "required", message: t("form.leaveTypeRequired") }],
+            render: (_field, value, onChange) => (
+              <OutlinedSelectField
+                formId={VACATION_POLICY_FORM_ID}
+                name="leave_type_id"
+                heading={t("form.basicData")}
+                label={t("form.leaveType")}
+                placeholder={t("form.leaveType")}
+                value={String(value ?? "")}
+                options={leaveTypeOptions}
+                onChange={onChange}
+                disabled={isEdit}
+                required
+              />
+            ),
+          },
           {
             type: "text",
             name: "name",
-            label: getText("form.name", "اسم النظام"),
-            placeholder: getText("form.namePlaceholder", "اسم النظام"),
+            label: t("form.systemName"),
             required: true,
             validation: [
+              { type: "required", message: t("form.nameRequired") },
               {
-                type: "required",
-                message: getText("form.nameRequired", "اسم النظام مطلوب"),
-              },
-              {
-                type: "pattern",
-                value: /^[\p{L}\p{N}\s]+$/u,
-                message: getText(
-                  "form.namePattern",
-                  "اسم النظام يجب أن يحتوي على حروف وأرقام فقط"
-                ),
+                type: "maxLength",
+                value: 255,
+                message: t("form.nameMaxLength"),
               },
             ],
-          },
-          // total days
-          {
-            type: "number",
-            name: "total_days",
-            label: getText("form.totalDays", "عدد أيام الإجازة"),
-            placeholder: getText(
-              "form.totalDaysPlaceholder",
-              "عدد أيام الإجازة"
+            render: (_field, value, onChange) => (
+              <OutlinedTextField
+                formId={VACATION_POLICY_FORM_ID}
+                name="name"
+                label={t("form.systemName")}
+                value={String(value ?? "")}
+                onChange={onChange}
+                required
+              />
             ),
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: getText(
-                  "form.totalDaysRequired",
-                  "عدد أيام الإجازة مطلوب"
-                ),
-              },
-              {
-                type: "pattern",
-                value: /^\d+$/,
-                message: getText(
-                  "form.totalDaysPattern",
-                  "عدد أيام الإجازة يجب أن يكون رقمًا"
-                ),
-              },
-            ],
           },
-          // vacation type
-          {
-            type: "text",
-            name: "vacation_type",
-            label: getText("form.type", "نوع الإجازة"),
-            placeholder: getText("form.typePlaceholder", "نوع الإجازة"),
-            defaultValue: getText("yearly", "سنوية"),
-            disabled: true,
-            required: true,
-            render: () => {
-              return (
-                <div className="w-full">
-                  <Label htmlFor="vacation-type">
-                    {getText("form.type", "نوع الإجازة")}
-                  </Label>
-
-                  <input
-                    type="text"
-                    value={getText("yearly", "سنوية")}
-                    disabled
-                    className="w-full rounded-lg bg-[#140f34] dark:bg-[#1A103C] border border-gray-300 dark:border-gray-700 py-2 px-3 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    readOnly
-                  />
-                </div>
-              );
-            },
-          },
-          // day type
+          numberField({
+            name: "max_days",
+            label: t("form.maxDays"),
+            requiredMessage: t("form.maxDaysRequired"),
+            condition: isWithoutBalance,
+          }),
+          numberField({
+            name: "total_days",
+            label: t("form.totalDays"),
+            requiredMessage: t("form.totalDaysRequired"),
+            condition: isBalanced,
+          }),
+          numberField({
+            name: "max_balance_days",
+            label: t("form.maxBalanceDays"),
+            condition: isBalanced,
+          }),
+          numberField({
+            name: "min_notice_days",
+            label: t("form.minNoticeDays"),
+            condition: isBalanced,
+          }),
           {
             type: "select",
-            name: "day_type",
-            label: getText("form.dayType", "نوع الأيام"),
-            placeholder: getText("form.dayTypePlaceholder", "نوع الأيام"),
-            options: [
-              {
-                value: DaysTypes.calender,
-                label: getText("calender", "التقويم"),
-              },
-              {
-                value: DaysTypes.work_day,
-                label: getText("work_day", "يوم عمل"),
-              },
-            ],
+            name: "day_calculation_type",
+            label: t("form.dayCalculation"),
             required: true,
-            validation: [
-              {
-                type: "required",
-                message: getText(
-                  "form.dayTypeRequired",
-                  "يجب اختيار نوع يوم واحد على الأقل"
-                ),
-              },
-            ],
+            condition: isBalanced,
+            options: dayTypeOptions,
+            validation: [{ type: "required", message: t("form.dayTypeRequired") }],
+            render: (_field, value, onChange) => (
+              <OutlinedSelectField
+                formId={VACATION_POLICY_FORM_ID}
+                name="day_calculation_type"
+                label={t("form.dayCalculation")}
+                value={String(value ?? "")}
+                options={dayTypeOptions}
+                onChange={onChange}
+                required
+              />
+            ),
           },
-          // vacation rollover?
+          {
+            type: "radio",
+            name: "entitlement_type",
+            label: t("form.accrual"),
+            required: true,
+            condition: isBalanced,
+            validation: [
+              { type: "required", message: t("form.entitlementRequired") },
+            ],
+            render: (_field, value, onChange) => (
+              <EntitlementField
+                t={t}
+                value={String(value ?? "")}
+                onChange={onChange}
+              />
+            ),
+          },
+          {
+            type: "select",
+            name: "entitlement_start_from",
+            label: t("form.accrualStart"),
+            condition: isBalanced,
+            options: entitlementStartOptions,
+            render: (_field, value, onChange) => (
+              <OutlinedSelectField
+                formId={VACATION_POLICY_FORM_ID}
+                name="entitlement_start_from"
+                label={t("form.accrualStart")}
+                value={String(value ?? "")}
+                options={entitlementStartOptions}
+                onChange={onChange}
+              />
+            ),
+          },
+          {
+            type: "select",
+            name: "promotion_type",
+            label: t("form.upgradeType"),
+            condition: isBalanced,
+            options: promotionOptions,
+            render: (_field, value, onChange) => (
+              <OutlinedSelectField
+                formId={VACATION_POLICY_FORM_ID}
+                name="promotion_type"
+                heading={t("form.upgrade")}
+                label={t("form.upgradeType")}
+                value={String(value ?? NO_PROMOTION)}
+                options={promotionOptions}
+                onChange={onChange}
+              />
+            ),
+          },
+          numberField({
+            name: "promotion_duration_months",
+            label: t("form.upgradePeriod"),
+            requiredMessage: t("form.upgradePeriodRequired"),
+            condition: hasPromotion,
+          }),
           {
             type: "checkbox",
             name: "is_rollover_allowed",
-            label: getText("form.isRolloverAllowed", "هل يسمح بترحيل الاجازة؟"),
-            defaultValue: true,
-            required: true,
+            label: t("form.rolloverToNextYear"),
+            condition: isBalanced,
+            render: (_field, value, onChange) => (
+              <SwitchRowField
+                heading={t("form.rolloverAndOptions")}
+                label={t("form.rolloverToNextYear")}
+                value={Boolean(value)}
+                onChange={onChange}
+              />
+            ),
           },
-          // half day allowed?
+          numberField({
+            name: "rollover_duration_months",
+            label: t("form.rolloverMonths"),
+            condition: isRolloverOn,
+          }),
           {
             type: "checkbox",
-            name: "is_allow_half_day",
-            label: getText("form.isAllowHalfDay", "هل يسمح بالنصف يوم؟"),
-            defaultValue: false,
-            required: true,
-          },
-          // upgrade_condition
-          {
-            type: "text",
-            name: "upgrade_condition",
-            label: getText("form.upgradeCondition", "شرط الترقية"),
-            placeholder: getText(
-              "form.upgradeConditionPlaceholder",
-              "شرط الترقية"
+            name: "allow_exceed_balance",
+            label: t("form.allowExceedBalance"),
+            condition: isBalanced,
+            render: (_field, value, onChange) => (
+              <SwitchRowField
+                label={t("form.allowExceedBalance")}
+                value={Boolean(value)}
+                onChange={onChange}
+              />
             ),
-            required: false,
           },
         ],
       },
     ],
+    onSubmit: async (values, formConfig) => {
+      const common: Values = {
+        ...(values.id ? { id: values.id } : {}),
+        name: values.name,
+        ...(isEdit ? {} : { leave_type_id: values.leave_type_id }),
+      };
+
+      const body: Values = isBalanced(values)
+        ? {
+            ...common,
+            total_days: toInt(values.total_days),
+            max_balance_days: toInt(values.max_balance_days),
+            min_notice_days: toInt(values.min_notice_days),
+            day_calculation_type: values.day_calculation_type,
+            entitlement_type: values.entitlement_type,
+            entitlement_start_from: values.entitlement_start_from || undefined,
+            ...(hasPromotion(values)
+              ? {
+                  promotion_type: PromotionTypes.after_duration,
+                  promotion_duration_months: toInt(
+                    values.promotion_duration_months,
+                  ),
+                }
+              : { promotion_type: null, promotion_duration_months: null }),
+            is_rollover_allowed: Boolean(values.is_rollover_allowed),
+            rollover_duration_months: values.is_rollover_allowed
+              ? toInt(values.rollover_duration_months)
+              : null,
+            allow_exceed_balance: Boolean(values.allow_exceed_balance),
+          }
+        : { ...common, max_days: toInt(values.max_days) };
+
+      Object.keys(body).forEach((key) => {
+        if (body[key] === undefined) delete body[key];
+      });
+
+      return defaultSubmitHandler(body, formConfig);
+    },
     onSuccess: () => {
       onSuccessFn();
     },
     resetOnSuccess: true,
-    submitButtonText: getText("form.submitButtonText", "حفظ المحدد"),
-    cancelButtonText: getText("form.cancelButtonText", "إلغاء"),
+    showReset: false,
+    showCancelButton: false,
+    showBackButton: false,
+    showSubmitLoader: true,
+    submitButtonText: t("form.submitButtonText"),
+    cancelButtonText: t("form.cancelButtonText"),
   };
 };

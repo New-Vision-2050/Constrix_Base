@@ -13,7 +13,7 @@ export const SocialMediaSitesFormConfig = () => {
   const tCommon = useTranslations("UserProfile.nestedTabs.commonActions");
 
   const socialMediaSitesFormConfig: FormConfig = {
-    formId: "ConnectionInformation-data-form",
+    formId: `ConnectionInformation-social-data-form-${userId}`,
     title: t("title"),
     apiUrl: `${baseURL}/socials${Boolean(userId) ? "/" + userId : ""}`,
     laravelValidation: {

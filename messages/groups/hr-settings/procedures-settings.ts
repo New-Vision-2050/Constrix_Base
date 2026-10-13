@@ -4,6 +4,7 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
   title: _m("Procedures and Settings", "الاجراءات والاعدادات"),
   subTabs: new MessagesGroup({
     workTasks: _m("Work Tasks", "مهام العمل"),
+    leaveRequests: _m("Leave Requests", "طلبات الإجازة"),
     maintenanceEmergencyTasks: _m(
       "Maintenance and Emergency Tasks",
       "مهام الصيانة والطوارئ",
@@ -26,6 +27,14 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
     accreditation: _m(
       "Accreditation procedures settings",
       "اعداد أجراءات الاعتماد",
+    ),
+    leaveRequest: _m(
+      "Leave request procedures settings",
+      "اعداد إجراءات طلب الإجازة",
+    ),
+    editLeaveRequest: _m(
+      "Edit leave request procedures",
+      "تعديل إجراءات طلب الإجازة",
     ),
   }),
   common: new MessagesGroup({

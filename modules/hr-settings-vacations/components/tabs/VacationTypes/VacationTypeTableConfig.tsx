@@ -4,11 +4,16 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { VacationType } from "@/modules/hr-settings-vacations/types/VacationType";
 import { getSetVacationTypeFormConfig } from "./SetVacationTypeForm";
+import { useQueryClient } from "@tanstack/react-query";
+import { LEAVE_TYPES_OPTIONS_QUERY_KEY } from "@/modules/hr-settings-vacations/hooks/useLeaveTypes";
 
 // Create a component that uses the translations
 export const getVacationTypeTableConfig = () => {
   const t = useTranslations("HRSettingsVacations.leavesTypes.table");
   const { can } = usePermissions();
+  const queryClient = useQueryClient();
+  const refreshLeaveTypeOptions = () =>
+    queryClient.invalidateQueries({ queryKey: LEAVE_TYPES_OPTIONS_QUERY_KEY });
 
   return {
     url: `${baseURL}/leave-types`,
@@ -29,7 +34,7 @@ export const getVacationTypeTableConfig = () => {
         },
       },
       {
-        key: "isDuduct_from_balance",
+        key: "is_deduct_from_balance",
         label: t("isDuduct_from_balance"),
         searchable: true,
         render: (_: unknown, row: VacationType) => {
@@ -49,12 +54,14 @@ export const getVacationTypeTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: getSetVacationTypeFormConfig(t, () => {}),
+    formConfig: getSetVacationTypeFormConfig(t, refreshLeaveTypeOptions),
+    onEditSuccess: refreshLeaveTypeOptions,
+    onDeleteSuccess: refreshLeaveTypeOptions,
     executions: [],
     executionConfig: {
       canEdit: can(PERMISSIONS.vacations.settings.leaveType.update),
       canDelete: can(PERMISSIONS.vacations.settings.leaveType.delete),
     },
-    deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
+    deleteConfirmMessage: t("DeleteConfirmMessage"),
   };
 };
