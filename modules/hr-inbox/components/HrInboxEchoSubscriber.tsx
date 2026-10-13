@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEcho } from "@/hooks/use-echo";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
-import { HR_EMPLOYEE_TASKS_INBOX_QUERY_KEY } from "@/modules/hr-inbox/query-keys";
+import {
+  HR_ADVANCE_REQUESTS_INBOX_QUERY_KEY,
+  HR_APPROVAL_INBOX_COUNTS_QUERY_KEY,
+  HR_EMPLOYEE_TASKS_INBOX_COUNTS_QUERY_KEY,
+  HR_EMPLOYEE_TASKS_INBOX_QUERY_KEY,
+  HR_LEAVE_REQUESTS_INBOX_QUERY_KEY,
+} from "@/modules/hr-inbox/query-keys";
 
-export function HrInboxEchoSubscriber({
-  onRefresh,
-}: {
-  onRefresh?: () => void;
-}) {
+export function HrInboxEchoSubscriber() {
   const userId = useAuthStore((s) => s.user?.id);
   const echo = useEcho();
   const queryClient = useQueryClient();
@@ -26,9 +28,20 @@ export function HrInboxEchoSubscriber({
         queryKey: [HR_EMPLOYEE_TASKS_INBOX_QUERY_KEY],
       });
       void queryClient.invalidateQueries({
+        queryKey: [HR_EMPLOYEE_TASKS_INBOX_COUNTS_QUERY_KEY],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [HR_LEAVE_REQUESTS_INBOX_QUERY_KEY],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [HR_ADVANCE_REQUESTS_INBOX_QUERY_KEY],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [HR_APPROVAL_INBOX_COUNTS_QUERY_KEY],
+      });
+      void queryClient.invalidateQueries({
         queryKey: ["widgets"],
       });
-      onRefresh?.();
     };
 
     channel.listen(".employee-task.inbox-counts", handler);
@@ -37,7 +50,7 @@ export function HrInboxEchoSubscriber({
       channel.stopListening(".employee-task.inbox-counts", handler);
       echo.echo.leave(channelName);
     };
-  }, [echo, userId, queryClient, onRefresh]);
+  }, [echo, userId, queryClient]);
 
   return null;
 }

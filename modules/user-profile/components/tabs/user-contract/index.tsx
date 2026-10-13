@@ -32,7 +32,6 @@ export default function UserContractTab({
     <HorizontalTabs
       onTabClick={(tab) => {
         setTab2(tab.id);
-        // Set verticalSection to first vertical tab of the selected horizontal tab
         const firstVerticalTabId = getFirstVerticalTabId(tab.id);
         setVerticalSection(firstVerticalTabId);
       }}
