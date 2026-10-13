@@ -14,6 +14,11 @@ export const DEFAULT_HR_PROCEDURES_OUTER_TABS: ProceduresSettingsOuterTab[] = [
     name: "leaveRequests",
     type: "leave_request",
   },
+  {
+    id: 2,
+    name: "advanceRequests",
+    type: "advance_request",
+  },
 ];
 
 export const DEFAULT_HR_PROCEDURES_CONFIG: ProceduresSettingsConfig = {

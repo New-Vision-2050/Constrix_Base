@@ -9,9 +9,11 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import LeavesTab from "./leaves";
 import AdvancesTab from "./advances";
 import UserLeaveRequestsList from "./leaves/components/UserLeaveRequestsList";
+import UserAdvanceRequestsList from "./advances/components/UserAdvanceRequestsList";
 
 const LEAVES_TAB_ID = "contract-settings-tab-leaves";
 const ADVANCES_TAB_ID = "contract-settings-tab-advances";
+const ADVANCE_REQUESTS_TAB_ID = "contract-settings-tab-advance-requests";
 const LEAVE_REQUESTS_TAB_ID = "contract-settings-tab-leave-requests";
 
 export default function ContractSettingsTab({ userId }: { userId: string }) {
@@ -49,6 +51,13 @@ export default function ContractSettingsTab({ userId }: { userId: string }) {
       title: t("advances"),
       icon: <Banknote />,
       content: <AdvancesTab userId={userId} />,
+      show: true,
+    },
+    {
+      id: ADVANCE_REQUESTS_TAB_ID,
+      title: t("advanceRequests"),
+      icon: <ClipboardList />,
+      content: <UserAdvanceRequestsList userId={userId} />,
       show: true,
     },
   ].filter((tab) => tab.show);
