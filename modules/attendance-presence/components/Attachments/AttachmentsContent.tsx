@@ -216,7 +216,12 @@ function DocumentCard({
   }, [newFile]);
 
   const previewImages = config.showImagePreview
-    ? files.filter((f) => f.type === "image")
+    ? files.filter(
+        (f) =>
+          f.type === "image" ||
+          f.type?.startsWith("image/") ||
+          /\.(jpe?g|png|webp|gif|avif|bmp)$/i.test(f.name ?? f.url),
+      )
     : [];
 
   // Sync fields if parent data changes (e.g. after another card saves)
