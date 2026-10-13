@@ -37,7 +37,7 @@ const VacationPolicieCard: React.FC<VacationPolicieCardProps> = ({
       <div className="space-y-4">
         <PolicyDetail
           label={t("totalDays")}
-          value={policy.total_days.toString()}
+          value={String(policy.total_days ?? "-")}
         />
 
         <PolicyDetail label={t("dayType")} value={policy.day_type === "calender" ? t("calender") : t("work_day")} />

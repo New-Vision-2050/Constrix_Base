@@ -25,7 +25,7 @@ export const getVacationTypeTableConfig = () => {
         label: t("isPaid"),
         sortable: true,
         render: (_: unknown, row: VacationType) => {
-          return row.is_payed ? t("paid") : t("notPaid");
+          return Number(row.is_payed) ? t("paid") : t("notPaid");
         },
       },
       {
@@ -33,50 +33,7 @@ export const getVacationTypeTableConfig = () => {
         label: t("isDuduct_from_balance"),
         searchable: true,
         render: (_: unknown, row: VacationType) => {
-          return row.is_deduct_from_balance ? t("duduct") : t("notDuduct");
-        },
-      },
-      {
-        key: "conditions",
-        label: t("conditions"),
-        sortable: true,
-      },
-      {
-        key: "branches",
-        label: t("branches"),
-        sortable: true,
-        render: (_: unknown, row: VacationType) => (
-          <div className="flex flex-wrap gap-2">
-            {row.branches.map((branch) => (
-              <span
-                key={branch.id}
-                className="px-2 py-1 bg-gray-600 rounded text-xs"
-              >
-                {branch.name}
-              </span>
-            ))}
-            {row.branches.length === 0 && "—"}
-          </div>
-        ),
-      },
-    ],
-    allSearchedFields: [
-      {
-        key: "branch_id",
-        searchType: {
-          type: "dropdown",
-          placeholder: t("branchesFilter"),
-          dynamicDropdown: {
-            url: `${baseURL}/management_hierarchies/list?type=branch`,
-            valueField: "id",
-            labelField: "name",
-            paginationEnabled: true,
-            itemsPerPage: 10,
-            searchParam: "name",
-            pageParam: "page",
-            limitParam: "per_page",
-            totalCountHeader: "x-total-count",
-          },
+          return Number(row.is_deduct_from_balance) ? t("duduct") : t("notDuduct");
         },
       },
     ],

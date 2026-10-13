@@ -68,45 +68,15 @@ export function getSetVacationTypeFormConfig(
               },
             ],
           },
-          // conditions
-          {
-            name: "conditions",
-            label: t("form.conditions"),
-            type: "text",
-            placeholder: t("form.conditionsPlaceholder"),
-            required: true,
-          },
-          // branch_ids
-          {
-            name: "branch_ids",
-            label: t("form.branches"),
-            type: "select",
-            isMulti: true,
-            placeholder: t("form.branchesPlaceholder"),
-            dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=branch`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
-            },
-          },
         ],
       },
     ],
-    editDataTransformer: (data) => {
-      console.log("editDataTransformer", data);
-      data.is_deduct_from_balance = Boolean(data.is_deduct_from_balance)
-        ? "1"
-        : "0";
-      data.is_payed = Boolean(data.is_payed) ? "1" : "0";
-      data.branch_ids = data.branches.map((branch: any) => branch.id.toString());
-      return data;
-    },
+    editDataTransformer: (data) => ({
+      id: data.id,
+      name: data.name,
+      is_payed: Number(data.is_payed) ? "1" : "0",
+      is_deduct_from_balance: Number(data.is_deduct_from_balance) ? "1" : "0",
+    }),
     onSuccess: onSuccessFn,
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
