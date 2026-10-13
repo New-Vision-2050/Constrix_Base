@@ -8,6 +8,7 @@ const SETTINGS_TAB_TITLE_KEYS: Record<string, string> = {
   employee_task: "employees",
   employee_task_request: "employees",
   leave_request: "leaveRequest",
+  advance_request: "advanceRequest",
 };
 
 const EDIT_TAB_TITLE_KEYS: Record<string, string> = {
@@ -20,6 +21,7 @@ const EDIT_TAB_TITLE_KEYS: Record<string, string> = {
   employee_task: "editEmployees",
   employee_task_request: "editEmployees",
   leave_request: "editLeaveRequest",
+  advance_request: "editAdvanceRequest",
 };
 
 export function getProcedureSettingsTabTitle(
