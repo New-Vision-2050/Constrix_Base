@@ -22,7 +22,7 @@ export const PersonalDataFormConfig = () => {
   } = useUserProfileCxt();
 
   const PersonalFormConfig: FormConfig = {
-    formId: `personal-data-form`,
+    formId: `personal-data-form-${userId}`,
     title: t("PersonalDataForm.title"),
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
@@ -113,7 +113,7 @@ export const PersonalDataFormConfig = () => {
               useFormStore
                 ?.getState()
                 .setValue(
-                  "personal-data-form",
+                  `personal-data-form-${userId}`,
                   "birthdate_hijri",
                   getHijriDate(newValue)
                 );
@@ -133,7 +133,7 @@ export const PersonalDataFormConfig = () => {
               useFormStore
                 ?.getState()
                 .setValue(
-                  "personal-data-form",
+                  `personal-data-form-${userId}`,
                   "birthdate_gregorian",
                   convertHijriDate(newValue)
                 );
