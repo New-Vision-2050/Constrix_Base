@@ -6,11 +6,11 @@ import { useTranslations } from "next-intl";
 
 export const EmailFormConfig = () => {
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
-  const { userConnectionData } = usePersonalDataTabCxt();
+  const { userConnectionData, userId } = usePersonalDataTabCxt();
   const { toggleMailOtpDialog, setMailOtpIdentifier } = useConnectionOTPCxt();
 
   const EmailFormConfig: FormConfig = {
-    formId: `email-data-form`,
+    formId: `email-data-form-${userId}`,
     title: t("title"),
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {

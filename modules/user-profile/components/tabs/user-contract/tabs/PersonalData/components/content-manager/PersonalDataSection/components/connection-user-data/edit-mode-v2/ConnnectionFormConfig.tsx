@@ -6,11 +6,11 @@ import { useTranslations } from "next-intl";
 
 export const ConnnectionFormConfig = () => {
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
-  const { userConnectionData } = usePersonalDataTabCxt();
+  const { userConnectionData, userId } = usePersonalDataTabCxt();
   const { togglePhoneOtpDialog, setPhoneOtpIdentifier } = useConnectionOTPCxt();
 
   const PersonalFormConfig: FormConfig = {
-    formId: `connection-data-form`,
+    formId: `connection-data-form-${userId}`,
     title: t("title"),
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
