@@ -49,8 +49,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
   const t = useTranslations("UserProfile.nestedTabs.contractData");
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
+  const formId = `user-contract-data-form-${userId}-${contract?.id ?? "new"}`;
   const contractDataFormConfig: FormConfig = {
-    formId: `user-contract-data-form-${contract?.id}`,
+    formId,
     apiUrl: `${baseURL}/employment_contracts`,
     sections: [
       {
@@ -68,7 +69,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             type: "date",
             placeholder: t("commencementDate"),
             minDate: {
-              formId: `user-contract-data-form-${contract?.id}`,
+              formId,
               field: "start_date",
             },
             validation: [],
@@ -120,7 +121,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
                     // Reset notice_period and probation_period when contract_duration_unit changes
                     formStore.setValues(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       {
                         contract_duration_unit: e.target.value,
                         // Reset related fields
@@ -130,9 +131,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                       }
                     );
                     // Get current form values
-                    const currentFormValues = formStore.getValues(
-                      `user-contract-data-form-${contract?.id}`
-                    );
+                    const currentFormValues = formStore.getValues(formId);
                     // Get form config to access validation rules
                     const formConfig = contractDataFormConfig;
 
@@ -152,7 +151,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
                     // Trigger validation for contract_duration field and set appropriate status
                     const contractValid = formStore.validateField(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       "contract_duration",
                       currentFormValues.contract_duration,
                       contractDurationRules,
@@ -166,7 +165,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
                     // Also trigger validation for notice_period and probation_period to check cross-field validations
                     const noticeValid = formStore.validateField(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       "notice_period",
                       currentFormValues.notice_period,
                       noticePeriodRules,
@@ -176,7 +175,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                     // If validation is successful, there won't be any errors as validateField handles errors automatically
 
                     const probationValid = formStore.validateField(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       "probation_period",
                       currentFormValues.probation_period,
                       probationPeriodRules,
@@ -226,15 +225,13 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
                     formStore.setValues(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       {
                         notice_period_unit: e.target.value,
                       }
                     );
                     // Get current form values
-                    const currentFormValues = formStore.getValues(
-                      `user-contract-data-form-${contract?.id}`
-                    );
+                    const currentFormValues = formStore.getValues(formId);
                     // Get form config to access validation rules
                     const formConfig = contractDataFormConfig;
 
@@ -246,7 +243,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
                     // Trigger validation for notice_period field
                     const noticeValid = formStore.validateField(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       "notice_period",
                       currentFormValues.notice_period,
                       noticePeriodRules,
@@ -344,15 +341,13 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
                     formStore.setValues(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       {
                         probation_period_unit: e.target.value,
                       }
                     );
                     // Get current form values
-                    const currentFormValues = formStore.getValues(
-                      `user-contract-data-form-${contract?.id}`
-                    );
+                    const currentFormValues = formStore.getValues(formId);
                     // Get form config to access validation rules
                     const formConfig = contractDataFormConfig;
 
@@ -364,7 +359,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
                     // Trigger validation for probation_period field
                     const probationValid = formStore.validateField(
-                      `user-contract-data-form-${contract?.id}`,
+                      formId,
                       "probation_period",
                       currentFormValues.probation_period,
                       probationPeriodRules,
@@ -515,7 +510,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             type: "text",
             render: () => (
               <PickupMap
-                formId={`user-contract-data-form-${contract?.id}`}
+                formId={formId}
                 keysToUpdate={["latitude", "longitude"]}
                 inGeneral={true}
                 lat={contract?.latitude?.toString()}

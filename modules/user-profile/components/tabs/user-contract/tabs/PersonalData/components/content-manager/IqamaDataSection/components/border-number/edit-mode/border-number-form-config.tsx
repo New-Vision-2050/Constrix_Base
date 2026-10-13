@@ -15,7 +15,7 @@ export const BorderNumberFormConfig = () => {
   const t = useTranslations("UserProfile.nestedTabs.borderNumberData");
 
   const borderNumberFormConfig: FormConfig = {
-    formId: "ConnectionInformation-data-form",
+    formId: `border-number-data-form-${userId}`,
     title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
