@@ -40,9 +40,10 @@ const VacationPolicieCard: React.FC<VacationPolicieCardProps> = ({
 
       {/* Policy Details */}
       <div className="space-y-4">
-        {policy.leave_type_name ? (
-          <PolicyDetail label={t("leaveType")} value={policy.leave_type_name} />
-        ) : null}
+        <PolicyDetail
+          label={t("totalDays")}
+          value={String(policy.total_days ?? "-")}
+        />
 
         {isBalanced ? (
           <>

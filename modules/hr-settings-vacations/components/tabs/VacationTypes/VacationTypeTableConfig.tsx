@@ -29,20 +29,17 @@ export const getVacationTypeTableConfig = () => {
         key: "is_payed",
         label: t("isPaid"),
         sortable: true,
-        render: (_: unknown, row: VacationType) =>
-          Number(row.is_payed) ? t("paid") : t("notPaid"),
+        render: (_: unknown, row: VacationType) => {
+          return Number(row.is_payed) ? t("paid") : t("notPaid");
+        },
       },
       {
         key: "is_deduct_from_balance",
         label: t("isDuduct_from_balance"),
-        render: (_: unknown, row: VacationType) =>
-          Number(row.is_deduct_from_balance) ? t("duduct") : t("notDuduct"),
-      },
-      {
-        key: "requires_attachment",
-        label: t("requiresAttachment"),
-        render: (_: unknown, row: VacationType) =>
-          Number(row.requires_attachment) ? t("required") : t("notRequired"),
+        searchable: true,
+        render: (_: unknown, row: VacationType) => {
+          return Number(row.is_deduct_from_balance) ? t("duduct") : t("notDuduct");
+        },
       },
     ],
     defaultSortColumn: "id",
