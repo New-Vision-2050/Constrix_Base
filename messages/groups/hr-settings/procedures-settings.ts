@@ -5,6 +5,7 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
   subTabs: new MessagesGroup({
     workTasks: _m("Work Tasks", "مهام العمل"),
     leaveRequests: _m("Leave Requests", "طلبات الإجازة"),
+    advanceRequests: _m("Advance Requests", "طلبات السلف"),
     maintenanceEmergencyTasks: _m(
       "Maintenance and Emergency Tasks",
       "مهام الصيانة والطوارئ",
@@ -35,6 +36,14 @@ export const hrProceduresSettingsMessages = new MessagesGroup({
     editLeaveRequest: _m(
       "Edit leave request procedures",
       "تعديل إجراءات طلب الإجازة",
+    ),
+    advanceRequest: _m(
+      "Advance request procedures settings",
+      "اعداد إجراءات طلب السلفة",
+    ),
+    editAdvanceRequest: _m(
+      "Edit advance request procedures",
+      "تعديل إجراءات طلب السلفة",
     ),
   }),
   common: new MessagesGroup({
