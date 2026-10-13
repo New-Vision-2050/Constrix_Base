@@ -1,21 +1,15 @@
 import { Badge } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { Inbox } from "lucide-react";
-import { apiClient } from "@/config/axios-config";
+import { useApprovalInboxCounts } from "@/modules/hr-inbox/hooks/useApprovalInboxCounts";
 
-export const HR_INBOX_COUNT_QUERY_KEY = ["hr-inbox-total-count"];
-
+/**
+ * Sidebar inbox icon. The badge is the grand total waiting on the user:
+ * employee tasks + leave requests + advance requests (shares query cache
+ * with the hr-inbox page count cards/badges).
+ */
 function HrInboxIconWithCount() {
-  const countQuery = useQuery({
-    queryKey: HR_INBOX_COUNT_QUERY_KEY,
-    queryFn: async () => {
-      const res = await apiClient.get("/admin/employee-tasks/inbox-counts");
-      const payload = res.data?.payload || res.data;
-      return payload?.total ?? 0;
-    },
-  });
-
-  const count = countQuery.data ?? 0;
+  const { tasksCount, leaveCount, advanceCount } = useApprovalInboxCounts();
+  const count = tasksCount + leaveCount + advanceCount;
 
   return (
     <Badge
