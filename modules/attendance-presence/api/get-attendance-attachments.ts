@@ -118,3 +118,49 @@ export async function updateIdentityDataAttachment(
     headers: { "Content-Type": "multipart/form-data" },
   });
 }
+
+/**
+ * The 5 identity-owned documents (passport / identity / border_number /
+ * entry_number / work_permit) are primarily managed from User Profile via the
+ * identity-data resource. The attendance-attachments endpoint stores its own
+ * copy, so this fetch is used to keep both views in sync.
+ * Returns null instead of throwing — this store is secondary for this page.
+ */
+export interface IdentityAttachmentData {
+  passport: string | null;
+  passport_start_date: string | null;
+  passport_end_date: string | null;
+  file_passport: AttachmentMedia[];
+  identity: string | null;
+  identity_start_date: string | null;
+  identity_end_date: string | null;
+  file_identity: AttachmentMedia[];
+  border_number: string | null;
+  border_number_start_date: string | null;
+  border_number_end_date: string | null;
+  file_border_number: AttachmentMedia[];
+  entry_number: string | null;
+  entry_number_start_date: string | null;
+  entry_number_end_date: string | null;
+  file_entry_number: AttachmentMedia[];
+  work_permit: string | null;
+  work_permit_start_date: string | null;
+  work_permit_end_date: string | null;
+  file_work_permit: AttachmentMedia[];
+}
+
+type IdentityApiResponse = {
+  code?: string;
+  payload?: IdentityAttachmentData;
+};
+
+export async function getIdentityAttachments(): Promise<IdentityAttachmentData | null> {
+  try {
+    const res = await apiClient.get<IdentityApiResponse>(
+      "/company-users/show-identity-data"
+    );
+    return res.data.payload ?? null;
+  } catch {
+    return null;
+  }
+}
