@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Pencil, X, Upload, Eye, RefreshCw, UserCircle2, ChevronDown, ChevronUp, Camera, ImagePlus, IdCard, BriefcaseBusiness, ShieldCheck, MapPinned, HardHat, Copy } from "lucide-react";
 import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
 import NoCropImageUpload from "@/components/shared/NoCropImageUpload";
+import { fetchPreviewBlobUrl } from "@/lib/file-preview/fetchPreviewBlobUrl";
 import validateProfileImage from "@/modules/dashboard/api/validate-image";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import Image from "next/image";
@@ -119,6 +120,19 @@ const DOC_CARDS: DocCardConfig[] = [
   },
 ];
 
+// ─── Media URL helpers ────────────────────────────────────────────────────────
+
+const API_ORIGIN = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(/\/$/, "");
+
+/** Relative storage paths must be resolved against the backend origin. */
+function normalizeMediaUrl(raw?: string | null): string | null {
+  if (!raw) return null;
+  const url = raw.trim();
+  if (!url) return null;
+  if (/^(https?:|blob:|data:)/i.test(url)) return url;
+  return `${API_ORIGIN}/${url.replace(/^\//, "")}`;
+}
+
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
 
 function CardSkeleton() {
@@ -141,13 +155,14 @@ function CardSkeleton() {
 
 function FileRow({ file }: { file: AttachmentMedia }) {
   const t = useTranslations("AttendancePresence.attachmentsTab");
+  const href = normalizeMediaUrl(file.url) ?? "#";
   return (
     <div className="flex items-center gap-2 py-1 px-2 rounded-md bg-sidebar-accent/30 text-sm">
       <span className="flex-1 truncate text-sidebar-foreground">
         {file.name ?? file.url.split("/").pop()}
       </span>
       <a
-        href={file.url}
+        href={href}
         target="_blank"
         rel="noopener noreferrer"
         className="text-primary hover:text-primary/80 flex-shrink-0"
@@ -231,6 +246,51 @@ function DocumentCard({
   const previewImages = config.showImagePreview
     ? (files.some(isImageMedia) ? files.filter(isImageMedia) : files)
     : [];
+
+  // Resolve a loadable preview URL: probe the direct URL first, and if the
+  // browser fails to load it (private bucket / mixed-content / wrong origin),
+  // fall back to a same-origin blob URL via the /api/download proxy.
+  const firstPreviewUrl = normalizeMediaUrl(previewImages[0]?.url);
+  const [resolvedPreviewUrl, setResolvedPreviewUrl] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!firstPreviewUrl) {
+      setResolvedPreviewUrl(null);
+      return;
+    }
+    if (
+      firstPreviewUrl.startsWith("blob:") ||
+      firstPreviewUrl.startsWith("data:")
+    ) {
+      setResolvedPreviewUrl(firstPreviewUrl);
+      return;
+    }
+
+    let cancelled = false;
+    let blobUrl: string | null = null;
+    const probe = new window.Image();
+    probe.onload = () => {
+      if (!cancelled) setResolvedPreviewUrl(firstPreviewUrl);
+    };
+    probe.onerror = () => {
+      void (async () => {
+        try {
+          blobUrl = await fetchPreviewBlobUrl(firstPreviewUrl);
+          if (!cancelled) setResolvedPreviewUrl(blobUrl);
+        } catch {
+          if (!cancelled) setResolvedPreviewUrl(null);
+        }
+      })();
+    };
+    probe.src = firstPreviewUrl;
+
+    return () => {
+      cancelled = true;
+      probe.onload = null;
+      probe.onerror = null;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, [firstPreviewUrl]);
 
   // Sync fields if parent data changes (e.g. after another card saves)
   React.useEffect(() => {
@@ -371,7 +431,7 @@ function DocumentCard({
                 objectFit="cover"
                 disableHover
                 disableClick
-                previewImage={newFilePreviewUrl ?? previewImages[0]?.url ?? null}
+                previewImage={newFilePreviewUrl ?? resolvedPreviewUrl}
                 onChange={(file, base64) => {
                   setNewFile(file);
                   setNewFilePreviewUrl(base64);
