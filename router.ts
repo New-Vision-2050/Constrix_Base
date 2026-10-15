@@ -29,6 +29,8 @@ export const ROUTER = {
   HR_INBOX: "/hr-inbox",
   HR_REPORTS_ATTENDANCE: "/hr-reports/attendance",
   HR_REPORTS_EMPLOYEE_TASKS: "/hr-reports/employee-tasks",
+  HR_REPORTS_LEAVE_REQUESTS: "/hr-reports/leave-requests",
+  HR_REPORTS_ADVANCE_REQUESTS: "/hr-reports/advance-requests",
   Organizational_Structure: "/organizational-structure",
   WORK_PANEL: "/work-panel",
   WORK_PANEL_SETTINGS: "/work-panel-settings",

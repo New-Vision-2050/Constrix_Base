@@ -1,4 +1,11 @@
-import { BarChart3, LayoutDashboardIcon, UserIcon } from "lucide-react";
+import {
+  BarChart3,
+  CalendarDays,
+  LayoutDashboardIcon,
+  ListTodo,
+  UserIcon,
+  Wallet,
+} from "lucide-react";
 import SettingsIcon from "@/public/icons/settings";
 import HrInboxIconWithCount from "@/components/icons/hr-inbox";
 import { ROUTER } from "@/router";
@@ -97,7 +104,11 @@ export function getHumanResourcesProject({
         name: t("Sidebar.Reports"),
         url: ROUTER.HR_REPORTS,
         icon: BarChart3,
-        isActive: matchesRoute(fullPath, ROUTER.HR_REPORTS),
+        isActive:
+          matchesRoute(fullPath, ROUTER.HR_REPORTS) &&
+          !matchesRoute(fullPath, ROUTER.HR_REPORTS_EMPLOYEE_TASKS) &&
+          !matchesRoute(fullPath, ROUTER.HR_REPORTS_LEAVE_REQUESTS) &&
+          !matchesRoute(fullPath, ROUTER.HR_REPORTS_ADVANCE_REQUESTS),
         show:
           !isCentralCompany &&
           can([
@@ -105,6 +116,37 @@ export function getHumanResourcesProject({
             PERMISSIONS.humanResources.procedures.view,
             PERMISSIONS.humanResources.services.view,
           ]),
+      },
+      {
+        name: t("Sidebar.TaskRequestsReport"),
+        url: ROUTER.HR_REPORTS_EMPLOYEE_TASKS,
+        icon: ListTodo,
+        isActive: matchesRoute(fullPath, ROUTER.HR_REPORTS_EMPLOYEE_TASKS),
+        show:
+          !isCentralCompany &&
+          can([
+            PERMISSIONS.humanResources.charts.view,
+            PERMISSIONS.humanResources.procedures.view,
+            PERMISSIONS.humanResources.services.view,
+          ]),
+      },
+      {
+        name: t("Sidebar.LeaveRequestsReport"),
+        url: ROUTER.HR_REPORTS_LEAVE_REQUESTS,
+        icon: CalendarDays,
+        isActive: matchesRoute(fullPath, ROUTER.HR_REPORTS_LEAVE_REQUESTS),
+        show:
+          !isCentralCompany &&
+          can([PERMISSIONS.vacations.leaveRequests.list]),
+      },
+      {
+        name: t("Sidebar.AdvanceRequestsReport"),
+        url: ROUTER.HR_REPORTS_ADVANCE_REQUESTS,
+        icon: Wallet,
+        isActive: matchesRoute(fullPath, ROUTER.HR_REPORTS_ADVANCE_REQUESTS),
+        show:
+          !isCentralCompany &&
+          can([PERMISSIONS.vacations.advanceRequests.list]),
       },
       {
         name: t("Sidebar.HRSettings"),

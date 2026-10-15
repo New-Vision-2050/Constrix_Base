@@ -80,6 +80,8 @@ export const PERMISSIONS = {
     },
     /** human-resources.leave-requests*leave-request.* — admin leave-requests list */
     leaveRequests: create("LEAVE_REQUEST"),
+    /** human-resources.advance-requests*advance-request.* — admin advance-requests list */
+    advanceRequests: create("ADVANCE_REQUEST"),
   },
   crm: {
     settings: create("CLIENT_SETTING"),

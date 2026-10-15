@@ -53,7 +53,15 @@ export const getRoutesMap = (
     "hr-reports/attendance": getText("hr-reports/attendance", "تقارير الحضور"),
     "hr-reports/employee-tasks": getText(
       "hr-reports/employee-tasks",
-      "تقارير المهام",
+      "طلبات المهام",
+    ),
+    "hr-reports/leave-requests": getText(
+      "hr-reports/leave-requests",
+      "تقرير طلبات الإجازة",
+    ),
+    "hr-reports/advance-requests": getText(
+      "hr-reports/advance-requests",
+      "تقرير طلبات السلف",
     ),
 
     // User routes
