@@ -118,3 +118,53 @@ export async function updateIdentityDataAttachment(
     headers: { "Content-Type": "multipart/form-data" },
   });
 }
+
+/**
+ * Identity documents as stored in the identity-data resource — the same data
+ * the User Profile (Personal Data / Iqama Data sections) reads and writes.
+ * Field names mirror {@link AttendanceDocuments} so the two stores can be
+ * merged key-by-key.
+ */
+export interface IdentityAttachmentData {
+  passport?: string | null;
+  passport_start_date?: string | null;
+  passport_end_date?: string | null;
+  file_passport?: AttachmentMedia[];
+  identity?: string | null;
+  identity_start_date?: string | null;
+  identity_end_date?: string | null;
+  file_identity?: AttachmentMedia[];
+  border_number?: string | null;
+  border_number_start_date?: string | null;
+  border_number_end_date?: string | null;
+  file_border_number?: AttachmentMedia[];
+  entry_number?: string | null;
+  entry_number_start_date?: string | null;
+  entry_number_end_date?: string | null;
+  file_entry_number?: AttachmentMedia[];
+  work_permit?: string | null;
+  work_permit_start_date?: string | null;
+  work_permit_end_date?: string | null;
+  file_work_permit?: AttachmentMedia[];
+}
+
+type IdentityApiResponse = {
+  payload?: IdentityAttachmentData;
+  data?: IdentityAttachmentData;
+};
+
+/**
+ * Secondary fetch of the identity-data resource (User Profile source) so the
+ * attachments page stays in sync with documents uploaded from the profile.
+ * Returns null on any failure — identity data is a best-effort enrichment.
+ */
+export async function getIdentityAttachments(): Promise<IdentityAttachmentData | null> {
+  try {
+    const res = await apiClient.get<IdentityApiResponse>(
+      "/company-users/show-identity-data"
+    );
+    return res.data.payload ?? res.data.data ?? null;
+  } catch {
+    return null;
+  }
+}

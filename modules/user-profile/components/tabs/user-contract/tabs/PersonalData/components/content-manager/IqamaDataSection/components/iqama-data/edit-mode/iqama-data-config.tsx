@@ -6,6 +6,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
 import NoCropImageUpload from "@/components/shared/NoCropImageUpload";
+import { normalizeMediaUrl } from "@/lib/file-preview/utils";
 
 export const IqamaDataFormConfig = () => {
   const { userId } = useUserProfileCxt();
@@ -101,7 +102,7 @@ export const IqamaDataFormConfig = () => {
               return (
                 <NoCropImageUpload
                   label={t("iqamaAttachment")}
-                  previewImage={previewUrl}
+                  previewImage={normalizeMediaUrl(previewUrl)}
                   onChange={(file) => onChange(file ? [file] : [])}
                   accept="image/jpeg,image/jpg,image/png,image/webp"
                   maxSize="5MB"

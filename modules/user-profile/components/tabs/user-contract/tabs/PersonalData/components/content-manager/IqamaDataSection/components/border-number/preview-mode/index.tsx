@@ -1,5 +1,6 @@
 import { checkString } from "@/utils/check-string";
 import PreviewTextField from "../../../../../../../components/previewTextField";
+import { normalizeMediaUrl } from "@/lib/file-preview/utils";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useTranslations } from "next-intl";
 
@@ -45,7 +46,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
               label={t("borderNumberAttachment")}
               value={media?.name ?? "---"}
               type={media?.type == "image" ? "image" : "pdf"}
-              fileUrl={media?.url}
+              fileUrl={normalizeMediaUrl(media?.url) ?? undefined}
             />
           </div>
         ))
