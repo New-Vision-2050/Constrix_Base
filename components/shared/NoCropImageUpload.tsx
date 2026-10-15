@@ -238,6 +238,7 @@ export default function NoCropImageUpload({
               component="img"
               src={currentImage}
               alt={label || "Image"}
+              onError={() => setCurrentImage(null)}
               sx={{
                 maxWidth: "100%",
                 maxHeight: fill || compact ? "100%" : { xs: 240, md: 360 },

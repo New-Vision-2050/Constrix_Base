@@ -6,6 +6,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
 import NoCropImageUpload from "@/components/shared/NoCropImageUpload";
+import { normalizeMediaUrl } from "@/lib/file-preview/utils";
 
 export const BorderNumberFormConfig = () => {
   const { userId } = useUserProfileCxt();
@@ -73,7 +74,7 @@ export const BorderNumberFormConfig = () => {
               return (
                 <NoCropImageUpload
                   label={t("borderNumberAttachment")}
-                  previewImage={previewUrl}
+                  previewImage={normalizeMediaUrl(previewUrl)}
                   onChange={(file) => onChange(file ? [file] : [])}
                   accept="image/jpeg,image/jpg,image/png,image/webp"
                   maxSize="5MB"

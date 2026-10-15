@@ -20,12 +20,16 @@ import {
   getAttendanceAttachments,
   updateAttendanceAttachment,
   updateIdentityDataAttachment,
+  getIdentityAttachments,
   AttachmentMedia,
   AttendanceAttachmentsPayload,
   AttendanceDocuments,
+  IdentityAttachmentData,
 } from "../../api/get-attendance-attachments";
+import { normalizeMediaUrl } from "@/lib/file-preview/utils";
 
 const QUERY_KEY = "hr-attendance-attachments";
+const IDENTITY_QUERY_KEY = "attachments-identity-data";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -120,17 +124,64 @@ const DOC_CARDS: DocCardConfig[] = [
   },
 ];
 
-// ─── Media URL helpers ────────────────────────────────────────────────────────
+// ─── Identity-data sync (keep this page in step with User Profile) ────────────
 
-const API_ORIGIN = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(/\/$/, "");
+/** Docs that are mirrored in the identity-data resource (User Profile source). */
+const IDENTITY_OWNED_DOC_KEYS: DocCardConfig["docKey"][] = [
+  "passport",
+  "identity",
+  "border_number",
+  "entry_number",
+  "work_permit",
+];
 
-/** Relative storage paths must be resolved against the backend origin. */
-function normalizeMediaUrl(raw?: string | null): string | null {
-  if (!raw) return null;
-  const url = raw.trim();
-  if (!url) return null;
-  if (/^(https?:|blob:|data:)/i.test(url)) return url;
-  return `${API_ORIGIN}/${url.replace(/^\//, "")}`;
+/**
+ * Attendance data stays authoritative (this page writes to it too), while any
+ * empty number/date/file is filled from the identity-data store so documents
+ * uploaded from User Profile are reflected here as well.
+ */
+function mergeWithIdentityData(
+  documents: AttendanceDocuments,
+  identity: IdentityAttachmentData | null,
+): AttendanceDocuments {
+  if (!identity) return documents;
+  const merged = { ...documents } as unknown as Record<string, unknown>;
+
+  const fillText = (key: string, value: string | null | undefined) => {
+    const current = merged[key];
+    if ((current === null || current === undefined || current === "") && value) {
+      merged[key] = value;
+    }
+  };
+
+  for (const config of DOC_CARDS) {
+    if (!IDENTITY_OWNED_DOC_KEYS.includes(config.docKey)) continue;
+
+    fillText(
+      config.docKey,
+      identity[config.docKey as keyof IdentityAttachmentData] as string | null,
+    );
+    fillText(
+      config.startDateKey as string,
+      identity[config.startDateKey as keyof IdentityAttachmentData] as string | null,
+    );
+    fillText(
+      config.endDateKey as string,
+      identity[config.endDateKey as keyof IdentityAttachmentData] as string | null,
+    );
+
+    const existingFiles =
+      ((merged[config.filesKey as string] as AttachmentMedia[] | undefined) ?? []);
+    if (existingFiles.length > 0) continue;
+    const identityFiles = identity[
+      config.filesKey as keyof IdentityAttachmentData
+    ] as AttachmentMedia[] | undefined;
+    if (Array.isArray(identityFiles) && identityFiles.length > 0) {
+      merged[config.filesKey as string] = identityFiles;
+    }
+  }
+
+  return merged as unknown as AttendanceDocuments;
 }
 
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
@@ -302,10 +353,36 @@ function DocumentCard({
   }, [documents, config, editing]);
 
   const mutation = useMutation({
-    mutationFn: (fd: FormData) =>
-      config.useIdentityDataEndpoint
-        ? updateIdentityDataAttachment(fd).then(() => null)
-        : updateAttendanceAttachment(fd),
+    mutationFn: async (fd: FormData) => {
+      if (config.useIdentityDataEndpoint) {
+        await updateIdentityDataAttachment(fd);
+        return null;
+      }
+      const res = await updateAttendanceAttachment(fd);
+      // Identity-owned docs are also mirrored to the profile (identity-data)
+      // store, otherwise User Profile keeps showing the old (or empty) file.
+      if (IDENTITY_OWNED_DOC_KEYS.includes(config.docKey)) {
+        const mirrorFd = new FormData();
+        // Only send fields that actually have a value — appending an empty
+        // string would wipe the data already saved in the profile.
+        const num = (fd.get(config.docKey) as string) ?? "";
+        const start = (fd.get(config.startDateKey as string) as string) ?? "";
+        const end = (fd.get(config.endDateKey as string) as string) ?? "";
+        if (num) mirrorFd.append(config.docKey, num);
+        if (start) mirrorFd.append(config.startDateKey as string, start);
+        if (end) mirrorFd.append(config.endDateKey as string, end);
+        const file = fd.get(config.filePostKey);
+        if (file instanceof File) mirrorFd.append(config.filePostKey, file);
+        if ([...mirrorFd.keys()].length > 0) {
+          try {
+            await updateIdentityDataAttachment(mirrorFd);
+          } catch (mirrorErr) {
+            console.warn(`[${config.docKey}] identity-data mirror failed:`, mirrorErr);
+          }
+        }
+      }
+      return res;
+    },
     onSuccess: (res) => {
       toast.success(t("saveSuccess"));
       setEditing(false);
@@ -738,6 +815,14 @@ export default function AttachmentsContent() {
     queryFn: getAttendanceAttachments,
   });
 
+  // The identity-owned docs (passport/identity/border/entry/work_permit) are
+  // also stored in the identity-data resource (User Profile). Fetch it so
+  // documents uploaded from the profile appear in these cards too.
+  const { data: identityData } = useQuery({
+    queryKey: [IDENTITY_QUERY_KEY],
+    queryFn: getIdentityAttachments,
+  });
+
   // Local state so cards update immediately without a full refetch
   const [localData, setLocalData] = useState<AttendanceAttachmentsPayload | null>(null);
 
@@ -749,6 +834,7 @@ export default function AttachmentsContent() {
     setLocalData((prev) =>
       prev ? { ...prev, documents: docs } : prev
     );
+    queryClient.invalidateQueries({ queryKey: [IDENTITY_QUERY_KEY] });
   };
 
   const handlePhotoUpdated = (url: string) => {
@@ -760,6 +846,14 @@ export default function AttachmentsContent() {
   const refetch = () => {
     queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
   };
+
+  const mergedDocuments = React.useMemo(
+    () =>
+      localData
+        ? mergeWithIdentityData(localData.documents, identityData ?? null)
+        : null,
+    [localData, identityData],
+  );
 
   if (isLoading) {
     return (
@@ -796,7 +890,7 @@ export default function AttachmentsContent() {
         <DocumentCard
           key={config.docKey}
           config={config}
-          documents={localData.documents}
+          documents={mergedDocuments ?? localData.documents}
           onUpdated={handleDocumentsUpdated}
           onRefetch={refetch}
         />
