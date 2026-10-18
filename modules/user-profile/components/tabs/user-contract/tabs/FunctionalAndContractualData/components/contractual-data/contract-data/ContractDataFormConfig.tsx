@@ -8,6 +8,7 @@ import { Contract } from "@/modules/user-profile/types/Contract";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import PickupMap from "@/components/shared/pickup-map";
+import { useQueryClient } from "@tanstack/react-query";
 
 type PropsT = {
   contract?: Contract;
@@ -47,6 +48,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
   const { handleRefetchEmploymentContractData, timeUnits } =
     useFunctionalContractualCxt();
 
+  const queryClient = useQueryClient();
   const t = useTranslations("UserProfile.nestedTabs.contractData");
   const tActions = useTranslations("UserProfile.nestedTabs.commonActions");
   const formId = `user-contract-data-form-${userId}-${contract?.id ?? "new"}`;
@@ -495,6 +497,21 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
+            name: "leave_category_id",
+            label: t("leaveCategory"),
+            type: "select",
+            placeholder: t("leaveCategory"),
+            dynamicOptions: {
+              url: `${baseURL}/leave-policy-categories`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+
+              totalCountHeader: "X-Total-Count",
+            },
+            validation: [],
+          },
+          {
             name: "latitude",
             label: "latitude",
             type: "hiddenObject",
@@ -553,6 +570,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
     ],
     initialValues: {
       annual_leave: contract?.annual_leave,
+      leave_category_id: contract?.leave_category?.id ?? contract?.leave_category_id,
       contract_number: contract?.contract_number,
       start_date: contract?.start_date,
       commencement_date: contract?.commencement_date,
@@ -585,6 +603,10 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
       handleRefetchWidgetData();
       handleRefetchDataStatus();
       handleRefetchEmploymentContractData();
+      queryClient.invalidateQueries({ queryKey: ["user-leave-policies"] });
+      queryClient.invalidateQueries({
+        queryKey: ["user-contract-leave-category"],
+      });
     },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body: Record<string, unknown> = {

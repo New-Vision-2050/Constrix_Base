@@ -10,6 +10,7 @@ import {
 } from "@/modules/hr-settings-vacations/constants/days-types";
 import { VacationPolicie } from "@/modules/hr-settings-vacations/types/VacationPolicie";
 import { VacationType } from "@/modules/hr-settings-vacations/types/VacationType";
+import { LeavePolicyCategory } from "@/modules/hr-settings-vacations/types/LeavePolicyCategory";
 import {
   OutlinedSelectField,
   OutlinedTextField,
@@ -27,6 +28,7 @@ type PropsT = {
   onSuccessFn: () => void;
   t: ReturnType<typeof useTranslations>;
   leaveTypes: VacationType[];
+  leaveCategories?: LeavePolicyCategory[];
   editedPolicy?: VacationPolicie;
 };
 
@@ -95,6 +97,7 @@ export const getSetVacationPloicyConfig = ({
   onSuccessFn,
   t,
   leaveTypes,
+  leaveCategories = [],
   editedPolicy,
 }: PropsT): FormConfig => {
   const isEdit = Boolean(editedPolicy);
@@ -118,6 +121,21 @@ export const getSetVacationPloicyConfig = ({
     leaveTypeOptions.push({
       value: String(editedPolicy.leave_type_id),
       label: editedPolicy.leave_type_name ?? "",
+    });
+  }
+  const categoryOptions = leaveCategories.map((category) => ({
+    value: String(category.id),
+    label: category.name,
+  }));
+  if (
+    editedPolicy?.leave_category_id &&
+    !categoryOptions.some(
+      (o) => o.value === String(editedPolicy.leave_category_id),
+    )
+  ) {
+    categoryOptions.push({
+      value: String(editedPolicy.leave_category_id),
+      label: editedPolicy.leave_category_name ?? "",
     });
   }
   const dayTypeOptions = [
@@ -186,6 +204,9 @@ export const getSetVacationPloicyConfig = ({
       leave_type_id: editedPolicy?.leave_type_id
         ? String(editedPolicy.leave_type_id)
         : "",
+      leave_category_id: editedPolicy?.leave_category_id
+        ? String(editedPolicy.leave_category_id)
+        : "",
       name: editedPolicy?.name ?? "",
       max_days: editedPolicy?.max_days ?? "",
       max_balance_days: editedPolicy?.max_balance_days ?? "",
@@ -228,6 +249,28 @@ export const getSetVacationPloicyConfig = ({
                 onChange={onChange}
                 disabled={isEdit}
                 required
+              />
+            ),
+          },
+          {
+            type: "select",
+            name: "leave_category_id",
+            label: t("form.category"),
+            required: !isEdit,
+            options: categoryOptions,
+            validation: isEdit
+              ? []
+              : [{ type: "required", message: t("form.categoryRequired") }],
+            render: (_field, value, onChange) => (
+              <OutlinedSelectField
+                formId={VACATION_POLICY_FORM_ID}
+                name="leave_category_id"
+                label={t("form.category")}
+                placeholder={t("form.category")}
+                value={String(value ?? "")}
+                options={categoryOptions}
+                onChange={onChange}
+                required={!isEdit}
               />
             ),
           },
@@ -395,6 +438,9 @@ export const getSetVacationPloicyConfig = ({
         ...(values.id ? { id: values.id } : {}),
         name: values.name,
         ...(isEdit ? {} : { leave_type_id: values.leave_type_id }),
+        ...(values.leave_category_id
+          ? { leave_category_id: values.leave_category_id }
+          : {}),
       };
 
       const body: Values = isBalanced(values)

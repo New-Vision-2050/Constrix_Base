@@ -76,6 +76,7 @@ export const PERMISSIONS = {
         /** human-resources.settings*leave-policy.assign — assign leave policies to a user */
         assign: "LEAVE_POLICY_ASSIGN",
       },
+      leavePolicyCategory: create("LEAVE_POLICY_CATEGORY"),
       publicHoliday: create("PUBLIC_HOLIDAY"),
     },
     /** human-resources.leave-requests*leave-request.* — admin leave-requests list */

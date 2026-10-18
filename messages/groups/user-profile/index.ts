@@ -111,6 +111,15 @@ export const userProfileMessages = new MessagesGroup({
           "No leave policies assigned for this year",
           "لا توجد سياسات إجازة مسندة لهذه السنة",
         ),
+        leaveCategory: _m("Leave category", "تصنيف الاجازات"),
+        leaveCategoryHint: _m(
+          "Assigned from the employment contract. Policies under this category are applied automatically.",
+          "يتم التعيين من عقد العمل. سياسات هذا التصنيف تُطبق تلقائيًا.",
+        ),
+        noLeaveCategory: _m(
+          "No leave category assigned in the employment contract",
+          "لم يتم تعيين تصنيف اجازات في عقد العمل",
+        ),
         assignPolicies: _m("Assign leave policies", "تعيين سياسات الإجازة"),
         assignPoliciesHint: _m(
           "The checked set replaces the user's current assignments when saved.",
@@ -295,6 +304,7 @@ export const userProfileMessages = new MessagesGroup({
       workingHoursType: _m("Type of Working Hours", "نوع ساعات العمل"),
       weeklyWorkingHours: _m("Weekly Working Hours", "ساعات العمل الاسبوعية"),
       annualLeaveDays: _m("Annual Leave Days", "ايام الاجازات السنوية"),
+      leaveCategory: _m("Leave Category", "تصنيف الاجازات"),
       rightToTerminateDuringProbation: _m(
         "Right to Terminate During Probation Period",
         "حق الانهاء خلال فترة التجربة",
