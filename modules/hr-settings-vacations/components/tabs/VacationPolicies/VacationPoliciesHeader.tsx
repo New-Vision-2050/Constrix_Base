@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useHRVacationCxt } from "@/modules/hr-settings-vacations/context/hr-vacation-cxt";
 import { useLeaveTypes } from "@/modules/hr-settings-vacations/hooks/useLeaveTypes";
+import { useLeavePolicyCategories } from "@/modules/hr-settings-vacations/hooks/useLeavePolicyCategories";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
@@ -24,6 +25,7 @@ export default function VacationPoliciesHeader() {
     handleStoreEditPolicy,
   } = useHRVacationCxt();
   const { data: leaveTypes = [] } = useLeaveTypes();
+  const { data: leaveCategories = [] } = useLeavePolicyCategories();
   const { values } = useFormInstance(VACATION_POLICY_FORM_ID);
 
   const onSuccessFn = () => {
@@ -35,6 +37,7 @@ export default function VacationPoliciesHeader() {
     onSuccessFn,
     t,
     leaveTypes,
+    leaveCategories,
     editedPolicy,
   });
 

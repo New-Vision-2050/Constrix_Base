@@ -3,6 +3,8 @@ export interface VacationPolicie {
     name: string;
     leave_type_id: string;
     leave_type_name?: string;
+    leave_category_id?: string | null;
+    leave_category_name?: string | null;
     is_deduct_from_balance: boolean | number;
     max_balance_days: number | null;
     total_days: number | null;

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import FormFieldSet from "../../../components/FormFieldSet";
 import useUserLeavePolicies from "../hooks/useUserLeavePolicies";
 import { LeaveBalanceTotals } from "../types";
-import AssignLeavePoliciesSection from "./AssignLeavePoliciesSection";
+import useUserContractLeaveCategory from "../hooks/useUserContractLeaveCategory";
 import LeaveBalancesTable from "./LeaveBalancesTable";
 import LeaveStatsCards from "./LeaveStatsCards";
 import LeaveSummaryChart from "./LeaveSummaryChart";
@@ -20,8 +20,8 @@ type Props = {
 
 /**
  * Leave policies section: summary stat widgets + consumed/remaining donut +
- * per-leave-type balances table (per selected year), plus the
- * assign-policies edit action.
+ * per-leave-type balances table (per selected year), plus the read-only
+ * leave category assigned from the employment contract.
  */
 export default function LeaveBalancesPanel({ userId }: Props) {
   const t = useTranslations(TRANSLATION_NAMESPACE);
@@ -32,6 +32,8 @@ export default function LeaveBalancesPanel({ userId }: Props) {
     year,
   );
   const loading = isLoading || isFetching;
+  const { data: leaveCategory, isLoading: categoryLoading } =
+    useUserContractLeaveCategory(userId);
 
   const totals = useMemo<LeaveBalanceTotals>(
     () =>
@@ -73,13 +75,17 @@ export default function LeaveBalancesPanel({ userId }: Props) {
         <LeaveBalancesTable rows={rows} loading={loading} />
       </FormFieldSet>
 
-      <FormFieldSet title={t("assignPolicies")}>
-        <AssignLeavePoliciesSection
-          userId={userId}
-          year={year}
-          assignedRows={rows}
-          assignedLoading={isLoading}
-        />
+      <FormFieldSet title={t("leaveCategory")}>
+        {categoryLoading ? (
+          <div className="h-10 max-w-sm animate-pulse rounded bg-white/5" />
+        ) : (
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-gray-400">{t("leaveCategoryHint")}</p>
+            <p className="text-base font-semibold">
+              {leaveCategory?.name ?? t("noLeaveCategory")}
+            </p>
+          </div>
+        )}
       </FormFieldSet>
     </div>
   );

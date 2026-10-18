@@ -2,6 +2,8 @@ import { MediaFile } from "@/types/media-file";
 
 export type Contract = {
   annual_leave: number;
+  leave_category_id?: string | null;
+  leave_category?: { id: string; name: string } | null;
   commencement_date: string;
   company_id: string;
   contract_duration: string;

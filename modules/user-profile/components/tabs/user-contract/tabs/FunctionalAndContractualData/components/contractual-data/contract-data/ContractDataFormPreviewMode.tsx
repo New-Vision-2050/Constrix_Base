@@ -99,6 +99,14 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
+          label={t("leaveCategory")}
+          value={contract?.leave_category?.name ?? ""}
+          valid={Boolean(contract?.leave_category?.name)}
+        />
+      </div>
+
+      <div className="p-2">
+        <PreviewTextField
           label={t("workPlace")}
           value={
             contract?.latitude && contract?.longitude

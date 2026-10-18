@@ -3,6 +3,7 @@ import { _m, MessagesGroup } from "../../types";
 export const hrsettingsVacationsMessages = new MessagesGroup({
   tabs: new MessagesGroup({
     leavesPolicies: _m("Leaves Policies", "أنظمة الاجازات"),
+    leavePolicyCategories: _m("Leave Categories", "تصنيف الاجازات"),
     leavesTypes: _m("Leaves Types", "أنواع الاجازات"),
     publicLeaves: _m("Public Leaves", "الاجازات الرسمية")
   }),
@@ -14,6 +15,7 @@ export const hrsettingsVacationsMessages = new MessagesGroup({
     totalDays: _m("Total days", "عدد أيام الإجازة"),
     maxDays: _m("Maximum leave days", "اقصى عدد لايام الاجازة"),
     leaveType: _m("Leave type", "نوع الاجازة"),
+    category: _m("Category", "التصنيف"),
     dayType: _m("Day calculation", "طريقة احتساب الايام"),
     allowed: _m("Allowed", "مسموح"),
     notAllowed: _m("Not allowed", "غير مسموح"),
@@ -51,6 +53,8 @@ export const hrsettingsVacationsMessages = new MessagesGroup({
       basicData: _m("Basic data", "البيانات الاساسية"),
       leaveType: _m("Leave type", "نوع الاجازة"),
       leaveTypeRequired: _m("Leave type is required", "نوع الاجازة مطلوب"),
+      category: _m("Category", "التصنيف"),
+      categoryRequired: _m("The leave policy category is required.", "تصنيف نظام الاجازة مطلوب."),
       systemName: _m("System name", "اسم النظام"),
       maxBalanceDays: _m("Maximum balance days", "اقصى عدد لرصيد ايام الاجازة"),
       maxDays: _m("Maximum leave days", "اقصى عدد لايام الاجازة"),
@@ -77,6 +81,26 @@ export const hrsettingsVacationsMessages = new MessagesGroup({
       rolloverMonths: _m("Leave rollover period (months)", "مدة ترحيل ايام الاجازة (شهر)"),
       allowExceedBalance: _m("Allow exceeding leave balance", "السماح بتخطي رصيد الاجازة"),
       numberRequired: _m("Must be a number", "يجب أن يكون رقمًا")
+    })
+  }),
+  leavePolicyCategories: new MessagesGroup({
+    title: _m("Leave Categories", "تصنيف الاجازات"),
+    table: new MessagesGroup({
+      name: _m("Name", "الاسم"),
+      DeleteConfirmMessage: _m("Are you sure you want to delete this category? Linked policies will be kept without a category.", "هل أنت متأكد من حذف هذا التصنيف؟ سيتم الإبقاء على الأنظمة المرتبطة بدون تصنيف."),
+      addCategory: _m("Add New Category", "اضافة تصنيف جديد"),
+      form: new MessagesGroup({
+        title: _m("Add New Category", "اضافة تصنيف جديد"),
+        editTitle: _m("Edit Category", "تعديل التصنيف"),
+        data: _m("Category data", "بيانات التصنيف"),
+        name: _m("Category name", "اسم التصنيف"),
+        namePlaceholder: _m("Category name", "اسم التصنيف"),
+        nameRequired: _m("Name is required", "اسم التصنيف مطلوب"),
+        nameMaxLength: _m("Name must not exceed 255 characters", "الاسم يجب ألا يتجاوز 255 حرفًا"),
+        submitButtonText: _m("Save", "حفظ"),
+        cancelButtonText: _m("Cancel", "إلغاء"),
+        resetButtonText: _m("Clear", "مسح النموذج")
+      })
     })
   }),
   leavesTypes: new MessagesGroup({
