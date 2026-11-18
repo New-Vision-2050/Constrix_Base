@@ -212,10 +212,42 @@ export interface CreateProjectOrderPermitsResponse {
   payload?: unknown;
 }
 
+export interface ImportConstructionRowError {
+  row: number;
+  reason: string;
+  work_order_name?: string | null;
+}
+
+export interface ImportConstructionLogDto {
+  import_id: string;
+  project_id: string;
+  company_id?: string | null;
+  user_id?: string | null;
+  status: string;
+  original_filename?: string | null;
+  total_rows?: number | null;
+  processed_rows?: number | null;
+  updated_rows?: number | null;
+  skipped_rows?: number | null;
+  row_errors?: ImportConstructionRowError[] | null;
+  failure_reason?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  created_at?: string | null;
+}
+
 export interface ImportProjectOrderPermitsResponse {
-  code: string;
-  message: string | null;
-  payload?: unknown;
+  code?: string;
+  message?: string | null;
+  payload?: ImportConstructionLogDto | { import_id?: string } | null;
+  data?: ImportConstructionLogDto | { import_id?: string } | null;
+}
+
+export interface ImportConstructionLogResponse {
+  code?: string;
+  message?: string | null;
+  payload?: ImportConstructionLogDto | null;
+  data?: ImportConstructionLogDto | null;
 }
 
 export interface NoteLog {
