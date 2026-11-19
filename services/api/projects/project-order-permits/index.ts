@@ -9,6 +9,7 @@ import type {
 import type {
   CompletionDataResponse,
   CreateProjectOrderPermitsResponse,
+  ImportConstructionLogResponse,
   ImportProjectOrderPermitsResponse,
   ListProjectOrderPermitDepartmentsResponse,
   ListProjectOrderPermitTypesResponse,
@@ -133,6 +134,14 @@ export const ProjectOrderPermitsApi = {
       },
     );
   },
+
+  getImportConstructionLog: (
+    projectId: string | number,
+    importId: string,
+  ) =>
+    baseApi.get<ImportConstructionLogResponse>(
+      `projects/${projectId}/order-permits/import-construction/${encodeURIComponent(importId)}`,
+    ),
 
   update: (
     projectId: string | number,

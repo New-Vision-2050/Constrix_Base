@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { FileDownloadOutlined } from "@mui/icons-material";
+import { FileDownloadOutlined, HistoryOutlined } from "@mui/icons-material";
 
 import { Plus } from "lucide-react";
 
@@ -45,6 +45,12 @@ import { downloadFromResponse } from "@/utils/downloadFromResponse";
 import AddWorkOrderDialog from "./add-work-order/AddWorkOrderDialog";
 import { getDrillingValidationErrorKey } from "./drillingValidation";
 import { PerRowEditablePermitCell, type EditablePermitField } from "./EditablePermitCell";
+import ImportConstructionLogsDialog from "./ImportConstructionLogsDialog";
+import {
+  extractImportConstructionId,
+  getLastImportConstructionId,
+  setLastImportConstructionId,
+} from "./importConstructionLogStorage";
 import NoteLogsEye from "./NoteLogsEye";
 import {
   canEditNoteFromDepartments,
@@ -303,7 +309,15 @@ export default function WorkOrdersTab({
 
   const [isExportingAll, setIsExportingAll] = useState(false);
 
+  const [updateLogsOpen, setUpdateLogsOpen] = useState(false);
+
+  const [lastImportId, setLastImportId] = useState<string | null>(null);
+
   const importFileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setLastImportId(getLastImportConstructionId(projectId));
+  }, [projectId]);
 
   const params = WorkOrdersTableLayout.useTableParams({
     initialPage: 1,
@@ -711,6 +725,15 @@ export default function WorkOrdersTab({
       const res = isDepartmentTab
         ? await ProjectOrderPermitsApi.importOrderPermits(projectId, file)
         : await ProjectOrderPermitsApi.import(projectId, file);
+
+      if (isDepartmentTab) {
+        const importId = extractImportConstructionId(res.data);
+        if (importId) {
+          setLastImportConstructionId(projectId, importId);
+          setLastImportId(importId);
+        }
+      }
+
       toast.success(res.data?.message ?? t("importSuccess"));
       await queryClient.invalidateQueries({
         queryKey: projectOrderPermitsQueryKey(projectId),
@@ -933,6 +956,22 @@ export default function WorkOrdersTab({
                   )}
                 </Button>
 
+                {isDepartmentTab ? (
+                  <Button
+                    variant="outlined"
+                    color="info"
+                    startIcon={<HistoryOutlined />}
+                    onClick={() => {
+                      const storedId =
+                        lastImportId ?? getLastImportConstructionId(projectId);
+                      setLastImportId(storedId);
+                      setUpdateLogsOpen(true);
+                    }}
+                  >
+                    {t("updateLogs.button")}
+                  </Button>
+                ) : null}
+
                 <Button
                   variant="contained"
                   color="primary"
@@ -980,6 +1019,16 @@ export default function WorkOrdersTab({
         onClose={() => setAddDialogOpen(false)}
         onCreated={handleWorkOrdersCreated}
       />
+
+      {isDepartmentTab ? (
+        <ImportConstructionLogsDialog
+          open={updateLogsOpen}
+          onClose={() => setUpdateLogsOpen(false)}
+          projectId={projectId}
+          importId={lastImportId}
+          emptyDash={emptyDash}
+        />
+      ) : null}
     </Box>
   );
 }
