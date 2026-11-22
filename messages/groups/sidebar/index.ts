@@ -63,6 +63,7 @@ export const sidebarMessages = new MessagesGroup({
   UnifiedContractMakkah: _m("Unified Contract in Makkah", "العقد الموحد بمكة"),
   UnifiedContractJeddah: _m("Unified Contract in Jeddah", "العقد الموحد بجدة"),
   Inbox: _m("Inbox", "صندوق الوارد"),
+  Forums: _m("Forums", "المنتديات"),
   PackagesAndPrograms: _m("Packages and Programs", "الباقات والبرامج"),
   CRM: _m("CRM", "علاقات العملاء"),
   clients: _m("Clients", "العملاء"),

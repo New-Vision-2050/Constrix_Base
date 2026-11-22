@@ -61,6 +61,7 @@ import { workPanelMessages } from "./groups/work-panel";
 import { attendancePresenceMessages } from "./groups/attendance-presence";
 import { hrReportsMessages } from "./groups/hr-reports";
 import { hrInboxMessages } from "./groups/hr-inbox";
+import { forumsModuleMessages } from "./groups/forums-module";
 import { iconsMessages } from "./groups/icons";
 import { projectMessages } from "./groups/projects";
 import { projectSettingsMessages } from "./groups/projects/settings";
@@ -135,6 +136,7 @@ export const messagesStructure = new MessagesGroup({
   AttendancePresence: attendancePresenceMessages,
   HRReports: hrReportsMessages,
   HrInbox: hrInboxMessages,
+  Forums: forumsModuleMessages,
   icons: iconsMessages,
   project: projectMessages,
   Projects: projectMessages,

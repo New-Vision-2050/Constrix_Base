@@ -32,6 +32,18 @@ export const ROUTER = {
   HR_REPORTS_LEAVE_REQUESTS: "/hr-reports/leave-requests",
   HR_REPORTS_ADVANCE_REQUESTS: "/hr-reports/advance-requests",
   Organizational_Structure: "/organizational-structure",
+  FORUMS: "/forums",
+  FORUM_ANNOUNCEMENT_NEW: "/forums/announcements/new",
+  FORUM_DETAILS: (id: string) => `/forums/${id}`,
+  FORUM_GROUPS: (id: string) => `/forums/${id}/groups`,
+  FORUM_GROUP_MEMBERS: (id: string, groupId: string) =>
+    `/forums/${id}/groups/${groupId}/members`,
+  FORUM_GROUP_PERMISSIONS: (id: string, groupId: string) =>
+    `/forums/${id}/groups/${groupId}/permissions`,
+  FORUM_MEMBERS: (id: string) => `/forums/${id}/members`,
+  FORUM_ADMINS: (id: string) => `/forums/${id}/admins`,
+  FORUM_SETTINGS: (id: string) => `/forums/${id}/settings`,
+  FORUM_ACTIVITY: (id: string) => `/forums/${id}/activity`,
   WORK_PANEL: "/work-panel",
   WORK_PANEL_SETTINGS: "/work-panel-settings",
   ROLES: "/roles",
