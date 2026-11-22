@@ -6,7 +6,7 @@ import { ChevronDown } from "lucide-react";
 import { Alert } from "@mui/material";
 import HeadlessTableLayout from "@/components/headless/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import ForumShell from "../components/ForumShell";
 import FilterCard, { FilterField, SelectFilter } from "../../components/ui/FilterCard";
 import ActivityDiffPanel from "./ActivityDiffPanel";
@@ -174,6 +174,7 @@ export default function ForumActivityView({ forumId }: { forumId: string }) {
 
           <FilterField label={t("forum.activity.filters.from")}>
             <Input
+              className="h-9"
               type="date"
               value={from}
               onChange={(event) => {
@@ -185,6 +186,7 @@ export default function ForumActivityView({ forumId }: { forumId: string }) {
 
           <FilterField label={t("forum.activity.filters.to")}>
             <Input
+              className="h-9"
               type="date"
               value={to}
               onChange={(event) => {

@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -135,6 +135,7 @@ export default function GroupDataModal({
               <span className="text-destructive"> *</span>
             </Label>
             <Input
+              className="h-9"
               value={name}
               onChange={(event) => setName(event.target.value)}
               autoFocus
@@ -166,6 +167,7 @@ export default function GroupDataModal({
                 {t("forum.groupModal.category")}
               </Label>
               <Input
+                className="h-9"
                 value={category}
                 onChange={(event) => setCategory(event.target.value)}
               />
@@ -201,6 +203,7 @@ export default function GroupDataModal({
               {t("forum.groupModal.sortOrder")}
             </Label>
             <Input
+              className="h-9"
               type="number"
               min={1}
               value={sortOrder}

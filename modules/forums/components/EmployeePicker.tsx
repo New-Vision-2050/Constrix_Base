@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -64,7 +64,7 @@ export default function EmployeePicker({
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={searchPlaceholder ?? t("searchEmployeePlaceholder")}
-            className="ps-9"
+            className="h-9 ps-9"
           />
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Archive, ArchiveRestore, Check } from "lucide-react";
 import { Alert } from "@mui/material";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/modules/table/components/ui/textarea";
 import { toast } from "@/modules/table/hooks/use-toast";
@@ -120,6 +120,7 @@ export default function ForumSettingsView({ forumId }: { forumId: string }) {
                   <span className="text-destructive"> *</span>
                 </Label>
                 <Input
+                  className="h-9"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   disabled={isLoading}

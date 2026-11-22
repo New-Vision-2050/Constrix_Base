@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Alert } from "@mui/material";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/modules/table/components/ui/textarea";
 import { Link, useRouter } from "@i18n/navigation";
@@ -182,6 +182,7 @@ export default function CreateAnnouncementView() {
                 <span className="text-destructive"> *</span>
               </Label>
               <Input
+                className="h-9"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
               />

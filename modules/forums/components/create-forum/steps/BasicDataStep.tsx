@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/modules/table/components/ui/textarea";
 import {
@@ -34,6 +34,7 @@ export default function BasicDataStep({
         error={errors.name ? t("common.requiredField") : undefined}
       >
         <Input
+          className="h-9"
           value={wizard.name}
           onChange={(event) => wizard.setName(event.target.value)}
         />

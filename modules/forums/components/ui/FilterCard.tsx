@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -55,7 +55,7 @@ export function SearchFilter({
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
-          className="ps-9"
+          className="h-9 ps-9"
         />
       </div>
     </FilterField>
