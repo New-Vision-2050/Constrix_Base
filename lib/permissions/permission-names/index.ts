@@ -143,4 +143,24 @@ export const PERMISSIONS = {
     procedures: create("HUMAN_RESOURCES_PROCEDURES"),
     services: create("HUMAN_RESOURCES_SERVICES"),
   },
+  /**
+   * human-resources.forums — forum management dashboard.
+   * `ARCHIVE` / `RESTORE` are not part of the default action set, so they are
+   * spelled out the same way as `vacations.settings.leavePolicy.assign`.
+   */
+  forum: {
+    ...create("FORUM"),
+    archive: "FORUM_ARCHIVE",
+    restore: "FORUM_RESTORE",
+    group: {
+      ...create("FORUM_GROUP"),
+      archive: "FORUM_GROUP_ARCHIVE",
+      restore: "FORUM_GROUP_RESTORE",
+    },
+    member: create("FORUM_MEMBER"),
+    admin: create("FORUM_ADMIN"),
+    announcement: create("FORUM_ANNOUNCEMENT"),
+    report: create("FORUM_REPORT"),
+    activity: create("FORUM_ACTIVITY"),
+  },
 };
