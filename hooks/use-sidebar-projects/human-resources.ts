@@ -3,6 +3,7 @@ import {
   CalendarDays,
   LayoutDashboardIcon,
   ListTodo,
+  MessagesSquare,
   UserIcon,
   Wallet,
 } from "lucide-react";
@@ -28,6 +29,7 @@ export function getHumanResourcesProject({
   const hrRoutes = [
     ROUTER.WORK_PANEL,
     ROUTER.HR_INBOX,
+    ROUTER.FORUMS,
     ROUTER.Organizational_Structure,
     ROUTER.AttendanceDeparture,
     ROUTER.HR_REPORTS,
@@ -40,6 +42,7 @@ export function getHumanResourcesProject({
     urls: [
       ROUTER.WORK_PANEL,
       ROUTER.HR_INBOX,
+      ROUTER.FORUMS,
       ROUTER.Organizational_Structure,
       ROUTER.AttendanceDeparture,
       ROUTER.HR_REPORTS,
@@ -74,6 +77,13 @@ export function getHumanResourcesProject({
             PERMISSIONS.humanResources.procedures.view,
             PERMISSIONS.humanResources.services.view,
           ]),
+      },
+      {
+        name: t("Sidebar.Forums"),
+        url: ROUTER.FORUMS,
+        icon: MessagesSquare,
+        isActive: matchesRoute(fullPath, ROUTER.FORUMS),
+        show: !isCentralCompany && can([PERMISSIONS.forum.list]),
       },
       {
         name: t("Sidebar.OrganizationalStructure"),
