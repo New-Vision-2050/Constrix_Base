@@ -119,6 +119,8 @@ export default function ForumActivityView({ forumId }: { forumId: string }) {
     [t, locale, expanded],
   );
 
+  const columnVisibility = Table.useColumnVisibility(columns);
+
   const tableState = Table.useTableState({
     data: rows,
     columns,
@@ -130,6 +132,7 @@ export default function ForumActivityView({ forumId }: { forumId: string }) {
     loading: isLoading,
     searchable: false,
     filtered: Boolean(action || actorId || from || to),
+    columnVisibility,
   });
 
   const expandedRow = rows.find((row) => row.id === expanded) ?? null;
@@ -199,17 +202,16 @@ export default function ForumActivityView({ forumId }: { forumId: string }) {
 
         {isError ? <Alert severity="error">{t("common.loadFailed")}</Alert> : null}
 
-        <div className="overflow-hidden rounded-xl border border-border">
-          <Table
-            table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
-            pagination={
-              <Table.Pagination
-                state={tableState}
-                pageSizeOptions={[10, 15, 25, 50]}
-              />
-            }
-          />
-        </div>
+        <Table
+          filters={<Table.TopActions state={tableState} />}
+          table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
+          pagination={
+            <Table.Pagination
+              state={tableState}
+              pageSizeOptions={[10, 15, 25, 50]}
+            />
+          }
+        />
 
         {expandedRow ? <ActivityDiffPanel row={expandedRow} /> : null}
       </div>

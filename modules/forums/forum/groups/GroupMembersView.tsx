@@ -217,6 +217,8 @@ export default function GroupMembersView({
     [t, canEdit],
   );
 
+  const columnVisibility = Table.useColumnVisibility(columns);
+
   const tableState = Table.useTableState({
     data: rows,
     columns,
@@ -228,6 +230,7 @@ export default function GroupMembersView({
     loading: isLoading,
     searchable: false,
     filtered: false,
+    columnVisibility,
   });
 
   const selectedIds = draft.map((member) => member.user_id);
@@ -265,17 +268,16 @@ export default function GroupMembersView({
           </Button>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border">
-          <Table
-            table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
-            pagination={
-              <Table.Pagination
-                state={tableState}
-                pageSizeOptions={[10, 15, 25, 50]}
-              />
-            }
-          />
-        </div>
+        <Table
+          filters={<Table.TopActions state={tableState} />}
+          table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
+          pagination={
+            <Table.Pagination
+              state={tableState}
+              pageSizeOptions={[10, 15, 25, 50]}
+            />
+          }
+        />
 
         <InfoNote icon={<Info />}>{t("forum.groupMembers.bulkHint")}</InfoNote>
 

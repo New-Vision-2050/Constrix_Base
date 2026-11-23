@@ -8,11 +8,13 @@ import {
   CheckCircle2,
   MessagesSquare,
   Pencil,
+  Plus,
   Settings2,
 } from "lucide-react";
 import { Alert } from "@mui/material";
 import HeadlessTableLayout from "@/components/headless/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "@i18n/navigation";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
@@ -22,6 +24,7 @@ import StatusChip from "../ui/StatusChip";
 import FilterCard, { SearchFilter, SelectFilter } from "../ui/FilterCard";
 import RowActionsMenu, { type RowAction } from "../ui/RowActionsMenu";
 import ConfirmDialog from "../ui/ConfirmDialog";
+import CreateForumWizard from "../create-forum/CreateForumWizard";
 import {
   useArchiveForum,
   useForumsList,
@@ -44,7 +47,9 @@ export default function ForumsListTab() {
 
   const [searchInput, setSearchInput] = useState("");
   const [status, setStatus] = useState<ForumStatus | "">("");
+  const [wizardOpen, setWizardOpen] = useState(false);
   const search = useDebounced(searchInput);
+  const canCreate = can([PERMISSIONS.forum.create]);
 
   const tableParams = Table.useTableParams({
     initialPage: 1,
@@ -182,6 +187,8 @@ export default function ForumsListTab() {
     [t, locale, company.name, can, router, restore],
   );
 
+  const columnVisibility = Table.useColumnVisibility(columns);
+
   const tableState = Table.useTableState({
     data: rows,
     columns,
@@ -193,6 +200,7 @@ export default function ForumsListTab() {
     loading: isLoading,
     searchable: false,
     filtered: Boolean(search || status),
+    columnVisibility,
   });
 
   return (
@@ -269,17 +277,28 @@ export default function ForumsListTab() {
         <Alert severity="error">{t("common.loadFailed")}</Alert>
       ) : null}
 
-      <div className="overflow-hidden rounded-xl border border-border">
-        <Table
-          table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
-          pagination={
-            <Table.Pagination
-              state={tableState}
-              pageSizeOptions={[10, 15, 25, 50]}
-            />
-          }
-        />
-      </div>
+      <Table
+        filters={
+          <Table.TopActions
+            state={tableState}
+            customActions={
+              canCreate ? (
+                <Button onClick={() => setWizardOpen(true)}>
+                  <Plus />
+                  {t("list.create")}
+                </Button>
+              ) : null
+            }
+          />
+        }
+        table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
+        pagination={
+          <Table.Pagination
+            state={tableState}
+            pageSizeOptions={[10, 15, 25, 50]}
+          />
+        }
+      />
 
       <ConfirmDialog
         open={Boolean(pendingArchive)}
@@ -296,6 +315,13 @@ export default function ForumsListTab() {
         }}
         onClose={() => setPendingArchive(null)}
       />
+
+      {wizardOpen ? (
+        <CreateForumWizard
+          open={wizardOpen}
+          onClose={() => setWizardOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

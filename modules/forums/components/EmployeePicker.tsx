@@ -92,12 +92,19 @@ export default function EmployeePicker({
           : employees.map((employee) => {
               const isSelected = selected.has(employee.id);
               return (
-                <button
+                <div
                   key={employee.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => onToggle(employee)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onToggle(employee);
+                    }
+                  }}
                   className={cn(
-                    "flex items-center justify-between gap-3 rounded-lg border p-3 text-start transition-colors",
+                    "flex cursor-pointer items-center justify-between gap-3 rounded-lg border p-3 text-start transition-colors",
                     isSelected
                       ? "border-primary bg-primary/10"
                       : "border-border bg-background/40 hover:border-primary/40",
@@ -121,9 +128,14 @@ export default function EmployeePicker({
                         {badgeLabel}
                       </span>
                     ) : null}
-                    <Checkbox checked={isSelected} tabIndex={-1} />
+                    <Checkbox
+                      checked={isSelected}
+                      tabIndex={-1}
+                      onCheckedChange={() => onToggle(employee)}
+                      onClick={(event) => event.stopPropagation()}
+                    />
                   </div>
-                </button>
+                </div>
               );
             })}
 

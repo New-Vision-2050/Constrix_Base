@@ -211,6 +211,8 @@ export default function ForumMembersView({ forumId }: { forumId: string }) {
     [t, canEdit],
   );
 
+  const columnVisibility = Table.useColumnVisibility(columns);
+
   const tableState = Table.useTableState({
     data: rows,
     columns,
@@ -222,6 +224,7 @@ export default function ForumMembersView({ forumId }: { forumId: string }) {
     loading: isLoading,
     searchable: false,
     filtered: Boolean(search || groupId),
+    columnVisibility,
   });
 
   const selectedRowIds = tableState.selection.selectedRows.map(
@@ -288,17 +291,16 @@ export default function ForumMembersView({ forumId }: { forumId: string }) {
           />
         </FilterCard>
 
-        <div className="overflow-hidden rounded-xl border border-border">
-          <Table
-            table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
-            pagination={
-              <Table.Pagination
-                state={tableState}
-                pageSizeOptions={[10, 15, 25, 50]}
-              />
-            }
-          />
-        </div>
+        <Table
+          filters={<Table.TopActions state={tableState} />}
+          table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
+          pagination={
+            <Table.Pagination
+              state={tableState}
+              pageSizeOptions={[10, 15, 25, 50]}
+            />
+          }
+        />
 
         {canEdit ? (
           <SectionCard
