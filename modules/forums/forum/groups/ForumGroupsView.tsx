@@ -238,6 +238,9 @@ export default function ForumGroupsView({ forumId }: { forumId: string }) {
     [t, can, router, forumId, restore],
   );
 
+  const columnVisibility = Table.useColumnVisibility(columns);
+  const canCreate = can([PERMISSIONS.forum.group.create]);
+
   const tableState = Table.useTableState({
     data: rows,
     columns,
@@ -249,6 +252,7 @@ export default function ForumGroupsView({ forumId }: { forumId: string }) {
     loading: isLoading,
     searchable: false,
     filtered: Boolean(search || status || sendPermission),
+    columnVisibility,
   });
 
   return (
@@ -257,14 +261,6 @@ export default function ForumGroupsView({ forumId }: { forumId: string }) {
       active="groups"
       title={t("forum.groups.title")}
       breadcrumb={t("forum.groups.breadcrumb")}
-      action={
-        can([PERMISSIONS.forum.group.create]) ? (
-          <Button onClick={() => openModal(null)}>
-            <Plus />
-            {t("forum.groups.create")}
-          </Button>
-        ) : null
-      }
     >
       <div className="flex flex-col gap-5">
         <div className="flex flex-wrap gap-4">
@@ -343,17 +339,28 @@ export default function ForumGroupsView({ forumId }: { forumId: string }) {
 
         {isError ? <Alert severity="error">{t("common.loadFailed")}</Alert> : null}
 
-        <div className="overflow-hidden rounded-xl border border-border">
-          <Table
-            table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
-            pagination={
-              <Table.Pagination
-                state={tableState}
-                pageSizeOptions={[10, 15, 25, 50]}
-              />
-            }
-          />
-        </div>
+        <Table
+          filters={
+            <Table.TopActions
+              state={tableState}
+              customActions={
+                canCreate ? (
+                  <Button onClick={() => openModal(null)}>
+                    <Plus />
+                    {t("forum.groups.create")}
+                  </Button>
+                ) : null
+              }
+            />
+          }
+          table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
+          pagination={
+            <Table.Pagination
+              state={tableState}
+              pageSizeOptions={[10, 15, 25, 50]}
+            />
+          }
+        />
       </div>
 
       <GroupDataModal

@@ -7,11 +7,13 @@ import {
   CheckCircle2,
   Megaphone,
   Pencil,
+  Plus,
   Trash2,
 } from "lucide-react";
 import { Alert } from "@mui/material";
 import HeadlessTableLayout from "@/components/headless/table";
-import { useRouter } from "@i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { Link, useRouter } from "@i18n/navigation";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { ROUTER } from "@/router";
@@ -41,6 +43,7 @@ export default function AnnouncementsTab() {
   const router = useRouter();
   const { can } = usePermissions();
   const company = useCurrentCompany();
+  const canCreate = can([PERMISSIONS.forum.announcement.create]);
 
   const [searchInput, setSearchInput] = useState("");
   const [status, setStatus] = useState<AnnouncementStatus | "">("");
@@ -171,6 +174,8 @@ export default function AnnouncementsTab() {
     [t, locale, can, router],
   );
 
+  const columnVisibility = Table.useColumnVisibility(columns);
+
   const tableState = Table.useTableState({
     data: rows,
     columns,
@@ -182,6 +187,7 @@ export default function AnnouncementsTab() {
     loading: isLoading,
     searchable: false,
     filtered: Boolean(search || status || authorId),
+    columnVisibility,
   });
 
   return (
@@ -255,17 +261,30 @@ export default function AnnouncementsTab() {
 
       {isError ? <Alert severity="error">{t("common.loadFailed")}</Alert> : null}
 
-      <div className="overflow-hidden rounded-xl border border-border">
-        <Table
-          table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
-          pagination={
-            <Table.Pagination
-              state={tableState}
-              pageSizeOptions={[10, 15, 25, 50]}
-            />
-          }
-        />
-      </div>
+      <Table
+        filters={
+          <Table.TopActions
+            state={tableState}
+            customActions={
+              canCreate ? (
+                <Button asChild>
+                  <Link href={ROUTER.FORUM_ANNOUNCEMENT_NEW}>
+                    <Plus />
+                    {t("announcements.create")}
+                  </Link>
+                </Button>
+              ) : null
+            }
+          />
+        }
+        table={<Table.Table state={tableState} loadingOptions={{ rows: 5 }} />}
+        pagination={
+          <Table.Pagination
+            state={tableState}
+            pageSizeOptions={[10, 15, 25, 50]}
+          />
+        }
+      />
 
       <ConfirmDialog
         open={Boolean(pendingDelete)}
